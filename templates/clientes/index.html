@@ -1,11 +1,22 @@
-<head>
-	<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}test.css" />
-</head>
-{% for hw in object_list %}
-  Nombres: {{hw.nombres}}<br/>
-  Apellidos: {{hw.apellidos}}<br/>
-  Fecha de Nacimiento: {{hw.fecha_nacimiento}}<br/>
-  Cedula: {{hw.cedula}}<br/>
-  RUC: {{hw.ruc}}<br/>
-{% endfor %}
-<p id="my_id001">Test: {{ STATIC_URL }}</p>
+<!DOCTYPE html>
+<html lang="es">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta name="robots" content="noindex" />
+		<title>PROPAR</title>
+		<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}test.css" />
+		<noscript>
+
+		</noscript>
+	</head>
+	<body>
+		<a href="/clientes">Clientes</a>
+		<p>Fracciones</p>
+		<p>Lotes</p>
+		<p>Vendedores</p>
+		<p>Cobradores</p>
+		<p>Movimientos</p>
+		<p>Infomres</p>
+		<p>Parametros</p>
+	</body>
+</html>
