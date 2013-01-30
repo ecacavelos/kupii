@@ -1,7 +1,7 @@
 from django import forms
 from django.forms import Form, ModelForm
 from django.forms.models import modelformset_factory
-from modulos.models import Cliente
+from datos.models import Cliente
 
 # Create the form class.
 class ClienteForm(ModelForm):

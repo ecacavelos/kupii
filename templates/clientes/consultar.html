@@ -10,7 +10,14 @@
 		</noscript>
 	</head>
 	<body>
-		<a href="consultar">Consultar Clientes</a></br>
-		<a href="agregar">Agregar Cliente</a></br>
+		{% for hw in object_list %}
+			<p>
+				Nombres: {{hw.nombres}}</br>
+				Apellidos: {{hw.apellidos}}</br>
+				Fecha de Nacimiento: {{hw.fecha_nacimiento}}</br>
+				Cedula: {{hw.cedula}}</br>
+				RUC: {{hw.ruc}}</br>
+			</p>
+		{% endfor %}
 	</body>
 </html>

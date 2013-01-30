@@ -10,7 +10,10 @@
 		</noscript>
 	</head>
 	<body>
-		<a href="consultar">Consultar Clientes</a></br>
-		<a href="agregar">Agregar Cliente</a></br>
+		<form action="" method="post">
+			{% csrf_token %}
+			{{ form.as_p }}
+			<input type="submit" value="Submit" />
+		</form>
 	</body>
 </html>
