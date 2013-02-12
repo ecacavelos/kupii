@@ -1,8 +1,11 @@
 @charset "utf-8";
 /* CSS Document */
 
-p {
-	color: green;
+body {
 	font-family: "Lucida Grande",Verdana,Arial,sans-serif;
 	font-size: 12px;
+}
+
+p {
+	color: green;		
 }
