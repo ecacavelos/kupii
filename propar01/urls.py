@@ -7,7 +7,8 @@ admin.autodiscover()
 urlpatterns = patterns('',
     url(r'^$', 'datos.views.index'),
     url(r'^clientes/', include('clientes.urls')),
-        
+    url(r'^fracciones/', include('fracciones.urls')),
+    url(r'^lotes/', include('lotes.urls')),    
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),    
     url(r'^admin/', include(admin.site.urls)),
 )

@@ -1,58 +1,93 @@
-from django.http import HttpResponse, HttpResponseRedirect, Http404
-from django.shortcuts import render_to_response
+from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext, loader
 from datos.models import Cliente
-from clientes.forms import ClienteForm
+from clientes.forms import ClienteForm, SearchForm
+from django.views.generic.list_detail import object_list
 
-# vista principal del modulo de clientes
+# Funcion principal del modulo de clientes.
 def clientes(request):
-    t = loader.get_template('clientes/index.html')    
+    t = loader.get_template('clientes/index.html')
     c = RequestContext(request, {})
     return HttpResponse(t.render(c))
 
-#vista para consultar el listado de todos los clientes
+# Funcion para consultar el listado de todos los clientes.
 def consultar_clientes(request):
-    t = loader.get_template('clientes/consultar.html')
-    object_list = Cliente.objects.all()
+    t = loader.get_template('clientes/listado.html')
+
+    if request.method == 'POST':
+        data = request.POST
+        search_form = SearchForm(data)        
+        object_list = Cliente.objects.all().order_by('id')
+        # En caso de que se haya solicitado una busqueda, filtramos de acuerdo al parametro correspondiente.
+        search_field = data.get('filtro', '')
+        message = ''
+        if data.get('boton_buscar'):
+            if data.get('buscar', '') != '':
+                if search_field == 'N':
+                    object_list = Cliente.objects.filter(nombres__iexact=data.get('buscar', '')).order_by('id')
+                elif search_field == 'A':
+                    object_list = Cliente.objects.filter(apellidos__iexact=data.get('buscar', '')).order_by('id')
+                elif search_field == 'C':
+                    object_list = Cliente.objects.filter(cedula__iexact=data.get('buscar', '')).order_by('id')
+                elif search_field == 'I':
+                    object_list = Cliente.objects.filter(id=int(data.get('buscar', '')))
+            else:
+                message = "No se ingresaron datos para la busqueda."
+    else:
+        object_list = Cliente.objects.all().order_by('id')
+        search_form = SearchForm({})
+        message = ""
+
     c = RequestContext(request, {
-        'object_list': object_list,                            
+        'object_list': object_list,
+        'search_form': search_form,
+        'message': message,
     })
     return HttpResponse(t.render(c))
 
-#vista para consultar el detalle de un cliente
+# Funcion para consultar el detalle de un cliente.
 def detalle_cliente(request, cliente_id):
     t = loader.get_template('clientes/detalle.html')
+
     object_list = Cliente.objects.get(pk=cliente_id)
-    form = ClienteForm(instance=object_list)
-    #form.save()
+    message = ''
+
+    if request.method == 'POST':
+        data = request.POST
+        if data.get('boton_guardar'):
+            form = ClienteForm(data, instance=object_list)
+            if form.is_valid():
+                message = "Se actualizaron los datos."
+                form.save(commit=False)
+                object_list.save()
+        elif data.get('boton_borrar'):
+            c = Cliente.objects.get(pk=cliente_id)
+            c.delete()
+            return HttpResponseRedirect('/clientes/listado')
+    else:
+        form = ClienteForm(instance=object_list)
+
     c = RequestContext(request, {
         'cliente': object_list,
         'form': form,
+        'message': message,
     })
     return HttpResponse(t.render(c))
-#    try:
-#        c = Cliente.objects.get(pk=cliente_id)
-#    except Cliente.DoesNotExist:
-#        raise Http404
-#    return render_to_response('clientes/detalle.html', {'cliente': c})
 
-# vista para agregar un nuevo cliente
+# Funcion para agregar un nuevo cliente.
 def agregar_clientes(request):
     t = loader.get_template('clientes/agregar.html')
-    if request.method == 'POST': # If the form has been submitted...    
+
+    if request.method == 'POST':
         form = ClienteForm(request.POST)
         if form.is_valid():
             form.save()
+            # Redireccionamos al listado de clientes luego de agregar el nuevo cliente.
             return HttpResponseRedirect('/clientes/listado')
     else:
-        form = ClienteForm()        
-        
+        form = ClienteForm()
+
     c = RequestContext(request, {
         'form': form,
     })
     return HttpResponse(t.render(c))
-
-def borrar_cliente(request, cliente_id):
-    c = Cliente.objects.get(pk=cliente_id)
-    c.delete()
-    return HttpResponseRedirect('/clientes/listado')

@@ -5,11 +5,18 @@ from datos.models import Cliente
 
 # Create the form class.
 class ClienteForm(ModelForm):
+    required_css_class = 'required'
     class Meta:
         model = Cliente
 
 class SearchForm(Form):
-    search_string = forms.CharField(max_length=100)
+    buscar = forms.CharField(max_length=100)
+    SEARCH_CHOICES = (
+        ("N", "Nombre"),
+        ("A", "Apellido"),
+        ("C", "Cedula"),
+        ("I", "ID"),
+    )
+    filtro = forms.ChoiceField(choices=SEARCH_CHOICES)
     
-ClienteFormSet = modelformset_factory(Cliente)
-
+ClienteFormSet = modelformset_factory(Cliente, extra=0, can_order=True)

@@ -10,7 +10,7 @@
 		</noscript>
 	</head>
 	<body>
-		<div id="detalle-cliente">
+		<div id="detalle-fraccion">
 			<form action="" method="post">
 				{% csrf_token %}
 				{% for field in form %}
@@ -19,12 +19,12 @@
 					{{ field.label_tag }} {{ field }}
 				</div>
 				{% endfor %}
-				<input class="cliente-form-button" type="submit" value="Agregar este Cliente" />
+				<input class="fraccion-form-button" type="submit" value="Agregar esta Fraccion" />
 			</form>
 		</div>
 		<br>
 		<div id="footer">
-			<a href="/clientes">Volver al módulo de Clientes</a>
+			<a href="/fracciones">Volver al módulo de Fracciones</a>
 		</div>
 	</body>
 </html>

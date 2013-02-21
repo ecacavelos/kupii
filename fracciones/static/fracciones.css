@@ -6,13 +6,8 @@ body {
 	font-size: 12px;
 }
 
-#listado-cuadro-busqueda {
-	border: 1px solid green;
-	padding: 8px 12px;
-}
-
-#listado-item-cliente {
-	border: 1px solid orange;
+#listado-item-fraccion {
+	border: 1px solid gray;
 	padding: 8px 12px;
 }
 
@@ -21,13 +16,13 @@ body {
 	padding: 8px 12px;
 }
 */
-/* Detalle de Clientes */
+/* Detalle de Fracciones */
 /*
-#detalle-cliente {
+#detalle-fraccion {
 	border: 1px solid rgb(204,204,204);
 }
 
-#detalle-cliente-header {
+#detalle-fraccion-header {
 	padding: 8px 12px;
 	border-bottom: 1px solid rgb(238,238,238);
 }
@@ -56,7 +51,7 @@ input[type="text"] {
 	width: 20em;
 }
 
-.cliente-form-button {
+.fraccion-form-button {
 	border: 1px solid rgb(204,204,204);
 	margin: 8px 12px;
 }

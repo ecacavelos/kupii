@@ -1,7 +1,7 @@
 from django.db import models
 
 # Create your models here.
-class Cliente(models.Model):    
+class Cliente(models.Model):
     nombres = models.CharField(max_length=255)
     apellidos = models.CharField(max_length=255)
     fecha_nacimiento = models.DateField('fecha de nacimiento')
@@ -27,19 +27,34 @@ class Cliente(models.Model):
     nombre_conyuge = models.CharField('nombre del conyuge', max_length=255, blank=True)
     def __unicode__(self):
         return (self.nombres + ' ' + self.apellidos)
-    
-class Fraccion(models.Model):        
+
+class Propietario(models.Model):
+    nombres = models.CharField(max_length=255)
+    apellidos = models.CharField(max_length=255)
+    fecha_nacimiento = models.DateField('fecha de nacimiento')
+    fecha_ingreso = models.DateField('fecha de ingreso')
+    cedula = models.CharField(max_length=8)
+    ruc = models.CharField(max_length=255)
+    direccion_particular = models.CharField(max_length=255)
+    telefono_particular = models.CharField(max_length=255)
+    celular_1 = models.CharField(max_length=255)
+    celular_2 = models.CharField(max_length=255, blank=True)
+    def __unicode__(self):
+        return (self.nombres + ' ' + self.apellidos)
+
+class Fraccion(models.Model):
     nombre = models.CharField(max_length=255)
     ubicacion = models.CharField(max_length=255)
-    propietario = models.ForeignKey(Cliente)
+    #propietario = models.ForeignKey(Propietario, blank=True, null=True, on_delete=models.SET_NULL)
     cantidad_manzanas = models.IntegerField()
     cantidad_lotes = models.IntegerField()
-    finca = models.CharField(max_length=255)
-    aprobacion_municipal_nro = models.CharField(max_length=255)
-    fecha_aprobacion = models.DateField('fecha de aprobacion')
-    superficie_total = models.IntegerField()
+    distrito = models.CharField(max_length=255)
+    finca = models.CharField(max_length=255, blank=True)
+    aprobacion_municipal_nro = models.CharField(max_length=255, blank=True)
+    fecha_aprobacion = models.DateField('fecha de aprobacion', blank=True, null=True)
+    superficie_total = models.IntegerField(blank=True, null=True)
     def __unicode__(self):
-        return (self.nombre + ' --- ' + self.ubicacion)
+        return (self.nombre + ' - ' + self.ubicacion)
     class Meta:
         verbose_name_plural = "fracciones"
         
@@ -84,17 +99,3 @@ class Cobrador(models.Model):
         return (self.nombres + ' ' + self.apellidos)
     class Meta:
         verbose_name_plural = "cobradores"
-        
-class Propietario(models.Model):
-    nombres = models.CharField(max_length=255)
-    apellidos = models.CharField(max_length=255)
-    fecha_nacimiento = models.DateField('fecha de nacimiento')
-    fecha_ingreso = models.DateField('fecha de ingreso')
-    cedula = models.CharField(max_length=8)
-    ruc = models.CharField(max_length=255)
-    direccion_particular = models.CharField(max_length=255)
-    telefono_particular = models.CharField(max_length=255)
-    celular_1 = models.CharField(max_length=255)
-    celular_2 = models.CharField(max_length=255, blank=True)
-    def __unicode__(self):
-        return (self.nombres + ' ' + self.apellidos)

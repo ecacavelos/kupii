@@ -10,9 +10,15 @@
 		</noscript>
 	</head>
 	<body>
-		<a href="listado">Consultar Clientes</a><br>
-		<a href="agregar">Agregar Cliente</a><br>
-		<br>
-		<a href="/">Volver a la Pagina Inicial</a>
+		{% for hw in object_list %}
+		<div id="listado-item-fraccion">
+			<a href="{{hw.id}}">{{hw.id}}</a>
+			<br>
+			Nombre: {{hw.nombre}}<br>
+			Ubicación: {{hw.ubicacion}}<br>
+		</div>
+		{% endfor %}
+		
+		<div id="footer"><a href="/fracciones">Volver al módulo de Fracciones</a></div>
 	</body>
 </html>

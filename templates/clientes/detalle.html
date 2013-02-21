@@ -4,35 +4,32 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 		<meta name="robots" content="noindex" />
 		<title>PROPAR</title>
-		<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}clientes.css" />
+		<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}datos.css" />
 		<noscript>
 
 		</noscript>
 	</head>
 	<body>
 		<div id="detalle-cliente">
-			<!--Nombres: {{cliente.nombres}}</br>
-			Apellidos: {{cliente.apellidos}}</br>
-			Fecha de Nacimiento: {{cliente.fecha_nacimiento}}</br>
-			Cedula: {{cliente.cedula}}</br>
-			RUC: {{cliente.ruc}}</br>
-			Género: {{cliente.sexo}}</br>
-			Estado Civil: {{cliente.estado_civil}}</br>
-			Dirección Particular: {{cliente.direccion_particular}}</br>
-			Dirección de Cobro: {{cliente.direccion_cobro}}</br>
-			Teléfono Particular: {{cliente.telefono_particular}}</br>
-			Teléfono Laboral: {{cliente.telefono_laboral}}</br>
-			Celular 1: {{cliente.celular_1}}</br>
-			Celular 2: {{cliente.celular_2}}</br>
-			Nombre del Cónyuge: {{cliente.nombre_conyuge}}</br>-->
-			{{cliente.id}}
-			<form action="/clientes/borrar/{{ cliente.id }}/" method="post">
+			<div id="detalle-cliente-header">
+				{{cliente.id}}
+			</div>
+			{{ message }}
+			<form action="/clientes/listado/{{ cliente.id }}/" method="post">
 				{% csrf_token %}
-				{{ form.as_p }}
-				<input type="submit" value="Borrar este Registro" />
+				{% for field in form %}
+				<div class="fieldWrapper{% if field.field.required %} required{% endif %}">
+					{{ field.errors }}
+					{{ field.label_tag }} {{ field }}
+				</div>
+				{% endfor %}
+				<input class="cliente-form-button" type="submit" name="boton_guardar" value="Guardar Cambios" />
+				<input class="cliente-form-button" type="submit" name="boton_borrar" value="Borrar este Registro" />
 			</form>
 		</div>
-		</br>
-		<a href="/clientes/listado">Volver al Listado de Clientes</a>
+		<br>
+		<div id="footer">
+			<a href="/clientes/listado">Volver al Listado de Clientes</a>
+		</div>
 	</body>
 </html>

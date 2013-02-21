@@ -2,10 +2,61 @@
 /* CSS Document */
 
 body {
-	font-family: "Lucida Grande",Verdana,Arial,sans-serif;
+	font-family: "Lucida Grande", Verdana, Arial, sans-serif;
 	font-size: 12px;
 }
 
-p {
-	color: green;		
+#listado-cuadro-busqueda {
+	border: 1px solid blue;
+	padding: 8px 12px;
+}
+
+#listado-item-cliente, #listado-item-fraccion {
+	border: 1px solid gray;
+	padding: 8px 12px;
+}
+
+#footer {
+	border: 1px solid blue;
+	padding: 8px 12px;
+}
+
+/* Detalle de Fracciones */
+
+#detalle-cliente, #detalle-fraccion {
+	border: 1px solid rgb(204,204,204);
+}
+
+#detalle-cliente-header, #detalle-fraccion-header {
+	padding: 8px 12px;
+	border-bottom: 1px solid rgb(238,238,238);
+}
+
+.fieldWrapper {
+	padding: 8px 12px;
+	border-bottom: 1px solid rgb(238,238,238);
+}
+
+label {
+	width: 8em;
+	display: inline-block;
+	vertical-align: top;
+}
+.required {
+	font-weight: bold;
+}
+
+input[type="text"], select {
+	border: 1px solid rgb(204,204,204);
+	font-size: 11px;
+	font-family: "Lucida Grande", Verdana, Arial, sans-serif;
+	padding: 2px 3px;
+}
+input[type="text"] {
+	width: 20em;
+}
+
+.cliente-form-button, .fraccion-form-button {
+	border: 1px solid rgb(204,204,204);
+	margin: 8px 12px;
 }
