@@ -30,14 +30,14 @@ class Cliente(models.Model):
 
 class Propietario(models.Model):
     nombres = models.CharField(max_length=255)
-    apellidos = models.CharField(max_length=255)
-    fecha_nacimiento = models.DateField('fecha de nacimiento')
+    apellidos = models.CharField(max_length=255, blank=True)
+    fecha_nacimiento = models.DateField('fecha de nacimiento', blank=True, null=True)
     fecha_ingreso = models.DateField('fecha de ingreso')
-    cedula = models.CharField(max_length=8)
-    ruc = models.CharField(max_length=255)
-    direccion_particular = models.CharField(max_length=255)
-    telefono_particular = models.CharField(max_length=255)
-    celular_1 = models.CharField(max_length=255)
+    cedula = models.CharField(max_length=8, blank=True)
+    ruc = models.CharField(max_length=255, blank=True)
+    direccion_particular = models.CharField(max_length=255, blank=True)
+    telefono_particular = models.CharField(max_length=255, blank=True)
+    celular_1 = models.CharField(max_length=255, blank=True)
     celular_2 = models.CharField(max_length=255, blank=True)
     def __unicode__(self):
         return (self.nombres + ' ' + self.apellidos)
@@ -45,7 +45,7 @@ class Propietario(models.Model):
 class Fraccion(models.Model):
     nombre = models.CharField(max_length=255)
     ubicacion = models.CharField(max_length=255)
-    #propietario = models.ForeignKey(Propietario, blank=True, null=True, on_delete=models.SET_NULL)
+    propietario = models.ForeignKey(Propietario)
     cantidad_manzanas = models.IntegerField()
     cantidad_lotes = models.IntegerField()
     distrito = models.CharField(max_length=255)
@@ -58,7 +58,9 @@ class Fraccion(models.Model):
     class Meta:
         verbose_name_plural = "fracciones"
         
-class Lote(models.Model):    
+class Lote(models.Model):
+    fraccion = models.ForeignKey(Fraccion)
+    manzana = models.IntegerField()
     precio_contado = models.IntegerField()
     precio_credito = models.IntegerField()
     precio_costo = models.IntegerField('precio de costo')
@@ -71,14 +73,14 @@ class Lote(models.Model):
 class Vendedor(models.Model):
     nombres = models.CharField(max_length=255)
     apellidos = models.CharField(max_length=255)
-    fecha_nacimiento = models.DateField('fecha de nacimiento')
-    fecha_ingreso = models.DateField('fecha de ingreso')
+    #fecha_nacimiento = models.DateField('fecha de nacimiento')    
     cedula = models.CharField(max_length=8)
-    ruc = models.CharField(max_length=255)
-    direccion_particular = models.CharField(max_length=255)
-    telefono_particular = models.CharField(max_length=255)
-    celular_1 = models.CharField(max_length=255)
-    celular_2 = models.CharField(max_length=255, blank=True)
+    #ruc = models.CharField(max_length=255)
+    direccion = models.CharField('direccion del vendedor', max_length=255)
+    telefono = models.CharField(max_length=255)
+    celular_1 = models.CharField(max_length=255, blank=True)
+    #celular_2 = models.CharField(max_length=255, blank=True)
+    fecha_ingreso = models.DateField('fecha de ingreso')
     def __unicode__(self):
         return (self.nombres + ' ' + self.apellidos)
     class Meta:
@@ -87,14 +89,14 @@ class Vendedor(models.Model):
 class Cobrador(models.Model):
     nombres = models.CharField(max_length=255)
     apellidos = models.CharField(max_length=255)
-    fecha_nacimiento = models.DateField('fecha de nacimiento')
-    fecha_ingreso = models.DateField('fecha de ingreso')
-    cedula = models.CharField(max_length=8)
-    ruc = models.CharField(max_length=255)
-    direccion_particular = models.CharField(max_length=255)
+    #fecha_nacimiento = models.DateField('fecha de nacimiento')    
+    cedula = models.CharField(max_length=8, blank=True)
+    #ruc = models.CharField(max_length=255)
+    direccion = models.CharField('direccion del cobrador', max_length=255)
     telefono_particular = models.CharField(max_length=255)
-    celular_1 = models.CharField(max_length=255)
-    celular_2 = models.CharField(max_length=255, blank=True)
+    celular_1 = models.CharField(max_length=255, blank=True)
+    #celular_2 = models.CharField(max_length=255, blank=True)
+    fecha_ingreso = models.DateField('fecha de ingreso')
     def __unicode__(self):
         return (self.nombres + ' ' + self.apellidos)
     class Meta:

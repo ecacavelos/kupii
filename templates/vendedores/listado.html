@@ -7,12 +7,18 @@
 		<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}datos.css" />
 		<noscript>
 
-		</noscript>
+		</noscript>		
 	</head>
 	<body>
-		<a href="listado">Consultar Lotes</a><br>
-		<a href="agregar">Agregar Lote</a><br>
-		<br>
-		<a href="/">Volver a la Pagina Inicial</a>
+		{% for hw in object_list %}
+		<div id="listado-item-vendedor">
+			<a href="{{hw.id}}">{{hw.id}}</a>
+			<br>
+			Nombres: {{hw.nombres}}<br>
+			Apellidos: {{hw.apellidos}}<br>			
+		</div>
+		{% endfor %}
+		
+		<div id="footer"><a href="/vendedores">Volver al módulo de Vendedores</a></div>
 	</body>
 </html>
