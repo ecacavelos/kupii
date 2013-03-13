@@ -8,6 +8,7 @@ class ClienteForm(ModelForm):
     required_css_class = 'required'
     class Meta:
         model = Cliente
+        exclude = ('deuda_contraida')
 
 class SearchForm(Form):
     buscar = forms.CharField(max_length=100)

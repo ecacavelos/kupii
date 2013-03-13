@@ -1,0 +1,13 @@
+{% extends "informes/base_informes.html" %}
+
+{% block content %}
+{% for hw in object_list %}
+<div id="informe-item-lote">
+	<a href="{{hw.id}}">{{hw}}</a>
+	<br>
+	Fraccion: {{hw.fraccion}}<br>
+</div>
+{% endfor %}
+
+<div id="footer"><a href="/informes">Volver al módulo de Informes</a></div>
+{% endblock %}

@@ -730,7 +730,7 @@ table#change-history tbody th {
 }
 
 #content-related {
-	display: none; /* para ocultar el recuadro de acciones relacionadas */
+	/*display: none;*/ /* para ocultar el recuadro de acciones relacionadas */
     float: right;
     width: 18em;
     position: relative;

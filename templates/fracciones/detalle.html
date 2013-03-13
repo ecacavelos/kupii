@@ -1,35 +1,25 @@
-<!DOCTYPE html>
-<html lang="es">
-	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-		<meta name="robots" content="noindex" />
-		<title>PROPAR</title>
-		<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}datos.css" />
-		<noscript>
+{% extends "fracciones/base_fracciones.html" %}
 
-		</noscript>
-	</head>
-	<body>
-		<div id="detalle-fraccion">
-			<div id="detalle-fraccion-header">
-				{{ fraccion.id }}
-			</div>
-			{{ message }}
-			<form action="/fracciones/listado/{{ fraccion.id }}/" method="post">
-				{% csrf_token %}
-				{% for field in form %}
-				<div class="fieldWrapper{% if field.field.required %} required{% endif %}">
-					{{ field.errors }}
-					{{ field.label_tag }} {{ field }}
-				</div>
-				{% endfor %}
-				<input class="fraccion-form-button" type="submit" name="boton_guardar" value="Guardar Cambios" />
-				<input class="fraccion-form-button" type="submit" name="boton_borrar" value="Borrar este Registro" />
-			</form>
+{% block content %}
+<div id="detalle-fraccion">
+	<div id="detalle-fraccion-header">
+		{{ fraccion.id }}
+	</div>
+	<div>{{ message }}</div>
+	<form action="/fracciones/listado/{{ fraccion.id }}/" method="post">
+		{% csrf_token %}
+		{% for field in form %}
+		<div class="fieldWrapper{% if field.field.required %} required{% endif %}">
+			{{ field.errors }}
+			{{ field.label_tag }} {{ field }}
 		</div>
-		<br>
-		<div id="footer">
-			<a href="/fracciones/listado">Volver al Listado de Fracciones</a>
-		</div>
-	</body>
-</html>
+		{% endfor %}
+		<input class="fraccion-form-button" type="submit" name="boton_guardar" value="Guardar Cambios" />
+		<input class="fraccion-form-button" type="submit" name="boton_borrar" value="Borrar este Registro" />
+	</form>
+</div>
+<br>
+<div id="footer">
+	<a href="/fracciones/listado">Volver al Listado de Fracciones</a>
+</div>
+{% endblock %}

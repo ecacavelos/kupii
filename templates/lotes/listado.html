@@ -1,25 +1,18 @@
-<!DOCTYPE html>
-<html lang="es">
-	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-		<meta name="robots" content="noindex" />
-		<title>PROPAR</title>
-		<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}datos.css" />
-		<noscript>
+{% extends "lotes/base_lotes.html" %}
 
-		</noscript>
-		{% load apptags %}
-	</head>
-	<body>
-		{% for hw in object_list %}
-		<div id="listado-item-lote">
-			<a href="{{hw.id}}">{{ hw.fraccion.id|leading_zeros:3 }}/{{ hw.manzana|leading_zeros:3 }}/{{ hw.id|leading_zeros:4 }}</a>
-			<br>
-			Precio Contado: {{hw.precio_contado}}<br>
-			Precio Crédito: {{hw.precio_credito}}<br>
-		</div>
-		{% endfor %}
-		
-		<div id="footer"><a href="/lotes">Volver al módulo de Lotes</a></div>
-	</body>
-</html>
+{% block content %}
+<div id="listado-cuadro-busqueda">
+	<a href="/lotes/agregar">Agregar Lote</a><br>
+</div>
+{% for hw in object_list %}
+<div id="listado-item-lote">
+	<a href="{{hw.id}}">{{hw}}</a>
+	<br>
+	Fraccion: {{hw.fraccion}}<br>
+	Precio Contado: {{hw.precio_contado}}<br>
+	Precio Crédito: {{hw.precio_credito}}<br>
+</div>
+{% endfor %}
+
+<div id="footer"><a href="/lotes">Volver al módulo de Lotes</a></div>
+{% endblock %}

@@ -1,30 +1,20 @@
-<!DOCTYPE html>
-<html lang="es">
-	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-		<meta name="robots" content="noindex" />
-		<title>PROPAR</title>
-		<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}datos.css" />
-		<noscript>
+{% extends "fracciones/base_fracciones.html" %}
 
-		</noscript>
-	</head>
-	<body>
-		<div id="detalle-fraccion">
-			<form action="" method="post">
-				{% csrf_token %}
-				{% for field in form %}
-				<div class="fieldWrapper{% if field.field.required %} required{% endif %}">
-					{{ field.errors }}
-					{{ field.label_tag }} {{ field }}
-				</div>
-				{% endfor %}
-				<input class="fraccion-form-button" type="submit" value="Agregar esta Fraccion" />
-			</form>
+{% block content %}
+<div id="detalle-fraccion">
+	<form action="" method="post">
+		{% csrf_token %}
+		{% for field in form %}
+		<div class="fieldWrapper{% if field.field.required %} required{% endif %}">
+			{{ field.errors }}
+			{{ field.label_tag }} {{ field }}
 		</div>
-		<br>
-		<div id="footer">
-			<a href="/fracciones">Volver al módulo de Fracciones</a>
-		</div>
-	</body>
-</html>
+		{% endfor %}
+		<input class="fraccion-form-button" type="submit" value="Agregar esta Fraccion" />
+	</form>
+</div>
+<br>
+<div id="footer">
+	<a href="/fracciones">Volver al módulo de Fracciones</a>
+</div>
+{% endblock %}

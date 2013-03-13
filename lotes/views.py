@@ -13,7 +13,7 @@ def lotes(request):
 def consultar_lotes(request):
     t = loader.get_template('lotes/listado.html')
     
-    object_list = Lote.objects.all().order_by('id')
+    object_list = Lote.objects.all().order_by('fraccion', 'manzana', 'nro_lote')
     
     c = RequestContext(request, {
         'object_list': object_list,
@@ -26,6 +26,7 @@ def detalle_lote(request, lote_id):
 
     object_list = Lote.objects.get(pk=lote_id)
     message = ''
+    message_id = "message"
 
     if request.method == 'POST':
         data = request.POST
@@ -33,6 +34,7 @@ def detalle_lote(request, lote_id):
             form = LoteForm(data, instance=object_list)
             if form.is_valid():
                 message = "Se actualizaron los datos."
+                message_id = "message-success"
                 form.save(commit=False)
                 object_list.save()
         elif data.get('boton_borrar'):
@@ -45,6 +47,7 @@ def detalle_lote(request, lote_id):
     c = RequestContext(request, {
         'lote': object_list,
         'form': form,
+        'message_id': message_id,
         'message': message,
     })
     return HttpResponse(t.render(c))

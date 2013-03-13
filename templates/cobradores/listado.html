@@ -1,24 +1,15 @@
-<!DOCTYPE html>
-<html lang="es">
-	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-		<meta name="robots" content="noindex" />
-		<title>PROPAR</title>
-		<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}datos.css" />
-		<noscript>
+{% extends "cobradores/base_cobradores.html" %}
 
-		</noscript>		
-	</head>
-	<body>
-		{% for hw in object_list %}
-		<div id="listado-item-cobrador">
-			<a href="{{hw.id}}">{{hw.id}}</a>
-			<br>
-			Nombres: {{hw.nombres}}<br>
-			Apellidos: {{hw.apellidos}}<br>			
-		</div>
-		{% endfor %}
-		
-		<div id="footer"><a href="/cobradores">Volver al módulo de Cobradores</a></div>
-	</body>
-</html>
+{% block content %}
+{% for hw in object_list %}
+<div id="listado-item-cobrador">
+	<a href="{{hw.id}}">{{hw.id}}</a><br>
+	Nombres: {{hw.nombres}}<br>
+	Apellidos: {{hw.apellidos}}<br>
+</div>
+{% endfor %}
+
+<div id="footer">
+	<a href="/cobradores">Volver al módulo de Cobradores</a>
+</div>
+{% endblock %}

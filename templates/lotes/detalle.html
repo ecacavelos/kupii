@@ -1,36 +1,27 @@
-<!DOCTYPE html>
-<html lang="es">
-	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-		<meta name="robots" content="noindex" />
-		<title>PROPAR</title>
-		<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}datos.css" />
-		<noscript>
+{% extends "lotes/base_lotes.html" %}
 
-		</noscript>
-		{% load apptags %}
-	</head>
-	<body>
-		<div id="detalle-lote">
-			<div id="detalle-lote-header">
-				{{ lote.fraccion.id|leading_zeros:3 }}/{{ lote.manzana|leading_zeros:3 }}/{{ lote.id|leading_zeros:4 }}
-			</div>
-			{{ message }}
-			<form action="/lotes/listado/{{ lote.id }}/" method="post">
-				{% csrf_token %}
-				{% for field in form %}
-				<div class="fieldWrapper{% if field.field.required %} required{% endif %}">
-					{{ field.errors }}
-					{{ field.label_tag }} {{ field }}
-				</div>
-				{% endfor %}
-				<input class="lote-form-button" type="submit" name="boton_guardar" value="Guardar Cambios" />
-				<input class="lote-form-button" type="submit" name="boton_borrar" value="Borrar este Registro" />
-			</form>
+{% block content %}
+<div id="detalle-lote">
+	<div id="detalle-lote-header">
+		{{ lote }}
+	</div>
+	{% if message_id == "message-success" %}		
+		<div id="{{message_id}}">{{ message }}</div>
+	{% endif %}
+	<form action="/lotes/listado/{{ lote.id }}/" method="post">
+		{% csrf_token %}
+		{% for field in form %}
+		<div class="fieldWrapper{% if field.field.required %} required{% endif %}">
+			{{ field.errors }}
+			{{ field.label_tag }} {{ field }}
 		</div>
-		<br>
-		<div id="footer">
-			<a href="/lotes/listado">Volver al Listado de Lotes</a>
-		</div>
-	</body>
-</html>
+		{% endfor %}
+		<input class="lote-form-button" type="submit" name="boton_guardar" value="Guardar Cambios" />
+		<input class="lote-form-button" type="submit" name="boton_borrar" value="Borrar este Registro" />
+	</form>
+</div>
+<br>
+<div id="footer">
+	<a href="/lotes/listado">Volver al Listado de Lotes</a>
+</div>
+{% endblock %}

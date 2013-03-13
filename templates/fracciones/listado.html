@@ -1,24 +1,14 @@
-<!DOCTYPE html>
-<html lang="es">
-	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-		<meta name="robots" content="noindex" />
-		<title>PROPAR</title>
-		<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}datos.css" />
-		<noscript>
+{% extends "fracciones/base_fracciones.html" %}
 
-		</noscript>
-	</head>
-	<body>
-		{% for hw in object_list %}
-		<div id="listado-item-fraccion">
-			<a href="{{hw.id}}">{{hw.id}}</a>
-			<br>
-			Nombre: {{hw.nombre}}<br>
-			Ubicación: {{hw.ubicacion}}<br>
-		</div>
-		{% endfor %}
-		
-		<div id="footer"><a href="/fracciones">Volver al módulo de Fracciones</a></div>
-	</body>
-</html>
+{% block content %}
+{% for hw in object_list %}
+<div id="listado-item-fraccion">
+	<a href="{{hw.id}}">{{hw.id}}</a>
+	<br>
+	Nombre: {{hw.nombre}}<br>
+	Ubicación: {{hw.ubicacion}}<br>
+</div>
+{% endfor %}
+
+<div id="footer"><a href="/fracciones">Volver al módulo de Fracciones</a></div>
+{% endblock %}

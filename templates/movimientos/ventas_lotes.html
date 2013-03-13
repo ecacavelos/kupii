@@ -1,0 +1,21 @@
+{% extends "movimientos/base_movimientos.html" %}
+
+{% block java_scripts %}
+<!--<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>-->
+<script type="text/javascript" src="{{ STATIC_URL }}movimientos.js"></script>
+{% endblock %}
+
+{% block content %}
+<div id="listado-cuadro-busqueda">
+	{{message}}
+	<form id="lote_identifier_form" action="" method="post">
+		{% csrf_token %}
+		Lote: {{ identifier_form.buscar }}<br>
+		Nombre de la Fracción: {% for hw in object_list %}{{hw.fraccion.nombre}}{% endfor %}
+	</form>
+</div>
+
+<div id="footer">
+	<a href="/movimientos">Volver al módulo de Movimientos</a>
+</div>
+{% endblock %}

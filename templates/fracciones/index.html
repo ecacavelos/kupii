@@ -1,18 +1,8 @@
-<!DOCTYPE html>
-<html lang="es">
-	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-		<meta name="robots" content="noindex" />
-		<title>PROPAR</title>
-		<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}datos.css" />
-		<noscript>
+{% extends "fracciones/base_fracciones.html" %}
 
-		</noscript>
-	</head>
-	<body>
-		<a href="listado">Consultar Fracciones</a><br>
-		<a href="agregar">Agregar Fracción</a><br>
-		<br>
-		<a href="/">Volver a la Pagina Inicial</a>
-	</body>
-</html>
+{% block content %}
+<a href="listado">Consultar Fracciones</a><br>
+<a href="agregar">Agregar Fracción</a><br>
+<br>
+<a href="/">Volver a la Pagina Inicial</a>
+{% endblock %}

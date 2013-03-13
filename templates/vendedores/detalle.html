@@ -1,35 +1,25 @@
-<!DOCTYPE html>
-<html lang="es">
-	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-		<meta name="robots" content="noindex" />
-		<title>PROPAR</title>
-		<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}datos.css" />
-		<noscript>
+{% extends "vendedores/base_vendedores.html" %}
 
-		</noscript>
-	</head>
-	<body>
-		<div id="detalle-vendedor">
-			<div id="detalle-vendedor-header">
-				{{ vendedor.id }}
-			</div>
-			{{ message }}
-			<form action="/vendedores/listado/{{ vendedor.id }}/" method="post">
-				{% csrf_token %}
-				{% for field in form %}
-				<div class="fieldWrapper{% if field.field.required %} required{% endif %}">
-					{{ field.errors }}
-					{{ field.label_tag }} {{ field }}
-				</div>
-				{% endfor %}
-				<input class="vendedor-form-button" type="submit" name="boton_guardar" value="Guardar Cambios" />
-				<input class="vendedor-form-button" type="submit" name="boton_borrar" value="Borrar este Registro" />
-			</form>
+{% block content %}
+<div id="detalle-vendedor">
+	<div id="detalle-vendedor-header">
+		{{ vendedor.id }}
+	</div>
+	<div>{{ message }}</div>
+	<form action="/vendedores/listado/{{ vendedor.id }}/" method="post">
+		{% csrf_token %}
+		{% for field in form %}
+		<div class="fieldWrapper{% if field.field.required %} required{% endif %}">
+			{{ field.errors }}
+			{{ field.label_tag }} {{ field }}
 		</div>
-		<br>
-		<div id="footer">
-			<a href="/vendedores/listado">Volver al Listado de Vendedores</a>
-		</div>
-	</body>
-</html>
+		{% endfor %}
+		<input class="vendedor-form-button" type="submit" name="boton_guardar" value="Guardar Cambios" />
+		<input class="vendedor-form-button" type="submit" name="boton_borrar" value="Borrar este Registro" />
+	</form>
+</div>
+<br>
+<div id="footer">
+	<a href="/vendedores/listado">Volver al Listado de Vendedores</a>
+</div>
+{% endblock %}

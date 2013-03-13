@@ -16,12 +16,29 @@ body {
 	padding: 8px 12px;
 }
 
+#informe-item-lote {
+	border: 1px dotted gray;
+	padding: 8px 12px;
+}
+
 #footer {
 	border: 1px solid blue;
 	padding: 8px 12px;
 }
 
+ul.errorlist {
+	list-style-type: none;
+	padding: 8px 0px;
+	margin: 0px;
+	color: red;
+}
+
 /* Detalle de Fracciones */
+
+#message-success {
+	padding: 8px 12px;
+	border: 1px solid rgb(102,204,102);
+}
 
 #detalle-cliente, #detalle-fraccion, #detalle-lote, #detalle-vendedor, #detalle-cobrador {
 	border: 1px solid rgb(204,204,204);
@@ -40,7 +57,7 @@ body {
 label {
 	width: 8em;
 	display: inline-block;
-	vertical-align: top;
+	vertical-align: middle;
 }
 .required {
 	font-weight: bold;

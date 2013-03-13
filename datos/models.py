@@ -1,6 +1,5 @@
 from django.db import models
 
-# Create your models here.
 class Cliente(models.Model):
     nombres = models.CharField(max_length=255)
     apellidos = models.CharField(max_length=255)
@@ -25,6 +24,7 @@ class Cliente(models.Model):
     celular_1 = models.CharField(max_length=255)
     celular_2 = models.CharField(max_length=255, blank=True)
     nombre_conyuge = models.CharField('nombre del conyuge', max_length=255, blank=True)
+    deuda_contraida = models.BigIntegerField(blank=True, null=True)
     def __unicode__(self):
         return (self.nombres + ' ' + self.apellidos)
 
@@ -52,52 +52,90 @@ class Fraccion(models.Model):
     finca = models.CharField(max_length=255, blank=True)
     aprobacion_municipal_nro = models.CharField(max_length=255, blank=True)
     fecha_aprobacion = models.DateField('fecha de aprobacion', blank=True, null=True)
-    superficie_total = models.IntegerField(blank=True, null=True)
+    superficie_total = models.DecimalField(max_digits=8, decimal_places=2, blank=True, null=True)
     def __unicode__(self):
-        return (self.nombre + ' - ' + self.ubicacion)
+        return (self.nombre)
     class Meta:
         verbose_name_plural = "fracciones"
-        
-class Lote(models.Model):
-    fraccion = models.ForeignKey(Fraccion)
-    manzana = models.IntegerField()
-    precio_contado = models.IntegerField()
-    precio_credito = models.IntegerField()
-    precio_costo = models.IntegerField('precio de costo')
-    superficie = models.IntegerField('superficie (m2)')
-    cuenta_corriente_catastral = models.CharField(max_length=255)
-    boleto_nro = models.IntegerField()
-    def __unicode__(self):
-        return ('Lote - Cuenta Corriente: ' + str(self.cuenta_corriente_catastral))
     
 class Vendedor(models.Model):
     nombres = models.CharField(max_length=255)
     apellidos = models.CharField(max_length=255)
-    #fecha_nacimiento = models.DateField('fecha de nacimiento')    
+    # fecha_nacimiento = models.DateField('fecha de nacimiento')    
     cedula = models.CharField(max_length=8)
-    #ruc = models.CharField(max_length=255)
+    # ruc = models.CharField(max_length=255)
     direccion = models.CharField('direccion del vendedor', max_length=255)
     telefono = models.CharField(max_length=255)
     celular_1 = models.CharField(max_length=255, blank=True)
-    #celular_2 = models.CharField(max_length=255, blank=True)
+    # celular_2 = models.CharField(max_length=255, blank=True)
     fecha_ingreso = models.DateField('fecha de ingreso')
     def __unicode__(self):
         return (self.nombres + ' ' + self.apellidos)
     class Meta:
         verbose_name_plural = "vendedores"
-        
+
 class Cobrador(models.Model):
     nombres = models.CharField(max_length=255)
     apellidos = models.CharField(max_length=255)
-    #fecha_nacimiento = models.DateField('fecha de nacimiento')    
+    # fecha_nacimiento = models.DateField('fecha de nacimiento')    
     cedula = models.CharField(max_length=8, blank=True)
-    #ruc = models.CharField(max_length=255)
+    # ruc = models.CharField(max_length=255)
     direccion = models.CharField('direccion del cobrador', max_length=255)
     telefono_particular = models.CharField(max_length=255)
     celular_1 = models.CharField(max_length=255, blank=True)
-    #celular_2 = models.CharField(max_length=255, blank=True)
+    # celular_2 = models.CharField(max_length=255, blank=True)
     fecha_ingreso = models.DateField('fecha de ingreso')
     def __unicode__(self):
         return (self.nombres + ' ' + self.apellidos)
     class Meta:
         verbose_name_plural = "cobradores"
+
+class PlanDeVendedores(models.Model):
+    nombre_del_plan = models.CharField(max_length=255)
+    def __unicode__(self):
+        return (self.nombre_del_plan)
+    class Meta:
+        verbose_name_plural = "planes de vendedores"
+
+class PlanDePagos(models.Model):
+    nombre_del_plan = models.CharField(max_length=255)
+    def __unicode__(self):
+        return (self.nombre_del_plan)
+    class Meta:
+        verbose_name_plural = "planes de pagos"
+        
+class Lote(models.Model):
+    fraccion = models.ForeignKey(Fraccion)
+    manzana = models.IntegerField()
+    nro_lote = models.IntegerField()
+    precio_contado = models.IntegerField()
+    precio_credito = models.IntegerField()
+    precio_de_cuota = models.IntegerField()
+    superficie = models.DecimalField('superficie (m2)', max_digits=8, decimal_places=2)
+    cuenta_corriente_catastral = models.CharField(max_length=255, blank=True)
+    boleto_nro = models.IntegerField(blank=True, null=True)
+    ESTADO_CHOICES = (
+        ("1", "Libre"),
+        ("2", "2"),
+        ("3", "Vendido"),
+        ("4", "4"),
+        ("5", "Recuperado"),
+    )
+    estado = models.CharField(max_length=1, choices=ESTADO_CHOICES)    
+    def __unicode__(self):
+        return (str(self.fraccion.id).zfill(3) + "/" + str(self.manzana).zfill(3) + "/" + str(self.nro_lote).zfill(4))
+    class Meta:
+        unique_together = (("fraccion", "manzana", "nro_lote"),)
+
+class Venta(models.Model):
+    lote = models.ForeignKey(Lote)
+    fecha_de_venta = models.DateField()
+    cliente = models.ForeignKey(Cliente)
+    vendedor = models.ForeignKey(Vendedor)
+    plan_de_vendedor = models.ForeignKey(PlanDeVendedores)
+    plan_de_pago = models.ForeignKey(PlanDePagos)
+    cuota_inicial = models.BigIntegerField()
+    precio_de_cuota = models.BigIntegerField()
+    cuota_de_refuerzo = models.BigIntegerField()    
+    def __unicode__(self):
+        return (self.id)
