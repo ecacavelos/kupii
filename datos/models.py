@@ -26,7 +26,7 @@ class Cliente(models.Model):
     nombre_conyuge = models.CharField('nombre del conyuge', max_length=255, blank=True)
     deuda_contraida = models.BigIntegerField(blank=True, null=True)
     def __unicode__(self):
-        return (self.nombres + ' ' + self.apellidos)
+        return (str(self.nombres) + ' ' + str(self.apellidos))
 
 class Propietario(models.Model):
     nombres = models.CharField(max_length=255)
@@ -99,6 +99,8 @@ class PlanDeVendedores(models.Model):
 
 class PlanDePagos(models.Model):
     nombre_del_plan = models.CharField(max_length=255)
+    tipo_de_plan = models.BooleanField('Plan a Credito')
+    cantidad_de_cuotas = models.IntegerField(blank=True, null=True)
     def __unicode__(self):
         return (self.nombre_del_plan)
     class Meta:
@@ -134,8 +136,11 @@ class Venta(models.Model):
     vendedor = models.ForeignKey(Vendedor)
     plan_de_vendedor = models.ForeignKey(PlanDeVendedores)
     plan_de_pago = models.ForeignKey(PlanDePagos)
-    cuota_inicial = models.BigIntegerField()
+    entrega_inicial = models.BigIntegerField()
     precio_de_cuota = models.BigIntegerField()
-    cuota_de_refuerzo = models.BigIntegerField()    
+    cuota_de_refuerzo = models.BigIntegerField()
+    precio_final_de_venta = models.BigIntegerField()
+    fecha_primer_vencimiento = models.DateField()
+    pagos_realizados = models.IntegerField(blank=True, null=True)
     def __unicode__(self):
-        return (self.id)
+        return (str(self.lote) + " a " + self.cliente.nombres + " " + self.cliente.apellidos)

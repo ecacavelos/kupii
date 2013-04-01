@@ -15,7 +15,7 @@ class LoteForm(ModelForm):
                 'cliente': TextInput(attrs={'maxlength': 20}),
             }
         
-class LoteIdentifierForm(Form):
-    buscar = forms.CharField(max_length=100)
+#class LoteIdentifierForm(Form):
+    #buscar = forms.CharField(max_length=100)
         
 LoteFormSet = modelformset_factory(Lote, extra=0, can_order=True)

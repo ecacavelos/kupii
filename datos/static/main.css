@@ -63,14 +63,14 @@ label {
 	font-weight: bold;
 }
 
-input[type="text"], select {
+input[type="text"], input[type="number"], input[type="date"], select {
 	border: 1px solid rgb(204,204,204);
-	font-size: 11px;
+	/*font-size: 11px;*/
 	font-family: "Lucida Grande", Verdana, Arial, sans-serif;
-	padding: 2px 3px;
+	padding: 2px 3px;	
 }
-input[type="text"] {
-	width: 20em;
+input[type="text"], input[type="number"] {
+	width: 20em;	
 }
 
 .cliente-form-button, .fraccion-form-button, .lote-form-button, .vendedor-form-button, .cobrador-form-button {
