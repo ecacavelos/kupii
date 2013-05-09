@@ -1,6 +1,6 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext, loader
-from datos.models import Vendedor
+from principal.models import Vendedor
 from vendedores.forms import VendedorForm
 from django.views.generic.list_detail import object_list
 

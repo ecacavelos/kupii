@@ -1,5 +1,5 @@
 from django.contrib import admin
-from datos.models import Cliente, Fraccion, Lote, Vendedor, Cobrador, Propietario, PlanDePagos, PlanDeVendedores, Venta
+from principal.models import Cliente, Fraccion, Lote, Vendedor, Cobrador, Propietario, PlanDePagos, PlanDeVendedores, Venta
 
 class ClienteAdmin(admin.ModelAdmin):
     list_display = ['__unicode__', 'cedula']

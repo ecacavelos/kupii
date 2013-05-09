@@ -1,6 +1,6 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext, loader
-from datos.models import Fraccion
+from principal.models import Fraccion
 from fracciones.forms import FraccionForm
 
 # Funcion principal del modulo de fracciones.

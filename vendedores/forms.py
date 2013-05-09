@@ -1,6 +1,6 @@
 from django.forms import ModelForm
 from django.forms.models import modelformset_factory
-from datos.models import Vendedor
+from principal.models import Vendedor
 
 # Create the form class.
 class VendedorForm(ModelForm):

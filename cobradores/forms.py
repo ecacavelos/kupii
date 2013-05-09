@@ -1,7 +1,7 @@
 from django import forms
 from django.forms import Form, ModelForm
 from django.forms.models import modelformset_factory
-from datos.models import Cobrador
+from principal.models import Cobrador
 
 # Create the form class.
 class CobradorForm(ModelForm):

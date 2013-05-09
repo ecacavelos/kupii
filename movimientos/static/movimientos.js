@@ -1,21 +1,3 @@
-$(document).ready(function() {
-	$("#id_lote").keydown(validateLotePre);
-	$("#id_lote").keyup(validateLotePost);
-
-	//$("#enviar_venta").click(validateVenta);
-
-	$("#main_venta_form").submit(validateVenta);
-});
-
-window.onload = function() {
-	//document.getElementById("id_lote").onblur = retrieveLote;
-	//document.getElementById("id_cliente").onblur = retrieveCliente;
-};
-
-// Funciones individuales
-var global_lote_id = 0;
-var monto_final_validado = false;
-
 function validateLotePre(event) {
 	// Allow: backspace, delete, tab, escape, and enter
 	if (event.keyCode == 46 || event.keyCode == 8 || event.keyCode == 9 || event.keyCode == 27 || event.keyCode == 13 ||
@@ -41,14 +23,16 @@ function validateLotePost(event) {
 	}
 };
 
+var splitted_id = "";
+
 function retrieveLote() {
 	if ($("#id_lote").val().toString().length == 12) {
 		// Extraemos los identificadores correspondientes a la fraccion, manzana y lote.
-		var splitted_id = $("#id_lote").val().split('/');
+		splitted_id = $("#id_lote").val().split('/');
 		// Hacemos un request POST AJAX para obtener los datos del lote ingresado.
 		var request = $.ajax({
-			type : "POST",
-			url : "/movimientos/ventas_lotes/",
+			type : "GET",			
+			url : "/datos/1/",
 			data : {
 				fraccion : splitted_id[0],
 				manzana : splitted_id[1],
@@ -93,8 +77,8 @@ function retrieveCliente() {
 	if ($("#id_cliente").val().toString().length > 0) {
 		// Hacemos un request POST AJAX para obtener los datos del cliente ingresado.
 		var request = $.ajax({
-			type : "POST",
-			url : "/movimientos/ventas_lotes/",
+			type : "GET",
+			url : "/datos/2/",
 			data : {
 				cliente : $("#id_cliente").val()
 			}
@@ -122,8 +106,8 @@ function retrieveVendedor() {
 	if ($("#id_vendedor").val().toString().length > 0) {
 		// Hacemos un request POST AJAX para obtener los datos del vendedor ingresado.
 		var request = $.ajax({
-			type : "POST",
-			url : "/movimientos/ventas_lotes/",
+			type : "GET",
+			url : "/datos/3/",
 			data : {
 				vendedor : $("#id_vendedor").val()
 			}
@@ -151,8 +135,8 @@ function retrievePlanVendedor() {
 	if ($("#id_plan_vendedor").val().toString().length > 0) {
 		// Hacemos un request POST AJAX para obtener los datos del plan de vendedores ingresado.
 		var request = $.ajax({
-			type : "POST",
-			url : "/movimientos/ventas_lotes/",
+			type : "GET",
+			url : "/datos/4/",
 			data : {
 				plan_vendedor : $("#id_plan_vendedor").val()
 			}
@@ -179,11 +163,14 @@ function retrievePlanPago() {
 	if ($("#id_plan_pago").val().toString().length > 0) {
 		// Hacemos un request POST AJAX para obtener los datos del plan de pagos ingresado.
 		var request = $.ajax({
-			type : "POST",
-			url : "/movimientos/ventas_lotes/",
+			type : "GET",
+			url : "/datos/5/",
 			data : {
 				plan_pago : $("#id_plan_pago").val(),
-				lote : global_lote_id
+				//lote : global_lote_id
+				plan_pago_fraccion : splitted_id[0],
+				plan_pago_manzana : splitted_id[1],
+				plan_pago_lote : splitted_id[2]
 			}
 		});
 		// Actualizamos el formulario con los datos obtenidos del plan de pagos.
@@ -191,7 +178,7 @@ function retrievePlanPago() {
 			//alert("Response: " + msg);
 			$("#plan_pago_error").html("");
 			$("#plan_pago_seleccionado").html(msg.nombre_del_plan);
-			
+
 			// El plan es a credito.
 			if (msg.credito == true) {
 				$("#tipo_pago_contado").removeAttr("checked").attr("disabled", "disabled");
@@ -203,7 +190,7 @@ function retrievePlanPago() {
 				$("#id_monto_cuota").val(0).removeAttr("disabled");
 				$("#id_cuota_refuerzo").val(0).removeAttr("disabled");
 				$("#id_entrega_inicial").select().focus();
-			// El plan es al contado.
+				// El plan es al contado.
 			} else {
 				$("#tipo_pago_credito").removeAttr("checked").attr("disabled", "disabled");
 				$("#tipo_pago_contado").prop("checked", true).removeAttr("disabled");
@@ -217,7 +204,7 @@ function retrievePlanPago() {
 
 			$("#id_fecha_vencimiento").val(fecha_actual).removeAttr("disabled");
 			$("#precio_final_venta").html("");
-			
+
 			$("#id_precio_venta").removeAttr("disabled").val(msg.precio_del_lote);
 			$("#id_precio_venta").select().focus();
 		});
@@ -228,72 +215,4 @@ function retrievePlanPago() {
 			$("#id_plan_pago").select().focus();
 		});
 	}
-};
-
-function calculatePrecioFinalVentaLote() {
-	var request = $.ajax({
-		type : "POST",
-		url : "/movimientos/ventas_lotes/",
-		data : {
-			calcular_cuotas : true,
-			plan_pago_establecido : $("#id_plan_pago").val(),
-			//lote_establecido : global_lote_id,
-			precio_de_venta : $("#id_precio_venta").val(),
-			entrega_inicial : $("#id_entrega_inicial").val(),
-			monto_cuota : $("#id_monto_cuota").val(),
-			cuota_refuerzo : $("#id_cuota_refuerzo").val()
-		}
-	});
-	request.done(function(msg) {
-		$("#precio_final_venta").html(msg.monto_total);
-		monto_final_validado = msg.monto_valido;
-		if (msg.monto_valido == false) {
-			$("#precio_final_venta").attr("class", "error");
-			$("#enviar_venta").attr("disabled", "disabled");
-		} else {
-			$("#precio_final_venta").removeAttr("class");
-			$("#enviar_venta").removeAttr("disabled");
-		}
-	});
-	request.fail(function(jqXHR, textStatus) {
-		$("#monto_total_error").html("Error.");
-	});
-};
-
-function validateVenta(event) {
-
-	event.preventDefault();
-	alert("testing");
-
-	if (monto_final_validado == true) {
-		var request2 = $.ajax({
-			type : "POST",
-			url : "/movimientos/ventas_lotes/",
-			data : {
-				ingresar_venta : true,
-				venta_lote : global_lote_id,
-				venta_fecha : $("#id_fecha").val(),
-				venta_cliente : $("#id_cliente").val(),
-				venta_vendedor : $("#id_vendedor").val(),
-				venta_plan_vendedor : $("#id_plan_vendedor").val(),
-				venta_plan_pago : $("#id_plan_pago").val(),
-				venta_entrega_inicial : $("#id_entrega_inicial").val(),
-				venta_precio_cuota : $("#id_monto_cuota").val(),
-				venta_cuota_refuerzo : $("#id_cuota_refuerzo").val(),
-				venta_precio_final_venta : $("#id_precio_venta").val(),
-				venta_fecha_primer_vencimiento : $("#id_fecha_vencimiento").val(),
-				venta_pagos_realizados : 0
-			}
-		});
-		request2.done(function(msg) {
-			alert("Se procesó la venta satisfactoriamente.");
-			top.location.href = "/movimientos";
-		});
-		request2.fail(function(jqXHR, textStatus) {
-			alert("Epic Fail.");
-		});
-	} else {
-		alert("no");
-	}
-
 };

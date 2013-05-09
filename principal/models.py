@@ -118,7 +118,7 @@ class Lote(models.Model):
     boleto_nro = models.IntegerField(blank=True, null=True)
     ESTADO_CHOICES = (
         ("1", "Libre"),
-        ("2", "2"),
+        ("2", "Reservado"),
         ("3", "Vendido"),
         ("4", "4"),
         ("5", "Recuperado"),

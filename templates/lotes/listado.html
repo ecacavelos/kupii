@@ -8,9 +8,8 @@
 <div id="listado-item-lote">
 	<a href="{{hw.id}}">{{hw}}</a>
 	<br>
-	Fraccion: {{hw.fraccion}}<br>
-	Precio Contado: {{hw.precio_contado}}<br>
-	Precio Crédito: {{hw.precio_credito}}<br>
+	Fraccion: {{ hw.fraccion }}<br>
+	Estado: {{ hw.get_estado_display }}<br>	
 </div>
 {% endfor %}
 

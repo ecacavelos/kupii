@@ -5,7 +5,8 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
-    url(r'^$', 'datos.views.index'),
+    url(r'^$', 'principal.views.index'),
+    url(r'^datos/', include('principal.urls')),
     url(r'^clientes/', include('clientes.urls')),
     url(r'^fracciones/', include('fracciones.urls')),
     url(r'^lotes/', include('lotes.urls')),

@@ -1,11 +1,12 @@
 from django import forms
 from django.forms import Form, ModelForm
 from django.forms.models import modelformset_factory
-from datos.models import Cliente
+from principal.models import Cliente
 
 # Create the form class.
 class ClienteForm(ModelForm):
     required_css_class = 'required'
+    fecha_nacimiento = forms.DateField(input_formats=('%Y-%m-%d', '%d/%m/%Y',))
     class Meta:
         model = Cliente
         exclude = ('deuda_contraida')
