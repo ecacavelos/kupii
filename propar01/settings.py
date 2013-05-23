@@ -12,9 +12,9 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',     # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'propar01',                                     # Or path to database file if using sqlite3.
+        'NAME': '<db_name>',                                     # Or path to database file if using sqlite3.
         'USER': 'postgres',                                     # Not used with sqlite3.
-        'PASSWORD': 'rutger',                                   # Not used with sqlite3.
+        'PASSWORD': '<db_password>',                                   # Not used with sqlite3.
         'HOST': '',                                             # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '5432',                                         # Set to empty string for default. Not used with sqlite3.
     }
@@ -67,7 +67,7 @@ STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    'C:/Users/David/Documents/Aptana Studio 3 Workspace/propar01/static',
+    '<PATH ABSOLUTO A DIRECTORIO DE ARCHIVOS ESTATICOS>',
 )
 
 # List of finder classes that know how to find static files in
@@ -116,7 +116,7 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    'propar01/templates'
+    '<PATH ABSOLUTO A DIRECTORIO DE TEMPLATES>'
 )
 
 INSTALLED_APPS = (
@@ -138,6 +138,7 @@ INSTALLED_APPS = (
     'cobradores',
     'informes',
     'movimientos',
+    'propietarios',
 )
 
 # A sample logging configuration. The only tangible logging

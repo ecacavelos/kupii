@@ -1,0 +1,20 @@
+{% extends "propietarios/base_propietarios.html" %}
+
+{% block content %}
+<div id="detalle-cliente">
+	<form action="" method="post">
+		{% csrf_token %}
+		{% for field in form %}
+		<div class="fieldWrapper{% if field.field.required %} required{% endif %}">
+			{{ field.errors }}
+			{{ field.label_tag }} {{ field }}
+		</div>
+		{% endfor %}
+		<input class="cliente-form-button" type="submit" value="Agregar este Propietario" />
+	</form>
+</div>
+<br>
+<div id="footer">
+	<a href="/propietarios">Volver al módulo de Propietarios</a>
+</div>
+{% endblock %}
