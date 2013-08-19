@@ -11,7 +11,7 @@ class LoteForm(ModelForm):
         model = Lote
         exclude = ('vendido', 'fecha_de_venta', 'cliente')
         widgets = {
-                'fraccion': TextInput(attrs={'maxlength': 20}),
+                'manzana': TextInput(attrs={'maxlength': 20}),
                 'cliente': TextInput(attrs={'maxlength': 20}),
             }
         

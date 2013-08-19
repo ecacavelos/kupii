@@ -57,7 +57,17 @@ class Fraccion(models.Model):
         return (self.nombre)
     class Meta:
         verbose_name_plural = "fracciones"
-    
+
+class Manzana(models.Model):
+    nro_manzana = models.IntegerField()
+    cantidad_lotes = models.IntegerField(null=True)
+    fraccion = models.ForeignKey(Fraccion)   
+    def __unicode__(self):
+        return (self.nro_manzana)
+    class Meta:
+        verbose_name_plural = "manzanas"
+        unique_together = (("fraccion", "nro_manzana"),)
+        
 class Vendedor(models.Model):
     nombres = models.CharField(max_length=255)
     apellidos = models.CharField(max_length=255)
@@ -107,8 +117,7 @@ class PlanDePagos(models.Model):
         verbose_name_plural = "planes de pagos"
         
 class Lote(models.Model):
-    fraccion = models.ForeignKey(Fraccion)
-    manzana = models.IntegerField()
+    manzana = models.ForeignKey(Manzana)
     nro_lote = models.IntegerField()
     precio_contado = models.IntegerField()
     precio_credito = models.IntegerField()
@@ -125,9 +134,9 @@ class Lote(models.Model):
     )
     estado = models.CharField(max_length=1, choices=ESTADO_CHOICES)    
     def __unicode__(self):
-        return (str(self.fraccion.id).zfill(3) + "/" + str(self.manzana).zfill(3) + "/" + str(self.nro_lote).zfill(4))
+        return (str(self.manzana).zfill(3) + "/" + str(self.nro_lote).zfill(4))
     class Meta:
-        unique_together = (("fraccion", "manzana", "nro_lote"),)
+        unique_together = (("manzana", "nro_lote"),)
 
 class Venta(models.Model):
     lote = models.ForeignKey(Lote)

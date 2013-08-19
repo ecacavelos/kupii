@@ -13,7 +13,7 @@ def lotes(request):
 def consultar_lotes(request):
     t = loader.get_template('lotes/listado.html')
     
-    object_list = Lote.objects.all().order_by('fraccion', 'manzana', 'nro_lote')
+    object_list = Lote.objects.all().order_by( 'manzana', 'nro_lote')
     
     c = RequestContext(request, {
         'object_list': object_list,

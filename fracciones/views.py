@@ -1,6 +1,6 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext, loader
-from principal.models import Fraccion
+from principal.models import Fraccion, Manzana
 from fracciones.forms import FraccionForm
 
 # Funcion principal del modulo de fracciones.
@@ -49,14 +49,23 @@ def detalle_fraccion(request, fraccion_id):
     })
     return HttpResponse(t.render(c))
 
-# Funcion para agregar una nuevo fraccion.
+# Funcion para agregar una nueva fraccion.
 def agregar_fracciones(request):
     t = loader.get_template('fracciones/agregar.html')
 
     if request.method == 'POST':
         form = FraccionForm(request.POST)
         if form.is_valid():
-            form.save()
+            fraccion = form.save()
+            cantidad_manzanas = fraccion.cantidad_manzanas
+            for i in range(1, cantidad_manzanas + 1):
+                manzana = Manzana()
+                manzana.fraccion = fraccion
+                manzana.nro_manzana = i
+                manzana.save()
+            # Agregar las cantidad_manzanas que correspondan
+            # total_manzanas = form.
+            # while 
             # Redireccionamos al listado de clientes luego de agregar el nuevo cliente.
             return HttpResponseRedirect('/fracciones/listado')
     else:
