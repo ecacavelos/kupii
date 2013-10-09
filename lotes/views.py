@@ -16,7 +16,7 @@ def consultar_lotes(request):
     object_list = Lote.objects.all().order_by( 'manzana', 'nro_lote')
     
     c = RequestContext(request, {
-        'object_list': object_list,
+        'object_list': object_list, 
     })
     return HttpResponse(t.render(c))
 

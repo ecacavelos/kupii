@@ -1,7 +1,7 @@
-{% extends "manzanas/base_manzanas.html" %}
+{% extends "parametros/base_parametros.html" %}
 
 {% block content %}
-<div id="detalle-manzana">
+<div id="detalle-plandepago">
 	<form action="" method="post">
 		{% csrf_token %}
 		{% for field in form %}
@@ -10,11 +10,11 @@
 			{{ field.label_tag }} {{ field }}
 		</div>
 		{% endfor %}
-		<input class="manzana-form-button" type="submit" value="Agregar esta Manzana" />
+		<input class="plandepago-form-button" type="submit" value="Agregar este Plan de Pago" />
 	</form>
 </div>
 <br>
 <div id="footer">
-	<a href="/manzanas">Volver al módulo de Manzanas</a>
+	<a href="/parametros/plan_pago">Volver a Plan de Pago</a>
 </div>
 {% endblock %}

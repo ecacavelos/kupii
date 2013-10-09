@@ -63,7 +63,8 @@ class Manzana(models.Model):
     cantidad_lotes = models.IntegerField(null=True)
     fraccion = models.ForeignKey(Fraccion)   
     def __unicode__(self):
-        return (self.nro_manzana)
+        #return (self.nro_manzana)
+        return('Manzana ' + str(self.nro_manzana))
     class Meta:
         verbose_name_plural = "manzanas"
         unique_together = (("fraccion", "nro_manzana"),)
@@ -79,6 +80,11 @@ class Vendedor(models.Model):
     celular_1 = models.CharField(max_length=255, blank=True)
     # celular_2 = models.CharField(max_length=255, blank=True)
     fecha_ingreso = models.DateField('fecha de ingreso')
+    porcentaje_cuota_inicial = models.IntegerField()
+    cantidad_cuotas = models.IntegerField()
+    cuota_inicial = models.IntegerField()
+    intervalos = models.IntegerField()
+    porcentaje_de_cuotas = models.IntegerField()
     def __unicode__(self):
         return (self.nombres + ' ' + self.apellidos)
     class Meta:
@@ -100,28 +106,36 @@ class Cobrador(models.Model):
     class Meta:
         verbose_name_plural = "cobradores"
 
-class PlanDeVendedores(models.Model):
+class PlanDePago(models.Model):
     nombre_del_plan = models.CharField(max_length=255)
-    def __unicode__(self):
-        return (self.nombre_del_plan)
-    class Meta:
-        verbose_name_plural = "planes de vendedores"
-
-class PlanDePagos(models.Model):
-    nombre_del_plan = models.CharField(max_length=255)
-    tipo_de_plan = models.BooleanField('Plan a Credito')
+    TIPO_CHOICES = (
+        ("contado", "Contado"),
+        ("credito", "Credito"),
+    )
+    tipo_de_plan = models.CharField(max_length=7, choices=TIPO_CHOICES)
     cantidad_de_cuotas = models.IntegerField(blank=True, null=True)
+    porcentaje_inicial_inmobiliaria = models.IntegerField()
+    cantidad_cuotas_inmobiliaria = models.IntegerField()
+    inicio_cuotas_inmobiliaria = models.IntegerField()
+    intervalos_cuotas_inmobiliaria = models.IntegerField()
+    porcentaje_cuotas_inmobiliaria = models.IntegerField()
+    porcentaje_cuotas_administracion = models.IntegerField()
+    porcentaje_inicial_gerente = models.IntegerField()
+    cantidad_cuotas_gerente = models.IntegerField()
+    inicio_cuotas_gerente = models.IntegerField()
+    intervalos_cuotas_gerente = models.IntegerField()
+    porcentaje_cuotas_gerente = models.IntegerField()
+    monto_fijo_cuotas_gerente = models.IntegerField()
     def __unicode__(self):
         return (self.nombre_del_plan)
     class Meta:
-        verbose_name_plural = "planes de pagos"
-        
+        verbose_name_plural = "planes de pago"
+
 class Lote(models.Model):
     manzana = models.ForeignKey(Manzana)
     nro_lote = models.IntegerField()
     precio_contado = models.IntegerField()
     precio_credito = models.IntegerField()
-    precio_de_cuota = models.IntegerField()
     superficie = models.DecimalField('superficie (m2)', max_digits=8, decimal_places=2)
     cuenta_corriente_catastral = models.CharField(max_length=255, blank=True)
     boleto_nro = models.IntegerField(blank=True, null=True)
@@ -143,13 +157,11 @@ class Venta(models.Model):
     fecha_de_venta = models.DateField()
     cliente = models.ForeignKey(Cliente)
     vendedor = models.ForeignKey(Vendedor)
-    plan_de_vendedor = models.ForeignKey(PlanDeVendedores)
-    plan_de_pago = models.ForeignKey(PlanDePagos)
-    entrega_inicial = models.BigIntegerField()
-    precio_de_cuota = models.BigIntegerField()
-    cuota_de_refuerzo = models.BigIntegerField()
+    plan_de_pago = models.ForeignKey(PlanDePago)
+    entrega_inicial = models.BigIntegerField(blank=True, null=True)
+    precio_de_cuota = models.BigIntegerField(blank=True, null=True)
     precio_final_de_venta = models.BigIntegerField()
-    fecha_primer_vencimiento = models.DateField()
+    fecha_primer_vencimiento = models.DateField(blank=True, null=True)
     pagos_realizados = models.IntegerField(blank=True, null=True)
     def __unicode__(self):
         return (str(self.lote) + " a " + self.cliente.nombres + " " + self.cliente.apellidos)

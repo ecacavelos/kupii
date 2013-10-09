@@ -3,7 +3,7 @@
 {% block content %}
 <div id="detalle-lote">
 	<div id="detalle-lote-header">
-		{{ lote }}
+		{{ lote.id }}
 	</div>
 	{% if message_id == "message-success" %}		
 		<div id="{{message_id}}">{{ message }}</div>

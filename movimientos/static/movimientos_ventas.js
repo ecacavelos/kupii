@@ -15,6 +15,8 @@ window.onload = function() {
 // Funciones individuales
 var global_lote_id = 0;
 var monto_final_validado = false;
+var entrega_inicial = 0;
+var monto_cuota = 0;
 
 function validateVenta(event) {
 
@@ -25,16 +27,14 @@ function validateVenta(event) {
 			url : "/movimientos/ventas_lotes/",
 			data : {
 				ingresar_venta : true,
-				venta_lote : global_lote_id,
-				venta_fecha : $("#id_fecha").val(),
-				venta_cliente : $("#id_cliente").val(),
-				venta_vendedor : $("#id_vendedor").val(),
-				venta_plan_vendedor : $("#id_plan_vendedor").val(),
-				venta_plan_pago : $("#id_plan_pago").val(),
+				venta_lote_id : global_lote_id,
+				venta_fecha_de_venta : $("#id_fecha").val(),
+				venta_cliente_id : $("#id_cliente").val(),
+				venta_vendedor_id : $("#id_vendedor").val(),
+				venta_plan_pago_id : $("#id_plan_pago").val(),
 				venta_entrega_inicial : $("#id_entrega_inicial").val(),
-				venta_precio_cuota : $("#id_monto_cuota").val(),
-				venta_cuota_refuerzo : $("#id_cuota_refuerzo").val(),
-				venta_precio_final_venta : $("#id_precio_venta").val(),
+				venta_precio_de_cuota : $("#id_monto_cuota").val(),
+				venta_precio_final_de_venta : $("#id_precio_venta").val(),
 				venta_fecha_primer_vencimiento : $("#id_fecha_vencimiento").val(),
 				venta_pagos_realizados : 0
 			}
@@ -63,7 +63,6 @@ function calculatePrecioFinalVentaLote() {
 			precio_de_venta : $("#id_precio_venta").val(),
 			entrega_inicial : $("#id_entrega_inicial").val(),
 			monto_cuota : $("#id_monto_cuota").val(),
-			cuota_refuerzo : $("#id_cuota_refuerzo").val()
 		}
 	});
 	request.done(function(msg) {
@@ -81,4 +80,12 @@ function calculatePrecioFinalVentaLote() {
 		$("#monto_total_error").html("Error.");
 	});
 
+};
+
+function calculateMontoCuotas() {
+	
+	var entrega_inicial = ($('#id_entrega_inicial').val());
+	entrega_inicial = parseInt(entrega_inicial);
+	var monto_cuota = (precio_credito - entrega_inicial) / cantidad_cuotas;
+	$("#id_monto_cuota").val(monto_cuota);
 };

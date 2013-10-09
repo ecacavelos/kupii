@@ -42,7 +42,7 @@ def detalle_vendedor(request, vendedor_id):
             return HttpResponseRedirect('/vendedores/listado')
     else:
         form = VendedorForm(instance=object_list)
-    
+
     c = RequestContext(request, {
         'vendedor': object_list,
         'form': form,

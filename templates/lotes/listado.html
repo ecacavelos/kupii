@@ -6,7 +6,7 @@
 </div>
 {% for hw in object_list %}
 <div id="listado-item-lote">
-	<a href="{{hw.id}}">{{hw}}</a>
+	<a href="{{hw.id}}">{{hw.id}}</a>
 	<br>
 	Estado: {{ hw.get_estado_display }}<br>	
 </div>

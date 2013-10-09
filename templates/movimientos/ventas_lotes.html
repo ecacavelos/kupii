@@ -32,10 +32,7 @@
 		<input id="id_vendedor" type="text" name="vendedor" disabled="disabled" maxlength="100" onblur="retrieveVendedor()" /><br>	
 		<label>Apellidos y Nombres: </label><div id="vendedor_seleccionado"></div><br>
 		<ul class="errorlist"><li id="vendedor_error"></li></ul>	
-		<label for="id_plan_vendedor">Plan del Vendedor: </label>	
-		<input id="id_plan_vendedor" type="text" name="plan_vendedor" disabled="disabled" maxlength="100" onblur="retrievePlanVendedor()" /><br>
-		<label>Nombre del Plan: </label><div id="plan_vendedor_seleccionado"></div>
-		<ul class="errorlist"><li id="plan_vendedor_error"></li></ul>
+
 	</div>
 	<div class="fieldWrapperMovimientos">
 		<label for="id_plan_pago">Plan de Pago: </label>
@@ -53,11 +50,9 @@
 		<div id="cantidad_cuotas_venta"></div><br>
 		<br>
 		<label for="id_entrega_inicial">Entrega Inicial: </label>
-		<input id="id_entrega_inicial" type="number" name="entrega_inicial" disabled="disabled" maxlength="100" onblur="calculatePrecioFinalVentaLote()" /><br>
+		<input id="id_entrega_inicial" type="number" name="entrega_inicial" disabled="disabled" maxlength="100" onblur="calculateMontoCuotas()" /><br>
 		<label for="id_monto_cuota">Monto de cada Cuota: </label>
 		<input id="id_monto_cuota" type="number" name="monto_cuota" disabled="disabled" maxlength="100" onblur="calculatePrecioFinalVentaLote()" /><br>
-		<label for="id_cuota_refuerzo">Monto de Cuota de Refuerzo: </label>
-		<input id="id_cuota_refuerzo" type="number" name="cuota_refuerzo" disabled="disabled" maxlength="100" onblur="calculatePrecioFinalVentaLote()" /><br>
 		<label>Monto Total: </label><div id="precio_final_venta"></div><br>
 		<ul class="errorlist"><li id="monto_total_error"></li></ul>
 		<label for="id_fecha_vencimiento">Fecha del 1er Vencimiento: </label>

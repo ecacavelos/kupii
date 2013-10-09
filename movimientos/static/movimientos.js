@@ -24,6 +24,9 @@ function validateLotePost(event) {
 };
 
 var splitted_id = "";
+var precio_contado = 0;
+var precio_credito = 0;
+var cantidad_cuotas = 0;
 
 function retrieveLote() {
 	if ($("#id_lote").val().toString().length == 12) {
@@ -48,7 +51,8 @@ function retrieveLote() {
 			$("#lote_error").html("");
 			$("#lote_superficie").html(msg.superficie);
 			$("#lote_seleccionado_detalles").html(s);
-
+			precio_contado = msg.precio_contado;
+			precio_credito = msg.precio_contado;
 			var d = new Date();
 			var month = d.getMonth() + 1;
 			var day = d.getDate();
@@ -118,8 +122,8 @@ function retrieveVendedor() {
 			$("#vendedor_error").html("");
 			$("#vendedor_seleccionado").html(msg);
 
-			$("#id_plan_vendedor").removeAttr("disabled");
-			$("#id_plan_vendedor").focus();
+			$("#id_plan_pago").removeAttr("disabled");
+			$("#id_plan_pago").focus();
 		});
 		// En caso de no poder obtener los datos del vendedor, indicamos el error.
 		request.fail(function(jqXHR, textStatus) {
@@ -127,34 +131,6 @@ function retrieveVendedor() {
 			$("#vendedor_error").html("No se pueden obtener los datos del Vendedor.");
 			$("#vendedor_seleccionado").html("");
 			$("#id_vendedor").select().focus();
-		});
-	}
-};
-
-function retrievePlanVendedor() {
-	if ($("#id_plan_vendedor").val().toString().length > 0) {
-		// Hacemos un request POST AJAX para obtener los datos del plan de vendedores ingresado.
-		var request = $.ajax({
-			type : "GET",
-			url : "/datos/4/",
-			data : {
-				plan_vendedor : $("#id_plan_vendedor").val()
-			}
-		});
-		// Actualizamos el formulario con los datos obtenidos del plan de vendedores.
-		request.done(function(msg) {
-			//alert("Response: " + msg);
-			$("#plan_vendedor_error").html("");
-			$("#plan_vendedor_seleccionado").html(msg);
-
-			$("#id_plan_pago").removeAttr("disabled");
-			$("#id_plan_pago").focus();
-		});
-		// En caso de no poder obtener los datos del plan de vendedores, indicamos el error.
-		request.fail(function(jqXHR, textStatus) {
-			$("#plan_vendedor_error").html("No se pueden obtener los datos del Plan de Vendedor.");
-			$("#plan_vendedor_seleccionado").html("");
-			$("#id_plan_vendedor").select().focus();
 		});
 	}
 };
@@ -167,10 +143,6 @@ function retrievePlanPago() {
 			url : "/datos/5/",
 			data : {
 				plan_pago : $("#id_plan_pago").val(),
-				//lote : global_lote_id
-				plan_pago_fraccion : splitted_id[0],
-				plan_pago_manzana : splitted_id[1],
-				plan_pago_lote : splitted_id[2]
 			}
 		});
 		// Actualizamos el formulario con los datos obtenidos del plan de pagos.
@@ -180,7 +152,10 @@ function retrievePlanPago() {
 			$("#plan_pago_seleccionado").html(msg.nombre_del_plan);
 
 			// El plan es a credito.
-			if (msg.credito == true) {
+			if (msg.credito == "credito") {
+				$("#id_precio_venta").removeAttr("disabled").val(precio_credito);
+				$("#id_precio_venta").select().focus();
+
 				$("#tipo_pago_contado").removeAttr("checked").attr("disabled", "disabled");
 				$("#tipo_pago_credito").prop("checked", true).removeAttr("disabled");
 
@@ -188,10 +163,13 @@ function retrievePlanPago() {
 
 				$("#id_entrega_inicial").val(0).removeAttr("disabled");
 				$("#id_monto_cuota").val(0).removeAttr("disabled");
-				$("#id_cuota_refuerzo").val(0).removeAttr("disabled");
 				$("#id_entrega_inicial").select().focus();
+				cantidad_cuotas = msg.cantidad_cuotas;
 				// El plan es al contado.
 			} else {
+				$("#id_precio_venta").removeAttr("disabled").val(precio_contado);
+				$("#id_precio_venta").select().focus();
+
 				$("#tipo_pago_credito").removeAttr("checked").attr("disabled", "disabled");
 				$("#tipo_pago_contado").prop("checked", true).removeAttr("disabled");
 
@@ -199,14 +177,10 @@ function retrievePlanPago() {
 
 				$("#id_entrega_inicial").val(0).attr("disabled", "disabled");
 				$("#id_monto_cuota").val(0).attr("disabled", "disabled");
-				$("#id_cuota_refuerzo").val(0).attr("disabled", "disabled");
 			}
 
 			$("#id_fecha_vencimiento").val(fecha_actual).removeAttr("disabled");
 			$("#precio_final_venta").html("");
-
-			$("#id_precio_venta").removeAttr("disabled").val(msg.precio_del_lote);
-			$("#id_precio_venta").select().focus();
 		});
 		// En caso de no poder obtener los datos del plan de pagos, indicamos el error.
 		request.fail(function(jqXHR, textStatus) {
