@@ -6,7 +6,7 @@ from datetime import datetime
 
 # vista principal de la plataforma PROPAR
 def index(request):
-    t = loader.get_template('index.html')
+    t = loader.get_template('index2.html')
     c = RequestContext(request, {})
     return HttpResponse(t.render(c))
 
