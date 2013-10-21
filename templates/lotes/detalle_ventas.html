@@ -1,0 +1,16 @@
+{% extends "lotes/base_lotes.html" %}
+
+{% block content %}
+Detalle de Venta<br>
+<div id="detalle-venta">
+	<form action="/lotes/listado/ventas/{{ venta.lote.id }}/" method="post">		
+		{{ venta.lote }}<br>
+		{{ venta.cliente }}<br>		
+		<input type="submit" name="boton_borrar" value="Borrar esta Venta (Recuperar este Lote)" />
+	</form>
+</div>
+<br>
+<div id="footer">
+	<a href="/lotes/listado">Volver al Listado de Lotes</a>
+</div>
+{% endblock %}

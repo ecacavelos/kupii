@@ -1,0 +1,20 @@
+{% extends "manzanas/base_manzanas.html" %}
+
+{% block content %}
+<div id="detalle-manzana">
+	<form action="" method="post">
+		{% csrf_token %}
+		{% for field in form %}
+		<div class="fieldWrapper{% if field.field.required %} required{% endif %}">
+			{{ field.errors }}
+			{{ field.label_tag }} {{ field }}
+		</div>
+		{% endfor %}
+		<input class="manzana-form-button" type="submit" value="Agregar esta Manzana" />
+	</form>
+</div>
+<br>
+<div id="footer">
+	<a href="/manzanas">Volver al módulo de Manzanas</a>
+</div>
+{% endblock %}

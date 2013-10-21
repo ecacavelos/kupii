@@ -1,0 +1,27 @@
+{% extends "clientes/base_clientes.html" %}
+
+{% block content %}
+<div id="detalle-cliente">
+	<div id="detalle-cliente-header">
+		{{cliente.id}}
+	</div>
+	<div>
+		{{ message }}
+	</div>
+	<form action="/clientes/listado/{{ cliente.id }}/" method="post">
+		{% csrf_token %}
+		{% for field in form %}
+		<div class="fieldWrapper{% if field.field.required %} required{% endif %}">
+			{{ field.errors }}
+			{{ field.label_tag }} {{ field }}
+		</div>
+		{% endfor %}
+		<input class="cliente-form-button" type="submit" name="boton_guardar" value="Guardar Cambios" />
+		<input class="cliente-form-button" type="submit" name="boton_borrar" value="Borrar este Registro" />
+	</form>
+</div>
+<br>
+<div id="footer">
+	<a href="/clientes/listado">Volver al Listado de Clientes</a>
+</div>
+{% endblock %}

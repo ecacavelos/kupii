@@ -1,0 +1,13 @@
+{% extends "manzanas/base_manzanas.html" %}
+
+{% block content %}
+{% for hw in object_list %}
+<div id="listado-item-fraccion">
+	<a href="{{hw.id}}">{{hw.id}}</a>
+	<br>
+	Número de manzana: {{hw.nro_manzana}}<br>
+</div>
+{% endfor %}
+
+<div id="footer"><a href="/manzanas">Volver al módulo de Manzanas</a></div>
+{% endblock %}

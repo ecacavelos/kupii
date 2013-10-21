@@ -1,0 +1,12 @@
+@charset "utf-8";
+/* CSS Document */
+
+#lote-ventas {
+	border: 1px solid green;
+	padding: 8px 12px;
+}
+
+#detalle-venta {
+	border: 1px solid rgb(204,204,204);
+	padding: 8px 12px;
+}

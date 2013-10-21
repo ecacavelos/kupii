@@ -1,0 +1,26 @@
+{% extends "parametros/base_parametros.html" %}
+
+{% block content %}
+<div id="listado-cuadro-busqueda">
+	{{message}}
+	<form action="" method="post">
+		{% csrf_token %}
+		{{ search_form.buscar }}
+		{{ search_form.filtro }}
+		<input type="submit" name="boton_buscar" value="Buscar" />
+		<input type="submit" name="boton_todos" value="Ver Todos" />
+	</form>
+</div>
+{% for hw in object_list %}
+<div id="listado-item-plandepagos">
+	<a href="{{hw.id}}">{{hw.id}}</a><br>
+	Nombre del Plan: {{hw.nombre_del_plan}}<br>
+	Tipo de plan: {{hw.tipo_de_plan}}<br>
+	Cantidad de Cuotas: {{hw.cantidad_de_cuotas}}<br>
+</div>
+{% endfor %}
+
+<div id="footer">
+	<a href="/parametros/plan_pago">Volver a Plan de Pago</a>
+</div>
+{% endblock %}

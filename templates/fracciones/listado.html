@@ -1,0 +1,14 @@
+{% extends "fracciones/base_fracciones.html" %}
+
+{% block content %}
+{% for hw in object_list %}
+<div id="listado-item-fraccion">
+	<a href="{{hw.id}}">{{hw.id}}</a>
+	<br>
+	Nombre: {{hw.nombre}}<br>
+	Ubicación: {{hw.ubicacion}}<br>
+</div>
+{% endfor %}
+
+<div id="footer"><a href="/fracciones">Volver al módulo de Fracciones</a></div>
+{% endblock %}

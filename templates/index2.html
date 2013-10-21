@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="grid_10" align="center">
+	<table width="90%" border="0" cellpadding="0" cellspacing="0" id="lista-categoria" align="center"> 
+	  <tr>
+	    <th colspan="3" class="categorias"><strong>Menú de Lotes</strong></th>
+	  </tr>
+	  <tr>
+	    <td><strong>Fracciones</strong></td>
+	    <td width="25px" title="Agregar Fracción"><a class="add" href="/fracciones/agregar/">&nbsp;</a></td>
+	    <td width="25px" title="Ver Fracciones"><a class="edit" href="/fracciones/listado/">&nbsp;</a></td>
+	  </tr>
+	  <tr>
+	    <td><strong>Manzanas</strong></td>
+	    <td width="25px" title="Ver Manzanas"><a class="edit" href="/manzanas/listado/">&nbsp;</a></td>
+	  </tr>
+	  <tr>
+	    <td><strong>Lotes</strong></td>
+	    <td width="25px" title="Agregar Lote"><a class="add" href="/lotes/agregar/">&nbsp;</a></td>
+	    <td width="25px" title="Ver lotes"><a class="edit" href="/lotes/listado/">&nbsp;</a></td>
+	  </tr>
+	</table>
+	
+	<table width="90%" border="0" cellpadding="0" cellspacing="0" id="lista-categoria" align="center"> 
+	  <tr>
+	    <th colspan="3" class="categorias"><strong>Configuraciones - Parámetros</strong></th>
+	  </tr>
+	  <tr>
+	    <td><strong>Planes de Pago</strong></td>
+	    <td width="25px" title="Agregar Plan de Pago"><a class="add" href="/parametros/plan_pago/agregar/">&nbsp;</a></td>
+	    <td width="25px" title="Ver Planes de Pago"><a class="edit" href="/parametros/plan_pago/listado/">&nbsp;</a></td>
+	  </tr>
+	  <tr>
+	    <td><strong>Parametros Generales</strong></td>
+	    <td width="25px" title="Agregar Plan de Pago"><a class="add" href="#">&nbsp;</a></td>
+	  </tr>
+	</table>
+	
+	<table width="90%" border="0" cellpadding="0" cellspacing="0" id="lista-categoria" align="center"> 
+	  <tr>
+	    <th colspan="3" class="categorias"><strong>Personas</strong></th>
+	  </tr>
+	  <tr>
+	    <td><strong>Clientes</strong></td>
+	    <td width="25px" title="Agregar Cliente"><a class="add" href="/clientes/agregar/">&nbsp;</a></td>
+	    <td width="25px" title="Ver Clientes"><a class="edit" href="/clientes/listado/">&nbsp;</a></td>
+	  </tr>
+	  <tr>
+	    <td><strong>Propietarios</strong></td>
+	    <td width="25px" title="Agregar Propietario"><a class="add" href="/propietarios/agregar/">&nbsp;</a></td>
+	    <td width="25px" title="Ver Vendedores"><a class="edit" href="/propietarios/listado/">&nbsp;</a></td>
+	  </tr>
+	  <tr>
+	    <td><strong>Vendedores</strong></td>
+	    <td width="25px" title="Agregar Vendedor"><a class="add" href="/vendedores/agregar/">&nbsp;</a></td>
+	    <td width="25px" title="Ver Vendedor"><a class="edit" href="/vendedores/listado/">&nbsp;</a></td>
+	  </tr>
+	</table>
+</div>
+
+ <div class="grid_6">
+	<table width="90%" border="0" cellpadding="0" cellspacing="0" id="lista-categoria" align="center">
+		<tr>
+			<th class="acciones"><strong>Acciones</strong></th>
+		</tr>
+		<tr>
+			<td class="last" title="Vender Lote"><a href="/movimientos/ventas_lotes/">Vender Lote</a></td>
+		</tr>
+	</table>
+</div>
+<div class="grid_6">
+	<table width="90%" border="0" cellpadding="0" cellspacing="0" id="lista-categoria" align="center">
+		<tr>
+			<th class="acciones"><strong>Informes</strong></th>
+		</tr>
+	</table>
+</div>
+{% endblock %}

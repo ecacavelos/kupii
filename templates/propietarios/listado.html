@@ -1,0 +1,32 @@
+{% extends "propietarios/base_propietarios.html" %}
+
+{% block content %}
+<div id="listado-cuadro-busqueda">
+	{{message}}
+	<form action="" method="post">
+		{% csrf_token %}
+		{{ search_form.buscar }}
+		{{ search_form.filtro }}
+		<input type="submit" name="boton_buscar" value="Buscar" />
+		<input type="submit" name="boton_todos" value="Ver Todos" />
+	</form>
+</div>
+{% for hw in object_list %}
+<div id="listado-item-cliente">
+	<a href="{{hw.id}}">{{hw.id}}</a><br>
+	Nombres: {{hw.nombres}}<br>
+	Apellidos: {{hw.apellidos}}<br>
+	Fecha de Nacimiento: {{hw.fecha_nacimiento}}<br>
+	Cedula: {{hw.cedula}}<br>
+	RUC: {{hw.ruc}}<br>
+	Dirección Particular: {{hw.direccion_particular}}<br>
+	Teléfono Particular: {{hw.telefono_particular}}<br>
+	Celular 1: {{hw.celular_1}}<br>
+	Celular 2: {{hw.celular_2}}<br>
+</div>
+{% endfor %}
+
+<div id="footer">
+	<a href="/propietarios">Volver al módulo de Propietarios</a>
+</div>
+{% endblock %}

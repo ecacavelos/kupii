@@ -1,0 +1,14 @@
+{% extends "vendedores/base_vendedores.html" %}
+
+{% block content %}
+{% for hw in object_list %}
+<div id="listado-item-vendedor">
+	<a href="{{hw.id}}">{{hw.id}}</a>
+	<br>
+	Nombres: {{hw.nombres}}<br>
+	Apellidos: {{hw.apellidos}}<br>			
+</div>
+{% endfor %}
+
+<div id="footer"><a href="/vendedores">Volver al módulo de Vendedores</a></div>
+{% endblock %}

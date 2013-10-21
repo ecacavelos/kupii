@@ -1,0 +1,38 @@
+{% extends "clientes/base_clientes.html" %}
+
+{% block content %}
+<div id="listado-cuadro-busqueda">
+	{{message}}
+	<form action="" method="post">
+		{% csrf_token %}
+		{{ search_form.buscar }}
+		{{ search_form.filtro }}
+		<input type="submit" name="boton_buscar" value="Buscar" />
+		<input type="submit" name="boton_todos" value="Ver Todos" />
+	</form>
+</div>
+{% for hw in object_list %}
+<div id="listado-item-cliente">
+	<a href="{{hw.id}}">{{hw.id}}</a><br>
+	Nombres: {{hw.nombres}}<br>
+	Apellidos: {{hw.apellidos}}<br>
+	Fecha de Nacimiento: {{hw.fecha_nacimiento}}<br>
+	Cedula: {{hw.cedula}}<br>
+	RUC: {{hw.ruc}}<br>
+	Género: {{hw.get_sexo_display}}<br>
+	Estado Civil: {{hw.get_estado_civil_display}}<br>
+	Dirección Particular: {{hw.direccion_particular}}<br>
+	Dirección de Cobro: {{hw.direccion_cobro}}<br>
+	Teléfono Particular: {{hw.telefono_particular}}<br>
+	Teléfono Laboral: {{hw.telefono_laboral}}<br>
+	Celular 1: {{hw.celular_1}}<br>
+	Celular 2: {{hw.celular_2}}<br>
+	Nombre del Cónyuge: {{hw.nombre_conyuge}}<br>
+	Deuda Contraída: {{hw.deuda_contraida}}<br>
+</div>
+{% endfor %}
+
+<div id="footer">
+	<a href="/clientes">Volver al módulo de Clientes</a>
+</div>
+{% endblock %}

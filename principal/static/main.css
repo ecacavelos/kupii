@@ -1,0 +1,77 @@
+@charset "utf-8";
+/* CSS Document */
+
+body {
+	font-family: "Lucida Grande", Verdana, Arial, sans-serif;
+	font-size: 12px;
+}
+
+#listado-cuadro-busqueda {
+	border: 1px solid blue;
+	padding: 8px 12px;
+}
+
+#listado-item-cliente, #listado-item-fraccion, #listado-item-lote, #listado-item-vendedor, #listado-item-cobrador {
+	border: 1px solid gray;
+	padding: 8px 12px;
+}
+
+#informe-item-lote {
+	border: 1px dotted gray;
+	padding: 8px 12px;
+}
+
+#footer {
+	border: 1px solid blue;
+	padding: 8px 12px;
+}
+
+ul.errorlist {
+	list-style-type: none;
+	padding: 8px 0px;
+	margin: 0px;
+	color: red;
+}
+
+#message-success {
+	padding: 8px 12px;
+	border: 1px solid rgb(102,204,102);
+}
+
+#detalle-cliente, #detalle-fraccion, #detalle-lote, #detalle-vendedor, #detalle-cobrador {
+	border: 1px solid rgb(204,204,204);
+}
+
+#detalle-cliente-header, #detalle-fraccion-header, #detalle-lote-header, #detalle-vendedor-header, #detalle-cobrador-header {
+	padding: 8px 12px;
+	border-bottom: 1px solid rgb(238,238,238);
+}
+
+.fieldWrapper {
+	padding: 8px 12px;
+	border-bottom: 1px solid rgb(238,238,238);
+}
+
+label {
+	width: 8em;
+	display: inline-block;
+	vertical-align: middle;
+}
+.required {
+	font-weight: bold;
+}
+
+input[type="text"], input[type="number"], input[type="date"], select {
+	border: 1px solid rgb(204,204,204);
+	/*font-size: 11px;*/
+	font-family: "Lucida Grande", Verdana, Arial, sans-serif;
+	padding: 2px 3px;	
+}
+input[type="text"], input[type="number"] {
+	width: 20em;	
+}
+
+.cliente-form-button, .fraccion-form-button, .lote-form-button, .vendedor-form-button, .cobrador-form-button {
+	border: 1px solid rgb(204,204,204);
+	margin: 8px 12px;
+}

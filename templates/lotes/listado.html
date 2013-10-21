@@ -1,0 +1,16 @@
+{% extends "lotes/base_lotes.html" %}
+
+{% block content %}
+<div id="listado-cuadro-busqueda">
+	<a href="/lotes/agregar">Agregar Lote</a><br>
+</div>
+{% for hw in object_list %}
+<div id="listado-item-lote">
+	<a href="{{hw.id}}">{{hw.id}}</a>
+	<br>
+	Estado: {{ hw.get_estado_display }}<br>	
+</div>
+{% endfor %}
+
+<div id="footer"><a href="/lotes">Volver al módulo de Lotes</a></div>
+{% endblock %}

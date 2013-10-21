@@ -1,0 +1,68 @@
+{% extends "movimientos/base_movimientos.html" %}
+
+{% block java_scripts %}
+<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}ajax_config.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}movimientos.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}movimientos_ventas.js"></script>
+{% endblock %}
+
+{% block content %}
+<form id="main_venta_form" action="" method="post">
+	{% csrf_token %}
+	<div class="fieldWrapperMovimientos">
+		<label for="id_lote">Lote: </label>
+		<input id="id_lote" type="text" name="lote" maxlength="12" onblur="retrieveLote()" /><br>
+		<ul class="errorlist"><li id="lote_error"></li></ul>
+		<label>Superficie (m2): </label><div id="lote_superficie"></div><br>
+		<label>Detalles del Lote: </label><div id="lote_seleccionado_detalles"></div>
+	</div>
+	<div class="fieldWrapperMovimientos">
+		<label for="id_fecha">Fecha de Venta: </label>
+		<input id="id_fecha" type="date" name="fecha" maxlength="10" /><br>
+	</div>
+	<div class="fieldWrapperMovimientos">
+		<label for="id_cliente">Código del Cliente: </label>
+		<input id="id_cliente" type="text" name="cliente" disabled="disabled" maxlength="100" onblur="retrieveCliente()" /><br>	
+		<label>Apellidos y Nombres: </label><div id="cliente_seleccionado"></div>
+		<ul class="errorlist"><li id="cliente_error"></li></ul>
+	</div>
+	<div class="fieldWrapperMovimientos">	
+		<label for="id_vendedor">Código del Vendedor: </label>
+		<input id="id_vendedor" type="text" name="vendedor" disabled="disabled" maxlength="100" onblur="retrieveVendedor()" /><br>	
+		<label>Apellidos y Nombres: </label><div id="vendedor_seleccionado"></div><br>
+		<ul class="errorlist"><li id="vendedor_error"></li></ul>	
+
+	</div>
+	<div class="fieldWrapperMovimientos">
+		<label for="id_plan_pago">Plan de Pago: </label>
+		<input id="id_plan_pago" type="text" name="plan_pago" disabled="disabled" maxlength="100" onblur="retrievePlanPago()" /><br>	
+		<label>Nombre del Plan: </label><div id="plan_pago_seleccionado"></div><br>
+		<ul class="errorlist"><li id="plan_pago_error"></li></ul>
+	</div>
+	<div class="fieldWrapperMovimientos">
+		<label for="id_precio_venta">Precio de Venta: </label>
+		<input id="id_precio_venta" type="text" name="precio_venta" disabled="disabled" maxlength="100" onblur="calculatePrecioFinalVentaLote()" />
+		<label id="tipo_pago_contado_label" class="shortLabel" for="tipo_pago_contado">Contado</label>
+		<input id="tipo_pago_contado" type="radio" name="tipo_pago" disabled="disabled" />
+		<label id="tipo_pago_credito_label" class="shortLabel" for="tipo_pago_credito">Credito</label>
+		<input id="tipo_pago_credito" type="radio" name="tipo_pago" disabled="disabled" /><br>
+		<div id="cantidad_cuotas_venta"></div><br>
+		<br>
+		<label for="id_entrega_inicial">Entrega Inicial: </label>
+		<input id="id_entrega_inicial" type="number" name="entrega_inicial" disabled="disabled" maxlength="100" onblur="calculateMontoCuotas()" /><br>
+		<label for="id_monto_cuota">Monto de cada Cuota: </label>
+		<input id="id_monto_cuota" type="number" name="monto_cuota" disabled="disabled" maxlength="100" onblur="calculatePrecioFinalVentaLote()" /><br>
+		<label>Monto Total: </label><div id="precio_final_venta"></div><br>
+		<ul class="errorlist"><li id="monto_total_error"></li></ul>
+		<label for="id_fecha_vencimiento">Fecha del 1er Vencimiento: </label>
+		<input id="id_fecha_vencimiento" type="date" name="fecha_vencimiento" disabled="disabled" maxlength="10" /><br>	
+	</div>
+	<div class="fieldWrapperMovimientos">
+		<input id="enviar_venta" type="submit" disabled="disabled" value="Guardar Venta" />
+	</div>
+	<div id="footer">
+		<a href="/movimientos">Volver al módulo de Movimientos</a>
+	</div>
+</form>
+{% endblock %}
