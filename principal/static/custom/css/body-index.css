@@ -447,6 +447,15 @@ input[type=button] {
 		border:thin #FFF solid;
 		background-color:#006633;
 	}
+input[type=submit] {
+		padding:5px 10px;
+		margin-right:5px;
+		font-size:13px;
+		color:#FFF;
+		border:thin #FFF solid;
+		background-color:#006633;
+	}
+
 
 input.verdecito[type=button] {
 	background-color:#02B06B;

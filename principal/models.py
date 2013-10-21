@@ -57,6 +57,9 @@ class Fraccion(models.Model):
         return (self.nombre)
     class Meta:
         verbose_name_plural = "fracciones"
+    def as_json(self):
+        return dict(
+            label=self.nombre)
 
 class Manzana(models.Model):
     cantidad_lotes = models.IntegerField(null=True)

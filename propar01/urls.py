@@ -17,6 +17,7 @@ urlpatterns = patterns('',
     url(r'^informes/', include('informes.urls')),
     url(r'^movimientos/', include('movimientos.urls')),
     url(r'^parametros/', include('parametros.urls')),
+    url(r'^ajax/', include('ajax.urls')),
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),    
     url(r'^admin/', include(admin.site.urls)),
 )

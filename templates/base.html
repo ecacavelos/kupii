@@ -13,9 +13,10 @@
 		<link href="{{ STATIC_URL }}custom/css/grid.css" rel="stylesheet" type="text/css" />
 		<link href="{{ STATIC_URL }}custom/css/body-index.css" rel="stylesheet" type="text/css" />
 		<link href='http://fonts.googleapis.com/css?family=Maven+Pro:400,500,700,900' rel='stylesheet' type='text/css'>
-
+		{% block header_resources %}{% endblock %}
 		<script src="{{ STATIC_URL }}custom/js/pngfix.js" type="text/javascript" defer=""></script>
 		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.js"></script>
+		{% block header_scripts %}{% endblock %}
 
 	</head>
 	<body>
