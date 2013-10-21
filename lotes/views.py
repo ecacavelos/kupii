@@ -1,7 +1,7 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext, loader
 from principal.models import Lote, Venta
-from lotes.forms import LoteForm
+from lotes.forms import LoteForm, FraccionManzana
 
 # Funcion principal del modulo de lotes.
 def lotes(request):
@@ -66,7 +66,7 @@ def detalle_ventas_lote(request, venta_id):
 
 # Funcion para agregar una nueva fraccion.
 def agregar_lotes(request):
-    t = loader.get_template('lotes/agregar.html')    
+    t = loader.get_template('lotes/agregar2.html')    
 
     if request.method == 'POST':
         form = LoteForm(request.POST)
@@ -76,8 +76,10 @@ def agregar_lotes(request):
             return HttpResponseRedirect('/lotes/listado')
     else:
         form = LoteForm()
+        form2 = FraccionManzana()
 
     c = RequestContext(request, {
         'form': form,
+        'form2': form2,
     })
     return HttpResponse(t.render(c))
