@@ -18,3 +18,15 @@ def get_fracciones_by_name(request):
     results = [ob.as_json() for ob in object_list]
 
     return HttpResponse(json.dumps(results), mimetype='application/json')
+
+@require_http_methods(["GET"])
+def get_manzanas_by_fraccion(request):
+    
+#     callback = request.GET['callback']
+    fraccion_id = request.GET['fraccion_id']
+    print("fraccion_id ->" + fraccion_id);
+#     object_list = Manzana.objects.all()
+    object_list = Manzana.objects.filter(fraccion_id=fraccion_id)
+    results = [ob.as_json() for ob in object_list]
+
+    return HttpResponse(json.dumps(results), mimetype='application/json')

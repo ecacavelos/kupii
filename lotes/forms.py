@@ -9,7 +9,7 @@ class LoteForm(ModelForm):
     required_css_class = 'required'
     class Meta:
         model = Lote
-        exclude = ('vendido', 'fecha_de_venta', 'manzana')
+        exclude = ('vendido', 'fecha_de_venta')
 #         widgets = {
 #                 'manzana': TextInput(attrs={'maxlength': 20}),
 #                 'cliente': TextInput(attrs={'maxlength': 20}),
@@ -22,4 +22,4 @@ LoteFormSet = modelformset_factory(Lote, extra=0, can_order=True)
 
 class FraccionManzana(Form):
     fraccion = forms.CharField(max_length=50)
-    manzana = forms.ChoiceField(widget=forms.Select)
+#     manzana = forms.ChoiceField(widget=forms.Select)

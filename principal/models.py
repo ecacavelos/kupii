@@ -59,7 +59,8 @@ class Fraccion(models.Model):
         verbose_name_plural = "fracciones"
     def as_json(self):
         return dict(
-            label=self.nombre)
+            label=self.nombre,
+            id=self.id)
 
 class Manzana(models.Model):
     nro_manzana = models.IntegerField()
@@ -70,6 +71,10 @@ class Manzana(models.Model):
         return('Manzana ' + str(self.id))
     class Meta:
         verbose_name_plural = "manzanas"
+    def as_json(self):
+        return dict(
+            label=self.nro_manzana,
+            id=self.id)
         
 class Vendedor(models.Model):
     nombres = models.CharField(max_length=255)

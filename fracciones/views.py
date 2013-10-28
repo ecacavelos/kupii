@@ -51,7 +51,7 @@ def detalle_fraccion(request, fraccion_id):
 
 # Funcion para agregar una nueva fraccion.
 def agregar_fracciones(request):
-    t = loader.get_template('fracciones/agregar.html')
+    t = loader.get_template('fracciones/agregar2.html')
 
     if request.method == 'POST':
         form = FraccionForm(request.POST)
