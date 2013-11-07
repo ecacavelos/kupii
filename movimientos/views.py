@@ -1,6 +1,6 @@
 from django.http import HttpResponse, HttpResponseServerError, HttpResponseRedirect
 from django.template import RequestContext, loader
-from principal.models import Cliente, Lote, Vendedor, PlanDePago, Venta, Reserva
+from principal.models import Cliente, Lote, Vendedor, PlanDePago, Venta, Reserva, PagoDeCuotas
 from django.utils import simplejson as json
 from datetime import datetime
 
@@ -103,11 +103,8 @@ def reservas_de_lotes(request):
 
         lote_id = data.get('reserva_lote_id', '')
         lote_a_reservar = Lote.objects.get(pk=lote_id)
-
         cliente_id = data.get('reserva_cliente_id', '')
-        
         date_parse_error = False
-
         try:
             fecha_reserva_parsed = datetime.strptime(data.get('reserva_fecha_de_reserva', ''), "%d/%m/%Y")
         except:
@@ -129,5 +126,55 @@ def reservas_de_lotes(request):
         lote_a_reservar.save()
 
     c = RequestContext(request, {
+    })
+    return HttpResponse(t.render(c))
+
+def pago_de_cuotas(request):
+    t = loader.get_template('movimientos/pago_cuotas.html')
+    
+    if request.method == 'POST':
+        data = request.POST
+
+        lote_id = data.get('pago_lote_id', '')
+        venta = Venta.objects.get(lote_id=lote_id)
+
+        cliente_id = data.get('pago_cliente_id', '')
+        vendedor_id = data.get('pago_vendedor_id', '')
+        plan_pago_id = data.get('pago_plan_de_pago_id', '')
+        nro_cuotas_a_pagar = data.get('pago_nro_cuotas_a_pagar', '')
+        total_de_cuotas = data.get('pago_total_de_cuotas', '')
+        total_de_mora = data.get('pago_total_de_mora', '')
+        total_de_pago = data.get('pago_total_de_pago', '')
+        
+        date_parse_error = False
+
+        try:
+            fecha_pago_parsed = datetime.strptime(data.get('pago_fecha_de_pago', ''), "%d/%m/%Y")
+        except:
+            date_parse_error = True
+
+        if date_parse_error == True:
+            try:
+                fecha_pago_parsed = datetime.strptime(data.get('pago_fecha_de_pago', ''), "%Y-%m-%d")
+            except:
+                date_parse_error = True
+
+        nuevo_pago = PagoDeCuotas()
+        nuevo_pago.lote = Lote.objects.get(pk=lote_id)
+        nuevo_pago.fecha_de_pago = fecha_pago_parsed
+        nuevo_pago.nro_cuotas_a_pagar = nro_cuotas_a_pagar
+        nuevo_pago.cliente = Cliente.objects.get(pk=cliente_id)
+        nuevo_pago.plan_de_pago = PlanDePago.objects.get(pk=plan_pago_id)
+        nuevo_pago.vendedor = Vendedor.objects.get(pk=vendedor_id)
+        nuevo_pago.total_de_cuotas = total_de_cuotas
+        nuevo_pago.total_de_mora = total_de_mora
+        nuevo_pago.total_de_pago = total_de_pago
+        
+        nuevo_pago.save()
+        venta.pagos_realizados = int(nro_cuotas_a_pagar) + int(venta.pagos_realizados)
+        venta.save()
+
+    c = RequestContext(request, {
+
     })
     return HttpResponse(t.render(c))

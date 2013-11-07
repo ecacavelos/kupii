@@ -57,10 +57,14 @@ class Fraccion(models.Model):
         return (self.nombre)
     class Meta:
         verbose_name_plural = "fracciones"
+    def as_json(self):
+        return dict(
+            label=self.nombre)
 
 class Manzana(models.Model):
-    cantidad_lotes = models.IntegerField(null=True)
+    nro_manzana = models.IntegerField()
     fraccion = models.ForeignKey(Fraccion)   
+    cantidad_lotes = models.IntegerField(null=True)
     def __unicode__(self):
         #return (self.nro_manzana)
         return('Manzana ' + str(self.id))
@@ -130,6 +134,7 @@ class PlanDePago(models.Model):
         verbose_name_plural = "planes de pago"
 
 class Lote(models.Model):
+    nro_lote = models.IntegerField()
     manzana = models.ForeignKey(Manzana)
     precio_contado = models.IntegerField()
     precio_credito = models.IntegerField()
@@ -167,3 +172,34 @@ class Reserva(models.Model):
     cliente = models.ForeignKey(Cliente)
     def __unicode__(self):
         return (str(self.lote) + " a " + self.cliente.nombres + " " + self.cliente.apellidos)
+    
+class PagoDeCuotas(models.Model):
+    venta = models.ForeignKey(Venta)
+    lote = models.ForeignKey(Lote)
+    fecha_de_pago = models.DateField()
+    nro_cuotas_a_pagar = models.IntegerField()
+    cliente = models.ForeignKey(Cliente)
+    plan_de_pago = models.ForeignKey(PlanDePago)
+    vendedor = models.ForeignKey(Vendedor)
+    total_de_cuotas = models.IntegerField()
+    total_de_mora = models.IntegerField()
+    total_a_pagar = models.IntegerField()
+    
+class TransferenciaDeLotes(models.Model):
+    lote = models.ForeignKey(Lote)
+    fecha_de_transferencia = models.DateField()
+    cliente = models.ForeignKey(Cliente)
+    vendedor = models.ForeignKey(Vendedor)
+    plan_de_pago = models.ForeignKey(PlanDePago)
+    
+class CambioDeLotes(models.Model):
+    cliente = models.ForeignKey(Cliente)
+    lote_a_cambiar = models.ForeignKey(Lote,related_name='loteacambiar')
+    lote_nuevo = models.ForeignKey(Lote)
+    
+class RecuperacionDeLotes(models.Model):
+    lote = models.ForeignKey(Lote)
+    fecha_de_transferencia = models.DateField()
+    cliente = models.ForeignKey(Cliente)
+    vendedor = models.ForeignKey(Vendedor)
+    

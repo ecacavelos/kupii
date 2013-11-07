@@ -41,7 +41,7 @@ function validateVenta(event) {
 		});
 		request2.done(function(msg) {
 			alert("Se procesó la venta satisfactoriamente.");
-			top.location.href = "/movimientos";
+			top.location.href = "/";
 		});
 		request2.fail(function(jqXHR, textStatus) {
 			alert("Epic Fail.");

@@ -1,0 +1,63 @@
+{% extends "movimientos/base_movimientos.html" %}
+
+{% block java_scripts %}
+<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}ajax_config.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}movimientos_pagos.js"></script>
+{% endblock %}
+
+{% block content %}
+<form id="main_pago_form" action="" method="post">
+	{% csrf_token %}
+	<div class="fieldWrapperMovimientos">
+		<label for="id_lote">Lote: </label>
+		<input id="id_lote" type="text" name="lote" maxlength="12" onblur="retrieveLote()" /><br>
+		<ul class="errorlist"><li id="lote_error"></li></ul>
+		<label>Detalles del Lote: </label><div id="lote_seleccionado_detalles"></div>
+	</div>
+	<div class="fieldWrapperMovimientos">
+		<label for="id_fecha">Fecha de Pago: </label>
+		<input id="id_fecha" type="date" name="fecha" maxlength="10" /><br>
+	</div>
+	<div class="fieldWrapperMovimientos">
+		<label for="id_cliente">Código del Cliente: </label>
+		<input id="id_cliente" type="text" name="cliente" disabled="disabled" maxlength="100" /><br>	
+		<label>Apellidos y Nombres: </label><div id="cliente_seleccionado"></div>
+		<ul class="errorlist"><li id="cliente_error"></li></ul>
+	</div>
+	<div class="fieldWrapperMovimientos">	
+		<label for="id_vendedor">Código del Vendedor: </label>
+		<input id="id_vendedor" type="text" name="vendedor" disabled="disabled" maxlength="100" /><br>	
+		<label>Apellidos y Nombres: </label><div id="vendedor_seleccionado"></div><br>
+		<ul class="errorlist"><li id="vendedor_error"></li></ul>	
+	</div>
+	<div class="fieldWrapperMovimientos">
+		<label for="id_plan_pago">Plan de Pago: </label>
+		<input id="id_plan_pago" type="text" name="plan_pago" disabled="disabled" maxlength="100" /><br>	
+		<label>Nombre del Plan: </label><div id="plan_pago_seleccionado"></div><br>
+		<ul class="errorlist"><li id="plan_pago_error"></li></ul>
+	</div>
+	<div class="fieldWrapperMovimientos">
+		<label for="nro_cuotas_a_pagar">Número de Cuotas a Pagar: </label>
+		<input id="nro_cuotas_a_pagar" type"number" name="nro_cuotas_a_pagar" maxlength="4" onblur="calculateTotalCuotas()"/><br>
+		<label for="monto_cuota">Monto de cada Cuota: </label>
+		<input id="monto_cuota" type="number" name="monto_cuota" disabled="disabled" maxlength="100" /><br>
+	</div>
+	<div class="fieldWrapperMovimientos">
+		<label for="total_cuotas">Total de Cuotas: </label>
+		<input id="total_cuotas" type="number" name="total_cuotas" disabled="disabled" maxlength="100" /><br>
+		<label for="total_mora">Total de Mora: </label>
+		<input id="total_mora" type="number" name="total_mora" disabled="disabled" maxlength="100" onblur="calculateTotalPago()"/><br>
+		<label for="total_pago">Monto Total: </label>
+		<input id="total_pago" type="number" name="total_pago" disabled="disabled" maxlength="100" /><br>
+		<label for="fecha_vencimiento">Fecha del 1er Vencimiento: </label>
+		<input id="fecha_vencimiento" type="date" name="fecha_vencimiento" disabled="disabled" maxlength="10" /><br>	
+	</div>
+	<div class="fieldWrapperMovimientos">
+		<input id="guardar_pago" type="submit" disabled="disabled" value="Guardar Pago" />
+	</div>
+	<div id="footer">
+		<a href="/">Volver a la página principal</a>
+	</div>
+</form>
+{% endblock %}
