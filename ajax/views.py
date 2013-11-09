@@ -33,10 +33,10 @@ def get_manzanas_by_fraccion(request):
 
 @require_http_methods(["GET"])
 def get_ventas_by_lote(request):
-    
+
     lote_id = request.GET['lote_id']
     print("lote_id ->" + lote_id);
-    
+
 #     object_list = Manzana.objects.all()
     object_list = Venta.objects.filter(lote=lote_id)
     results = [ob.as_json() for ob in object_list]

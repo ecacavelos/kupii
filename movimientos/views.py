@@ -1,6 +1,6 @@
 from django.http import HttpResponse, HttpResponseServerError, HttpResponseRedirect
 from django.template import RequestContext, loader
-from principal.models import Cliente, Lote, Vendedor, PlanDePago, Venta, Reserva, PagoDeCuotas
+from principal.models import Cliente, Lote, Vendedor, PlanDePago, Venta, Reserva, PagoDeCuotas, TransferenciaDeLotes
 from django.utils import simplejson as json
 from datetime import datetime
 
@@ -174,6 +174,51 @@ def pago_de_cuotas(request):
         venta.pagos_realizados = int(nro_cuotas_a_pagar) + int(venta.pagos_realizados)
         venta.save()
 
+    c = RequestContext(request, {
+
+    })
+    return HttpResponse(t.render(c))
+
+def transferencias_de_lotes(request):
+    t = loader.get_template('movimientos/transferencias_lotes.html')
+    
+    if request.method == 'POST':
+        data = request.POST
+
+        lote_id = data.get('transferencia_lote_id', '')
+        venta = Venta.objects.get(lote_id=lote_id)
+
+
+        cliente_original_id = data.get('transferencia_cliente_original_id', '')
+        cliente_id = data.get('transferencia_cliente_id', '')
+        vendedor_id = data.get('transferencia_vendedor_id', '')
+        plan_pago_id = data.get('transferencia_plan_de_pago_id', '')
+        
+        date_parse_error = False
+
+        try:
+            fecha_transferencia_parsed = datetime.strptime(data.get('transferencia_fecha_de_transferencia', ''), "%d/%m/%Y")
+        except:
+            date_parse_error = True
+
+        if date_parse_error == True:
+            try:
+                fecha_transferencia_parsed = datetime.strptime(data.get('transferencia_fecha_de_transferencia', ''), "%Y-%m-%d")
+            except:
+                date_parse_error = True
+
+        nueva_transferencia = TransferenciaDeLotes()
+        nueva_transferencia.lote = Lote.objects.get(pk=lote_id)
+        nueva_transferencia.fecha_de_transferencia = fecha_transferencia_parsed
+        nueva_transferencia.cliente_original = Cliente.objects.get(pk=cliente_original_id)
+        nueva_transferencia.cliente = Cliente.objects.get(pk=cliente_id)
+        nueva_transferencia.plan_de_pago = PlanDePago.objects.get(pk=plan_pago_id)
+        nueva_transferencia.vendedor = Vendedor.objects.get(pk=vendedor_id)
+        
+        nueva_transferencia.save()
+        venta.cliente = Cliente.objects.get(pk=cliente_id)
+        venta.save()
+        
     c = RequestContext(request, {
 
     })

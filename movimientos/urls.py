@@ -7,4 +7,5 @@ urlpatterns = patterns('movimientos.views',
     url(r'^ventas_lotes/calcular_cuotas/$', 'ventas_de_lotes_calcular_cuotas'),
     url(r'^pago_cuotas/$', 'pago_de_cuotas'),
     url(r'^reservas_lotes/$', 'reservas_de_lotes'),
+    url(r'^transferencias_lotes/$', 'transferencias_de_lotes')
 )

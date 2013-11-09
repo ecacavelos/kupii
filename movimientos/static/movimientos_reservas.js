@@ -30,7 +30,7 @@ function validateReserva(event) {
 	});
 	request3.done(function(msg) {
 		alert("Se procesó la reserva satisfactoriamente.");
-		top.location.href = "/movimientos";
+		top.location.href = "/";
 	});
 	request3.fail(function(jqXHR, textStatus) {
 		alert("Se encontró un error en la reserva, favor verifique los datos");

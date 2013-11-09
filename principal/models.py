@@ -190,7 +190,7 @@ class Reserva(models.Model):
     cliente = models.ForeignKey(Cliente)
     def __unicode__(self):
         return (str(self.lote) + " a " + self.cliente.nombres + " " + self.cliente.apellidos)
-    
+
 class PagoDeCuotas(models.Model):
     lote = models.ForeignKey(Lote)
     fecha_de_pago = models.DateField()
@@ -202,22 +202,21 @@ class PagoDeCuotas(models.Model):
     total_de_mora = models.IntegerField()
     total_de_pago = models.IntegerField()
 
-    
 class TransferenciaDeLotes(models.Model):
     lote = models.ForeignKey(Lote)
     fecha_de_transferencia = models.DateField()
     cliente = models.ForeignKey(Cliente)
+    cliente_original = models.ForeignKey(Cliente,related_name='clienteoriginal')
     vendedor = models.ForeignKey(Vendedor)
     plan_de_pago = models.ForeignKey(PlanDePago)
-    
+
 class CambioDeLotes(models.Model):
     cliente = models.ForeignKey(Cliente)
     lote_a_cambiar = models.ForeignKey(Lote,related_name='loteacambiar')
     lote_nuevo = models.ForeignKey(Lote)
-    
+
 class RecuperacionDeLotes(models.Model):
     lote = models.ForeignKey(Lote)
     fecha_de_transferencia = models.DateField()
     cliente = models.ForeignKey(Cliente)
     vendedor = models.ForeignKey(Vendedor)
-    
