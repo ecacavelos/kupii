@@ -17,6 +17,7 @@ var global_lote_id = 0;
 var splitted_id = "";
 var lote_id = 0;
 var pagos_realizados = 0;
+var venta_id = 0;
 
 function validateLotePre(event) {
 	// Allow: backspace, delete, tab, escape, and enter
@@ -46,11 +47,12 @@ function validateLotePost(event) {
 function validatePago(event) {
 
 	event.preventDefault();
-	var request3 = $.ajax({
+	var request4 = $.ajax({
 		type : "POST",
 		url : "/movimientos/pago_cuotas/",
 		data : {
 			ingresar_pago : true,
+			pago_venta_id : venta_id,
 			pago_lote_id : global_lote_id,
 			pago_fecha_de_pago : $("#id_fecha").val(),
 			pago_nro_cuotas_a_pagar : $("#nro_cuotas_a_pagar").val(),
@@ -62,11 +64,11 @@ function validatePago(event) {
 			pago_total_de_pago : $("#total_pago").val(),
 		}
 	});
-	request3.done(function(msg) {
+	request4.done(function(msg) {
 		alert("Se procesó el pago exitosamente.");
 		top.location.href = "/";
 	});
-	request3.fail(function(jqXHR, textStatus) {
+	request4.fail(function(jqXHR, textStatus) {
 		alert("Se encontró un error en el pago, favor verifique los datos");
 	});
 	return false;
@@ -78,7 +80,7 @@ function retrieveLote() {
 		splitted_id = $("#id_lote").val().split('/');
 		// Hacemos un request POST AJAX para obtener los datos del lote ingresado.
 		var request = $.ajax({
-			type : "GET",			
+			type : "GET",
 			url : "/datos/1/",
 			data : {
 				fraccion : splitted_id[0],
@@ -104,10 +106,13 @@ function retrieveLote() {
 			fecha_actual = new Date().toJSON().substring(0, 10);
 
 			$("#id_fecha").val(fecha_actual);
-			//$("#id_cliente").removeAttr("disabled");
-			//$("#id_vendedor").removeAttr("disabled");
-			//$("#id_plan_pago").removeAttr("disabled");
-			//$("#id_monto").removeAttr("disabled");
+			$("#id_cliente").removeAttr("disabled");
+			$("#id_cliente").focus();
+			$("#id_vendedor").removeAttr("disabled");
+			$("#id_vendedor").focus();
+			$("#id_plan_pago").removeAttr("disabled");
+			$("#id_plan_pago").focus();
+			$("#id_monto").removeAttr("disabled");
 			$("#nro_cuotas_a_pagar").focus();
 		});
 		// En caso de no poder obtener los datos del lote, indicamos el error.
@@ -134,6 +139,7 @@ function retrieveVenta() {
 		});
 		// Actualizamos el formulario con los datos obtenidos del lote.
 		request.done(function(msg) {
+			venta_id = (msg[0]['venta_id']);
 			$("#id_cliente").val(msg[0]['cliente_id']);
 			$("#cliente_seleccionado").val(msg[0]['cliente']);
 			$("#id_vendedor").val(msg[0]['vendedor_id']);
@@ -144,6 +150,86 @@ function retrieveVenta() {
 			$("#monto_cuota").val(msg[0]['precio_de_cuota']);
 		});
 //	}
+};
+
+function retrieveCliente() {
+	if ($("#id_cliente").val().toString().length > 0) {
+		// Hacemos un request POST AJAX para obtener los datos del cliente ingresado.
+		var request = $.ajax({
+			type : "GET",
+			url : "/datos/2/",
+			data : {
+				cliente : $("#id_cliente").val()
+			}
+		});
+		// Actualizamos el formulario con los datos obtenidos del cliente.
+		request.done(function(msg) {
+			//alert("Response: " + msg);
+			$("#cliente_error").html("");
+			$("#cliente_seleccionado").html(msg);
+
+		});
+		// En caso de no poder obtener los datos del cliente, indicamos el error.
+		request.fail(function(jqXHR, textStatus) {
+			//alert("Request failed: " + jqXHR);
+			$("#cliente_error").html("No se pueden obtener los datos del Cliente.");
+			$("#cliente_seleccionado").html("");
+			$("#id_cliente").select().focus();
+		});
+	}
+};
+
+function retrieveVendedor() {
+	if ($("#id_vendedor").val().toString().length > 0) {
+		// Hacemos un request POST AJAX para obtener los datos del vendedor ingresado.
+		var request = $.ajax({
+			type : "GET",
+			url : "/datos/3/",
+			data : {
+				vendedor : $("#id_vendedor").val()
+			}
+		});
+		// Actualizamos el formulario con los datos obtenidos del vendedor.
+		request.done(function(msg) {
+			//alert("Response: " + msg);
+			$("#vendedor_error").html("");
+			$("#vendedor_seleccionado").html(msg);
+
+		});
+		// En caso de no poder obtener los datos del vendedor, indicamos el error.
+		request.fail(function(jqXHR, textStatus) {
+			//alert("Request failed: " + jqXHR);
+			$("#vendedor_error").html("No se pueden obtener los datos del Vendedor.");
+			$("#vendedor_seleccionado").html("");
+			$("#id_vendedor").select().focus();
+		});
+	}
+};
+
+function retrievePlanPago() {
+	if ($("#id_plan_pago").val().toString().length > 0) {
+		// Hacemos un request POST AJAX para obtener los datos del plan de pagos ingresado.
+		var request = $.ajax({
+			type : "GET",
+			url : "/datos/5/",
+			data : {
+				plan_pago : $("#id_plan_pago").val(),
+			}
+		});
+		// Actualizamos el formulario con los datos obtenidos del plan de pagos.
+		request.done(function(msg) {
+			//alert("Response: " + msg);
+			$("#plan_pago_error").html("");
+			$("#plan_pago_seleccionado").html(msg.nombre_del_plan);
+
+		});
+		// En caso de no poder obtener los datos del plan de pagos, indicamos el error.
+		request.fail(function(jqXHR, textStatus) {
+			$("#plan_pago_error").html("No se pueden obtener los datos del Plan de Pago.");
+			$("#plan_pago_seleccionado").html("");
+			$("#id_plan_pago").select().focus();
+		});
+	}
 };
 
 function calculateTotalCuotas() {

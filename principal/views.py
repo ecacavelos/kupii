@@ -35,8 +35,8 @@ def retrieve_lote(request):
             response_data['superficie'] = str(r.superficie)
             response_data['lote_id'] = r.id
             response_data['lote_tag'] = str(r)
-            response_data['precio_contado'] = r.precio_credito
-            response_data['precio_credito'] = r.precio_contado
+            response_data['precio_contado'] = r.precio_contado
+            response_data['precio_credito'] = r.precio_credito
             return HttpResponse(json.dumps(response_data), content_type="application/json")
         else:
             return HttpResponseServerError("No se encontraron lotes.")

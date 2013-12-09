@@ -4,7 +4,7 @@ $(document).ready(function() {
 	
 	//$("#enviar_reserva").click(validateReserva);
 
-	$("#main_transferencia_form").submit(validateTransferencia);
+	$("#main_recuperacion_form").submit(validateRecuperacion);
 });
 
 window.onload = function() {
@@ -16,6 +16,10 @@ window.onload = function() {
 var global_lote_id = 0;
 var splitted_id = "";
 var lote_id = 0;
+var venta_id = 0;			//ID de la venta relacionada al lote
+var PrecioVenta = 0;		//Precio de venta fijado para el lote
+var EntregaInicial = 0;		//Entrega inicial pagada por el lote
+var TotalPagado = 0;		//Sumatoria de cuotas pagadas por el lote
 
 function validateLotePre(event) {
 	// Allow: backspace, delete, tab, escape, and enter
@@ -42,28 +46,28 @@ function validateLotePost(event) {
 	}
 };
 
-function validateTransferencia(event) {
+function validateRecuperacion(event) {
 
 	event.preventDefault();
-	var request5 = $.ajax({
+	var request7 = $.ajax({
 		type : "POST",
-		url : "/movimientos/transferencias_lotes/",
+		url : "/movimientos/recuperacion_lotes/",
 		data : {
-			ingresar_transferencia : true,
-			transferencia_lote_id : global_lote_id,
-			transferencia_fecha_de_transferencia : $("#id_fecha").val(),
-			transferencia_cliente_original_id : $("#id_cliente_original").val(),
-			transferencia_cliente_id : $("#id_cliente").val(),
-			transferencia_plan_de_pago_id : $("#id_plan_pago").val(),
-			transferencia_vendedor_id : $("#id_vendedor").val(),
+			recuperar_lote : true,
+			recuperacion_lote_id : global_lote_id,
+			recuperacion_venta_id : venta_id,
+			recuperacion_fecha_de_recuperacion : $("#id_fecha").val(),
+			recuperacion_cliente_id : $("#id_cliente").val(),
+			recuperacion_plan_de_pago_id : $("#id_plan_pago").val(),
+			recuperacion_vendedor_id : $("#id_vendedor").val(),
 		}
 	});
-	request5.done(function(msg) {
-		alert("Se procesó la transferencia exitosamente.");
+	request7.done(function(msg) {
+		alert("Se procesó la recuperacion exitosamente.");
 		top.location.href = "/";
 	});
-	request5.fail(function(jqXHR, textStatus) {
-		alert("Se encontró un error en la transferencia, favor verifique los datos");
+	request7.fail(function(jqXHR, textStatus) {
+		alert("Se encontró un error en la recuperacion, favor verifique los datos");
 	});
 	return false;
 };
@@ -100,8 +104,12 @@ function retrieveLote() {
 			fecha_actual = new Date().toJSON().substring(0, 10);
 
 			$("#id_fecha").val(fecha_actual);
-			$("#id_cliente").removeAttr("disabled");
-			$("#id_cliente").focus();
+			//$("#id_cliente").removeAttr("disabled");
+			retrieveCliente();
+			//$("#id_vendedor").removeAttr("disabled");
+			retrieveVendedor();
+			//$("#id_plan_pago").removeAttr("disabled");
+			retrievePlanPago();
 		});
 		// En caso de no poder obtener los datos del lote, indicamos el error.
 		request.fail(function(jqXHR, textStatus) {
@@ -127,12 +135,20 @@ function retrieveVenta() {
 		});
 		// Actualizamos el formulario con los datos obtenidos del lote.
 		request.done(function(msg) {
-			$("#id_cliente_original").val(msg[0]['cliente_id']);
-			$("#cliente_original_seleccionado").val(msg[0]['cliente']);
+			$("#id_cliente").val(msg[0]['cliente_id']);
+			$("#cliente_seleccionado").val(msg[0]['cliente']);
 			$("#id_vendedor").val(msg[0]['vendedor_id']);
 			$("#vendedor_seleccionado").val(msg[0]['vendedor']);
 			$("#plan_pago").val(msg[0]['plan_de_pago']);
 			$("#id_plan_pago").val(msg[0]['plan_de_pago_id']);
+			venta_id = (msg[0]['venta_id']);
+			PrecioVenta = (msg[0]['precio_de_venta']);
+			EntregaInicial = (msg[0]['entrega_inicial']);
+			retrievePagos();
+		});
+		request.fail(function(jqXHR, textStatus) {
+			alert("El lote no está vendido");
+			$("#id_lote").select().focus();
 		});
 //	}
 };
@@ -153,8 +169,6 @@ function retrieveCliente() {
 			$("#cliente_error").html("");
 			$("#cliente_seleccionado").html(msg);
 
-			$("#guardar_transferencia").removeAttr("disabled");
-			$("#guardar_transferencia").focus();
 		});
 		// En caso de no poder obtener los datos del cliente, indicamos el error.
 		request.fail(function(jqXHR, textStatus) {
@@ -163,5 +177,93 @@ function retrieveCliente() {
 			$("#cliente_seleccionado").html("");
 			$("#id_cliente").select().focus();
 		});
+	}
+};
+
+function retrieveVendedor() {
+	if ($("#id_vendedor").val().toString().length > 0) {
+		// Hacemos un request POST AJAX para obtener los datos del vendedor ingresado.
+		var request = $.ajax({
+			type : "GET",
+			url : "/datos/3/",
+			data : {
+				vendedor : $("#id_vendedor").val()
+			}
+		});
+		// Actualizamos el formulario con los datos obtenidos del vendedor.
+		request.done(function(msg) {
+			//alert("Response: " + msg);
+			$("#vendedor_error").html("");
+			$("#vendedor_seleccionado").html(msg);
+
+		});
+		// En caso de no poder obtener los datos del vendedor, indicamos el error.
+		request.fail(function(jqXHR, textStatus) {
+			//alert("Request failed: " + jqXHR);
+			$("#vendedor_error").html("No se pueden obtener los datos del Vendedor.");
+			$("#vendedor_seleccionado").html("");
+			$("#id_vendedor").select().focus();
+		});
+	}
+};
+
+function retrievePlanPago() {
+	if ($("#id_plan_pago").val().toString().length > 0) {
+		// Hacemos un request POST AJAX para obtener los datos del plan de pagos ingresado.
+		var request = $.ajax({
+			type : "GET",
+			url : "/datos/5/",
+			data : {
+				plan_pago : $("#id_plan_pago").val(),
+			}
+		});
+		// Actualizamos el formulario con los datos obtenidos del plan de pagos.
+		request.done(function(msg) {
+			//alert("Response: " + msg);
+			$("#plan_pago_error").html("");
+			$("#plan_pago_seleccionado").html(msg.nombre_del_plan);
+
+		});
+		// En caso de no poder obtener los datos del plan de pagos, indicamos el error.
+		request.fail(function(jqXHR, textStatus) {
+			$("#plan_pago_error").html("No se pueden obtener los datos del Plan de Pago.");
+			$("#plan_pago_seleccionado").html("");
+			$("#id_plan_pago").select().focus();
+		});
+	}
+};
+
+function retrievePagos() {
+	//if ($("#lote_id").val().toString().length > 0) {
+		var request = $.ajax({
+			type : "GET",
+			url : "/ajax/get_pagos_by_venta/",
+			data : {
+				venta_id : venta_id,
+			},
+			dataType : "json"
+		});
+		// Actualizamos el formulario con los datos obtenidos del lote.
+		request.done(function(msg) {
+			var length = msg.length;
+			var TotalPagado = 0;
+			for(var i=0; i < length; i++){
+    			TotalPagado += msg[i]['total_de_cuotas'];  
+			}
+			//alert(TotalPagado);
+		});
+		recuperable();
+//	}	
+};
+
+function recuperable() {
+	if (TotalPagado <= ((PrecioVenta/4) - EntregaInicial) ) {
+		$("#recuperar_lote").removeAttr("disabled");
+		$("#recuperar_lote").focus();
+		alert("Lote recuperable");
+	}
+	else {
+		$("#recuperar_lote").attr("disabled", "disabled");
+		alert("Lote no recuperable, se pagó más del 25% del valor del mismo");
 	}
 };

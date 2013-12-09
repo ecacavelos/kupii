@@ -21,19 +21,19 @@
 	</div>
 	<div class="fieldWrapperMovimientos">
 		<label for="id_cliente">Código del Cliente: </label>
-		<input id="id_cliente" type="text" name="cliente" disabled="disabled" maxlength="100" /><br>	
+		<input id="id_cliente" type="text" name="cliente" disabled="disabled" maxlength="100" onblur="retrieveCliente()" /><br>	
 		<label>Apellidos y Nombres: </label><div id="cliente_seleccionado"></div>
 		<ul class="errorlist"><li id="cliente_error"></li></ul>
 	</div>
 	<div class="fieldWrapperMovimientos">	
 		<label for="id_vendedor">Código del Vendedor: </label>
-		<input id="id_vendedor" type="text" name="vendedor" disabled="disabled" maxlength="100" /><br>	
+		<input id="id_vendedor" type="text" name="vendedor" disabled="disabled" maxlength="100" onblur="retrieveVendedor()" /><br>	
 		<label>Apellidos y Nombres: </label><div id="vendedor_seleccionado"></div><br>
 		<ul class="errorlist"><li id="vendedor_error"></li></ul>	
 	</div>
 	<div class="fieldWrapperMovimientos">
 		<label for="id_plan_pago">Plan de Pago: </label>
-		<input id="id_plan_pago" type="text" name="plan_pago" disabled="disabled" maxlength="100" /><br>	
+		<input id="id_plan_pago" type="text" name="plan_pago" disabled="disabled" maxlength="100" onblur="retrievePlanPago()" /><br>	
 		<label>Nombre del Plan: </label><div id="plan_pago_seleccionado"></div><br>
 		<ul class="errorlist"><li id="plan_pago_error"></li></ul>
 	</div>

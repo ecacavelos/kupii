@@ -181,6 +181,8 @@ class Venta(models.Model):
             plan_de_pago = self.plan_de_pago.nombre_del_plan,
             cantidad_cuotas = self.plan_de_pago.cantidad_de_cuotas,
             precio_de_cuota = self.precio_de_cuota,
+            entrega_inicial = self.entrega_inicial,
+            precio_de_venta = self.precio_final_de_venta,
             pagos_realizados = self.pagos_realizados,
         )
     
@@ -192,6 +194,7 @@ class Reserva(models.Model):
         return (str(self.lote) + " a " + self.cliente.nombres + " " + self.cliente.apellidos)
 
 class PagoDeCuotas(models.Model):
+    venta = models.ForeignKey(Venta)
     lote = models.ForeignKey(Lote)
     fecha_de_pago = models.DateField()
     nro_cuotas_a_pagar = models.IntegerField()
@@ -201,6 +204,11 @@ class PagoDeCuotas(models.Model):
     total_de_cuotas = models.IntegerField()
     total_de_mora = models.IntegerField()
     total_de_pago = models.IntegerField()
+    def as_json(self):
+        return dict(
+            nro_cuotas_a_pagar = self.nro_cuotas_a_pagar,
+            total_de_cuotas = self.total_de_cuotas,
+        )
 
 class TransferenciaDeLotes(models.Model):
     lote = models.ForeignKey(Lote)
@@ -212,11 +220,14 @@ class TransferenciaDeLotes(models.Model):
 
 class CambioDeLotes(models.Model):
     cliente = models.ForeignKey(Cliente)
+    fecha_de_cambio = models.DateField()
     lote_a_cambiar = models.ForeignKey(Lote,related_name='loteacambiar')
     lote_nuevo = models.ForeignKey(Lote)
 
 class RecuperacionDeLotes(models.Model):
     lote = models.ForeignKey(Lote)
-    fecha_de_transferencia = models.DateField()
+    venta = models.ForeignKey(Venta)
+    fecha_de_recuperacion = models.DateField()
     cliente = models.ForeignKey(Cliente)
     vendedor = models.ForeignKey(Vendedor)
+    plan_de_pago = models.ForeignKey(PlanDePago)

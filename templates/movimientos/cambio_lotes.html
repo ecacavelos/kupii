@@ -1,0 +1,43 @@
+{% extends "movimientos/base_movimientos.html" %}
+
+{% block java_scripts %}
+<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}ajax_config.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}movimientos_cambios.js"></script>
+{% endblock %}
+
+{% block content %}
+<form id="main_cambios_form" action="" method="post">
+	{% csrf_token %}
+	<div class="fieldWrapperMovimientos">
+		<label for="id_cliente">Código del Cliente: </label>
+		<input id="id_cliente" type="text" name="cliente" maxlength="100" onblur="retrieveCliente()" /><br>	
+		<label>Apellidos y Nombres: </label><div id="cliente_seleccionado"></div>
+		<ul class="errorlist"><li id="cliente_error"></li></ul>
+	</div>
+	<div class="fieldWrapperMovimientos">
+		<label for="id_fecha">Fecha de Cambio: </label>
+		<input id="id_fecha" type="date" name="fecha" maxlength="10" /><br>
+	</div>
+	<div class="fieldWrapperMovimientos">
+		<label for="id_lote">Lote a ser cambiado: </label>
+		<input id="id_lote" type="text" name="lote" disabled="disabled" maxlength="12" onblur="retrieveLote()" /><br>
+		<ul class="errorlist"><li id="lote_error"></li></ul>
+		<label>Superficie (m2): </label><div id="lote_superficie"></div><br>
+		<label>Detalles del Lote: </label><div id="lote_seleccionado_detalles"></div>
+	</div>
+	<div class="fieldWrapperMovimientos">
+		<label for="id_lote2">Nuevo Lote a asignar: </label>
+		<input id="id_lote2" type="text" name="lote2" disabled="disabled" maxlength="12" onblur="retrieveLote2()" /><br>
+		<ul class="errorlist"><li id="lote2_error"></li></ul>
+		<label>Superficie (m2): </label><div id="lote2_superficie"></div><br>
+		<label>Detalles del Lote: </label><div id="lote2_seleccionado_detalles"></div>
+	</div>
+	<div class="fieldWrapperMovimientos">
+		<input id="cambiar_lotes" type="submit" disabled="disabled" value="Cambio Lotes" />
+	</div>
+	<div id="footer">
+		<a href="/">Volver a la página principal</a>
+	</div>
+</form>
+{% endblock %}

@@ -1,6 +1,6 @@
 from django.http import HttpResponse, HttpResponseServerError, HttpResponseRedirect
 from django.template import RequestContext, loader
-from principal.models import Cliente, Lote, Vendedor, PlanDePago, Venta, Reserva, PagoDeCuotas, TransferenciaDeLotes
+from principal.models import Cliente, Lote, Vendedor, PlanDePago, Venta, Reserva, PagoDeCuotas, TransferenciaDeLotes, CambioDeLotes, RecuperacionDeLotes
 from django.utils import simplejson as json
 from datetime import datetime
 
@@ -137,14 +137,15 @@ def pago_de_cuotas(request):
 
         lote_id = data.get('pago_lote_id', '')
         venta = Venta.objects.get(lote_id=lote_id)
-
-        cliente_id = data.get('pago_cliente_id', '')
-        vendedor_id = data.get('pago_vendedor_id', '')
-        plan_pago_id = data.get('pago_plan_de_pago_id', '')
-        nro_cuotas_a_pagar = data.get('pago_nro_cuotas_a_pagar', '')
-        total_de_cuotas = data.get('pago_total_de_cuotas', '')
-        total_de_mora = data.get('pago_total_de_mora', '')
-        total_de_pago = data.get('pago_total_de_pago', '')
+        
+        venta_id = data.get('pago_venta_id')
+        cliente_id = data.get('pago_cliente_id')
+        vendedor_id = data.get('pago_vendedor_id')
+        plan_pago_id = data.get('pago_plan_de_pago_id')
+        nro_cuotas_a_pagar = data.get('pago_nro_cuotas_a_pagar')
+        total_de_cuotas = data.get('pago_total_de_cuotas')
+        total_de_mora = data.get('pago_total_de_mora')
+        total_de_pago = data.get('pago_total_de_pago')
         
         date_parse_error = False
 
@@ -160,6 +161,7 @@ def pago_de_cuotas(request):
                 date_parse_error = True
 
         nuevo_pago = PagoDeCuotas()
+        nuevo_pago.venta = Venta.objects.get(pk=venta_id)
         nuevo_pago.lote = Lote.objects.get(pk=lote_id)
         nuevo_pago.fecha_de_pago = fecha_pago_parsed
         nuevo_pago.nro_cuotas_a_pagar = nro_cuotas_a_pagar
@@ -193,7 +195,7 @@ def transferencias_de_lotes(request):
         cliente_id = data.get('transferencia_cliente_id', '')
         vendedor_id = data.get('transferencia_vendedor_id', '')
         plan_pago_id = data.get('transferencia_plan_de_pago_id', '')
-        
+
         date_parse_error = False
 
         try:
@@ -214,12 +216,100 @@ def transferencias_de_lotes(request):
         nueva_transferencia.cliente = Cliente.objects.get(pk=cliente_id)
         nueva_transferencia.plan_de_pago = PlanDePago.objects.get(pk=plan_pago_id)
         nueva_transferencia.vendedor = Vendedor.objects.get(pk=vendedor_id)
-        
+
         nueva_transferencia.save()
         venta.cliente = Cliente.objects.get(pk=cliente_id)
         venta.save()
-        
+
     c = RequestContext(request, {
 
+    })
+    return HttpResponse(t.render(c))
+
+def cambio_de_lotes(request):
+    t = loader.get_template('movimientos/cambio_lotes.html')
+
+    if request.method == 'POST':
+        data = request.POST
+
+        lote_id = data.get('cambio_lote_id', '')
+        cambio = CambioDeLotes.objects.get(lote_id=lote_id)
+
+
+        cliente_original_id = data.get('transferencia_cliente_original_id', '')
+        cliente_id = data.get('transferencia_cliente_id', '')
+        vendedor_id = data.get('transferencia_vendedor_id', '')
+        plan_pago_id = data.get('transferencia_plan_de_pago_id', '')
+
+        date_parse_error = False
+
+        try:
+            fecha_transferencia_parsed = datetime.strptime(data.get('transferencia_fecha_de_transferencia', ''), "%d/%m/%Y")
+        except:
+            date_parse_error = True
+
+        if date_parse_error == True:
+            try:
+                fecha_transferencia_parsed = datetime.strptime(data.get('transferencia_fecha_de_transferencia', ''), "%Y-%m-%d")
+            except:
+                date_parse_error = True
+
+        nuevo_cambio = CambioDeLotes()
+        nuevo_cambio.lote = Lote.objects.get(pk=lote_id)
+        nuevo_cambio.fecha_de_transferencia = fecha_transferencia_parsed
+        nuevo_cambio.cliente_original = Cliente.objects.get(pk=cliente_original_id)
+        nuevo_cambio.cliente = Cliente.objects.get(pk=cliente_id)
+        nuevo_cambio.plan_de_pago = PlanDePago.objects.get(pk=plan_pago_id)
+        nuevo_cambio.vendedor = Vendedor.objects.get(pk=vendedor_id)
+
+        nuevo_cambio.save()
+        cambio.cliente = Cliente.objects.get(pk=cliente_id)
+        cambio.save()
+
+    c = RequestContext(request, {
+
+    })
+    return HttpResponse(t.render(c))
+
+def recuperacion_de_lotes(request):
+    t = loader.get_template('movimientos/recuperacion_lotes.html')
+
+    if request.method == 'POST':
+        data = request.POST
+
+        lote_id = data.get('recuperacion_lote_id', '')
+        lote_a_recuperar = Lote.objects.get(pk=lote_id)
+
+        venta_id = data.get('recuperacion_venta_id')
+        cliente_id = data.get('recuperacion_cliente_id', '')
+        vendedor_id = data.get('recuperacion_vendedor_id', '')
+        plan_pago_id = data.get('recuperacion_plan_de_pago_id', '')
+
+        date_parse_error = False
+
+        try:
+            fecha_recuperacion_parsed = datetime.strptime(data.get('recuperacion_fecha_de_recuperacion', ''), "%d/%m/%Y")
+        except:
+            date_parse_error = True
+
+        if date_parse_error == True:
+            try:
+                fecha_recuperacion_parsed = datetime.strptime(data.get('recuperacion_fecha_de_recuperacion', ''), "%Y-%m-%d")
+            except:
+                date_parse_error = True
+
+        nueva_recuperacion = RecuperacionDeLotes()
+        nueva_recuperacion.lote = Lote.objects.get(pk=lote_id)
+        nueva_recuperacion.venta = Venta.objects.get(pk=venta_id)
+        nueva_recuperacion.fecha_de_recuperacion = fecha_recuperacion_parsed
+        nueva_recuperacion.cliente = Cliente.objects.get(pk=cliente_id)
+        nueva_recuperacion.plan_de_pago = PlanDePago.objects.get(pk=plan_pago_id)
+        nueva_recuperacion.vendedor = Vendedor.objects.get(pk=vendedor_id)
+
+        nueva_recuperacion.save()
+        lote_a_recuperar.estado = "1"
+        lote_a_recuperar.save()
+        
+    c = RequestContext(request, {
     })
     return HttpResponse(t.render(c))
