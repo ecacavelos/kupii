@@ -1,32 +1,49 @@
-{% extends "propietarios/base_propietarios.html" %}
+{% extends "lotes/base_lotes.html" %}
 
 {% block content %}
-<div id="listado-cuadro-busqueda">
-	{{message}}
-	<form action="" method="post">
-		{% csrf_token %}
-		{{ search_form.buscar }}
-		{{ search_form.filtro }}
-		<input type="submit" name="boton_buscar" value="Buscar" />
-		<input type="submit" name="boton_todos" value="Ver Todos" />
-	</form>
-</div>
-{% for hw in object_list %}
-<div id="listado-item-cliente">
-	<a href="{{hw.id}}">{{hw.id}}</a><br>
-	Nombres: {{hw.nombres}}<br>
-	Apellidos: {{hw.apellidos}}<br>
-	Fecha de Nacimiento: {{hw.fecha_nacimiento}}<br>
-	Cedula: {{hw.cedula}}<br>
-	RUC: {{hw.ruc}}<br>
-	Dirección Particular: {{hw.direccion_particular}}<br>
-	Teléfono Particular: {{hw.telefono_particular}}<br>
-	Celular 1: {{hw.celular_1}}<br>
-	Celular 2: {{hw.celular_2}}<br>
-</div>
-{% endfor %}
+<div class="gri16 text-izquierda" id="breadcumb">
+						<a href="/">Inicio</a> <span class="verde-1">></span>  
+						<a href="/propietarios/">Propietarios</a> 
+						<span class="verde-1">> Listado de Propietarios</span> 
+					</div>
 
-<div id="footer">
-	<a href="/propietarios">Volver al módulo de Propietarios</a>
-</div>
+					<div class="clear"></div>
+
+					<div class="grid_10">
+  						<h1>Listado de Propietarios</h1>
+					</div>
+
+					<div class="grid_6">
+  						<a href="#" class="historico">Buscar</a>
+					</div>
+
+					<div class="clear"></div>
+					<div id="listado-cuadro-busqueda">
+						<a href="/propietarios/agregar" class="boton-verde">Agregar Propietario</a>
+						<br><br>
+					</div>
+					<div id="listado-item-lote">
+						<table width="50%" border="1" cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
+							<th>Propietario Nro</th><th>Nombres y apellidos </th><th>Tel&eacute;fono particular</th><th>Direcci&oacute;n</th>
+{% for hw in object_list %}
+		<tr>
+			<td>
+				<a href="{{hw.id}}">{{hw.id}} <strong>(Ver Detalles)</strong></a>
+			</td>
+			<td>
+				{{hw.nombres}} {{hw.apellidos}}
+			</td>
+			<td>
+				{{hw.telefono_particular}}
+			</td>
+			<td>
+				{{hw.direccion_particular}}
+			</td>
+		</tr>
+
+{% endfor %}
+						</table>
+					</div>
+
+<div id="footer"><a href="/propietarios" class="boton-verde">Volver al módulo de Propietarios</a></div>
 {% endblock %}

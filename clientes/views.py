@@ -2,7 +2,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext, loader
 from principal.models import Cliente
 from clientes.forms import ClienteForm, SearchForm
-from django.views.generic.list_detail import object_list
+#from django.views.generic.list_detail import object_list
 
 # Funcion principal del modulo de clientes.
 def index(request):

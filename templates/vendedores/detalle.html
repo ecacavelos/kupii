@@ -1,25 +1,54 @@
-{% extends "vendedores/base_vendedores.html" %}
+{% extends "lotes/base_lotes.html" %}
 
 {% block content %}
-<div id="detalle-vendedor">
-	<div id="detalle-vendedor-header">
-		{{ vendedor.id }}
+<div class="gri16 text-izquierda" id="breadcumb">
+						<a href="/">Inicio</a> <span class="verde-1">></span>  
+						<a href="/vendedores/">Vendedores</a> <span class="verde-1">></span>  
+						<a href="/lotes/listado/">Listado de Vendedores</a>  
+						<span class="verde-1">> Detalles de vendedor</span> 
+					</div>
+
+					<div class="clear"></div>
+
+					<div class="grid_10">
+  						<h1>Detalles de Vendedor</h1>
+					</div>
+
+					<div class="grid_6">
+  						<a href="#" class="historico">Buscar</a>
+					</div>
+
+					<div class="clear"></div>
+<div id="detalle-lote">
+	<div id="detalle-lote-header">
+		<h3 class="detalle-lote-header">Vendedores {{ vendedor.id }} </h3>
 	</div>
-	<div>{{ message }}</div>
+	{% if message_id == "message-success" %}		
+		<div id="{{message_id}}">{{ message }}</div>
+	{% endif %}
+	<table width="50%" border="1" cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
 	<form action="/vendedores/listado/{{ vendedor.id }}/" method="post">
 		{% csrf_token %}
 		{% for field in form %}
+		<tr>
 		<div class="fieldWrapper{% if field.field.required %} required{% endif %}">
 			{{ field.errors }}
-			{{ field.label_tag }} {{ field }}
+			<td>{{ field.label_tag }}</td><td>{{ field }}</td>
 		</div>
+		</tr>		
 		{% endfor %}
-		<input class="vendedor-form-button" type="submit" name="boton_guardar" value="Guardar Cambios" />
-		<input class="vendedor-form-button" type="submit" name="boton_borrar" value="Borrar este Registro" />
+	</table>
+		<div id="lote-ventas">
+			{% for venta in ventas_relacionadas %}
+				<a href="/lotes/vendedores/ventas/{{ venta.id }}" target="_blank">{{ venta }}</a>
+			{% endfor %}
+		</div>
+		<input class="lote-form-button" type="submit" name="boton_guardar" value="Guardar Cambios" />
+		<input class="lote-form-button" type="submit" name="boton_borrar" value="Borrar este Registro" />
 	</form>
 </div>
 <br>
 <div id="footer">
-	<a href="/vendedores/listado">Volver al Listado de Vendedores</a>
+	<a href="/vendedores/listado" class="boton-verde">Volver al Listado de Vendedores</a>
 </div>
 {% endblock %}

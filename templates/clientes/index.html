@@ -1,8 +1,13 @@
-{% extends "clientes/base_clientes.html" %}
+{% extends "lotes/base_lotes.html" %}
 
 {% block content %}
-<a href="listado">Consultar Clientes</a><br>
-<a href="agregar">Agregar Cliente</a><br>
-<br>
-<a href="/">Volver a la Pagina Inicial</a>
+<div class="gri16 text-izquierda" id="breadcumb">
+	<a href="/">Inicio</a> 
+	<span class="verde-1">> Clientes</span> 
+</div>
+<a href="listado" class="boton-verde">Consultar Clientes</a>
+<br><br><br>
+<a href="agregar" class="boton-verde">Agregar Clientes</a><br>
+<br><br><br>
+<a href="/" class="boton-verde">Volver a la Pagina Inicial</a>
 {% endblock %}

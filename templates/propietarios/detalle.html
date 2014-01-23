@@ -1,27 +1,54 @@
-{% extends "clientes/base_clientes.html" %}
+{% extends "lotes/base_lotes.html" %}
 
 {% block content %}
-<div id="detalle-cliente">
-	<div id="detalle-cliente-header">
-		{{cliente.id}}
+<div class="gri16 text-izquierda" id="breadcumb">
+						<a href="/">Inicio</a> <span class="verde-1">></span>  
+						<a href="/propietarios/">Propietarios</a> <span class="verde-1">></span>  
+						<a href="/propietarios/listado/">Listado de Propietarios</a>  
+						<span class="verde-1">> Detalles de Propietario</span> 
+					</div>
+
+					<div class="clear"></div>
+
+					<div class="grid_10">
+  						<h1>Detalles de Propietarios</h1>
+					</div>
+
+					<div class="grid_6">
+  						<a href="#" class="historico">Buscar</a>
+					</div>
+
+					<div class="clear"></div>
+<div id="detalle-lote">
+	<div id="detalle-lote-header">
+		<h3 class="detalle-lote-header">Propietario {{ propietario.id }} </h3>
 	</div>
-	<div>
-		{{ message }}
-	</div>
+	{% if message_id == "message-success" %}		
+		<div id="{{message_id}}">{{ message }}</div>
+	{% endif %}
+	<table width="50%" border="1" cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
 	<form action="/propietarios/listado/{{ propietario.id }}/" method="post">
 		{% csrf_token %}
 		{% for field in form %}
+		<tr>
 		<div class="fieldWrapper{% if field.field.required %} required{% endif %}">
 			{{ field.errors }}
-			{{ field.label_tag }} {{ field }}
+			<td>{{ field.label_tag }}</td><td>{{ field }}</td>
 		</div>
+		</tr>		
 		{% endfor %}
-		<input class="cliente-form-button" type="submit" name="boton_guardar" value="Guardar Cambios" />
-		<input class="cliente-form-button" type="submit" name="boton_borrar" value="Borrar este Registro" />
+	</table>
+		<div id="lote-ventas">
+			{% for venta in ventas_relacionadas %}
+				<a href="/propietarios/listado/ventas/{{ venta.id }}" target="_blank">{{ venta }}</a>
+			{% endfor %}
+		</div>
+		<input class="lote-form-button" type="submit" name="boton_guardar" value="Guardar Cambios" />
+		<input class="lote-form-button" type="submit" name="boton_borrar" value="Borrar este Registro" />
 	</form>
 </div>
 <br>
 <div id="footer">
-	<a href="/propietarios/listado">Volver al Listado de Propietarios</a>
+	<a href="/propietarios/listado" class="boton-verde">Volver al Listado de Propietarios</a>
 </div>
 {% endblock %}

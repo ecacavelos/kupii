@@ -2,7 +2,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext, loader
 from principal.models import Propietario
 from propietarios.forms import PropietarioForm, SearchForm
-from django.views.generic.list_detail import object_list
+#from django.views.generic.list_detail import object_list
 
 # Funcion principal del modulo de propietarios.
 def index(request):

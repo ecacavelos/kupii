@@ -1,6 +1,5 @@
 @charset "utf-8";
 /* CSS Document */
-
 #lote-ventas {
 	border: 1px solid green;
 	padding: 8px 12px;
@@ -10,3 +9,142 @@
 	border: 1px solid rgb(204,204,204);
 	padding: 8px 12px;
 }
+
+table.listado-lotes {
+	border:2px solid #CCC;
+	margin-bottom:15px;
+	margin-left: 250px;
+}
+
+table.listado-lotes tr th {
+	padding:10px 10px 10px 40px;
+	font-size:16px;
+	font-weight:400;
+	text-align:center;
+	background-color:#02B06B;
+	color:#FFF
+}
+
+table.listado-lotes tr td {
+	padding:7px;
+	font-size:14px;
+	text-align:center;
+	border-bottom:thin solid #CCC
+}
+
+table.listado-lotes tr td.last {
+	border-bottom: none
+}
+
+	a.boton-verde
+	{
+    background-color: #006633;
+    border: thin solid #FFFFFF;
+    color: #FFFFFF;
+    font-size: 13px;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+	}
+
+	#listado-item-lote{
+		alignment-adjust: center;
+	}
+	
+	.lote-form-button{
+		background-color: #006633;
+    	border: thin solid #FFFFFF;
+    	color: #FFFFFF;
+    	font-size: 13px;
+    	margin-right: 5px;
+    	margin-top: 5px;
+    	padding: 5px 10px;
+    	cursor: pointer;
+	}
+	
+	h3.detalle-lote-header{
+		text-align: center;
+		color:#006633;
+	}
+	
+	#id_manzana {
+		background-color: #FFFFFF;
+    	border: thin solid #CCCCCC;
+    	box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3) inset;
+    	font-size: 13px;
+    	font-weight: 400;
+    	padding-left: 60px;
+    	padding-top: 5px;
+    	padding-bottom: 5px;
+    	
+	}
+	
+	#id_estado {
+		background-color: #FFFFFF;
+    	border: thin solid #CCCCCC;
+    	box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3) inset;
+    	font-size: 13px;
+    	font-weight: 400;
+    	padding-left: 60px;
+    	padding-top: 5px;
+    	padding-bottom: 5px;
+    	
+	}
+	
+	#id_propietario {
+		background-color: #FFFFFF;
+    	border: thin solid #CCCCCC;
+    	box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3) inset;
+    	font-size: 13px;
+    	font-weight: 400;
+    	padding-left: 40px;
+    	padding-top: 5px;
+    	padding-bottom: 5px;
+    	
+	}
+	
+	#id_fraccion {
+		background-color: #FFFFFF;
+    	border: thin solid #CCCCCC;
+    	box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3) inset;
+    	font-size: 13px;
+    	font-weight: 400;
+    	padding-left: 68px;
+    	padding-top: 5px;
+    	padding-bottom: 5px;
+    	
+	}
+	
+	#id_sexo {
+		background-color: #FFFFFF;
+    	border: thin solid #CCCCCC;
+    	box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3) inset;
+    	font-size: 13px;
+    	font-weight: 400;
+    	padding-left: 72px;
+    	padding-top: 5px;
+    	padding-bottom: 5px;
+    	
+	}
+	
+	#id_estado_civil {
+		background-color: #FFFFFF;
+    	border: thin solid #CCCCCC;
+    	box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3) inset;
+    	font-size: 13px;
+    	font-weight: 400;
+    	padding-left: 70px;
+    	padding-top: 5px;
+    	padding-bottom: 5px;
+    	
+	}
+	
+	#caja-contenido {
+	min-height:500px;
+	background-color:#fff;
+	padding-top:10px;
+	padding-bottom:30px;
+	
+}
+

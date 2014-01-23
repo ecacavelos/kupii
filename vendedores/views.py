@@ -2,7 +2,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext, loader
 from principal.models import Vendedor
 from vendedores.forms import VendedorForm
-from django.views.generic.list_detail import object_list
+#from django.views.generic.list_detail import object_list
 
 # Funcion principal del modulo de vendedores.
 def vendedores(request):

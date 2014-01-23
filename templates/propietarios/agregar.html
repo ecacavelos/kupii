@@ -1,20 +1,95 @@
-{% extends "propietarios/base_propietarios.html" %}
+{% extends "lotes/base_lotes.html" %}
+
+{% block header_resources %}
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+{% endblock %}
+
+{% block header_scripts %}
+
+<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+
+<script type="text/javascript">
+
+var data = [
+		{"label" : "Aragorn"}
+		];
+$(document).ready(function() {
+	
+	$("#id_manzana").attr('readonly', true);
+	var fraccion_id;
+	$("#id_manzana").empty();
+
+	base_url = "/ajax/get_fracciones_by_name/";
+	params = "";
+	 $( "#id_fraccion" ).autocomplete({
+	  source:  base_url,
+      minLength: 1,
+      select: function( event, ui ) {
+      	$("#id_manzana").attr('readonly', false);
+      	fraccion_id = ui.item.id;
+      	var request_manzanas = $.ajax({
+					url : '/ajax/get_manzanas_by_fraccion/',
+					type : "GET",
+					data : {
+						fraccion_id : fraccion_id
+					},
+					dataType : "json"
+				});
+			request_manzanas.done(function (data){
+				$.each(data, function (index,value) {
+					$("#id_manzana").append('<option value="'+ value.id +'">' + 'Manzana ' + value.label + '</option>') ;
+				});
+			});
+      }
+    });
+});
+</script>
+{% endblock %}
 
 {% block content %}
-<div id="detalle-cliente">
-	<form action="" method="post">
-		{% csrf_token %}
-		{% for field in form %}
-		<div class="fieldWrapper{% if field.field.required %} required{% endif %}">
-			{{ field.errors }}
-			{{ field.label_tag }} {{ field }}
-		</div>
-		{% endfor %}
-		<input class="cliente-form-button" type="submit" value="Agregar este Propietario" />
-	</form>
+<div class="gri16 text-izquierda" id="breadcumb">
+	<a href="/">Inicio</a> <span class="verde-1">></span>  
+	<a href="/propietarios/">Propietarios</a> 
+	<span class="verde-1">> Agregar Propietario</span> 
 </div>
-<br>
-<div id="footer">
-	<a href="/propietarios">Volver al módulo de Propietarios</a>
+
+<div class="clear"></div>
+
+<div class="grid_10">
+  <h1>Agregar Propietario</h1>
+</div>
+
+<div class="grid_6">
+  <a href="#" class="historico">Buscar</a>
+</div>
+
+<div class="clear"></div>
+
+<div class="grid_16" align="center">
+	
+	  <form action="" method="post">
+	  	<table width="94%" border="0" cellpadding="0" cellspacing="0" id="forms" align="center">
+		{% csrf_token %}
+		{% for field in form2 %}
+			{{ field.errors }}
+			<tr>
+	    		<td><strong>{{ field.label_tag }}:</strong></td>
+	    		<td class="noimage">{{ field }}</td>
+	    	</tr>		
+		{% endfor %}
+		{% for field in form %}
+			{{ field.errors }}
+			<tr>
+	    		<td><strong>{{ field.label_tag }}:</strong></td>
+	    		<td class="noimage">{{ field }}</td>
+	    	</tr>		
+		{% endfor %}
+		
+	    </table>
+	  </form>
+	
+	<input name="" class="boton-verde" type="submit" value="Grabar" style="margin-bottom: 10px; cursor: pointer;" />
+<div class="clear"></div>
 </div>
 {% endblock %}

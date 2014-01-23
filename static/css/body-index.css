@@ -159,12 +159,14 @@ a {
 #caja-contenido {
 	min-height:500px;
 	background-color:#fff;
-	padding-top:10px
+	padding-top:10px;
+	padding-bottom:30px;
+	
 }
 
 table#lista-categoria {
 	border:2px solid #CCC;
-	margin-bottom:15px
+	margin-bottom:15px;
 }
 
 table#lista-categoria tr th {
@@ -411,6 +413,30 @@ ul#boton li a:hover {
 	font-size:13px
 }
 
+select#id_manzana {
+		background-color: #FFFFFF;
+    	border: thin solid #CCCCCC;
+    	box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3) inset;
+    	font-size: 13px;
+    	font-weight: 400;
+    	padding-left: 60px;
+    	padding-top: 5px;
+    	padding-bottom: 5px;
+    	
+	}
+	
+	select#id_estado {
+		background-color: #FFFFFF;
+    	border: thin solid #CCCCCC;
+    	box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3) inset;
+    	font-size: 13px;
+    	font-weight: 400;
+    	padding-left: 60px;
+    	padding-top: 5px;
+    	padding-bottom: 5px;
+    	
+	}
+
 
 
 /*Form*/
@@ -442,10 +468,23 @@ input[type=text]{
 input[type=button] {
 		padding:5px 10px;
 		margin-right:5px;
+		margin-top:5px;
 		font-size:13px;
 		color:#FFF;
 		border:thin #FFF solid;
 		background-color:#006633;
+		cursor: pointer;
+	}
+	
+	input[type=submit] {
+		padding:5px 10px;
+		margin-right:5px;
+		margin-top:5px;
+		font-size:13px;
+		color:#FFF;
+		border:thin #FFF solid;
+		background-color:#006633;
+		cursor: pointer;
 	}
 
 input.verdecito[type=button] {
@@ -461,5 +500,9 @@ input[type=button]:active {
 		-webkit-box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.7);
         box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.7);
 	}
+	
+	
+	
+
 
 /*FIN Form*/

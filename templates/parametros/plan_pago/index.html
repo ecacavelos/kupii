@@ -1,8 +1,14 @@
-{% extends "parametros/base_parametros.html" %}
+{% extends "lotes/base_lotes.html" %}
 
 {% block content %}
-<a href="listado">Consultar Plan de Pago</a><br>
-<a href="agregar">Agregar Plan de Pago</a><br>
-<br>
-<a href="/parametros">Volver a la Parametros</a>
+<div class="gri16 text-izquierda" id="breadcumb">
+	<a href="/">Inicio</a> 
+	<a href="/parametros/">> Parametros</a>
+	<span class="verde-1">> Planes de pago</span> 
+</div>
+<a href="listado" class="boton-verde">Consultar Planes de pago</a>
+<br><br><br>
+<a href="agregar" class="boton-verde">Agregar Plan de pago</a><br>
+<br><br><br>
+<a href="/parametros/" class="boton-verde">Volver a Parametros</a>
 {% endblock %}
