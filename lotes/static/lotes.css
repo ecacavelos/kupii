@@ -10,6 +10,10 @@
 	padding: 8px 12px;
 }
 
+li{
+	list-style: none;
+}
+
 table.listado-lotes {
 	border:2px solid #CCC;
 	margin-bottom:15px;
@@ -138,6 +142,146 @@ table.listado-lotes tr td.last {
     	padding-top: 5px;
     	padding-bottom: 5px;
     	
+	}
+	
+	#id_tipo_de_plan {
+		background-color: #FFFFFF;
+    	border: thin solid #CCCCCC;
+    	box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3) inset;
+    	font-size: 13px;
+    	font-weight: 400;
+    	padding-left: 70px;
+    	padding-top: 5px;
+    	padding-bottom: 5px;
+    	
+	}
+	
+	#id_entrega_inicial{
+		/*display:block;
+		width:280px;
+		height:30px;
+		float:left;
+		padding:5px 10px;
+		color:#000;
+		*/
+		font-size:13px;
+		padding:4px;
+		font-weight:400;
+		background-color:#fff;
+		-webkit-box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+        box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+		border:thin #CCC solid;
+	}
+	
+	#id_monto_cuota{
+		/*display:block;
+		width:280px;
+		height:30px;
+		float:left;
+		padding:5px 10px;
+		color:#000;
+		*/
+		font-size:13px;
+		padding:4px;
+		font-weight:400;
+		background-color:#fff;
+		-webkit-box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+        box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+		border:thin #CCC solid;
+	}
+	
+	#id_fecha_vencimiento{
+		/*display:block;
+		width:280px;
+		height:30px;
+		float:left;
+		padding:5px 10px;
+		color:#000;
+		*/
+		font-size:13px;
+		padding:4px;
+		font-weight:400;
+		background-color:#fff;
+		-webkit-box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+        box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+		border:thin #CCC solid;
+	}
+	
+	#id_fecha{
+		/*display:block;
+		width:280px;
+		height:30px;
+		float:left;
+		padding:5px 10px;
+		color:#000;
+		*/
+		font-size:13px;
+		padding:4px;
+		font-weight:400;
+		background-color:#fff;
+		-webkit-box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+        box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+		border:thin #CCC solid;
+	}
+	
+	#nro_cuotas_a_pagar{
+		font-size:13px;
+		padding:4px;
+		font-weight:400;
+		background-color:#fff;
+		-webkit-box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+        box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+		border:thin #CCC solid;
+	}
+	
+	#monto_cuota{
+		font-size:13px;
+		padding:4px;
+		font-weight:400;
+		background-color:#fff;
+		-webkit-box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+        box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+		border:thin #CCC solid;
+	}
+	
+	#total_cuotas{
+		font-size:13px;
+		padding:4px;
+		font-weight:400;
+		background-color:#fff;
+		-webkit-box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+        box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+		border:thin #CCC solid;
+	}
+	
+	#total_mora{
+		font-size:13px;
+		padding:4px;
+		font-weight:400;
+		background-color:#fff;
+		-webkit-box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+        box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+		border:thin #CCC solid;
+	}
+	
+	#total_pago{
+		font-size:13px;
+		padding:4px;
+		font-weight:400;
+		background-color:#fff;
+		-webkit-box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+        box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+		border:thin #CCC solid;
+	}
+	
+	#fecha_vencimiento{
+		font-size:13px;
+		padding:4px;
+		font-weight:400;
+		background-color:#fff;
+		-webkit-box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+        box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+		border:thin #CCC solid;
 	}
 	
 	#caja-contenido {

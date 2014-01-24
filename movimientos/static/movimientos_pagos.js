@@ -92,7 +92,7 @@ function retrieveLote() {
 		// Actualizamos el formulario con los datos obtenidos del lote.
 		request.done(function(msg) {
 			global_lote_id = msg.lote_id;
-			var s = "<a href=\"/lotes/listado/" + msg.lote_id + "\" target=\"_blank\" \">" + msg.lote_tag + "</a>";
+			var s = "<a class='boton-verde' href=\"/lotes/listado/" + msg.lote_id + "\" target=\"_blank\" \">" + msg.lote_tag + "</a>";
 
 			$("#lote_error").html("");
 			$("#lote_superficie").html(msg.superficie);

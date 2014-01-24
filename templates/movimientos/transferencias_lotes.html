@@ -1,4 +1,4 @@
-{% extends "movimientos/base_movimientos.html" %}
+{% extends "lotes/base_lotes.html" %}
 
 {% block java_scripts %}
 <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
@@ -7,48 +7,103 @@
 {% endblock %}
 
 {% block content %}
+<div class="gri16 text-izquierda" id="breadcumb">
+	<a href="/">Inicio</a> <span class="verde-1">></span>  
+	<a href="/movimientos/">Movimientos</a> 
+	<span class="verde-1">> Transferir Lote</span> 
+</div>
+<div class="clear"></div>
+
+<div class="grid_10">
+  <h1>Transferencia de Lote</h1>
+</div>
+
+<div class="grid_6">
+  <a href="#" class="historico">Buscar</a>
+</div>
+
+<div class="clear"></div>
+<div class="grid_16" align="center">
 <form id="main_transferencia_form" action="" method="post">
+	<table width="94%" border="0" cellpadding="0" cellspacing="0" id="forms" align="center">
 	{% csrf_token %}
 	<div class="fieldWrapperMovimientos">
-		<label for="id_lote">Lote: </label>
-		<input id="id_lote" type="text" name="lote" maxlength="12" onblur="retrieveLote()" /><br>
-		<ul class="errorlist"><li id="lote_error"></li></ul>
-		<label>Superficie (m2): </label><div id="lote_superficie"></div><br>
-		<label>Detalles del Lote: </label><div id="lote_seleccionado_detalles"></div>
+		<tr>
+			<td><label for="id_lote">Lote: </label></td>
+			<td class="noimage"><input id="id_lote" type="text" name="lote" maxlength="12" onblur="retrieveLote()" />
+		<ul class="errorlist"><li id="lote_error"></li></ul></td>
+		</tr>
+		<tr>
+			<td><label>Superficie (m2): </label></td>
+			<td class="noimage"><div id="lote_superficie"></div></td>
+		</tr>
+		<tr>
+			<td><label>Detalles del Lote: </label></td>
+			<td class="noimage"><div id="lote_seleccionado_detalles"></div></td>
+		</tr>
 	</div>
 	<div class="fieldWrapperMovimientos">
-		<label for="id_fecha">Fecha de Transferencia: </label>
-		<input id="id_fecha" type="date" name="fecha" maxlength="10" /><br>
+		<tr>
+			<td><label for="id_fecha">Fecha de Transferencia: </label></td>
+			<td class="noimage"><input id="id_fecha" type="date" name="fecha" maxlength="10" /></td>
+		</tr>
 	</div>
 	<div class="fieldWrapperMovimientos">
-		<label for="id_cliente_original">Código del Cliente Original: </label>
-		<input id="id_cliente_original" type="text" name="cliente" disabled="disabled" maxlength="100" /><br>	
-		<label>Apellidos y Nombres: </label><div id="cliente_original_seleccionado"></div>
-		<ul class="errorlist"><li id="cliente_error"></li></ul>
+		<tr>
+			<td><label for="id_cliente_original">Código del Cliente Original: </label></td>
+			<td class="noimage"><input id="id_cliente_original" type="text" name="cliente" disabled="disabled" maxlength="100" /></td>
+		</tr>	
+		<tr>
+			<td><label>Apellidos y Nombres: </label></td>
+			<td class="noimage"><div id="cliente_original_seleccionado"></div>
+		<ul class="errorlist"><li id="cliente_error"></li></ul></td>
+		</tr>
 	</div>
 	<div class="fieldWrapperMovimientos">
-		<label for="id_cliente">Código del Cliente a Transferir: </label>
-		<input id="id_cliente" type="text" name="cliente" disabled="disabled" maxlength="100" onblur="retrieveCliente()" /><br>	
-		<label>Apellidos y Nombres: </label><div id="cliente_seleccionado"></div>
-		<ul class="errorlist"><li id="cliente_error"></li></ul>
+		<tr>
+			<td><label for="id_cliente">Código del Cliente a Transferir: </label></td>
+			<td class="noimage"><input id="id_cliente" type="text" name="cliente" disabled="disabled" maxlength="100" onblur="retrieveCliente()" /></td>
+		</tr>	
+		<tr>
+			<td><label>Apellidos y Nombres: </label></td>
+			<td class="noimage"><div id="cliente_seleccionado"></div>
+		<ul class="errorlist"><li id="cliente_error"></li></ul></td>
+		</tr>
 	</div>
 	<div class="fieldWrapperMovimientos">	
-		<label for="id_vendedor">Código del Vendedor: </label>
-		<input id="id_vendedor" type="text" name="vendedor" disabled="disabled" maxlength="100" onblur="retrieveVendedor()" /><br>	
-		<label>Apellidos y Nombres: </label><div id="vendedor_seleccionado"></div><br>
-		<ul class="errorlist"><li id="vendedor_error"></li></ul>
+		<tr>
+			<td><label for="id_vendedor">Código del Vendedor: </label></td>
+			<td class="noimage"><input id="id_vendedor" type="text" name="vendedor" disabled="disabled" maxlength="100" onblur="retrieveVendedor()" /></td>
+		</tr>	
+		<tr>
+			<td><label>Apellidos y Nombres: </label></td>
+			<td class="noimage"><div id="vendedor_seleccionado"></div><br>
+		<ul class="errorlist"><li id="vendedor_error"></li></ul></td>
+		</tr>
 	</div>
 	<div class="fieldWrapperMovimientos">
-		<label for="id_plan_pago">Plan de Pago: </label>
-		<input id="id_plan_pago" type="text" name="plan_pago" disabled="disabled" maxlength="100" onblur="retrievePlanPago()" /><br>	
-		<label>Nombre del Plan: </label><div id="plan_pago_seleccionado"></div><br>
+		<tr>
+			<td><label for="id_plan_pago">Plan de Pago: </label></td>
+			<td class="noimage"><input id="id_plan_pago" type="text" name="plan_pago" disabled="disabled" maxlength="100" onblur="retrievePlanPago()" /></td>
+		</tr>	
+		<tr>
+			<td><label>Nombre del Plan: </label></td>
+			<td class="noimage"><div id="plan_pago_seleccionado"></div><br>
 		<ul class="errorlist"><li id="plan_pago_error"></li></ul>
+		</td>
+		</tr>
 	</div>
-	<div class="fieldWrapperMovimientos">
-		<input id="guardar_transferencia" type="submit" disabled="disabled" value="Guardar Transferencia" />
+<div class="fieldWrapperMovimientos">
 	</div>
+	</table>
+	<input id="enviar_transferencia" style="cursor: pointer;" type="submit" disabled="disabled" value="Guardar Transferencia" />
+	<br><br><br>
+	</form>
+	<div class="clear"></div>
+	</div>
+	
 	<div id="footer">
-		<a href="/">Volver a la página principal</a>
+		<a href="/movimientos/" class="boton-verde">Volver al m&oacute;dulo de movimientos</a>
 	</div>
-</form>
+
 {% endblock %}
