@@ -5,6 +5,30 @@
 <script type="text/javascript" src="{{ STATIC_URL }}ajax_config.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}movimientos.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}movimientos_ventas.js"></script>
+<script type="text/javascript">
+
+var data = [
+		{"label" : "Aragorn"}
+		];
+$(document).ready(function() {
+	var id_plan_pago;
+	$("#id_plan_pago").empty();
+      	var get_all_planes = $.ajax({
+					url : '/datos/7/',
+					type : "GET",
+					data : {
+						id_plan_pago : id_plan_pago
+					},
+					dataType : "json"
+				});
+			get_all_planes.done(function (data){
+				$.each(data, function (index,value) {
+					$("#id_plan_pago").append('<option value="'+ value.id +'">' + 'Plan ' + value.label + '</option>') ;
+				});
+    });
+$("#id_plan_pago").attr('readonly', true);
+});
+</script>
 {% endblock %}
 
 {% block content %}
@@ -74,7 +98,10 @@
 	<div class="fieldWrapperMovimientos">
 		<tr>
 			<td><label for="id_plan_pago">Plan de Pago: </label></td>
-			<td class="noimage"><input id="id_plan_pago" type="text" name="plan_pago" disabled="disabled" maxlength="100" onblur="retrievePlanPago()" /></td>	
+			<td class="noimage">
+				<select id="id_plan_pago" name="plan_pago" disabled="disabled" maxlength="100" onblur="retrievePlanPago()">
+				
+				</select>	
 		</tr>
 		<tr>
 			<td><label>Nombre del Plan: </label></td>

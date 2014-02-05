@@ -6,4 +6,7 @@ urlpatterns = patterns('ajax.views',
     url(r'^get_ventas_by_lote/$', 'get_ventas_by_lote', name='get_ventas_by_lote'),
     url(r'^get_ventas_by_cliente/$', 'get_ventas_by_cliente', name='get_ventas_by_cliente'),
     url(r'^get_pagos_by_venta/$', 'get_pagos_by_venta', name='get_pagos_by_venta'),
+    url(r'^get_propietario_id_by_name/$', 'get_propietario_id_by_name', name='get_propietario_id_by_name'),
+    url(r'^get_propietario_lastId/$', 'get_propietario_lastId', name='get_propietario_lastId'),
+    url(r'^get_propietario_name_by_id/$', 'get_propietario_name_by_id', name='get_propietario_name_by_id'),
 )

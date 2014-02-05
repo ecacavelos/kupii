@@ -1,7 +1,7 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext, loader
 from principal.models import Fraccion, Manzana
-from fracciones.forms import FraccionForm
+from fracciones.forms import FraccionForm, FraccionFormAdd
 
 # Funcion principal del modulo de fracciones.
 def fracciones(request):
@@ -30,7 +30,7 @@ def detalle_fraccion(request, fraccion_id):
     if request.method == 'POST':
         data = request.POST
         if data.get('boton_guardar'):
-            form = FraccionForm(data, instance=object_list)
+            form = FraccionFormAdd(data, instance=object_list)
             if form.is_valid():
                 message = "Se actualizaron los datos."
                 form.save(commit=False)

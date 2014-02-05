@@ -1,14 +1,25 @@
-from django.http import HttpResponse, HttpResponseServerError
+from django.http import HttpResponse, HttpResponseServerError, HttpResponseRedirect
 from django.template import RequestContext, loader
-from principal.models import Lote, Cliente, Vendedor, PlanDePago, Fraccion, Manzana, Venta
+from principal.models import Lote, Cliente, Vendedor, PlanDePago, Fraccion, Manzana, Venta, Propietario
 from django.utils import simplejson as json
 from datetime import datetime
+from django.contrib import auth
 
+def logout(request):
+    auth.logout(request)
+    # Redirect to a success page.
+    return HttpResponseRedirect("/account/loggedout/")
+                                
 # vista principal de la plataforma PROPAR
 def index(request):
-    t = loader.get_template('index2.html')
-    c = RequestContext(request, {})
-    return HttpResponse(t.render(c))
+    if request.user.is_authenticated():
+        t = loader.get_template('index2.html')
+        c = RequestContext(request, {
+                                     #'nombre': 'profe'
+                                     })
+        return HttpResponse(t.render(c))
+    else:
+        return HttpResponseRedirect("/login")
 
 def retrieve_lote(request):
     if request.method == 'GET':
@@ -87,6 +98,39 @@ def retrieve_plan_pago(request):
             return HttpResponse(json.dumps(response_data), content_type="application/json")
         except:
             return HttpResponseServerError("No se encontraron planes de pago.")
+     
+
+def get_all_planes(request):
+    if request.method == 'GET':
+        #data = request.GET
+        try:
+#     callback = request.GET['callback']
+#    plan_id = request.GET['id_plan_pago']
+#    print("id_plan_pago ->" + plan_id);
+            object_list = PlanDePago.objects.all()
+#    object_list = PlanDePago.objects.filter(plan_id=plan_id)
+            results = [ob.as_json() for ob in object_list]
+
+            return HttpResponse(json.dumps(results), mimetype='application/json')
+        except:
+            return HttpResponseServerError('No se pudo procesar el pedido')
+            #return (e)         
+
+def get_propietario_id_by_name(request):
+    if request.method == 'GET':
+        #data = request.GET
+        try:
+            callback = request.GET['callback']
+            id_propietario = request.GET['id_propietario']
+            print("id_propietario ->" + id_propietario);
+            object_list = Propietario.objects.filter(id_propietario= id_propietario)
+#    object_list = PlanDePago.objects.filter(plan_id=plan_id)
+            results = [ob.as_json() for ob in object_list]
+
+            return HttpResponse(json.dumps(results), mimetype='application/json')
+        except:
+            return HttpResponseServerError('No se pudo procesar el pedido')
+            #return (e)     
 
 def retrieve_venta(request):
     if request.method == 'GET':

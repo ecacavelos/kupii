@@ -19,10 +19,11 @@
 		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.js"></script>
 		{% block header_scripts %}{% endblock %}
 		{% block java_scripts %}
-		<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+		<!--<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>-->
 		<script type="text/javascript" src="{{ STATIC_URL }}ajax_config.js"></script>
 		<script type="text/javascript" src="{{ STATIC_URL }}movimientos.js"></script>
 		<script type="text/javascript" src="{{ STATIC_URL }}movimientos_ventas.js"></script>
+		<script type="text/javascript" src="{{ STATIC_URL }}jquery.mask.min.js"></script>
 		{% endblock %}
 
 	</head>
@@ -37,14 +38,22 @@
 					</div>
 					<div class="grid_11">
 						<div id="menu">
+							{% if user.is_authenticated %}
 							<ul id="boton">
 								<li>
-									<a href="#" class="salir">Salir</a>
+									<a href="/logout" class="salir">Salir</a>
 								</li>
 								<li>
-									<a href="#" class="usuario">Esteban Cacavelos</a>
+									<a href="#" class="usuario">{{ user.username }}</a>
 								</li>
 							</ul>
+							{% else %}
+							<ul id="boton">
+								<li>
+									<a href="/login" class="usuario">Iniciar sesi&oacute;n</a>
+								</li>
+							</ul>
+							{% endif %}
 						</div>
 						<div id="titulo">
 							<h1>SISTEMA DE ADMINISTRACI&Oacute;N </h1>

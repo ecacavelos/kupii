@@ -86,6 +86,10 @@ function calculateMontoCuotas() {
 	
 	var entrega_inicial = ($('#id_entrega_inicial').val());
 	entrega_inicial = parseInt(entrega_inicial);
-	var monto_cuota = (precio_credito - entrega_inicial) / cantidad_cuotas;
+	console.log("precio_credito: "+precio_credito);
+	console.log("entrega_inicial: "+entrega_inicial);
+	console.log("precio_credito: "+cantidad_cuotas);
+	var monto_cuota = Math.round((precio_credito - entrega_inicial) / cantidad_cuotas);
+	console.log("monto_cuota: "+monto_cuota);
 	$("#id_monto_cuota").val(monto_cuota);
 };

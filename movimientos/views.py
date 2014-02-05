@@ -49,9 +49,13 @@ def ventas_de_lotes(request):
         nueva_venta.precio_final_de_venta = long(data.get('venta_precio_final_de_venta', ''))
         nueva_venta.fecha_primer_vencimiento = fecha_vencim_parsed
         nueva_venta.pagos_realizados = 0
-
-        sumatoria_cuotas = nueva_venta.entrega_inicial + (nueva_venta.plan_de_pago.cantidad_de_cuotas * nueva_venta.precio_de_cuota)
-
+        
+        if nueva_venta.plan_de_pago.tipo_de_plan != 'contado':
+            cant_cuotas = nueva_venta.plan_de_pago.cantidad_de_cuotas
+            sumatoria_cuotas = nueva_venta.entrega_inicial + (cant_cuotas * nueva_venta.precio_de_cuota)
+        else:
+            sumatoria_cuotas = nueva_venta.precio_final_de_venta
+            
         if  sumatoria_cuotas >= nueva_venta.precio_final_de_venta:
             nueva_venta.save()
             lote_a_vender.estado = "3"
@@ -87,7 +91,7 @@ def ventas_de_lotes_calcular_cuotas(request):
         else:
             response_data['monto_total'] = int(precio_venta_actual)
 
-        if response_data['monto_total'] >= precio_venta_actual:
+        if response_data['monto_total'] >= precio_venta_actual: 
             response_data['monto_valido'] = True
         else:
             response_data['monto_valido'] = False

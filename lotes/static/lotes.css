@@ -20,6 +20,19 @@ table.listado-lotes {
 	margin-left: 250px;
 }
 
+table.listado-lotes2 {
+	border:2px solid #CCC;
+	margin-bottom:15px;
+	margin-left: 345px;
+}
+
+table.listado-lotes2 tr td {
+	padding:7px;
+	font-size:14px;
+	text-align:center;
+	
+}
+
 table.listado-lotes tr th {
 	padding:10px 10px 10px 40px;
 	font-size:16px;
@@ -275,6 +288,16 @@ table.listado-lotes tr td.last {
 	}
 	
 	#fecha_vencimiento{
+		font-size:13px;
+		padding:4px;
+		font-weight:400;
+		background-color:#fff;
+		-webkit-box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+        box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+		border:thin #CCC solid;
+	}
+	
+	#password{
 		font-size:13px;
 		padding:4px;
 		font-weight:400;

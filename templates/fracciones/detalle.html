@@ -1,5 +1,72 @@
 {% extends "lotes/base_lotes.html" %}
 
+{% block header_resources %}
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+
+{% endblock %}
+
+{% block header_scripts %}
+
+<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+
+<script type="text/javascript">
+		var data = [
+	{"label" : "Aragorn"}
+	];
+	$(document).ready(function() {
+	
+	var propietario_id = $('#id_propietario').val();	
+	var request_name_by_id = $.ajax({
+				url : '/ajax/get_propietario_name_by_id/',
+				type : "GET",
+				data : {
+						propietario_id : propietario_id
+					},
+				dataType : "json",
+				success: function (data){
+					$.each(data, function (index,value) {
+					$("#id_name_propietario").val(value.label);
+					});
+				}
+			});
+		
+
+	
+	//$("#id_name_propietario").empty();
+
+	base_url = "/ajax/get_propietario_id_by_name/";
+	params = "value";
+	$( "#id_name_propietario" ).autocomplete({
+	source:  base_url,
+	minLength: 1,
+	select: function( event, ui ) {
+	id_propietario = ui.item.id;
+	$("#id_propietario").val(id_propietario) ;
+
+	}
+	});
+	});
+
+	function validar_id_propietario(){
+		if ($('#id_propietario').val() == '' || $('#id_propietario').val() == null ){
+			var request_propietario_id = $.ajax({
+				url : '/ajax/get_propietario_lastId/',
+				type : "GET",
+				success: function (data){
+					$.each(data, function (index,value) {
+					$("#id_propietario").val(value.id);
+					$("#form_add_fraccion").submit();
+					});
+				}
+			});
+	} else {
+		$("#form_add_fraccion").submit();
+	}
+}
+</script>
+{% endblock %}
+
 {% block content %}
 <div class="gri16 text-izquierda" id="breadcumb">
 						<a href="/">Inicio</a> <span class="verde-1">></span>  
@@ -21,7 +88,7 @@
 					<div class="clear"></div>
 <div id="detalle-lote">
 	<div id="detalle-lote-header">
-		<h3 class="detalle-lote-header">Fracci&oacute;n {{ lote.id }} </h3>
+		<h3 class="detalle-lote-header">Fracci&oacute;n Nro {{ fraccion.id }} </h3>
 	</div>
 	{% if message_id == "message-success" %}		
 		<div id="{{message_id}}">{{ message }}</div>
@@ -29,13 +96,24 @@
 	<table width="50%" border="1" cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
 	<form action="/fracciones/listado/{{ fraccion.id }}/" method="post">
 		{% csrf_token %}
+		{% for hidden in form.hidden_fields %}
+			{{ hidden }}
+		{% endfor %}
 		{% for field in form %}
 		<tr>
+		{%if field.html_name == 'propietario' %}
+		<div class="fieldWrapper{% if field.field.required %} required{% endif %}">
+			{{ field.errors }}
+			<td>{{ field.label_tag }}</td><td><input type="text" id="id_name_propietario" name="name_propietario" /></td>
+		</div>
+		{%else%}	
 		<div class="fieldWrapper{% if field.field.required %} required{% endif %}">
 			{{ field.errors }}
 			<td>{{ field.label_tag }}</td><td>{{ field }}</td>
 		</div>
-		</tr>		
+		{%endif%}
+		</tr>
+				
 		{% endfor %}
 	</table>
 

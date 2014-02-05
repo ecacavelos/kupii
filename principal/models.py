@@ -41,6 +41,11 @@ class Propietario(models.Model):
     celular_2 = models.CharField(max_length=255, blank=True)
     def __unicode__(self):
         return (self.nombres + ' ' + self.apellidos)
+    
+    def as_json(self):
+        return dict(
+            label= self.nombres + ' ' + self.apellidos,
+            id=self.id)
 
 class Fraccion(models.Model):
     nombre = models.CharField(max_length=255)
@@ -135,6 +140,12 @@ class PlanDePago(models.Model):
     monto_fijo_cuotas_gerente = models.IntegerField()
     def __unicode__(self):
         return (self.nombre_del_plan)
+    
+    def as_json(self):
+        return dict(
+            label=self.nombre_del_plan,
+            id=self.id)
+    
     class Meta:
         verbose_name_plural = "planes de pago"
 

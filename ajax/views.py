@@ -5,7 +5,65 @@ from django.contrib import messages
 from django.views.decorators.http import require_http_methods
 from django.template import RequestContext, loader
 from django.utils import simplejson as json
-from principal.models import Fraccion, Manzana, Venta, PagoDeCuotas
+from principal.models import Fraccion, Manzana, Venta, PagoDeCuotas, Propietario
+
+@require_http_methods(["GET"])
+def get_propietario_id_by_name(request):
+    if request.method == 'GET':
+        #data = request.GET
+        try:
+            
+            name_propietario = request.GET['term']
+            print("term ->" + name_propietario);
+            object_list = Propietario.objects.filter(nombres__icontains= name_propietario)
+#    object_list = PlanDePago.objects.filter(plan_id=plan_id)
+            results = [ob.as_json() for ob in object_list]
+
+            return HttpResponse(json.dumps(results), mimetype='application/json')
+        except:
+            return HttpResponseServerError('No se pudo procesar el pedido')
+            #return (e)   
+
+@require_http_methods(["GET"])
+def get_propietario_name_by_id(request):
+    if request.method == 'GET':
+        #data = request.GET
+        try:
+            
+            id_propietario = request.GET['propietario_id']
+            print("id ->" + id_propietario);
+            object_list = Propietario.objects.filter(id= id_propietario)
+#    object_list = PlanDePago.objects.filter(plan_id=plan_id)
+            results = [ob.as_json() for ob in object_list]
+
+            return HttpResponse(json.dumps(results), mimetype='application/json')
+        except:
+            return HttpResponseServerError('No se pudo procesar el pedido')
+            #return (e)  
+
+@require_http_methods(["GET"])
+def get_propietario_lastId(request):
+    
+#     callback = request.GET['callback']
+    if request.method == 'GET':
+        #data = request.GET
+        try:
+#     callback = request.GET['callback']
+#    plan_id = request.GET['id_plan_pago']
+#    print("id_plan_pago ->" + plan_id);
+            #object_list = Propietario.objects.all().order_by("-id")[0]
+            id = Propietario.objects.latest('id').id
+            
+#    object_list = PlanDePago.objects.filter(plan_id=plan_id)
+
+            results = [{"id": id}]
+
+            return HttpResponse(json.dumps(results), mimetype='application/json')
+        except:
+            return HttpResponseServerError('No se pudo procesar el pedido')
+            #return (e)   
+    
+
 
 
 @require_http_methods(["GET"])
