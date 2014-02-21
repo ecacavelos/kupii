@@ -23,13 +23,21 @@
 					</div>
 					<div id="listado-item-lote">
 						<table width="50%" border="1" cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
-							<th>Manzanas</th>
+							<th>Nro Manzana</th>
+							<th>Nro Fracci&oacute;n</th>
+							<th>Cantidad de Lotes</th>
 {% for hw in object_list %}
 		<tr>
 			<td>
-				<a href="{{hw.id}}">Manzana nro: {{hw.nro_manzana}} <strong>(Ver Detalles)</strong></a>
+				<!--<a href="{{hw.id}}">Manzana nro: {{hw.nro_manzana}} <strong>(Ver Detalles)</strong></a>-->
+				{{hw.id}}
 			</td>
-			
+			<td>
+				{{hw.fraccion_id}}
+			</td>
+			<td>
+				{{hw.cantidad_lotes}}
+			</td>
 		</tr>
 
 {% endfor %}

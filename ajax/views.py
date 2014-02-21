@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.views.decorators.http import require_http_methods
 from django.template import RequestContext, loader
 from django.utils import simplejson as json
-from principal.models import Fraccion, Manzana, Venta, PagoDeCuotas, Propietario
+from principal.models import Fraccion, Manzana, Venta, PagoDeCuotas, Propietario, Lote
 
 @require_http_methods(["GET"])
 def get_propietario_id_by_name(request):
@@ -23,6 +23,59 @@ def get_propietario_id_by_name(request):
         except:
             return HttpResponseServerError('No se pudo procesar el pedido')
             #return (e)   
+ 
+ 
+@require_http_methods(["GET"])
+def get_lotes_a_cargar_by_manzana(request):
+    if request.method == 'GET':
+        #data = request.GET
+        try:
+            
+            id_manzana = request.GET['id_manzana']
+            id_fraccion = request.GET['id_fraccion']
+            print("id_manzana ->" + id_manzana);
+            print("id_fraccion ->" + id_fraccion);
+            object_list = Manzana.objects.filter(pk= id_manzana, fraccion=id_fraccion)
+            id_manzana = object_list[0].id
+            total_lotes = object_list[0].cantidad_lotes
+            object_list2= Lote.objects.filter(manzana_id = id_manzana)
+            cantidad_encontrada = len(object_list2)
+            print("cantidad_encontrada ->" + str(cantidad_encontrada));
+            diferencia = total_lotes - cantidad_encontrada
+            results =[]
+            if (diferencia == 0):
+#    object_list = PlanDePago.objects.filter(plan_id=plan_id)
+                #results = [ob.as_json() for ob in object_list2]
+                results = [{"id": 0, "label": "No quedan Lotes disponibles en esta manzana"}]
+            else:
+                if (cantidad_encontrada == 0):
+                    for i in range(1, total_lotes+1):
+                        record = {"id": i, "label": i}
+                        results.append(record)
+                else:
+                    encontrados = []
+                    for i in range(1, total_lotes+2):
+                        encontrados.append(0)
+                        
+                    for j in range(1, cantidad_encontrada +1):
+                        nro_lote_encontrado = object_list2[j-1].nro_lote
+                        for i in range(1,total_lotes+1): 
+                            if (i == object_list2[j-1].nro_lote):
+                                encontrados[nro_lote_encontrado]= nro_lote_encontrado
+                        
+                        
+                    for i in range(1, total_lotes+1):
+                        if (i != encontrados[i]):
+                            record = {"id": i, "label": i}
+                            results.append(record)                            
+                            
+                        
+                        
+            return HttpResponse(json.dumps(results), mimetype='application/json')
+        except:
+            return HttpResponseServerError('No se pudo procesar el pedido')
+            #return (e)   
+ 
 
 @require_http_methods(["GET"])
 def get_propietario_name_by_id(request):

@@ -267,6 +267,36 @@ table.listado-lotes tr td.last {
 		border:thin #CCC solid;
 	}
 	
+	#id_cantidad_manzanas{
+		font-size:13px;
+		padding:4px;
+		font-weight:400;
+		background-color:#fff;
+		-webkit-box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+        box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+		border:thin #CCC solid;
+	}
+	
+	#id_cantidad_lotes{
+		font-size:13px;
+		padding:4px;
+		font-weight:400;
+		background-color:#fff;
+		-webkit-box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+        box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+		border:thin #CCC solid;
+	}
+	
+	#id_superficie_total{
+		font-size:13px;
+		padding:4px;
+		font-weight:400;
+		background-color:#fff;
+		-webkit-box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+        box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+		border:thin #CCC solid;
+	}
+	
 	#total_mora{
 		font-size:13px;
 		padding:4px;

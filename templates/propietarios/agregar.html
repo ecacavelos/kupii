@@ -1,21 +1,44 @@
 {% extends "lotes/base_lotes.html" %}
 
 {% block header_resources %}
+<!--
 <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+-->
 {% endblock %}
 
 {% block header_scripts %}
-
+<!--
 <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
 <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
-
+-->
 <script type="text/javascript">
+
+function solo_numeros () {
+		
+	  	$('#id_cedula').val($('#id_cedula').val().replace(/\D/g,''));
+	}
+
+function _enviar(){
+	if (self.opener != null ){
+		self.opener.form_add_fraccion.id_name_propietario.value = $("#id_nombres").val() +' '+ $("#id_apellidos").val() ;
+		$("#form_add_propietario").submit();
+		//window.close();
+	} else {
+		$("#form_add_propietario").submit();
+	}
+	
+}
+
+
 
 var data = [
 		{"label" : "Aragorn"}
 		];
 $(document).ready(function() {
-	
+	$("#id_fecha_nacimiento").datepicker({ dateFormat: 'dd/mm/yy' });
+	$("#id_fecha_ingreso").datepicker({ dateFormat: 'dd/mm/yy' });
+	$('.date').mask('##/##/####');
+	//var date = $('#datepicker').datepicker({ dateFormat: 'dd/mm/yyyy' }).val();
 	$("#id_manzana").attr('readonly', true);
 	var fraccion_id;
 	$("#id_manzana").empty();
@@ -68,28 +91,44 @@ $(document).ready(function() {
 
 <div class="grid_16" align="center">
 	
-	  <form action="" method="post" onsubmit="if (self.opener != null){self.opener.form_add_fraccion.id_name_propietario.value = (this.id_nombres.value +' '+ this.id_apellidos.value) ;}">
+	  <form action="" method="post" id="form_add_propietario">
+	  	<div id="{{message_id}}">{{ message }}</div>
 	  	<table width="94%" border="0" cellpadding="0" cellspacing="0" id="forms" align="center">
 		{% csrf_token %}
-		{% for field in form2 %}
-			{{ field.errors }}
-			<tr>
-	    		<td><strong>{{ field.label_tag }}:</strong></td>
-	    		<td class="noimage">{{ field }}</td>
-	    	</tr>		
-		{% endfor %}
 		{% for field in form %}
 			{{ field.errors }}
 			<tr>
-	    		<td><strong>{{ field.label_tag }}:</strong></td>
-	    		<td class="noimage">{{ field }}</td>
-	    	</tr>		
+	    		<td><strong>{{ field.label_tag }}</strong></td>
+	    		{%if field.html_name == 'fecha_nacimiento' %}
+					<td class="noimage">
+						<input type="text" name="fecha_nacimiento" id="id_fecha_nacimiento" class="date">
+						{{ field.errors }}
+					</td>
+				{%else%}
+					{%if field.html_name == 'fecha_ingreso' %}
+					<td class="noimage">
+						<input type="text" name="fecha_ingreso" id="id_fecha_ingreso" class="date">
+						{{ field.errors }}
+					</td>
+					{%else%}
+						{%if field.html_name == 'cedula' %}
+						<td class="noimage">
+							<input type="text" name="cedula" id="id_cedula" onkeyup="solo_numeros();">
+							{{ field.errors }}
+						</td>
+					{%else%}
+						
+						<td class="noimage">{{ field }} {{ field.errors }}</td>
+					{%endif%}	
+					{%endif%}
+				{%endif%}	
 		{% endfor %}
-		
-	    </table>
-	    <input name="" class="boton-verde" type="submit" value="Grabar" style="margin-bottom: 10px; cursor: pointer;" />
+		</table>
+	    <input name="" class="boton-verde" type="button" value="Grabar" onclick="_enviar();" style="margin-bottom: 10px; cursor: pointer;" />
+	    	    
 	  </form>
-	
+	<a class="boton-verde" href="/propietarios/">Volver al menú de Propietarios</a>
+	<br><br><br>
 	
 <div class="clear"></div>
 </div>

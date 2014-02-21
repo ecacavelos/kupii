@@ -4,7 +4,7 @@ class Cliente(models.Model):
     nombres = models.CharField(max_length=255)
     apellidos = models.CharField(max_length=255)
     fecha_nacimiento = models.DateField('fecha de nacimiento')
-    cedula = models.CharField(max_length=8)
+    cedula = models.CharField(unique=True,max_length=8, blank=False, null=False)
     ruc = models.CharField(max_length=255)
     SEXO_CHOICES = (
         ("M", "Masculino"),
@@ -33,7 +33,7 @@ class Propietario(models.Model):
     apellidos = models.CharField(max_length=255, blank=True)
     fecha_nacimiento = models.DateField('fecha de nacimiento', blank=True, null=True)
     fecha_ingreso = models.DateField('fecha de ingreso')
-    cedula = models.CharField(max_length=8, blank=True)
+    cedula = models.CharField(unique=True,max_length=8, blank=False, null=False)
     ruc = models.CharField(max_length=255, blank=True)
     direccion_particular = models.CharField(max_length=255, blank=True)
     telefono_particular = models.CharField(max_length=255, blank=True)
@@ -78,6 +78,8 @@ class Manzana(models.Model):
         verbose_name_plural = "manzanas"
     def as_json(self):
         return dict(
+            cantidad=self.cantidad_lotes,        
+            fraccion=self.fraccion_id,        
             label=self.nro_manzana,
             id=self.id)
         
@@ -85,7 +87,7 @@ class Vendedor(models.Model):
     nombres = models.CharField(max_length=255)
     apellidos = models.CharField(max_length=255)
     # fecha_nacimiento = models.DateField('fecha de nacimiento')    
-    cedula = models.CharField(max_length=8)
+    cedula = models.CharField(unique=True,max_length=8, blank=False, null=False)
     # ruc = models.CharField(max_length=255)
     direccion = models.CharField('direccion del vendedor', max_length=255)
     telefono = models.CharField(max_length=255)
@@ -106,7 +108,7 @@ class Cobrador(models.Model):
     nombres = models.CharField(max_length=255)
     apellidos = models.CharField(max_length=255)
     # fecha_nacimiento = models.DateField('fecha de nacimiento')    
-    cedula = models.CharField(max_length=8, blank=True)
+    cedula = models.CharField(unique=True,max_length=8, blank=False, null=False)
     # ruc = models.CharField(max_length=255)
     direccion = models.CharField('direccion del cobrador', max_length=255)
     telefono_particular = models.CharField(max_length=255)
@@ -161,12 +163,16 @@ class Lote(models.Model):
         ("1", "Libre"),
         ("2", "Reservado"),
         ("3", "Vendido"),
-        ("4", "4"),
-        ("5", "Recuperado"),
+        ("4", "Recuperado"),
     )
     estado = models.CharField(max_length=1, choices=ESTADO_CHOICES)
     def __unicode__(self):
         return (str(self.manzana).zfill(3) + "/" + str(self.id).zfill(4))
+    
+    def as_json(self):
+        return dict(
+            label=self.nro_lote,
+            id=self.nro_lote)
 
 class Venta(models.Model):
     lote = models.ForeignKey(Lote)
@@ -241,4 +247,4 @@ class RecuperacionDeLotes(models.Model):
     fecha_de_recuperacion = models.DateField()
     cliente = models.ForeignKey(Cliente)
     vendedor = models.ForeignKey(Vendedor)
-    plan_de_pago = models.ForeignKey(PlanDePago)
+    #plan_de_pago = models.ForeignKey(PlanDePago)

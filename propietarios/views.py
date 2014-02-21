@@ -4,6 +4,7 @@ from principal.models import Propietario
 from propietarios.forms import PropietarioForm, SearchForm
 #from django.views.generic.list_detail import object_list
 
+
 # Funcion principal del modulo de propietarios.
 def index(request):
     t = loader.get_template('propietarios/index.html')

@@ -8,7 +8,7 @@ class PlanDePagoForm(ModelForm):
     required_css_class = 'required'
     class Meta:
         model = PlanDePago
-        exclude = ('deuda_contraida')
+        exclude = ['deuda_contraida']
 
 class SearchForm(Form):
     buscar = forms.CharField(max_length=100)

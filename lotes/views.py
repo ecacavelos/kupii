@@ -64,9 +64,10 @@ def detalle_ventas_lote(request, venta_id):
     })
     return HttpResponse(t.render(c))
 
-# Funcion para agregar una nueva fraccion.
+# Funcion para agregar un nuevo lote.
 def agregar_lotes(request):
-    t = loader.get_template('lotes/agregar2.html')    
+    t = loader.get_template('lotes/agregar2.html')
+    message = ""    
 
     if request.method == 'POST':
         form = LoteForm(request.POST)
@@ -74,6 +75,11 @@ def agregar_lotes(request):
             form.save()
             # Redireccionamos al listado de lotes luego de agregar el nuevo lote.
             return HttpResponseRedirect('/lotes/listado')
+        else:
+            form = LoteForm()
+            form2 = FraccionManzana()
+            message = "Debe Completar los campos requeridos"
+            
     else:
         form = LoteForm()
         form2 = FraccionManzana()
@@ -81,5 +87,6 @@ def agregar_lotes(request):
     c = RequestContext(request, {
         'form': form,
         'form2': form2,
+        'message': message,
     })
     return HttpResponse(t.render(c))

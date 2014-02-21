@@ -9,4 +9,6 @@ urlpatterns = patterns('ajax.views',
     url(r'^get_propietario_id_by_name/$', 'get_propietario_id_by_name', name='get_propietario_id_by_name'),
     url(r'^get_propietario_lastId/$', 'get_propietario_lastId', name='get_propietario_lastId'),
     url(r'^get_propietario_name_by_id/$', 'get_propietario_name_by_id', name='get_propietario_name_by_id'),
+    url(r'^create_form_by_number/$', 'create_form_by_number', name='create_form_by_number'),
+    url(r'^get_lotes_a_cargar_by_manzana/$', 'get_lotes_a_cargar_by_manzana', name='get_lotes_a_cargar_by_manzana'),    
 )

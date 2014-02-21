@@ -9,7 +9,7 @@ class ClienteForm(ModelForm):
     fecha_nacimiento = forms.DateField(input_formats=('%Y-%m-%d', '%d/%m/%Y',))
     class Meta:
         model = Cliente
-        exclude = ('deuda_contraida')
+        exclude = ['deuda_contraida']
 
 class SearchForm(Form):
     buscar = forms.CharField(max_length=100)

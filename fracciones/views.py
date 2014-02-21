@@ -1,7 +1,9 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext, loader
-from principal.models import Fraccion, Manzana
+from principal.models import Fraccion, Manzana, Lote
 from fracciones.forms import FraccionForm, FraccionFormAdd
+from django.db import reset_queries, close_connection
+
 
 # Funcion principal del modulo de fracciones.
 def fracciones(request):
@@ -22,6 +24,8 @@ def consultar_fracciones(request):
 
 # Funcion para el detalle de una fraccion: edita o borra una fraccion.
 def detalle_fraccion(request, fraccion_id):
+    close_connection()
+    reset_queries()
     t = loader.get_template('fracciones/detalle.html')    
 
     object_list = Fraccion.objects.get(pk=fraccion_id)
@@ -35,10 +39,31 @@ def detalle_fraccion(request, fraccion_id):
                 message = "Se actualizaron los datos."
                 form.save(commit=False)
                 object_list.save()
+                #return HttpResponseRedirect('/fracciones/listado')
+            else:
+                message = "No se pudo actualizar los datos."
+                    
         elif data.get('boton_borrar'):
             f = Fraccion.objects.get(pk=fraccion_id)
+            cantidad_manzanas = f.cantidad_manzanas
+            cantidad_lotes = f.cantidad_lotes
+            
+            
+      
+            for i in range(1, cantidad_manzanas + 1):
+                #m = Manzana.objects.get(nro_manzana=i, fraccion=fraccion_id)
+                m = Manzana.objects.filter(nro_manzana=i, fraccion=fraccion_id)
+                m_list= list(m)
+                #m = Manzana.objects.raw('SELECT id FROM principal_lote WHERE (nro_manzana = '+str(i)+' AND fraccion_id = '+str(f.id)+')')
+                manzana_id = m[0].id
+                
+                for j in range(1, cantidad_lotes + 1):
+                    l = Lote.objects.filter(manzana_id=manzana_id, nro_lote=j)
+                    l.delete()                
+                m.delete()
             f.delete()
-            return HttpResponseRedirect('/fracciones/listado')
+            return HttpResponseRedirect('/fracciones/listado')        
+        
     else:        
         form = FraccionForm(instance=object_list)
                 
@@ -55,13 +80,17 @@ def agregar_fracciones(request):
 
     if request.method == 'POST':
         form = FraccionForm(request.POST)
+        lotes_por_manzana = request.POST['lotes_por_manzana']
+        lotes_por_manzana = lotes_por_manzana.split(",")
         if form.is_valid():
             fraccion = form.save()
             cantidad_manzanas = fraccion.cantidad_manzanas
+            # cantidad_lotes = fraccion.cantidad_lotes
             for i in range(1, cantidad_manzanas + 1):
                 manzana = Manzana()
                 manzana.fraccion = fraccion
                 manzana.nro_manzana = i
+                manzana.cantidad_lotes = lotes_por_manzana[i - 1]
                 manzana.save()
             # Agregar las cantidad_manzanas que correspondan
             # total_manzanas = form.

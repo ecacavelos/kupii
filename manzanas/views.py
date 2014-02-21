@@ -20,6 +20,25 @@ def consultar_manzanas(request):
     })
     return HttpResponse(t.render(c))
 
+def agregar_lotes_por_manzana(request):
+    
+    #id_propietario = request.GET['cant_manzanas']
+    t = loader.get_template('manzanas/agregar.html')
+    
+    if request.method == 'POST':
+        form = ManzanaForm(request.POST)
+        if form.is_valid():
+            Manzana = form.save()
+            
+            return HttpResponseRedirect('/manzanas/listado')
+    else:
+        form = ManzanaForm()
+
+    c = RequestContext(request, {
+        'form': form,
+    })
+    return HttpResponse(t.render(c))
+
 # Funcion para el detalle de una fraccion: edita o borra una fraccion.
 def detalle_manzana(request, manzana_id):
     t = loader.get_template('manzanas/detalle.html')    
