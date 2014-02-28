@@ -27,6 +27,12 @@ class Cliente(models.Model):
     deuda_contraida = models.BigIntegerField(blank=True, null=True)
     def __unicode__(self):
         return (str(self.nombres) + ' ' + str(self.apellidos))
+    
+    def as_json(self):
+        return dict(
+            label= self.nombres + ' ' + self.apellidos,
+            id=self.id)
+    
 
 class Propietario(models.Model):
     nombres = models.CharField(max_length=255)
@@ -103,6 +109,11 @@ class Vendedor(models.Model):
         return (self.nombres + ' ' + self.apellidos)
     class Meta:
         verbose_name_plural = "vendedores"
+    
+    def as_json(self):
+        return dict(
+            label= self.nombres + ' ' + self.apellidos,
+            id=self.id)
 
 class Cobrador(models.Model):
     nombres = models.CharField(max_length=255)

@@ -1,16 +1,52 @@
 {% extends "lotes/base_lotes.html" %}
 
-{% block java_scripts %}
+{% block header_resources %}
+<!--
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+-->
+{% endblock %}
+
+{% block header_scripts %}
+<!--
 <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}ajax_config.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}movimientos.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}movimientos_ventas.js"></script>
+-->
 <script type="text/javascript">
 /* Cambio para label de commit*/
 var data = [
 		{"label" : "Aragorn"}
 		];
 $(document).ready(function() {
+	$('#id_fecha').mask('##/##/####');
+	$("#id_fecha").datepicker({ dateFormat: 'dd/mm/yy' });
+	//$("#id_fecha").datepicker.regional[""].dateFormat = 'dd/mm/yy';
+	$("#id_fecha").datepicker("setDate", new Date());
+	
+	base_url = "/ajax/get_cliente_id_by_name/";
+		params = "value";
+		$("#id_nombre_cliente").autocomplete({
+			source : base_url,
+			minLength : 1,
+			select : function(event, ui) {
+				id_cliente = ui.item.id;
+				$("#id_cliente").val(id_cliente);
+			}
+		});
+		
+		base_url = "/ajax/get_vendedor_id_by_name/";
+		params = "value";
+		$("#id_nombre_vendedor").autocomplete({
+			source : base_url,
+			minLength : 1,
+			select : function(event, ui) {
+				id_vendedor = ui.item.id;
+				$("#id_vendedor").val(id_vendedor);
+				$('#id_plan_pago').prop('disabled', false);
+			}
+		});
+	
 	var id_plan_pago;
 	$("#id_plan_pago").empty();
       	var get_all_planes = $.ajax({
@@ -23,6 +59,7 @@ $(document).ready(function() {
 				});
 			get_all_planes.done(function (data){
 				$.each(data, function (index,value) {
+					$("#id_plan_pago").append('<option value="0">Elija un plan de pago</option>') ;
 					$("#id_plan_pago").append('<option value="'+ value.id +'">' + 'Plan ' + value.label + '</option>') ;
 				});
     });
@@ -70,27 +107,26 @@ $("#id_plan_pago").attr('readonly', true);
 	<div class="fieldWrapperMovimientos">
 		<tr>
 			<td><label for="id_fecha">Fecha de Venta: </label></td>
-			<td class="noimage"><input id="id_fecha" type="date" name="fecha" maxlength="10" /></td>
+			<td class="noimage"><input id="id_fecha" type="text" name="fecha" maxlength="10" /></td>
 		</tr>
 	</div>
 	<div class="fieldWrapperMovimientos">
 		<tr>
-			<td><label for="id_cliente">Código del Cliente: </label></td>
-			<td class="noimage"><input id="id_cliente" type="text" name="cliente" disabled="disabled" maxlength="100" onblur="retrieveCliente()" /></td>	
-		</tr>
-		<tr>
-			<td><label>Apellidos y Nombres: </label></td>
+			<td><label>Cliente: </label></td>
+			<td class="noimage"><input id="id_cliente" type="hidden" name="cliente" disabled="disabled" maxlength="100" onblur="retrieveCliente()" />
+				<input id="id_nombre_cliente" type="text" name="nombre_cliente" disabled="disabled" maxlength="100" />
+			</td>
 			<td class="noimage"><div id="cliente_seleccionado"></div>
 			<ul class="errorlist"><li id="cliente_error"></li></ul></td>
 		</tr>
 	</div>
 	<div class="fieldWrapperMovimientos">
-		<tr>	
-			<td><label for="id_vendedor">Código del Vendedor: </label></td>
-			<td class="noimage"><input id="id_vendedor" type="text" name="vendedor" disabled="disabled" maxlength="100" onblur="retrieveVendedor()" /></td>	
-		</tr>
+		
 		<tr>
-			<td><label>Apellidos y Nombres: </label></td>
+			<td><label>Vendedor: </label></td>
+			<td class="noimage"><input id="id_vendedor" type="hidden" name="vendedor" maxlength="100" onblur="retrieveVendedor()" />
+				<input id="id_nombre_vendedor" type="text" name="nombre_vendedor" maxlength="100" />
+			</td>
 			<td class="noimage"><div id="vendedor_seleccionado"></div>
 			<ul class="errorlist"><li id="vendedor_error"></li></ul></td>
 		</tr>	
@@ -100,7 +136,7 @@ $("#id_plan_pago").attr('readonly', true);
 			<td><label for="id_plan_pago">Plan de Pago: </label></td>
 			<td class="noimage">
 				<select id="id_plan_pago" name="plan_pago" disabled="disabled" maxlength="100" onblur="retrievePlanPago()">
-				
+				<option value="0">Elije un plan de pago</option>
 				</select>	
 		</tr>
 		<tr>
@@ -124,11 +160,11 @@ $("#id_plan_pago").attr('readonly', true);
 		</tr>
 		<tr>
 			<td><label for="id_entrega_inicial">Entrega Inicial: </label></td>
-			<td class="noimage"><input id="id_entrega_inicial" type="number" name="entrega_inicial" disabled="disabled" maxlength="100" onblur="calculateMontoCuotas()" /></td>
+			<td class="noimage"><input id="id_entrega_inicial" type="text" name="entrega_inicial" disabled="disabled" maxlength="100" onblur="calculateMontoCuotas()" /></td>
 		</tr>
 		<tr>
 			<td><label for="id_monto_cuota">Monto de cada Cuota: </label></td>
-			<td class="noimage"><input id="id_monto_cuota" type="number" name="monto_cuota" disabled="disabled" maxlength="100" onblur="calculatePrecioFinalVentaLote()" /></td>
+			<td class="noimage"><input id="id_monto_cuota" type="text" name="monto_cuota" disabled="disabled" maxlength="100" onblur="calculatePrecioFinalVentaLote()" /></td>
 		</tr>
 		<tr>
 			<td><label>Monto Total: </label></td>
@@ -138,7 +174,7 @@ $("#id_plan_pago").attr('readonly', true);
 		</tr>
 		<tr>
 			<td><label for="id_fecha_vencimiento">Fecha del 1er Vencimiento: </label></td>
-			<td class="noimage"><input id="id_fecha_vencimiento" type="date" name="fecha_vencimiento" disabled="disabled" maxlength="10" /></td>
+			<td class="noimage"><input id="id_fecha_vencimiento" type="text" name="fecha_vencimiento" disabled="disabled" maxlength="10" /></td>
 		</tr>	
 	</div>
 	<div class="fieldWrapperMovimientos">

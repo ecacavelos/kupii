@@ -58,11 +58,11 @@ function retrieveLote() {
 			var day = d.getDate();
 
 			//fecha_actual = (day < 10 ? '0' : '') + day + '/' + (month < 10 ? '0' : '') + month + '/' + d.getFullYear();
-			fecha_actual = new Date().toJSON().substring(0, 10);
+			//fecha_actual = new Date().toJSON().substring(0, 10);
 
-			$("#id_fecha").val(fecha_actual);
+			//$("#id_fecha").val(fecha_actual);
 
-			$("#id_cliente").removeAttr("disabled");
+			$("#id_nombre_cliente").removeAttr("disabled");
 			$("#id_cliente").focus();
 		});
 		// En caso de no poder obtener los datos del lote, indicamos el error.
@@ -93,11 +93,14 @@ function retrieveCliente() {
 			$("#cliente_error").html("");
 			$("#cliente_seleccionado").html(msg);
 
-			$("#id_vendedor").removeAttr("disabled");
-			$("#id_vendedor").focus();
+			$("#id_nombre_vendedor").removeAttr("disabled");
+			$("#id_nombre_vendedor").focus();
 			$("#enviar_reserva").removeAttr("disabled");
 			$("#enviar_reserva").focus();
 		});
+		
+		
+		
 		// En caso de no poder obtener los datos del cliente, indicamos el error.
 		request.fail(function(jqXHR, textStatus) {
 			//alert("Request failed: " + jqXHR);

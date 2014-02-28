@@ -11,7 +11,8 @@ class FraccionForm(ModelForm):
     class Meta:
         model = Fraccion
         widgets = {
-            'propietario': HiddenInput,            
+            'propietario': HiddenInput,
+            'superficie_total': TextInput,            
         }
      
 class FraccionFormAdd(ModelForm):
@@ -19,7 +20,8 @@ class FraccionFormAdd(ModelForm):
     class Meta:
         model = Fraccion
         widgets = {
-            'propietario': HiddenInput,            
+            'propietario': HiddenInput,
+            'superficie_total': TextInput,              
         }        
         
                 

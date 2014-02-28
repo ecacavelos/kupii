@@ -9,12 +9,14 @@ class LoteForm(ModelForm):
     required_css_class = 'required'
     class Meta:
         model = Lote
-        exclude = ('vendido', 'fecha_de_venta')
-        
-#         widgets = {
-#                 'manzana': TextInput(attrs={'maxlength': 20}),
-#                 'cliente': TextInput(attrs={'maxlength': 20}),
-#             }
+        exclude = ('vendido', 'fecha_de_venta'),        
+        widgets = {
+                 'nro_lote': TextInput,
+                 'precio_contado': TextInput,
+                 'precio_credito': TextInput,
+                 'superficie': TextInput,
+                 'boleto_nro': TextInput,                 
+         }
         
 #class LoteIdentifierForm(Form):
     #buscar = forms.CharField(max_length=100)

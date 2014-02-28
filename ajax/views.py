@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.views.decorators.http import require_http_methods
 from django.template import RequestContext, loader
 from django.utils import simplejson as json
-from principal.models import Fraccion, Manzana, Venta, PagoDeCuotas, Propietario, Lote
+from principal.models import Fraccion, Manzana, Venta, PagoDeCuotas, Propietario, Lote, Cliente, Vendedor
 
 @require_http_methods(["GET"])
 def get_propietario_id_by_name(request):
@@ -23,7 +23,39 @@ def get_propietario_id_by_name(request):
         except:
             return HttpResponseServerError('No se pudo procesar el pedido')
             #return (e)   
- 
+
+
+def get_cliente_id_by_name(request):
+    if request.method == 'GET':
+        #data = request.GET
+        try:
+            
+            name_cliente = request.GET['term']
+            print("term ->" + name_cliente);
+            object_list = Cliente.objects.filter(nombres__icontains= name_cliente)
+#    object_list = PlanDePago.objects.filter(plan_id=plan_id)
+            results = [ob.as_json() for ob in object_list]
+
+            return HttpResponse(json.dumps(results), mimetype='application/json')
+        except:
+            return HttpResponseServerError('No se pudo procesar el pedido')
+            #return (e)   
+
+def get_vendedor_id_by_name(request):
+    if request.method == 'GET':
+        #data = request.GET
+        try:
+            
+            name_vendedor = request.GET['term']
+            print("term ->" + name_vendedor);
+            object_list = Vendedor.objects.filter(nombres__icontains= name_vendedor)
+#    object_list = PlanDePago.objects.filter(plan_id=plan_id)
+            results = [ob.as_json() for ob in object_list]
+
+            return HttpResponse(json.dumps(results), mimetype='application/json')
+        except:
+            return HttpResponseServerError('No se pudo procesar el pedido')
+            #return (e)     
  
 @require_http_methods(["GET"])
 def get_lotes_a_cargar_by_manzana(request):

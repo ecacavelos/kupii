@@ -37,7 +37,7 @@ def retrieve_lote(request):
                 mymanzana = manzana
         #object_list = Lote.objects.get(manzana_nro_manzana=mymanzana.nro_manzana, nro_lote=lote_int)
         
-        object_list = Lote.objects.get(manzana_id=mymanzana.id, nro_lote=lote_int)
+        object_list = Lote.objects.get(manzana_id=mymanzana.id, nro_lote=lote_int, estado="1")
         r = object_list
         if r:
             #r = r[0]
