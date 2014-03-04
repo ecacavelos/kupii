@@ -1,6 +1,6 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext, loader
-from principal.models import Lote, Venta
+from principal.models import Lote, Venta, Manzana, Fraccion
 from lotes.forms import LoteForm, FraccionManzana
 
 # Funcion principal del modulo de lotes.
@@ -13,10 +13,26 @@ def lotes(request):
 def consultar_lotes(request):
     t = loader.get_template('lotes/listado.html')
     
-    object_list = Lote.objects.all().order_by( 'manzana', 'id')
+    object_list = Lote.objects.all().order_by( 'id','manzana')
+    total_lotes = object_list.count()
+    m=[]
+    f=[]
     
+    for i in range(0, total_lotes): 
+        manzana_id = object_list[i].manzana_id
+        m.append( Manzana.objects.get(pk = manzana_id))
+        
+        #setattr(object_list[i], 'nro_manzana', m.nro_manzana)
+        fraccion_id = m[i].fraccion_id
+        f.append(Fraccion.objects.get(pk = fraccion_id))
+        #setattr(object_list[i], 'fraccion', fraccion_id)
+        
+        
     c = RequestContext(request, {
-        'object_list': object_list, 
+        'object_list': object_list,
+        'manzana': m,
+        'fraccion': f,
+        
     })
     return HttpResponse(t.render(c))
 
