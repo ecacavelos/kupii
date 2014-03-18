@@ -48,6 +48,7 @@ function solo_numeros_porcentaje_de_cuotas () {
 }
 
 $(document).ready(function() {
+	$("label[for='id_porcentaje_cuota_inicial']").text("Porcentaje entrega inicial:");
 	$("#id_fecha_ingreso").datepicker({ dateFormat: 'dd/mm/yy' });
 	$("#id_fecha_ingreso").addClass("date");
 	$('.date').mask('##/##/####');

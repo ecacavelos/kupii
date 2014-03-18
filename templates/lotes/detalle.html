@@ -163,7 +163,7 @@ $(document).ready(function() {
 		</div>
 		</tr>		
 		{% endfor %}
-	</table>
+	
 		<div id="lote-ventas">
 			{% for venta in ventas_relacionadas %}
 				<a href="/lotes/listado/ventas/{{ venta.id }}" target="_blank">{{ venta }}</a>
@@ -172,6 +172,7 @@ $(document).ready(function() {
 		<input class="lote-form-button" type="submit" name="boton_guardar" value="Guardar Cambios" />
 		<input class="lote-form-button" type="submit" name="boton_borrar" value="Borrar este Registro" />
 	</form>
+	</table>
 </div>
 <br>
 <div id="footer">

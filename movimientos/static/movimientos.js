@@ -52,7 +52,7 @@ function retrieveLote() {
 			$("#lote_superficie").html(msg.superficie);
 			$("#lote_seleccionado_detalles").html(s);
 			precio_contado = msg.precio_contado;
-			precio_credito = msg.precio_contado;
+			precio_credito = msg.precio_credito;
 			var d = new Date();
 			var month = d.getMonth() + 1;
 			var day = d.getDate();
@@ -68,7 +68,7 @@ function retrieveLote() {
 		// En caso de no poder obtener los datos del lote, indicamos el error.
 		request.fail(function(jqXHR, textStatus) {
 			//alert("Request failed: " + jqXHR);
-			$("#lote_error").html("No se pueden obtener los datos de Lote.");
+			$("#lote_error").html("El Lote no existe o fue vendido.");
 		});
 	} else {
 		if ($("#id_lote").val().toString().length > 0) {
@@ -159,6 +159,7 @@ function retrievePlanPago() {
 			// El plan es a credito.
 			if (msg.credito == "credito") {
 				$("#id_precio_venta").removeAttr("disabled").val(precio_credito);
+				$('#id_precio_venta').val(format.call($('#id_precio_venta').val().split(' ').join(''),'.',','));
 				$("#id_precio_venta").select().focus();
 
 				$("#tipo_pago_contado").removeAttr("checked").attr("disabled", "disabled");
@@ -173,19 +174,22 @@ function retrievePlanPago() {
 				// El plan es al contado.
 			} else {
 				$("#id_precio_venta").removeAttr("disabled").val(precio_contado);
+				$('#id_precio_venta').val(format.call($('#id_precio_venta').val().split(' ').join(''),'.',','));
 				$("#id_precio_venta").select().focus();
 
 				$("#tipo_pago_credito").removeAttr("checked").attr("disabled", "disabled");
 				$("#tipo_pago_contado").prop("checked", true).removeAttr("disabled");
 
 				$("#cantidad_cuotas_venta").html("");
-
+				//alert(precio_contado);
+				$("#precio_final_venta").html(precio_contado);
 				$("#id_entrega_inicial").val(0).attr("disabled", "disabled");
 				$("#id_monto_cuota").val(0).attr("disabled", "disabled");
 			}
-
-			$("#id_fecha_vencimiento").val(fecha_actual).removeAttr("disabled");
-			$("#precio_final_venta").html("");
+			//fecha_actual = new Date().toJSON().substring(0, 10);
+			$("#id_fecha_vencimiento").datepicker({ dateFormat: 'dd/mm/yy' });
+			$("#id_fecha_vencimiento").datepicker("setDate", new Date()).removeAttr("disabled");
+			//$("#precio_final_venta").html("");
 		});
 		// En caso de no poder obtener los datos del plan de pagos, indicamos el error.
 		request.fail(function(jqXHR, textStatus) {

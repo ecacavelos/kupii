@@ -142,7 +142,7 @@ function retrieveLote() {
 		// En caso de no poder obtener los datos del lote, indicamos el error.
 		request.fail(function(jqXHR, textStatus) {
 			//alert("Request failed: " + jqXHR);
-			$("#lote_error").html("No se pueden obtener los datos de Lote.");
+			$("#lote_error").html("El Lote no existe o fue vendido.");
 		});
 	} else {
 		if ($("#id_lote").val().toString().length > 0) {
@@ -235,7 +235,7 @@ function retrieveLote2() {
 		// En caso de no poder obtener los datos del lote, indicamos el error.
 		request.fail(function(jqXHR, textStatus) {
 			//alert("Request failed: " + jqXHR);
-			$("#lote2_error").html("No se pueden obtener los datos de Lote.");
+			$("#lote2_error").html("El Lote no existe o fue vendido.");
 		});
 		cambiable();
 	} else {

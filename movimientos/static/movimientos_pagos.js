@@ -107,18 +107,71 @@ function retrieveLote() {
 
 			$("#id_fecha").val(fecha_actual);
 			$("#id_cliente").removeAttr("disabled");
-			$("#id_cliente").focus();
+			//$("#id_cliente").focus();
 			$("#id_vendedor").removeAttr("disabled");
-			$("#id_vendedor").focus();
+			//$("#id_vendedor").focus();
 			$("#id_plan_pago").removeAttr("disabled");
-			$("#id_plan_pago").focus();
+			//$("#id_plan_pago").focus();
 			$("#id_monto").removeAttr("disabled");
-			$("#nro_cuotas_a_pagar").focus();
+			//$("#nro_cuotas_a_pagar").focus();
 		});
 		// En caso de no poder obtener los datos del lote, indicamos el error.
 		request.fail(function(jqXHR, textStatus) {
 			//alert("Request failed: " + jqXHR);
-			$("#lote_error").html("No se pueden obtener los datos de Lote.");
+			$("#lote_error").html("El Lote no existe o fue vendido.");
+		});
+	} else {
+		if ($("#id_lote").val().toString().length > 0) {
+			$("#lote_error").html("No se encuentra el Lote indicado.");
+		}
+	}
+};
+
+function retrieveLotePago() {
+	if ($("#id_lote").val().toString().length == 12) {
+		// Extraemos los identificadores correspondientes a la fraccion, manzana y lote.
+		splitted_id = $("#id_lote").val().split('/');
+		// Hacemos un request POST AJAX para obtener los datos del lote ingresado.
+		var request = $.ajax({
+			type : "GET",
+			url : "/datos/9/",
+			data : {
+				fraccion : splitted_id[0],
+				manzana : splitted_id[1],
+				lote : splitted_id[2]
+			},
+			dataType : "json"
+		});
+		// Actualizamos el formulario con los datos obtenidos del lote.
+		request.done(function(msg) {
+			global_lote_id = msg.lote_id;
+			var s = "<a class='boton-verde' href=\"/lotes/listado/" + msg.lote_id + "\" target=\"_blank\" \">" + msg.lote_tag + "</a>";
+
+			$("#lote_error").html("");
+			$("#lote_superficie").html(msg.superficie);
+			$("#lote_seleccionado_detalles").html(s);
+			lote_id = msg.lote_id;
+			var d = new Date();
+			var month = d.getMonth() + 1;
+			var day = d.getDate();
+			retrieveVenta();
+			//fecha_actual = (day < 10 ? '0' : '') + day + '/' + (month < 10 ? '0' : '') + month + '/' + d.getFullYear();
+			fecha_actual = new Date().toJSON().substring(0, 10);
+
+			//$("#id_fecha").val(fecha_actual);
+			$("#id_cliente").removeAttr("disabled");
+			//$("#id_cliente").focus();
+			$("#id_vendedor").removeAttr("disabled");
+			//$("#id_vendedor").focus();
+			$("#id_plan_pago").removeAttr("disabled");
+			//$("#id_plan_pago").focus();
+			$("#id_monto").removeAttr("disabled");
+			//$("#nro_cuotas_a_pagar").focus();
+		});
+		// En caso de no poder obtener los datos del lote, indicamos el error.
+		request.fail(function(jqXHR, textStatus) {
+			//alert("Request failed: " + jqXHR);
+			$("#lote_error").html("Lote inválido.");
 		});
 	} else {
 		if ($("#id_lote").val().toString().length > 0) {
@@ -140,6 +193,7 @@ function retrieveVenta() {
 		// Actualizamos el formulario con los datos obtenidos del lote.
 		request.done(function(msg) {
 			venta_id = (msg[0]['venta_id']);
+			$("#id_venta_pagos").val(venta_id);
 			$("#id_cliente").val(msg[0]['cliente_id']);
 			$("#cliente_seleccionado").val(msg[0]['cliente']);
 			$("#id_vendedor").val(msg[0]['vendedor_id']);
@@ -148,6 +202,8 @@ function retrieveVenta() {
 			$("#id_plan_pago").val(msg[0]['plan_de_pago_id']);
 			$("#precio_de_cuota").val(msg[0]['precio_de_cuota']);
 			$("#monto_cuota").val(msg[0]['precio_de_cuota']);
+			$("#id_fecha_venta").val(msg[0]['fecha_de_venta']);
+			
 		});
 //	}
 };
@@ -174,7 +230,7 @@ function retrieveCliente() {
 			//alert("Request failed: " + jqXHR);
 			$("#cliente_error").html("No se pueden obtener los datos del Cliente.");
 			$("#cliente_seleccionado").html("");
-			$("#id_cliente").select().focus();
+			//$("#id_cliente").select().focus();
 		});
 	}
 };
@@ -201,7 +257,7 @@ function retrieveVendedor() {
 			//alert("Request failed: " + jqXHR);
 			$("#vendedor_error").html("No se pueden obtener los datos del Vendedor.");
 			$("#vendedor_seleccionado").html("");
-			$("#id_vendedor").select().focus();
+			//$("#id_vendedor").select().focus();
 		});
 	}
 };
@@ -227,7 +283,7 @@ function retrievePlanPago() {
 		request.fail(function(jqXHR, textStatus) {
 			$("#plan_pago_error").html("No se pueden obtener los datos del Plan de Pago.");
 			$("#plan_pago_seleccionado").html("");
-			$("#id_plan_pago").select().focus();
+			//$("#id_plan_pago").select().focus();
 		});
 	}
 };
@@ -239,7 +295,8 @@ function calculateTotalCuotas() {
 	var total_cuotas = (monto_cuota * nro_cuotas_a_pagar);
 	$("#total_cuotas").val(total_cuotas);
 	$("#total_mora").removeAttr("disabled");
-	$("#total_mora").focus();
+	//$("#total_mora").focus();
+	$("#total_mora").val("5000");
 };
 
 function calculateTotalPago() {
@@ -251,5 +308,5 @@ function calculateTotalPago() {
 	total_pago = parseInt(total_pago);
 	$("#total_pago").val(total_pago);
 	$("#guardar_pago").removeAttr("disabled");
-	$("#guardar_pago").focus();
+	//$("#guardar_pago").focus();
 };

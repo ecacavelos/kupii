@@ -22,8 +22,58 @@ def get_propietario_id_by_name(request):
             return HttpResponse(json.dumps(results), mimetype='application/json')
         except:
             return HttpResponseServerError('No se pudo procesar el pedido')
-            #return (e)   
+            #return (e)
 
+@require_http_methods(["GET"])
+def get_vendedor_name_id_by_cedula(request):
+    if request.method == 'GET':
+        #data = request.GET
+        try:
+            
+            cedula_vendedor = request.GET['term']
+            print("term ->" + cedula_vendedor);
+            object_list = Vendedor.objects.filter(cedula__icontains= cedula_vendedor)
+#    object_list = PlanDePago.objects.filter(plan_id=plan_id)
+            results = [ob.as_json() for ob in object_list]
+
+            return HttpResponse(json.dumps(results), mimetype='application/json')
+        except:
+            return HttpResponseServerError('No se pudo procesar el pedido')
+            #return (e) 
+            
+@require_http_methods(["GET"])
+def get_propietario_name_id_by_cedula(request):
+    if request.method == 'GET':
+        #data = request.GET
+        try:
+            
+            cedula_propietario = request.GET['term']
+            print("term ->" + cedula_propietario);
+            object_list = Propietario.objects.filter(cedula__icontains= cedula_propietario)
+#    object_list = PlanDePago.objects.filter(plan_id=plan_id)
+            results = [ob.as_json() for ob in object_list]
+
+            return HttpResponse(json.dumps(results), mimetype='application/json')
+        except:
+            return HttpResponseServerError('No se pudo procesar el pedido')
+            #return (e)                  
+
+@require_http_methods(["GET"])
+def get_cliente_name_id_by_cedula(request):
+    if request.method == 'GET':
+        #data = request.GET
+        try:
+            
+            cedula_cliente = request.GET['term']
+            print("term ->" + cedula_cliente);
+            object_list = Cliente.objects.filter(cedula__icontains= cedula_cliente)
+#    object_list = PlanDePago.objects.filter(plan_id=plan_id)
+            results = [ob.as_json() for ob in object_list]
+
+            return HttpResponse(json.dumps(results), mimetype='application/json')
+        except:
+            return HttpResponseServerError('No se pudo procesar el pedido')
+            #return (e)   
 
 def get_cliente_id_by_name(request):
     if request.method == 'GET':
@@ -181,7 +231,7 @@ def get_ventas_by_lote(request):
     print("lote_id ->" + lote_id);
 
 #     object_list = Manzana.objects.all()
-    object_list = Venta.objects.filter(lote=lote_id)
+    object_list = Venta.objects.filter(lote=lote_id).order_by('-id')[:1]
     results = [ob.as_json() for ob in object_list]
     json.dumps(results)
     return HttpResponse(json.dumps(results), mimetype='application/json')

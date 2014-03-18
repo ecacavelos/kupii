@@ -37,7 +37,7 @@ def ventas_de_lotes(request):
                 fecha_vencim_parsed = datetime.strptime(data.get('venta_fecha_primer_vencimiento', ''), "%Y-%m-%d")
             except:
                 date_parse_error = True
-
+                
         nueva_venta = Venta()
         nueva_venta.lote = lote_a_vender
         nueva_venta.fecha_de_venta = fecha_venta_parsed
@@ -48,7 +48,7 @@ def ventas_de_lotes(request):
         nueva_venta.precio_de_cuota = long(data.get('venta_precio_de_cuota', ''))
         nueva_venta.precio_final_de_venta = long(data.get('venta_precio_final_de_venta', ''))
         nueva_venta.fecha_primer_vencimiento = fecha_vencim_parsed
-        nueva_venta.pagos_realizados = 0
+        nueva_venta.pagos_realizados = 0    
         
         if nueva_venta.plan_de_pago.tipo_de_plan != 'contado':
             cant_cuotas = nueva_venta.plan_de_pago.cantidad_de_cuotas
@@ -140,13 +140,15 @@ def pago_de_cuotas(request):
         data = request.POST
 
         lote_id = data.get('pago_lote_id', '')
-        venta = Venta.objects.get(lote_id=lote_id)
         
+        nro_cuotas_a_pagar = data.get('pago_nro_cuotas_a_pagar')
         venta_id = data.get('pago_venta_id')
+        venta = Venta.objects.get(pk=venta_id)
+        venta.pagos_realizados = int(nro_cuotas_a_pagar) + int(venta.pagos_realizados)
         cliente_id = data.get('pago_cliente_id')
         vendedor_id = data.get('pago_vendedor_id')
         plan_pago_id = data.get('pago_plan_de_pago_id')
-        nro_cuotas_a_pagar = data.get('pago_nro_cuotas_a_pagar')
+        
         total_de_cuotas = data.get('pago_total_de_cuotas')
         total_de_mora = data.get('pago_total_de_mora')
         total_de_pago = data.get('pago_total_de_pago')
@@ -177,7 +179,7 @@ def pago_de_cuotas(request):
         nuevo_pago.total_de_pago = total_de_pago
         
         nuevo_pago.save()
-        venta.pagos_realizados = int(nro_cuotas_a_pagar) + int(venta.pagos_realizados)
+        
         venta.save()
 
     c = RequestContext(request, {

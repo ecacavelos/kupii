@@ -21,6 +21,7 @@ function solo_numeros () {
 function _enviar(){
 	if (self.opener != null ){
 		self.opener.form_add_fraccion.id_name_propietario.value = $("#id_nombres").val() +' '+ $("#id_apellidos").val() ;
+		self.opener.form_add_fraccion.id_cedula_propietario.value = $("#id_cedula").val();
 		$("#form_add_propietario").submit();
 		//window.close();
 	} else {

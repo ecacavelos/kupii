@@ -31,6 +31,7 @@ class Cliente(models.Model):
     def as_json(self):
         return dict(
             label= self.nombres + ' ' + self.apellidos,
+            cedula= self.cedula,
             id=self.id)
     
 
@@ -51,6 +52,7 @@ class Propietario(models.Model):
     def as_json(self):
         return dict(
             label= self.nombres + ' ' + self.apellidos,
+            cedula= self.cedula,
             id=self.id)
 
 class Fraccion(models.Model):
@@ -113,6 +115,7 @@ class Vendedor(models.Model):
     def as_json(self):
         return dict(
             label= self.nombres + ' ' + self.apellidos,
+            cedula = self.cedula,
             id=self.id)
 
 class Cobrador(models.Model):
@@ -150,7 +153,7 @@ class PlanDePago(models.Model):
     inicio_cuotas_gerente = models.IntegerField()
     intervalos_cuotas_gerente = models.IntegerField()
     porcentaje_cuotas_gerente = models.IntegerField()
-    monto_fijo_cuotas_gerente = models.IntegerField()
+    #monto_fijo_cuotas_gerente = models.IntegerField()
     def __unicode__(self):
         return (self.nombre_del_plan)
     
@@ -212,6 +215,7 @@ class Venta(models.Model):
             entrega_inicial = self.entrega_inicial,
             precio_de_venta = self.precio_final_de_venta,
             pagos_realizados = self.pagos_realizados,
+            fecha_de_venta = str(self.fecha_de_venta),
         )
     
 class Reserva(models.Model):

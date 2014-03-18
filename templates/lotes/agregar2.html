@@ -93,6 +93,9 @@ function solo_numeros () {
 		
 $(document).ready(function() {
 	
+	$('#id_estado').hide();
+	$('#id_estado').val("1");
+	$("label[for='id_estado']").hide();
 	$('#id_precio_contado').on('keyup', function(){
 	 		$('#id_precio_contado').val(format.call($('#id_precio_contado').val().split(' ').join(''),'.',','));solo_numeros_comas_puntos_contado();
 	});

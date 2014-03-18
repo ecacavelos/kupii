@@ -119,6 +119,13 @@ function _validar(){
 
 $(document).ready(function() {
 	
+	$("label[for='id_porcentaje_inicial_inmobiliaria']").text("Porcentaje entrega inicial inmoviliaria:");
+	$("label[for='id_porcentaje_inicial_gerente']").text("Porcentaje inicial gerente sucursal:");
+	$("label[for='id_cantidad_cuotas_gerente']").text("Cantidad cuotas gerente sucursal:");
+	$("label[for='id_inicio_cuotas_gerente']").text("Inicio cuotas gerente sucursal:");
+	$("label[for='id_intervalos_cuotas_gerente']").text("Intervalos cuotas gerente sucursal:");
+	$("label[for='id_porcentaje_cuotas_gerente']").text("Porcentaje cuotas gerente sucursal:");
+	
 	$( "#id_cantidad_de_cuotas" ).keyup(function() {
   		solo_numeros_cantidad_de_cuotas();
 	});

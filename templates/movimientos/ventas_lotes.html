@@ -18,9 +18,49 @@
 var data = [
 		{"label" : "Aragorn"}
 		];
+		
+function solo_numeros_puntos_precio_venta () {
+		$('#id_precio_venta').val($('#id_precio_venta').val().replace(/[^\d.]+/g, ''));
+}
+
+function solo_numeros_puntos_entrega_inicial () {
+		$('#id_entrega_inicial ').val($('#id_entrega_inicial ').val().replace(/[^\d.]+/g, ''));
+}
+
+function solo_numeros_puntos_monto_cuota () {
+		$('#id_monto_cuota ').val($('#id_monto_cuota ').val().replace(/[^\d.]+/g, ''));
+}
+
+function format(comma, period) {
+		
+		var comma = comma || ',';
+		var period = period || '.';
+		var split = this.toString().split(',');
+		var numeric = split[0];
+		var decimal = split.length > 1 ? period + split[1] : '';
+		var reg = /(\d+)(\d{3})/;
+		for (var i = 1; i < numeric.length; i++) {
+			numeric = numeric.replace(".", "");
+		}
+		while (reg.test(numeric)) {
+
+			numeric = numeric.replace(reg, '$1' + comma + '$2');
+		}
+		//} else {
+		//	numeric = numeric.substr(0,numeric.length-1);
+		//}
+		
+		return numeric + decimal;
+	}
+
 $(document).ready(function() {
 	$('#id_fecha').mask('##/##/####');
 	$("#id_fecha").datepicker({ dateFormat: 'dd/mm/yy' });
+	$('#id_fecha_vencimiento').mask('##/##/####');
+	$("#id_fecha_vencimiento").datepicker({ dateFormat: 'dd/mm/yy' });
+	
+	
+	
 	//$("#id_fecha").datepicker.regional[""].dateFormat = 'dd/mm/yy';
 	$("#id_fecha").datepicker("setDate", new Date());
 	
@@ -31,7 +71,44 @@ $(document).ready(function() {
 			minLength : 1,
 			select : function(event, ui) {
 				id_cliente = ui.item.id;
+				cedula_cliente = ui.item.cedula;
 				$("#id_cliente").val(id_cliente);
+				$("#id_cedula_cliente").val(cedula_cliente);
+								
+			}
+		});
+		
+		//cliente por cedula
+		base_url = "/ajax/get_cliente_name_id_by_cedula/";
+		params = "value";
+		$("#id_cedula_cliente").autocomplete({
+			source : base_url,
+			minLength : 1,
+			select : function(event, ui) {
+				id_cliente = ui.item.id;
+				name_cliente= ui.item.label;
+				cedula_cliente = ui.item.cedula;
+				ui.item.value = ui.item.cedula;
+				$("#id_cliente").val(id_cliente);
+				$("#id_cedula_cliente").val(cedula_cliente);
+				$("#id_nombre_cliente").val(name_cliente);
+			}
+		});
+		
+		//vendodor por cedula
+		base_url = "/ajax/get_vendedor_name_id_by_cedula/";
+		params = "value";
+		$("#id_cedula_vendedor").autocomplete({
+			source : base_url,
+			minLength : 1,
+			select : function(event, ui) {
+				id_vendedor = ui.item.id;
+				name_vendedor= ui.item.label;
+				cedula_vendedor = ui.item.cedula;
+				ui.item.value = ui.item.cedula;
+				$("#id_vendedor").val(id_vendedor);
+				$("#id_cedula_vendedor").val(cedula_vendedor);
+				$("#id_nombre_vendedor").val(name_vendedor);
 			}
 		});
 		
@@ -42,7 +119,9 @@ $(document).ready(function() {
 			minLength : 1,
 			select : function(event, ui) {
 				id_vendedor = ui.item.id;
+				cedula_vendedor = ui.item.cedula;
 				$("#id_vendedor").val(id_vendedor);
+				$("#id_cedula_vendedor").val(cedula_vendedor);
 				$('#id_plan_pago').prop('disabled', false);
 			}
 		});
@@ -58,8 +137,9 @@ $(document).ready(function() {
 					dataType : "json"
 				});
 			get_all_planes.done(function (data){
+				$("#id_plan_pago").append('<option value="0">Elija un plan de pago</option>') ;
 				$.each(data, function (index,value) {
-					$("#id_plan_pago").append('<option value="0">Elija un plan de pago</option>') ;
+					
 					$("#id_plan_pago").append('<option value="'+ value.id +'">' + 'Plan ' + value.label + '</option>') ;
 				});
     });
@@ -113,8 +193,9 @@ $("#id_plan_pago").attr('readonly', true);
 	<div class="fieldWrapperMovimientos">
 		<tr>
 			<td><label>Cliente: </label></td>
-			<td class="noimage"><input id="id_cliente" type="hidden" name="cliente" disabled="disabled" maxlength="100" onblur="retrieveCliente()" />
-				<input id="id_nombre_cliente" type="text" name="nombre_cliente" disabled="disabled" maxlength="100" />
+			<td class="noimage"><input id="id_cliente" type="hidden" name="cliente"  maxlength="100" onchange="retrieveCliente()" />
+				<input id="id_nombre_cliente" type="text" name="nombre_cliente" placeholder="Ingrese el Nombre"  maxlength="100" /> <br><br>
+				<input id="id_cedula_cliente" type="text" name="cedula_cliente" placeholder="Ingrese el Nro. de C.I."  maxlength="100" />
 			</td>
 			<td class="noimage"><div id="cliente_seleccionado"></div>
 			<ul class="errorlist"><li id="cliente_error"></li></ul></td>
@@ -124,8 +205,9 @@ $("#id_plan_pago").attr('readonly', true);
 		
 		<tr>
 			<td><label>Vendedor: </label></td>
-			<td class="noimage"><input id="id_vendedor" type="hidden" name="vendedor" maxlength="100" onblur="retrieveVendedor()" />
-				<input id="id_nombre_vendedor" type="text" name="nombre_vendedor" maxlength="100" />
+			<td class="noimage"><input id="id_vendedor" type="hidden" name="vendedor" maxlength="100" onbchange="retrieveVendedor()" />
+				<input id="id_nombre_vendedor" type="text" name="nombre_vendedor" placeholder="Ingrese el Nombre" maxlength="100" /> <br><br>
+				<input id="id_cedula_vendedor" type="text" name="cedula_vendedor" placeholder="Ingrese el Nro. de C.I."  maxlength="100" />
 			</td>
 			<td class="noimage"><div id="vendedor_seleccionado"></div>
 			<ul class="errorlist"><li id="vendedor_error"></li></ul></td>
@@ -135,7 +217,7 @@ $("#id_plan_pago").attr('readonly', true);
 		<tr>
 			<td><label for="id_plan_pago">Plan de Pago: </label></td>
 			<td class="noimage">
-				<select id="id_plan_pago" name="plan_pago" disabled="disabled" maxlength="100" onblur="retrievePlanPago()">
+				<select id="id_plan_pago" name="plan_pago"  maxlength="100" onchange="retrievePlanPago()">
 				<option value="0">Elije un plan de pago</option>
 				</select>	
 		</tr>
@@ -148,11 +230,11 @@ $("#id_plan_pago").attr('readonly', true);
 	<div class="fieldWrapperMovimientos">
 		<tr>
 			<td><label for="id_precio_venta">Precio de Venta: </label></td>
-			<td class="noimage"><input id="id_precio_venta" type="text" name="precio_venta" disabled="disabled" maxlength="100" onblur="calculatePrecioFinalVentaLote()" /><br><br>
+			<td class="noimage"><input id="id_precio_venta" type="text" name="precio_venta"  maxlength="100" onblur="calculatePrecioFinalVentaLote()" onkeyup="$(this).val(format.call($(this).val().split(' ').join(''),'.',','));solo_numeros_puntos_precio_venta();"/><br><br>
 			<label id="tipo_pago_contado_label" class="shortLabel" for="tipo_pago_contado">Contado</label>
-			<input id="tipo_pago_contado" type="radio" name="tipo_pago" disabled="disabled" />
+			<input id="tipo_pago_contado" type="radio" name="tipo_pago"  />
 			<label id="tipo_pago_credito_label" class="shortLabel" for="tipo_pago_credito">Credito</label>
-			<input id="tipo_pago_credito" type="radio" name="tipo_pago" disabled="disabled" /></td>
+			<input id="tipo_pago_credito" type="radio" name="tipo_pago"  /></td>
 		</tr>
 		<tr>
 			<td><label for="cantidad_cuotas_venta">Cantidad de cuotas: </label></td>
@@ -160,11 +242,11 @@ $("#id_plan_pago").attr('readonly', true);
 		</tr>
 		<tr>
 			<td><label for="id_entrega_inicial">Entrega Inicial: </label></td>
-			<td class="noimage"><input id="id_entrega_inicial" type="text" name="entrega_inicial" disabled="disabled" maxlength="100" onblur="calculateMontoCuotas()" /></td>
+			<td class="noimage"><input id="id_entrega_inicial" type="text" name="entrega_inicial"  maxlength="100" onchange="calculateMontoCuotas();calculatePrecioFinalVentaLote();$('#id_monto_cuota').attr('readonly', true);" onkeyup="$(this).val(format.call($(this).val().split(' ').join(''),'.',','));solo_numeros_puntos_entrega_inicial();" /></td>
 		</tr>
 		<tr>
 			<td><label for="id_monto_cuota">Monto de cada Cuota: </label></td>
-			<td class="noimage"><input id="id_monto_cuota" type="text" name="monto_cuota" disabled="disabled" maxlength="100" onblur="calculatePrecioFinalVentaLote()" /></td>
+			<td class="noimage"><input id="id_monto_cuota" type="text" name="monto_cuota"  maxlength="100" onblur="calculatePrecioFinalVentaLote()" onkeyup="$(this).val(format.call($(this).val().split(' ').join(''),'.',','));solo_numeros_puntos_monto_cuota();" /></td>
 		</tr>
 		<tr>
 			<td><label>Monto Total: </label></td>
@@ -174,13 +256,13 @@ $("#id_plan_pago").attr('readonly', true);
 		</tr>
 		<tr>
 			<td><label for="id_fecha_vencimiento">Fecha del 1er Vencimiento: </label></td>
-			<td class="noimage"><input id="id_fecha_vencimiento" type="text" name="fecha_vencimiento" disabled="disabled" maxlength="10" /></td>
+			<td class="noimage"><input id="id_fecha_vencimiento" type="text" name="fecha_vencimiento" disabled="disabled"  maxlength="10" /></td>
 		</tr>	
 	</div>
 	<div class="fieldWrapperMovimientos">
 	</div>
 	</table>
-	<input id="enviar_venta" style="cursor: pointer;" type="submit" disabled="disabled" value="Guardar Venta" />
+	<input id="enviar_venta" style="cursor: pointer;" type="submit" value="Guardar Venta" />
 	<br><br><br>
 	</form>
 	<div class="clear"></div>
