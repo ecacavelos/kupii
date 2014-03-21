@@ -1,0 +1,50 @@
+{% extends "lotes/base_lotes.html" %}
+
+{% block content %}
+<div class="gri16 text-izquierda" id="breadcumb">
+	<a href="/">Inicio</a> <span class="verde-1">></span>  
+	<a href="/movimientos/"></a> 
+	<span class="verde-1">> Listado de Reservas</span> 
+</div>
+<div class="clear"></div>
+
+					<div class="grid_10">
+  						<h1>Listado de Reservas</h1>
+					</div>
+
+					<div class="grid_6">
+  						<a href="#" class="historico">Buscar</a>
+					</div>
+
+					<div class="clear"></div>
+					<div id="listado-cuadro-busqueda">
+						<a href="/movimientos/agregar" class="boton-verde">Agregar Reserva</a>
+						<br><br>
+					</div>
+					<div id="listado-item-lote">
+						<table width="50%" border="1" cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
+							<th>Codigo</th><th>Lote</th><th>Cliente</th><th>Fecha de Reserva</th>
+{% for hw in object_list %}
+		<tr>
+			<td>
+				<!--<a href="/lotes/listado/pagos/{{ hw.id }}/">{{hw.id}} <strong>(Ver Detalles)</strong></a>-->
+				<a href="#">{{hw.id}} <strong>(Ver Detalles)</strong></a>
+			</td>
+			<td>
+			    {{hw.lote_id}}
+			</td>
+			<td>
+			    {{hw.cliente_id}}
+			</td>
+			<td>
+			    {{hw.fecha_de_reserva}}
+			</td>			
+									
+		</tr>
+
+{% endfor %}
+						</table>
+					</div>
+
+<div id="footer"><a href="/movimientos" class="boton-verde">Volver al módulo de Movimientos</a></div>
+{% endblock %}

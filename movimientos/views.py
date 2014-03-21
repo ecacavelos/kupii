@@ -3,7 +3,7 @@ from django.template import RequestContext, loader
 from principal.models import Cliente, Lote, Vendedor, PlanDePago, Venta, Reserva, PagoDeCuotas, TransferenciaDeLotes, CambioDeLotes, RecuperacionDeLotes
 from django.utils import simplejson as json
 from datetime import datetime
-
+ 
 # Funcion principal del modulo de lotes.
 def movimientos(request):
     t = loader.get_template('movimientos/index.html')
@@ -319,3 +319,117 @@ def recuperacion_de_lotes(request):
     c = RequestContext(request, {
     })
     return HttpResponse(t.render(c))
+
+
+# Funcion para consultar el listado de todas las ventas.
+def listar_ventas(request):
+    t = loader.get_template('movimientos/listado_ventas.html')
+    
+    try:
+        object_list = Venta.objects.all().order_by('id')
+        a = len(object_list)
+        if a>0:
+            for i in object_list:
+                if(i.fecha_de_venta!=None):
+                    i.fecha_de_venta=i.fecha_de_venta.strftime("%d/%m/%Y")
+                if(i.precio_final_de_venta!=None):
+                    i.precio_final_de_venta=str('{:,}'.format(i.precio_final_de_venta)).replace(",", ".")
+            c = RequestContext(request, {
+                'object_list': object_list,
+            })
+            return HttpResponse(t.render(c))
+    except:
+        return HttpResponseServerError("No se pudo obtener el Listado de Ventas de Lotes.")
+
+#Funcion para consultar el listado de todos los pagos.
+def listar_pagos(request):
+    t = loader.get_template('movimientos/listado_pagos.html')
+    
+    try:
+        object_list = PagoDeCuotas.objects.all().order_by('id')
+        a = len(object_list)
+        if a>0:
+            for i in object_list:
+                if(i.fecha_de_pago!=None):
+                    i.fecha_de_pago=i.fecha_de_pago.strftime("%d/%m/%Y")
+                if(i.total_de_cuotas!=None):
+                    i.total_de_cuotas=str('{:,}'.format(i.total_de_cuotas)).replace(",", ".")
+                if(i.total_de_mora!=None):
+                    i.total_de_mora=str('{:,}'.format(i.total_de_mora)).replace(",", ".")
+            c = RequestContext(request, { 
+                'object_list': object_list,
+            })
+            return HttpResponse(t.render(c))
+    except:
+        return HttpResponseServerError("No se pudo obtener el Listado de Pagos de Lotes.")
+        
+def listar_cambios(request):
+    t = loader.get_template('movimientos/listado_cambios.html')
+    
+    try:
+        object_list = CambioDeLotes.objects.all().order_by('id')
+        a = len(object_list)
+        if a>0:
+            for i in object_list:
+                if(i.fecha_de_cambio!=None):
+                    i.fecha_de_cambio=i.fecha_de_cambio.strftime("%d/%m/%Y")
+            c = RequestContext(request, {
+                'object_list': object_list,
+            })
+            return HttpResponse(t.render(c))
+    except:
+        return HttpResponseServerError("No se pudo obtener el Listado de Cambios de Lotes.")
+
+def listar_rec(request):
+    t = loader.get_template('movimientos/listado_recuperacion.html')
+    try:
+        object_list = RecuperacionDeLotes.objects.all().order_by('id')
+        a = len(object_list)
+        if a>0:
+            for i in object_list:
+                if(i.fecha_de_recuperacion!=None):
+                    i.fecha_de_recuperacion=i.fecha_de_cambio.strftime("%d/%m/%Y")        
+            c = RequestContext(request, {
+                'object_list': object_list,
+            })
+            return HttpResponse(t.render(c))
+    except:
+        return HttpResponseServerError("No se pudo obtener el Listado de Recuperacion de Lotes.")
+        
+def listar_res(request):
+    t = loader.get_template('movimientos/listado_reservas.html')
+    
+    try:
+        object_list = Reserva.objects.all().order_by('id')
+        a = len(object_list)
+        if a>0:
+            for i in object_list:
+                if(i.fecha_de_reserva!=None):
+                    i.fecha_de_reserva=i.fecha_de_reserva.strftime("%d/%m/%Y")
+            c = RequestContext(request, {
+                'object_list': object_list,
+            })
+            return HttpResponse(t.render(c))
+    except:
+        return HttpResponseServerError("No se pudo obtener el Listado de Reservas de Lotes.")
+    
+def listar_transf(request):
+    t = loader.get_template('movimientos/listado_transferencias.html')
+    
+    try:
+        object_list = TransferenciaDeLotes.objects.all().order_by('id')
+        a = len(object_list)
+        if a>0:
+            for i in object_list:
+                i.fecha_de_transferencia=i.fecha_de_transferencia.strftime("%d/%m/%Y")
+                
+        c = RequestContext(request, {
+                   'object_list': object_list,
+            })
+        return HttpResponse(t.render(c))            
+        
+            
+    except:
+        return HttpResponseServerError("No se pudo obtener el Listado de Transferencias de Lotes.")
+
+

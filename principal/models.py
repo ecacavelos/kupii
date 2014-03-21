@@ -258,7 +258,7 @@ class CambioDeLotes(models.Model):
 
 class RecuperacionDeLotes(models.Model):
     lote = models.ForeignKey(Lote)
-    venta = models.ForeignKey(Venta)
+    venta= models.ForeignKey(Venta)
     fecha_de_recuperacion = models.DateField()
     cliente = models.ForeignKey(Cliente)
     vendedor = models.ForeignKey(Vendedor)

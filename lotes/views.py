@@ -106,3 +106,12 @@ def agregar_lotes(request):
         'message': message,
     })
     return HttpResponse(t.render(c))
+
+
+        
+         
+    
+    
+    
+    
+    
