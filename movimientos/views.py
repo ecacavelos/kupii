@@ -404,6 +404,7 @@ def listar_res(request):
     except:
         return HttpResponseServerError("No se pudo obtener el Listado de Reservas de Lotes.")
     
+    
 def listar_transf(request):
     t = loader.get_template('movimientos/listado_transferencias.html')
     
