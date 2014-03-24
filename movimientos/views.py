@@ -342,38 +342,31 @@ def recuperacion_de_lotes(request):
 # Funcion para consultar el listado de todas las ventas.
 def listar_ventas(request):
     t = loader.get_template('movimientos/listado_ventas.html')
-    
     try:
         object_list = Venta.objects.all().order_by('id')
         a = len(object_list)
         if a>0:
             for i in object_list:
-                if(i.fecha_de_venta!=None):
-                    i.fecha_de_venta=i.fecha_de_venta.strftime("%d/%m/%Y")
-                if(i.precio_final_de_venta!=None):
-                    i.precio_final_de_venta=str('{:,}'.format(i.precio_final_de_venta)).replace(",", ".")
+                i.fecha_de_venta=i.fecha_de_venta.strftime("%d/%m/%Y")
+                i.precio_final_de_venta=str('{:,}'.format(i.precio_final_de_venta)).replace(",", ".")
             c = RequestContext(request, {
                 'object_list': object_list,
             })
             return HttpResponse(t.render(c))
     except:
-        return HttpResponseServerError("No se pudo obtener el Listado de Ventas de Lotes.")
-
+        return HttpResponseServerError("No se pudo obtener el Listado de Ventas de Lotes.")    
+    
 #Funcion para consultar el listado de todos los pagos.
 def listar_pagos(request):
     t = loader.get_template('movimientos/listado_pagos.html')
-    
     try:
         object_list = PagoDeCuotas.objects.all().order_by('id')
         a = len(object_list)
         if a>0:
             for i in object_list:
-                if(i.fecha_de_pago!=None):
-                    i.fecha_de_pago=i.fecha_de_pago.strftime("%d/%m/%Y")
-                if(i.total_de_cuotas!=None):
-                    i.total_de_cuotas=str('{:,}'.format(i.total_de_cuotas)).replace(",", ".")
-                if(i.total_de_mora!=None):
-                    i.total_de_mora=str('{:,}'.format(i.total_de_mora)).replace(",", ".")
+                i.fecha_de_pago=i.fecha_de_pago.strftime("%d/%m/%Y")
+                i.total_de_cuotas=str('{:,}'.format(i.total_de_cuotas)).replace(",", ".")
+                i.total_de_mora=str('{:,}'.format(i.total_de_mora)).replace(",", ".")
             c = RequestContext(request, { 
                 'object_list': object_list,
             })
@@ -413,8 +406,7 @@ def listar_res(request):
         a = len(object_list)
         if a>0:
             for i in object_list:
-                if(i.fecha_de_reserva!=None):
-                    i.fecha_de_reserva=i.fecha_de_reserva.strftime("%d/%m/%Y")
+                i.fecha_de_reserva=i.fecha_de_reserva.strftime("%d/%m/%Y")
             c = RequestContext(request, {
                 'object_list': object_list,
             })
@@ -432,13 +424,10 @@ def listar_transf(request):
         if a>0:
             for i in object_list:
                 i.fecha_de_transferencia=i.fecha_de_transferencia.strftime("%d/%m/%Y")
-                
         c = RequestContext(request, {
                    'object_list': object_list,
             })
         return HttpResponse(t.render(c))            
-        
-            
     except:
         return HttpResponseServerError("No se pudo obtener el Listado de Transferencias de Lotes.")
 
