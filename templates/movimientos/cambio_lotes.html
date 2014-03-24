@@ -1,8 +1,9 @@
 {% extends "lotes/base_lotes.html" %}
 
-{% block java_scripts %}
-<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+{% block header_scripts %}
+<!--<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}ajax_config.js"></script>
+-->
 <script type="text/javascript" src="{{ STATIC_URL }}movimientos_cambios.js"></script>
 {% endblock %}
 
@@ -29,25 +30,8 @@
 	{% csrf_token %}
 	<div class="fieldWrapperMovimientos">
 		<tr>
-			<td><label for="id_cliente">Código del Cliente: </label></td>
-			<td class="noimage"><input id="id_cliente" type="text" name="cliente" maxlength="100" onblur="retrieveCliente()" /></td>
-		</tr>
-		<tr>
-			<td><label>Apellidos y Nombres: </label></td>
-			<td class="noimage"><div id="cliente_seleccionado"></div>
-		<ul class="errorlist"><li id="cliente_error"></li></ul></td>
-		</tr>
-	</div>
-	<div class="fieldWrapperMovimientos">
-		<tr>
-			<td><label for="id_fecha">Fecha de Cambio: </label></td>
-			<td class="noimage"><input id="id_fecha" type="date" name="fecha" maxlength="10" /></td>
-		</tr>
-	</div>
-	<div class="fieldWrapperMovimientos">
-		<tr>
 			<td><label for="id_lote">Lote a ser cambiado: </label></td>
-			<td class="noimage"><input id="id_lote" type="text" name="lote" disabled="disabled" maxlength="12" onblur="retrieveLote()" /><br>
+			<td class="noimage"><input id="id_lote" type="text" name="lote"  maxlength="12" onblur="retrieveLoteCambio()" /><br>
 		<ul class="errorlist"><li id="lote_error"></li></ul></td>
 		</tr>
 		<tr>
@@ -59,6 +43,23 @@
 			<td class="noimage"><div id="lote_seleccionado_detalles"></div></td>
 		</tr>
 	</div>
+	<div class="fieldWrapperMovimientos">
+		<tr>
+			<td><label for="id_fecha">Fecha de Cambio: </label></td>
+			<td class="noimage"><input id="id_fecha" type="date" name="fecha" maxlength="10" /></td>
+		</tr>
+	</div>
+	<div class="fieldWrapperMovimientos">
+		<tr>
+			<td><label for="id_cliente">Cliente: </label></td>
+			<td class="noimage">
+				<input id="id_cliente" type="hidden" name="cliente" maxlength="100" onblur="retrieveCliente()" />
+				<div id="cliente_seleccionado"></div>
+		<ul class="errorlist"><li id="cliente_error"></li></ul></td>
+		</tr>
+	</div>
+	
+	
 	<div class="fieldWrapperMovimientos">
 		<tr>
 			<td><label for="id_lote2">Nuevo Lote a asignar: </label></td>
@@ -77,7 +78,7 @@
 <div class="fieldWrapperMovimientos">
 	</div>
 	</table>
-	<input id="enviar_cambio" style="cursor: pointer;" type="submit" disabled="disabled" value="Guardar Cambio" />
+	<input id="enviar_cambio" style="cursor: pointer;" type="submit" value="Guardar Cambio" />
 	<br><br><br>
 	</form>
 	<div class="clear"></div>

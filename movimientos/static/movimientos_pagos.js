@@ -19,6 +19,29 @@ var lote_id = 0;
 var pagos_realizados = 0;
 var venta_id = 0;
 
+//Separador de miles y comas en escritura
+	function format(comma, period) {
+		
+		var comma = comma || ',';
+		var period = period || '.';
+		var split = this.toString().split(',');
+		var numeric = split[0];
+		var decimal = split.length > 1 ? period + split[1] : '';
+		var reg = /(\d+)(\d{3})/;
+		for (var i = 1; i < numeric.length; i++) {
+			numeric = numeric.replace(".", "");
+		}
+		while (reg.test(numeric)) {
+
+			numeric = numeric.replace(reg, '$1' + comma + '$2');
+		}
+		//} else {
+		//	numeric = numeric.substr(0,numeric.length-1);
+		//}
+		
+		return numeric + decimal;
+	}
+
 function validateLotePre(event) {
 	// Allow: backspace, delete, tab, escape, and enter
 	if (event.keyCode == 46 || event.keyCode == 8 || event.keyCode == 9 || event.keyCode == 27 || event.keyCode == 13 ||
@@ -69,8 +92,15 @@ function validatePago(event) {
 		top.location.href = "/";
 	});
 	request4.fail(function(jqXHR, textStatus) {
-		alert("Se encontró un error en el pago, favor verifique los datos");
+		//console.log(request4);
+		if (jqXHR.responseText == "La cantidad de cuotas a pagar, es mayor a la cantidad de cuotas restantes."){
+			alert(jqXHR.responseText);	
+		} else {
+			alert("Se encontró un error en el pago, favor verifique los datos");
+		}
+		
 	});
+	
 	return false;
 };
 
@@ -202,7 +232,18 @@ function retrieveVenta() {
 			$("#id_plan_pago").val(msg[0]['plan_de_pago_id']);
 			$("#precio_de_cuota").val(msg[0]['precio_de_cuota']);
 			$("#monto_cuota").val(msg[0]['precio_de_cuota']);
+			
+			$("#monto_cuota2").html(String(msg[0]['precio_de_cuota']));
+			$("#monto_cuota2").html(String(format.call($("#monto_cuota2").html().split(' ').join(''),'.',',')));
 			$("#id_fecha_venta").val(msg[0]['fecha_de_venta']);
+			
+			var fechita = String(msg[0]['fecha_de_venta']);
+			//alert(fechita);
+			fechita = $.datepicker.parseDate('yy-mm-dd', fechita);
+			$("#id_fecha_venta2").datepicker("setDate", fechita);
+			$("#id_fecha_venta2").datepicker({ dateFormat: 'dd/mm/yy' });
+			$("#id_fecha_venta2").datepicker('disable');
+			
 			
 		});
 //	}
@@ -294,9 +335,13 @@ function calculateTotalCuotas() {
 	nro_cuotas_a_pagar = parseInt(nro_cuotas_a_pagar);
 	var total_cuotas = (monto_cuota * nro_cuotas_a_pagar);
 	$("#total_cuotas").val(total_cuotas);
+	$("#total_cuotas2").html(String(total_cuotas));
+	$("#total_cuotas2").html(String(format.call($("#total_cuotas2").html().split(' ').join(''),'.',',')));
 	$("#total_mora").removeAttr("disabled");
 	//$("#total_mora").focus();
 	$("#total_mora").val("5000");
+	$("#total_mora2").html("5000");
+	$("#total_mora2").html(String(format.call($("#total_mora2").html().split(' ').join(''),'.',',')));
 };
 
 function calculateTotalPago() {
@@ -307,6 +352,8 @@ function calculateTotalPago() {
 	var total_pago = (total_cuotas + total_mora);
 	total_pago = parseInt(total_pago);
 	$("#total_pago").val(total_pago);
+	$("#total_pago2").html(String(total_pago));
+	$("#total_pago2").html(String(format.call($("#total_pago2").html().split(' ').join(''),'.',',')));
 	$("#guardar_pago").removeAttr("disabled");
 	//$("#guardar_pago").focus();
 };

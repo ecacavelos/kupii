@@ -54,7 +54,74 @@ def retrieve_lote(request):
 
     return HttpResponseServerError("No valido.")
 
+def retrieve_lote_cambio(request):
+    if request.method == 'GET':
+        data = request.GET
+
+        fraccion_int = int(data.get('fraccion', ''))
+        manzana_int = int(data.get('manzana', ''))
+        lote_int = int(data.get('lote', ''))
+
+        #object_list = Lote.objects.get(fraccion=fraccion_int, manzana=manzana_int, nro_lote=lote_int)
+        myfraccion = Fraccion.objects.get(id=fraccion_int)
+        fraccion_manzanas = Manzana.objects.filter(fraccion=myfraccion)
+        for manzana in fraccion_manzanas:
+            if manzana.nro_manzana == manzana_int:
+                mymanzana = manzana
+        #object_list = Lote.objects.get(manzana_nro_manzana=mymanzana.nro_manzana, nro_lote=lote_int)
+        
+        object_list = Lote.objects.filter(manzana_id=mymanzana.id, nro_lote=lote_int).exclude(estado= "1")
+        r = object_list
+        if r:
+            #r = r[0]
+            # Creamos una cadena JSON para enviar la respuesta al request AJAX POST.
+            response_data = {}
+            response_data['superficie'] = str(r[0].superficie)
+            response_data['lote_id'] = r[0].id
+            response_data['lote_tag'] = str(r[0])
+            response_data['precio_contado'] = r[0].precio_contado
+            response_data['precio_credito'] = r[0].precio_credito
+            return HttpResponse(json.dumps(response_data), content_type="application/json")
+        else:
+            return HttpResponseServerError("No se encontraron lotes.")
+
+    return HttpResponseServerError("No valido.")
+
 def retrieve_lote_pago_cuotas(request):
+    if request.method == 'GET':
+        data = request.GET
+
+        fraccion_int = int(data.get('fraccion', ''))
+        manzana_int = int(data.get('manzana', ''))
+        lote_int = int(data.get('lote', ''))
+
+        #object_list = Lote.objects.get(fraccion=fraccion_int, manzana=manzana_int, nro_lote=lote_int)
+        myfraccion = Fraccion.objects.get(id=fraccion_int)
+        fraccion_manzanas = Manzana.objects.filter(fraccion=myfraccion)
+        for manzana in fraccion_manzanas:
+            if manzana.nro_manzana == manzana_int:
+                mymanzana = manzana
+        #object_list = Lote.objects.get(manzana_nro_manzana=mymanzana.nro_manzana, nro_lote=lote_int)
+        
+        object_list = Lote.objects.get(manzana_id=mymanzana.id, nro_lote=lote_int, estado="3")
+        #object_list_venta = Venta.objects.latest('fecha_de_venta')       
+        r = object_list
+        if r:
+            #r = r[0]
+            # Creamos una cadena JSON para enviar la respuesta al request AJAX POST.
+            response_data = {}
+            response_data['superficie'] = str(r.superficie)
+            response_data['lote_id'] = r.id
+            response_data['lote_tag'] = str(r)
+            response_data['precio_contado'] = r.precio_contado
+            response_data['precio_credito'] = r.precio_credito
+            return HttpResponse(json.dumps(response_data), content_type="application/json")
+        else:
+            return HttpResponseServerError("No se encontraron lotes.")
+
+    return HttpResponseServerError("No valido.")
+
+def retrieve_lote_recuperacion(request):
     if request.method == 'GET':
         data = request.GET
 

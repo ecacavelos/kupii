@@ -51,7 +51,8 @@ function solo_numeros () {
 		//console.log("\n"+res);
 		$("#id_superficie").val(res);
 		$("#id_manzana").prop('disabled', false);
-		$("#id_nro_lote").prop('disabled', false);	
+		$("#id_nro_lote").prop('disabled', false);
+		$("#id_estado").prop('disabled', false);	
 	}
 
 	function solo_numeros_comas_puntos_contado () {
@@ -96,6 +97,7 @@ $(document).ready(function() {
 	
 	$('#id_manzana').prop('disabled', true);
 	$('#id_nro_lote').prop('disabled', true);
+	$('#id_estado').prop('disabled', true);
 	
 	$('#id_superficie').val($('#id_superficie').val().replace(".",","));
 	$('#id_superficie').val(format.call($('#id_superficie').val().split(' ').join(''),'.',','));

@@ -4,14 +4,17 @@
 <!--
 <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}ajax_config.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}movimientos.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}movimientos_ventas.js"></script>
 -->
+<script type="text/javascript" src="{{ STATIC_URL }}movimientos.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}movimientos_pagos.js"></script>
+
 <script type="text/javascript">
 $(document).ready(function() {
 	$('#id_fecha').mask('##/##/####');
 	$("#id_fecha").datepicker({ dateFormat: 'dd/mm/yy' });
 	$("#id_fecha").datepicker("setDate", new Date());
+	$("#id_fecha").datepicker('disable');
+	
 });
 </script>
 {% endblock %}
@@ -53,7 +56,7 @@ $(document).ready(function() {
 	<div class="fieldWrapperMovimientos">
 		<tr>
 			<td><label for="id_fecha">Fecha de Pago: </label></td>
-			<td class="noimage"><input id="id_fecha" type="text" name="fecha" maxlength="10" /></td>
+			<td class="noimage"><input id="id_fecha" type="text" readonly name="fecha" maxlength="10" /></td>
 		</tr>
 	</div>
 	<div class="fieldWrapperMovimientos">
@@ -96,25 +99,37 @@ $(document).ready(function() {
 		</tr>
 		<tr>
 			<td><label for="monto_cuota">Monto de cada Cuota: </label></td>
-			<td class="noimage"><input id="monto_cuota" type="text" name="monto_cuota" readonly maxlength="100" /></td>
+			<td class="noimage"><input id="monto_cuota" type="hidden" name="monto_cuota" readonly maxlength="100" /><div id="monto_cuota2"></div></td>
 		</tr>
 	</div>
 	<div class="fieldWrapperMovimientos">
 		<tr>
 			<td><label for="total_cuotas">Total monto Cuotas: </label></td>
-			<td class="noimage"><input id="total_cuotas" type="text" name="total_cuotas" readonly maxlength="100" /></td>
+			<td class="noimage">
+				<input id="total_cuotas" type="hidden" name="total_cuotas" readonly maxlength="100" />
+				<div id="total_cuotas2"></div>
+				</td>
 		</tr>
 		<tr>
 			<td><label for="total_mora">Total de Mora: </label></td>
-			<td class="noimage"><input id="total_mora" type="text" name="total_mora" readonly maxlength="100" onblur="calculateTotalPago()"/></td>
+			<td class="noimage">
+				<input id="total_mora" type="hidden" name="total_mora" readonly maxlength="100" onblur="calculateTotalPago()"/>
+				<div id="total_mora2"></div>
+				</td>
 		</tr>
 		<tr>
 			<td><label for="total_pago">Monto Total a Pagar: </label></td>
-			<td class="noimage"><input id="total_pago" type="text" name="total_pago" readonly maxlength="100" /></td>
+			<td class="noimage">
+				<input id="total_pago" type="hidden" name="total_pago" readonly maxlength="100" />
+				<div id="total_pago2"></div>
+			</td>
 		</tr>
 		<tr>
 			<td><label for="fecha_vencimiento">Fecha de &Uacute;ltima Venta: </label></td>
-			<td class="noimage"><input id="id_fecha_venta" type="text" name="fecha_venta" readonly maxlength="10" /></td>
+			<td class="noimage">
+				<input id="id_fecha_venta" type="hidden" name="fecha_venta" readonly maxlength="10" />
+				<input id="id_fecha_venta2" type="text" name="fecha_venta2" readonly maxlength="10" />
+			</td>
 		</tr>	
 	</div>
 	<div class="fieldWrapperMovimientos">

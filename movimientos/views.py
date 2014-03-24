@@ -165,22 +165,33 @@ def pago_de_cuotas(request):
                 fecha_pago_parsed = datetime.strptime(data.get('pago_fecha_de_pago', ''), "%Y-%m-%d")
             except:
                 date_parse_error = True
+        
+        cantidad_cuotas = PlanDePago.objects.get(pk=plan_pago_id)        
+        cuotas_restantes = int(cantidad_cuotas.cantidad_de_cuotas) - int(nro_cuotas_a_pagar)        
+        if cuotas_restantes >= int(nro_cuotas_a_pagar):
+        
+            nuevo_pago = PagoDeCuotas()
+            nuevo_pago.venta = Venta.objects.get(pk=venta_id)
+            nuevo_pago.lote = Lote.objects.get(pk=lote_id)
+            nuevo_pago.fecha_de_pago = fecha_pago_parsed
+            nuevo_pago.nro_cuotas_a_pagar = nro_cuotas_a_pagar
+            nuevo_pago.cliente = Cliente.objects.get(pk=cliente_id)
+            nuevo_pago.plan_de_pago = PlanDePago.objects.get(pk=plan_pago_id)
+            nuevo_pago.vendedor = Vendedor.objects.get(pk=vendedor_id)
+            nuevo_pago.total_de_cuotas = total_de_cuotas
+            nuevo_pago.total_de_mora = total_de_mora
+            nuevo_pago.total_de_pago = total_de_pago
+            
+            nuevo_pago.save()
+            
+            venta.save()
+            c = RequestContext(request, {
 
-        nuevo_pago = PagoDeCuotas()
-        nuevo_pago.venta = Venta.objects.get(pk=venta_id)
-        nuevo_pago.lote = Lote.objects.get(pk=lote_id)
-        nuevo_pago.fecha_de_pago = fecha_pago_parsed
-        nuevo_pago.nro_cuotas_a_pagar = nro_cuotas_a_pagar
-        nuevo_pago.cliente = Cliente.objects.get(pk=cliente_id)
-        nuevo_pago.plan_de_pago = PlanDePago.objects.get(pk=plan_pago_id)
-        nuevo_pago.vendedor = Vendedor.objects.get(pk=vendedor_id)
-        nuevo_pago.total_de_cuotas = total_de_cuotas
-        nuevo_pago.total_de_mora = total_de_mora
-        nuevo_pago.total_de_pago = total_de_pago
+            })
+            return HttpResponse(t.render(c))
         
-        nuevo_pago.save()
-        
-        venta.save()
+        else:
+            return HttpResponseServerError("La cantidad de cuotas a pagar, es mayor a la cantidad de cuotas restantes.")  
 
     c = RequestContext(request, {
 
@@ -194,8 +205,8 @@ def transferencias_de_lotes(request):
         data = request.POST
 
         lote_id = data.get('transferencia_lote_id', '')
-        venta = Venta.objects.get(lote_id=lote_id)
-
+        venta_para_id = Venta.objects.filter(lote=lote_id).order_by('-id')[:1]
+        venta = Venta.objects.get(pk=venta_para_id[0].id)
 
         cliente_original_id = data.get('transferencia_cliente_original_id', '')
         cliente_id = data.get('transferencia_cliente_id', '')
@@ -238,40 +249,47 @@ def cambio_de_lotes(request):
     if request.method == 'POST':
         data = request.POST
 
-        lote_id = data.get('cambio_lote_id', '')
-        cambio = CambioDeLotes.objects.get(lote_id=lote_id)
+        #lote_id = data.get('cambio_lote_id', '')
+        #cambio = CambioDeLotes.objects.get(lote_id=lote_id)
 
 
-        cliente_original_id = data.get('transferencia_cliente_original_id', '')
-        cliente_id = data.get('transferencia_cliente_id', '')
-        vendedor_id = data.get('transferencia_vendedor_id', '')
-        plan_pago_id = data.get('transferencia_plan_de_pago_id', '')
-
+        lote_original_id = data.get('cambio_lote_original_id', '')
+        cliente_id = data.get('cambio_cliente_id', '')
+        lote_nuevo_id = data.get('cambio_lote2_id', '')
+        #venta_id = data.get('cambio_venta_id', '')
+        #plan_de_pago_id = data.get('cambio_plan_de_pago_id', '')
+        
         date_parse_error = False
 
         try:
-            fecha_transferencia_parsed = datetime.strptime(data.get('transferencia_fecha_de_transferencia', ''), "%d/%m/%Y")
+            fecha_cambio_parsed = datetime.strptime(data.get('cambio_fecha_de_cambio', ''), "%d/%m/%Y")
         except:
             date_parse_error = True
 
         if date_parse_error == True:
             try:
-                fecha_transferencia_parsed = datetime.strptime(data.get('transferencia_fecha_de_transferencia', ''), "%Y-%m-%d")
+                fecha_cambio_parsed = datetime.strptime(data.get('cambio_fecha_de_cambio', ''), "%Y-%m-%d")
             except:
                 date_parse_error = True
 
-        nuevo_cambio = CambioDeLotes()
-        nuevo_cambio.lote = Lote.objects.get(pk=lote_id)
-        nuevo_cambio.fecha_de_transferencia = fecha_transferencia_parsed
-        nuevo_cambio.cliente_original = Cliente.objects.get(pk=cliente_original_id)
-        nuevo_cambio.cliente = Cliente.objects.get(pk=cliente_id)
-        nuevo_cambio.plan_de_pago = PlanDePago.objects.get(pk=plan_pago_id)
-        nuevo_cambio.vendedor = Vendedor.objects.get(pk=vendedor_id)
-
+        nuevo_cambio = CambioDeLotes()       
+        nuevo_cambio.lote_a_cambiar_id = lote_original_id
+        nuevo_cambio.fecha_de_cambio = fecha_cambio_parsed
+        nuevo_cambio.cliente_id = cliente_id 
+        nuevo_cambio.lote_nuevo_id = lote_nuevo_id
+        
+        
+        lote_nuevo = Lote.objects.get(pk=lote_nuevo_id)
+        lote_nuevo.estado="3"
+        lote_nuevo.save()
+        
+        lote_viejo = Lote.objects.get(pk=lote_original_id)
+        lote_viejo.estado="1"
+        lote_viejo.save()
+        
         nuevo_cambio.save()
-        cambio.cliente = Cliente.objects.get(pk=cliente_id)
-        cambio.save()
-
+        
+    
     c = RequestContext(request, {
 
     })
@@ -380,7 +398,7 @@ def listar_rec(request):
     object_list = RecuperacionDeLotes.objects.all().order_by('id')
     for i in object_list:
         if(i.fecha_de_recuperacion!=None):
-            i.fecha_de_recuperacion=i.fecha_de_cambio.strftime("%d/%m/%Y")        
+            i.fecha_de_recuperacion=i.fecha_de_recuperacion.strftime("%d/%m/%Y")        
     c = RequestContext(request, {
         'object_list': object_list,
     })

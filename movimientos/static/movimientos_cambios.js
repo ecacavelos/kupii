@@ -38,7 +38,30 @@ function validateLotePre(event) {
 			event.preventDefault();
 		}
 	}
-};
+}
+
+//Separador de miles y comas en escritura
+	function format(comma, period) {
+		
+		var comma = comma || ',';
+		var period = period || '.';
+		var split = this.toString().split(',');
+		var numeric = split[0];
+		var decimal = split.length > 1 ? period + split[1] : '';
+		var reg = /(\d+)(\d{3})/;
+		for (var i = 1; i < numeric.length; i++) {
+			numeric = numeric.replace(".", "");
+		}
+		while (reg.test(numeric)) {
+
+			numeric = numeric.replace(reg, '$1' + comma + '$2');
+		}
+		//} else {
+		//	numeric = numeric.substr(0,numeric.length-1);
+		//}
+		
+		return numeric + decimal;
+	}
 
 function validateLotePost(event) {
 	if ((event.which >= 48 && event.which <= 57) || (event.which >= 96 && event.which <= 105)) {
@@ -49,7 +72,7 @@ function validateLotePost(event) {
 			$("#id_lote2").val($("#id_lote2").val() + '/');
 		}
 	}
-};
+}
 
 function validateCambio(event) {
 
@@ -61,9 +84,9 @@ function validateCambio(event) {
 			realizar_cambio : true,
 			cambio_cliente_id : $("#id_cliente").val(),
 			cambio_fecha_de_cambio : $("#id_fecha").val(),
-			cambio_lote_id : global_lote_id,
+			cambio_lote_original_id : global_lote_id,
 			cambio_lote2_id : global_lote2_id,
-			cambio_venta_id : a,
+			cambio_venta_id : venta_id,
 		}
 	});
 	request6.done(function(msg) {
@@ -74,7 +97,7 @@ function validateCambio(event) {
 		alert("Se encontró un error en el cambio, favor verifique los datos");
 	});
 	return false;
-};
+}
 
 function retrieveCliente() {
 	if ($("#id_cliente").val().toString().length > 0) {
@@ -98,7 +121,7 @@ function retrieveCliente() {
 			//fecha_actual = (day < 10 ? '0' : '') + day + '/' + (month < 10 ? '0' : '') + month + '/' + d.getFullYear();
 			fecha_actual = new Date().toJSON().substring(0, 10);
 			
-			$("#id_fecha").val(fecha_actual);
+			//$("#id_fecha").val(fecha_actual);
 			$("#id_lote").removeAttr("disabled");
 		});
 		// En caso de no poder obtener los datos del cliente, indicamos el error.
@@ -109,16 +132,16 @@ function retrieveCliente() {
 			$("#id_cliente").select().focus();
 		});
 	}
-};
+}
 
-function retrieveLote() {
+function retrieveLoteCambio() {
 	if ($("#id_lote").val().toString().length == 12) {
 		// Extraemos los identificadores correspondientes a la fraccion, manzana y lote.
 		splitted_id = $("#id_lote").val().split('/');
 		// Hacemos un request POST AJAX para obtener los datos del lote ingresado.
 		var request = $.ajax({
 			type : "GET",			
-			url : "/datos/1/",
+			url : "/datos/11/",
 			data : {
 				fraccion : splitted_id[0],
 				manzana : splitted_id[1],
@@ -129,15 +152,25 @@ function retrieveLote() {
 		// Actualizamos el formulario con los datos obtenidos del lote.
 		request.done(function(msg) {
 			global_lote_id = msg.lote_id;
-			var s = "<a href=\"/lotes/listado/" + msg.lote_id + "\" target=\"_blank\" \">" + msg.lote_tag + "</a>";
+			var s = "<a class='boton-verde' href=\"/lotes/listado/" + msg.lote_id + "\" target=\"_blank\" \">" + msg.lote_tag + "</a>";
 
 			$("#lote_error").html("");
-			$("#lote_superficie").html(msg.superficie);
+			sup = msg.superficie.replace(".",",");
+			$("#lote_superficie").html(sup);
+			//alert("hola");
+			$("#lote_superficie").html(String(format.call($("#lote_superficie").html().split(' ').join(''),'.',',')));
 			$("#lote_seleccionado_detalles").html(s);
+			$('#id_fecha').mask('##/##/####');
+			$("#id_fecha").datepicker({ dateFormat: 'dd/mm/yy' });
+			$("#id_fecha").datepicker("setDate", new Date());
+			$("#id_fecha").datepicker('disable');
 			lote_id = msg.lote_id;
 			lote_precio = msg.precio_credito;
 			retrieveVenta();
-			$("#id_lote2").focus();
+			retrieveCliente();
+			
+			
+			//$("#id_lote2").focus();
 		});
 		// En caso de no poder obtener los datos del lote, indicamos el error.
 		request.fail(function(jqXHR, textStatus) {
@@ -149,7 +182,7 @@ function retrieveLote() {
 			$("#lote_error").html("No se encuentra el Lote indicado.");
 		}
 	}
-};
+}
 
 function retrieveVenta() {
 	//if ($("#lote_id").val().toString().length > 0) {
@@ -165,7 +198,7 @@ function retrieveVenta() {
 		request.done(function(msg) {
 			var cliente_venta = parseInt(msg[0]['cliente_id']);
 			var venta_id = msg[0]['venta_id'];
-			//$("#id_cliente_original").val(msg[0]['cliente_id']);
+			$("#id_cliente").val(msg[0]['cliente_id']);
 			//$("#cliente_original_seleccionado").val(msg[0]['cliente']);
 			//$("#id_vendedor").val(msg[0]['vendedor_id']);
 			//$("#vendedor_seleccionado").val(msg[0]['vendedor']);
@@ -180,7 +213,7 @@ function retrieveVenta() {
 			$("#id_lote").focus();
 		}
 //	}
-};
+}
 
 function retrievePagos() {
 	//if ($("#lote_id").val().toString().length > 0) {
@@ -202,7 +235,7 @@ function retrievePagos() {
 			//alert(TotalPagado);
 		});
 //	}	
-};
+}
 
 function retrieveLote2() {
 	if ($("#id_lote2").val().toString().length == 12) {
@@ -222,38 +255,45 @@ function retrieveLote2() {
 		// Actualizamos el formulario con los datos obtenidos del lote.
 		request.done(function(msg) {
 			global_lote2_id = msg.lote_id;
-			var s = "<a href=\"/lotes/listado/" + msg.lote_id + "\" target=\"_blank\" \">" + msg.lote_tag + "</a>";
+			var s = "<a class='boton-verde' href=\"/lotes/listado/" + msg.lote_id + "\" target=\"_blank\" \">" + msg.lote_tag + "</a>";
 
 			$("#lote2_error").html("");
-			$("#lote2_superficie").html(msg.superficie);
+			sup = msg.superficie.replace(".",",");
+			$("#lote2_superficie").html(sup);
+			$("#lote2_superficie").html(String(format.call($("#lote2_superficie").html().split(' ').join(''),'.',',')));
 			$("#lote2_seleccionado_detalles").html(s);
 			lote2_id = msg.lote_id;
 			lote2_precio = msg.precio_credito;
 			$("#cambiar_lotes").removeAttr("disabled");
-			
+			//alert("Exito ajax");
+			cambiable();
 		});
 		// En caso de no poder obtener los datos del lote, indicamos el error.
 		request.fail(function(jqXHR, textStatus) {
 			//alert("Request failed: " + jqXHR);
 			$("#lote2_error").html("El Lote no existe o fue vendido.");
+			//alert("Error ajax");
+			cambiable();
 		});
-		cambiable();
+		
 	} else {
 		if ($("#id_lote2").val().toString().length > 0) {
 			$("#lote2_error").html("No se encuentra el Lote indicado.");
 			$("#id_lote2").focus();
+			//alert("No se encuentra el Lote indicado.");
+			cambiable();
 		}
 	}
-};
+}
 
 function cambiable() {
 	if (lote_precio == lote2_precio) {
-		alert("Ambos lotes tienen el mismo precio")
+		alert("Ambos lotes tienen el mismo precio");
 	}
 	if (lote_precio > lote2_precio) {
-		alert("El lote nuevo tiene un precio inferior al lote original")
+		alert("El lote nuevo tiene un precio inferior al lote original");
 	}
 	if (lote_precio < lote2_precio) {
-		alert ("El lote nuevo tiene un precio superior al lote original")
+		alert ("El lote nuevo tiene un precio superior al lote original");
 	}
 }

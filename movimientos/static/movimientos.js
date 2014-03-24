@@ -1,3 +1,26 @@
+//Separador de miles y comas en escritura
+	function format(comma, period) {
+		
+		var comma = comma || ',';
+		var period = period || '.';
+		var split = this.toString().split(',');
+		var numeric = split[0];
+		var decimal = split.length > 1 ? period + split[1] : '';
+		var reg = /(\d+)(\d{3})/;
+		for (var i = 1; i < numeric.length; i++) {
+			numeric = numeric.replace(".", "");
+		}
+		while (reg.test(numeric)) {
+
+			numeric = numeric.replace(reg, '$1' + comma + '$2');
+		}
+		//} else {
+		//	numeric = numeric.substr(0,numeric.length-1);
+		//}
+		
+		return numeric + decimal;
+	}
+
 function validateLotePre(event) {
 	// Allow: backspace, delete, tab, escape, and enter
 	if (event.keyCode == 46 || event.keyCode == 8 || event.keyCode == 9 || event.keyCode == 27 || event.keyCode == 13 ||
@@ -49,7 +72,10 @@ function retrieveLote() {
 			var s = "<a class='boton-verde' href=\"/lotes/listado/" + msg.lote_id + "\" target=\"_blank\" \">" + msg.lote_tag + "</a>";
 
 			$("#lote_error").html("");
-			$("#lote_superficie").html(msg.superficie);
+			sup = msg.superficie.replace(".",",");
+			$("#lote_superficie").html(sup);
+			//alert("hola");
+			$("#lote_superficie").html(String(format.call($("#lote_superficie").html().split(' ').join(''),'.',',')));
 			$("#lote_seleccionado_detalles").html(s);
 			precio_contado = msg.precio_contado;
 			precio_credito = msg.precio_credito;
@@ -63,7 +89,7 @@ function retrieveLote() {
 			//$("#id_fecha").val(fecha_actual);
 
 			$("#id_nombre_cliente").removeAttr("disabled");
-			$("#id_cliente").focus();
+			//$("#id_cliente").focus();
 		});
 		// En caso de no poder obtener los datos del lote, indicamos el error.
 		request.fail(function(jqXHR, textStatus) {
@@ -96,7 +122,7 @@ function retrieveCliente() {
 			$("#id_nombre_vendedor").removeAttr("disabled");
 			$("#id_nombre_vendedor").focus();
 			$("#enviar_reserva").removeAttr("disabled");
-			$("#enviar_reserva").focus();
+			//$("#enviar_reserva").focus();
 		});
 		
 		
@@ -106,7 +132,7 @@ function retrieveCliente() {
 			//alert("Request failed: " + jqXHR);
 			$("#cliente_error").html("No se pueden obtener los datos del Cliente.");
 			$("#cliente_seleccionado").html("");
-			$("#id_cliente").select().focus();
+			//$("#id_cliente").select().focus();
 		});
 	}
 };
@@ -128,14 +154,14 @@ function retrieveVendedor() {
 			$("#vendedor_seleccionado").html(msg);
 
 			$("#id_plan_pago").removeAttr("disabled");
-			$("#id_plan_pago").focus();
+			//$("#id_plan_pago").focus();
 		});
 		// En caso de no poder obtener los datos del vendedor, indicamos el error.
 		request.fail(function(jqXHR, textStatus) {
 			//alert("Request failed: " + jqXHR);
 			$("#vendedor_error").html("No se pueden obtener los datos del Vendedor.");
 			$("#vendedor_seleccionado").html("");
-			$("#id_vendedor").select().focus();
+			//$("#id_vendedor").select().focus();
 		});
 	}
 };
@@ -160,7 +186,7 @@ function retrievePlanPago() {
 			if (msg.credito == "credito") {
 				$("#id_precio_venta").removeAttr("disabled").val(precio_credito);
 				$('#id_precio_venta').val(format.call($('#id_precio_venta').val().split(' ').join(''),'.',','));
-				$("#id_precio_venta").select().focus();
+				//$("#id_precio_venta").select().focus();
 
 				$("#tipo_pago_contado").removeAttr("checked").attr("disabled", "disabled");
 				$("#tipo_pago_credito").prop("checked", true).removeAttr("disabled");
@@ -175,7 +201,7 @@ function retrievePlanPago() {
 			} else {
 				$("#id_precio_venta").removeAttr("disabled").val(precio_contado);
 				$('#id_precio_venta').val(format.call($('#id_precio_venta').val().split(' ').join(''),'.',','));
-				$("#id_precio_venta").select().focus();
+				//$("#id_precio_venta").select().focus();
 
 				$("#tipo_pago_credito").removeAttr("checked").attr("disabled", "disabled");
 				$("#tipo_pago_contado").prop("checked", true).removeAttr("disabled");
@@ -195,7 +221,7 @@ function retrievePlanPago() {
 		request.fail(function(jqXHR, textStatus) {
 			$("#plan_pago_error").html("No se pueden obtener los datos del Plan de Pago.");
 			$("#plan_pago_seleccionado").html("");
-			$("#id_plan_pago").select().focus();
+			//$("#id_plan_pago").select().focus();
 		});
 	}
 };
