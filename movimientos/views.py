@@ -365,36 +365,27 @@ def listar_pagos(request):
         
 def listar_cambios(request):
     t = loader.get_template('movimientos/listado_cambios.html')
+    object_list = CambioDeLotes.objects.all().order_by('id')
+    for i in object_list:
+        if(i.fecha_de_cambio!=None):
+            i.fecha_de_cambio=i.fecha_de_cambio.strftime("%d/%m/%Y")
+    c = RequestContext(request, {
+            'object_list': object_list,
+    })
+    return HttpResponse(t.render(c))
     
-    try:
-        object_list = CambioDeLotes.objects.all().order_by('id')
-        a = len(object_list)
-        if a>0:
-            for i in object_list:
-                if(i.fecha_de_cambio!=None):
-                    i.fecha_de_cambio=i.fecha_de_cambio.strftime("%d/%m/%Y")
-            c = RequestContext(request, {
-                'object_list': object_list,
-            })
-            return HttpResponse(t.render(c))
-    except:
-        return HttpResponseServerError("No se pudo obtener el Listado de Cambios de Lotes.")
 
 def listar_rec(request):
     t = loader.get_template('movimientos/listado_recuperacion.html')
-    try:
-        object_list = RecuperacionDeLotes.objects.all().order_by('id')
-        a = len(object_list)
-        if a>0:
-            for i in object_list:
-                if(i.fecha_de_recuperacion!=None):
-                    i.fecha_de_recuperacion=i.fecha_de_cambio.strftime("%d/%m/%Y")        
-            c = RequestContext(request, {
-                'object_list': object_list,
-            })
-            return HttpResponse(t.render(c))
-    except:
-        return HttpResponseServerError("No se pudo obtener el Listado de Recuperacion de Lotes.")
+    object_list = RecuperacionDeLotes.objects.all().order_by('id')
+    for i in object_list:
+        if(i.fecha_de_recuperacion!=None):
+            i.fecha_de_recuperacion=i.fecha_de_cambio.strftime("%d/%m/%Y")        
+    c = RequestContext(request, {
+        'object_list': object_list,
+    })
+    return HttpResponse(t.render(c))
+    
         
 def listar_res(request):
     t = loader.get_template('movimientos/listado_reservas.html')
