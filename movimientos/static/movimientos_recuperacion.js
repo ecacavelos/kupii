@@ -64,7 +64,7 @@ function validateRecuperacion(event) {
 	});
 	request7.done(function(msg) {
 		alert("Se procesó la recuperacion exitosamente.");
-		top.location.href = "/";
+		top.location.href = "/movimientos/listado_recuperacion";
 	});
 	request7.fail(function(jqXHR, textStatus) {
 		alert("Se encontró un error en la recuperacion, favor verifique los datos");

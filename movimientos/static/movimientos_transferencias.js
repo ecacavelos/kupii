@@ -83,7 +83,7 @@ function validateTransferencia(event) {
 	});
 	request5.done(function(msg) {
 		alert("Se procesó la transferencia exitosamente.");
-		top.location.href = "/";
+		top.location.href = "/movimientos/listado_transferencias";
 	});
 	request5.fail(function(jqXHR, textStatus) {
 		alert("Se encontró un error en la transferencia, favor verifique los datos");

@@ -91,7 +91,7 @@ function validateCambio(event) {
 	});
 	request6.done(function(msg) {
 		alert("Se procesó el cambio exitosamente.");
-		top.location.href = "/";
+		top.location.href = "/movimientos/listado_cambios";
 	});
 	request6.fail(function(jqXHR, textStatus) {
 		alert("Se encontró un error en el cambio, favor verifique los datos");

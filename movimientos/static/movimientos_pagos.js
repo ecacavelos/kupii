@@ -89,7 +89,7 @@ function validatePago(event) {
 	});
 	request4.done(function(msg) {
 		alert("Se procesó el pago exitosamente.");
-		top.location.href = "/";
+		top.location.href = "/movimientos/listado_pagos";
 	});
 	request4.fail(function(jqXHR, textStatus) {
 		//console.log(request4);
@@ -238,9 +238,10 @@ function retrieveVenta() {
 			$("#monto_cuota2").html(String(msg[0]['precio_de_cuota']));
 			$("#monto_cuota2").html(String(format.call($("#monto_cuota2").html().split(' ').join(''),'.',',')));
 			$("#id_fecha_venta").val(msg[0]['fecha_de_venta']);
+			//$("#id_fecha_venta2").val(msg[0]['fecha_de_venta']);
 			
 			var fechita = String(msg[0]['fecha_de_venta']);
-			//alert(fechita);
+			console.log(fechita);
 			fechita = $.datepicker.parseDate('yy-mm-dd', fechita);
 			$("#id_fecha_venta2").datepicker("setDate", fechita);
 			$("#id_fecha_venta2").datepicker({ dateFormat: 'dd/mm/yy' });
