@@ -367,6 +367,7 @@ def listar_pagos(request):
                 i.fecha_de_pago=i.fecha_de_pago.strftime("%d/%m/%Y")
                 i.total_de_cuotas=str('{:,}'.format(i.total_de_cuotas)).replace(",", ".")
                 i.total_de_mora=str('{:,}'.format(i.total_de_mora)).replace(",", ".")
+                i.total_de_pago=str('{:,}'.format(i.total_de_pago)).replace(",", ".")
             c = RequestContext(request, { 
                 'object_list': object_list,
             })

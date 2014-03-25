@@ -81,7 +81,7 @@ class Manzana(models.Model):
     cantidad_lotes = models.IntegerField(null=True)
     def __unicode__(self):
         #return (self.nro_manzana)
-        return('Manzana ' + str(self.id))
+        return('Manzana ' + str(self.nro_manzana))
     class Meta:
         verbose_name_plural = "manzanas"
     def as_json(self):
@@ -181,7 +181,7 @@ class Lote(models.Model):
     )
     estado = models.CharField(max_length=1, choices=ESTADO_CHOICES)
     def __unicode__(self):
-        return (str(self.manzana).zfill(3) + "/" + str(self.id).zfill(4))
+        return (str(self.manzana).zfill(3) + "/" + str(self.nro_lote).zfill(4))
     
     def as_json(self):
         return dict(

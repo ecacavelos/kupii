@@ -20,6 +20,34 @@ table.listado-lotes {
 	margin-left: 250px;
 }
 
+table.listado-movimientos {
+	border:2px solid #CCC;
+	margin-bottom:15px;
+	margin-left: 305px;
+}
+
+table.listado-movimientos tr td {
+	padding:7px;
+	font-size:14px;
+	text-align:center;
+	border-bottom:thin solid #CCC
+}
+
+table.listado-movimientos tr th {
+	padding:10px 10px 10px 40px;
+	font-size:16px;
+	font-weight:400;
+	text-align:center;
+	background-color:#02B06B;
+	color:#FFF
+}
+
+table.listado-pagos {
+	border:2px solid #CCC;
+	margin-bottom:15px;
+	margin-left: 60px;
+}
+
 table.listado-lotes2 {
 	border:2px solid #CCC;
 	margin-bottom:15px;
@@ -42,7 +70,23 @@ table.listado-lotes tr th {
 	color:#FFF
 }
 
+table.listado-pagos tr th {
+	padding:10px 10px 10px 40px;
+	font-size:16px;
+	font-weight:400;
+	text-align:center;
+	background-color:#02B06B;
+	color:#FFF
+}
+
 table.listado-lotes tr td {
+	padding:7px;
+	font-size:14px;
+	text-align:center;
+	border-bottom:thin solid #CCC
+}
+
+table.listado-pagos tr td {
 	padding:7px;
 	font-size:14px;
 	text-align:center;

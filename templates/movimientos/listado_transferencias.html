@@ -28,19 +28,16 @@
 		<tr>
 			<td>
 				<!--<a href="/lotes/listado/pagos/{{ hw.id }}/">{{hw.id}} <strong>(Ver Detalles)</strong></a>-->
-				<a href="#">{{hw.id}} <strong>(Ver Detalles)</strong></a>
+				<a href="#">{{hw.lote}} <strong>(Ver Detalles)</strong></a>
 			</td>
 			<td>
-				{{hw.lote}}
-			</td>
-			<td>
-			    {{hw.fecha_de_transferencia}}
+				{{hw.fecha_de_transferencia}}
 			</td>
 			<td>
 			    {{hw.cliente}}
 			</td>
 			<td>
-			    {{hw.cliente_original_id.cliente}}
+			    {{hw.cliente_original}}
 			</td>			
 			<td>
 				{{hw.vendedor}}

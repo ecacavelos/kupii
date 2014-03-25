@@ -35,18 +35,15 @@
 				<a href="{{hw.id}}">{{hw.nro_lote}} <strong>(Ver Detalles)</strong></a>
 			</td>
 			<td>
-				{% for m in manzana %}
-      				{% if forloop.counter == forloop.parentloop.counter %}
-          				{{ m.nro_manzana}}
-      				{% endif %}
-   				{% endfor %}
+				{{hw.manzana}}
 			</td>
 			<td>
-				{% for f in fraccion %}
-      				{% if forloop.counter == forloop.parentloop.counter %}
-          				{{ f.id}}
-      				{% endif %}
-   				{% endfor %}
+				 {% for f in fraccion %}
+					{% if forloop.counter == forloop.parentloop.counter %}
+						{{ f.id}}
+					{% endif %}
+				 {% endfor %}
+
 				
 			</td>
 			<td>
