@@ -54,7 +54,7 @@ function validateVenta(event) {
 		});
 		request2.done(function(msg) {
 			alert("Se procesó la venta satisfactoriamente.");
-			top.location.href = "/";
+			top.location.href = "/listado_ventas/";
 		});
 		request2.fail(function(jqXHR, textStatus) {
 			alert("Error en la solicitud.");

@@ -57,7 +57,7 @@ function validateLotePre(event) {
 			event.preventDefault();
 		}
 	}
-};
+}
 
 function validateLotePost(event) {
 	if ((event.which >= 48 && event.which <= 57) || (event.which >= 96 && event.which <= 105)) {
@@ -65,7 +65,7 @@ function validateLotePost(event) {
 			$("#id_lote").val($("#id_lote").val() + '/');
 		}
 	}
-};
+}
 
 function validatePago(event) {
 
@@ -102,7 +102,7 @@ function validatePago(event) {
 	});
 	
 	return false;
-};
+}
 
 function retrieveLote() {
 	if ($("#id_lote").val().toString().length == 12) {
@@ -155,7 +155,7 @@ function retrieveLote() {
 			$("#lote_error").html("No se encuentra el Lote indicado.");
 		}
 	}
-};
+}
 
 function retrieveLotePago() {
 	if ($("#id_lote").val().toString().length == 12) {
@@ -185,6 +185,8 @@ function retrieveLotePago() {
 			var month = d.getMonth() + 1;
 			var day = d.getDate();
 			retrieveVenta();
+			//alert("llegue");
+			
 			//fecha_actual = (day < 10 ? '0' : '') + day + '/' + (month < 10 ? '0' : '') + month + '/' + d.getFullYear();
 			fecha_actual = new Date().toJSON().substring(0, 10);
 
@@ -208,7 +210,7 @@ function retrieveLotePago() {
 			$("#lote_error").html("No se encuentra el Lote indicado.");
 		}
 	}
-};
+}
 
 function retrieveVenta() {
 	//if ($("#lote_id").val().toString().length > 0) {
@@ -244,10 +246,13 @@ function retrieveVenta() {
 			$("#id_fecha_venta2").datepicker({ dateFormat: 'dd/mm/yy' });
 			$("#id_fecha_venta2").datepicker('disable');
 			
+			retrieveCliente();
+			retrieveVendedor();
+			retrievePlanPago();
 			
 		});
 //	}
-};
+}
 
 function retrieveCliente() {
 	if ($("#id_cliente").val().toString().length > 0) {
@@ -274,7 +279,7 @@ function retrieveCliente() {
 			//$("#id_cliente").select().focus();
 		});
 	}
-};
+}
 
 function retrieveVendedor() {
 	if ($("#id_vendedor").val().toString().length > 0) {
@@ -301,7 +306,7 @@ function retrieveVendedor() {
 			//$("#id_vendedor").select().focus();
 		});
 	}
-};
+}
 
 function retrievePlanPago() {
 	if ($("#id_plan_pago").val().toString().length > 0) {
@@ -327,7 +332,7 @@ function retrievePlanPago() {
 			//$("#id_plan_pago").select().focus();
 		});
 	}
-};
+}
 
 function calculateTotalCuotas() {
 	var monto_cuota = ($('#monto_cuota').val());
@@ -342,7 +347,7 @@ function calculateTotalCuotas() {
 	$("#total_mora").val("5000");
 	$("#total_mora2").html("5000");
 	$("#total_mora2").html(String(format.call($("#total_mora2").html().split(' ').join(''),'.',',')));
-};
+}
 
 function calculateTotalPago() {
 	var total_cuotas = $("#total_cuotas").val();
@@ -356,4 +361,4 @@ function calculateTotalPago() {
 	$("#total_pago2").html(String(format.call($("#total_pago2").html().split(' ').join(''),'.',',')));
 	$("#guardar_pago").removeAttr("disabled");
 	//$("#guardar_pago").focus();
-};
+}
