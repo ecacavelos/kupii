@@ -132,11 +132,11 @@ function retrieveLote() {
 
 			//$("#id_fecha").val(fecha_actual);
 			//$("#id_cliente").removeAttr("disabled");
-			retrieveCliente();
+			
 			//$("#id_vendedor").removeAttr("disabled");
-			retrieveVendedor();
+			
 			//$("#id_plan_pago").removeAttr("disabled");
-			retrievePlanPago();
+			
 		});
 		// En caso de no poder obtener los datos del lote, indicamos el error.
 		request.fail(function(jqXHR, textStatus) {
@@ -195,6 +195,7 @@ function retrieveCliente() {
 			//alert("Response: " + msg);
 			$("#cliente_error").html("");
 			$("#cliente_seleccionado").html(msg);
+			retrieveVendedor();
 
 		});
 		// En caso de no poder obtener los datos del cliente, indicamos el error.
@@ -222,6 +223,7 @@ function retrieveVendedor() {
 			//alert("Response: " + msg);
 			$("#vendedor_error").html("");
 			$("#vendedor_seleccionado").html(msg);
+			retrievePlanPago();
 
 		});
 		// En caso de no poder obtener los datos del vendedor, indicamos el error.
@@ -278,6 +280,7 @@ function retrievePagos() {
     			TotalPagado += msg[i]['total_de_cuotas'];  
 			}
 			//alert(TotalPagado);
+			retrieveCliente();
 		});
 		recuperable();
 //	}	

@@ -167,7 +167,7 @@ function retrieveLoteCambio() {
 			lote_id = msg.lote_id;
 			lote_precio = msg.precio_credito;
 			retrieveVenta();
-			retrieveCliente();
+			
 			
 			
 			//$("#id_lote2").focus();
@@ -199,6 +199,7 @@ function retrieveVenta() {
 			var cliente_venta = parseInt(msg[0]['cliente_id']);
 			var venta_id = msg[0]['venta_id'];
 			$("#id_cliente").val(msg[0]['cliente_id']);
+			retrieveCliente();
 			//$("#cliente_original_seleccionado").val(msg[0]['cliente']);
 			//$("#id_vendedor").val(msg[0]['vendedor_id']);
 			//$("#vendedor_seleccionado").val(msg[0]['vendedor']);

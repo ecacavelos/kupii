@@ -149,13 +149,14 @@ $(document).ready(function() {
 					<div class="clear"></div>
 <div id="detalle-lote">
 	<div id="detalle-lote-header">
-		<h3 class="detalle-lote-header">Lote {{ lote.id }} </h3>
+		<h3 class="detalle-lote-header">Lote id: {{ lote.id }} </h3>
 	</div>
 			
 		<div id="{{message_id}}">{{ message }}</div>
 	
-	<table width="50%" border="1" cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
+	
 	<form action="/lotes/listado/{{ lote.id }}/" method="post" id="form_mod_lote" name="form_mod_lote" onsubmit="_validar();">
+	<table width="50%" border="1" cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
 		{% csrf_token %}
 		{% for field in form %}
 		<tr>
@@ -165,16 +166,27 @@ $(document).ready(function() {
 		</div>
 		</tr>		
 		{% endfor %}
-	
-		<div id="lote-ventas">
-			{% for venta in ventas_relacionadas %}
-				<a href="/lotes/listado/ventas/{{ venta.id }}" target="_blank">{{ venta }}</a>
-			{% endfor %}
-		</div>
-		<input class="lote-form-button" type="submit" name="boton_guardar" value="Guardar Cambios" />
-		<input class="lote-form-button" type="submit" name="boton_borrar" value="Borrar este Registro" />
-	</form>
+		
+		
 	</table>
+		<input class="lote-form-button" type="submit" name="boton_guardar" value="Guardar Cambios" />
+		<input class="lote-form-button" type="submit" name="boton_borrar" value="Borrar este Registro" />	
+	</form>
+	
+	<div id="lote-ventas">
+			<h4>Historial de Ventas</h4>
+			<table border="1">
+				<th>Id</th><th>Fecha de Venta</th><th>Vendido a:</th>
+				{% for venta in ventas_relacionadas %}
+				<tr>
+					<td><a href="/lotes/listado/ventas/{{ venta.id }}" target="_blank">{{ venta.id }}</a></td>
+					<td><a href="/lotes/listado/ventas/{{ venta.id }}" target="_blank">{{ venta.fecha_de_venta }}</a></td>
+					<td><a href="/lotes/listado/ventas/{{ venta.id }}" target="_blank">{{ venta.cliente }}</a></td>
+				</tr>
+				{% endfor %}	
+			</table>
+			
+	</div>
 </div>
 <br>
 <div id="footer">
