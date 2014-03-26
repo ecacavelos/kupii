@@ -93,8 +93,9 @@ function calculatePrecioFinalVentaLote() {
 		}
 	});
 	request.complete(function(msg) {
-		$("#precio_final_venta").html(msg.responseJSON.monto_total);
-		$("#precio_final_venta").html(format.call($('#precio_final_venta').html().split(' ').join(''),'.',','));
+		//$("#precio_final_venta").html(msg.responseJSON.monto_total);
+		//$("#precio_final_venta").html(format.call($('#precio_final_venta').html().split(' ').join(''),'.',','));
+		$("#precio_final_venta").html($("#id_precio_venta").val());
 		monto_final_validado = msg.responseJSON.monto_valido;
 		if (msg.responseJSON.monto_valido == false) {
 			$("#precio_final_venta").attr("class", "error");
@@ -114,6 +115,11 @@ function calculatePrecioFinalVentaLote() {
 function calculateMontoCuotas() {
 	var res_entrega = $("#id_entrega_inicial").val();
 	var res_cuota = $("#id_monto_cuota").val();
+	var precio_venta=$("#id_precio_venta").val();
+	
+	for ( i = 0; i < precio_venta.length; i++) {
+			precio_venta = precio_venta.replace(".", "");
+	}	
 	for ( i = 0; i < res_entrega.length; i++) {
 			res_entrega = res_entrega.replace(".", "");
 	}
@@ -122,12 +128,21 @@ function calculateMontoCuotas() {
 		}
 	var entrega_inicial = res_entrega;
 	entrega_inicial = parseInt(entrega_inicial);
+	 precio_venta= parseInt(precio_venta);
 	console.log("precio_credito: "+precio_credito);
 	console.log("entrega_inicial: "+entrega_inicial);
 	console.log("cantidad_credito: "+cantidad_cuotas);
-	var monto_cuota = Math.ceil((precio_credito - entrega_inicial) / cantidad_cuotas);
+	var monto_cuota = Math.ceil((precio_venta - entrega_inicial) / cantidad_cuotas);
 	//monto_cuota = Math.round(monto_cuota);
-	console.log("monto_cuota: "+monto_cuota);
-	$("#id_monto_cuota").val(monto_cuota);
-	$("#id_monto_cuota").val(format.call($('#id_monto_cuota').val().split(' ').join(''),'.',','));
+	if(precio_venta<entrega_inicial){ 
+		alert("La entrega inicial debe ser menor al precio de venta.");
+		$("#id_monto_cuota").val("");
+		$("#precio_final_venta").html("");
+		
+	}else{
+		console.log("monto_cuota: "+monto_cuota);
+		$("#id_monto_cuota").val(monto_cuota);
+		$("#id_monto_cuota").val(format.call($('#id_monto_cuota').val().split(' ').join(''),'.',','));
+		$("#monto_total_error").html("");
+	}
 };

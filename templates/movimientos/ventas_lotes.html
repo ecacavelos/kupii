@@ -247,7 +247,7 @@ $("#id_plan_pago").attr('readonly', true);
 		</tr>
 		<tr>
 			<td><label for="id_entrega_inicial">Entrega Inicial: </label></td>
-			<td class="noimage"><input id="id_entrega_inicial" type="text" name="entrega_inicial"  maxlength="100" onchange="calculateMontoCuotas();calculatePrecioFinalVentaLote();$('#id_monto_cuota').attr('readonly', true);" onkeyup="$(this).val(format.call($(this).val().split(' ').join(''),'.',','));solo_numeros_puntos_entrega_inicial();" /></td>
+			<td class="noimage"><input id="id_entrega_inicial" type="text" name="entrega_inicial"  maxlength="100" onblur="calculateMontoCuotas();calculatePrecioFinalVentaLote();$('#id_monto_cuota').attr('readonly', true);" onkeyup="$(this).val(format.call($(this).val().split(' ').join(''),'.',','));solo_numeros_puntos_entrega_inicial();" /></td>
 		</tr>
 		<tr>
 			<td><label for="id_monto_cuota">Monto de cada Cuota: </label></td>

@@ -1,4 +1,4 @@
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError
 from django.template import RequestContext, loader
 from principal.models import Lote, Venta, Manzana, Fraccion
 from lotes.forms import LoteForm, FraccionManzana
@@ -74,11 +74,16 @@ def detalle_lote(request, lote_id):
 # Funcion que detalla las ventas relacionadas a un lote determinado.
 def detalle_ventas_lote(request, venta_id):
     t = loader.get_template('lotes/detalle_ventas.html')
-    venta = Venta.objects.get(pk=venta_id)
-    c = RequestContext(request, {
-        'venta': venta,
-    })
-    return HttpResponse(t.render(c))
+    try:
+        venta = Venta.objects.get(pk=venta_id)
+        venta.fecha_de_venta=venta.fecha_de_venta.strftime("%d/%m/%Y")
+        venta.precio_final_de_venta=str('{:,}'.format(venta.precio_final_de_venta)).replace(",", ".")
+        c = RequestContext(request, {
+            'venta': venta,
+            })
+        return HttpResponse(t.render(c))
+    except:    
+        return HttpResponseServerError("No se pudo obtener el Detalle de Venta del Lote.") 
 
 # Funcion para agregar un nuevo lote.
 def agregar_lotes(request):
