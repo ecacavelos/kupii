@@ -174,7 +174,7 @@ $("#id_plan_pago").attr('readonly', true);
 	<div class="fieldWrapperMovimientos">
 		<tr>
 			<td><label for="id_lote">Lote: </label></td>
-			<td class="noimage"><input id="id_lote" type="text" name="lote" maxlength="12" onkeyup="retrieveLote()" />
+			<td class="noimage"><input id="id_lote" type="text" name="lote" maxlength="12" onblur="retrieveLoteVenta()" />
 			<ul class="errorlist"><li id="lote_error"></li></ul></td>
 		</tr>
 		<tr>

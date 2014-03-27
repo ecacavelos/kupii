@@ -37,3 +37,55 @@ function validateReserva(event) {
 	});
 	return false;
 };
+
+function retrieveLoteReservas() {
+	if ($("#id_lote").val().toString().length == 12) {
+		// Extraemos los identificadores correspondientes a la fraccion, manzana y lote.
+		splitted_id = $("#id_lote").val().split('/');
+		// Hacemos un request POST AJAX para obtener los datos del lote ingresado.
+		var request = $.ajax({
+			type : "GET",			
+			url : "/datos/1/",
+			data : {
+				fraccion : splitted_id[0],
+				manzana : splitted_id[1],
+				lote : splitted_id[2]
+			},
+			dataType : "json"
+		});
+		// Actualizamos el formulario con los datos obtenidos del lote.
+		request.done(function(msg) {
+			global_lote_id = msg.lote_id;
+			var s = "<a class='boton-verde' href=\"/lotes/listado/" + msg.lote_id + "\" target=\"_blank\" \">" + msg.lote_tag + "</a>";
+
+			$("#lote_error").html("");
+			sup = msg.superficie.replace(".",",");
+			$("#lote_superficie").html(sup);
+			//alert("hola");
+			$("#lote_superficie").html(String(format.call($("#lote_superficie").html().split(' ').join(''),'.',',')));
+			$("#lote_seleccionado_detalles").html(s);
+			precio_contado = msg.precio_contado;
+			precio_credito = msg.precio_credito;
+			var d = new Date();
+			var month = d.getMonth() + 1;
+			var day = d.getDate();
+
+			//fecha_actual = (day < 10 ? '0' : '') + day + '/' + (month < 10 ? '0' : '') + month + '/' + d.getFullYear();
+			//fecha_actual = new Date().toJSON().substring(0, 10);
+
+			//$("#id_fecha").val(fecha_actual);
+
+			$("#id_nombre_cliente").removeAttr("disabled");
+			//$("#id_cliente").focus();
+		});
+		// En caso de no poder obtener los datos del lote, indicamos el error.
+		request.fail(function(jqXHR, textStatus) {
+			//alert("Request failed: " + jqXHR);
+			$("#lote_error").html("El Lote no existe o ya ha sido reservado.");
+		});
+	} else {
+		if ($("#id_lote").val().toString().length > 0) {
+			$("#lote_error").html("No se encuentra el Lote indicado.");
+		}
+	}
+};

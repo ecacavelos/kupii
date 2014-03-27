@@ -15,14 +15,19 @@ def ventas_de_lotes(request):
 
     if request.method == 'POST':
         data = request.POST
-
         lote_id = data.get('venta_lote_id', '')
         lote_a_vender = Lote.objects.get(pk=lote_id)
 
         cliente_id = data.get('venta_cliente_id', '')
         vendedor_id = data.get('venta_vendedor_id', '')
         plan_pago_id = data.get('venta_plan_pago_id', '')
-
+        estado_lote=data.get('estado_lote','')
+        
+        if estado_lote == "2":
+            objeto_reserva=Reserva.objects.filter(cliente_id=cliente_id,lote_id=lote_id)
+            a=len(objeto_reserva)
+            if a==0:
+                return HttpResponseServerError("El lote no fue reservado por este cliente")
         date_parse_error = False
 
         try:
@@ -62,7 +67,7 @@ def ventas_de_lotes(request):
             lote_a_vender.save()
         else:
             return HttpResponseServerError("La sumatoria de las cuotas es menor al precio final de venta.")
-
+            print("hola")
         return HttpResponse(sumatoria_cuotas)
 
     else:

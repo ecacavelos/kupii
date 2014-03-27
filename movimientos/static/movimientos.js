@@ -211,6 +211,8 @@ function retrievePlanPago() {
 				$("#precio_final_venta").html(precio_contado);
 				$("#id_entrega_inicial").val(0).attr("disabled", "disabled");
 				$("#id_monto_cuota").val(0).attr("disabled", "disabled");
+				//alert("hola");
+				calculatePrecioFinalVentaLote();
 			}
 			//fecha_actual = new Date().toJSON().substring(0, 10);
 			$("#id_fecha_vencimiento").datepicker({ dateFormat: 'dd/mm/yy' });

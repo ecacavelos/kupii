@@ -141,7 +141,7 @@ function retrieveLote() {
 		// En caso de no poder obtener los datos del lote, indicamos el error.
 		request.fail(function(jqXHR, textStatus) {
 			//alert("Request failed: " + jqXHR);
-			$("#lote_error").html("El Lote no existe o fue vendido.");
+			$("#lote_error").html("El Lote no existe o no fue vendido ni reservado.");
 		});
 	} else {
 		if ($("#id_lote").val().toString().length > 0) {
