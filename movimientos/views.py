@@ -3,6 +3,8 @@ from django.template import RequestContext, loader
 from principal.models import Cliente, Lote, Vendedor, PlanDePago, Venta, Reserva, PagoDeCuotas, TransferenciaDeLotes, CambioDeLotes, RecuperacionDeLotes
 from django.utils import simplejson as json
 from datetime import datetime
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.shortcuts import render_to_response
  
 # Funcion principal del modulo de lotes.
 def movimientos(request):
@@ -354,13 +356,85 @@ def listar_ventas(request):
             for i in object_list:
                 i.fecha_de_venta=i.fecha_de_venta.strftime("%d/%m/%Y")
                 i.precio_final_de_venta=str('{:,}'.format(i.precio_final_de_venta)).replace(",", ".")
+            paginator=Paginator(object_list,15)
+            page=request.GET.get('page')
+            try:
+                lista=paginator.page(page)
+            except PageNotAnInteger:
+                lista=paginator.page(1)
+            except EmptyPage:
+                lista=paginator.page(paginator.num_pages)
             c = RequestContext(request, {
-                'object_list': object_list,
+                'object_list': lista,
+            })
+            return HttpResponse(t.render(c))
+    except:
+        return HttpResponseServerError("No se pudo obtener el Listado de Ventas de Lotes.")
+    
+# Funcion para consultar el listado de todas las ventas.
+def listar_busqueda(request):
+    
+    t = loader.get_template('movimientos/listado_ventas.html')
+    try:
+        tabla = request.GET['tabla']
+        nombre = request.GET['nombre']
+        
+        if tabla=='cliente':
+            object_list = Cliente.objects.filter(nombres_icontains=nombre)
+            a = len(object_list)
+            paginator=Paginator(object_list,15)
+            page=request.GET.get('page')
+            try:
+                lista=paginator.page(page)
+            except PageNotAnInteger:
+                lista=paginator.page(1)
+            except EmptyPage:
+                lista=paginator.page(paginator.num_pages)
+            c = RequestContext(request, {
+                'object_list': lista,
             })
             return HttpResponse(t.render(c))
     except:
         return HttpResponseServerError("No se pudo obtener el Listado de Ventas de Lotes.")    
-    
+        
+        if tabla=='propietario':
+            object_list = Cliente.objects.filter(nombres_icontains=)
+            
+            
+            paginator=Paginator(object_list,15)
+            page=request.GET.get('page')
+            try:
+                lista=paginator.page(page)
+            except PageNotAnInteger:
+                lista=paginator.page(1)
+            except EmptyPage:
+                lista=paginator.page(paginator.num_pages)
+            c = RequestContext(request, {
+                'object_list': lista,
+            })
+            return HttpResponse(t.render(c))
+    except:
+        return HttpResponseServerError("No se pudo obtener el Listado de Ventas de Lotes.") 
+        if tabla=='vendedor':
+            object_list = Cliente.objects.filter(nombres_icontains=)
+                i.fecha_de_venta=i.fecha_de_venta.strftime("%d/%m/%Y")
+                i.precio_final_de_venta=str('{:,}'.format(i.precio_final_de_venta)).replace(",", ".")
+            paginator=Paginator(object_list,15)
+            page=request.GET.get('page')
+            try:
+                lista=paginator.page(page)
+            except PageNotAnInteger:
+                lista=paginator.page(1)
+            except EmptyPage:
+                lista=paginator.page(paginator.num_pages)
+            c = RequestContext(request, {
+                'object_list': lista,
+            })
+            return HttpResponse(t.render(c))
+    except:
+        return HttpResponseServerError("No se pudo obtener el Listado de Ventas de Lotes.")     
+            
+            
 #Funcion para consultar el listado de todos los pagos.
 def listar_pagos(request):
     t = loader.get_template('movimientos/listado_pagos.html')
@@ -373,35 +447,66 @@ def listar_pagos(request):
                 i.total_de_cuotas=str('{:,}'.format(i.total_de_cuotas)).replace(",", ".")
                 i.total_de_mora=str('{:,}'.format(i.total_de_mora)).replace(",", ".")
                 i.total_de_pago=str('{:,}'.format(i.total_de_pago)).replace(",", ".")
-            c = RequestContext(request, { 
-                'object_list': object_list,
+            paginator=Paginator(object_list,15)
+            page=request.GET.get('page')
+            try:
+                lista=paginator.page(page)
+            except PageNotAnInteger:
+                lista=paginator.page(1)
+            except EmptyPage:
+                lista=paginator.page(paginator.num_pages)
+            c = RequestContext(request, {
+                'object_list': lista,
             })
             return HttpResponse(t.render(c))
-    except:
-        return HttpResponseServerError("No se pudo obtener el Listado de Pagos de Lotes.")
+    except:   
+            return HttpResponseServerError("No se pudo obtener el Listado de Pagos de Lotes.")
         
 def listar_cambios(request):
     t = loader.get_template('movimientos/listado_cambios.html')
-    object_list = CambioDeLotes.objects.all().order_by('id')
-    for i in object_list:
-        if(i.fecha_de_cambio!=None):
-            i.fecha_de_cambio=i.fecha_de_cambio.strftime("%d/%m/%Y")
-    c = RequestContext(request, {
-            'object_list': object_list,
-    })
-    return HttpResponse(t.render(c))
+    try:
+        object_list = CambioDeLotes.objects.all().order_by('id')
+        for i in object_list:
+            if(i.fecha_de_cambio!=None):
+                i.fecha_de_cambio=i.fecha_de_cambio.strftime("%d/%m/%Y")
+            paginator=Paginator(object_list,15)
+            page=request.GET.get('page')
+            try:
+                lista=paginator.page(page)
+            except PageNotAnInteger:
+                lista=paginator.page(1)
+            except EmptyPage:
+                lista=paginator.page(paginator.num_pages)
+            c = RequestContext(request, {
+                'object_list': lista,
+            })
+            return HttpResponse(t.render(c))
+    except:   
+            return HttpResponseServerError("No se pudo obtener el Listado de Cambios de Lotes.")
+            
     
 
 def listar_rec(request):
     t = loader.get_template('movimientos/listado_recuperacion.html')
-    object_list = RecuperacionDeLotes.objects.all().order_by('id')
-    for i in object_list:
-        if(i.fecha_de_recuperacion!=None):
-            i.fecha_de_recuperacion=i.fecha_de_recuperacion.strftime("%d/%m/%Y")        
-    c = RequestContext(request, {
-        'object_list': object_list,
-    })
-    return HttpResponse(t.render(c))
+    try:
+        object_list = RecuperacionDeLotes.objects.all().order_by('id')
+        for i in object_list:
+            if(i.fecha_de_recuperacion!=None):
+                i.fecha_de_recuperacion=i.fecha_de_recuperacion.strftime("%d/%m/%Y")        
+        paginator=Paginator(object_list,15)
+        page=request.GET.get('page')
+        try:
+            lista=paginator.page(page)
+        except PageNotAnInteger:
+            lista=paginator.page(1)
+        except EmptyPage:
+            lista=paginator.page(paginator.num_pages)
+        c = RequestContext(request, {
+            'object_list': lista,
+        })
+        return HttpResponse(t.render(c))
+    except:   
+            return HttpResponseServerError("No se pudo obtener el Listado de Recuperacion de Lotes.")
     
         
 def listar_res(request):
@@ -413,12 +518,20 @@ def listar_res(request):
         if a>0:
             for i in object_list:
                 i.fecha_de_reserva=i.fecha_de_reserva.strftime("%d/%m/%Y")
+            paginator=Paginator(object_list,15)
+            page=request.GET.get('page')
+            try:
+                lista=paginator.page(page)
+            except PageNotAnInteger:
+                lista=paginator.page(1)
+            except EmptyPage:
+                lista=paginator.page(paginator.num_pages)
             c = RequestContext(request, {
-                'object_list': object_list,
+                'object_list': lista,
             })
             return HttpResponse(t.render(c))
-    except:
-        return HttpResponseServerError("No se pudo obtener el Listado de Reservas de Lotes.")
+    except:   
+            return HttpResponseServerError("No se pudo obtener el Listado de Reservas de Lotes.")
     
     
 def listar_transf(request):
@@ -430,11 +543,19 @@ def listar_transf(request):
         if a>0:
             for i in object_list:
                 i.fecha_de_transferencia=i.fecha_de_transferencia.strftime("%d/%m/%Y")
-        c = RequestContext(request, {
-                   'object_list': object_list,
+            paginator=Paginator(object_list,15)
+            page=request.GET.get('page')
+            try:
+                lista=paginator.page(page)
+            except PageNotAnInteger:
+                lista=paginator.page(1)
+            except EmptyPage:
+                lista=paginator.page(paginator.num_pages)
+            c = RequestContext(request, {
+                'object_list': lista,
             })
-        return HttpResponse(t.render(c))            
-    except:
-        return HttpResponseServerError("No se pudo obtener el Listado de Transferencias de Lotes.")
+            return HttpResponse(t.render(c))
+    except:   
+            return HttpResponseServerError("No se pudo obtener el Listado de Transferencias de Lotes.")
 
 

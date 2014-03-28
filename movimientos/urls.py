@@ -16,4 +16,5 @@ urlpatterns = patterns('movimientos.views',
     url(r'^listado_recuperacion/$', 'listar_rec'),
     url(r'^listado_reservas/$', 'listar_res'),
     url(r'^listado_transferencias/$', 'listar_transf'),
+    url(r'^listado_busqueda/$', 'listar_busqueda'),
 )
