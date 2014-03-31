@@ -1,6 +1,6 @@
 from django.http import HttpResponse, HttpResponseServerError, HttpResponseRedirect
 from django.template import RequestContext, loader
-from principal.models import Cliente, Lote, Vendedor, PlanDePago, Venta, Reserva, PagoDeCuotas, TransferenciaDeLotes, CambioDeLotes, RecuperacionDeLotes
+from principal.models import Cliente,Propietario, Lote, Vendedor, PlanDePago, Venta, Reserva, PagoDeCuotas, TransferenciaDeLotes, CambioDeLotes, RecuperacionDeLotes
 from django.utils import simplejson as json
 from datetime import datetime
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -370,18 +370,19 @@ def listar_ventas(request):
             return HttpResponse(t.render(c))
     except:
         return HttpResponseServerError("No se pudo obtener el Listado de Ventas de Lotes.")
+
+
+def listar_busqueda_personas(request):
     
-# Funcion para consultar el listado de todas las ventas.
-def listar_busqueda(request):
     
-    t = loader.get_template('movimientos/listado_ventas.html')
     try:
-        tabla = request.GET['tabla']
-        nombre = request.GET['nombre']
+        
+        tabla = request.POST['tabla']
+        nombre = request.POST['nombre']
         
         if tabla=='cliente':
-            object_list = Cliente.objects.filter(nombres_icontains=nombre)
-            a = len(object_list)
+            t = loader.get_template('clientes/listado.html')
+            object_list = Cliente.objects.filter(nombres__icontains=nombre)
             paginator=Paginator(object_list,15)
             page=request.GET.get('page')
             try:
@@ -394,13 +395,10 @@ def listar_busqueda(request):
                 'object_list': lista,
             })
             return HttpResponse(t.render(c))
-    except:
-        return HttpResponseServerError("No se pudo obtener el Listado de Ventas de Lotes.")    
-        
+    
         if tabla=='propietario':
-            object_list = Cliente.objects.filter(nombres_icontains=)
-            
-            
+            t = loader.get_template('propietarios/listado.html')
+            object_list = Propietario.objects.filter(nombres__icontains=nombre)
             paginator=Paginator(object_list,15)
             page=request.GET.get('page')
             try:
@@ -413,12 +411,16 @@ def listar_busqueda(request):
                 'object_list': lista,
             })
             return HttpResponse(t.render(c))
-    except:
-        return HttpResponseServerError("No se pudo obtener el Listado de Ventas de Lotes.") 
+        
         if tabla=='vendedor':
-            object_list = Cliente.objects.filter(nombres_icontains=)
-                i.fecha_de_venta=i.fecha_de_venta.strftime("%d/%m/%Y")
-                i.precio_final_de_venta=str('{:,}'.format(i.precio_final_de_venta)).replace(",", ".")
+            t = loader.get_template('vendedores/listado.html')
+            object_list = Vendedor.objects.filter(nombres__icontains=nombre)
+            #a=len(object_list)
+            #if a>0:
+            #    for i in object_list:
+            #        i.fecha_de_venta=i.fecha_de_venta.strftime("%d/%m/%Y")
+            #        i.precio_final_de_venta=str('{:,}'.format(i.precio_final_de_venta)).replace(",", ".")
+        
             paginator=Paginator(object_list,15)
             page=request.GET.get('page')
             try:
@@ -432,7 +434,7 @@ def listar_busqueda(request):
             })
             return HttpResponse(t.render(c))
     except:
-        return HttpResponseServerError("No se pudo obtener el Listado de Ventas de Lotes.")     
+        return HttpResponseServerError("Error en la ejecucion.")     
             
             
 #Funcion para consultar el listado de todos los pagos.

@@ -4,6 +4,13 @@
 <script>
 function _cerrar(){
 	window.close();
+}
+function buscar(){
+	if($("#nombre").val()==""){
+		alert("Debe ingresar un nombre para buscar.");
+	}else{
+		$("#frm_busqueda").submit();
+	}
 }	
 </script>
 {% endblock %}
@@ -23,7 +30,12 @@ function _cerrar(){
 					</div>
 
 					<div class="grid_6">
-  						<a href="#" class="historico">Buscar</a>
+  						<form name="frm_busqueda" id="frm_busqueda" method="post" action="/movimientos/listado_busqueda_personas/">
+  							{% csrf_token %}
+  							<input name="tabla" type="hidden" value="propietario"/>
+  							<input id="nombre" type="text" name="nombre"/>
+  							<input type="button" value="Buscar" onclick="buscar();" class="historico" style="cursor: pointer"/>
+  						</form>
 					</div>
 
 					<div class="clear"></div>
