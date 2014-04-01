@@ -3,7 +3,7 @@ from django.template import RequestContext, loader
 from principal.models import Fraccion, Manzana, Lote
 from fracciones.forms import FraccionForm, FraccionFormAdd
 from django.db import reset_queries, close_connection
-
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 # Funcion principal del modulo de fracciones.
 def fracciones(request):
@@ -17,8 +17,16 @@ def consultar_fracciones(request):
     
     object_list = Fraccion.objects.all().order_by('id')
     
+    paginator=Paginator(object_list,15)
+    page=request.GET.get('page')
+    try:
+        lista=paginator.page(page)
+    except PageNotAnInteger:
+        lista=paginator.page(1)
+    except EmptyPage:
+        lista=paginator.page(paginator.num_pages)
     c = RequestContext(request, {
-        'object_list': object_list,
+        'object_list': lista,
     })
     return HttpResponse(t.render(c))
 

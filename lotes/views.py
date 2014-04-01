@@ -2,6 +2,7 @@ from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerEr
 from django.template import RequestContext, loader
 from principal.models import Lote, Venta, Manzana, Fraccion
 from lotes.forms import LoteForm, FraccionManzana
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 # Funcion principal del modulo de lotes.
 def lotes(request):
@@ -26,10 +27,18 @@ def consultar_lotes(request):
         fraccion_id = m[i].fraccion_id
         f.append(Fraccion.objects.get(pk = fraccion_id))
         #setattr(object_list[i], 'fraccion', fraccion_id)
-        
+    paginator=Paginator(object_list,15)
+    page=request.GET.get('page')
+    try:
+        lista=paginator.page(page)
+    except PageNotAnInteger:
+        lista=paginator.page(1)
+    except EmptyPage:
+        lista=paginator.page(paginator.num_pages)
+    
         
     c = RequestContext(request, {
-        'object_list': object_list,
+        'object_list': lista,
         'manzana': m,
         'fraccion': f,
         

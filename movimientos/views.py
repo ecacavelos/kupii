@@ -1,10 +1,10 @@
-from django.http import HttpResponse, HttpResponseServerError, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseServerError
 from django.template import RequestContext, loader
 from principal.models import Cliente,Propietario, Lote, Vendedor, PlanDePago, Venta, Reserva, PagoDeCuotas, TransferenciaDeLotes, CambioDeLotes, RecuperacionDeLotes
 from django.utils import simplejson as json
 from datetime import datetime
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.shortcuts import render_to_response
+
  
 # Funcion principal del modulo de lotes.
 def movimientos(request):
@@ -69,7 +69,6 @@ def ventas_de_lotes(request):
             lote_a_vender.save()
         else:
             return HttpResponseServerError("La sumatoria de las cuotas es menor al precio final de venta.")
-            print("hola")
         return HttpResponse(sumatoria_cuotas)
 
     else:
@@ -356,6 +355,7 @@ def listar_ventas(request):
             for i in object_list:
                 i.fecha_de_venta=i.fecha_de_venta.strftime("%d/%m/%Y")
                 i.precio_final_de_venta=str('{:,}'.format(i.precio_final_de_venta)).replace(",", ".")
+                
             paginator=Paginator(object_list,15)
             page=request.GET.get('page')
             try:
@@ -374,15 +374,20 @@ def listar_ventas(request):
 
 def listar_busqueda_personas(request):
     
-    
     try:
         
         tabla = request.POST['tabla']
-        nombre = request.POST['nombre']
+        busqueda = request.POST['busqueda']
+        tipo_busqueda=request.POST['tipo_busqueda']
         
         if tabla=='cliente':
             t = loader.get_template('clientes/listado.html')
-            object_list = Cliente.objects.filter(nombres__icontains=nombre)
+
+            if tipo_busqueda=="nombre":
+                object_list = Cliente.objects.filter(nombres__icontains=busqueda)
+            if tipo_busqueda=="cedula":
+                object_list = Cliente.objects.filter(cedula__icontains=busqueda)
+                
             paginator=Paginator(object_list,15)
             page=request.GET.get('page')
             try:
@@ -398,7 +403,12 @@ def listar_busqueda_personas(request):
     
         if tabla=='propietario':
             t = loader.get_template('propietarios/listado.html')
-            object_list = Propietario.objects.filter(nombres__icontains=nombre)
+
+            if tipo_busqueda=="nombre":
+                object_list = Propietario.objects.filter(nombres__icontains=busqueda)
+            if tipo_busqueda=="cedula":
+                object_list = Propietario.objects.filter(cedula__icontains=busqueda)
+                
             paginator=Paginator(object_list,15)
             page=request.GET.get('page')
             try:
@@ -414,13 +424,11 @@ def listar_busqueda_personas(request):
         
         if tabla=='vendedor':
             t = loader.get_template('vendedores/listado.html')
-            object_list = Vendedor.objects.filter(nombres__icontains=nombre)
-            #a=len(object_list)
-            #if a>0:
-            #    for i in object_list:
-            #        i.fecha_de_venta=i.fecha_de_venta.strftime("%d/%m/%Y")
-            #        i.precio_final_de_venta=str('{:,}'.format(i.precio_final_de_venta)).replace(",", ".")
-        
+            if tipo_busqueda=="nombre":
+                object_list = Vendedor.objects.filter(nombres__icontains=busqueda)
+            if tipo_busqueda=="cedula":
+                object_list = Vendedor.objects.filter(cedula__icontains=busqueda)
+                   
             paginator=Paginator(object_list,15)
             page=request.GET.get('page')
             try:

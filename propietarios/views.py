@@ -2,6 +2,9 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext, loader
 from principal.models import Propietario
 from propietarios.forms import PropietarioForm, SearchForm
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
+
 #from django.views.generic.list_detail import object_list
 
 
@@ -39,8 +42,17 @@ def consultar_propietarios(request):
         search_form = SearchForm({})
         message = ""
  
+    paginator=Paginator(object_list,15)
+    page=request.GET.get('page')
+    try:
+        lista=paginator.page(page)
+    except PageNotAnInteger:
+        lista=paginator.page(1)
+    except EmptyPage:
+        lista=paginator.page(paginator.num_pages)
+
     c = RequestContext(request, {
-        'object_list': object_list,
+        'object_list': lista,
         'search_form': search_form,
         'message': message,
     })

@@ -2,6 +2,8 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext, loader
 from principal.models import Cliente
 from clientes.forms import ClienteForm, SearchForm
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
 #from django.views.generic.list_detail import object_list
 
 # Funcion principal del modulo de clientes.
@@ -37,9 +39,18 @@ def consultar_clientes(request):
         object_list = Cliente.objects.all().order_by('id')
         search_form = SearchForm({})
         message = ""
+        
+    paginator=Paginator(object_list,15)
+    page=request.GET.get('page')
+    try:
+        lista=paginator.page(page)
+    except PageNotAnInteger:
+        lista=paginator.page(1)
+    except EmptyPage:
+        lista=paginator.page(paginator.num_pages)
 
     c = RequestContext(request, {
-        'object_list': object_list,
+        'object_list': lista,
         'search_form': search_form,
         'message': message,
     })

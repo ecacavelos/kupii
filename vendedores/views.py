@@ -2,6 +2,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext, loader
 from principal.models import Vendedor
 from vendedores.forms import VendedorForm
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 #from django.views.generic.list_detail import object_list
 
 # Funcion principal del modulo de vendedores.
@@ -16,10 +17,20 @@ def consultar_vendedores(request):
     
     object_list = Vendedor.objects.all().order_by('id')
     
+    paginator=Paginator(object_list,15)
+    page=request.GET.get('page')
+    try:
+        lista=paginator.page(page)
+    except PageNotAnInteger:
+        lista=paginator.page(1)
+    except EmptyPage:
+        lista=paginator.page(paginator.num_pages)
     c = RequestContext(request, {
-        'object_list': object_list,
+        'object_list': lista,
     })
     return HttpResponse(t.render(c))
+    
+    
 
 # Funcion para el detalle de un vendedor: edita o borra un vendedor.
 def detalle_vendedor(request, vendedor_id):

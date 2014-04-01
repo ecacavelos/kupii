@@ -2,6 +2,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext, loader
 from principal.models import Manzana
 from manzanas.forms import ManzanaForm
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 # Funcion principal del modulo de manzanas.
 def manzanas(request):
@@ -15,8 +16,16 @@ def consultar_manzanas(request):
     
     object_list = Manzana.objects.all().order_by('id')
     
+    paginator=Paginator(object_list,15)
+    page=request.GET.get('page')
+    try:
+        lista=paginator.page(page)
+    except PageNotAnInteger:
+        lista=paginator.page(1)
+    except EmptyPage:
+        lista=paginator.page(paginator.num_pages)
     c = RequestContext(request, {
-        'object_list': object_list,
+        'object_list': lista,
     })
     return HttpResponse(t.render(c))
 
