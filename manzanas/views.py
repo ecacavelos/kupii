@@ -76,3 +76,24 @@ def detalle_manzana(request, manzana_id):
         'message': message,
     })
     return HttpResponse(t.render(c))
+def listar_busqueda_manzanas(request):
+    
+    busqueda = request.POST['busqueda']
+    t = loader.get_template('manzanas/listado.html')
+    
+    fraccion,manzana=busqueda.split("/") 
+    object_list=Manzana.objects.filter(nro_manzana=int(manzana),fraccion_id=int(fraccion))
+        
+    paginator = Paginator(object_list, 15)
+    page = request.GET.get('page')
+    try:
+        lista = paginator.page(page)
+    except PageNotAnInteger:
+        lista = paginator.page(1)
+    except EmptyPage:
+        lista = paginator.page(paginator.num_pages)
+    
+    c = RequestContext(request, {
+      'object_list': lista,
+    })
+    return HttpResponse(t.render(c))

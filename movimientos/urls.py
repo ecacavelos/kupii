@@ -17,7 +17,5 @@ urlpatterns = patterns('movimientos.views',
     url(r'^listado_reservas/$', 'listar_res'),
     url(r'^listado_transferencias/$', 'listar_transf'),
     url(r'^listado_busqueda_personas/$', 'listar_busqueda_personas'),
-    url(r'^listado_busqueda_fracciones/$', 'listar_busqueda_fracciones'),
-    url(r'^listado_busqueda_manzanas/$', 'listar_busqueda_manzanas'),
-    url(r'^listado_busqueda_lotes/$', 'listar_busqueda_lotes'),
-)
+    url(r'^listado_busqueda_ventas/$', 'listar_busqueda_ventas'),
+)   

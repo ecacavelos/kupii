@@ -1,10 +1,10 @@
 from django.http import HttpResponse, HttpResponseServerError
 from django.template import RequestContext, loader
-from principal.models import Fraccion, Lote, Manzana, Cliente,Propietario, Lote, Vendedor, PlanDePago, Venta, Reserva, PagoDeCuotas, TransferenciaDeLotes, CambioDeLotes, RecuperacionDeLotes
+from principal.models import Cliente,Propietario, Lote, Vendedor, PlanDePago, Venta, Reserva, PagoDeCuotas, TransferenciaDeLotes, CambioDeLotes, RecuperacionDeLotes
 from django.utils import simplejson as json
 from datetime import datetime
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-import re 
+
  
 # Funcion principal del modulo de lotes.
 def movimientos(request):
@@ -570,83 +570,43 @@ def listar_busqueda_personas(request):
     except:
         return HttpResponseServerError("Error en la ejecucion.")   
     
-def listar_busqueda_fracciones(request):
-    
-    busqueda = request.POST['busqueda']
-    tipo_busqueda = request.POST['tipo_busqueda']
-    object_list=[]
-    t = loader.get_template('fracciones/listado.html')
-        
-    if tipo_busqueda == "numero":
-        
-        object_list = Fraccion.objects.filter(pk=busqueda)
-    
-    if tipo_busqueda == "propietario":
-        propietario_list = Propietario.objects.filter(nombres__icontains=busqueda)
-        for prop in propietario_list:
-            query = Fraccion.objects.filter(propietario_id=prop.id)
-            if query:
-                for f in query:
-                    object_list.append(f)
+def listar_busqueda_ventas(request):
+    try: 
+        t = loader.get_template('movimientos/listado_ventas.html')
+        busqueda = request.POST['busqueda']
+        tipo_busqueda=request.POST['tipo_busqueda']
+        '''
+        if tipo_busqueda=='lote':
+            object_list=Venta.objects.filter(=busqueda)
        
-        
-    paginator = Paginator(object_list, 15)
-    page = request.GET.get('page')
-    try:
-        lista = paginator.page(page)
-    except PageNotAnInteger:
-        lista = paginator.page(1)
-    except EmptyPage:
-        lista = paginator.page(paginator.num_pages)
-    
-    c = RequestContext(request, {
-      'object_list': lista,
-    })
-    
-    return HttpResponse(t.render(c))
-    
-def listar_busqueda_manzanas(request):
-    
-    busqueda = request.POST['busqueda']
-    t = loader.get_template('manzanas/listado.html')
-    
-    fraccion,manzana=busqueda.split("/") 
-    object_list=Manzana.objects.filter(nro_manzana=int(manzana),fraccion_id=int(fraccion))
-        
-    paginator = Paginator(object_list, 15)
-    page = request.GET.get('page')
-    try:
-        lista = paginator.page(page)
-    except PageNotAnInteger:
-        lista = paginator.page(1)
-    except EmptyPage:
-        lista = paginator.page(paginator.num_pages)
-    
-    c = RequestContext(request, {
-      'object_list': lista,
-    })
-    return HttpResponse(t.render(c))
-    
-def listar_busqueda_lotes(request):
-    
-    busqueda = request.POST['busqueda']
-    t = loader.get_template('lotes/listado.html')
-    
-    re.findall(r"[\w/]+",busqueda)
-    re.sre_parse() 
-    object_list=Manzana.objects.filter(nro_manzana=int(manzana),fraccion_id=int(fraccion),nro_lote=int(lote))
-        
-    paginator = Paginator(object_list, 15)
-    page = request.GET.get('page')
-    try:
-        lista = paginator.page(page)
-    except PageNotAnInteger:
-        lista = paginator.page(1)
-    except EmptyPage:
-        lista = paginator.page(paginator.num_pages)
-    
-    c = RequestContext(request, {
-      'object_list': lista,
-    })
-    return HttpResponse(t.render(c))
+        if tipo_busqueda=='vendedor':
+            #object_list = Venta.objects.filter(Venta.vendedor.nombres__icontains=busqueda)
+            #paginator=Paginator(object_list,15)
+            page=request.GET.get('page')
+            try:
+                lista=paginator.page(page)
+            except PageNotAnInteger:
+                lista=paginator.page(1)
+            except EmptyPage:
+                lista=paginator.page(paginator.num_pages)
+            c = RequestContext(request, {
+                'object_list': lista,
+            })
+            return HttpResponse(t.render(c))
+    except:
+        return HttpResponseServerError("Error en la ejecucion.")  
+'''
+
+
+
+
+
+
+
+
+
+
+
+
+
     

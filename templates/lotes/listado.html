@@ -32,7 +32,7 @@ function buscar(){
 					</div>
 
 					<div class="grid_6">
-  						<form name="frm_busqueda" id="frm_busqueda" method="post" action="/movimientos/listado_busqueda_lotes/">
+  						<form name="frm_busqueda" id="frm_busqueda" method="post" action="/lotes/listado_busqueda_lotes/">
   							{% csrf_token %}
   									
 							<input id="busqueda" type="" name="busqueda" />
@@ -67,9 +67,7 @@ function buscar(){
 					{% if forloop.counter == forloop.parentloop.counter %}
 						{{ f.id}}
 					{% endif %}
-				 {% endfor %}
-
-				
+				 {% endfor %}				
 			</td>
 			<td>
 				{{ hw.get_estado_display }}

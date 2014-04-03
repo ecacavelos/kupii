@@ -121,7 +121,50 @@ def agregar_lotes(request):
     })
     return HttpResponse(t.render(c))
 
+def listar_busqueda_lotes(request):
+    
+    busqueda = request.POST['busqueda']
+    t = loader.get_template('lotes/listado.html')
+    
+    x=str(busqueda)
+    print x[0:3]
+    print x[4:7]
+    print x[8:]
+    print int(x[4:7])
+    print int(x[8:])
+    fraccion_int = int(x[0:3])
+    manzana_int =int(x[4:7])
+    lote_int = int(x[8:])
+    myfraccion = Fraccion.objects.filter(id=fraccion_int)
+    fraccion_manzanas = Manzana.objects.filter(fraccion=myfraccion)
+    for manzana in fraccion_manzanas:
+        if manzana.nro_manzana == manzana_int:
+            mymanzana = manzana
+        
+    object_list = Lote.objects.filter(manzana_id=mymanzana.id, nro_lote=lote_int)
+    paginator=Paginator(object_list,15)
+    page=request.GET.get('page')
+    try:
+        lista=paginator.page(page)
+    except PageNotAnInteger:
+        lista=paginator.page(1)
+    except EmptyPage:
+        lista=paginator.page(paginator.num_pages)
+    
+        
+    c = RequestContext(request, {
+        'object_list': lista,
+        'manzana': fraccion_manzanas,
+        'fraccion': myfraccion,
+        
+    })
+    return HttpResponse(t.render(c))
 
+    
+        
+   
+    
+   
         
          
     

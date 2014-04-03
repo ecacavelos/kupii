@@ -1,5 +1,20 @@
 {% extends "lotes/base_lotes.html" %}
-
+{% block header_scripts %}
+<script>
+function buscar(){
+	if($("#tipo_busqueda").val()==0){
+		alert("Debe elegir un tipo de busqueda.");
+	}
+	else{
+		if($("#busqueda").val()==""){
+			alert("Debe ingresar un nombre para buscar.");
+		}else{
+			$("#frm_busqueda").submit();
+		}
+	}
+}	
+</script>
+{% endblock %}
 {% block content %}
 <div class="gri16 text-izquierda" id="breadcumb">
 	<a href="/">Inicio</a> <span class="verde-1">></span>  
@@ -13,7 +28,29 @@
 					</div>
 
 					<div class="grid_6">
-  						<a href="#" class="historico">Buscar</a>
+  						<form name="frm_busqueda" id="frm_busqueda" method="post" action="/movimientos/listado_busqueda_ventas/">
+							
+							{% csrf_token %}
+							
+							<select id="tipo_busqueda" name="tipo_busqueda">
+								<option value="0">Elija una opcion</option>
+								<option value="lote">Lote</option>
+								<option value="cliente">Cliente</option>
+								<option value="vendedor">Vendedor</option>
+								<option value="fecha">Fecha de Venta</option>
+							</select>
+							
+							
+							
+							<input id="busqueda" type="" name="busqueda" />
+							
+							
+  							<input name="tabla" type="hidden" value="venta"/>
+  							
+  							<input type="button" value="Buscar" onclick="buscar();" class="historico" style="cursor: pointer"/>
+  							
+  							
+  						</form>
 					</div>
 
 					<div class="clear"></div>

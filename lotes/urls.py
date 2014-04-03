@@ -6,4 +6,6 @@ urlpatterns = patterns('lotes.views',
     url(r'^listado/(?P<lote_id>\d+)/$', 'detalle_lote'),
     url(r'^listado/ventas/(?P<venta_id>\d+)/$', 'detalle_ventas_lote'),
     url(r'^agregar/$', 'agregar_lotes'),
+    url(r'^listado_busqueda_lotes/$', 'listar_busqueda_lotes'),
+
 )

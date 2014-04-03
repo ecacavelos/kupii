@@ -1,6 +1,6 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext, loader
-from principal.models import Fraccion, Manzana, Lote
+from principal.models import Propietario,Fraccion, Manzana, Lote
 from fracciones.forms import FraccionForm, FraccionFormAdd
 from django.db import reset_queries, close_connection
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -111,4 +111,38 @@ def agregar_fracciones(request):
     c = RequestContext(request, {
         'form': form,
     })
+    return HttpResponse(t.render(c))
+def listar_busqueda_fracciones(request):
+    
+    busqueda = request.POST['busqueda']
+    tipo_busqueda = request.POST['tipo_busqueda']
+    object_list=[]
+    t = loader.get_template('fracciones/listado.html')
+        
+    if tipo_busqueda == "numero":
+        
+        object_list = Fraccion.objects.filter(pk=busqueda)
+    
+    if tipo_busqueda == "propietario":
+        propietario_list = Propietario.objects.filter(nombres__icontains=busqueda)
+        for prop in propietario_list:
+            query = Fraccion.objects.filter(propietario_id=prop.id)
+            if query:
+                for f in query:
+                    object_list.append(f)
+       
+        
+    paginator = Paginator(object_list, 15)
+    page = request.GET.get('page')
+    try:
+        lista = paginator.page(page)
+    except PageNotAnInteger:
+        lista = paginator.page(1)
+    except EmptyPage:
+        lista = paginator.page(paginator.num_pages)
+    
+    c = RequestContext(request, {
+      'object_list': lista,
+    })
+    
     return HttpResponse(t.render(c))
