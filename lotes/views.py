@@ -127,11 +127,6 @@ def listar_busqueda_lotes(request):
     t = loader.get_template('lotes/listado.html')
     
     x=str(busqueda)
-    print x[0:3]
-    print x[4:7]
-    print x[8:]
-    print int(x[4:7])
-    print int(x[8:])
     fraccion_int = int(x[0:3])
     manzana_int =int(x[4:7])
     lote_int = int(x[8:])
