@@ -685,12 +685,12 @@ def listar_busqueda_ventas(request):
                 })
                 return HttpResponse(t.render(c))     
         if tipo_busqueda=='fecha':
-            fecha_venta_parsed = datetime.strptime(busqueda, "%Y-%m-%d")
+            fecha_venta_parsed = datetime.strptime(busqueda, "%d/%m/%Y").date()
             object_list = Venta.objects.filter(fecha_de_venta__icontains=fecha_venta_parsed) 
             f = []
             a = len(object_list)    
             if a > 0:
-                for i in venta:
+                for i in object_list:
                     lote = Lote.objects.get(pk=i.lote_id)
                     manzana = Manzana.objects.get(pk=lote.manzana_id)
                     f.append(Fraccion.objects.get(pk=manzana.fraccion_id))
@@ -708,8 +708,7 @@ def listar_busqueda_ventas(request):
             
                 c = RequestContext(request, {
                     'object_list': lista,
-                    'fraccion': f,
-        
+                    'fraccion': f,        
                 })
                 return HttpResponse(t.render(c))  
 
