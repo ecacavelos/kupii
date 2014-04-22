@@ -576,8 +576,259 @@ def listar_busqueda_personas(request):
         return HttpResponseServerError("Error en la ejecucion.")   
     
 def listar_busqueda_ventas(request):
-     
-        t = loader.get_template('movimientos/listado_ventas.html')
+        
+        try:
+            t = loader.get_template('movimientos/listado_ventas.html')
+            busqueda = request.POST['busqueda']
+            tipo_busqueda=request.POST['tipo_busqueda']
+        
+            if tipo_busqueda=='lote':
+                try:
+                    x=str(busqueda)
+                    fraccion_int = int(x[0:3])
+                    manzana_int =int(x[4:7])
+                    lote_int = int(x[8:])
+                except:
+                    return HttpResponseServerError("Datos erroneos, favor cargar el numero de lote con el formato Fraccion/Manzana/Lote.")       
+                myfraccion = Fraccion.objects.filter(id=fraccion_int)
+                fraccion_manzanas = Manzana.objects.filter(fraccion=myfraccion)
+                manzana_id=Manzana.objects.get(fraccion_id=fraccion_int,nro_manzana=manzana_int)
+                lote_id=Lote.objects.get(manzana_id=manzana_id,nro_lote=lote_int)
+                object_list = Venta.objects.filter(lote_id=lote_id.id)
+                f = []
+                a = len(object_list)    
+                if a > 0:
+                    for i in object_list:
+                        lote = Lote.objects.get(pk=i.lote_id)
+                        manzana = Manzana.objects.get(pk=lote.manzana_id)
+                        f.append(Fraccion.objects.get(pk=manzana.fraccion_id))
+                        i.fecha_de_venta = i.fecha_de_venta.strftime("%d/%m/%Y")
+                        i.precio_final_de_venta = str('{:,}'.format(i.precio_final_de_venta)).replace(",", ".")
+                    
+                    '''
+                     Con fraccion id y nro_manzana se obtiene manzana_id
+                     Con manzana_id y nro de lote se obtiene lote_id
+                     Con lote_id se obtiene venta_id
+                     '''
+                    paginator=Paginator(object_list,15)
+                    page=request.GET.get('page')
+                    try:
+                        lista=paginator.page(page)
+                    except PageNotAnInteger:
+                        lista=paginator.page(1)
+                    except EmptyPage:
+                        lista=paginator.page(paginator.num_pages)
+            
+                    c = RequestContext(request, {
+                        'object_list': lista,
+                        'fraccion': f,
+        
+                    })
+                    return HttpResponse(t.render(c))
+ 
+            if tipo_busqueda=='cliente':
+                object_list = Cliente.objects.filter(nombres__icontains=busqueda)    
+                for i in object_list:
+                    venta=Venta.objects.filter(cliente_id=i.id)
+                f = []
+                a = len(object_list)    
+                if a > 0:
+                    for i in venta:
+                        lote = Lote.objects.get(pk=i.lote_id)
+                        manzana = Manzana.objects.get(pk=lote.manzana_id)
+                        f.append(Fraccion.objects.get(pk=manzana.fraccion_id))
+                        i.fecha_de_venta = i.fecha_de_venta.strftime("%d/%m/%Y")
+                        i.precio_final_de_venta = str('{:,}'.format(i.precio_final_de_venta)).replace(",", ".")
+               
+                        paginator=Paginator(venta,15)
+                        page=request.GET.get('page')
+                        try:
+                            lista=paginator.page(page)
+                        except PageNotAnInteger:
+                            lista=paginator.page(1)
+                        except EmptyPage:
+                            lista=paginator.page(paginator.num_pages)
+            
+                        c = RequestContext(request, {
+                            'object_list': lista,
+                            'fraccion': f,
+        
+                        })
+                        return HttpResponse(t.render(c))     
+        
+            if tipo_busqueda=='vendedor':
+                object_list = Vendedor.objects.filter(nombres__icontains=busqueda)    
+                for i in object_list:
+                    venta=Venta.objects.filter(vendedor_id=i.id)
+                f = []
+                a = len(object_list)    
+                if a > 0:
+                    for i in venta:
+                        lote = Lote.objects.get(pk=i.lote_id)
+                        manzana = Manzana.objects.get(pk=lote.manzana_id)
+                        f.append(Fraccion.objects.get(pk=manzana.fraccion_id))
+                        i.fecha_de_venta = i.fecha_de_venta.strftime("%d/%m/%Y")
+                        i.precio_final_de_venta = str('{:,}'.format(i.precio_final_de_venta)).replace(",", ".")
+           
+                    paginator=Paginator(venta,15)
+                    page=request.GET.get('page')
+                    try:
+                        lista=paginator.page(page)
+                    except PageNotAnInteger:
+                        lista=paginator.page(1)
+                    except EmptyPage:
+                        lista=paginator.page(paginator.num_pages)
+            
+                    c = RequestContext(request, {
+                        'object_list': lista,
+                        'fraccion': f,
+        
+                    })
+                    return HttpResponse(t.render(c))     
+                
+            if tipo_busqueda=='fecha':
+                fecha_venta_parsed = datetime.strptime(busqueda, "%d/%m/%Y").date()
+                object_list = Venta.objects.filter(fecha_de_venta__icontains=fecha_venta_parsed) 
+                f = []
+                a = len(object_list)    
+                if a > 0:
+                    for i in object_list:
+                        lote = Lote.objects.get(pk=i.lote_id)
+                        manzana = Manzana.objects.get(pk=lote.manzana_id)
+                        f.append(Fraccion.objects.get(pk=manzana.fraccion_id))
+                        i.fecha_de_venta = i.fecha_de_venta.strftime("%d/%m/%Y")
+                        i.precio_final_de_venta = str('{:,}'.format(i.precio_final_de_venta)).replace(",", ".")
+           
+                        paginator=Paginator(object_list,15)
+                        page=request.GET.get('page')
+                        try:
+                            lista=paginator.page(page)
+                        except PageNotAnInteger:
+                            lista=paginator.page(1)
+                        except EmptyPage:
+                            lista=paginator.page(paginator.num_pages)
+            
+                        c = RequestContext(request, {
+                            'object_list': lista,
+                            'fraccion': f,        
+                        })
+                        return HttpResponse(t.render(c))  
+        except:
+            return HttpResponseServerError("Error en la ejecucion") 
+
+
+def listar_busqueda_pagos(request):
+            
+        try:
+            t = loader.get_template('movimientos/listado_pagos.html')
+            busqueda = request.POST['busqueda']
+            tipo_busqueda=request.POST['tipo_busqueda']
+        
+            if tipo_busqueda=='lote':
+                try:
+                    x=str(busqueda)
+                    fraccion_int = int(x[0:3])
+                    manzana_int =int(x[4:7])
+                    lote_int = int(x[8:])
+                except:
+                    return HttpResponseServerError("Datos erroneos, favor cargar el numero de lote con el formato Fraccion/Manzana/Lote.")       
+                myfraccion = Fraccion.objects.filter(id=fraccion_int)
+                fraccion_manzanas = Manzana.objects.filter(fraccion=myfraccion)
+                manzana_id=Manzana.objects.get(fraccion_id=fraccion_int,nro_manzana=manzana_int)
+                lote_id=Lote.objects.get(manzana_id=manzana_id,nro_lote=lote_int)
+                object_list = PagoDeCuotas.objects.filter(lote_id=lote_id.id)
+                f = []
+                a = len(object_list)    
+                if a > 0:
+                    for i in object_list:
+                        lote = Lote.objects.get(pk=i.lote_id)
+                        manzana = Manzana.objects.get(pk=lote.manzana_id)
+                        f.append(Fraccion.objects.get(pk=manzana.fraccion_id))
+                        i.fecha_de_pago=i.fecha_de_pago.strftime("%d/%m/%Y")
+                        i.total_de_cuotas=str('{:,}'.format(i.total_de_cuotas)).replace(",", ".")
+                        i.total_de_mora=str('{:,}'.format(i.total_de_mora)).replace(",", ".")
+                        i.total_de_pago=str('{:,}'.format(i.total_de_pago)).replace(",", ".")
+                    
+                    '''
+                     Con fraccion id y nro_manzana se obtiene manzana_id
+                     Con manzana_id y nro de lote se obtiene lote_id
+                     Con lote_id se obtiene venta_id
+                    '''
+                    paginator=Paginator(object_list,15)
+                    page=request.GET.get('page')
+                    try:
+                        lista=paginator.page(page)
+                    except PageNotAnInteger:
+                        lista=paginator.page(1)
+                    except EmptyPage:
+                        lista=paginator.page(paginator.num_pages)
+            
+                    c = RequestContext(request, {
+                        'object_list': lista,
+                        'fraccion': f,
+        
+                    })
+                    return HttpResponse(t.render(c))
+ 
+            if tipo_busqueda=='cliente':
+                object_list = Cliente.objects.filter(nombres__icontains=busqueda)    
+                for i in object_list:
+                    venta=PagoDeCuotas.objects.filter(cliente_id=i.id)
+                f = []
+                a = len(object_list)    
+                if a > 0:
+                    for i in venta:
+                        i.fecha_de_pago=i.fecha_de_pago.strftime("%d/%m/%Y")
+                        i.total_de_cuotas=str('{:,}'.format(i.total_de_cuotas)).replace(",", ".")
+                        i.total_de_mora=str('{:,}'.format(i.total_de_mora)).replace(",", ".")
+                        i.total_de_pago=str('{:,}'.format(i.total_de_pago)).replace(",", ".")
+               
+                    paginator=Paginator(venta,15)
+                    page=request.GET.get('page')
+                    try:
+                        lista=paginator.page(page)
+                    except PageNotAnInteger:
+                        lista=paginator.page(1)
+                    except EmptyPage:
+                        lista=paginator.page(paginator.num_pages)
+            
+                    c = RequestContext(request, {
+                        'object_list': lista,
+                            
+                    })
+                    return HttpResponse(t.render(c))
+            if tipo_busqueda=='fecha':
+                fecha_pago_parsed = datetime.strptime(busqueda, "%d/%m/%Y").date()
+                object_list = PagoDeCuotas.objects.filter(fecha_de_pago__icontains=fecha_pago_parsed) 
+                a = len(object_list)    
+                if a > 0:
+                    for i in object_list:
+                        i.fecha_de_pago=i.fecha_de_pago.strftime("%d/%m/%Y")
+                        i.total_de_cuotas=str('{:,}'.format(i.total_de_cuotas)).replace(",", ".")
+                        i.total_de_mora=str('{:,}'.format(i.total_de_mora)).replace(",", ".")
+                        i.total_de_pago=str('{:,}'.format(i.total_de_pago)).replace(",", ".")
+           
+                    paginator=Paginator(object_list,15)
+                    page=request.GET.get('page')
+                    try:
+                        lista=paginator.page(page)
+                    except PageNotAnInteger:
+                        lista=paginator.page(1)
+                    except EmptyPage:
+                        lista=paginator.page(paginator.num_pages)
+        
+                    c = RequestContext(request, {
+                        'object_list': lista,
+                    })
+                    return HttpResponse(t.render(c))  
+    
+        except:
+            return HttpResponseServerError("Error en la ejecucion") 
+    
+    
+def listar_busqueda_reservas(request):
+    try:
+        t = loader.get_template('movimientos/listado_reservas.html')
         busqueda = request.POST['busqueda']
         tipo_busqueda=request.POST['tipo_busqueda']
         
@@ -589,11 +840,13 @@ def listar_busqueda_ventas(request):
                 lote_int = int(x[8:])
             except:
                 return HttpResponseServerError("Datos erroneos, favor cargar el numero de lote con el formato Fraccion/Manzana/Lote.")       
+                
+                                    
             myfraccion = Fraccion.objects.filter(id=fraccion_int)
             fraccion_manzanas = Manzana.objects.filter(fraccion=myfraccion)
             manzana_id=Manzana.objects.get(fraccion_id=fraccion_int,nro_manzana=manzana_int)
             lote_id=Lote.objects.get(manzana_id=manzana_id,nro_lote=lote_int)
-            object_list = Venta.objects.filter(lote_id=lote_id.id)
+            object_list = Reserva.objects.filter(lote_id=lote_id.id)
             f = []
             a = len(object_list)    
             if a > 0:
@@ -601,14 +854,8 @@ def listar_busqueda_ventas(request):
                     lote = Lote.objects.get(pk=i.lote_id)
                     manzana = Manzana.objects.get(pk=lote.manzana_id)
                     f.append(Fraccion.objects.get(pk=manzana.fraccion_id))
-                    i.fecha_de_venta = i.fecha_de_venta.strftime("%d/%m/%Y")
-                    i.precio_final_de_venta = str('{:,}'.format(i.precio_final_de_venta)).replace(",", ".")
-                    
-                    '''
-                     Con fraccion id y nro_manzana se obtiene manzana_id
-                     Con manzana_id y nro de lote se obtiene lote_id
-                     Con lote_id se obtiene venta_id
-                     '''
+                    i.fecha_de_reserva=i.fecha_de_reserva.strftime("%d/%m/%Y")         
+                
                 paginator=Paginator(object_list,15)
                 page=request.GET.get('page')
                 try:
@@ -617,28 +864,23 @@ def listar_busqueda_ventas(request):
                     lista=paginator.page(1)
                 except EmptyPage:
                     lista=paginator.page(paginator.num_pages)
-            
+        
                 c = RequestContext(request, {
                     'object_list': lista,
                     'fraccion': f,
-        
                 })
-                return HttpResponse(t.render(c))
- 
+                return HttpResponse(t.render(c))  
+            
         if tipo_busqueda=='cliente':
             object_list = Cliente.objects.filter(nombres__icontains=busqueda)    
             for i in object_list:
-                venta=Venta.objects.filter(cliente_id=i.id)
+                venta=Reserva.objects.filter(cliente_id=i.id)
             f = []
             a = len(object_list)    
             if a > 0:
                 for i in venta:
-                    lote = Lote.objects.get(pk=i.lote_id)
-                    manzana = Manzana.objects.get(pk=lote.manzana_id)
-                    f.append(Fraccion.objects.get(pk=manzana.fraccion_id))
-                    i.fecha_de_venta = i.fecha_de_venta.strftime("%d/%m/%Y")
-                    i.precio_final_de_venta = str('{:,}'.format(i.precio_final_de_venta)).replace(",", ".")
-               
+                    i.fecha_de_reserva=i.fecha_de_reserva.strftime("%d/%m/%Y")
+        
                 paginator=Paginator(venta,15)
                 page=request.GET.get('page')
                 try:
@@ -650,53 +892,16 @@ def listar_busqueda_ventas(request):
             
                 c = RequestContext(request, {
                     'object_list': lista,
-                    'fraccion': f,
-        
                 })
-                return HttpResponse(t.render(c))     
-        
-        if tipo_busqueda=='vendedor':
-            object_list = Vendedor.objects.filter(nombres__icontains=busqueda)    
-            for i in object_list:
-                venta=Venta.objects.filter(vendedor_id=i.id)
-            f = []
-            a = len(object_list)    
-            if a > 0:
-                for i in venta:
-                    lote = Lote.objects.get(pk=i.lote_id)
-                    manzana = Manzana.objects.get(pk=lote.manzana_id)
-                    f.append(Fraccion.objects.get(pk=manzana.fraccion_id))
-                    i.fecha_de_venta = i.fecha_de_venta.strftime("%d/%m/%Y")
-                    i.precio_final_de_venta = str('{:,}'.format(i.precio_final_de_venta)).replace(",", ".")
-           
-                paginator=Paginator(venta,15)
-                page=request.GET.get('page')
-                try:
-                    lista=paginator.page(page)
-                except PageNotAnInteger:
-                    lista=paginator.page(1)
-                except EmptyPage:
-                    lista=paginator.page(paginator.num_pages)
-            
-                c = RequestContext(request, {
-                    'object_list': lista,
-                    'fraccion': f,
-        
-                })
-                return HttpResponse(t.render(c))     
+                return HttpResponse(t.render(c))
         if tipo_busqueda=='fecha':
-            fecha_venta_parsed = datetime.strptime(busqueda, "%d/%m/%Y").date()
-            object_list = Venta.objects.filter(fecha_de_venta__icontains=fecha_venta_parsed) 
-            f = []
+            fecha_reserva_parsed = datetime.strptime(busqueda, "%d/%m/%Y").date()
+            object_list = Reserva.objects.filter(fecha_de_reserva__icontains=fecha_reserva_parsed) 
             a = len(object_list)    
             if a > 0:
                 for i in object_list:
-                    lote = Lote.objects.get(pk=i.lote_id)
-                    manzana = Manzana.objects.get(pk=lote.manzana_id)
-                    f.append(Fraccion.objects.get(pk=manzana.fraccion_id))
-                    i.fecha_de_venta = i.fecha_de_venta.strftime("%d/%m/%Y")
-                    i.precio_final_de_venta = str('{:,}'.format(i.precio_final_de_venta)).replace(",", ".")
-           
+                    i.fecha_de_pago=i.fecha_de_reserva.strftime("%d/%m/%Y")
+                                   
                 paginator=Paginator(object_list,15)
                 page=request.GET.get('page')
                 try:
@@ -705,19 +910,19 @@ def listar_busqueda_ventas(request):
                     lista=paginator.page(1)
                 except EmptyPage:
                     lista=paginator.page(paginator.num_pages)
-            
+        
                 c = RequestContext(request, {
                     'object_list': lista,
-                    'fraccion': f,        
                 })
                 return HttpResponse(t.render(c))  
-
-
-
-
-
-
-
+    except:
+        return HttpResponseServerError("Error en la ejecucion") 
+    
+    
+    
+    
+    
+    
 
 
 
