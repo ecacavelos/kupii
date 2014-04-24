@@ -1,6 +1,10 @@
 {% extends "lotes/base_lotes.html" %}
 {% block header_scripts %}
-<script>
+
+<script type="text/javascript">
+$(document).ready(function() {
+	$("#fecha_hasta").hide();
+});	
 function buscar(){
 	if($("#tipo_busqueda").val()==0){
 		alert("Debe elegir un tipo de busqueda.");
@@ -12,6 +16,12 @@ function buscar(){
 			$("#frm_busqueda").submit();
 		}
 	}
+}
+
+function desplegar_fecha(){
+	if($("#tipo_busqueda").val()=='fecha'){
+		$("#fecha_hasta").show();
+	}	
 }	
 </script>
 {% endblock %}
@@ -32,21 +42,21 @@ function buscar(){
 							
 							{% csrf_token %}
 							
-							<select id="tipo_busqueda" name="tipo_busqueda">
+							<select id="tipo_busqueda" name="tipo_busqueda" onchange="desplegar_fecha();">
 								<option value="0">Elija una opcion</option>
 								<option value="lote">Lote</option>
 								<option value="cliente">Cliente</option>
 								<option value="vendedor">Vendedor</option>
 								<option value="fecha">Fecha de Venta</option>
+								
 							</select>
 							
 							
 							
-							<input id="busqueda" type="" name="busqueda" />
+							<input id="busqueda" name="busqueda" />
 							
-							
+							<input name="fecha_hasta" id="fecha_hasta" type="text" value=""/>
   							<input name="tabla" type="hidden" value="venta"/>
-  							
   							<input type="button" value="Buscar" onclick="buscar();" class="historico" style="cursor: pointer"/>
   							
   							
@@ -59,7 +69,7 @@ function buscar(){
 						<br><br>
 					</div>
 					<div id="listado-item-lote">
-						<table width="50%" border="1" cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
+						<table width="50%" border="1" cellpadding="0" cellspacing="0" class="listado-ventas" align="center">
 							<th>Venta Nro</th><th>Lote Nro</th><th>Fracci&oacute;n</th><th>Cliente</th><th>Vendedor</th><th>Fecha de Venta</th><th>Precio Final de Venta</th>
 {% for hw in object_list %}
 		<tr>

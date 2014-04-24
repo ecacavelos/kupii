@@ -1,6 +1,9 @@
 {% extends "lotes/base_lotes.html" %}
 {% block header_scripts %}
-<script>
+<script type="text/javascript">
+$(document).ready(function() {
+	$("#fecha_hasta").hide();
+});	
 function buscar(){
 	if($("#tipo_busqueda").val()==0){
 		alert("Debe elegir un tipo de busqueda.");
@@ -13,6 +16,11 @@ function buscar(){
 		}
 	}
 }	
+function desplegar_fecha(){
+	if($("#tipo_busqueda").val()=='fecha'){
+		$("#fecha_hasta").show();
+	}	
+}
 </script>
 {% endblock %}
 {% block content %}
@@ -32,15 +40,15 @@ function buscar(){
 							
 							{% csrf_token %}
 							
-							<select id="tipo_busqueda" name="tipo_busqueda">
+							<select id="tipo_busqueda" name="tipo_busqueda" onchange="desplegar_fecha();">
 								<option value="0">Elija una opcion</option>
 								<option value="lote">Lote</option>
 								<option value="cliente">Cliente</option>
 								<option value="fecha">Fecha de Reserva</option>
 							</select>
-							<input id="busqueda" type="" name="busqueda" />
+							<input id="busqueda" name="busqueda" />
 							
-							
+							<input name="fecha_hasta" id="fecha_hasta" type="text" value=""/>
   							<input name="tabla" type="hidden" value="venta"/>
   							
   							<input type="button" value="Buscar" onclick="buscar();" class="historico" style="cursor: pointer"/>
@@ -56,7 +64,7 @@ function buscar(){
 					</div>
 					<div id="listado-item-lote">
 						<table width="50%" border="1" cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
-							<th>Codigo</th><th>Lote</th><th>Cliente</th><th>Fecha de Reserva</th>
+							<th>Codigo</th><th>Lote</th><th>Fracci&oacute;n</th><th>Cliente</th><th>Fecha de Reserva</th>
 {% for hw in object_list %}
 		<tr>
 			<td>
@@ -64,6 +72,13 @@ function buscar(){
 			</td>			
 			<td>
 			    {{hw.lote}}
+			</td>
+			<td>
+				 {% for f in fraccion %}
+					{% if forloop.counter == forloop.parentloop.counter %}
+						{{ f.id}}
+					{% endif %}
+				 {% endfor %}				
 			</td>
 			<td>
 			    {{hw.cliente}}

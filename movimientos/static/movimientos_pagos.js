@@ -1,4 +1,5 @@
 $(document).ready(function() {
+	$("#fecha_hasta").hide();
 	$("#id_lote").keydown(validateLotePre);
 	$("#id_lote").keyup(validateLotePost);
 	

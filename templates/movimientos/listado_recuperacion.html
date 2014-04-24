@@ -1,6 +1,32 @@
 {% extends "lotes/base_lotes.html" %}
+{% block header_scripts %}
 
+<script type="text/javascript">
+$(document).ready(function() {
+	$("#fecha_hasta").hide();
+});	
+function buscar(){
+	if($("#tipo_busqueda").val()==0){
+		alert("Debe elegir un tipo de busqueda.");
+	}
+	else{
+		if($("#busqueda").val()==""){
+			alert("Debe ingresar un nombre para buscar.");
+		}else{
+			$("#frm_busqueda").submit();
+		}
+	}
+}
+
+function desplegar_fecha(){
+	if($("#tipo_busqueda").val()=='fecha'){
+		$("#fecha_hasta").show();
+	}	
+}	
+</script>
+{% endblock %}
 {% block content %}
+
 <div class="gri16 text-izquierda" id="breadcumb">
 	<a href="/">Inicio</a> <span class="verde-1">></span>  
 	<a href="/movimientos/">Movimientos</a> 
@@ -13,7 +39,28 @@
 					</div>
 
 					<div class="grid_6">
-  						<a href="#" class="historico">Buscar</a>
+  						<form name="frm_busqueda" id="frm_busqueda" method="post" action="/movimientos/listado_busqueda_recuperacion/">
+							
+							{% csrf_token %}
+							
+							<select id="tipo_busqueda" name="tipo_busqueda" onchange="desplegar_fecha();">
+								<option value="0">Elija una opcion</option>
+								<option value="lote">Lote</option>
+								<option value="cliente">Cliente</option>
+								<option value="fecha">Fecha de Recuperacion</option>
+								
+							</select>
+							
+							
+							
+							<input id="busqueda" name="busqueda" />
+							
+							<input name="fecha_hasta" id="fecha_hasta" type="text" value=""/>
+  							<input name="tabla" type="hidden" value="venta"/>
+  							<input type="button" value="Buscar" onclick="buscar();" class="historico" style="cursor: pointer"/>
+  							
+  							
+  						</form>
 					</div>
 
 					<div class="clear"></div>
@@ -50,6 +97,17 @@
 		</tr>
 
 {% endfor %}
+<div class="pagination">
+    <span class="step-links">
+        {% for num in object_list.paginator.page_range %}
+  		{% ifequal num object_list.number %}
+    	<span class="current"><b>{{ num }}</b></span>
+  		{% else %}
+    	<a href="?page={{ num }}"> {{ num }}</a>
+  		{% endifequal %} 
+{% endfor %}
+    </span>
+</div>
 						</table>
 					</div>
 

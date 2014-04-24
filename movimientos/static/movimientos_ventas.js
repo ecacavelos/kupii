@@ -1,4 +1,5 @@
 $(document).ready(function() {
+	$("#fecha_hasta").hide();
 	$("#id_lote").keydown(validateLotePre);
 	$("#id_lote").keyup(validateLotePost);
 
@@ -18,6 +19,8 @@ var monto_final_validado = false;
 var entrega_inicial = 0;
 var monto_cuota = 0;
 var estado_lote="";
+
+
 
 function validateVenta(event) {
 	
@@ -166,6 +169,8 @@ function retrieveLoteVenta() {
 		}
 	}
 };
+
+
 
 function calculateMontoCuotas() {
 	var res_entrega = $("#id_entrega_inicial").val();
