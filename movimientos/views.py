@@ -348,35 +348,34 @@ def recuperacion_de_lotes(request):
 # Funcion para consultar el listado de todas las ventas.
 def listar_ventas(request):
     t = loader.get_template('movimientos/listado_ventas.html')
-    object_list = Venta.objects.all().order_by('id')
-    f = []
-    a = len(object_list)
-    if a > 0:
-        for i in object_list:
-            lote = Lote.objects.get(pk=i.lote_id)
-            manzana = Manzana.objects.get(pk=lote.manzana_id)
-            f.append(Fraccion.objects.get(pk=manzana.fraccion_id))
-            i.fecha_de_venta = i.fecha_de_venta.strftime("%d/%m/%Y")
-            i.precio_final_de_venta = str('{:,}'.format(i.precio_final_de_venta)).replace(",", ".")
+    try:
+        object_list = Venta.objects.all().order_by('id')
+        f = []
+        a = len(object_list)
+        if a > 0:
+            for i in object_list:
+                lote = Lote.objects.get(pk=i.lote_id)
+                manzana = Manzana.objects.get(pk=lote.manzana_id)
+                f.append(Fraccion.objects.get(pk=manzana.fraccion_id))
+                i.fecha_de_venta = i.fecha_de_venta.strftime("%d/%m/%Y")
+                i.precio_final_de_venta = str('{:,}'.format(i.precio_final_de_venta)).replace(",", ".")
                 
-        paginator = Paginator(object_list, 15)
-        page = request.GET.get('page')
-        try:
-            lista = paginator.page(page)
-        except PageNotAnInteger:
-            lista = paginator.page(1)
-        except EmptyPage:
-            lista = paginator.page(paginator.num_pages)
+            paginator = Paginator(object_list, 15)
+            page = request.GET.get('page')
+            try:
+                lista = paginator.page(page)
+            except PageNotAnInteger:
+                lista = paginator.page(1)
+            except EmptyPage:
+                lista = paginator.page(paginator.num_pages)
             
-        c = RequestContext(request, {
-            'object_list': lista,
-            'fraccion': f,
-        
-        })
-            
-        return HttpResponse(t.render(c))       
-
-
+            c = RequestContext(request, {
+                'object_list': lista,
+                'fraccion': f,
+            })
+            return HttpResponse(t.render(c))       
+    except:    
+        return HttpResponseServerError("No se pudo obtener el Listado de Ventas de Lotes.")
   
             
             
@@ -405,8 +404,9 @@ def listar_pagos(request):
             })
             return HttpResponse(t.render(c))
     except:   
-            return HttpResponseServerError("No se pudo obtener el Listado de Pagos de Lotes.")
+        return HttpResponseServerError("No se pudo obtener el Listado de Pagos de Lotes.")
         
+#Funcion para obtener el listado de cambios de lotes.        
 def listar_cambios(request):
     t = loader.get_template('movimientos/listado_cambios.html')
     try:
@@ -427,7 +427,7 @@ def listar_cambios(request):
             })
             return HttpResponse(t.render(c))
     except:   
-            return HttpResponseServerError("No se pudo obtener el Listado de Cambios de Lotes.")
+        return HttpResponseServerError("No se pudo obtener el Listado de Cambios de Lotes.")
             
     
 #Funcion para listar los lotes recuperados.
@@ -451,9 +451,9 @@ def listar_rec(request):
         })
         return HttpResponse(t.render(c))
     except:   
-            return HttpResponseServerError("No se pudo obtener el Listado de Recuperacion de Lotes.")
+        return HttpResponseServerError("No se pudo obtener el Listado de Recuperacion de Lotes.")
     
-        
+#Funcion para obtener el listado de los lotes reservados.        
 def listar_res(request):
     t = loader.get_template('movimientos/listado_reservas.html')
     f = []
@@ -480,9 +480,9 @@ def listar_res(request):
             })
             return HttpResponse(t.render(c))
     except:   
-            return HttpResponseServerError("No se pudo obtener el Listado de Reservas de Lotes.")
+        return HttpResponseServerError("No se pudo obtener el Listado de Reservas de Lotes.")
     
-    
+#Funcion para obtener el listado de los lotes transferidos.
 def listar_transf(request):
     t = loader.get_template('movimientos/listado_transferencias.html')
     f = []
@@ -509,12 +509,12 @@ def listar_transf(request):
             })
             return HttpResponse(t.render(c))
     except:   
-            return HttpResponseServerError("No se pudo obtener el Listado de Transferencias de Lotes.")
+        return HttpResponseServerError("No se pudo obtener el Listado de Transferencias de Lotes.")
+
 
 def listar_busqueda_personas(request):
     
     try:
-        
         tabla = request.POST['tabla']
         busqueda = request.POST['busqueda']
         tipo_busqueda=request.POST['tipo_busqueda']
@@ -526,20 +526,7 @@ def listar_busqueda_personas(request):
                 object_list = Cliente.objects.filter(nombres__icontains=busqueda)
             if tipo_busqueda=="cedula":
                 object_list = Cliente.objects.filter(cedula__icontains=busqueda)
-                
-            paginator=Paginator(object_list,15)
-            page=request.GET.get('page')
-            try:
-                lista=paginator.page(page)
-            except PageNotAnInteger:
-                lista=paginator.page(1)
-            except EmptyPage:
-                lista=paginator.page(paginator.num_pages)
-            c = RequestContext(request, {
-                'object_list': lista,
-            })
-            return HttpResponse(t.render(c))
-    
+                           
         if tabla=='propietario':
             t = loader.get_template('propietarios/listado.html')
 
@@ -548,18 +535,7 @@ def listar_busqueda_personas(request):
             if tipo_busqueda=="cedula":
                 object_list = Propietario.objects.filter(cedula__icontains=busqueda)
                 
-            paginator=Paginator(object_list,15)
-            page=request.GET.get('page')
-            try:
-                lista=paginator.page(page)
-            except PageNotAnInteger:
-                lista=paginator.page(1)
-            except EmptyPage:
-                lista=paginator.page(paginator.num_pages)
-            c = RequestContext(request, {
-                'object_list': lista,
-            })
-            return HttpResponse(t.render(c))
+            
         
         if tabla=='vendedor':
             t = loader.get_template('vendedores/listado.html')
@@ -568,18 +544,19 @@ def listar_busqueda_personas(request):
             if tipo_busqueda=="cedula":
                 object_list = Vendedor.objects.filter(cedula__icontains=busqueda)
                    
-            paginator=Paginator(object_list,15)
-            page=request.GET.get('page')
-            try:
-                lista=paginator.page(page)
-            except PageNotAnInteger:
-                lista=paginator.page(1)
-            except EmptyPage:
-                lista=paginator.page(paginator.num_pages)
-            c = RequestContext(request, {
-                'object_list': lista,
-            })
-            return HttpResponse(t.render(c))
+        paginator=Paginator(object_list,15)
+        page=request.GET.get('page')
+        try:
+            lista=paginator.page(page)
+        except PageNotAnInteger:
+            lista=paginator.page(1)
+        except EmptyPage:
+            lista=paginator.page(paginator.num_pages)
+        c = RequestContext(request, {
+            'object_list': lista,
+        })
+        return HttpResponse(t.render(c))
+
     except:
         return HttpResponseServerError("Error en la ejecucion.")   
     
@@ -614,11 +591,11 @@ def listar_busqueda_ventas(request):
                         i.fecha_de_venta = i.fecha_de_venta.strftime("%d/%m/%Y")
                         i.precio_final_de_venta = str('{:,}'.format(i.precio_final_de_venta)).replace(",", ".")
                     
-                    '''
-                     Con fraccion id y nro_manzana se obtiene manzana_id
-                     Con manzana_id y nro de lote se obtiene lote_id
-                     Con lote_id se obtiene venta_id
-                     '''
+                        '''
+                        Con fraccion id y nro_manzana se obtiene manzana_id
+                        Con manzana_id y nro de lote se obtiene lote_id
+                        Con lote_id se obtiene venta_id
+                        '''
                     paginator=Paginator(object_list,15)
                     page=request.GET.get('page')
                     try:
@@ -631,10 +608,14 @@ def listar_busqueda_ventas(request):
                     c = RequestContext(request, {
                         'object_list': lista,
                         'fraccion': f,
-        
                     })
-                    return HttpResponse(t.render(c))
- 
+                else:
+                    c = RequestContext(request, {
+                        'object_list': object_list,
+                        'fraccion': f,
+                    })
+                return HttpResponse(t.render(c))
+            
             if tipo_busqueda=='cliente':
                 object_list = Cliente.objects.filter(nombres__icontains=busqueda)    
                 for i in object_list:
@@ -687,13 +668,12 @@ def listar_busqueda_ventas(request):
                     except EmptyPage:
                         lista=paginator.page(paginator.num_pages)
             
-                    c = RequestContext(request, {
-                        'object_list': lista,
-                        'fraccion': f,
-        
-                    })
-                    return HttpResponse(t.render(c))     
-                
+                c = RequestContext(request, {
+                    'object_list': lista,
+                    'fraccion': f,
+                })
+                return HttpResponse(t.render(c))
+                     
             if tipo_busqueda=='fecha':
                 fecha_venta_parsed = datetime.strptime(busqueda, "%d/%m/%Y").date()
                 fecha_hasta_parsed=datetime.strptime(fecha_hasta,"%d/%m/%Y").date()

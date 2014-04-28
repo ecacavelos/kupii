@@ -2,6 +2,8 @@
 {% block header_scripts %}
 <script type="text/javascript">
 $(document).ready(function() {
+	$('#fecha_hasta').mask('##/##/####');
+	$("#fecha_hasta").datepicker({ dateFormat: 'dd/mm/yy' });
 	$("#fecha_hasta").hide();
 });	
 function buscar(){
@@ -17,8 +19,18 @@ function buscar(){
 	}
 }	
 function desplegar_fecha(){
+	
 	if($("#tipo_busqueda").val()=='fecha'){
-		$("#fecha_hasta").show();
+		$("#fecha_hasta").show();		
+		$('#busqueda').mask('##/##/####');
+	    $("#busqueda").datepicker({ dateFormat: 'dd/mm/yy' });
+	} else{
+		$("#fecha_hasta").hide();
+		$("#busqueda").datepicker("destroy");
+		$("#busqueda").removeClass("hasDatepicker");
+		$("#busqueda").unmask();
+		$("#fecha_hasta").val("");
+		$("#busqueda").val("");
 	}	
 }
 </script>
