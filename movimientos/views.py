@@ -1167,8 +1167,6 @@ def listar_busqueda_recuperacion(request):
                 lote_int = int(x[8:])
             except:
                 return HttpResponseServerError("Datos erroneos, favor cargar el numero de lote con el formato Fraccion/Manzana/Lote.")       
-                
-                                    
             myfraccion = Fraccion.objects.filter(id=fraccion_int)
             fraccion_manzanas = Manzana.objects.filter(fraccion=myfraccion)
             
@@ -1233,7 +1231,6 @@ def listar_busqueda_recuperacion(request):
             else:
                 c = RequestContext(request, {
                     'object_list': object_list,
-                    'fraccion': f,        
                 })
             return HttpResponse(t.render(c))  
         
