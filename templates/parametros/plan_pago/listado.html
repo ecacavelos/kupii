@@ -43,6 +43,19 @@
 		</tr>
 
 {% endfor %}
+<div class="pagination">
+    <span class="step-links">
+        {%if object_list.has_previous%}
+        <a href="?page={{ object_list.previous_page_number }}"> Anterior</a>
+		{%endif%}
+    	
+    	|{{object_list.number}}|
+    	
+    	{%if object_list.has_next%}
+		<a href="?page={{ object_list.next_page_number }}"> Siguiente</a>
+		{%endif%}
+    </span>
+</div>
 						</table>
 					</div>
 
