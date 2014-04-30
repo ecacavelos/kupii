@@ -58,7 +58,7 @@ function buscar(){
 {% for hw in object_list %}
 		<tr>
 			<td>
-				<a href="{{hw.id}}">{{hw.cedula}} <strong>(Ver Detalles)</strong></a>
+				<a href="/clientes/listado/{{hw.id}}">{{hw.cedula}} <strong>(Ver Detalles)</strong></a>
 			</td>
 			<td>
 				{{hw.nombres}} {{hw.apellidos}}
@@ -76,13 +76,13 @@ function buscar(){
 <div class="pagination">
     <span class="step-links">
 {%if object_list.has_previous%}
-<a href="?page={{ object_list.previous_page_number }}"> Anterior</a>
+<a href="?page={{ object_list.previous_page_number }}{{ultima_busqueda}}"> Anterior</a>
 {%endif%}
 
 |{{object_list.number}}|
 
 {%if object_list.has_next%}
-<a href="?page={{ object_list.next_page_number }}"> Siguiente</a>
+<a href="?page={{ object_list.next_page_number }}{{ultima_busqueda}}"> Siguiente</a>
 {%endif%}
 
     </span>
