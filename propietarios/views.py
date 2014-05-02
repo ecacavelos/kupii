@@ -10,13 +10,23 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 # Funcion principal del modulo de propietarios.
 def index(request):
-    t = loader.get_template('propietarios/index.html')
-    c = RequestContext(request, {})
-    return HttpResponse(t.render(c))
+    
+    if request.user.is_authenticated():
+        t = loader.get_template('propietarios/index.html')
+        c = RequestContext(request, {})
+        return HttpResponse(t.render(c))
+    else:
+        return HttpResponseRedirect("/login")
 
 # Funcion para consultar el listado de todos los propietarios.
 def consultar_propietarios(request):
-    t = loader.get_template('propietarios/listado.html')
+    
+    if request.user.is_authenticated():
+        t = loader.get_template('propietarios/listado.html')
+        #c = RequestContext(request, {})
+        #return HttpResponse(t.render(c))
+    else:
+        return HttpResponseRedirect("/login")
  
     if request.method == 'POST':
         data = request.POST
@@ -60,7 +70,13 @@ def consultar_propietarios(request):
 
 # Funcion para consultar el detalle de un propietario.
 def detalle_propietario(request, propietario_id):
-    t = loader.get_template('propietarios/detalle.html')
+    
+    if request.user.is_authenticated():
+        t = loader.get_template('propietarios/detalle.html')
+        #c = RequestContext(request, {})
+        #return HttpResponse(t.render(c))
+    else:
+        return HttpResponseRedirect("/login")
  
     object_list = Propietario.objects.get(pk=propietario_id)
     message = ''
@@ -89,7 +105,13 @@ def detalle_propietario(request, propietario_id):
 
 # Funcion para agregar un nuevo propietario.
 def agregar_propietarios(request):
-    t = loader.get_template('propietarios/agregar.html')
+    
+    if request.user.is_authenticated():
+        t = loader.get_template('propietarios/agregar.html')
+        #c = RequestContext(request, {})
+        #return HttpResponse(t.render(c))
+    else:
+        return HttpResponseRedirect("/login")
 
     if request.method == 'POST':
         form = PropietarioForm(request.POST)

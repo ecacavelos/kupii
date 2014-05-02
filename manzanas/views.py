@@ -6,13 +6,24 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 # Funcion principal del modulo de manzanas.
 def manzanas(request):
-    t = loader.get_template('manzanas/index.html')
-    c = RequestContext(request, {})
-    return HttpResponse(t.render(c))
+    
+    if request.user.is_authenticated():
+        t = loader.get_template('manzanas/index.html')
+        c = RequestContext(request, {})
+        return HttpResponse(t.render(c))
+    else:
+        return HttpResponseRedirect("/login") 
 
 # Funcion para consultar el listado de todas las manzanas.
 def consultar_manzanas(request):
-    t = loader.get_template('manzanas/listado.html')
+    
+    
+    if request.user.is_authenticated():
+        t = loader.get_template('manzanas/listado.html')
+        #c = RequestContext(request, {})
+        #return HttpResponse(t.render(c))
+    else:
+        return HttpResponseRedirect("/login") 
     
     object_list = Manzana.objects.all().order_by('id')
     
@@ -32,7 +43,14 @@ def consultar_manzanas(request):
 def agregar_lotes_por_manzana(request):
     
     #id_propietario = request.GET['cant_manzanas']
-    t = loader.get_template('manzanas/agregar.html')
+    
+    
+    if request.user.is_authenticated():
+        t = loader.get_template('manzanas/agregar.html')
+        #c = RequestContext(request, {})
+        #return HttpResponse(t.render(c))
+    else:
+        return HttpResponseRedirect("/login") 
     
     if request.method == 'POST':
         form = ManzanaForm(request.POST)
@@ -50,7 +68,14 @@ def agregar_lotes_por_manzana(request):
 
 # Funcion para el detalle de una fraccion: edita o borra una fraccion.
 def detalle_manzana(request, manzana_id):
-    t = loader.get_template('manzanas/detalle.html')    
+     
+    
+    if request.user.is_authenticated():
+        t = loader.get_template('manzanas/detalle.html') 
+        #c = RequestContext(request, {})
+        #return HttpResponse(t.render(c))
+    else:
+        return HttpResponseRedirect("/login")  
  
     object_list = Manzana.objects.get(pk=manzana_id)
     message = ''
@@ -79,7 +104,14 @@ def detalle_manzana(request, manzana_id):
 def listar_busqueda_manzanas(request):
     
     busqueda = request.POST['busqueda']
-    t = loader.get_template('manzanas/listado.html')
+    
+    
+    if request.user.is_authenticated():
+        t = loader.get_template('manzanas/listado.html') 
+        #c = RequestContext(request, {})
+        #return HttpResponse(t.render(c))
+    else:
+        return HttpResponseRedirect("/login") 
     
     fraccion,manzana=busqueda.split("/") 
     object_list=Manzana.objects.filter(nro_manzana=int(manzana),fraccion_id=int(fraccion))

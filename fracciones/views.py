@@ -7,13 +7,25 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 # Funcion principal del modulo de fracciones.
 def fracciones(request):
-    t = loader.get_template('fracciones/index.html')
-    c = RequestContext(request, {})
-    return HttpResponse(t.render(c))
+    
+    
+    if request.user.is_authenticated():
+        t = loader.get_template('fracciones/index.html')
+        c = RequestContext(request, {})
+        return HttpResponse(t.render(c))
+    else:
+        return HttpResponseRedirect("/login")
 
 # Funcion para consultar el listado de todas las fracciones.
 def consultar_fracciones(request):
-    t = loader.get_template('fracciones/listado.html')
+    
+    
+    if request.user.is_authenticated():
+        t = loader.get_template('fracciones/listado.html')
+        #c = RequestContext(request, {})
+        #return HttpResponse(t.render(c))
+    else:
+        return HttpResponseRedirect("/login")
     
     object_list = Fraccion.objects.all().order_by('id')
     
@@ -34,7 +46,14 @@ def consultar_fracciones(request):
 def detalle_fraccion(request, fraccion_id):
     close_connection()
     reset_queries()
-    t = loader.get_template('fracciones/detalle.html')    
+    
+    
+    if request.user.is_authenticated():
+        t = loader.get_template('fracciones/detalle.html')
+        #c = RequestContext(request, {})
+        #return HttpResponse(t.render(c))
+    else:
+        return HttpResponseRedirect("/login")    
 
     object_list = Fraccion.objects.get(pk=fraccion_id)
     message = ''
@@ -84,7 +103,14 @@ def detalle_fraccion(request, fraccion_id):
 
 # Funcion para agregar una nueva fraccion.
 def agregar_fracciones(request):
-    t = loader.get_template('fracciones/agregar2.html')
+    
+    
+    if request.user.is_authenticated():
+        t = loader.get_template('fracciones/agregar2.html')
+        #c = RequestContext(request, {})
+        #return HttpResponse(t.render(c))
+    else:
+        return HttpResponseRedirect("/login")   
 
     if request.method == 'POST':
         form = FraccionForm(request.POST)
@@ -117,7 +143,14 @@ def listar_busqueda_fracciones(request):
     busqueda = request.POST['busqueda']
     tipo_busqueda = request.POST['tipo_busqueda']
     object_list=[]
-    t = loader.get_template('fracciones/listado.html')
+    
+    
+    if request.user.is_authenticated():
+        t = loader.get_template('fracciones/listado.html')
+        #c = RequestContext(request, {})
+        #return HttpResponse(t.render(c))
+    else:
+        return HttpResponseRedirect("/login") 
         
     if tipo_busqueda == "numero":
         

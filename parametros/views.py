@@ -5,19 +5,34 @@ from parametros.forms import PlanDePagoForm, SearchForm
 
 # Funcion principal del modulo de lotes.
 def parametros(request):
-    t = loader.get_template('parametros/index.html')
-    c = RequestContext(request, {})
-    return HttpResponse(t.render(c))
+    
+    if request.user.is_authenticated():
+        t = loader.get_template('parametros/index.html')
+        c = RequestContext(request, {})
+        return HttpResponse(t.render(c))
+    else:
+        return HttpResponseRedirect("/login") 
 
 #Funcion del modulo plan de pagos
 def plan_de_pago(request):
-    t = loader.get_template('parametros/plan_pago/index.html')
-    c = RequestContext(request, {})
-    return HttpResponse(t.render(c))
+    
+    if request.user.is_authenticated():
+        t = loader.get_template('parametros/plan_pago/index.html')
+        c = RequestContext(request, {})
+        return HttpResponse(t.render(c))
+    else:
+        return HttpResponseRedirect("/login")
 
 #funcion para consultar el listado de todos los planes de pagos
 def consultar_plan_de_pago(request):
-    t = loader.get_template('parametros/plan_pago/listado.html')
+    
+    if request.user.is_authenticated():
+        t = loader.get_template('parametros/plan_pago/listado.html')
+        #c = RequestContext(request, {})
+        #return HttpResponse(t.render(c))
+    else:
+        return HttpResponseRedirect("/login")
+    
     if request.method == 'POST':
         data = request.POST
         search_form = SearchForm(data)        
@@ -51,7 +66,15 @@ def consultar_plan_de_pago(request):
 
 # Funcion para consultar el detalle de un cliente.
 def detalle_plan_de_pago(request, plandepago_id):
-    t = loader.get_template('parametros/plan_pago/detalle.html')
+    
+    
+    if request.user.is_authenticated():
+        t = loader.get_template('parametros/plan_pago/detalle.html')
+        #c = RequestContext(request, {})
+        #return HttpResponse(t.render(c))
+    else:
+        return HttpResponseRedirect("/login")
+    
     object_list = PlanDePago.objects.get(pk=plandepago_id)
     message = ''
 
@@ -79,7 +102,15 @@ def detalle_plan_de_pago(request, plandepago_id):
 
 #funcion para agregar planes de pago
 def agregar_plan_de_pago(request):
-    t = loader.get_template('parametros/plan_pago/agregar.html')
+    
+    
+    if request.user.is_authenticated():
+        t = loader.get_template('parametros/plan_pago/agregar.html')
+        #c = RequestContext(request, {})
+        #return HttpResponse(t.render(c))
+    else:
+        return HttpResponseRedirect("/login")
+    
     if request.method == 'POST':
         form = PlanDePagoForm(request.POST)
         if form.is_valid():
@@ -95,6 +126,10 @@ def agregar_plan_de_pago(request):
     return HttpResponse(t.render(c))
 
 def parametros_generales(request):
-    t = loader.get_template('parametros/generales.html')
-    c = RequestContext(request, {})
-    return HttpResponse(t.render(c))
+    
+    if request.user.is_authenticated():
+        t = loader.get_template('parametros/generales.html')
+        c = RequestContext(request, {})
+        return HttpResponse(t.render(c))
+    else:
+        return HttpResponseRedirect("/login")

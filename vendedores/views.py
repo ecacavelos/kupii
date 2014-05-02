@@ -7,13 +7,23 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 # Funcion principal del modulo de vendedores.
 def vendedores(request):
-    t = loader.get_template('vendedores/index.html')
-    c = RequestContext(request, {})
-    return HttpResponse(t.render(c))
+    
+    if request.user.is_authenticated():
+        t = loader.get_template('vendedores/index.html')
+        c = RequestContext(request, {})
+        return HttpResponse(t.render(c))
+    else:
+        return HttpResponseRedirect("/login")
 
 # Funcion para consultar el listado de todas los vendedores.
 def consultar_vendedores(request):
-    t = loader.get_template('vendedores/listado.html')
+    
+    if request.user.is_authenticated():
+        t = loader.get_template('vendedores/listado.html')
+        #c = RequestContext(request, {})
+        #return HttpResponse(t.render(c))
+    else:
+        return HttpResponseRedirect("/login")
     
     object_list = Vendedor.objects.all().order_by('id')
     
@@ -34,7 +44,14 @@ def consultar_vendedores(request):
 
 # Funcion para el detalle de un vendedor: edita o borra un vendedor.
 def detalle_vendedor(request, vendedor_id):
-    t = loader.get_template('vendedores/detalle.html')    
+    
+    
+    if request.user.is_authenticated():
+        t = loader.get_template('vendedores/detalle.html')
+        #c = RequestContext(request, {})
+        #return HttpResponse(t.render(c))
+    else:
+        return HttpResponseRedirect("/login")    
 
     object_list = Vendedor.objects.get(pk=vendedor_id)
     message = ''
@@ -63,7 +80,14 @@ def detalle_vendedor(request, vendedor_id):
 
 # Funcion para agregar un nuevo vendedor.
 def agregar_vendedores(request):
-    t = loader.get_template('vendedores/agregar.html')
+    
+    
+    if request.user.is_authenticated():
+        t = loader.get_template('vendedores/agregar.html')
+        #c = RequestContext(request, {})
+        #return HttpResponse(t.render(c))
+    else:
+        return HttpResponseRedirect("/login")
 
     if request.method == 'POST':
         form = VendedorForm(request.POST)

@@ -6,13 +6,24 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 # Funcion principal del modulo de lotes.
 def lotes(request):
-    t = loader.get_template('lotes/index.html')
-    c = RequestContext(request, {})
-    return HttpResponse(t.render(c))
+    
+    if request.user.is_authenticated():
+        t = loader.get_template('lotes/index.html')
+        c = RequestContext(request, {})
+        return HttpResponse(t.render(c))
+    else:
+        return HttpResponseRedirect("/login") 
 
 # Funcion para consultar el listado de todas las lotes.
 def consultar_lotes(request):
-    t = loader.get_template('lotes/listado.html')
+    
+    
+    if request.user.is_authenticated():
+        t = loader.get_template('lotes/listado.html')
+        #c = RequestContext(request, {})
+        #return HttpResponse(t.render(c))
+    else:
+        return HttpResponseRedirect("/login") 
     
     object_list = Lote.objects.all().order_by( 'id','manzana')
     total_lotes = object_list.count()
@@ -47,7 +58,14 @@ def consultar_lotes(request):
 
 # Funcion para el detalle de una fraccion: edita o borra una fraccion.
 def detalle_lote(request, lote_id):
-    t = loader.get_template('lotes/detalle.html')    
+    
+    
+    if request.user.is_authenticated():
+        t = loader.get_template('lotes/detalle.html')
+        #c = RequestContext(request, {})
+        #return HttpResponse(t.render(c))
+    else:
+        return HttpResponseRedirect("/login")     
 
     object_list = Lote.objects.get(pk=lote_id)
     message = ''
@@ -82,7 +100,15 @@ def detalle_lote(request, lote_id):
 
 # Funcion que detalla las ventas relacionadas a un lote determinado.
 def detalle_ventas_lote(request, venta_id):
-    t = loader.get_template('lotes/detalle_ventas.html')
+    
+    
+    if request.user.is_authenticated():
+        t = loader.get_template('lotes/detalle_ventas.html')
+        #c = RequestContext(request, {})
+        #return HttpResponse(t.render(c))
+    else:
+        return HttpResponseRedirect("/login")  
+    
     try:
         venta = Venta.objects.get(pk=venta_id)
         venta.fecha_de_venta=venta.fecha_de_venta.strftime("%d/%m/%Y")
@@ -96,7 +122,15 @@ def detalle_ventas_lote(request, venta_id):
 
 # Funcion para agregar un nuevo lote.
 def agregar_lotes(request):
-    t = loader.get_template('lotes/agregar2.html')
+    
+    
+    if request.user.is_authenticated():
+        t = loader.get_template('lotes/agregar2.html')
+        #c = RequestContext(request, {})
+        #return HttpResponse(t.render(c))
+    else:
+        return HttpResponseRedirect("/login") 
+    
     message = ""    
 
     if request.method == 'POST':
@@ -124,7 +158,13 @@ def agregar_lotes(request):
 def listar_busqueda_lotes(request):
     
     busqueda = request.POST['busqueda']
-    t = loader.get_template('lotes/listado.html')
+    
+    if request.user.is_authenticated():
+        t = loader.get_template('lotes/listado.html')
+        #c = RequestContext(request, {})
+        #return HttpResponse(t.render(c))
+    else:
+        return HttpResponseRedirect("/login") 
     
     x=str(busqueda)
     fraccion_int = int(x[0:3])

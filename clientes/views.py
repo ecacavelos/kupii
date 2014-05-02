@@ -8,14 +8,23 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 # Funcion principal del modulo de clientes.
 def index(request):
-    t = loader.get_template('clientes/index.html')
-    c = RequestContext(request, {})
-    return HttpResponse(t.render(c))
+    if request.user.is_authenticated():
+        t = loader.get_template('clientes/index.html')
+        c = RequestContext(request, {})
+        return HttpResponse(t.render(c))
+    else:
+        return HttpResponseRedirect("/login")
+    
 
 # Funcion para consultar el listado de todos los clientes.
 def consultar_clientes(request):
-    t = loader.get_template('clientes/listado.html')
-
+    if request.user.is_authenticated():
+        t = loader.get_template('clientes/listado.html')
+        #c = RequestContext(request, {})
+        #return HttpResponse(t.render(c))
+    else:
+        return HttpResponseRedirect("/login")
+    
     if request.method == 'POST':
         data = request.POST
         search_form = SearchForm(data)        
@@ -58,7 +67,13 @@ def consultar_clientes(request):
 
 # Funcion para consultar el detalle de un cliente.
 def detalle_cliente(request, cliente_id):
-    t = loader.get_template('clientes/detalle.html')
+    
+    if request.user.is_authenticated():
+        t = loader.get_template('clientes/detalle.html')
+        #c = RequestContext(request, {})
+        #return HttpResponse(t.render(c))
+    else:
+        return HttpResponseRedirect("/login")
 
     object_list = Cliente.objects.get(pk=cliente_id)
     message = ''
@@ -87,8 +102,14 @@ def detalle_cliente(request, cliente_id):
 
 # Funcion para agregar un nuevo cliente.
 def agregar_clientes(request):
-    t = loader.get_template('clientes/agregar.html')
-
+    
+    if request.user.is_authenticated():
+        t = loader.get_template('clientes/agregar.html')
+        #c = RequestContext(request, {})
+        #return HttpResponse(t.render(c))
+    else:
+        return HttpResponseRedirect("/login")
+    
     if request.method == 'POST':
         form = ClienteForm(request.POST)
         if form.is_valid():
