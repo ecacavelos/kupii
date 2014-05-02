@@ -1,5 +1,4 @@
 {% extends "lotes/base_lotes.html" %}
-
 {% block header_scripts %}
 <script>
 function _cerrar(){
@@ -19,9 +18,7 @@ function buscar(){
 }
 </script>
 {% endblock %}
-
 {% block content %}
-
 <div class="gri16 text-izquierda" id="breadcumb">
 						<a href="/">Inicio</a> <span class="verde-1">></span>  
 						<a href="/propietarios/">Propietarios</a> 
@@ -83,13 +80,13 @@ function buscar(){
 <div class="pagination">
     <span class="step-links">
         {%if object_list.has_previous%}
-        <a href="?page={{ object_list.previous_page_number }}"> Anterior</a>
+        <a href="?page={{ object_list.previous_page_number }}{{ultima_busqueda}}"> Anterior</a>
 		{%endif%}
     	
     	|{{object_list.number}}|
     	
     	{%if object_list.has_next%}
-		<a href="?page={{ object_list.next_page_number }}"> Siguiente</a>
+		<a href="?page={{ object_list.next_page_number }}{{ultima_busqueda}}"> Siguiente</a>
 		{%endif%}
     </span>
 </div>

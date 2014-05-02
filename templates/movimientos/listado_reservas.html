@@ -106,13 +106,13 @@ function desplegar_fecha(){
         <div class="pagination">
     <span class="step-links">
         {%if object_list.has_previous%}
-        <a href="?page={{ object_list.previous_page_number }}"> Anterior</a>
+        <a href="?page={{ object_list.previous_page_number }}{{ultima_busqueda}}"> Anterior</a>
 		{%endif%}
     	
     	|{{object_list.number}}|
     	
     	{%if object_list.has_next%}
-		<a href="?page={{ object_list.next_page_number }}"> Siguiente</a>
+		<a href="?page={{ object_list.next_page_number }}{{ultima_busqueda}}"> Siguiente</a>
 		{%endif%}
     </span>
 </div>
