@@ -1,4 +1,5 @@
 $(document).ready(function() {
+	$('.grid_6').hide();
 	$("#id_lote").keydown(validateLotePre);
 	$("#id_lote").keyup(validateLotePost);
 	$("#id_lote2").keydown(validateLotePre);

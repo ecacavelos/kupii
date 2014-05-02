@@ -8,6 +8,7 @@
 <script type="text/javascript" src="{{ STATIC_URL }}movimientos_recuperacion.js"></script>
 <script type="text/javascript">
 $(document).ready(function() {
+	$('.grid_6').hide();
 	$('#id_fecha').mask('##/##/####');
 	$("#id_fecha").datepicker({ dateFormat: 'dd/mm/yy' });
 	$("#id_fecha").datepicker("setDate", new Date());

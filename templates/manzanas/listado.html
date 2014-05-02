@@ -1,14 +1,17 @@
-{% extends "manzanas/base_manzanas.html" %}
+{% extends "lotes/base_lotes.html" %}
 {% block header_scripts %}
 
 <script type="text/javascript">
+$(document).ready(function() {
+	$("#busqueda").mask("###/###");
+});
 function buscar(){
 	if($("#tipo_busqueda").val()==0){
 		alert("Debe elegir un tipo de busqueda.");
 	}
 	else{
 		if($("#busqueda").val()==""){
-			alert("Debe ingresar un nombre para buscar.");
+			alert("Debe ingresar un nro de manzana para buscar.");
 		}else{
 			$("#frm_busqueda").submit();
 		}
@@ -34,8 +37,8 @@ function buscar(){
 					<div class="grid_6">
   						<form name="frm_busqueda" id="frm_busqueda" method="post" action="/manzanas/listado_busqueda_manzanas/">
   							{% csrf_token %}
-  									
-							<input id="busqueda" type="" name="busqueda" />
+  							<label for="busqueda">Nro. Manzana</label><br>		
+							<input id="busqueda" type="text" name="busqueda" placeholder="Ej: 001/001" />
   							<input name="tabla" type="hidden" value="manzana"/>
   							
   							<input type="button" value="Buscar" onclick="buscar();" class="historico" style="cursor: pointer"/>
@@ -68,15 +71,18 @@ function buscar(){
 {% endfor %}
 <div class="pagination">
     <span class="step-links">
-        {% for num in object_list.paginator.page_range %}
-  		{% ifequal num object_list.number %}
-    	<span class="current"><b>{{ num }}</b></span>
-  		{% else %}
-    	<a href="?page={{ num }}"> {{ num }}</a>
-  		{% endifequal %} 
-{% endfor %}
+        {%if object_list.has_previous%}
+        <a href="?page={{ object_list.previous_page_number }}"> Anterior</a>
+		{%endif%}
+    	P&aacute;gina
+    	|{{object_list.number}}|
+    	
+    	{%if object_list.has_next%}
+		<a href="?page={{ object_list.next_page_number }}"> Siguiente</a>
+		{%endif%}
+        
     </span>
-</div>			
+</div>	
 						</table>
 					</div>
 

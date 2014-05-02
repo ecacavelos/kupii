@@ -523,8 +523,8 @@ def listar_busqueda_personas(request):
 
                 if tipo_busqueda=="nombre":
                     object_list = Cliente.objects.filter(nombres__icontains=busqueda)
-                    if tipo_busqueda=="cedula":
-                        object_list = Cliente.objects.filter(cedula__icontains=busqueda)
+                if tipo_busqueda=="cedula":
+                    object_list = Cliente.objects.filter(cedula__icontains=busqueda)
                            
             if tabla=='propietario':
                 t = loader.get_template('propietarios/listado.html')

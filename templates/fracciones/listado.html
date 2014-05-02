@@ -23,26 +23,37 @@ function buscar(){
 </div>
 <div class="clear"></div>
 
-					<div class="grid_10">
+					<div class="grid_10" style="width: 555px;">
   						<h1>Listado de Fracciones</h1>
 					</div>
 
 					<div class="grid_6">
   						<form name="frm_busqueda" id="frm_busqueda" method="post" action="/fracciones/listado_busqueda_fracciones/">
   							{% csrf_token %}
-  							
-  							<select id="tipo_busqueda" name="tipo_busqueda">
-								<option value="0">Elija una opcion</option>
-								<option value="numero">Numero</option>
-								<option value="propietario">Propietario</option>
-							</select>
+  							<table>
+  								<tr>
+  									<td>
+  										Tipo de b&uacute;squeda:
+  									</td>
   									
+  								</tr>
+  								<tr>
+  									<td>
+  										<select id="tipo_busqueda" name="tipo_busqueda">
+											<option value="0">Elija una opcion</option>
+											<option value="numero">Numero de Fracci&oacute;n</option>
+											<option value="propietario">Nombre de Propietario</option>
+										</select>
+  									</td>
+  									<td>
+  										<input id="busqueda" type="text" name="busqueda" />				
+  									</td>
+  									<td>
+  										<input type="button" value="Buscar" onclick="buscar();" class="historico" style="cursor: pointer"/>
+  									</td>
+  								</tr>
+  							</table>
   							
-							
-							<input id="busqueda" type="" name="busqueda" />				
-  							
-  							 							
-  							<input type="button" value="Buscar" onclick="buscar();" class="historico" style="cursor: pointer"/>
   						</form>
 					</div>
 
@@ -80,7 +91,7 @@ function buscar(){
     	{%if object_list.has_previous%}
         <a href="?page={{ object_list.previous_page_number }}"> Anterior</a>
 		{%endif%}
-    	
+    	P&aacute;gina
     	|{{object_list.number}}|
     	
     	{%if object_list.has_next%}

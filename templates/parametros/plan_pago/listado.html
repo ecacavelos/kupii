@@ -1,5 +1,11 @@
 {% extends "lotes/base_lotes.html" %}
-
+{% block header_scripts %}
+<script type="text/javascript">
+$(document).ready(function(){
+	$( ".grid_6" ).hide();
+});
+</script>
+{%endblock%}
 {% block content %}
 <div class="gri16 text-izquierda" id="breadcumb">
 						<a href="/">Inicio</a> 
@@ -48,7 +54,7 @@
         {%if object_list.has_previous%}
         <a href="?page={{ object_list.previous_page_number }}"> Anterior</a>
 		{%endif%}
-    	
+    	P&aacute;gina
     	|{{object_list.number}}|
     	
     	{%if object_list.has_next%}

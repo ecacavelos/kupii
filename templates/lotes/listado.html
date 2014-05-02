@@ -8,7 +8,7 @@ function buscar(){
 	}
 	else{
 		if($("#busqueda").val()==""){
-			alert("Debe ingresar un nombre para buscar.");
+			alert("Debe ingresar un nro de lote para buscar.");
 		}else{
 			$("#frm_busqueda").submit();
 		}
@@ -34,11 +34,28 @@ function buscar(){
 					<div class="grid_6">
   						<form name="frm_busqueda" id="frm_busqueda" method="post" action="/lotes/listado_busqueda_lotes/">
   							{% csrf_token %}
-  									
-							<input id="busqueda" type="" name="busqueda" />
-  							<input name="tabla" type="hidden" value="lote"/>
-  							
-  							<input type="button" value="Buscar" onclick="buscar();" class="historico" style="cursor: pointer"/>
+  							<table>
+  								<tr>
+  									<tr>
+  										<td>
+  											Nro de Lote:
+  										</td>
+  										<td id="campo_busqueda">
+  											
+  										</td>
+  									</tr>
+  									<td>
+  										<input id="busqueda" type="" name="busqueda" placeholder="Ej: 001/001/0001"/>
+  									</td>
+  									<td>
+  										<input type="button" value="Buscar" onclick="buscar();" class="historico" style="cursor: pointer"/>
+  									</td>
+  								</tr>
+  								
+  								<input name="tabla" type="hidden" value="lote"/>
+  								 
+  							</table>		
+							
 						</form>
 					</div>
 
@@ -79,7 +96,7 @@ function buscar(){
         {%if object_list.has_previous%}
         <a href="?page={{ object_list.previous_page_number }}"> Anterior</a>
 		{%endif%}
-    	
+    	P&aacute;gina
     	|{{object_list.number}}|
     	
     	{%if object_list.has_next%}
