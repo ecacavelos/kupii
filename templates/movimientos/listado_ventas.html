@@ -82,13 +82,49 @@ function desplegar_fecha(){
 					<div id="listado-item-lote">
 						<table width="50%" border="1" cellpadding="0" cellspacing="0" class="listado-ventas" align="center">
 							<th>Venta Nro</th><th>Lote Nro</th><th>Fracci&oacute;n</th><th>Cliente</th><th>Vendedor</th><th>Fecha de Venta</th><th>Precio Final de Venta</th>
+{%if busqueda == 'cliente'%}
+{% for hw in object_list %}
+	{%for lot in hw%}
+		<tr>
+			<td>
+				<a href="/lotes/listado/ventas/{{ lot.id }}/">{{lot.id}} <strong>(Ver Detalles)</strong></a>
+			</td>
+			<td>
+				{{lot.lote}}				
+			</td>
+			<td>
+				 {% for f in fraccion %}
+					{% if forloop.counter == forloop.parentloop.counter %}
+						{{ f.id}}
+					{% endif %}
+				 {% endfor %}				
+			</td>
+			<td>
+			    {{lot.cliente}}
+			</td>
+			<td>
+			    {{lot.vendedor}}
+			</td>			
+			<td>
+				{{lot.fecha_de_venta}}
+			</td>
+			<td>
+				{{lot.precio_final_de_venta}}
+			</td>
+			
+		</tr>
+{%endfor%}
+{% endfor %}
+{%else%}
 {% for hw in object_list %}
 		<tr>
 			<td>
 				<a href="/lotes/listado/ventas/{{ hw.id }}/">{{hw.id}} <strong>(Ver Detalles)</strong></a>
 			</td>
 			<td>
+				
 				{{hw.lote}}
+				
 			</td>
 			<td>
 				 {% for f in fraccion %}
@@ -113,6 +149,7 @@ function desplegar_fecha(){
 		</tr>
 
 {% endfor %}
+{%endif%}
 <div class="pagination">
     <span class="step-links">
        <div class="pagination">

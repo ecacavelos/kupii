@@ -671,18 +671,33 @@ def listar_busqueda_ventas(request):
                 return HttpResponse(t.render(c))
             
             if tipo_busqueda=='cliente':
-                object_list = Cliente.objects.filter(nombres__icontains=busqueda)    
+                object_list = Cliente.objects.filter(nombres__icontains=busqueda)
+                venta=[]
+                
+                cantVentas=0
+                cantClientes=0    
                 for i in object_list:
-                    venta=Venta.objects.filter(cliente_id=i.id)
+                    
+                    ventaAux=list(Venta.objects.filter(cliente_id=i.id))
+                    if ventaAux:
+                        venta.append(ventaAux)
+                        
+                    
+                        
                 f = []
-                a = len(object_list)    
+                a = len(object_list)
+                cantClientes = len(venta)
+                    
                 if a > 0:
-                    for i in venta:
-                        lote = Lote.objects.get(pk=i.lote_id)
-                        manzana = Manzana.objects.get(pk=lote.manzana_id)
-                        f.append(Fraccion.objects.get(pk=manzana.fraccion_id))
-                        i.fecha_de_venta = i.fecha_de_venta.strftime("%d/%m/%Y")
-                        i.precio_final_de_venta = str('{:,}'.format(i.precio_final_de_venta)).replace(",", ".")
+                    for c in range (0,cantClientes):
+                        cantVentas= len(venta[c])
+                        for v in range (0,cantVentas):
+                            lote = Lote.objects.get(pk=venta[c][v].lote_id)
+                            manzana = Manzana.objects.get(pk=lote.manzana_id)
+                            f.append(Fraccion.objects.get(pk=manzana.fraccion_id))
+                            venta[c][v].fecha_de_venta = venta[c][v].fecha_de_venta.strftime("%d/%m/%Y")
+                            venta[c][v].precio_final_de_venta = str('{:,}'.format(venta[c][v].precio_final_de_venta)).replace(",", ".")
+                        
                
                     ultima_busqueda = "&tabla=&busqueda="+busqueda+"&tipo_busqueda="+tipo_busqueda      
                     paginator=Paginator(venta,15)
@@ -698,6 +713,7 @@ def listar_busqueda_ventas(request):
                         'object_list': lista,
                         'fraccion': f,
                         'ultima_busqueda': ultima_busqueda,
+                        'busqueda': 'cliente',
                     })
                 else:
                     c = RequestContext(request, {
@@ -778,7 +794,8 @@ def listar_busqueda_ventas(request):
                         'fraccion': f,        
                     })
                 return HttpResponse(t.render(c))  
-        except:
+        except Exception, error:
+            print error
             return HttpResponseServerError("Error en la ejecucion") 
     else:
         try:
