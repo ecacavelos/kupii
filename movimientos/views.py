@@ -673,19 +673,25 @@ def listar_busqueda_ventas(request):
             if tipo_busqueda=='cliente':
                 object_list = Cliente.objects.filter(nombres__icontains=busqueda)    
                 venta=[]
+                cantVentas=0
+                cantClientes=0
                 for i in object_list:
-                    venta.append(Venta.objects.filter(cliente_id=i.id))
+                    ventaAux=list(Venta.objects.filter(cliente_id=i.id))
+                    if ventaAux:
+                        venta.append(ventaAux)
                 f = []
                 
                 a = len(object_list)
-                b=len(venta)    
+                cantClientes=len(venta)    
                 if a > 0:
-                    for i in venta:
-                        lote = Lote.objects.get(pk=i.lote_id)
-                        manzana = Manzana.objects.get(pk=lote.manzana_id)
-                        f.append(Fraccion.objects.get(pk=manzana.fraccion_id))
-                        i.fecha_de_venta = i.fecha_de_venta.strftime("%d/%m/%Y")
-                        i.precio_final_de_venta = str('{:,}'.format(i.precio_final_de_venta)).replace(",", ".")
+                    for c in range(0,cantClientes):
+                        cantVentas=len(venta[c])
+                        for v in range (0,cantVentas):
+                            lote = Lote.objects.get(pk=venta[c][v].lote_id)
+                            manzana = Manzana.objects.get(pk=lote.manzana_id)
+                            f.append(Fraccion.objects.get(pk=manzana.fraccion_id))
+                            venta[c][v].fecha_de_venta = venta[c][v].fecha_de_venta.strftime("%d/%m/%Y")
+                            venta[c][v].precio_final_de_venta = str('{:,}'.format(venta[c][v].precio_final_de_venta)).replace(",", ".")
                
                     ultima_busqueda = "&tabla=&busqueda="+busqueda+"&tipo_busqueda="+tipo_busqueda      
                     paginator=Paginator(venta,15)
@@ -701,6 +707,7 @@ def listar_busqueda_ventas(request):
                         'object_list': lista,
                         'fraccion': f,
                         'ultima_busqueda': ultima_busqueda,
+                        'busqueda': 'cliente',
                     })
                 else:
                     c = RequestContext(request, {
@@ -711,18 +718,27 @@ def listar_busqueda_ventas(request):
         
             if tipo_busqueda=='vendedor':
                 object_list = Vendedor.objects.filter(nombres__icontains=busqueda)    
+                venta=[]
+                cantVentas=0
+                cantVendedores=0
                 for i in object_list:
-                    venta=Venta.objects.filter(vendedor_id=i.id)
+                    ventaAux=list(Venta.objects.filter(vendedor_id=i.id))
+                    if ventaAux:
+                        venta.append(ventaAux)
                 f = []
-                a = len(object_list)    
+                
+                a = len(object_list)
+                cantVentas=len(venta)    
                 if a > 0:
-                    for i in venta:
-                        lote = Lote.objects.get(pk=i.lote_id)
-                        manzana = Manzana.objects.get(pk=lote.manzana_id)
-                        f.append(Fraccion.objects.get(pk=manzana.fraccion_id))
-                        i.fecha_de_venta = i.fecha_de_venta.strftime("%d/%m/%Y")
-                        i.precio_final_de_venta = str('{:,}'.format(i.precio_final_de_venta)).replace(",", ".")
-           
+                    for c in range(0,cantVentas):
+                        cantVentas=len(venta[c])
+                        for v in range (0,cantVentas):
+                            lote = Lote.objects.get(pk=venta[c][v].lote_id)
+                            manzana = Manzana.objects.get(pk=lote.manzana_id)
+                            f.append(Fraccion.objects.get(pk=manzana.fraccion_id))
+                            venta[c][v].fecha_de_venta = venta[c][v].fecha_de_venta.strftime("%d/%m/%Y")
+                            venta[c][v].precio_final_de_venta = str('{:,}'.format(venta[c][v].precio_final_de_venta)).replace(",", ".")
+               
                     ultima_busqueda = "&tabla=&busqueda="+busqueda+"&tipo_busqueda="+tipo_busqueda      
                     paginator=Paginator(venta,15)
                     page=request.GET.get('page')
@@ -737,13 +753,14 @@ def listar_busqueda_ventas(request):
                         'object_list': lista,
                         'fraccion': f,
                         'ultima_busqueda': ultima_busqueda,
+                        'busqueda': 'cliente',
                     })
                 else:
                     c = RequestContext(request, {
                         'object_list': object_list,
                         'fraccion': f,
                     })
-                return HttpResponse(t.render(c))
+                return HttpResponse(t.render(c))     
                      
             if tipo_busqueda=='fecha':
                 fecha_venta_parsed = datetime.strptime(busqueda, "%d/%m/%Y").date()
@@ -846,17 +863,26 @@ def listar_busqueda_ventas(request):
             
             if tipo_busqueda=='cliente':
                 object_list = Cliente.objects.filter(nombres__icontains=busqueda)    
+                venta=[]
+                cantVentas=0
+                cantClientes=0
                 for i in object_list:
-                    venta=Venta.objects.filter(cliente_id=i.id)
+                    ventaAux=list(Venta.objects.filter(cliente_id=i.id))
+                    if ventaAux:
+                        venta.append(ventaAux)
                 f = []
-                a = len(object_list)    
+                
+                a = len(object_list)
+                cantClientes=len(venta)    
                 if a > 0:
-                    for i in venta:
-                        lote = Lote.objects.get(pk=i.lote_id)
-                        manzana = Manzana.objects.get(pk=lote.manzana_id)
-                        f.append(Fraccion.objects.get(pk=manzana.fraccion_id))
-                        i.fecha_de_venta = i.fecha_de_venta.strftime("%d/%m/%Y")
-                        i.precio_final_de_venta = str('{:,}'.format(i.precio_final_de_venta)).replace(",", ".")
+                    for c in range(0,cantClientes):
+                        cantVentas=len(venta[c])
+                        for v in range (0,cantVentas):
+                            lote = Lote.objects.get(pk=venta[c][v].lote_id)
+                            manzana = Manzana.objects.get(pk=lote.manzana_id)
+                            f.append(Fraccion.objects.get(pk=manzana.fraccion_id))
+                            venta[c][v].fecha_de_venta = venta[c][v].fecha_de_venta.strftime("%d/%m/%Y")
+                            venta[c][v].precio_final_de_venta = str('{:,}'.format(venta[c][v].precio_final_de_venta)).replace(",", ".")
                
                     ultima_busqueda = "&tabla=&busqueda="+busqueda+"&tipo_busqueda="+tipo_busqueda      
                     paginator=Paginator(venta,15)
@@ -872,28 +898,38 @@ def listar_busqueda_ventas(request):
                         'object_list': lista,
                         'fraccion': f,
                         'ultima_busqueda': ultima_busqueda,
+                        'busqueda': 'cliente',
                     })
                 else:
                     c = RequestContext(request, {
                         'object_list': object_list,
                         'fraccion': f,
                     })
-                return HttpResponse(t.render(c))     
+                return HttpResponse(t.render(c))        
         
             if tipo_busqueda=='vendedor':
                 object_list = Vendedor.objects.filter(nombres__icontains=busqueda)    
+                venta=[]
+                cantVentas=0
+                cantVendedores=0
                 for i in object_list:
-                    venta=Venta.objects.filter(vendedor_id=i.id)
+                    ventaAux=list(Venta.objects.filter(vendedor_id=i.id))
+                    if ventaAux:
+                        venta.append(ventaAux)
                 f = []
-                a = len(object_list)    
+                
+                a = len(object_list)
+                cantVentas=len(venta)    
                 if a > 0:
-                    for i in venta:
-                        lote = Lote.objects.get(pk=i.lote_id)
-                        manzana = Manzana.objects.get(pk=lote.manzana_id)
-                        f.append(Fraccion.objects.get(pk=manzana.fraccion_id))
-                        i.fecha_de_venta = i.fecha_de_venta.strftime("%d/%m/%Y")
-                        i.precio_final_de_venta = str('{:,}'.format(i.precio_final_de_venta)).replace(",", ".")
-           
+                    for c in range(0,cantVentas):
+                        cantVentas=len(venta[c])
+                        for v in range (0,cantVentas):
+                            lote = Lote.objects.get(pk=venta[c][v].lote_id)
+                            manzana = Manzana.objects.get(pk=lote.manzana_id)
+                            f.append(Fraccion.objects.get(pk=manzana.fraccion_id))
+                            venta[c][v].fecha_de_venta = venta[c][v].fecha_de_venta.strftime("%d/%m/%Y")
+                            venta[c][v].precio_final_de_venta = str('{:,}'.format(venta[c][v].precio_final_de_venta)).replace(",", ".")
+               
                     ultima_busqueda = "&tabla=&busqueda="+busqueda+"&tipo_busqueda="+tipo_busqueda      
                     paginator=Paginator(venta,15)
                     page=request.GET.get('page')
@@ -908,13 +944,14 @@ def listar_busqueda_ventas(request):
                         'object_list': lista,
                         'fraccion': f,
                         'ultima_busqueda': ultima_busqueda,
+                        'busqueda': 'cliente',
                     })
                 else:
                     c = RequestContext(request, {
                         'object_list': object_list,
                         'fraccion': f,
                     })
-                return HttpResponse(t.render(c))
+                return HttpResponse(t.render(c))     
                      
             if tipo_busqueda=='fecha':
                 fecha_venta_parsed = datetime.strptime(busqueda, "%d/%m/%Y").date()
@@ -1018,19 +1055,31 @@ def listar_busqueda_pagos(request):
  
             if tipo_busqueda=='cliente':
                 object_list = Cliente.objects.filter(nombres__icontains=busqueda)    
+                pago=[]
+                cantPagos=0
+                cantClientes=0
                 for i in object_list:
-                    venta=PagoDeCuotas.objects.filter(cliente_id=i.id)
+                    pagoAux=list(PagoDeCuotas.objects.filter(cliente_id=i.id))
+                    if pagoAux:
+                        pago.append(pagoAux)
                 f = []
-                a = len(object_list)    
+                
+                a = len(object_list)
+                cantClientes=len(pago)    
                 if a > 0:
-                    for i in venta:
-                        i.fecha_de_pago=i.fecha_de_pago.strftime("%d/%m/%Y")
-                        i.total_de_cuotas=str('{:,}'.format(i.total_de_cuotas)).replace(",", ".")
-                        i.total_de_mora=str('{:,}'.format(i.total_de_mora)).replace(",", ".")
-                        i.total_de_pago=str('{:,}'.format(i.total_de_pago)).replace(",", ".")
-                        
+                    for c in range(0,cantClientes):
+                        cantPagos=len(pago[c])
+                        for v in range (0,cantPagos):
+                            lote = Lote.objects.get(pk=pago[c][v].lote_id)
+                            manzana = Manzana.objects.get(pk=lote.manzana_id)
+                            f.append(Fraccion.objects.get(pk=manzana.fraccion_id))
+                            pago[c][v].fecha_de_pago = pago[c][v].fecha_de_pago.strftime("%d/%m/%Y")
+                            pago[c][v].total_de_cuotas=str('{:,}'.format(pago[c][v].total_de_cuotas)).replace(",", ".")
+                            pago[c][v].total_de_mora=str('{:,}'.format(pago[c][v].total_de_mora)).replace(",", ".")
+                            pago[c][v].total_de_pago=str('{:,}'.format(pago[c][v].total_de_pago)).replace(",", ".")             
+                    
                     ultima_busqueda = "&tabla=&busqueda="+busqueda+"&tipo_busqueda="+tipo_busqueda      
-                    paginator=Paginator(venta,15)
+                    paginator=Paginator(pago,15)
                     page=request.GET.get('page')
                     try:
                         lista=paginator.page(page)
@@ -1041,13 +1090,16 @@ def listar_busqueda_pagos(request):
             
                     c = RequestContext(request, {
                         'object_list': lista,
-                        'ultima_busqueda': ultima_busqueda,    
+                        'fraccion': f,
+                        'ultima_busqueda': ultima_busqueda,
+                        'busqueda': 'cliente',
                     })
                 else:
                     c = RequestContext(request, {
-                        'object_list': object_list,                                
+                        'object_list': object_list,
+                        'fraccion': f,
                     })
-                return HttpResponse(t.render(c))  
+                return HttpResponse(t.render(c))         
                     
             if tipo_busqueda=='fecha':
                 
@@ -1149,19 +1201,31 @@ def listar_busqueda_pagos(request):
  
             if tipo_busqueda=='cliente':
                 object_list = Cliente.objects.filter(nombres__icontains=busqueda)    
+                pago=[]
+                cantPagos=0
+                cantClientes=0
                 for i in object_list:
-                    venta=PagoDeCuotas.objects.filter(cliente_id=i.id)
+                    pagoAux=list(PagoDeCuotas.objects.filter(cliente_id=i.id))
+                    if pagoAux:
+                        pago.append(pagoAux)
                 f = []
-                a = len(object_list)    
+                
+                a = len(object_list)
+                cantClientes=len(pago)    
                 if a > 0:
-                    for i in venta:
-                        i.fecha_de_pago=i.fecha_de_pago.strftime("%d/%m/%Y")
-                        i.total_de_cuotas=str('{:,}'.format(i.total_de_cuotas)).replace(",", ".")
-                        i.total_de_mora=str('{:,}'.format(i.total_de_mora)).replace(",", ".")
-                        i.total_de_pago=str('{:,}'.format(i.total_de_pago)).replace(",", ".")
-               
+                    for c in range(0,cantClientes):
+                        cantPagos=len(pago[c])
+                        for v in range (0,cantPagos):
+                            lote = Lote.objects.get(pk=pago[c][v].lote_id)
+                            manzana = Manzana.objects.get(pk=lote.manzana_id)
+                            f.append(Fraccion.objects.get(pk=manzana.fraccion_id))
+                            pago[c][v].fecha_de_pago = pago[c][v].fecha_de_pago.strftime("%d/%m/%Y")
+                            pago[c][v].total_de_cuotas=str('{:,}'.format(pago[c][v].total_de_cuotas)).replace(",", ".")
+                            pago[c][v].total_de_mora=str('{:,}'.format(pago[c][v].total_de_mora)).replace(",", ".")
+                            pago[c][v].total_de_pago=str('{:,}'.format(pago[c][v].total_de_pago)).replace(",", ".")             
+                    
                     ultima_busqueda = "&tabla=&busqueda="+busqueda+"&tipo_busqueda="+tipo_busqueda      
-                    paginator=Paginator(venta,15)
+                    paginator=Paginator(pago,15)
                     page=request.GET.get('page')
                     try:
                         lista=paginator.page(page)
@@ -1172,14 +1236,16 @@ def listar_busqueda_pagos(request):
             
                     c = RequestContext(request, {
                         'object_list': lista,
+                        'fraccion': f,
                         'ultima_busqueda': ultima_busqueda,
+                        'busqueda': 'cliente',
                     })
                 else:
                     c = RequestContext(request, {
                         'object_list': object_list,
-                        'fraccion': f,        
+                        'fraccion': f,
                     })
-                return HttpResponse(t.render(c))  
+                return HttpResponse(t.render(c))         
                     
             if tipo_busqueda=='fecha':
                 
@@ -1282,17 +1348,27 @@ def listar_busqueda_reservas(request):
             
             if tipo_busqueda=='cliente':
                 object_list = Cliente.objects.filter(nombres__icontains=busqueda)    
+                res=[]
+                cantRes=0
+                cantClientes=0
                 for i in object_list:
-                    res=Reserva.objects.filter(cliente_id=i.id)
+                    resAux=list(Reserva.objects.filter(cliente_id=i.id))
+                    if resAux:
+                        res.append(resAux)
                 f = []
-                a = len(object_list)    
+                
+                a = len(object_list)
+                cantClientes=len(res)    
                 if a > 0:
-                    for i in res:
-                        i.fecha_de_reserva=i.fecha_de_reserva.strftime("%d/%m/%Y")
-                        lote = Lote.objects.get(pk=i.lote_id)
-                        manzana = Manzana.objects.get(pk=lote.manzana_id)
-                        f.append(Fraccion.objects.get(pk=manzana.fraccion_id))
-            
+                    for c in range(0,cantClientes):
+                        cantRes=len(res[c])
+                        for v in range (0,cantRes):
+                            lote = Lote.objects.get(pk=res[c][v].lote_id)
+                            manzana = Manzana.objects.get(pk=lote.manzana_id)
+                            f.append(Fraccion.objects.get(pk=manzana.fraccion_id))
+                            res[c][v].fecha_de_reserva = res[c][v].fecha_de_reserva.strftime("%d/%m/%Y")
+                            
+               
                     ultima_busqueda = "&tabla=&busqueda="+busqueda+"&tipo_busqueda="+tipo_busqueda      
                     paginator=Paginator(res,15)
                     page=request.GET.get('page')
@@ -1302,18 +1378,19 @@ def listar_busqueda_reservas(request):
                         lista=paginator.page(1)
                     except EmptyPage:
                         lista=paginator.page(paginator.num_pages)
-                
+            
                     c = RequestContext(request, {
                         'object_list': lista,
                         'fraccion': f,
                         'ultima_busqueda': ultima_busqueda,
+                        'busqueda': 'cliente',
                     })
                 else:
                     c = RequestContext(request, {
                         'object_list': object_list,
-                       'fraccion': f,        
-                })  
-                return HttpResponse(t.render(c))
+                        'fraccion': f,
+                    })
+                return HttpResponse(t.render(c))     
             
             if tipo_busqueda=='fecha':
                 fecha_reserva_parsed = datetime.strptime(busqueda, "%d/%m/%Y").date()
@@ -1415,17 +1492,28 @@ def listar_busqueda_reservas(request):
             
             if tipo_busqueda=='cliente':
                 object_list = Cliente.objects.filter(nombres__icontains=busqueda)    
+                res=[]
+                cantRes=0
+                cantClientes=0
                 for i in object_list:
-                    res=Reserva.objects.filter(cliente_id=i.id)
+                    resAux=list(Reserva.objects.filter(cliente_id=i.id))
+                    if resAux:
+                        res.append(resAux)
                 f = []
-                a = len(object_list)    
+                
+                a = len(object_list)
+                cantClientes=len(res)    
                 if a > 0:
-                    for i in res:
-                        i.fecha_de_reserva=i.fecha_de_reserva.strftime("%d/%m/%Y")
-                        lote = Lote.objects.get(pk=i.lote_id)
-                        manzana = Manzana.objects.get(pk=lote.manzana_id)
-                        f.append(Fraccion.objects.get(pk=manzana.fraccion_id))
-            
+                    for c in range(0,cantClientes):
+                        cantRes=len(res[c])
+                        for v in range (0,cantRes):
+                            lote = Lote.objects.get(pk=res[c][v].lote_id)
+                            manzana = Manzana.objects.get(pk=lote.manzana_id)
+                            f.append(Fraccion.objects.get(pk=manzana.fraccion_id))
+                            res[c][v].fecha_de_reserva = res[c][v].fecha_de_reserva.strftime("%d/%m/%Y")
+                            
+                            
+               
                     ultima_busqueda = "&tabla=&busqueda="+busqueda+"&tipo_busqueda="+tipo_busqueda      
                     paginator=Paginator(res,15)
                     page=request.GET.get('page')
@@ -1435,18 +1523,19 @@ def listar_busqueda_reservas(request):
                         lista=paginator.page(1)
                     except EmptyPage:
                         lista=paginator.page(paginator.num_pages)
-                
+            
                     c = RequestContext(request, {
                         'object_list': lista,
                         'fraccion': f,
                         'ultima_busqueda': ultima_busqueda,
+                        'busqueda': 'cliente',
                     })
                 else:
                     c = RequestContext(request, {
                         'object_list': object_list,
-                       'fraccion': f,        
-                })  
-                return HttpResponse(t.render(c))
+                        'fraccion': f,
+                    })
+                return HttpResponse(t.render(c))  
             
             if tipo_busqueda=='fecha':
                 fecha_reserva_parsed = datetime.strptime(busqueda, "%d/%m/%Y").date()
@@ -1595,14 +1684,24 @@ def listar_busqueda_cambios(request):
             
             if tipo_busqueda=='cliente':
                 object_list = Cliente.objects.filter(nombres__icontains=busqueda)    
+                cambio=[]
+                cantCambios=0
+                cantClientes=0
                 for i in object_list:
-                    cambio=CambioDeLotes.objects.filter(cliente_id=i.id)
-                a = len(object_list)    
+                    cambioAux=list(CambioDeLotes.objects.filter(cliente_id=i.id))
+                    if cambioAux:
+                        cambio.append(cambioAux)
+                f = []
+                
+                a = len(object_list)
+                cantClientes=len(cambio)    
                 if a > 0:
-                    for i in cambio:
-                        i.fecha_de_cambio=i.fecha_de_cambio.strftime("%d/%m/%Y")
-                              
-                    ultima_busqueda = "&tabla=&busqueda="+busqueda+"&tipo_busqueda="+tipo_busqueda                  
+                    for c in range(0,cantClientes):
+                        cantCambios=len(cambio[c])
+                        for v in range (0,cantCambios):
+                            cambio[c][v].fecha_de_cambio = cambio[c][v].fecha_de_cambio.strftime("%d/%m/%Y")
+                                           
+                    ultima_busqueda = "&tabla=&busqueda="+busqueda+"&tipo_busqueda="+tipo_busqueda      
                     paginator=Paginator(cambio,15)
                     page=request.GET.get('page')
                     try:
@@ -1614,13 +1713,17 @@ def listar_busqueda_cambios(request):
             
                     c = RequestContext(request, {
                         'object_list': lista,
+                        'fraccion': f,
                         'ultima_busqueda': ultima_busqueda,
+                        'busqueda': 'cliente',
                     })
                 else:
                     c = RequestContext(request, {
-                        'object_list': object_list,       
+                        'object_list': object_list,
+                        'fraccion': f,
                     })
-                return HttpResponse(t.render(c))  
+                return HttpResponse(t.render(c))       
+           
                 
             if tipo_busqueda=='fecha':
                 fecha_cambio_parsed = datetime.strptime(busqueda, "%d/%m/%Y").date()
@@ -1663,14 +1766,24 @@ def listar_busqueda_cambios(request):
             
             if tipo_busqueda=='cliente':
                 object_list = Cliente.objects.filter(nombres__icontains=busqueda)    
+                cambio=[]
+                cantCambios=0
+                cantClientes=0
                 for i in object_list:
-                    cambio=CambioDeLotes.objects.filter(cliente_id=i.id)
-                a = len(object_list)    
+                    cambioAux=list(CambioDeLotes.objects.filter(cliente_id=i.id))
+                    if cambioAux:
+                        cambio.append(cambioAux)
+                f = []
+                
+                a = len(object_list)
+                cantClientes=len(cambio)    
                 if a > 0:
-                    for i in cambio:
-                        i.fecha_de_cambio=i.fecha_de_cambio.strftime("%d/%m/%Y")
-                              
-                    ultima_busqueda = "&tabla=&busqueda="+busqueda+"&tipo_busqueda="+tipo_busqueda                  
+                    for c in range(0,cantClientes):
+                        cantCambios=len(cambio[c])
+                        for v in range (0,cantCambios):
+                            cambio[c][v].fecha_de_cambio = cambio[c][v].fecha_de_cambio.strftime("%d/%m/%Y")
+                                           
+                    ultima_busqueda = "&tabla=&busqueda="+busqueda+"&tipo_busqueda="+tipo_busqueda      
                     paginator=Paginator(cambio,15)
                     page=request.GET.get('page')
                     try:
@@ -1682,13 +1795,16 @@ def listar_busqueda_cambios(request):
             
                     c = RequestContext(request, {
                         'object_list': lista,
+                        'fraccion': f,
                         'ultima_busqueda': ultima_busqueda,
+                        'busqueda': 'cliente',
                     })
                 else:
                     c = RequestContext(request, {
-                        'object_list': object_list,       
+                        'object_list': object_list,
+                        'fraccion': f,
                     })
-                return HttpResponse(t.render(c))  
+                return HttpResponse(t.render(c))      
                 
             if tipo_busqueda=='fecha':
                 fecha_cambio_parsed = datetime.strptime(busqueda, "%d/%m/%Y").date()
@@ -1785,15 +1901,26 @@ def listar_busqueda_recuperacion(request):
                 
             if tipo_busqueda=='cliente':
                 object_list = Cliente.objects.filter(nombres__icontains=busqueda)    
+                rec=[]
+                cantRec=0
+                cantClientes=0
                 for i in object_list:
-                    res=RecuperacionDeLotes.objects.filter(cliente_id=i.id)
-                a = len(object_list)    
+                    recAux=list(RecuperacionDeLotes.objects.filter(cliente_id=i.id))
+                    if recAux:
+                        rec.append(recAux)
+                f = []
+                
+                a = len(object_list)
+                cantClientes=len(rec)    
                 if a > 0:
-                    for i in res:
-                        i.fecha_de_recuperacion=i.fecha_de_recuperacion.strftime("%d/%m/%Y")
-                        
-                    ultima_busqueda = "&tabla=&busqueda="+busqueda+"&tipo_busqueda="+tipo_busqueda        
-                    paginator=Paginator(res,15)
+                    for c in range(0,cantClientes):
+                        cantRec=len(rec[c])
+                        for v in range (0,cantRec):
+                            rec[c][v].fecha_de_recuperacion = rec[c][v].fecha_de_recuperacion.strftime("%d/%m/%Y")
+                            
+               
+                    ultima_busqueda = "&tabla=&busqueda="+busqueda+"&tipo_busqueda="+tipo_busqueda      
+                    paginator=Paginator(rec,15)
                     page=request.GET.get('page')
                     try:
                         lista=paginator.page(page)
@@ -1801,16 +1928,19 @@ def listar_busqueda_recuperacion(request):
                         lista=paginator.page(1)
                     except EmptyPage:
                         lista=paginator.page(paginator.num_pages)
-                
+            
                     c = RequestContext(request, {
                         'object_list': lista,
+                        'fraccion': f,
                         'ultima_busqueda': ultima_busqueda,
+                        'busqueda': 'cliente',
                     })
                 else:
                     c = RequestContext(request, {
                         'object_list': object_list,
+                        'fraccion': f,
                     })
-                return HttpResponse(t.render(c))  
+                return HttpResponse(t.render(c))     
             
             if tipo_busqueda=='fecha':
                 fecha_recuperacion_parsed = datetime.strptime(busqueda, "%d/%m/%Y").date()
@@ -1904,15 +2034,26 @@ def listar_busqueda_recuperacion(request):
                 
             if tipo_busqueda=='cliente':
                 object_list = Cliente.objects.filter(nombres__icontains=busqueda)    
+                rec=[]
+                cantRec=0
+                cantClientes=0
                 for i in object_list:
-                    res=RecuperacionDeLotes.objects.filter(cliente_id=i.id)
-                a = len(object_list)    
+                    recAux=list(RecuperacionDeLotes.objects.filter(cliente_id=i.id))
+                    if recAux:
+                        rec.append(recAux)
+                f = []
+                
+                a = len(object_list)
+                cantClientes=len(rec)    
                 if a > 0:
-                    for i in res:
-                        i.fecha_de_recuperacion=i.fecha_de_recuperacion.strftime("%d/%m/%Y")
-                        
-                    ultima_busqueda = "&tabla=&busqueda="+busqueda+"&tipo_busqueda="+tipo_busqueda        
-                    paginator=Paginator(res,15)
+                    for c in range(0,cantClientes):
+                        cantRec=len(rec[c])
+                        for v in range (0,cantRec):
+                            rec[c][v].fecha_de_recuperacion = rec[c][v].fecha_de_recuperacion.strftime("%d/%m/%Y")
+                            
+               
+                    ultima_busqueda = "&tabla=&busqueda="+busqueda+"&tipo_busqueda="+tipo_busqueda      
+                    paginator=Paginator(rec,15)
                     page=request.GET.get('page')
                     try:
                         lista=paginator.page(page)
@@ -1920,16 +2061,19 @@ def listar_busqueda_recuperacion(request):
                         lista=paginator.page(1)
                     except EmptyPage:
                         lista=paginator.page(paginator.num_pages)
-                
+            
                     c = RequestContext(request, {
                         'object_list': lista,
+                        'fraccion': f,
                         'ultima_busqueda': ultima_busqueda,
+                        'busqueda': 'cliente',
                     })
                 else:
                     c = RequestContext(request, {
                         'object_list': object_list,
+                        'fraccion': f,
                     })
-                return HttpResponse(t.render(c))  
+                return HttpResponse(t.render(c))    
             
             if tipo_busqueda=='fecha':
                 fecha_recuperacion_parsed = datetime.strptime(busqueda, "%d/%m/%Y").date()
