@@ -195,10 +195,7 @@ def listar_busqueda_lotes(request):
     })
     return HttpResponse(t.render(c))
 
-    
-        
-   
-    
+
    
         
          

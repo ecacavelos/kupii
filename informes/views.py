@@ -1,6 +1,6 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext, loader
-from principal.models import Lote, Fraccion, Manzana
+from principal.models import Lote, Fraccion, Manzana, PagoDeCuotas
 from lotes.forms import LoteForm
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
@@ -95,3 +95,50 @@ def listar_busqueda_lotes(request):
         
     })
     return HttpResponse(t.render(c))
+
+def listar_clientes_atrasados(request):
+    
+    venta = request.GET['venta_id']
+    cliente = request.GET['cliente_id']    
+
+    if request.user.is_authenticated():
+        t = loader.get_template('imformes/detalle_pagos.html')
+    else:
+        return HttpResponseRedirect("/login") 
+
+    if venta!=None and cliente!=None:    
+    
+        object_list = PagoDeCuotas.objects.filter(venta_id=venta.id,cliente_id=cliente.id).order_by('fecha_de_pago' )
+    
+        if len(object_list)>0:
+            for i in object_list:
+                i.fecha_de_pago=i.fecha_de_pago.strftime("%d/%m/%Y")
+                i.total_de_cuotas=str('{:,}'.format(i.total_de_cuotas)).replace(",", ".")
+                i.total_de_mora=str('{:,}'.format(i.total_de_mora)).replace(",", ".")
+                i.total_de_pago=str('{:,}'.format(i.total_de_pago)).replace(",", ".")
+            
+            paginator=Paginator(object_list,15)
+            page=request.GET.get('page')
+            try:
+                lista=paginator.page(page)
+            except PageNotAnInteger:
+                lista=paginator.page(1)
+            except EmptyPage:
+                lista=paginator.page(paginator.num_pages)
+            c = RequestContext(request, {
+                'object_list': lista,
+            })
+            return HttpResponse(t.render(c))
+    
+    else:
+        return HttpResponseRedirect("/movimientos/listado_pagos") 
+
+
+
+
+
+
+
+
+
+
