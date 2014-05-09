@@ -73,6 +73,28 @@ table.listado-transferencias tr th {
 	color:#FFF
 }
 
+table.listado-pagos-atrasados {
+	border:2px solid #CCC;
+	margin-bottom:15px;
+	margin-left: 50px;
+}
+
+table.listado-pagos-atrasados tr td {
+	padding:7px;
+	font-size:14px;
+	text-align:center;
+	border-bottom:thin solid #CCC
+}
+
+table.listado-pagos-atrasados tr th {
+	padding:10px 10px 10px 40px;
+	font-size:16px;
+	font-weight:400;
+	text-align:center;
+	background-color:#02B06B;
+	color:#FFF
+}
+
 table.listado-movimientos {
 	border:2px solid #CCC;
 	margin-bottom:15px;
