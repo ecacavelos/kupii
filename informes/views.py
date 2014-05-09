@@ -1,8 +1,10 @@
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError
 from django.template import RequestContext, loader
-from principal.models import Lote, Fraccion, Manzana, PagoDeCuotas
+from principal.models import Lote, Fraccion, Manzana, PagoDeCuotas, Venta
 from lotes.forms import LoteForm
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.db.models import Q
+
 
 # Funcion principal del modulo de lotes.
 def informes(request):
@@ -102,15 +104,15 @@ def listar_clientes_atrasados(request):
     cliente = request.GET['cliente_id']    
 
     if request.user.is_authenticated():
-        t = loader.get_template('imformes/detalle_pagos.html')
+        t = loader.get_template('informes/detalle_pagos_cliente.html')
     else:
         return HttpResponseRedirect("/login") 
 
-    if venta!=None and cliente!=None:    
+    if venta != '' and cliente !='':    
     
-        object_list = PagoDeCuotas.objects.filter(venta_id=venta.id,cliente_id=cliente.id).order_by('fecha_de_pago' )
-    
-        if len(object_list)>0:
+        object_list = PagoDeCuotas.objects.filter(venta_id=venta,cliente_id=cliente).order_by('fecha_de_pago' )
+        a= len(object_list)
+        if a > 0:
             for i in object_list:
                 i.fecha_de_pago=i.fecha_de_pago.strftime("%d/%m/%Y")
                 i.total_de_cuotas=str('{:,}'.format(i.total_de_cuotas)).replace(",", ".")
@@ -129,14 +131,51 @@ def listar_clientes_atrasados(request):
                 'object_list': lista,
             })
             return HttpResponse(t.render(c))
-    
+        else:
+            return HttpResponseRedirect("/informes/clientes_atrasados")
     else:
-        return HttpResponseRedirect("/movimientos/listado_pagos") 
+        return HttpResponseRedirect("/informes/clientes_atrasados") 
 
 
 
-
-
+def clientes_atrasados(request):
+    
+    if request.user.is_authenticated():
+        t = loader.get_template('informes/clientes_atrasados.html')
+        #c = RequestContext(request, {})
+        #return HttpResponse(t.render(c))
+    else:
+        return HttpResponseRedirect("/login") 
+    meses = 2
+    try:
+        
+        object_list = Venta.objects.filter(~Q(plan_de_pago = '2'), ).order_by('cliente')
+        f = []
+        a = len(object_list)
+        if a > 0:
+            for i in object_list:
+                lote = Lote.objects.get(pk=i.lote_id)
+                manzana = Manzana.objects.get(pk=lote.manzana_id)
+                f.append(Fraccion.objects.get(pk=manzana.fraccion_id))
+                i.fecha_de_venta = i.fecha_de_venta.strftime("%d/%m/%Y")
+                i.precio_final_de_venta = str('{:,}'.format(i.precio_final_de_venta)).replace(",", ".")
+                
+            paginator = Paginator(object_list, 15)
+            page = request.GET.get('page')
+            try:
+                lista = paginator.page(page)
+            except PageNotAnInteger:
+                lista = paginator.page(1)
+            except EmptyPage:
+                lista = paginator.page(paginator.num_pages)
+            
+            c = RequestContext(request, {
+                'object_list': lista,
+                'fraccion': f,
+            })
+            return HttpResponse(t.render(c))       
+    except:    
+        return HttpResponseServerError("No se pudo obtener el Listado de Clientes Atrasados.")
 
 
 
