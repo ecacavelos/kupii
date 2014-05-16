@@ -39,12 +39,41 @@ function buscar(){
 					<div class="grid_6">
   						<form name="frm_busqueda" id="frm_busqueda" method="post" action="/informes/informe_general/">
   							{% csrf_token %}
-  							    <input name="fecha_ini" id="fecha_ini" type="text" value="" onclick="desplegar_fecha();"/>
-  								<input name="fecha_fin" id="fecha_fin" type="text" value="" onclick="desplegar_fecha();"/>
-  								<input name="fraccion_ini" id="fraccion_ini" type="text" value=""/>
-  								<input name="fraccion_fin" id="fraccion_fin" type="text" value=""/>
-  								<input type="button" value="Buscar" onclick="buscar();" class="historico" style="cursor: pointer"/>
-  								<input name="tabla" type="hidden" value="lote"/>
+  								<table>
+  									<th></th><th>Desde:</th><th>Hasta:</th>
+  									<tr>
+  										<td>
+  											Rango de Fecha:
+  										</td>
+  										<td>
+  											<input name="fecha_ini" id="fecha_ini" type="text" value="" onclick="desplegar_fecha();"/>
+  										</td>
+  										<td>
+  											<input name="fecha_fin" id="fecha_fin" type="text" value="" onclick="desplegar_fecha();"/>
+  										</td>
+  									</tr>
+  									<tr>
+  										<td>
+  											Rango de Fracci&oacute;n:
+  										</td>
+  										<td>
+  											<input name="fraccion_ini" id="fraccion_ini" type="text" value=""/>
+  										</td>
+  										<td>
+  											<input name="fraccion_fin" id="fraccion_fin" type="text" value=""/>
+  										</td>
+  									</tr>
+  									<tr>
+  										<td>
+  											<input type="button" value="Buscar" onclick="buscar();" class="historico" style="cursor: pointer"/>
+  										</td>
+  										<td>
+  											<input name="tabla" type="hidden" value="lote"/>
+  										</td>
+  									</tr>
+  								</table>
+  							    
+  								
   						</form>
 					</div>
 
