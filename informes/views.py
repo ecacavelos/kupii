@@ -4,7 +4,7 @@ from principal.models import Lote, Fraccion, Manzana, PagoDeCuotas, Venta
 from lotes.forms import LoteForm
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
-
+from datetime import datetime
 
 # Funcion principal del modulo de lotes.
 def informes(request):
@@ -141,7 +141,7 @@ def listar_clientes_atrasados(request):
 def clientes_atrasados(request):
     
     if request.user.is_authenticated():
-        t = loader.get_template('informes/clientes_atrasados.html')
+        t = loader.get_template('/informes/clientes_atrasados.html')
         #c = RequestContext(request, {})
         #return HttpResponse(t.render(c))
     else:
@@ -178,6 +178,90 @@ def clientes_atrasados(request):
         return HttpResponseServerError("No se pudo obtener el Listado de Clientes Atrasados.")
 
 
+def informe_general(request):
+    
+    if request.method=='GET':
+        try:
+            if request.user.is_authenticated():
+                t = loader.get_template('informes/informe_general.html')
+                c = RequestContext(request, {
+                    'object_list': [],
+                })
+                return HttpResponse(t.render(c))                
+            else:
+                return HttpResponseRedirect("/login") 
+        except Exception, error:
+                print error
+    else:
+        try:
+            if request.user.is_authenticated():
+                t = loader.get_template('informes/informe_general.html')                
+            else:
+                return HttpResponseRedirect("/login") 
+    
+            fraccion_ini=request.POST['fraccion_ini']
+            fraccion_fin=request.POST['fraccion_fin']
+        
+            fecha_ini=request.POST['fecha_ini']
+            fecha_fin=request.POST['fecha_fin']
+            fecha_ini_parsed = datetime.strptime(fecha_ini, "%d/%m/%Y").date()
+            fecha_fin_parsed = datetime.strptime(fecha_fin, "%d/%m/%Y").date()
+        
+            try:
+                #Obtenemos el lote correspondiente a cada fraccion
+                lista_lotes=[]
+                object_list=[]
+                manzanas_list=Manzana.objects.filter(fraccion_id__gte=fraccion_ini,fraccion_id__lte=fraccion_fin)
+                for m in manzanas_list:
+                    lotes_list=Lote.objects.filter(manzana_id=m.id)
+                    for l in lotes_list:
+                        lista_lotes.append(l)
+                
+                #for lote in lista_lotes:
+                for lote in lista_lotes:
+                    lista_pagos=PagoDeCuotas.objects.filter(lote_id=lote.id,fecha_de_pago__range=(fecha_ini_parsed,fecha_fin_parsed))
+                    for p in lista_pagos:
+                        object_list.append(p)
+                                
+                     
+                #object_list =lista.objects.filter(fecha_de_pago___range=(fecha_ini_parsed,fecha_fin_parsed))
+                                
+            except Exception, error:
+                print error
+            a = len(object_list)
+            f=[]
+            if a>0:
+                monto_total_cobrado=0
+                try:
+                    for i in object_list:
+                        i.fecha_de_pago=i.fecha_de_pago.strftime("%d/%m/%Y")
+                        i.total_de_cuotas=str('{:,}'.format(i.total_de_cuotas)).replace(",", ".")
+                        i.total_de_mora=str('{:,}'.format(i.total_de_mora)).replace(",", ".")
+                        i.total_de_pago=str('{:,}'.format(i.total_de_pago)).replace(",", ".")
+                        #monto_total_cobrado+=i.total_de_pago
+                        
+                
+                    paginator=Paginator(object_list,15)
+                    page=request.GET.get('page')
+                    try:
+                        lista=paginator.page(page)
+                    except PageNotAnInteger:
+                        lista=paginator.page(1)
+                    except EmptyPage:
+                        lista=paginator.page(paginator.num_pages)
+                    c = RequestContext(request, {
+                        'object_list': lista,
+                       
+                    })
+                    return HttpResponse(t.render(c))
+                except Exception, error:
+                    print error
+        except:   
+            return HttpResponseServerError("No se pudo obtener el Listado de Pagos de Lotes.")
+
+   
 
 
+            
 
+    

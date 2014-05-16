@@ -806,7 +806,7 @@ def listar_busqueda_ventas(request):
             t = loader.get_template('movimientos/listado_ventas.html')
             busqueda = request.GET['busqueda']
             tipo_busqueda=request.GET['tipo_busqueda']
-            fecha_hasta=request.GETT['fecha_hasta']
+            fecha_hasta=request.GET['fecha_hasta']
         
             if tipo_busqueda=='lote':
                 try:
