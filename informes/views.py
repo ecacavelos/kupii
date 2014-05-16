@@ -4,7 +4,8 @@ from principal.models import Lote, Fraccion, Manzana, PagoDeCuotas, Venta
 from lotes.forms import LoteForm
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
-from datetime import datetime
+from datetime import datetime, timedelta
+from calendar import monthrange
 
 # Funcion principal del modulo de lotes.
 def informes(request):
@@ -132,24 +133,79 @@ def listar_clientes_atrasados(request):
             })
             return HttpResponse(t.render(c))
         else:
-            return HttpResponseRedirect("/informes/clientes_atrasados")
+            c = RequestContext(request, {
+                'object_list': object_list,
+            })
+            return HttpResponse(t.render(c))
     else:
         return HttpResponseRedirect("/informes/clientes_atrasados") 
 
 
 
+
+def monthdelta(d1, d2):
+    delta = 0
+    while True:
+        mdays = monthrange(d1.year, d1.month)[1]
+        d1 += timedelta(days=mdays)
+        if d1 <= d2:
+            delta += 1
+        else:
+            break
+    return delta
+
 def clientes_atrasados(request):
     
     if request.user.is_authenticated():
-        t = loader.get_template('/informes/clientes_atrasados.html')
+        t = loader.get_template('informes/clientes_atrasados.html')
         #c = RequestContext(request, {})
         #return HttpResponse(t.render(c))
     else:
-        return HttpResponseRedirect("/login") 
-    meses = 2
+        return HttpResponseRedirect("/login")
+    
+    
     try:
         
-        object_list = Venta.objects.filter(~Q(plan_de_pago = '2'), ).order_by('cliente')
+        if request.method == 'GET':
+            meses_peticion = 0
+        else:
+            if request.POST['meses_de_atraso'] =='':
+                meses_peticion = 0
+            else:
+                meses_peticion = int(request.POST['meses_de_atraso'])    
+        dias = meses_peticion*30
+        fecha_actual= datetime.now()
+        ventas_a_cuotas = Venta.objects.filter(~Q(plan_de_pago = '2'), fecha_primer_vencimiento__lt=fecha_actual).order_by('cliente')
+        object_list=[]
+        for v in ventas_a_cuotas:
+            fecha_primer_vencimiento = v.fecha_primer_vencimiento
+            fecha_primer_vencimiento = datetime.combine(fecha_primer_vencimiento, datetime.min.time())
+            #diferencia = monthdelta(fecha_actual, d2)
+            fecha_resultante = fecha_actual - fecha_primer_vencimiento
+            cuotas_pagadas = v.pagos_realizados
+            print ("Id de venta: "+str(v.id))
+            print ("Fecha Actual: "+str(fecha_actual))
+            print ("Fecha 1er Vencimieto: "+str(fecha_primer_vencimiento))
+            print ("Fecha resultante: "+str(fecha_resultante))
+            f1 = fecha_actual.date()
+            f2 = fecha_primer_vencimiento.date()
+            diferencia = (f1-f2).days
+            
+            #diferencia = fecha_resultante.days()
+            print ("Dias de Diferencia: "+str(diferencia))
+            meses_diferencia = int (diferencia /30)
+            print ("Meses de diferencia: "+str(meses_diferencia))
+            print ("Meses de atraso solicitado: "+str(meses_peticion))
+            
+            if meses_diferencia >= meses_peticion and cuotas_pagadas < ((meses_diferencia+1) - meses_peticion) :
+                object_list.append(v)
+                print ("Venta agregada")
+                print (" ")
+            else:
+                print ("Venta no agregada")
+                print (" ")    
+            #print (object_list)
+            
         f = []
         a = len(object_list)
         if a > 0:
@@ -158,6 +214,7 @@ def clientes_atrasados(request):
                 manzana = Manzana.objects.get(pk=lote.manzana_id)
                 f.append(Fraccion.objects.get(pk=manzana.fraccion_id))
                 i.fecha_de_venta = i.fecha_de_venta.strftime("%d/%m/%Y")
+                i.fecha_primer_vencimiento = i.fecha_primer_vencimiento.strftime("%d/%m/%Y")
                 i.precio_final_de_venta = str('{:,}'.format(i.precio_final_de_venta)).replace(",", ".")
                 
             paginator = Paginator(object_list, 15)
@@ -168,14 +225,18 @@ def clientes_atrasados(request):
                 lista = paginator.page(1)
             except EmptyPage:
                 lista = paginator.page(paginator.num_pages)
-            
-            c = RequestContext(request, {
-                'object_list': lista,
-                'fraccion': f,
-            })
-            return HttpResponse(t.render(c))       
-    except:    
-        return HttpResponseServerError("No se pudo obtener el Listado de Clientes Atrasados.")
+        else:
+            lista=object_list
+                
+        c = RequestContext(request, {
+            'object_list': lista,
+            'fraccion': f,
+        })
+        return HttpResponse(t.render(c))    
+           
+    except Exception, error:
+            print error    
+            return HttpResponseServerError("No se pudo obtener el Listado de Clientes Atrasados.")
 
 
 def informe_general(request):

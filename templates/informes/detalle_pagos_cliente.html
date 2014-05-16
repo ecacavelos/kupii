@@ -32,7 +32,7 @@ $(document).ready(function() {
 					<div class="clear"></div>
 
 					<div class="grid_10">
-  						<h1>Listado de Pagos</h1>
+  						<h1>Listado de Pagos del Cliente Atrasado</h1>
 					</div>
 
 					<div class="grid_6">
@@ -70,13 +70,16 @@ $(document).ready(function() {
 					</div>
 					<div id="listado-item-lote">
 						<table width="50%" border="1" cellpadding="0" cellspacing="0" class="listado-pagos-atrasados" align="center">
-							<th>Codigo</th><th>Lote Nro</th><th>Cliente</th><th>Cuotas a Pagar</th><th>Plan de Pago</th><th>Fecha de Pago</th><th>Total de Cuotas</th><th>Total de Mora</th><th>Total de Pago</th>
+							<th>Id Pago</th><th>Venta</th><th>Lote Nro</th><th>Cliente</th><th>Cuotas a Pagar</th><th>Plan de Pago</th><th>Fecha de Pago</th><th>Total de Cuotas</th><th>Total de Mora</th><th>Total de Pago</th>
 
 
 {% for hw in object_list %}
 		<tr>
 			<td>
 			    {{hw.id}}
+			</td>
+			<td>
+			    {{hw.venta}}
 			</td>	
 			<td>
 				{{hw.lote}}
@@ -122,5 +125,5 @@ $(document).ready(function() {
 						</table>
 					</div>
 
-<div id="footer"><a href="/lotes" class="boton-verde">Volver al módulo de Lotes</a></div>
+<div id="footer"><a href="/informes/clientes_atrasados/" class="boton-verde">Volver al listado de Clientes Atrasados</a></div>
 {% endblock %}

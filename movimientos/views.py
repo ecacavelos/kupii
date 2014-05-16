@@ -172,8 +172,9 @@ def pago_de_cuotas(request):
             except:
                 date_parse_error = True
         
-        cantidad_cuotas = PlanDePago.objects.get(pk=plan_pago_id)        
-        cuotas_restantes = int(cantidad_cuotas.cantidad_de_cuotas) - int(nro_cuotas_a_pagar)        
+        cantidad_cuotas = PlanDePago.objects.get(pk=plan_pago_id)
+        cuotas_pagadas = Venta.objects.get(pk=venta.id)        
+        cuotas_restantes = int(cantidad_cuotas.cantidad_de_cuotas) - int(cuotas_pagadas.pagos_realizados)        
         if cuotas_restantes >= int(nro_cuotas_a_pagar):
         
             nuevo_pago = PagoDeCuotas()

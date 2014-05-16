@@ -36,20 +36,20 @@ $(document).ready(function() {
 					</div>
 
 					<div class="grid_6">
-  						<form name="frm_busqueda" id="frm_busqueda" method="post" action="/informes/listado_busqueda_cliente_atrasado/">
+  						<form name="frm_busqueda" id="frm_busqueda" method="post" action="/informes/clientes_atrasados/">
   							{% csrf_token %}
   							<table>
   								<tr>
   									<tr>
   										<td>
-  											Nro de Lote:
+  											Meses de atraso:
   										</td>
   										<td id="campo_busqueda">
   											
   										</td>
   									</tr>
   									<td>
-  										<input id="busqueda" type="" name="busqueda" placeholder="Ej: 001/001/0001"/>
+  										<input id="busqueda" type="" name="meses_de_atraso" placeholder="Ej: 3"/>
   									</td>
   									<td>
   										<input type="button" value="Buscar" onclick="buscar();" class="historico" style="cursor: pointer"/>
@@ -70,7 +70,7 @@ $(document).ready(function() {
 					</div>
 					<div id="listado-item-lote">
 						<table width="50%" border="1" cellpadding="0" cellspacing="0" class="listado-clientes-atrasados" align="center">
-							<th>Cliente</th><th>Venta Nro</th><th>Lote Nro</th><th>Fracci&oacute;n</th><th>Vendedor</th><th>Plan de Pago</th><th>Fecha de Venta</th><th>Precio Final de Venta</th>
+							<th>Cliente</th><th>Venta Nro</th><th>Lote Nro</th><th>Fracci&oacute;n</th><th>Fecha 1er vencimiento</th><th>Plan de Pago</th><th>Fecha de Venta</th><th>Precio Final de Venta</th>
 
 {% for hw in object_list %}
 		<tr>
@@ -97,7 +97,7 @@ $(document).ready(function() {
 			
 			
 			<td>
-			    {{hw.vendedor}}
+			    {{hw.fecha_primer_vencimiento}}
 			</td>
 			<td>
 			    {{hw.plan_de_pago}}
