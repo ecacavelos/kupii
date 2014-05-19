@@ -9,6 +9,7 @@
 <script type="text/javascript" >
 $(document).ready(function() {
 	$('.grid_6').hide();
+	$('#id_fecha').mask('##/##/####');
 base_url = "/ajax/get_cliente_id_by_name/";
 		params = "value";
 		$("#id_nombre_cliente").autocomplete({

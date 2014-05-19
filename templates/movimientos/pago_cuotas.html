@@ -13,8 +13,8 @@ $(document).ready(function() {
 	$('.grid_6').hide();
 	$('#id_fecha').mask('##/##/####');
 	$("#id_fecha").datepicker({ dateFormat: 'dd/mm/yy' });
-	$("#id_fecha").datepicker("setDate", new Date());
-	$("#id_fecha").datepicker('disable');
+	//$("#id_fecha").datepicker("setDate", new Date());
+	//$("#id_fecha").datepicker('disable');
 	$("#id_fecha_venta2").datepicker({ dateFormat: 'dd/mm/yy' });
 	
 });
@@ -58,7 +58,7 @@ $(document).ready(function() {
 	<div class="fieldWrapperMovimientos">
 		<tr>
 			<td><label for="id_fecha">Fecha de Pago: </label></td>
-			<td class="noimage"><input id="id_fecha" type="text" readonly name="fecha" maxlength="10" /></td>
+			<td class="noimage"><input id="id_fecha" type="text" name="fecha" maxlength="10" /></td>
 		</tr>
 	</div>
 	<div class="fieldWrapperMovimientos">
@@ -115,8 +115,8 @@ $(document).ready(function() {
 		<tr>
 			<td><label for="total_mora">Total de Mora: </label></td>
 			<td class="noimage">
-				<input id="total_mora" type="hidden" name="total_mora" readonly maxlength="100" onblur="calculateTotalPago()"/>
-				<div id="total_mora2"></div>
+				<input id="total_mora" type="text" name="total_mora" maxlength="100" onblur="calculateTotalPago()"/>
+				<!--<div id="total_mora2"></div>-->
 				</td>
 		</tr>
 		<tr>

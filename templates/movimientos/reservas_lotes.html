@@ -13,8 +13,8 @@ $(document).ready(function() {
 	$('.grid_6').hide();
 	$('#id_fecha').mask('##/##/####');
 	$("#id_fecha").datepicker({ dateFormat: 'dd/mm/yy' });
-	$("#id_fecha").datepicker("setDate", new Date());
-	$("#id_fecha").datepicker('disable');
+	//$("#id_fecha").datepicker("setDate", new Date());
+	//$("#id_fecha").datepicker('disable');
 	
 	base_url = "/ajax/get_cliente_id_by_name/";
 		params = "value";
