@@ -1,6 +1,7 @@
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError
 from django.template import RequestContext, loader
 from principal.models import Lote, Fraccion, Manzana, PagoDeCuotas, Venta
+
 from lotes.forms import LoteForm
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
@@ -278,30 +279,74 @@ def informe_general(request):
                     for l in lotes_list:
                         lista_lotes.append(l)
                 
-                #for lote in lista_lotes:
+                
                 for lote in lista_lotes:
                     lista_pagos=PagoDeCuotas.objects.filter(lote_id=lote.id,fecha_de_pago__range=(fecha_ini_parsed,fecha_fin_parsed))
                     for p in lista_pagos:
                         object_list.append(p)
                                 
                      
-                #object_list =lista.objects.filter(fecha_de_pago___range=(fecha_ini_parsed,fecha_fin_parsed))
+                
                                 
             except Exception, error:
                 print error
             a = len(object_list)
-            f=[]
+            
             if a>0:
-                monto_total_cobrado=0
+                lista_total_cuotas=[0]
+                lista_total_mora=[0]
+                lista_total_pagos=[0]
+                monto_total_cuotas=[0]
+                monto_total_mora=[0]
+                monto_total_pagos=[0]
+                #lista que guarda los indices de principio y fin de una determinada fraccion
+                lista_cambios=[0]
+            
                 try:
+                    j=0  
+                    k=0 
+                    #guardamos la primera fraccion para tener algo con que comparar en el for
+                    fraccion_actual=object_list[0].lote.manzana.fraccion_id
                     for i in object_list:
+                        #contador general de registros
+                        k+=1
+                         
+                        if(fraccion_actual==i.lote.manzana.fraccion_id):
+                            monto_total_cuotas[j]+=int(i.total_de_cuotas)
+                            monto_total_mora[j]+=int(i.total_de_mora)
+                            monto_total_pagos[j]+=int(i.total_de_pago)
+                        else:
+                            #al cambiar de fraccion se guarda la posicion del cambio en la lista de cambios
+                            lista_cambios.append(k-1)
+                            #cambiamos de fraccion
+                            fraccion_actual= i.lote.manzana.fraccion_id
+                            
+                            #agregamos a la lista los totales acumulados
+                            lista_total_cuotas.append(monto_total_cuotas[j])
+                            lista_total_mora.append(monto_total_mora[j])
+                            lista_total_pagos.append(monto_total_pagos[j])
+                            
+                            #contador de los montos totales pertenecientes a una misma fraccion
+                            j+=1
+                            
+                            #agregamos a la lista de la nueva fraccion los totales acumulados
+                            monto_total_cuotas.append(int(i.total_de_cuotas))
+                            monto_total_mora.append(int(i.total_de_mora))
+                            monto_total_pagos.append(int(i.total_de_pago))
+                                         
                         i.fecha_de_pago=i.fecha_de_pago.strftime("%d/%m/%Y")
                         i.total_de_cuotas=str('{:,}'.format(i.total_de_cuotas)).replace(",", ".")
                         i.total_de_mora=str('{:,}'.format(i.total_de_mora)).replace(",", ".")
                         i.total_de_pago=str('{:,}'.format(i.total_de_pago)).replace(",", ".")
-                        #monto_total_cobrado+=i.total_de_pago
-                        
-                
+                    
+                    #guardamos la posicion del ultimo cambio
+                    lista_cambios.append(k)
+                    
+                    #agregamos a la lista de totales los totales acumulados
+                    lista_total_cuotas.append(monto_total_cuotas[j])
+                    lista_total_mora.append(monto_total_mora[j])
+                    lista_total_pagos.append(monto_total_pagos[j])
+                    
                     paginator=Paginator(object_list,15)
                     page=request.GET.get('page')
                     try:
@@ -312,7 +357,10 @@ def informe_general(request):
                         lista=paginator.page(paginator.num_pages)
                     c = RequestContext(request, {
                         'object_list': lista,
-                       
+                        'lista_total_cuotas': lista_total_cuotas,
+                        'lista_total_mora': lista_total_mora,
+                        'lista_total_pagos': lista_total_pagos,
+                        'lista_cambios': lista_cambios,
                     })
                     return HttpResponse(t.render(c))
                 except Exception, error:

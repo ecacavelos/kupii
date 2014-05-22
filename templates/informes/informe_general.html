@@ -2,12 +2,43 @@
 {% block header_scripts %}
 
 <script type="text/javascript">
-function desplegar_fecha(){
+$(document).ready(function() {
 	$('#fecha_ini').mask('##/##/####');
 	$("#fecha_ini").datepicker({ dateFormat: 'dd/mm/yy' });
 	$('#fecha_fin').mask('##/##/####');
 	$("#fecha_fin").datepicker({ dateFormat: 'dd/mm/yy' });
+	
+	lista_total_cuotas=[];
+	lista_total_pagos=[];
+	lista_total_mora=[];
+	lista_cambios=[];
+	{%for tc in lista_total_cuotas%}
+	 lista_total_cuotas[{{forloop.counter}}]= "<td>{{tc}}</td>";
+	{%endfor%} 
+	{%for tp in lista_total_pagos%}
+	 lista_total_pagos[{{forloop.counter}}]= "<td>{{tp}}</td>";
+	{%endfor%} 
+	{%for tm in lista_total_mora%}
+	 lista_total_mora[{{forloop.counter}}]= "<td>{{tm}}</td>";
+	{%endfor%} 
+	{%for lc in lista_cambios%}
+	 lista_cambios[{{forloop.counter}}]= "{{lc}}";
+	{%endfor%} 
+
+//creamos la tabla con los resultados de las sumatorias de pagos, mora y cuotas por cada fraccion.
+//la está ordenada por fracciones, tabla se despliega cuando cambia la fraccion.
+
+var tablaTotales="<td colspan='7'>Totales</td>"; 
+
+
+for(var i=1;i<=lista_total_pagos.length;i++){
+	fila=tablaTotales+lista_total_cuotas[i]+lista_total_mora[i]+lista_total_pagos[i];
+	console.log(fila);
+	$('#fila-'+lista_cambios[i]).html(fila);
+	$('#fila-'+lista_cambios[i]).show(); 
 }
+	
+});
 
 function buscar(){
 	if($("#tipo_busqueda").val()==0){
@@ -20,7 +51,9 @@ function buscar(){
 			$("#frm_busqueda").submit();
 		}
 	}
-}	 
+}
+
+	 
 </script>
 {% endblock %}
 {% block content %}
@@ -46,10 +79,10 @@ function buscar(){
   											Rango de Fecha:
   										</td>
   										<td>
-  											<input name="fecha_ini" id="fecha_ini" type="text" value="" onclick="desplegar_fecha();"/>
+  											<input name="fecha_ini" id="fecha_ini" type="text" value="" />
   										</td>
   										<td>
-  											<input name="fecha_fin" id="fecha_fin" type="text" value="" onclick="desplegar_fecha();"/>
+  											<input name="fecha_fin" id="fecha_fin" type="text" value="" />
   										</td>
   									</tr>
   									<tr>
@@ -84,15 +117,19 @@ function buscar(){
 					</div>
 					<div id="listado-item-lote">
 						<table width="50%" border="1" cellpadding="0" cellspacing="0" class="listado-pagos" align="center">
-							<th>Codigo</th><th>Lote Nro</th><th>Cliente</th><th>Cuotas a Pagar</th><th>Plan de Pago</th><th>Fecha de Pago</th><th>Total de Cuotas</th><th>Total de Mora</th><th>Total de Pago</th>
+							<th>Codigo</th><th>Lote Nro</th><th>Fracci&oacute;n</th><th>Cliente</th><th>Cuotas a Pagar</th><th>Plan de Pago</th><th>Fecha de Pago</th><th>Total de Cuotas</th><th>Total de Mora</th><th>Total de Pago</th>
 
 {% for hw in object_list %}
+
 		<tr>
 			<td>
 			    {{hw.id}}
 			</td>	
 			<td>
 				{{hw.lote}}
+			</td>
+			<td> 				
+				{{hw.lote.manzana.fraccion_id}}				
 			</td>
 			<td>
 			    {{hw.cliente}}
@@ -117,7 +154,15 @@ function buscar(){
 			</td>
 			
 		</tr>
+		<tr id='fila-{{forloop.counter}}' style="display: none;"></tr>
 {% endfor %}
+		{%if lista_totales%}
+			<tr>
+				{%for i in lista_totales%}
+				{{i.lista_totales}}
+				{%endfor%}
+			</tr>
+			{%endif%}
 <div class="pagination">
     <span class="step-links">
         {%if object_list.has_previous%}
