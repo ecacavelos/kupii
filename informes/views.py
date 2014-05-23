@@ -301,7 +301,10 @@ def informe_general(request):
                 monto_total_pagos=[0]
                 #lista que guarda los indices de principio y fin de una determinada fraccion
                 lista_cambios=[0]
-            
+                total_acumulado_cuotas=0
+                total_acumulado_mora=0
+                total_acumulado_pagos=0
+                lista_totales_acumulados=[]
                 try:
                     j=0  
                     k=0 
@@ -315,6 +318,11 @@ def informe_general(request):
                             monto_total_cuotas[j]+=int(i.total_de_cuotas)
                             monto_total_mora[j]+=int(i.total_de_mora)
                             monto_total_pagos[j]+=int(i.total_de_pago)
+                            
+                            #acumulamos los totales para una lista de totales generales
+                            total_acumulado_cuotas+=int(i.total_de_cuotas)
+                            total_acumulado_mora+=int(i.total_de_mora)
+                            total_acumulado_pagos+=int(i.total_de_pago)
                         else:
                             #al cambiar de fraccion se guarda la posicion del cambio en la lista de cambios
                             lista_cambios.append(k-1)
@@ -326,6 +334,10 @@ def informe_general(request):
                             lista_total_mora.append(monto_total_mora[j])
                             lista_total_pagos.append(monto_total_pagos[j])
                             
+                            #...y sumamos a los totales generales
+                            total_acumulado_cuotas+=int(i.total_de_cuotas)
+                            total_acumulado_mora+=int(i.total_de_mora)
+                            total_acumulado_pagos+=int(i.total_de_pago)
                             #contador de los montos totales pertenecientes a una misma fraccion
                             j+=1
                             
@@ -333,6 +345,7 @@ def informe_general(request):
                             monto_total_cuotas.append(int(i.total_de_cuotas))
                             monto_total_mora.append(int(i.total_de_mora))
                             monto_total_pagos.append(int(i.total_de_pago))
+                            
                                          
                         i.fecha_de_pago=i.fecha_de_pago.strftime("%d/%m/%Y")
                         i.total_de_cuotas=str('{:,}'.format(i.total_de_cuotas)).replace(",", ".")
@@ -346,6 +359,10 @@ def informe_general(request):
                     lista_total_cuotas.append(monto_total_cuotas[j])
                     lista_total_mora.append(monto_total_mora[j])
                     lista_total_pagos.append(monto_total_pagos[j])
+
+                    lista_totales_acumulados.append(total_acumulado_cuotas)
+                    lista_totales_acumulados.append(total_acumulado_mora)
+                    lista_totales_acumulados.append(total_acumulado_pagos)
                     
                     paginator=Paginator(object_list,15)
                     page=request.GET.get('page')
@@ -361,6 +378,7 @@ def informe_general(request):
                         'lista_total_mora': lista_total_mora,
                         'lista_total_pagos': lista_total_pagos,
                         'lista_cambios': lista_cambios,
+                        'lista_totales_acumulados':lista_totales_acumulados,
                     })
                     return HttpResponse(t.render(c))
                 except Exception, error:
