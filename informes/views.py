@@ -1,6 +1,6 @@
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError
 from django.template import RequestContext, loader
-from principal.models import Lote, Fraccion, Manzana, PagoDeCuotas, Venta
+from principal.models import Lote, Fraccion, Manzana, PagoDeCuotas, Venta, Reserva, CambioDeLotes, RecuperacionDeLotes, TransferenciaDeLotes
 
 from lotes.forms import LoteForm
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -386,9 +386,61 @@ def informe_general(request):
         except:   
             return HttpResponseServerError("No se pudo obtener el Listado de Pagos de Lotes.")
 
-   
+def informe_movimientos(request):
+    if request.method=='GET':
+        try:
+            if request.user.is_authenticated():
+                t = loader.get_template('informes/informe_movimientos.html')
+                c = RequestContext(request, {
+                    'object_list': [],
+                })
+                return HttpResponse(t.render(c))                
+            else:
+                return HttpResponseRedirect("/login") 
+        except Exception, error:
+                print error
+    else:
+        
+        if request.user.is_authenticated():
+            t = loader.get_template('informes/informe_movimientos.html')                
+        else:
+            return HttpResponseRedirect("/login") 
+    
+        try:
+            lote_id=request.POST['lote_id']
+            lote_int=int(lote_id[8:])
+        
+            fecha_ini=request.POST['fecha_ini']
+            fecha_fin=request.POST['fecha_fin']
+            fecha_ini_parsed = datetime.strptime(fecha_ini, "%d/%m/%Y").date()
+            fecha_fin_parsed = datetime.strptime(fecha_fin, "%d/%m/%Y").date()
 
-
+            lista_pagos=PagoDeCuotas.objects.filter(lote_id=lote_int,fecha_de_pago__range=(fecha_ini_parsed,fecha_fin_parsed))
+            lista_ventas=Venta.objects.filter(lote_id=lote_int,fecha_de_venta__range=(fecha_ini_parsed,fecha_fin_parsed))
+            lista_reservas=Reserva.objects.filter(lote_id=lote_int,fecha_de_reserva__range=(fecha_ini_parsed,fecha_fin_parsed))
+            lista_cambios=CambioDeLotes.objects.filter(lote_nuevo_id=lote_int,fecha_de_cambio__range=(fecha_ini_parsed,fecha_fin_parsed))
+            lista_recuperaciones=RecuperacionDeLotes.objects.filter(lote_id=lote_int,fecha_de_recuperacion__range=(fecha_ini_parsed,fecha_fin_parsed))
+            lista_transferencias=TransferenciaDeLotes.objects.filter(lote_id=lote_int,fecha_de_transferencia__range=(fecha_ini_parsed,fecha_fin_parsed))
+        
+                #'lista_cambios': lista_cambios,
+                #'lista_recuperaciones': lista_recuperaciones,
+            c = RequestContext(request, {
+                'lista_pagos': lista_pagos,
+                'lista_ventas': lista_ventas,
+                'lista_reservas': lista_reservas,
+                'lista_cambios': lista_cambios,
+                'lista_recuperaciones': lista_recuperaciones,
+                'lista_transferencias': lista_transferencias,
+            })
+            return HttpResponse(t.render(c))
+        except Exception, error:
+            print error
+                
+        
+        
+        
+        
+        
             
 
     
