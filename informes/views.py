@@ -301,6 +301,7 @@ def informe_general(request):
                 monto_total_pagos=[0]
                 #lista que guarda los indices de principio y fin de una determinada fraccion
                 lista_cambios=[0]
+                
                 total_acumulado_cuotas=0
                 total_acumulado_mora=0
                 total_acumulado_pagos=0
@@ -330,6 +331,11 @@ def informe_general(request):
                             fraccion_actual= i.lote.manzana.fraccion_id
                             
                             #agregamos a la lista los totales acumulados
+                            monto_total_cuotas[j]=str('{:,}'.format(monto_total_cuotas[j])).replace(",", ".")
+                            monto_total_mora[j]=str('{:,}'.format(monto_total_mora[j])).replace(",", ".")
+                            monto_total_pagos[j]=str('{:,}'.format(monto_total_pagos[j])).replace(",", ".")
+                    
+
                             lista_total_cuotas.append(monto_total_cuotas[j])
                             lista_total_mora.append(monto_total_mora[j])
                             lista_total_pagos.append(monto_total_pagos[j])
@@ -355,11 +361,17 @@ def informe_general(request):
                     #guardamos la posicion del ultimo cambio
                     lista_cambios.append(k)
                     
+                    
                     #agregamos a la lista de totales los totales acumulados
                     lista_total_cuotas.append(monto_total_cuotas[j])
                     lista_total_mora.append(monto_total_mora[j])
                     lista_total_pagos.append(monto_total_pagos[j])
 
+                    #parseamos los datos
+                    total_acumulado_cuotas=str('{:,}'.format(total_acumulado_cuotas)).replace(",", ".")
+                    total_acumulado_mora=str('{:,}'.format(total_acumulado_mora)).replace(",", ".")
+                    total_acumulado_pagos=str('{:,}'.format(total_acumulado_pagos)).replace(",", ".")
+                    
                     lista_totales_acumulados.append(total_acumulado_cuotas)
                     lista_totales_acumulados.append(total_acumulado_mora)
                     lista_totales_acumulados.append(total_acumulado_pagos)
@@ -414,18 +426,50 @@ def informe_movimientos(request):
             fecha_fin=request.POST['fecha_fin']
             fecha_ini_parsed = datetime.strptime(fecha_ini, "%d/%m/%Y").date()
             fecha_fin_parsed = datetime.strptime(fecha_fin, "%d/%m/%Y").date()
-
+            lista_aux=[]
             lista_pagos=PagoDeCuotas.objects.filter(lote_id=lote_int,fecha_de_pago__range=(fecha_ini_parsed,fecha_fin_parsed))
+            if(lista_pagos):
+                lista_aux.append(lista_pagos)
+                paginator=Paginator(lista_pagos,15)
+                page=request.GET.get('page')
+                try:
+                    lista=paginator.page(page)
+                except PageNotAnInteger:
+                    lista=paginator.page(1)
+                except EmptyPage:
+                    lista=paginator.page(paginator.num_pages)
+            
             lista_ventas=Venta.objects.filter(lote_id=lote_int,fecha_de_venta__range=(fecha_ini_parsed,fecha_fin_parsed))
+            if(lista_ventas):
+                lista_aux.append(lista_ventas)
             lista_reservas=Reserva.objects.filter(lote_id=lote_int,fecha_de_reserva__range=(fecha_ini_parsed,fecha_fin_parsed))
+            if(lista_reservas):
+                lista_aux.append(lista_reservas)
             lista_cambios=CambioDeLotes.objects.filter(lote_nuevo_id=lote_int,fecha_de_cambio__range=(fecha_ini_parsed,fecha_fin_parsed))
+            if(lista_cambios):
+                lista_aux.append(lista_cambios)
             lista_recuperaciones=RecuperacionDeLotes.objects.filter(lote_id=lote_int,fecha_de_recuperacion__range=(fecha_ini_parsed,fecha_fin_parsed))
+            if(lista_recuperaciones):
+                lista_aux.append(lista_recuperaciones)
             lista_transferencias=TransferenciaDeLotes.objects.filter(lote_id=lote_int,fecha_de_transferencia__range=(fecha_ini_parsed,fecha_fin_parsed))
-        
-                #'lista_cambios': lista_cambios,
-                #'lista_recuperaciones': lista_recuperaciones,
+            if(lista_transferencias):
+                lista_aux.append(lista_transferencias)
+                
+            if(lista_aux):
+                lista_aux.append(lista_aux)
+                paginator=Paginator(lista_aux,6)
+                page=request.GET.get('page')
+                try:
+                    listaP=paginator.page(page)
+                except PageNotAnInteger:
+                    listaP=paginator.page(1)
+                except EmptyPage:
+                    listaP=paginator.page(paginator.num_pages)
+                    
             c = RequestContext(request, {
                 'lista_pagos': lista_pagos,
+                'lista': lista,
+                'listaP': listaP,
                 'lista_ventas': lista_ventas,
                 'lista_reservas': lista_reservas,
                 'lista_cambios': lista_cambios,
