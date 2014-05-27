@@ -7,4 +7,5 @@ urlpatterns = patterns('informes.views',
     url(r'^clientes_atrasados/$', 'clientes_atrasados'),
     url(r'^detalle_pagos_clientes/$', 'listar_clientes_atrasados'),
     url(r'^informe_general/$', 'informe_general'),
+    url(r'^informe_movimientos/$', 'informe_movimientos'),
 )
