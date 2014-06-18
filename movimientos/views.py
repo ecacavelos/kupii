@@ -355,17 +355,16 @@ def listar_ventas(request):
     t = loader.get_template('movimientos/listado_ventas.html')
     try:
         object_list = Venta.objects.all().order_by('id')
-        f = []
+        #f = []
         a = len(object_list)
-        id = 0
         if a > 0:
             for i in object_list:
-                lote = Lote.objects.get(pk=i.lote_id)
-                manzana = Manzana.objects.get(pk=lote.manzana_id)
-                f.append(Fraccion.objects.get(pk=manzana.fraccion_id))
-                i.fecha_de_venta = i.fecha_de_venta.strftime("%d/%m/%Y")
+                #lote = Lote.objects.get(pk=i.lote_id)
+                #manzana = Manzana.objects.get(pk=lote.manzana_id)
+                #f.append(Fraccion.objects.get(pk=manzana.fraccion_id))
+                #i.fecha_de_venta = i.fecha_de_venta.strftime("%d/%m/%Y")
                 i.precio_final_de_venta = str('{:,}'.format(i.precio_final_de_venta)).replace(",", ".")
-                id = i.lote_id
+                id = i.id
             paginator = Paginator(object_list, 15)
             page = request.GET.get('page')
             try:
@@ -377,7 +376,7 @@ def listar_ventas(request):
             
             c = RequestContext(request, {
                 'object_list': lista,
-                'fraccion': f,
+                #'fraccion': f,
             })
             return HttpResponse(t.render(c))       
     except Exception, error:
