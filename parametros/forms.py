@@ -1,8 +1,8 @@
 from django import forms
 from django.forms import Form, ModelForm
 from django.forms.models import modelformset_factory
-from principal.models import PlanDePago
-from django.forms.widgets import TextInput
+from principal.models import PlanDePago, PlanDePagoVendedor
+from django.forms.widgets import TextInput, Textarea
 
 # Create the form class.
 class PlanDePagoForm(ModelForm):
@@ -38,3 +38,19 @@ class SearchForm(Form):
     filtro = forms.ChoiceField(choices=SEARCH_CHOICES)
     
 PlanDePagoFormSet = modelformset_factory(PlanDePago, extra=0, can_order=True)
+
+# Create the form class.
+class PlanDePagoVendedorForm(ModelForm):
+    required_css_class = 'required'
+    class Meta:
+        model = PlanDePagoVendedor
+        widgets = {
+                 'porcentaje_cuota_inicial': TextInput,
+                 'cantidad_cuotas': TextInput,
+                 'cuota_inicial': TextInput,
+                 'intervalos': TextInput,
+                 'porcentaje_de_cuotas': TextInput,
+                 'observacion': Textarea,               
+         }
+        
+FraccionFormSet = modelformset_factory(PlanDePagoVendedor, extra=0, can_order=True)

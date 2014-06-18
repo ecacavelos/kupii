@@ -102,11 +102,7 @@ class Vendedor(models.Model):
     celular_1 = models.CharField(max_length=255, blank=True)
     # celular_2 = models.CharField(max_length=255, blank=True)
     fecha_ingreso = models.DateField('fecha de ingreso')
-    porcentaje_cuota_inicial = models.IntegerField()
-    cantidad_cuotas = models.IntegerField()
-    cuota_inicial = models.IntegerField()
-    intervalos = models.IntegerField()
-    porcentaje_de_cuotas = models.IntegerField()
+    sucursal = models.CharField(max_length=255)
     def __unicode__(self):
         return (self.nombres + ' ' + self.apellidos)
     class Meta:
@@ -117,6 +113,24 @@ class Vendedor(models.Model):
             label= self.nombres + ' ' + self.apellidos,
             cedula = self.cedula,
             id=self.id)
+
+class PlanDePagoVendedor(models.Model):
+    nombre = models.CharField(max_length=255)
+    porcentaje_cuota_inicial = models.IntegerField()
+    cantidad_cuotas = models.IntegerField()
+    cuota_inicial = models.IntegerField()
+    intervalos = models.IntegerField()
+    porcentaje_de_cuotas = models.IntegerField()
+    observacion = models.CharField(max_length=255)
+    def __unicode__(self):
+        return (self.nombre)
+    class Meta:
+        verbose_name_plural = "plandepagovendedores"
+    
+    def as_json(self):
+        return dict(
+            label= self.nombre,
+            id=self.id)        
 
 class Cobrador(models.Model):
     nombres = models.CharField(max_length=255)
