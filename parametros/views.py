@@ -1,6 +1,6 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext, loader
-from principal.models import PlanDePago
+from principal.models import PlanDePago, PlanDePagoVendedor
 from parametros.forms import PlanDePagoForm, SearchForm, PlanDePagoVendedorForm
 
 # Funcion principal del modulo de lotes.
