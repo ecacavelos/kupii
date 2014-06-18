@@ -10,14 +10,14 @@ $(document).ready(function(){
 <div class="gri16 text-izquierda" id="breadcumb">
 						<a href="/">Inicio</a> 
 						<a href="/parametros/">> Parametros</a>  
-						<a href="/parametros/plan_pago/">> Planes de pago</a> 
-						<span class="verde-1">> Listado de Planes de pago</span> 
+						<a href="/parametros/plan_pago/">> Planes de pago de Vendedores</a> 
+						<span class="verde-1">> Listado de Planes de pago de Vendedores</span> 
 					</div>
 
 					<div class="clear"></div>
 
 					<div class="grid_10">
-  						<h1>Listado de Planes de Pago</h1>
+  						<h1>Listado de Planes de Pago de Vendedores</h1>
 					</div>
 
 					<div class="grid_6">
@@ -26,7 +26,7 @@ $(document).ready(function(){
 
 					<div class="clear"></div>
 					<div id="listado-cuadro-busqueda">
-						<a href="/parametros/plan_pago/agregar" class="boton-verde">Agregar Plan de Pago</a>
+						<a href="/parametros/plan_pago_vendedores/agregar" class="boton-verde">Agregar Plan de Pago de Vendedor</a>
 						<br><br>
 					</div>
 					<div id="listado-item-lote">
@@ -38,13 +38,13 @@ $(document).ready(function(){
 				<a href="{{hw.id}}">{{hw.id}} <strong>(Ver Detalles)</strong></a>
 			</td>
 			<td>
-				{{hw.nombre_del_plan}}
+				{{hw.nombre}}
 			</td>
 			<td>
-				{{hw.tipo_de_plan}}
+				{{hw.tipo}}
 			</td>
 			<td>
-				{{hw.cantidad_de_cuotas}}
+				{{hw.cantidad_cuotas}}
 			</td>
 		</tr>
 
@@ -65,5 +65,5 @@ $(document).ready(function(){
 						</table>
 					</div>
 
-<div id="footer"><a href="/parametros/plan_pago" class="boton-verde">Volver al módulo de Plan de pago</a></div>
+<div id="footer"><a href="/parametros/plan_pago_vendedores" class="boton-verde">Volver al módulo de Plan de pago de Vendedores</a></div>
 {% endblock %}

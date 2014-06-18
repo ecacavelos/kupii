@@ -88,24 +88,24 @@ def consultar_plan_de_pago_vendedores(request):
     if request.method == 'POST':
         data = request.POST
         search_form = SearchForm(data)        
-        object_list = PlanDePago.objects.all().order_by('id')
+        object_list = PlanDePagoVendedor.objects.all().order_by('id')
         # En caso de que se haya solicitado una busqueda, filtramos de acuerdo al parametro correspondiente.
         search_field = data.get('filtro', '')
         message = ''
         if data.get('boton_buscar'):
             if data.get('buscar', '') != '':
                 if search_field == 'N':
-                    object_list = PlanDePago.objects.filter(nombre_del_plan__iexact=data.get('buscar', '')).order_by('id')
+                    object_list = PlanDePagoVendedor.objects.filter(nombre_del_plan__iexact=data.get('buscar', '')).order_by('id')
                 elif search_field == 'T':
-                    object_list = PlanDePago.objects.filter(tipo_de_plan__iexact=data.get('buscar', '')).order_by('id')
+                    object_list = PlanDePagoVendedor.objects.filter(tipo_de_plan__iexact=data.get('buscar', '')).order_by('id')
                 elif search_field == 'C':
-                    object_list = PlanDePago.objects.filter(cantidad_de_cuotas__iexact=data.get('buscar', '')).order_by('id')
+                    object_list = PlanDePagoVendedor.objects.filter(cantidad_de_cuotas__iexact=data.get('buscar', '')).order_by('id')
                 elif search_field == 'I':
-                    object_list = PlanDePago.objects.filter(id=int(data.get('buscar', '')))
+                    object_list = PlanDePagoVendedor.objects.filter(id=int(data.get('buscar', '')))
             else:
                 message = "No se ingresaron datos para la busqueda."
     else:
-        object_list = PlanDePago.objects.all().order_by('id')
+        object_list = PlanDePagoVendedor.objects.all().order_by('id')
         search_form = SearchForm({})
         message = ""
 
@@ -153,7 +153,7 @@ def detalle_plan_de_pago(request, plandepago_id):
     return HttpResponse(t.render(c))
 
 # Funcion para consultar el detalle de un cliente.
-def detalle_plan_de_pago_vendedores(request, plandepago_id):
+def detalle_plan_de_pago_vendedores(request, plandepago_vendedor_id):
     
     
     if request.user.is_authenticated():
@@ -163,23 +163,23 @@ def detalle_plan_de_pago_vendedores(request, plandepago_id):
     else:
         return HttpResponseRedirect("/login")
     
-    object_list = PlanDePago.objects.get(pk=plandepago_id)
+    object_list = PlanDePagoVendedor.objects.get(pk=plandepago_vendedor_id)
     message = ''
 
     if request.method == 'POST':
         data = request.POST
         if data.get('boton_guardar'):
-            form = PlanDePagoForm(data, instance=object_list)
+            form = PlanDePagoVendedorForm(data, instance=object_list)
             if form.is_valid():
                 message = "Se actualizaron los datos."
                 form.save(commit=False)
                 object_list.save()
         elif data.get('boton_borrar'):
-            c = PlanDePago.objects.get(pk=plandepago_id)
+            c = PlanDePagoVendedor.objects.get(pk=plandepago_vendedor_id)
             c.delete()
             return HttpResponseRedirect('/parametros/plan_pago_vendedores/listado')
     else:
-        form = PlanDePagoForm(instance=object_list)
+        form = PlanDePagoVendedorForm(instance=object_list)
 
     c = RequestContext(request, {
         'plandepago': object_list,

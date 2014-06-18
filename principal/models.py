@@ -117,6 +117,11 @@ class Vendedor(models.Model):
 
 class PlanDePagoVendedor(models.Model):
     nombre = models.CharField(max_length=255)
+    TIPO_CHOICES = (
+        ("contado", "Contado"),
+        ("credito", "Credito"),
+    )
+    tipo = models.CharField(max_length=20, choices=TIPO_CHOICES)
     porcentaje_cuota_inicial = models.IntegerField()
     cantidad_cuotas = models.IntegerField()
     cuota_inicial = models.IntegerField()
