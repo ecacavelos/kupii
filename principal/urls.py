@@ -14,6 +14,7 @@ urlpatterns = patterns('principal.views',
     url(r'^10/$', 'retrieve_lote_recuperacion'),
     url(r'^11/$', 'retrieve_lote_cambio'),
     url(r'^12/$', 'retrieve_lote_venta'),
+    url(r'^13/$', 'get_all_planes_vendedores'),
     url(r'^$login/', 'django.contrib.auth.views.login', {'template_name': '/login.html'}, name='login'),
     url(r'^$logout/', 'django.contrib.auth.views.logout', {'template_name': '/logout.html'}, name='logout'),
 )

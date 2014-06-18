@@ -49,6 +49,7 @@ function validateVenta(event) {
 				venta_cliente_id : $("#id_cliente").val(),
 				venta_vendedor_id : $("#id_vendedor").val(),
 				venta_plan_pago_id : $("#id_plan_pago").val(),
+				venta_plan_pago_vendedor_id: $("#id_plan_pago_vendedores").val(),
 				venta_entrega_inicial : res_entrega,
 				venta_precio_de_cuota : res_cuota,
 				venta_precio_final_de_venta : res_venta,

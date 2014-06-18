@@ -38,10 +38,10 @@ class Cliente(models.Model):
 class Propietario(models.Model):
     nombres = models.CharField(max_length=255)
     apellidos = models.CharField(max_length=255, blank=True)
-    fecha_nacimiento = models.DateField('fecha de nacimiento', blank=True, null=True)
-    fecha_ingreso = models.DateField('fecha de ingreso')
-    cedula = models.CharField(unique=True,max_length=8, blank=False, null=False)
-    ruc = models.CharField(max_length=255, blank=True)
+    fecha_nacimiento = models.DateField('fecha de nacimiento',blank=True,null=True)
+    fecha_ingreso = models.DateField('fecha de ingreso',blank=True,null=True)
+    cedula = models.CharField(max_length=10, blank=True, null=True)
+    ruc = models.CharField(max_length=255, blank=True,null=True)
     direccion_particular = models.CharField(max_length=255, blank=True)
     telefono_particular = models.CharField(max_length=255, blank=True)
     celular_1 = models.CharField(max_length=255, blank=True)
@@ -56,14 +56,15 @@ class Propietario(models.Model):
             id=self.id)
 
 class Fraccion(models.Model):
+    id=models.IntegerField(primary_key=True)
     nombre = models.CharField(max_length=255)
-    ubicacion = models.CharField(max_length=255)
+    ubicacion = models.CharField(max_length=255,blank=True,null=True)
     propietario = models.ForeignKey(Propietario)
     cantidad_manzanas = models.IntegerField()
     cantidad_lotes = models.IntegerField()
-    distrito = models.CharField(max_length=255)
-    finca = models.CharField(max_length=255, blank=True)
-    aprobacion_municipal_nro = models.CharField(max_length=255, blank=True)
+    distrito = models.CharField(max_length=255,blank=True,null=True)
+    finca = models.CharField(max_length=255, blank=True,null=True)
+    aprobacion_municipal_nro = models.CharField(max_length=255, blank=True,null=True)
     fecha_aprobacion = models.DateField('fecha de aprobacion', blank=True, null=True)
     superficie_total = models.DecimalField(max_digits=8, decimal_places=2, blank=True, null=True)
     def __unicode__(self):
@@ -88,7 +89,7 @@ class Manzana(models.Model):
         return dict(
             cantidad=self.cantidad_lotes,        
             fraccion=self.fraccion_id,        
-            label=self.nro_manzana,
+            label=self.nro_manzana, 
             id=self.id)
         
 class Vendedor(models.Model):
@@ -148,6 +149,7 @@ class Cobrador(models.Model):
     class Meta:
         verbose_name_plural = "cobradores"
 
+
 class PlanDePago(models.Model):
     nombre_del_plan = models.CharField(max_length=255)
     TIPO_CHOICES = (
@@ -178,7 +180,7 @@ class PlanDePago(models.Model):
     
     class Meta:
         verbose_name_plural = "planes de pago"
-
+        
 class Lote(models.Model):
     nro_lote = models.IntegerField()
     manzana = models.ForeignKey(Manzana)
@@ -186,7 +188,7 @@ class Lote(models.Model):
     precio_credito = models.IntegerField()
     superficie = models.DecimalField('superficie (m2)', max_digits=8, decimal_places=2)
     cuenta_corriente_catastral = models.CharField(max_length=255, blank=True)
-    boleto_nro = models.IntegerField(blank=True, null=True)
+    boleto_nro = models.CharField(max_length=255,blank=True, null=True)
     ESTADO_CHOICES = (
         ("1", "Libre"),
         ("2", "Reservado"),
@@ -213,6 +215,8 @@ class Venta(models.Model):
     precio_final_de_venta = models.BigIntegerField()
     fecha_primer_vencimiento = models.DateField(blank=True, null=True)
     pagos_realizados = models.IntegerField(blank=True, null=True)
+    importacion_paralot=models.BooleanField(blank=False, null=False)
+    plan_de_pago_vendedor=models.ForeignKey(PlanDePagoVendedor)
     def __unicode__(self):
         return (str(self.lote) + " a " + self.cliente.nombres + " " + self.cliente.apellidos)
     def as_json(self):
@@ -230,6 +234,9 @@ class Venta(models.Model):
             precio_de_venta = self.precio_final_de_venta,
             pagos_realizados = self.pagos_realizados,
             fecha_de_venta = str(self.fecha_de_venta),
+            importacion_paralot=str(self.importacion_paralot),
+            plan_de_pago_vendedor_id = self.plan_de_pago_vendedor.id,
+            plan_de_pago_vendedor = self.plandepagovendedor.nombre,            
         )
     
 class Reserva(models.Model):
@@ -277,3 +284,4 @@ class RecuperacionDeLotes(models.Model):
     cliente = models.ForeignKey(Cliente)
     vendedor = models.ForeignKey(Vendedor)
     #plan_de_pago = models.ForeignKey(PlanDePago)
+    

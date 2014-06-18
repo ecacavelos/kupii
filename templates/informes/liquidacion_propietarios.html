@@ -1,0 +1,183 @@
+{% extends "lotes/base_lotes.html" %}
+{% block header_scripts %}
+
+<script type="text/javascript">
+$(document).ready(function() {
+	
+	$('#fecha_ini').mask('##/##/####');
+	$("#fecha_ini").datepicker({ dateFormat: 'dd/mm/yy' });
+	$('#fecha_fin').mask('##/##/####');
+	$("#fecha_fin").datepicker({ dateFormat: 'dd/mm/yy' });
+	
+	lista_total_cuotas=[];
+	lista_total_pagos=[];
+	lista_total_mora=[];
+		
+	totales[1]="0";
+	totales[2]="0";
+	totales[3]="0";
+	
+	{%for t in totales%}
+	 totales[{{forloop.counter}}]= "{{ta}}";
+	{%endfor%} 
+
+//creamos la tabla con los resultados de las sumatorias de pagos, mora y cuotas por cada fraccion.
+//la está ordenada por fracciones, tabla se despliega cuando cambia la fraccion.
+
+//var tablaTotales="<td colspan='7'>Totales Fraccion:</td>"; 
+/*
+for(var i=1;i<=lista_total_pagos.length;i++){
+	fila=tablaTotales+lista_total_cuotas[i]+lista_total_mora[i]+lista_total_pagos[i];
+	console.log(fila);
+	$('#fila-'+lista_cambios[i]).html(fila);
+	$('#fila-'+lista_cambios[i]).show();
+	
+}
+*/
+		fila="<td colspan='2'>Liquidacion:</td><td>"+totales[1]+"</td><td>"+totales[2]+"</td><td>"+totales[3]+"</td>";
+		$('#fila_totales').html(fila);
+		$('#fila_totales').show();	
+});
+
+
+
+function validar(){
+	if($('#fecha_ini').val()=="" || $('#fecha_fin').val()=="") {
+		alert("Debe ingresar un rango de fechas");
+		return; 		
+	}
+	if($('#fraccion_ini').val()==0 || $('#fraccion_fin').val()==0 || $('#fraccion_ini').val()=="" || $('#fraccion_fin').val()=="") {
+		alert("Debe ingresar un rango de fracciones");
+		return; 		
+	}
+	$("#frm_busqueda").submit();	
+}
+	 
+</script>
+{% endblock %}
+{% block content %}
+<div class="gri16 text-izquierda" id="breadcumb">
+						<a href="/">Inicio</a> <span class="verde-1">></span>  
+						<a href="/informes/">Informes</a> 
+						<span class="verde-1">>Liquidaci&oacute;n de Propietarios</span> 
+					</div>
+
+					<div class="clear"></div>
+
+					<div class="grid_10">
+  						<h1>Liquidaci&oacute;n de Propietarios</h1>
+					</div>
+
+					<div class="grid_6">
+  						<form name="frm_busqueda" id="frm_busqueda" method="post" action="/informes/liquidacion_propietarios/">
+  							{% csrf_token %}
+  								<table>
+  									<tr>
+  										<td>
+  											Fracci&oacute;n:
+  										</td>
+  										<td>
+  											<input name="fraccion" id="fraccion" type="text" value=""/>
+  										</td>
+  									</tr>
+  									<tr>	
+  										<td>
+  										    Propietario
+  										</td>
+  										<td>
+  											<input name="propietario" id="propietario" type="text" value=""/>
+  										</td>
+  									</tr>
+  									<th></th><th>Desde:</th><th>Hasta:</th>
+  									<tr>
+  										<td>
+  											Rango de Fecha:
+  										</td>
+  										<td>
+  											<input name="fecha_ini" id="fecha_ini" type="text" value="" />
+  										</td>
+  										<td>
+  											<input name="fecha_fin" id="fecha_fin" type="text" value="" />
+  										</td>
+  									</tr>
+  									<tr>
+  										<td>
+  											<input type="button" value="Buscar" onclick="validar();" class="historico" style="cursor: pointer"/>
+  										</td>
+  										<td>
+  											<input name="tabla" type="hidden" value="lote"/>
+  										</td>
+  									</tr>
+  								</table>
+  							    
+  								
+  						</form>
+					</div>
+
+					<div class="clear"></div>
+					<div id="listado-cuadro-busqueda">
+						
+						<br><br>
+					</div>
+					<div id="listado-item-lote">
+						<table width="50%" border="1" cellpadding="0" cellspacing="0" class="listado-pagos" align="center">
+							<th>Fecha</th><th>Lote Nro</th><th>Monto Pagado</th><th>Monto Inmobiliaria</th><th>Monto Propietario</th>
+
+{% for hw in object_list %}
+		<tr>
+			<td>
+			    {{hw.id}}
+			</td>
+			<td> 				
+				{{hw.lote.manzana.fraccion_id}}				
+			</td>
+			<td>
+				{{hw.lote}}
+			</td>
+			
+			<td>
+			    {{hw.cliente}}
+			</td>
+			<td>
+			    {{hw.nro_cuotas_a_pagar}}
+			</td>
+			<td>
+			    {{hw.plan_de_pago}}
+			</td>
+			<td>
+			    {{hw.fecha_de_pago}}
+			</td>			
+			<td>
+				{{hw.total_de_cuotas}}
+			</td>
+			<td>
+				{{hw.total_de_mora}}
+			</td>
+			<td>
+				{{hw.total_de_pago}}
+			</td>
+			
+		</tr>
+		<tr id='fila-{{forloop.counter}}' style="display: none;"></tr>		
+		
+{% endfor %}
+		<tr id='fila_totales' style="display: none;"></tr>
+<div class="pagination">
+    <span class="step-links">
+        {%if object_list.has_previous%}
+        <a href="?page={{ object_list.previous_page_number }}"> Anterior</a>
+		{%endif%}
+    	P&aacute;gina
+    	|{{object_list.number}}|
+    	
+    	{%if object_list.has_next%}
+		<a href="?page={{ object_list.next_page_number }}"> Siguiente</a>
+		{%endif%}
+        
+    </span>
+</div>
+						</table>
+					</div>
+
+<div id="footer"><a href="/informes" class="boton-verde">Volver al módulo de Informes</a></div>
+{% endblock %}

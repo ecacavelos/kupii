@@ -1,6 +1,6 @@
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError
 from django.template import RequestContext, loader
-from principal.models import Lote, Venta, Manzana, Fraccion
+from principal.models import Lote, Venta, Manzana, Fraccion,LoteP
 from lotes.forms import LoteForm, FraccionManzana
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
@@ -17,7 +17,6 @@ def lotes(request):
 # Funcion para consultar el listado de todas las lotes.
 def consultar_lotes(request):
     
-    
     if request.user.is_authenticated():
         t = loader.get_template('lotes/listado.html')
         #c = RequestContext(request, {})
@@ -26,18 +25,7 @@ def consultar_lotes(request):
         return HttpResponseRedirect("/login") 
     
     object_list = Lote.objects.all().order_by( 'id','manzana')
-    total_lotes = object_list.count()
-    m=[]
-    f=[]
     
-    for i in range(0, total_lotes): 
-        manzana_id = object_list[i].manzana_id
-        m.append( Manzana.objects.get(pk = manzana_id))
-        
-        #setattr(object_list[i], 'nro_manzana', m.nro_manzana)
-        fraccion_id = m[i].fraccion_id
-        f.append(Fraccion.objects.get(pk = fraccion_id))
-        #setattr(object_list[i], 'fraccion', fraccion_id)
     paginator=Paginator(object_list,15)
     page=request.GET.get('page')
     try:
@@ -50,9 +38,6 @@ def consultar_lotes(request):
         
     c = RequestContext(request, {
         'object_list': lista,
-        'manzana': m,
-        'fraccion': f,
-        
     })
     return HttpResponse(t.render(c))
 
@@ -100,8 +85,6 @@ def detalle_lote(request, lote_id):
 
 # Funcion que detalla las ventas relacionadas a un lote determinado.
 def detalle_ventas_lote(request, venta_id):
-    
-    
     if request.user.is_authenticated():
         t = loader.get_template('lotes/detalle_ventas.html')
         #c = RequestContext(request, {})
@@ -170,13 +153,9 @@ def listar_busqueda_lotes(request):
     fraccion_int = int(x[0:3])
     manzana_int =int(x[4:7])
     lote_int = int(x[8:])
-    myfraccion = Fraccion.objects.filter(id=fraccion_int)
-    fraccion_manzanas = Manzana.objects.filter(fraccion=myfraccion)
-    for manzana in fraccion_manzanas:
-        if manzana.nro_manzana == manzana_int:
-            mymanzana = manzana
+    manzana= Manzana.objects.get(fraccion_id= fraccion_int, nro_manzana= manzana_int)
         
-    object_list = Lote.objects.filter(manzana_id=mymanzana.id, nro_lote=lote_int)
+    object_list = Lote.objects.filter(manzana=manzana.id, nro_lote=lote_int)
     paginator=Paginator(object_list,15)
     page=request.GET.get('page')
     try:
@@ -189,9 +168,6 @@ def listar_busqueda_lotes(request):
         
     c = RequestContext(request, {
         'object_list': lista,
-        'manzana': fraccion_manzanas,
-        'fraccion': myfraccion,
-        
     })
     return HttpResponse(t.render(c))
 

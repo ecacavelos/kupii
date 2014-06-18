@@ -1,6 +1,6 @@
 from django.http import HttpResponse, HttpResponseServerError
 from django.template import RequestContext, loader
-from principal.models import Fraccion, Manzana, Cliente,Propietario, Lote, Vendedor, PlanDePago, Venta, Reserva, PagoDeCuotas, TransferenciaDeLotes, CambioDeLotes, RecuperacionDeLotes
+from principal.models import Fraccion, Manzana, Cliente,Propietario, Lote, Vendedor, PlanDePago, PlanDePagoVendedor, Venta, Reserva, PagoDeCuotas, TransferenciaDeLotes, CambioDeLotes, RecuperacionDeLotes
 from django.utils import simplejson as json
 from datetime import datetime
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -23,6 +23,8 @@ def ventas_de_lotes(request):
         cliente_id = data.get('venta_cliente_id', '')
         vendedor_id = data.get('venta_vendedor_id', '')
         plan_pago_id = data.get('venta_plan_pago_id', '')
+        plan_pago_vendedor_id=data.get('venta_plan_pago_vendedor_id','')
+        
         estado_lote=data.get('estado_lote','')
         
         if estado_lote == "2":
@@ -44,19 +46,22 @@ def ventas_de_lotes(request):
                 fecha_vencim_parsed = datetime.strptime(data.get('venta_fecha_primer_vencimiento', ''), "%Y-%m-%d")
             except:
                 date_parse_error = True
-                
-        nueva_venta = Venta()
-        nueva_venta.lote = lote_a_vender
-        nueva_venta.fecha_de_venta = fecha_venta_parsed
-        nueva_venta.cliente = Cliente.objects.get(pk=cliente_id)
-        nueva_venta.vendedor = Vendedor.objects.get(pk=vendedor_id)
-        nueva_venta.plan_de_pago = PlanDePago.objects.get(pk=plan_pago_id)
-        nueva_venta.entrega_inicial = long(data.get('venta_entrega_inicial', ''))
-        nueva_venta.precio_de_cuota = long(data.get('venta_precio_de_cuota', ''))
-        nueva_venta.precio_final_de_venta = long(data.get('venta_precio_final_de_venta', ''))
-        nueva_venta.fecha_primer_vencimiento = fecha_vencim_parsed
-        nueva_venta.pagos_realizados = 0    
-        
+        try:        
+            nueva_venta = Venta()
+            nueva_venta.lote = lote_a_vender
+            nueva_venta.fecha_de_venta = fecha_venta_parsed
+            nueva_venta.cliente = Cliente.objects.get(pk=cliente_id)
+            nueva_venta.vendedor = Vendedor.objects.get(pk=vendedor_id)
+            nueva_venta.plan_de_pago = PlanDePago.objects.get(pk=plan_pago_id)
+            nueva_venta.entrega_inicial = long(data.get('venta_entrega_inicial', ''))
+            nueva_venta.precio_de_cuota = long(data.get('venta_precio_de_cuota', ''))
+            nueva_venta.precio_final_de_venta = long(data.get('venta_precio_final_de_venta', ''))
+            nueva_venta.fecha_primer_vencimiento = fecha_vencim_parsed
+            nueva_venta.pagos_realizados = 0    
+            nueva_venta.importacion_paralot=False
+            nueva_venta.plan_de_pago_vendedor= PlanDePagoVendedor.objects.get(pk=plan_pago_vendedor_id)
+        except Exception, error:
+            print error            
         if nueva_venta.plan_de_pago.tipo_de_plan != 'contado':
             cant_cuotas = nueva_venta.plan_de_pago.cantidad_de_cuotas
             sumatoria_cuotas = nueva_venta.entrega_inicial + (cant_cuotas * nueva_venta.precio_de_cuota)
@@ -352,6 +357,7 @@ def listar_ventas(request):
         object_list = Venta.objects.all().order_by('id')
         f = []
         a = len(object_list)
+        id = 0
         if a > 0:
             for i in object_list:
                 lote = Lote.objects.get(pk=i.lote_id)
@@ -359,7 +365,7 @@ def listar_ventas(request):
                 f.append(Fraccion.objects.get(pk=manzana.fraccion_id))
                 i.fecha_de_venta = i.fecha_de_venta.strftime("%d/%m/%Y")
                 i.precio_final_de_venta = str('{:,}'.format(i.precio_final_de_venta)).replace(",", ".")
-                
+                id = i.lote_id
             paginator = Paginator(object_list, 15)
             page = request.GET.get('page')
             try:
@@ -374,7 +380,10 @@ def listar_ventas(request):
                 'fraccion': f,
             })
             return HttpResponse(t.render(c))       
-    except:    
+    except Exception, error:
+        print error
+        print id
+           
         return HttpResponseServerError("No se pudo obtener el Listado de Ventas de Lotes.")
   
             

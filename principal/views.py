@@ -1,6 +1,6 @@
 from django.http import HttpResponse, HttpResponseServerError, HttpResponseRedirect
 from django.template import RequestContext, loader
-from principal.models import Lote, Cliente, Vendedor, PlanDePago, Fraccion, Manzana, Venta, Propietario
+from principal.models import Lote, Cliente, Vendedor, PlanDePago, Fraccion, Manzana, Venta, Propietario, PlanDePagoVendedor
 from django.utils import simplejson as json
 from datetime import datetime
 from django.contrib import auth
@@ -245,6 +245,22 @@ def get_all_planes(request):
 #    plan_id = request.GET['id_plan_pago']
 #    print("id_plan_pago ->" + plan_id);
             object_list = PlanDePago.objects.all()
+#    object_list = PlanDePago.objects.filter(plan_id=plan_id)
+            results = [ob.as_json() for ob in object_list]
+
+            return HttpResponse(json.dumps(results), mimetype='application/json')
+        except:
+            return HttpResponseServerError('No se pudo procesar el pedido')
+            #return (e)
+            
+def get_all_planes_vendedores(request):
+    if request.method == 'GET':
+        #data = request.GET
+        try:
+#     callback = request.GET['callback']
+#    plan_id = request.GET['id_plan_pago']
+#    print("id_plan_pago ->" + plan_id);
+            object_list = PlanDePagoVendedor.objects.all()
 #    object_list = PlanDePago.objects.filter(plan_id=plan_id)
             results = [ob.as_json() for ob in object_list]
 

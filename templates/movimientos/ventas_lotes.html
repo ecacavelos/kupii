@@ -147,6 +147,25 @@ $(document).ready(function() {
 				});
     });
 $("#id_plan_pago").attr('readonly', true);
+
+var id_plan_pago_vendedores;
+	$("#id_plan_pago_vendedores").empty();
+      	var get_all_planes_vendedores = $.ajax({
+					url : '/datos/13/',
+					type : "GET",
+					data : {
+						id_plan_pago_vendedores : id_plan_pago_vendedores
+					},
+					dataType : "json"
+				});
+			get_all_planes_vendedores.done(function (data){
+				$("#id_plan_pago_vendedores").append('<option value="0">Elija un plan de pago</option>') ;
+				$.each(data, function (index,value) {
+					
+					$("#id_plan_pago_vendedores").append('<option value="'+ value.id +'">' + 'Plan ' + value.label + '</option>') ;
+				});
+    });
+$("#id_plan_pago_vendedores").attr('readonly', true);
 });
 </script>
 {% endblock %}
@@ -227,11 +246,26 @@ $("#id_plan_pago").attr('readonly', true);
 				<option value="0">Elige un plan de pago</option>
 				</select>	
 		</tr>
-		<tr>
+		<!--<tr>
 			<td><label>Nombre del Plan: </label></td>
 			<td class="noimage"><div id="plan_pago_seleccionado"></div>
 			<ul class="errorlist"><li id="plan_pago_error"></li></ul></td>
 		</tr>
+		-->
+		<tr>
+			<td><label for="id_plan_pago_vendedores">Plan de Pago Vendedor: </label></td>
+			<td class="noimage">
+				<select id="id_plan_pago_vendedores" name="plan_pago_vendedores"  maxlength="100">
+				<option value="0">Elige un plan de pago</option>
+				</select>	
+		</tr>
+		<!--	
+		<tr>
+			<td><label>Nombre del Plan: </label></td>
+			<td class="noimage"><div id="plan_pago__vendedor_seleccionado"></div>
+			<ul class="errorlist"><li id="plan_pago__vendedor_error"></li></ul></td>
+		</tr>
+		-->
 	</div>
 	<div class="fieldWrapperMovimientos">
 		<tr>

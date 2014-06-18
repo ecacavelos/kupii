@@ -7,8 +7,8 @@ from django.forms.widgets import TextInput
 # Create the form class.
 class PropietarioForm(ModelForm):
     required_css_class = 'required'
-    fecha_nacimiento = forms.DateField(input_formats=('%Y-%m-%d', '%d/%m/%Y',))
-    fecha_ingreso = forms.DateField(input_formats=('%Y-%m-%d', '%d/%m/%Y',))
+    #fecha_nacimiento = forms.DateField(input_formats=('%Y-%m-%d', '%d/%m/%Y',))
+    #fecha_ingreso = forms.DateField(input_formats=('%Y-%m-%d', '%d/%m/%Y',))
     class Meta:
         model = Propietario
         widgets = {
