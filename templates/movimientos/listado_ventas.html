@@ -93,11 +93,7 @@ function desplegar_fecha(){
 				{{lot.lote}}				
 			</td>
 			<td>
-				 {% for f in fraccion %}
-					{% if forloop.counter == forloop.parentloop.counter %}
-						{{ f.id}}
-					{% endif %}
-				 {% endfor %}				
+				{{lot.lote.manzana.fraccion}}			
 			</td>
 			<td>
 			    {{lot.cliente}}
