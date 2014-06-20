@@ -1,6 +1,6 @@
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError
 from django.template import RequestContext, loader
-from principal.models import Lote, Fraccion, Manzana, PagoDeCuotas, Venta, Reserva, CambioDeLotes, RecuperacionDeLotes, TransferenciaDeLotes
+from principal.models import Lote, Fraccion, Manzana, PagoDeCuotas, Venta, Reserva, CambioDeLotes, RecuperacionDeLotes, TransferenciaDeLotes 
 
 from lotes.forms import LoteForm
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -193,15 +193,15 @@ def clientes_atrasados(request):
                 print (" ")    
             #print (object_list)
             
-        f = []
+        #f = []
         a = len(object_list)
         if a > 0:
             for i in object_list:
-                lote = Lote.objects.get(pk=i.lote_id)
-                manzana = Manzana.objects.get(pk=lote.manzana_id)
-                f.append(Fraccion.objects.get(pk=manzana.fraccion_id))
-                i.fecha_de_venta = i.fecha_de_venta.strftime("%d/%m/%Y")
-                i.fecha_primer_vencimiento = i.fecha_primer_vencimiento.strftime("%d/%m/%Y")
+                #lote = Lote.objects.get(pk=i.lote_id)
+                #manzana = Manzana.objects.get(pk=lote.manzana_id)
+                #f.append(Fraccion.objects.get(pk=manzana.fraccion_id))
+                #i.fecha_de_venta = i.fecha_de_venta.strftime("%d/%m/%Y")
+                #i.fecha_primer_vencimiento = i.fecha_primer_vencimiento.strftime("%d/%m/%Y")
                 i.precio_final_de_venta = str('{:,}'.format(i.precio_final_de_venta)).replace(",", ".")
                 
             paginator = Paginator(object_list, 15)
@@ -217,7 +217,7 @@ def clientes_atrasados(request):
                 
         c = RequestContext(request, {
             'object_list': lista,
-            'fraccion': f,
+            #'fraccion': f,
         })
         return HttpResponse(t.render(c))    
            
@@ -468,25 +468,30 @@ def informe_movimientos(request):
                 
 def liquidacion_propietarios(request):
     if request.method=='GET':
-        try:
+        try:  
             if request.user.is_authenticated():
                 t = loader.get_template('informes/liquidacion_propietarios.html')
                 c = RequestContext(request, {
                     'object_list': [],
                 })
-                return HttpResponse(t.render(c))                
+                return HttpResponse(t.render(c))
             else:
                 return HttpResponseRedirect("/login") 
         except Exception, error:
                 print error
-    if request.method=='GET':
-        try:
+            
+    else:
+        try:  
             if request.user.is_authenticated():
+                fecha_ini=request.POST['fecha_ini']
+                fecha_fin=request.POST['fecha_fin']
+                object_list = PagoDeCuotas.objects.filter(fecha_de_pago__range=fecha_ini,fecha_fin)
+                
                 t = loader.get_template('informes/liquidacion_propietarios.html')
                 c = RequestContext(request, {
-                    'object_list': [],
+                    'object_list': object_list,
                 })
-                return HttpResponse(t.render(c))                
+                return HttpResponse(t.render(c))
             else:
                 return HttpResponseRedirect("/login") 
         except Exception, error:

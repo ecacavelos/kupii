@@ -88,11 +88,7 @@ $(document).ready(function() {
 				
 			</td>
 			<td>
-				 {% for f in fraccion %}
-					{% if forloop.counter == forloop.parentloop.counter %}
-						{{ f.id}}
-					{% endif %}
-				 {% endfor %}				
+				 {{hw.lote.manzana.fraccion}}				
 			</td>
 			
 			
