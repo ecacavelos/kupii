@@ -19,8 +19,7 @@ def informes(request):
         return HttpResponseRedirect("/login") 
 
 def lotes_libres(request):
-    
-    
+ 
     if request.user.is_authenticated():
         t = loader.get_template('informes/lotes_libres.html')
         #c = RequestContext(request, {})
@@ -45,47 +44,7 @@ def lotes_libres(request):
         'object_list': lista,
     })
     return HttpResponse(t.render(c))
-'''
-def listar_busqueda_lotes(request):
-    
-    busqueda = request.POST['busqueda']
-    
-    if request.user.is_authenticated():
-        t = loader.get_template('informes/lotes_libres.html')
-        #c = RequestContext(request, {})
-        #return HttpResponse(t.render(c))
-    else:
-        return HttpResponseRedirect("/login") 
-    
-    x=str(busqueda)
-    fraccion_int = int(x[0:3])
-    manzana_int =int(x[4:7])
-    lote_int = int(x[8:])
-    #myfraccion = Fraccion.objects.filter(id=fraccion_int)
-    #fraccion_manzanas = Manzana.objects.filter(fraccion=myfraccion)
-    #for manzana in fraccion_manzanas:
-    #    if manzana.nro_manzana == manzana_int:
-    #        mymanzana = manzana
-        
-    object_list = Lote.objects.filter(manzana_id=manzana_int, nro_lote=lote_int, estado="1")
-    paginator=Paginator(object_list,15)
-    page=request.GET.get('page')
-    try:
-        lista=paginator.page(page)
-    except PageNotAnInteger:
-        lista=paginator.page(1)
-    except EmptyPage:
-        lista=paginator.page(paginator.num_pages)
-    
-        
-    c = RequestContext(request, {
-        'object_list': lista,
-        #'manzana': fraccion_manzanas,
-        #'fraccion': myfraccion,
-        
-    })
-    return HttpResponse(t.render(c))
-'''
+
 def listar_clientes_atrasados(request):
     
     venta = request.GET['venta_id']
@@ -465,7 +424,7 @@ def informe_movimientos(request):
             return HttpResponse(t.render(c))
         except Exception, error:
             print error
-                
+'''                
 def liquidacion_propietarios(request):
     if request.method=='GET':
         try:  
@@ -494,8 +453,17 @@ def liquidacion_propietarios(request):
                 return HttpResponse(t.render(c))
             else:
                 return HttpResponseRedirect("/login") 
-        except Exception, error:
-                print error
+        
+            try:
+                fraccion_id=request.POST['fraccion']
+                propietario=request.POST['propietario']
+                fecha_ini=request.POST['fecha_ini']
+                fecha_fin=request.POST['fecha_fin']
+                fecha_ini_parsed = datetime.strptime(fecha_ini, "%d/%m/%Y").date()
+                fecha_fin_parsed = datetime.strptime(fecha_fin, "%d/%m/%Y").date()
+                lista_pagos=PagoDeCuotas.objects.filter()
+                manzanas_list=Manzana.objects.filter(fraccion_id__gte=fraccion_ini,fraccion_id__lte=fraccion_fin)
+                    
         
 def liquidacion_vendedores(request):
     if request.method=='GET':
@@ -522,7 +490,7 @@ def liquidacion_vendedores(request):
                 return HttpResponseRedirect("/login") 
         except Exception, error:
                 print error
-        
+'''     
 def liquidacion_gerentes(request):
     if request.method=='GET':
         try:
@@ -550,6 +518,5 @@ def liquidacion_gerentes(request):
                 print error
 
         
-            
 
     

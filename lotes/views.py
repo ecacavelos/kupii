@@ -1,6 +1,6 @@
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError
 from django.template import RequestContext, loader
-from principal.models import Lote, Venta, Manzana, Fraccion,LoteP
+from principal.models import Lote, Venta, Manzana, Fraccion
 from lotes.forms import LoteForm, FraccionManzana
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 

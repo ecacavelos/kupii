@@ -3,6 +3,9 @@
 
 <script type="text/javascript">
 $(document).ready(function() {
+	if($("#tipo_busqueda").val()=='lote'){
+		$('#busqueda').mask('###/###/####');
+	}
 	$("#fecha_hasta").hide();
 	$('#fecha_hasta').mask('##/##/####');
 	$("#fecha_hasta").datepicker({ dateFormat: 'dd/mm/yy' });
