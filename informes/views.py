@@ -1,3 +1,4 @@
+# -*- encoding: utf-8 -*-
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError
 from django.template import RequestContext, loader
 from principal.models import Lote, Fraccion, Manzana, PagoDeCuotas, Venta, Reserva, CambioDeLotes, RecuperacionDeLotes, TransferenciaDeLotes 
@@ -441,7 +442,7 @@ def informe_movimientos(request):
                     'lista_transferencias': [],
                 })
         return HttpResponse(t.render(c))
-''' 
+ 
 def liquidacion_propietarios(request):
     if request.method=='GET':
         try:  
@@ -461,47 +462,70 @@ def liquidacion_propietarios(request):
             if request.user.is_authenticated():
                 fecha_ini=request.POST['fecha_ini']
                 fecha_fin=request.POST['fecha_fin']
-                object_list = PagoDeCuotas.objects.filter(fecha_de_pago__range=fecha_ini,fecha_fin)
+                fecha_ini_parsed = datetime.strptime(fecha_ini, "%d/%m/%Y").date()
+                fecha_fin_parsed = datetime.strptime(fecha_fin, "%d/%m/%Y").date()
+                tipo_busqueda=request.POST['tipo_busqueda']
+                pagos_list=[]
+                if tipo_busqueda == "fraccion":
+                    fraccion_id=request.POST['busqueda']
+                    manzana_list =  Manzana.objects.filter(fraccion_id= fraccion_id)
+                    lista_lotes=[]
+                    for m in manzana_list:
+                        lotes_list=Lote.objects.filter(manzana_id=m.id)
+                        for l in lotes_list:
+                            lista_lotes.append(l)
+                            pagos_list = PagoDeCuotas.objects.filter(lote_id= l.id ,fecha_de_pago__range= [fecha_ini_parsed, fecha_fin_parsed])
+                else:
+                    propietario=request.POST['busqueda']
+                
+                
+                
                 
                 t = loader.get_template('informes/liquidacion_propietarios.html')
                 c = RequestContext(request, {
-                    'object_list': object_list,
+                    'pagos_list': pagos_list,
                 })
                 return HttpResponse(t.render(c))
             else:
                 return HttpResponseRedirect("/login") 
         
-            try:
-                fraccion_id=request.POST['fraccion']
-                propietario=request.POST['propietario']
-                fecha_ini=request.POST['fecha_ini']
-                fecha_fin=request.POST['fecha_fin']
-                fecha_ini_parsed = datetime.strptime(fecha_ini, "%d/%m/%Y").date()
-                fecha_fin_parsed = datetime.strptime(fecha_fin, "%d/%m/%Y").date()
+        except Exception, error:
+                print error
+        '''
+        try:
+            fraccion_id=request.POST['fraccion']
+            propietario=request.POST['propietario']
+            fecha_ini=request.POST['fecha_ini']
+            fecha_fin=request.POST['fecha_fin']
+            lista_lotes=[]
+            fecha_ini_parsed = datetime.strptime(fecha_ini, "%d/%m/%Y").date()
+            fecha_fin_parsed = datetime.strptime(fecha_fin, "%d/%m/%Y").date()
                 
-                #Obtenemos las manzanas pertenecientes a cada fraccion
-                manzanas_list=Manzana.objects.filter(fraccion_id__gte=fraccion_ini,fraccion_id__lte=fraccion_fin)
-                for m in manzanas_list:
-                    lotes_list=Lote.objects.filter(manzana_id=m.id)
-                    #Por cada manzana, obtenemos sus lotes
-                    for l in lotes_list:
-                        lista_lotes.append(l)
+            #Obtenemos las manzanas pertenecientes a cada fraccion
+            manzanas_list=Manzana.objects.filter(fraccion_id__gte=fraccion_ini,fraccion_id__lte=fraccion_fin)
+            for m in manzanas_list:
+                lotes_list=Lote.objects.filter(manzana_id=m.id)
+            #Por cada manzana, obtenemos sus lotes
+            for l in lotes_list:
+                lista_lotes.append(l)
                               
-                #Por cada lote, obtenemos los pagos de los lotes correspondientes a la fraccion              
-                for lote in lista_lotes:
-                    lista_pagos=PagoDeCuotas.objects.filter(lote_id=lote.id,fecha_de_pago__range=(fecha_ini_parsed,fecha_fin_parsed))
-                    for p in lista_pagos:
-                        object_list.append(p)
-'''
-    
-'''                   
-OJO: ayer vendí un lote, el 003/003/0005 Fraccion Rincon Alegre, para ver qué es lo que se carga en la BD. Específicamente para probar pagar más
-de una cuota de una vez, y ver cómo se almacena eso en la BD, para saber si puedo usar directamente la columna total_de_cuotas o la columna 
-total_de_pago para los calculos. Ellos toman las 10 primeras cuotas impares para hacer el cálculo de los porcentajes:
-De las cuotas 1,3,5,7,9 cobran comision el gerente y el vendedor de acuerdo al plan de pago 
-De las cuotas 11,13,15,17,19 100% para la inmobiliaria
-De la cuota 20 en adelante 100% para el propietario, o un porcentaje para la inmobiliaria, si le corresponde en el plan de pago                    
-'''
+            #Por cada lote, obtenemos los pagos de los lotes correspondientes a la fraccion              
+            for lote in lista_lotes:
+                lista_pagos=PagoDeCuotas.objects.filter(lote_id=lote.id,fecha_de_pago__range=(fecha_ini_parsed,fecha_fin_parsed))
+                for p in lista_pagos:
+                    object_list.append(p)
+                        
+        except Exception, error:
+                print error
+        '''        
+                   
+#OJO: ayer vendí un lote, el 003/003/0005 Fraccion Rincon Alegre, para ver qué es lo que se carga en la BD. Específicamente para probar pagar más
+#de una cuota de una vez, y ver cómo se almacena eso en la BD, para saber si puedo usar directamente la columna total_de_cuotas o la columna 
+#total_de_pago para los calculos. Ellos toman las 10 primeras cuotas impares para hacer el cálculo de los porcentajes:
+#De las cuotas 1,3,5,7,9 cobran comision el gerente y el vendedor de acuerdo al plan de pago 
+#De las cuotas 11,13,15,17,19 100% para la inmobiliaria
+#De la cuota 20 en adelante 100% para el propietario, o un porcentaje para la inmobiliaria, si le corresponde en el plan de pago                    
+
         
 def liquidacion_vendedores(request):
     if request.method=='GET':
