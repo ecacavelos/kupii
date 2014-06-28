@@ -379,7 +379,7 @@ def informe_movimientos(request):
             lista_aux=[]
             lista_pagos=PagoDeCuotas.objects.filter(lote_id=lote.id,fecha_de_pago__range=(fecha_ini_parsed,fecha_fin_parsed))
             
-            lista_aux.extend(lista_pagos)
+            lista_aux.append(lista_pagos)
             paginator=Paginator(lista_pagos,15)
             page=request.GET.get('page')
             try:
@@ -406,7 +406,7 @@ def informe_movimientos(request):
                 lista_aux.append(lista_transferencias)
               
             if(lista_aux):
-                lista_aux.extend(lista_aux)
+                lista_aux.append(lista_aux)
             
             paginator=Paginator(lista_aux,6)
             page=request.GET.get('page')
@@ -478,9 +478,29 @@ def liquidacion_propietarios(request):
                 fecha_fin=request.POST['fecha_fin']
                 fecha_ini_parsed = datetime.strptime(fecha_ini, "%d/%m/%Y").date()
                 fecha_fin_parsed = datetime.strptime(fecha_fin, "%d/%m/%Y").date()
-                lista_pagos=PagoDeCuotas.objects.filter(lote.manzana.fraccion_gte=fraccion_ini,lote.manzana.fraccion_lte=fraccion_fin)
-                #manzanas_list=Manzana.objects.filter(fraccion_id__gte=fraccion_ini,fraccion_id__lte=fraccion_fin)
-                    
+                
+                #Obtenemos las manzanas pertenecientes a cada fraccion
+                manzanas_list=Manzana.objects.filter(fraccion_id__gte=fraccion_ini,fraccion_id__lte=fraccion_fin)
+                for m in manzanas_list:
+                    lotes_list=Lote.objects.filter(manzana_id=m.id)
+                    #Por cada manzana, obtenemos sus lotes
+                    for l in lotes_list:
+                        lista_lotes.append(l)
+                              
+                #Por cada lote, obtenemos los pagos de los lotes correspondientes a la fraccion              
+                for lote in lista_lotes:
+                    lista_pagos=PagoDeCuotas.objects.filter(lote_id=lote.id,fecha_de_pago__range=(fecha_ini_parsed,fecha_fin_parsed))
+                    for p in lista_pagos:
+                        object_list.append(p)
+'''
+    
+'''                   
+OJO: ayer vendí un lote, el 003/003/0005 Fraccion Rincon Alegre, para ver qué es lo que se carga en la BD. Específicamente para probar pagar más
+de una cuota de una vez, y ver cómo se almacena eso en la BD, para saber si puedo usar directamente la columna total_de_cuotas o la columna 
+total_de_pago para los calculos. Ellos toman las 10 primeras cuotas impares para hacer el cálculo de los porcentajes:
+De las cuotas 1,3,5,7,9 cobran comision el gerente y el vendedor de acuerdo al plan de pago 
+De las cuotas 11,13,15,17,19 100% para la inmobiliaria
+De la cuota 20 en adelante 100% para el propietario, o un porcentaje para la inmobiliaria, si le corresponde en el plan de pago                    
 '''
         
 def liquidacion_vendedores(request):

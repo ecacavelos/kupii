@@ -75,7 +75,7 @@ function desplegar_fecha(){
 					</div>
 					<div id="listado-item-lote">
 						<table width="50%" border="1" cellpadding="0" cellspacing="0" class="listado-pagos" align="center">
-							<th>Id Pago</th><th>Venta</th><th>Lote Nro</th><th>Cliente</th><th>Cuotas Pagadas</th><th>Plan de Pago</th><th>Fecha de Pago</th><th>Total de Cuotas</th><th>Total de Mora</th><th>Total de Pago</th>
+							<th>Id Pago</th><th>Venta</th><th>Fracci&oacute;n</th><th>Lote Nro</th><th>Cliente</th><th>Cuotas Pagadas</th><th>Plan de Pago</th><th>Fecha de Pago</th><th>Total de Cuotas</th><th>Total de Mora</th><th>Total de Pago</th>
 {%if busqueda == 'cliente'%}
 {% for hw in object_list %}
 	{%for lot in hw%}
@@ -85,6 +85,9 @@ function desplegar_fecha(){
 			</td>
 			<td>
 			    {{lot.venta}}
+			</td>
+			<td>
+			    {{lot.manzana.fraccion.id}}
 			</td>	
 			<td>
 				{{lot.lote}}
@@ -123,6 +126,9 @@ function desplegar_fecha(){
 			<td>
 			    {{hw.venta.id}}
 			</td>	
+			<td>
+				{{hw.lote.manzana.fraccion.id}}
+			</td>
 			<td>
 				{{hw.lote}}
 			</td>
