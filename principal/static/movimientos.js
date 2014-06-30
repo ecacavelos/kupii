@@ -227,3 +227,66 @@ function retrievePlanPago() {
 		});
 	}
 };
+/*
+function retrievePlanPagoVendedor() {
+	if ($("#id_plan_pago_vendedores").val().toString().length > 0) {
+		// Hacemos un request POST AJAX para obtener los datos del plan de pagos ingresado.
+		var request = $.ajax({
+			type : "GET",
+			url : "/datos/4/",
+			data : {
+				plan_pago : $("#id_plan_pago_vendedores").val(),
+			}
+		});
+		// Actualizamos el formulario con los datos obtenidos del plan de pagos.
+		request.done(function(msg) {
+			//alert("Response: " + msg);
+			$("#plan_pago_error_vendedor").html("");
+			$("#plan_pago_vendedor_seleccionado").html(msg.nombre_del_plan);
+
+			// El plan es a credito.
+			if (msg.credito == "credito") {
+				$("#id_precio_venta").removeAttr("disabled").val(precio_credito);
+				$('#id_precio_venta').val(format.call($('#id_precio_venta').val().split(' ').join(''),'.',','));
+				//$("#id_precio_venta").select().focus();
+
+				$("#tipo_pago_contado").removeAttr("checked").attr("disabled", "disabled");
+				$("#tipo_pago_credito").prop("checked", true).removeAttr("disabled");
+
+				$("#cantidad_cuotas_venta").html(msg.cantidad_cuotas + " cuotas.");
+
+				$("#id_entrega_inicial").val(0).removeAttr("disabled");
+				$("#id_monto_cuota").val(0).removeAttr("disabled");
+				$("#id_entrega_inicial").select().focus();
+				cantidad_cuotas = msg.cantidad_cuotas;
+				// El plan es al contado.
+			} else {
+				$("#id_precio_venta").removeAttr("disabled").val(precio_contado);
+				$('#id_precio_venta').val(format.call($('#id_precio_venta').val().split(' ').join(''),'.',','));
+				//$("#id_precio_venta").select().focus();
+
+				$("#tipo_pago_credito").removeAttr("checked").attr("disabled", "disabled");
+				$("#tipo_pago_contado").prop("checked", true).removeAttr("disabled");
+
+				$("#cantidad_cuotas_venta").html("");
+				//alert(precio_contado);
+				$("#precio_final_venta").html(precio_contado);
+				$("#id_entrega_inicial").val(0).attr("disabled", "disabled");
+				$("#id_monto_cuota").val(0).attr("disabled", "disabled");
+				//alert("hola");
+				calculatePrecioFinalVentaLote();
+			}
+			//fecha_actual = new Date().toJSON().substring(0, 10);
+			$("#id_fecha_vencimiento").datepicker({ dateFormat: 'dd/mm/yy' });
+			$("#id_fecha_vencimiento").datepicker("setDate", new Date()).removeAttr("disabled");
+			//$("#precio_final_venta").html("");
+		});
+		// En caso de no poder obtener los datos del plan de pagos, indicamos el error.
+		request.fail(function(jqXHR, textStatus) {
+			$("#plan_pago_error").html("No se pueden obtener los datos del Plan de Pago.");
+			$("#plan_pago_seleccionado").html("");
+			//$("#id_plan_pago").select().focus();
+		});
+	}
+};
+*/

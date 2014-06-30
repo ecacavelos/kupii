@@ -475,6 +475,9 @@ def liquidacion_propietarios(request):
                         for l in lotes_list:
                             lista_lotes.append(l)
                             pagos_list = PagoDeCuotas.objects.filter(lote_id= l.id ,fecha_de_pago__range= [fecha_ini_parsed, fecha_fin_parsed])
+                    
+                    cant_pagos=[pagos_list.objects.count()]
+                        
                 else:
                     propietario=request.POST['busqueda']
                 

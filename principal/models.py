@@ -174,7 +174,7 @@ class PlanDePago(models.Model):
     inicio_cuotas_gerente = models.IntegerField()
     intervalos_cuotas_gerente = models.IntegerField()
     porcentaje_cuotas_gerente = models.IntegerField()
-    #monto_fijo_cuotas_gerente = models.IntegerField()
+    monto_fijo_cuotas_gerente = models.IntegerField()
     def __unicode__(self):
         return (self.nombre_del_plan)
     
@@ -241,7 +241,7 @@ class Venta(models.Model):
             fecha_de_venta = str(self.fecha_de_venta),
             importacion_paralot=str(self.importacion_paralot),
             plan_de_pago_vendedor_id = self.plan_de_pago_vendedor.id,
-            plan_de_pago_vendedor = self.plandepagovendedor.nombre,            
+            plan_de_pago_vendedor = self.plan_de_pago_vendedor.nombre,            
         )
     
 class Reserva(models.Model):

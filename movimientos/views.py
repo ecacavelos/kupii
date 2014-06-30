@@ -53,6 +53,7 @@ def ventas_de_lotes(request):
             nueva_venta.cliente = Cliente.objects.get(pk=cliente_id)
             nueva_venta.vendedor = Vendedor.objects.get(pk=vendedor_id)
             nueva_venta.plan_de_pago = PlanDePago.objects.get(pk=plan_pago_id)
+            nueva_venta.plan_de_pago_vendedor = PlanDePagoVendedor.objects.get(pk=plan_pago_vendedor_id)
             nueva_venta.entrega_inicial = long(data.get('venta_entrega_inicial', ''))
             nueva_venta.precio_de_cuota = long(data.get('venta_precio_de_cuota', ''))
             nueva_venta.precio_final_de_venta = long(data.get('venta_precio_final_de_venta', ''))

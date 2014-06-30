@@ -82,6 +82,7 @@ function validatePago(event) {
 			pago_nro_cuotas_a_pagar : $("#nro_cuotas_a_pagar").val(),
 			pago_cliente_id : $("#id_cliente").val(),
 			pago_plan_de_pago_id : $("#id_plan_pago").val(),
+			pago_plan_pago_vendedor_id : $("#id_plan_pago_vendedores").val(),
 			pago_vendedor_id : $("#id_vendedor").val(),
 			pago_total_de_cuotas : $("#total_cuotas").val(),
 			pago_total_de_mora : $("#total_mora").val(),
@@ -197,6 +198,7 @@ function retrieveLotePago() {
 			$("#id_vendedor").removeAttr("disabled");
 			//$("#id_vendedor").focus();
 			$("#id_plan_pago").removeAttr("disabled");
+			$("#id_plan_pago_vendedores").removeAttr("disabled");
 			//$("#id_plan_pago").focus();
 			$("#id_monto").removeAttr("disabled");
 			//$("#nro_cuotas_a_pagar").focus();
@@ -233,9 +235,10 @@ function retrieveVenta() {
 			$("#vendedor_seleccionado").val(msg[0]['vendedor']);
 			$("#plan_pago").val(msg[0]['plan_de_pago']);
 			$("#id_plan_pago").val(msg[0]['plan_de_pago_id']);
+			$("#plan_pago_vendedores").val(msg[0]['plan_de_pago_vendedores']);
+			$("#id_plan_pago_vendedores").val(msg[0]['plan_de_pago_vendedores_id']);
 			$("#precio_de_cuota").val(msg[0]['precio_de_cuota']);
 			$("#monto_cuota").val(msg[0]['precio_de_cuota']);
-			
 			$("#monto_cuota2").html(String(msg[0]['precio_de_cuota']));
 			$("#monto_cuota2").html(String(format.call($("#monto_cuota2").html().split(' ').join(''),'.',',')));
 			$("#id_fecha_venta").val(msg[0]['fecha_de_venta']);
@@ -251,6 +254,7 @@ function retrieveVenta() {
 			retrieveCliente();
 			retrieveVendedor();
 			retrievePlanPago();
+			retrievePlanPagoVendedor();
 			
 		});
 //	}
@@ -309,6 +313,12 @@ function retrieveVendedor() {
 		});
 	}
 }
+/*
+function retrievePlanes(){
+	retrievePlanPago();
+	retrievePlanPagoVendedor(); 
+}
+*/
 
 function retrievePlanPago() {
 	if ($("#id_plan_pago").val().toString().length > 0) {
@@ -331,6 +341,34 @@ function retrievePlanPago() {
 		request.fail(function(jqXHR, textStatus) {
 			$("#plan_pago_error").html("No se pueden obtener los datos del Plan de Pago.");
 			$("#plan_pago_seleccionado").html("");
+			//$("#id_plan_pago").select().focus();
+		});
+	}
+}
+
+function retrievePlanPagoVendedor() {
+	if ($("#id_plan_pago_vendedores").val().toString().length > 0) {
+		// Hacemos un request POST AJAX para obtener los datos del plan de pagos ingresado.
+		var request = $.ajax({
+			type : "GET",
+			url : "/datos/4/",
+			data : {
+				plan_pago : $("#id_plan_pago_vendedores").val(),
+			}
+			
+		});
+		alert("data");
+		// Actualizamos el formulario con los datos obtenidos del plan de pagos.
+		request.done(function(msg) {
+			//alert("Response: " + msg);
+			$("#plan_pago_vendedor_error").html("");
+			$("#plan_pago_vendedor_seleccionado").html(msg.nombre_del_plan);
+
+		});
+		// En caso de no poder obtener los datos del plan de pagos, indicamos el error.
+		request.fail(function(jqXHR, textStatus) {
+			$("#plan_pago_vendedor_error").html("No se pueden obtener los datos del Plan de Pago.");
+			$("#plan_pago_vendedor_seleccionado").html("");
 			//$("#id_plan_pago").select().focus();
 		});
 	}
