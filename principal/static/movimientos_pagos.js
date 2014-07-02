@@ -235,8 +235,8 @@ function retrieveVenta() {
 			$("#vendedor_seleccionado").val(msg[0]['vendedor']);
 			$("#plan_pago").val(msg[0]['plan_de_pago']);
 			$("#id_plan_pago").val(msg[0]['plan_de_pago_id']);
-			$("#plan_pago_vendedores").val(msg[0]['plan_de_pago_vendedores']);
-			$("#id_plan_pago_vendedores").val(msg[0]['plan_de_pago_vendedores_id']);
+			$("#plan_pago_vendedores").val(msg[0]['plan_de_pago_vendedor']);
+			$("#id_plan_pago_vendedores").val(msg[0]['plan_de_pago_vendedor_id']);
 			$("#precio_de_cuota").val(msg[0]['precio_de_cuota']);
 			$("#monto_cuota").val(msg[0]['precio_de_cuota']);
 			$("#monto_cuota2").html(String(msg[0]['precio_de_cuota']));
@@ -338,12 +338,13 @@ function retrievePlanPagoVendedor() {
 		});
 	}
 }
-/*
+
 function retrievePlanes(){
-	retrievePlanPago();
+	// retrievePlanPago();
+	retrieveLotePago();
 	retrievePlanPagoVendedor(); 
 }
-*/
+
 function retrievePlanPago() {
 	if ($("#id_plan_pago").val().toString().length > 0) {
 		// Hacemos un request POST AJAX para obtener los datos del plan de pagos ingresado.

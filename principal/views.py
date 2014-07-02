@@ -306,3 +306,21 @@ def retrieve_venta(request):
             return HttpResponseServerError("No se encontro la venta.")
 
     return HttpResponseServerError("No valido.")
+
+def retrieve_plan_pago_vendedores(request):
+    if request.method == 'GET':
+        data = request.GET
+
+        try:
+            datos_plan = PlanDePagoVendedor.objects.get(pk=data.get('plan_pago_vendedor', ''))
+            # Creamos la respuesta al request.
+            response_data = {}
+            # TODO: setear todo lo que necesites para tu vista.
+            
+#             response_data['nombre_del_plan'] = str(datos_plan.nombre_del_plan)
+#             response_data['credito'] = datos_plan.tipo_de_plan
+#             response_data['cantidad_cuotas'] = datos_plan.cantidad_de_cuotas
+            
+            return HttpResponse(json.dumps(response_data), content_type="application/json")
+        except:
+            return HttpResponseServerError("No se encontraron planes de pago.")
