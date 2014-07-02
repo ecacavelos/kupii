@@ -221,22 +221,6 @@ def retrieve_vendedor(request):
         except:
             return HttpResponseServerError("No se encontraron vendedores.")
 
-def retrieve_plan_pago(request):
-    if request.method == 'GET':
-        data = request.GET
-
-        try:
-            datos_plan = PlanDePago.objects.get(pk=data.get('plan_pago', ''))
-            # Creamos la respuesta al request.
-            response_data = {}
-            response_data['nombre_del_plan'] = str(datos_plan.nombre_del_plan)
-            response_data['credito'] = datos_plan.tipo_de_plan
-            response_data['cantidad_cuotas'] = datos_plan.cantidad_de_cuotas
-            return HttpResponse(json.dumps(response_data), content_type="application/json")
-        except:
-            return HttpResponseServerError("No se encontraron planes de pago.")
-     
-
 def get_all_planes(request):
     if request.method == 'GET':
         #data = request.GET
@@ -307,6 +291,21 @@ def retrieve_venta(request):
 
     return HttpResponseServerError("No valido.")
 
+def retrieve_plan_pago(request):
+    if request.method == 'GET':
+        data = request.GET
+
+        try:
+            datos_plan = PlanDePago.objects.get(pk=data.get('plan_pago', ''))
+            # Creamos la respuesta al request.
+            response_data = {}
+            response_data['nombre_del_plan'] = str(datos_plan.nombre_del_plan)
+            response_data['credito'] = datos_plan.tipo_de_plan
+            response_data['cantidad_cuotas'] = datos_plan.cantidad_de_cuotas
+            return HttpResponse(json.dumps(response_data), content_type="application/json")
+        except:
+            return HttpResponseServerError("No se encontraron planes de pago.")
+
 def retrieve_plan_pago_vendedores(request):
     if request.method == 'GET':
         data = request.GET
@@ -317,9 +316,9 @@ def retrieve_plan_pago_vendedores(request):
             response_data = {}
             # TODO: setear todo lo que necesites para tu vista.
             
-#             response_data['nombre_del_plan'] = str(datos_plan.nombre_del_plan)
-#             response_data['credito'] = datos_plan.tipo_de_plan
-#             response_data['cantidad_cuotas'] = datos_plan.cantidad_de_cuotas
+            response_data['nombre_del_plan'] = str(datos_plan.nombre)
+            response_data['credito'] = datos_plan.tipo
+            response_data['cantidad_cuotas'] = datos_plan.cantidad_cuotas
             
             return HttpResponse(json.dumps(response_data), content_type="application/json")
         except:

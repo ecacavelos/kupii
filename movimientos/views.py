@@ -160,7 +160,7 @@ def pago_de_cuotas(request):
         cliente_id = data.get('pago_cliente_id')
         vendedor_id = data.get('pago_vendedor_id')
         plan_pago_id = data.get('pago_plan_de_pago_id')
-        
+        plan_pago_vendedor_id=data.get('pago_plan_de_pago_vendedor_id')
         total_de_cuotas = data.get('pago_total_de_cuotas')
         total_de_mora = data.get('pago_total_de_mora')
         total_de_pago = data.get('pago_total_de_pago')
@@ -182,20 +182,22 @@ def pago_de_cuotas(request):
         cuotas_pagadas = Venta.objects.get(pk=venta.id)        
         cuotas_restantes = int(cantidad_cuotas.cantidad_de_cuotas) - int(cuotas_pagadas.pagos_realizados)        
         if cuotas_restantes >= int(nro_cuotas_a_pagar):
-        
-            nuevo_pago = PagoDeCuotas()
-            nuevo_pago.venta = Venta.objects.get(pk=venta_id)
-            nuevo_pago.lote = Lote.objects.get(pk=lote_id)
-            nuevo_pago.fecha_de_pago = fecha_pago_parsed
-            nuevo_pago.nro_cuotas_a_pagar = nro_cuotas_a_pagar
-            nuevo_pago.cliente = Cliente.objects.get(pk=cliente_id)
-            nuevo_pago.plan_de_pago = PlanDePago.objects.get(pk=plan_pago_id)
-            nuevo_pago.vendedor = Vendedor.objects.get(pk=vendedor_id)
-            nuevo_pago.total_de_cuotas = total_de_cuotas
-            nuevo_pago.total_de_mora = total_de_mora
-            nuevo_pago.total_de_pago = total_de_pago
-            
-            nuevo_pago.save()
+            try:
+                nuevo_pago = PagoDeCuotas()
+                nuevo_pago.venta = Venta.objects.get(pk=venta_id)
+                nuevo_pago.lote = Lote.objects.get(pk=lote_id)
+                nuevo_pago.fecha_de_pago = fecha_pago_parsed
+                nuevo_pago.nro_cuotas_a_pagar = nro_cuotas_a_pagar
+                nuevo_pago.cliente = Cliente.objects.get(pk=cliente_id)
+                nuevo_pago.plan_de_pago = PlanDePago.objects.get(pk=plan_pago_id)
+                nuevo_pago.plan_de_pago_vendedores= PlanDePagoVendedor.objects.get(pk=plan_pago_vendedor_id)
+                nuevo_pago.vendedor = Vendedor.objects.get(pk=vendedor_id)
+                nuevo_pago.total_de_cuotas = total_de_cuotas
+                nuevo_pago.total_de_mora = total_de_mora
+                nuevo_pago.total_de_pago = total_de_pago
+                nuevo_pago.save()
+            except Exception, error:
+                print error
             
             venta.save()
             c = RequestContext(request, {

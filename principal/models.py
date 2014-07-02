@@ -258,6 +258,7 @@ class PagoDeCuotas(models.Model):
     nro_cuotas_a_pagar = models.IntegerField()
     cliente = models.ForeignKey(Cliente)
     plan_de_pago = models.ForeignKey(PlanDePago)
+    plan_de_pago_vendedores = models.ForeignKey(PlanDePagoVendedor)
     vendedor = models.ForeignKey(Vendedor)
     total_de_cuotas = models.IntegerField()
     total_de_mora = models.IntegerField()

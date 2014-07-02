@@ -313,12 +313,13 @@ function retrieveVendedor() {
 		});
 	}
 }
-/*
+
 function retrievePlanes(){
-	retrievePlanPago();
+	// retrievePlanPago();
+	retrieveLotePago();
 	retrievePlanPagoVendedor(); 
 }
-*/
+
 
 function retrievePlanPago() {
 	if ($("#id_plan_pago").val().toString().length > 0) {
@@ -357,7 +358,7 @@ function retrievePlanPagoVendedor() {
 			}
 			
 		});
-		alert("data");
+		//alert("data");
 		// Actualizamos el formulario con los datos obtenidos del plan de pagos.
 		request.done(function(msg) {
 			//alert("Response: " + msg);

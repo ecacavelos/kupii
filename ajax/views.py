@@ -168,7 +168,7 @@ def get_propietario_name_by_id(request):
             id_propietario = request.GET['propietario_id']
             print("id ->" + id_propietario);
             object_list = Propietario.objects.filter(id= id_propietario)
-#    object_list = PlanDePago.objects.filter(plan_id=plan_id)
+            #object_list = PlanDePago.objects.filter(plan_id=plan_id)
             results = [ob.as_json() for ob in object_list]
 
             return HttpResponse(json.dumps(results), mimetype='application/json')
