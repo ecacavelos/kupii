@@ -1,9 +1,8 @@
 # -*- encoding: utf-8 -*-
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError
 from django.template import RequestContext, loader
-from principal.models import Lote, Fraccion, Manzana, PagoDeCuotas, Venta, Reserva, CambioDeLotes, RecuperacionDeLotes, TransferenciaDeLotes 
-
-from lotes.forms import LoteForm
+from principal.models import Lote, Manzana, PagoDeCuotas, Venta, Reserva, CambioDeLotes, RecuperacionDeLotes, TransferenciaDeLotes 
+from operator import attrgetter
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
 from datetime import datetime, timedelta
@@ -29,7 +28,6 @@ def lotes_libres(request):
         return HttpResponseRedirect("/login") 
     
     object_list = Lote.objects.filter(estado="1").order_by('manzana', 'nro_lote')
-    total_lotes = object_list.count()
     
     paginator=Paginator(object_list,15)
     page=request.GET.get('page')
@@ -468,18 +466,46 @@ def liquidacion_propietarios(request):
                 pagos_list=[]
                 if tipo_busqueda == "fraccion":
                     fraccion_id=request.POST['busqueda']
+                    print('Fraccion: '+fraccion_id+'\n')
                     manzana_list =  Manzana.objects.filter(fraccion_id= fraccion_id)
                     lista_lotes=[]
+                    pagos_list=[]
                     for m in manzana_list:
                         lotes_list=Lote.objects.filter(manzana_id=m.id)
                         for l in lotes_list:
                             lista_lotes.append(l)
-                            pagos_list = PagoDeCuotas.objects.filter(lote_id= l.id ,fecha_de_pago__range= [fecha_ini_parsed, fecha_fin_parsed])
-                    
-                    cant_pagos=[pagos_list.objects.count()]
+                            pago=PagoDeCuotas.objects.filter(lote_id= l.id ,fecha_de_pago__range= [fecha_ini_parsed, fecha_fin_parsed])
+                            if pago !=None:
+                                pagos_list.append(pago)
+                    #sorted(pagos_list, key=attrgetter('lote_id'))
+                    print('Lotes:' +str(len(lista_lotes)))
+                    #current_lote=pagos_list.pop(0).lote_id
+                    monto_propietario=0
+                    print('FECHA'+'\t'+'LOTE ID'+'\t'+'PLAN DE PAGO'+'\t'+'CUOTA NRO'+'\t'+'CANT. CUOTAS'+'\t'+'MONTO CUOTA'+'\t'+'MONTO INMOBILIARIA'+'\t'+'MONTO PROPIETARIO')
+                    for i in pagos_list:
+                        cant_cuotas=0
+                        for pago in i:
+                            cant_cuotas+=1
+                            if(cant_cuotas%2 !=0 ):
+                                if(cant_cuotas>0 and cant_cuotas<6):
+                                    monto_inmobiliaria=pago.total_de_cuotas*int(pago.plan_de_pago.porcentaje_cuotas_inmobiliaria/100)
+                                    monto_propietario=0
+                                elif (cant_cuotas<20):
+                                    monto_inmobiliaria=pago.total_de_cuotas
+                                    monto_propietario=0
+                                else:
+                                    monto_inmobiliaria=0
+                                    monto_propietario=pago.total_de_cuotas
+                            else:
+                                monto_inmobiliaria=0
+                                monto_propietario=pago.total_de_cuotas
+                            #print(str(cant_cuotas))
+                            print (str(pago.fecha_de_pago)+'\t'+str(pago.lote_id)+'\t'+pago.plan_de_pago.nombre_del_plan+'\t'+str(cant_cuotas)+'/'+str(pago.plan_de_pago.cantidad_de_cuotas)+'\t'+str(pago.total_de_cuotas)+'\t'+str(monto_inmobiliaria)+'\t'+str(monto_propietario)+'\n')
                         
-                else:
-                    propietario=request.POST['busqueda']
+
+                    
+                    #else:
+                    #propietario=request.POST['busqueda']
                 
                 
                 
