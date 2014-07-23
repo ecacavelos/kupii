@@ -91,7 +91,7 @@ function validatePago(event) {
 	});
 	request4.done(function(msg) {
 		alert("Se procesó el pago exitosamente.");
-		top.location.href = "/movimientos/listado_pagos";
+		top.location.href = "/movimientos/pago_cuotas";
 	});
 	request4.fail(function(jqXHR, textStatus) {
 		//console.log(request4);
