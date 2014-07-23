@@ -187,17 +187,16 @@ def clientes_atrasados(request):
 def informe_general(request):
     
     if request.method=='GET':
-        try:
-            if request.user.is_authenticated():
-                t = loader.get_template('informes/informe_general.html')
-                c = RequestContext(request, {
-                    'object_list': [],
-                })
-                return HttpResponse(t.render(c))                
-            else:
-                return HttpResponseRedirect("/login") 
-        except Exception, error:
-                print error
+
+        if request.user.is_authenticated():
+            t = loader.get_template('informes/informe_general.html')
+            c = RequestContext(request, {
+                'object_list': [],
+            })
+            return HttpResponse(t.render(c))                
+        else:
+            return HttpResponseRedirect("/login") 
+    
     else:
         try:
             if request.user.is_authenticated():
@@ -344,7 +343,6 @@ def informe_general(request):
 
 def informe_movimientos(request):
     if request.method=='GET':
-        try:
             if request.user.is_authenticated():
                 t = loader.get_template('informes/informe_movimientos.html')
                 c = RequestContext(request, {
@@ -353,8 +351,6 @@ def informe_movimientos(request):
                 return HttpResponse(t.render(c))                
             else:
                 return HttpResponseRedirect("/login") 
-        except Exception, error:
-                print error
     else:
         
         if request.user.is_authenticated():
@@ -443,17 +439,14 @@ def informe_movimientos(request):
  
 def liquidacion_propietarios(request):
     if request.method=='GET':
-        try:  
-            if request.user.is_authenticated():
-                t = loader.get_template('informes/liquidacion_propietarios.html')                
-                c = RequestContext(request, {
-                    'object_list': [],
-                })
-                return HttpResponse(t.render(c))
-            else:
-                return HttpResponseRedirect("/login") 
-        except Exception, error:
-                print error
+        if request.user.is_authenticated():
+            t = loader.get_template('informes/liquidacion_propietarios.html')                
+            c = RequestContext(request, {
+                'object_list': [],
+            })
+            return HttpResponse(t.render(c))
+        else:
+            return HttpResponseRedirect("/login")
             
     else:
         try:  
