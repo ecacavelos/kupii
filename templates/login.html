@@ -1,0 +1,32 @@
+{% extends "lotes/base_lotes.html" %}
+{% block title %} Login {% endblock %}
+{% block content %}
+   <div id="text" style="alignment-adjust: center;">
+        <table class="listado-lotes2">
+          <form action="." method="post">
+          {% csrf_token %}
+            <tr>
+                <td><label for="username">Usuario:</label></td>
+                <td><input type="text" name="username" value="" id="username"></td>
+            </tr>
+            <tr>
+                <td><label for="password">Contrase&ntilde;a:</label></td>
+                <td><input type="password" name="password" value="" id="password"></td>
+            </tr>
+            </table>
+                <input type="submit" style="cursor: pointer;" value="Login" />
+            {% if next %}
+                <input type="hidden" name="next" value="{{ next }}" /></td>
+            {% else %}
+                <input type="hidden" name="next" value="/" /></td>
+            {% endif %}
+            
+          </form>
+        
+
+
+      {% if form.errors %}
+        <p class="error">Usuario o contrase&ntilde;a incorrectos</p>
+      {% endif %}
+    </div>
+{% endblock %}

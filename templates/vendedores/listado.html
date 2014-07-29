@@ -1,0 +1,97 @@
+{% extends "lotes/base_lotes.html" %}
+{% block header_scripts %}
+<script>
+function _cerrar(){
+	window.close();
+}
+function buscar(){
+	if($("#tipo_busqueda").val()==0){
+		alert("Debe elegir un tipo de busqueda.");
+	}
+	else{
+		if($("#busqueda").val()==""){
+			alert("Debe ingresar un nombre para buscar.");
+		}else{
+			$("#frm_busqueda").submit();
+		}
+	}
+}	
+</script>
+{% endblock %}
+{% block content %}
+<div class="gri16 text-izquierda" id="breadcumb">
+						<a href="/">Inicio</a> <span class="verde-1">></span>  
+						<a href="/vendedores/">Vendedores</a> 
+						<span class="verde-1">> Listado de Vendedores</span> 
+					</div>
+
+					<div class="clear"></div>
+
+					<div class="grid_10">
+  						<h1>Listado de Vendedores</h1>
+					</div>
+
+					<div class="grid_6">
+						<form name="frm_busqueda" id="frm_busqueda" method="post" action="/movimientos/listado_busqueda_personas/">
+							
+							{% csrf_token %}
+							
+							<select id="tipo_busqueda" name="tipo_busqueda">
+								<option value="0">Elija una opcion</option>
+								<option value="nombre">Nombre</option>
+								<option value="cedula">Cedula</option>
+							</select>
+							
+							
+							
+							<input id="busqueda" type="" name="busqueda" />
+							
+							
+  							<input name="tabla" type="hidden" value="vendedor"/>
+  							
+  							<input type="button" value="Buscar" onclick="buscar();" class="historico" style="cursor: pointer"/>
+  							
+  							
+  						</form>
+					</div>
+
+					<div class="clear"></div>
+					<div id="listado-cuadro-busqueda">
+						<a href="/vendedores/agregar" class="boton-verde">Agregar Vendedor</a>
+						<br><br>
+					</div>
+					<div id="listado-item-lote">
+						<table width="50%" border="1" cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
+							<th>Cedula Nro</th><th>Nombres y apellidos</th><th>Celular</th>
+{% for hw in object_list %}
+		<tr>
+			<td>
+				<a href="{{hw.id}}">{{hw.cedula}} <strong>(Ver Detalles)</strong></a>
+			</td>
+			<td>
+				{{ hw.nombres }} {{ hw.apellidos }}
+			</td>
+			<td>
+				{{ hw.celular_1 }}
+			</td>
+		</tr>
+
+{% endfor %}
+<div class="pagination">
+    <span class="step-links">
+        {%if object_list.has_previous%}
+        <a href="?page={{ object_list.previous_page_number }}{{ultima_busqueda}}"> Anterior</a>
+		{%endif%}
+    	P&aacute;gina
+    	|{{object_list.number}}|
+    	
+    	{%if object_list.has_next%}
+		<a href="?page={{ object_list.next_page_number }}{{ultima_busqueda}}"> Siguiente</a>
+		{%endif%}
+    </span>
+</div>
+						</table>
+					</div>
+
+<div id="footer"><a href="/vendedores" class="boton-verde">Volver al módulo de Vendedores</a></div>
+{% endblock %}

@@ -1,0 +1,330 @@
+{% extends "lotes/base_lotes.html" %}
+{% block header_scripts %}
+
+<script type="text/javascript">
+$(document).ready(function() {
+	
+	$('#fecha_ini').mask('##/##/####');
+	$("#fecha_ini").datepicker({ dateFormat: 'dd/mm/yy' });
+	$('#fecha_fin').mask('##/##/####');
+	$("#fecha_fin").datepicker({ dateFormat: 'dd/mm/yy' });
+});
+
+
+function validar(){
+	if($('#fecha_ini').val()=="" || $('#fecha_fin').val()=="") {
+		alert("Debe ingresar un rango de fechas");
+		return; 		
+	}
+	if($('#lote_id').val()==0 || $('#lote_id').val()=="") {
+		alert("Debe ingresar un lote");
+		return; 		
+	}
+	$("#frm_busqueda").submit();	
+}
+	 
+</script>
+{% endblock %}
+{% block content %}
+<div class="gri16 text-izquierda" id="breadcumb">
+						<a href="/">Inicio</a> <span class="verde-1">></span>  
+						<a href="/informes/">Informes</a> 
+						<span class="verde-1">> Informe general de movimientos</span> 
+					</div>
+
+					<div class="clear"></div>
+
+					<div class="grid_10">
+  						<h1>Informe General de Movimientos de lotes </h1>
+					</div>
+
+					<div class="grid_6">
+  						<form name="frm_busqueda" id="frm_busqueda" method="post" action="/informes/informe_movimientos/">
+  							{% csrf_token %}
+  								<table>
+  									<th></th><th>Desde:</th><th>Hasta:</th>
+  									<tr>
+  										<td>
+  											Rango de Fecha:
+  										</td>
+  										<td>
+  											<input name="fecha_ini" id="fecha_ini" type="text" value="" />
+  										</td>
+  										<td>
+  											<input name="fecha_fin" id="fecha_fin" type="text" value="" />
+  										</td>
+  									</tr>
+  									<tr>
+  										<td>
+  											Lote:
+  										</td>
+  										<td>
+  											<input name="lote_id" id="lote_id" type="text" value=""/>
+  										</td>
+  										
+  									</tr>
+  									<tr>
+  										<td>
+  											<input type="button" value="Buscar" onclick="validar();" class="historico" style="cursor: pointer"/>
+  										</td>
+  										<td>
+  											<input name="tabla" type="hidden" value="lote"/>
+  										</td>
+  									</tr>
+  								</table>
+  							    
+  								
+  						</form>
+					</div>
+
+					<div class="clear"></div>
+					<div id="listado-cuadro-busqueda">
+						
+						<br><br>
+				    </div>
+				    <div id="listado-item-lote">
+						
+{%if lista_ventas %}
+<h1>Listado de ventas</h1>
+<table width="50%" border="1" cellpadding="0" cellspacing="0" class="listado-ventas" align="center">
+							<th>Venta Nro</th><th>Lote Nro</th><th>Fracci&oacute;n</th><th>Cliente</th><th>Vendedor</th><th>Fecha de Venta</th><th>Precio Final de Venta</th>
+{% for lv in lista_ventas %}
+	{%for lot in hw%}
+		<tr>
+			<td>
+				{{lot.id}} 
+			</td>
+			<td>
+				{{lot.lote}}				
+			</td>
+			<td>
+				{{lot.lote.manzana.fraccion_id}}				
+			</td>
+			<td>
+			    {{lot.cliente}}
+			</td>
+			<td>
+			    {{lot.vendedor}}
+			</td>			
+			<td>
+				{{lot.fecha_de_venta}}
+			</td>
+			<td>
+				{{lot.precio_final_de_venta}}
+			</td>
+		</tr>
+{%endfor%}
+{% endfor %}
+{%endif%}
+</table>
+</div>
+{%if lista_pagos%}
+<h1>Listado de pagos</h1>
+<div id="listado-item-lote">
+<table width="50%" border="1" cellpadding="0" cellspacing="0" class="listado-pagos" align="center">
+<th>Pago ID</th><th>Fracci&oacute;n</th><th>Lote Nro</th><th>Cliente</th><th>Cuotas Pagadas</th><th>Plan de Pago</th><th>Fecha de 
+
+Pago</th><th>Total de Cuotas</th><th>Total de Mora</th><th>Total de Pago</th>
+{% for lp in lista_pagos %}
+		<tr>
+			<td>
+			    {{lp.id}}
+			</td>
+			<td>
+			    {{lp.venta.id}}
+			</td>	
+			<td>
+				{{lp.lote}}
+			</td>
+			<td>
+			    {{lp.cliente}}
+			</td>
+			<td>
+			    {{lp.nro_cuotas_a_pagar}}
+			</td>
+			<td>
+			    {{lp.plan_de_pago}}
+			</td>
+			<td>
+			    {{lp.fecha_de_pago}}
+			</td>			
+			<td>
+				{{lp.total_de_cuotas}}
+			</td>
+			<td>
+				{{lp.total_de_mora}}
+			</td>
+			<td>
+				{{lp.total_de_pago}}
+			</td>
+		</tr>		
+{% endfor %}
+{%endif%}
+<div class="pagination">
+    <span class="step-links">
+       <div class="pagination">
+    <span class="step-links">
+        {%if object_list.has_previous%}
+        <a href="?page={{ object_list.previous_page_number }}{{ultima_busqueda}}"> Anterior</a>
+		{%endif%}
+    	P&aacute;gina
+    	|{{object_list.number}}|
+    	
+    	{%if object_list.has_next%}
+		<a href="?page={{ object_list.next_page_number }}{{ultima_busqueda}}"> Siguiente</a>
+		{%endif%}
+    </span>
+</div> 
+
+</table>
+</div>
+{%if lista_reservas%}
+<h1>Listado de reservas</h1>
+<div id="listado-item-lote">
+						<table width="50%" border="1" cellpadding="0" cellspacing="0" class="listado-lotes" 
+
+align="center">
+							<th>Codigo</th><th>Lote</th><th>Fracci&oacute;n</th><th>Cliente</th><th>Fecha 
+
+de Reserva</th>
+{% for lr in lista_reservas %}
+		<tr>
+			<td>
+			    {{lr.id}}
+			</td>			
+			<td>
+			    {{lr.lote}}
+			</td>
+			<td>
+				{{lr.lote.manzana.fraccion_id}}
+			</td>
+			<td>
+			    {{lr.cliente}}
+			</td>
+			<td>
+			    {{lr.fecha_de_reserva}}
+			</td>												
+		</tr>
+{% endfor %}
+{%endif%}
+</table>
+</div>
+{%if lista_transferencias%}
+<h1>Listado de transferencias</h1>
+<div id="listado-item-lote">
+<table width="50%" border="1" cellpadding="0" cellspacing="0" class="listado-transferencias" align="center">
+<th>Lote</th><th>Fracci&oacute;n</th><th>Fecha de Transferencia</th><th>Cliente</th><th>Cliente Original</th><th>Vendedor</th><th>Plan 
+
+de Pago</th>
+{% for lt in lista_transferencias %}
+		<tr>
+			<td>
+			    {{lt.lote}}
+			</td>
+			<td>
+				{{lt.lote.manzana.fraccion_id}}				
+			</td>	
+			<td>
+				{{lt.fecha_de_transferencia}}
+			</td>
+			<td>
+			    {{lt.cliente}}
+			</td>
+			<td>
+			    {{lt.cliente_original}}
+			</td>			
+			<td>
+				{{lt.vendedor}}
+			</td>
+			<td>
+				{{lt.plan_de_pago}}
+			</td>
+		</tr>
+{% endfor %}
+{%endif%}
+</table>
+</div>
+{%if lista_cambios%}
+<h1>Listado de cambios</h1>
+</table>
+</div>
+<div id="listado-item-lote">
+						<table width="50%" border="1" cellpadding="0" cellspacing="0" class="listado-lotes" 
+
+align="center">
+							<th>Codigo</th><th>Cliente</th><th>Fecha de Cambio</th><th>Lote 
+
+Anterior</th><th>Lote Nuevo</th>
+{% for lc in lista_cambios %}
+		<tr>
+			<td>
+			    {{lc.id}}
+			</td>	
+			<td>
+			    {{lc.cliente}}
+			</td>
+			<td>
+			    {{lc.fecha_de_cambio}}
+			</td>
+			<td>
+			    {{lc.lote_a_cambiar}}
+			</td>			
+			<td>
+				{{lc.lote_nuevo}}
+			</td>						
+		</tr>
+{% endfor %}
+{%endif%}
+</table>
+</div>
+{%if lista_recuperacion%}
+<h1>Listado de recuperacion</h1>
+<div id="listado-item-lote">
+						<table width="50%" border="1" cellpadding="0" cellspacing="0" class="listado-lotes" 
+
+align="center">
+							<th>Codigo</th><th>Lote</th><th>Fecha de 
+
+Recuperacion</th><th>Cliente</th><th>Vendedor</th><th>Venta</th>
+{% for lre in lista_recuperacion %}
+		<tr>
+			<td>
+			    {{lre.id}}
+			</td>	
+			<td>
+			    {{lre.lote}}
+			</td>
+			<td>
+			    {{lre.fecha_de_recuperacion}}
+			</td>
+			<td>
+			    {{lre.cliente}}
+			</td>
+			<td>
+			    {{lre.vendedor}}
+			</td>
+			<td>
+			    {{lre.venta}}
+			</td>
+		</tr>
+{% endfor %}
+{%endif%}
+</table>
+</div>
+<div class="pagination">
+    <span class="step-links">
+       <div class="pagination">
+    <span class="step-links">
+        {%if listaP.has_previous%}
+        <a href="?page={{ listaP.previous_page_number }}"> Anterior</a>
+		{%endif%}
+    	P&aacute;gina
+    	|{{listaP.number}}|
+    	
+    	{%if listaP.has_next%}
+		<a href="?page={{ listaP.next_page_number }}"> Siguiente</a>
+		{%endif%}
+    </span>
+</div> 
+<div id="footer"><a href="/movimientos" class="boton-verde">Volver al módulo de Movimientos</a></div>
+{% endblock %}
