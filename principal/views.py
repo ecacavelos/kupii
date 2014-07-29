@@ -5,6 +5,7 @@ from principal.models import Lote, Cliente, Vendedor, PlanDePago, Fraccion, Manz
 from django.utils import simplejson as json
 from datetime import datetime
 from django.contrib import auth
+import common_functions
 
 def logout(request):
     auth.logout(request)
@@ -327,17 +328,12 @@ def retrieve_plan_pago_vendedores(request):
 
 
 
-def get_cuotas_detail_by_lote(request):
+def get_cuotas_lotes_detalles(request):
 
     if request.method == 'GET':
         lote_id = request.GET['lote_id']
         print("buscando pagos del lote --> " + lote_id);
-    
-        #El query es: select sum(nro_cuotas_a_pagar) from principal_pagodecuotas where lote_id = 16108;
-        cant_cuotas_pagadas = PagoDeCuotas.objects.filter(lote=lote_id).aggregate(Sum('nro_cuotas_a_pagar'))
-        venta = Venta.objects.get(lote_id=lote_id)
-        plan_de_pago= PlanDePago.objects.get(id=venta.plan_de_pago.id)
-        datos = dict([('cant_cuotas_pagadas', cant_cuotas_pagadas['nro_cuotas_a_pagar__sum']), ('cantidad_total_cuotas', plan_de_pago.cantidad_de_cuotas)]);
-#         results = [ob.as_json() for ob in object_list]
-#         json.dumps(results)
+        datos = common_functions.get_cuotas_detail_by_lote(lote_id)
         return HttpResponse(json.dumps(datos), mimetype='application/json')
+    
+
