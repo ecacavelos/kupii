@@ -627,7 +627,7 @@ def liquidacion_vendedores(request):
                 pagos_list=PagoDeCuotas.objects.filter(vendedor_id=vendedor_id,fecha_de_pago__range= [fecha_ini_parsed, fecha_fin_parsed])
                 for p in pagos_list:
                     lote=Lote.objects.get(pk=p.lote_id)
-                    if lote.id not in lotes_list:
+                    if lote not in lotes_list:
                         lotes_list.append(lote)
                 total_importe=0
                 total_comision=0
@@ -638,13 +638,12 @@ def liquidacion_vendedores(request):
                 
                 
                 for l in lotes_list:
-                    cant_cuotas = 0
                     for i in pagos_list:
-                        #get_nro_cuota(i)
-                        print 'Fecha: '+str(i.fecha_de_pago)+' Pago id: '+str(i.id)+' Lote: '+str(i.lote_id)+' '+str(get_nro_cuota(i))
-                        '''
-                            cant_cuotas += 1
-                            if(cant_cuotas % 2 != 0 and cant_cuotas < 10):
+                        #print 'Fecha: '+str(i.fecha_de_pago)+' Pago id: '+str(i.id)+' Lote: '+str(i.lote_id)+' '+str(get_nro_cuota(i))
+                        if(l.id==i.lote_id):
+                            cuota=get_nro_cuota(i)
+                            if(cuota % 2 != 0 and cuota < 10):
+                                print str(i.id)
                                 importe = i.total_de_cuotas
                                 comision = i.total_de_cuotas * int(i.plan_de_pago_vendedores.porcentaje_de_cuotas / 100)
                                 total_importe += importe
@@ -652,7 +651,7 @@ def liquidacion_vendedores(request):
                                 try:
                                     lista_fila.append(i.cliente.apellidos + ' ' + i.cliente.nombres)
                                     lista_fila.append(i.lote)
-                                    lista_fila.append(str(cant_cuotas) + '/' + str(i.plan_de_pago.cantidad_de_cuotas))
+                                    lista_fila.append(str(cuota) + '/' + str(i.plan_de_pago.cantidad_de_cuotas))
                                     lista_fila.append(i.fecha_de_pago)
                                     lista_fila.append(str('{:,}'.format(importe)).replace(",", "."))
                                     lista_fila.append(str('{:,}'.format(comision)).replace(",", "."))
@@ -660,11 +659,11 @@ def liquidacion_vendedores(request):
                                     lista_fila = []
                                 except Exception, error:
                                     print error
-                        '''            
+                            
                 
                     
-                    #totales_vendedor.append(total_importe)
-                    #totales_vendedor.append(total_comision)
+                    totales_vendedor.append(total_importe)
+                    totales_vendedor.append(total_comision)
                     print 'hola'
                     t = loader.get_template('informes/liquidacion_vendedores.html')
                     c = RequestContext(request, {

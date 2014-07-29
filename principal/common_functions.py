@@ -1,6 +1,7 @@
 from django.db.models import Count, Min, Sum, Avg
 from principal.models import Lote, Cliente, Vendedor, PlanDePago, Fraccion, Manzana, Venta, Propietario, PlanDePagoVendedor,PagoDeCuotas
 from monthdelta import MonthDelta
+
 def get_cuotas_detail_by_lote(lote_id=None):
 
     print("buscando pagos del lote --> " + lote_id);    
@@ -17,12 +18,15 @@ def get_nro_cuota(pago):
     PagoDeCuotas(pago)
     lote_id=pago.lote_id
     fecha_fin=pago.fecha_de_pago
-    cuotas_pagadas = PagoDeCuotas.objects.filter(lote=lote_id).order_by('fecha_de_pago')
+    pago_id=pago.id
+    cuotas_pagadas = PagoDeCuotas.objects.filter(lote=lote_id).order_by('id','fecha_de_pago')
     nro_cuota=0
+    current_pago=pago_id
     for cuota in cuotas_pagadas:
         if(cuota.fecha_de_pago<=fecha_fin):
             nro_cuota+=1
-        else:
+        else:    
             break
-    datos=dict([('nro_cuota',nro_cuota)])
+    #datos=dict([('nro_cuota',nro_cuota)])
+    datos=nro_cuota
     return datos
