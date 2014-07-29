@@ -335,5 +335,21 @@ def get_cuotas_lotes_detalles(request):
         print("buscando pagos del lote --> " + lote_id);
         datos = common_functions.get_cuotas_detail_by_lote(lote_id)
         return HttpResponse(json.dumps(datos), mimetype='application/json')
+  
+'''    
+def get_numero_de_cuota():
     
+    if request.method == 'GET':
+        lote_id = request.GET['lote_id']
+        fecha_fin= request.GET['fecha_fin']
+        print("buscando pagos del lote --> " + lote_id);
+        datos = common_functions.get_nro_cuota(lote_id,fecha_fin)
+        return HttpResponse(json.dumps(datos), mimetype='application/json')
+''' 
+
+
+
+
+
+
 

@@ -11,4 +11,18 @@ def get_cuotas_detail_by_lote(lote_id=None):
 #     calcular la fecha de vencimiento.
     proximo_vencimiento = (venta.fecha_de_venta + MonthDelta(cant_cuotas_pagadas['nro_cuotas_a_pagar__sum'])).strftime('%d/%m/%Y')
     datos = dict([('cant_cuotas_pagadas', cant_cuotas_pagadas['nro_cuotas_a_pagar__sum']), ('cantidad_total_cuotas', plan_de_pago.cantidad_de_cuotas), ('proximo_vencimiento', proximo_vencimiento)])
-    return datos;
+    return datos    
+
+def get_nro_cuota(pago):
+    PagoDeCuotas(pago)
+    lote_id=pago.lote_id
+    fecha_fin=pago.fecha_de_pago
+    cuotas_pagadas = PagoDeCuotas.objects.filter(lote=lote_id).order_by('fecha_de_pago')
+    nro_cuota=0
+    for cuota in cuotas_pagadas:
+        if(cuota.fecha_de_pago<=fecha_fin):
+            nro_cuota+=1
+        else:
+            break
+    datos=dict([('nro_cuota',nro_cuota)])
+    return datos
