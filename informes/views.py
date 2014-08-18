@@ -8,7 +8,7 @@ from django.db.models import Q
 from datetime import datetime, timedelta
 from calendar import monthrange
 from principal.common_functions import get_nro_cuota
-
+from django.utils import simplejson
 
 # Funcion principal del modulo de lotes.
 def informes(request):
@@ -615,62 +615,13 @@ def liquidacion_vendedores(request):
             return HttpResponseRedirect("/login") 
         
     else:
-        if request.user.is_authenticated():
-            fecha_ini=request.POST['fecha_ini']
-            fecha_fin=request.POST['fecha_fin']
-            fecha_ini_parsed = datetime.strptime(fecha_ini, "%d/%m/%Y").date()
-            fecha_fin_parsed = datetime.strptime(fecha_fin, "%d/%m/%Y").date()
-            tipo_busqueda=request.POST['tipo_busqueda']
-            if(tipo_busqueda=='vendedor_id'):
-                vendedor_id=request.POST['busqueda']
-                lotes_list=[]
-                pagos_list=PagoDeCuotas.objects.filter(vendedor_id=vendedor_id,fecha_de_pago__range= [fecha_ini_parsed, fecha_fin_parsed])
-                for p in pagos_list:
-                    lote=Lote.objects.get(pk=p.lote_id)
-                    if lote not in lotes_list:
-                        lotes_list.append(lote)
-                total_importe=0
-                total_comision=0
-                totales_fraccion=[]
-                totales_vendedor=[]
-                lista_fila=[]
-                lista_pagos=[]
-                
-                
-                for l in lotes_list:
-                    for i in pagos_list:
-                        #print 'Fecha: '+str(i.fecha_de_pago)+' Pago id: '+str(i.id)+' Lote: '+str(i.lote_id)+' '+str(get_nro_cuota(i))
-                        if(l.id==i.lote_id):
-                            cuota=get_nro_cuota(i)
-                            if(cuota % 2 != 0 and cuota < 10):
-                                print str(i.id)
-                                importe = i.total_de_cuotas
-                                comision = i.total_de_cuotas * int(i.plan_de_pago_vendedores.porcentaje_de_cuotas / 100)
-                                total_importe += importe
-                                total_comision += comision
-                                try:
-                                    lista_fila.append(i.cliente.apellidos + ' ' + i.cliente.nombres)
-                                    lista_fila.append(i.lote)
-                                    lista_fila.append(str(cuota) + '/' + str(i.plan_de_pago.cantidad_de_cuotas))
-                                    lista_fila.append(i.fecha_de_pago)
-                                    lista_fila.append(str('{:,}'.format(importe)).replace(",", "."))
-                                    lista_fila.append(str('{:,}'.format(comision)).replace(",", "."))
-                                    lista_pagos.append(lista_fila)
-                                    lista_fila = []
-                                except Exception, error:
-                                    print error
-                            
-                
-                    
-                    totales_vendedor.append(total_importe)
-                    totales_vendedor.append(total_comision)
-                    print 'hola'
-                    t = loader.get_template('informes/liquidacion_vendedores.html')
-                    c = RequestContext(request, {
-                        'object_list': lista_pagos,
-                        'totales_vendedor': totales_vendedor,
-                    })
-                    return HttpResponse(t.render(c))
+        
+        t = loader.get_template('informes/liquidacion_vendedores.html')
+        c = RequestContext(request, {
+            #'pagos_list': pagos_list,
+            #'lista_totales_vendedor': lista_totales_vendedor,
+        })
+        return HttpResponse(t.render(c))
                 
 def liquidacion_gerentes(request):
     if request.method=='GET':

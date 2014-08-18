@@ -265,8 +265,14 @@ class PagoDeCuotas(models.Model):
     total_de_pago = models.IntegerField()
     def as_json(self):
         return dict(
+            lote=str(self.lote),
+            fecha_de_pago=str(self.fecha_de_pago),
+            cliente=str(self.cliente),
+            plan_de_pago=self.plan_de_pago_id,
+            plan_de_pago_vendedores=self.plan_de_pago_vendedores_id, 
             nro_cuotas_a_pagar = self.nro_cuotas_a_pagar,
             total_de_cuotas = self.total_de_cuotas,
+            
         )
 
 class TransferenciaDeLotes(models.Model):

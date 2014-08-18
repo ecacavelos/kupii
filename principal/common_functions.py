@@ -16,17 +16,10 @@ def get_cuotas_detail_by_lote(lote_id=None):
 
 def get_nro_cuota(pago):
     PagoDeCuotas(pago)
-    lote_id=pago.lote_id
-    fecha_fin=pago.fecha_de_pago
     pago_id=pago.id
-    cuotas_pagadas = PagoDeCuotas.objects.filter(lote=lote_id).order_by('id','fecha_de_pago')
-    nro_cuota=0
-    current_pago=pago_id
-    for cuota in cuotas_pagadas:
-        if(cuota.fecha_de_pago<=fecha_fin):
-            nro_cuota+=1
-        else:    
-            break
-    #datos=dict([('nro_cuota',nro_cuota)])
-    datos=nro_cuota
-    return datos
+    lote_id=pago.lote_id
+    #fecha_fin=pago.fecha_de_pago
+    cant_cuotas = PagoDeCuotas.objects.filter(lote_id=lote_id, pk__lte=pago_id).count()
+    
+    return cant_cuotas
+
