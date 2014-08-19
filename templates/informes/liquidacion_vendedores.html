@@ -33,8 +33,39 @@
 	}
 	
 	function calculartotales(data){
-		alert("hola");
-		
+		var fraccion_actual=data[0].fraccion_id;
+		var importe=0;
+		var comision=0;
+		var total_importe_vendedor=0;
+		var total_comision_vendedor=0;
+		for(var i=0;i<data.length;i++){
+			if(data[i].fraccion_id==fraccion_actual){
+				importe+=data[i].importe;
+				comision+=data[i].comision;
+				$('#tabla_vendedores').append("<tr><td>"+data[i].cliente+"</td><td>"+data[i].lote+"</td><td>"+data[i].cuota_nro+"</td><td>"+data[i].fecha_pago+"</td><td>"+data[i].importe+"</td><td>"+data[i].comision+"</td><td>"+data[i].fraccion+"</td></tr>");
+				total_importe_vendedor+=importe;
+				total_comision_vendedor+=comision;
+				//si es la ultima fila
+				if (i==data.length-1){
+					$('#tabla_vendedores').append("<tr><td colspan='4'>Totales de Fraccion</td><td>"+importe+"</td><td>"+comision+"</td></tr>");
+					$('#tabla_vendedores').append("<tr><td colspan='4'>Totales del Vendedor</td><td>"+total_importe_vendedor+"</td><td>"+total_comision_vendedor+"</td></tr>");	
+				}
+			}
+			else{
+				 						
+				$('#tabla_vendedores').append("<tr><td colspan='4'>Totales de Fraccion</td><td>"+importe+"</td><td>"+comision+"</td></tr>");
+				$('#tabla_vendedores').append("<tr><td>"+data[i].cliente+"</td><td>"+data[i].lote+"</td><td>"+data[i].cuota_nro+"</td><td>"+data[i].fecha_pago+"</td><td>"+data[i].importe+"</td><td>"+data[i].comision+"</td><td>"+data[i].fraccion+"</td></tr>");
+				fraccion_actual=data[i].fraccion_id;	
+				importe=0;
+				comision=0;
+				importe+=data[i].importe;
+				comision+=data[i].comision;
+
+						
+			}
+					
+		}
+		alert("Ola k ase");
 	}		
 
 
@@ -100,22 +131,11 @@
 </div>
 <div id="listado-item-lote">
 	<table id="tabla_vendedores" width="50%" border="1" cellpadding="0" cellspacing="0" class="listado-pagos" align="center">
-		<th>Cliente</th><th>Lote Nro</th><th>Cuota Nº</th><th>Fecha de Pago</th><th>Importe</th><th>Comision</th>
+		<th>Cliente</th><th>Lote Nro</th><th>Cuota Nº</th><th>Fecha de Pago</th><th>Importe</th><th>Comisi&oacute;n</th><th>Fracci&oacute;n</th>
 
-		{% for hw in data %}
-		<tr>
-			<td>{{hw.0}}</td>
-			<td>{{hw.1}}</td>
-			<td>{{hw.2}}</td>
-			<td>{{hw.3}}</td>
-			<td>{{hw.4}}</td>
-			<td>{{hw.5}}</td>
-			<!--<td>{{hw.6}}</td>-->
-		</tr>
-		<tr id='fila-{{forloop.counter}}' style="display: none;"></tr>
-
-		{% endfor %}
-		<tr id='fila_totales' style="display: none;"></tr>
+		
+		
+		<tr id='fila_totales_fraccion' style="display: none;"></tr>
 		<div class="pagination">
 			<span class="step-links"> {%if object_list.has_previous%} <a href="?page={{ object_list.previous_page_number }}"> Anterior</a> {%endif%}
 				P&aacute;gina

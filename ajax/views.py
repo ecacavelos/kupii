@@ -281,11 +281,12 @@ def get_lista_pagos(request):
         select pc.* from principal_pagodecuotas pc, principal_lote l, principal_manzana m, principal_fraccion f
         where pc.fecha_de_pago >= \''''+ fecha_ini +               
         '''\' and pc.fecha_de_pago <= \'''' + fecha_fin +
-        '''\' and pc.vendedor_id=''' + vendedor_id +                ''' 
+        '''\' and pc.vendedor_id=''' + vendedor_id +                
+        ''' 
         and (pc.lote_id = l.id and l.manzana_id=m.id and m.fraccion_id=f.id) order by f.id,pc.fecha_de_pago
         '''
         )
-        print query
+        #print query
         object_list=list(PagoDeCuotas.objects.raw(query))
         cuotas=[]
         for i in object_list:
@@ -301,7 +302,7 @@ def get_lista_pagos(request):
                 cuota['importe']=i.total_de_cuotas
                 cuota['comision']=int(i.total_de_cuotas*(i.plan_de_pago_vendedores.porcentaje_de_cuotas/100))
                 cuotas.append(cuota)
-        print 'hola'
+        #print 'hola'
         return HttpResponse(json.dumps(cuotas), mimetype='application/json')
 
 
