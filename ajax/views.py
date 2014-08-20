@@ -266,47 +266,54 @@ def get_pagos_by_venta(request):
     return HttpResponse(json.dumps(results), mimetype='application/json')
 
 
+
+
 @require_http_methods(["GET"])
 def get_lista_pagos(request):
     
-    vendedor_id = request.GET['busqueda']
-    print("vendedor_id ->" + vendedor_id);
+    #vendedor_id = request.GET['busqueda']
+    #print("vendedor_id ->" + vendedor_id);
     fecha_ini=request.GET['fecha_ini']
     fecha_fin=request.GET['fecha_fin']
     tipo_busqueda=request.GET['tipo_busqueda']
     if(tipo_busqueda=='vendedor_id'):
         vendedor_id=request.GET['busqueda']
-        query=(
-        '''
-        select pc.* from principal_pagodecuotas pc, principal_lote l, principal_manzana m, principal_fraccion f
-        where pc.fecha_de_pago >= \''''+ fecha_ini +               
-        '''\' and pc.fecha_de_pago <= \'''' + fecha_fin +
-        '''\' and pc.vendedor_id=''' + vendedor_id +                
-        ''' 
-        and (pc.lote_id = l.id and l.manzana_id=m.id and m.fraccion_id=f.id) order by f.id,pc.fecha_de_pago
-        '''
-        )
-        #print query
-        object_list=list(PagoDeCuotas.objects.raw(query))
-        cuotas=[]
-        for i in object_list:
-            nro_cuota=get_nro_cuota(i)
-            if(nro_cuota%2!=0 and nro_cuota<10):
-                cuota={}            
-                cuota['fraccion_id']=i.lote.manzana.fraccion.id
-                cuota['fraccion']=str(i.lote.manzana.fraccion)
-                cuota['cliente']=str(i.cliente)
-                cuota['lote']=str(i.lote)
-                cuota['cuota_nro']=str(nro_cuota)+'/'+str(i.plan_de_pago.cantidad_de_cuotas)
-                cuota['fecha_pago']=str(i.fecha_de_pago)
-                cuota['importe']=i.total_de_cuotas
-                cuota['comision']=int(i.total_de_cuotas*(i.plan_de_pago_vendedores.porcentaje_de_cuotas/100))
-                cuotas.append(cuota)
-        #print 'hola'
-        return HttpResponse(json.dumps(cuotas), mimetype='application/json')
-
-
-
-
+        print("vendedor_id ->" + vendedor_id)
+    if(tipo_busqueda=='nombre'):
+        nombre_vendedor=request.GET['busqueda']
+        print("nombre_vendedor ->" + nombre_vendedor)
+        vendedor=Vendedor.objects.get(nombres__icontains=nombre_vendedor)
+        vendedor_id=str(vendedor.id)
+    query=(
+    '''
+    select pc.* from principal_pagodecuotas pc, principal_lote l, principal_manzana m, principal_fraccion f
+    where pc.fecha_de_pago >= \''''+ fecha_ini +               
+    '''\' and pc.fecha_de_pago <= \'''' + fecha_fin +
+    '''\' and pc.vendedor_id=''' + vendedor_id +                
+    ''' 
+    and (pc.lote_id = l.id and l.manzana_id=m.id and m.fraccion_id=f.id) order by f.id,pc.fecha_de_pago
+    '''
+    )
+        
+        
+    object_list=list(PagoDeCuotas.objects.raw(query))
+    cuotas=[]
+    for i in object_list:
+        nro_cuota=get_nro_cuota(i)
+        if(nro_cuota%2!=0 and nro_cuota<10):
+            cuota={}            
+            cuota['fraccion_id']=i.lote.manzana.fraccion.id
+            cuota['fraccion']=str(i.lote.manzana.fraccion)
+            cuota['cliente']=str(i.cliente)
+            cuota['lote']=str(i.lote)
+            cuota['cuota_nro']=str(nro_cuota)+'/'+str(i.plan_de_pago.cantidad_de_cuotas)
+            cuota['fecha_pago']=str(i.fecha_de_pago)
+            cuota['importe']=i.total_de_cuotas
+            cuota['comision']=int(i.total_de_cuotas*(i.plan_de_pago_vendedores.porcentaje_de_cuotas/100))
+            cuotas.append(cuota)
+    print 'hola'
+    return HttpResponse(json.dumps(cuotas), mimetype='application/json')
+    
+            
 
 
