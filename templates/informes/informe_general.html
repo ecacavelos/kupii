@@ -9,66 +9,69 @@ $(document).ready(function() {
 	$('#fecha_fin').mask('##/##/####');
 	$("#fecha_fin").datepicker({ dateFormat: 'dd/mm/yy' });
 	
-	lista_total_cuotas=[];
-	lista_total_pagos=[];
-	lista_total_mora=[];
-		
-	lista_cambios=[];
-	lista_totales_acumulados=[];
-	
-	lista_totales_acumulados[1]="0";
-	lista_totales_acumulados[2]="0";
-	lista_totales_acumulados[3]="0";
-	
-	
-	{%for tc in lista_total_cuotas%}
-	 lista_total_cuotas[{{forloop.counter}}]= "<td>{{tc}}</td>";
-	{%endfor%} 
-	{%for tp in lista_total_pagos%}
-	 lista_total_pagos[{{forloop.counter}}]= "<td>{{tp}}</td>";
-	{%endfor%} 
-	{%for tm in lista_total_mora%}
-	 lista_total_mora[{{forloop.counter}}]= "<td>{{tm}}</td>";
-	{%endfor%} 
-	{%for lc in lista_cambios%}
-	 lista_cambios[{{forloop.counter}}]= "{{lc}}";
-	{%endfor%}
-	{%for ta in lista_totales_acumulados%}
-	 lista_totales_acumulados[{{forloop.counter}}]= "{{ta}}";
-	{%endfor%} 
-
-//creamos la tabla con los resultados de las sumatorias de pagos, mora y cuotas por cada fraccion.
-//la tabla está ordenada por fracciones, se despliega cuando cambia la fraccion.
-
-var tablaTotales="<td colspan='7'>Totales Fraccion:</td>"; 
-
-for(var i=1;i<=lista_total_pagos.length;i++){
-	fila=tablaTotales+lista_total_cuotas[i]+lista_total_mora[i]+lista_total_pagos[i];
-	console.log(fila);
-	$('#fila-'+lista_cambios[i]).html(fila);
-	$('#fila-'+lista_cambios[i]).show();
-	
-}
-
-		fila="<td colspan='7'>Totales Generales:</td><td>"+lista_totales_acumulados[1]+"</td><td>"+lista_totales_acumulados[2]+"</td><td>"+lista_totales_acumulados[3]+"</td>";
-		$('#fila_totales').html(fila);
-		$('#fila_totales').show();	
-});
-
-
-
-function validar(){
-	if($('#fecha_ini').val()=="" || $('#fecha_fin').val()=="") {
-		alert("Debe ingresar un rango de fechas");
-		return; 		
+	});
+	function validar(){
+		var request_pagos= $.ajax({
+					url : '/ajax/get_informe_general/',
+					type : "GET",
+					data : {
+						fecha_ini: $('#fecha_ini').val(),
+						fecha_fin: $('#fecha_fin').val(),
+						fraccion_ini: $('#fraccion_ini').val(),
+						fraccion_fin: $('#fraccion_fin').val()
+					},
+					dataType : "json"
+				});
+  				request_pagos.success(function (data){
+  				
+				alert("hola");
+				calculartotales(data);					
+				});			
 	}
-	if($('#fraccion_ini').val()==0 || $('#fraccion_fin').val()==0 || $('#fraccion_ini').val()=="" || $('#fraccion_fin').val()=="") {
-		alert("Debe ingresar un rango de fracciones");
-		return; 		
+	
+	function calculartotales(data){
+		var fraccion_actual=data[0].fraccion_id;
+		var total_cuotas=0;
+		var total_mora=0;
+		var total_pagos=0;
+		var total_general_cuotas=0;
+		var total_general_mora=0;
+		var total_general_pagos=0;
+		for(var i=0;i<data.length;i++){
+			//se suman los totales por fracion
+			if(data[i].fraccion_id==fraccion_actual){
+				total_cuotas+=data[i].total_de_cuotas;
+				total_mora+=data[i].total_de_mora;
+				total_pagos+=data[i].total_de_pago;
+				$('#tabla_pagos').append("<tr><td>"+data[i].fraccion+"</td><td>"+data[i].lote+"</td><td>"+data[i].cliente+"</td><td>"+data[i].cuota_nro+"</td><td>"+data[i].plan_de_pago+"</td><td>"+data[i].fecha_pago+"</td><td>"+data[i].total_de_cuotas+"</td><td>"+data[i].total_de_mora+"</td><td>"+data[i].total_de_pago+"</td></tr>");
+				//... y acumulamos para los totales generales
+				total_general_cuotas+=data[i].total_de_cuotas;
+				total_general_mora+=data[i].total_de_mora;
+				total_general_pagos+=data[i].total_de_pago;
+				//si es la ultima fila
+				if (i==data.length-1){
+					$('#tabla_pagos').append("<tr><td colspan='6'>Totales de Fraccion: </td><td>"+total_cuotas+"</td><td>"+total_mora+"</td><td>"+total_pagos+"</td></tr>");
+					$('#tabla_pagos').append("<tr><td colspan='6'>Totales Generales: </td><td>"+total_general_cuotas+"</td><td>"+total_general_mora+"</td><td>"+total_general_pagos+"</td></tr>");
+				}
+			}
+			else{
+				 						
+				$('#tabla_pagos').append("<tr><td colspan='6'>Totales de Fraccion: </td><td>"+total_cuotas+"</td><td>"+total_mora+"</td><td>"+total_pagos+"</td></tr>");
+				$('#tabla_pagos').append("<tr><td>"+data[i].fraccion+"</td><td>"+data[i].lote+"</td><td>"+data[i].cliente+"</td><td>"+data[i].cuota_nro+"</td><td>"+data[i].plan_de_pago+"</td><td>"+data[i].fecha_pago+"</td><td>"+data[i].total_de_cuotas+"</td><td>"+data[i].total_de_mora+"</td><td>"+data[i].total_de_pago+"</td></tr>");
+				fraccion_actual=data[i].fraccion_id;	
+				total_cuotas=0;
+				total_mora=0;
+				total_pagos=0;
+				total_cuotas+=data[i].total_de_cuotas;
+				total_mora+=data[i].total_de_mora;
+				total_pagos+=data[i].total_de_pago;								
+			}
+					
+			
+		}	
 	}
-	$("#frm_busqueda").submit();	
-}
-	 
+	
+
 </script>
 {% endblock %}
 {% block content %}
@@ -131,9 +134,10 @@ function validar(){
 						<br><br>
 					</div>
 					<div id="listado-item-lote">
-						<table width="50%" border="1" cellpadding="0" cellspacing="0" class="listado-pagos" align="center">
-							<th>Pago ID</th><th>Fracci&oacute;n</th><th>Lote Nro</th><th>Cliente</th><th>Cuotas Pagadas</th><th>Plan de Pago</th><th>Fecha de Pago</th><th>Total de Cuotas</th><th>Total de Mora</th><th>Total de Pago</th>
+						<table id="tabla_pagos" width="50%" border="1" cellpadding="0" cellspacing="0" class="listado-pagos" align="center">
+							<th>Fracci&oacute;n</th><th>Lote Nro</th><th>Cliente</th><th>Cuota Nº</th><th>Plan de Pago</th><th>Fecha de Pago</th><th>Total de Cuotas</th><th>Total de Mora</th><th>Total de Pago</th>
 
+<!--
 {% for hw in object_list %}
 		<tr>
 			<td>
@@ -170,7 +174,7 @@ function validar(){
 			
 		</tr>
 		<tr id='fila-{{forloop.counter}}' style="display: none;"></tr>		
-		
+	-->	
 {% endfor %}
 		<tr id='fila_totales' style="display: none;"></tr>
 <div class="pagination">
