@@ -13,6 +13,19 @@
 	
 	
 	});
+	
+	function format(nro){
+
+		var number = new String(nro);
+		var result = '';
+		while( number.length > 3 ){
+			result = '.' + number.substr(number.length - 3) + result;
+	 		number = number.substring(0, number.length - 3);
+		}
+		result = number + result;
+		return result;
+	};
+	
 	function validar(){
 		var request_pagos= $.ajax({
 					url : '/ajax/get_lista_pagos/',
@@ -42,19 +55,19 @@
 			if(data[i].fraccion_id==fraccion_actual){
 				importe+=data[i].importe;
 				comision+=data[i].comision;
-				$('#tabla_vendedores').append("<tr><td>"+data[i].cliente+"</td><td>"+data[i].lote+"</td><td>"+data[i].cuota_nro+"</td><td>"+data[i].fecha_pago+"</td><td>"+data[i].importe+"</td><td>"+data[i].comision+"</td><td>"+data[i].fraccion+"</td></tr>");
+				$('#tabla_vendedores').append("<tr><td>"+data[i].cliente+"</td><td>"+data[i].lote+"</td><td>"+data[i].cuota_nro+"</td><td>"+data[i].fecha_pago+"</td><td>"+format(data[i].importe)+"</td><td>"+format(data[i].comision)+"</td><td>"+data[i].fraccion+"</td></tr>");
 				total_importe_vendedor+=importe;
 				total_comision_vendedor+=comision;
 				//preguntamos si es la ultima fila de la tabla, para imprimir los totales generales del vendedor
 				if (i==data.length-1){
-					$('#tabla_vendedores').append("<tr><td colspan='4'>Totales de Fraccion</td><td>"+importe+"</td><td>"+comision+"</td></tr>");
-					$('#tabla_vendedores').append("<tr><td colspan='4'>Totales del Vendedor</td><td>"+total_importe_vendedor+"</td><td>"+total_comision_vendedor+"</td></tr>");	
+					$('#tabla_vendedores').append("<tr><td colspan='4'>Totales de Fraccion</td><td>"+format(importe)+"</td><td>"+format(comision)+"</td></tr>");
+					$('#tabla_vendedores').append("<tr><td colspan='4'>Totales del Vendedor</td><td>"+format(total_importe_vendedor)+"</td><td>"+format(total_comision_vendedor)+"</td></tr>");	
 				}
 			}
 			else{
 				//al cambiar de fraccion, se imprimen los totales acumulados, y se suman los totales para la siguiente
-				$('#tabla_vendedores').append("<tr><td colspan='4'>Totales de Fraccion</td><td>"+importe+"</td><td>"+comision+"</td></tr>");
-				$('#tabla_vendedores').append("<tr><td>"+data[i].cliente+"</td><td>"+data[i].lote+"</td><td>"+data[i].cuota_nro+"</td><td>"+data[i].fecha_pago+"</td><td>"+data[i].importe+"</td><td>"+data[i].comision+"</td><td>"+data[i].fraccion+"</td></tr>");
+				$('#tabla_vendedores').append("<tr><td colspan='4'>Totales de Fraccion</td><td>"+format(importe)+"</td><td>"+format(comision)+"</td></tr>");
+				$('#tabla_vendedores').append("<tr><td>"+data[i].cliente+"</td><td>"+data[i].lote+"</td><td>"+data[i].cuota_nro+"</td><td>"+data[i].fecha_pago+"</td><td>"+format(data[i].importe)+"</td><td>"+format(data[i].comision)+"</td><td>"+data[i].fraccion+"</td></tr>");
 				fraccion_actual=data[i].fraccion_id;	
 				importe=0;
 				comision=0;

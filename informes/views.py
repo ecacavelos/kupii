@@ -200,148 +200,11 @@ def informe_general(request):
             return HttpResponseRedirect("/login") 
     
     else:
-        try:
-            if request.user.is_authenticated():
-                t = loader.get_template('informes/informe_general.html')                
-            else:
-                return HttpResponseRedirect("/login") 
-    
-            fraccion_ini=request.POST['fraccion_ini']
-            fraccion_fin=request.POST['fraccion_fin']
-        
-            fecha_ini=request.POST['fecha_ini']
-            fecha_fin=request.POST['fecha_fin']
-            fecha_ini_parsed = datetime.strptime(fecha_ini, "%d/%m/%Y").date()
-            fecha_fin_parsed = datetime.strptime(fecha_fin, "%d/%m/%Y").date()
-        
-            try:
-                #Obtenemos el lote correspondiente a cada fraccion
-                lista_lotes=[]
-                object_list=[]
-                manzanas_list=Manzana.objects.filter(fraccion_id__gte=fraccion_ini,fraccion_id__lte=fraccion_fin)
-                for m in manzanas_list:
-                    lotes_list=Lote.objects.filter(manzana_id=m.id)
-                    for l in lotes_list:
-                        lista_lotes.append(l)
-                
-                
-                for lote in lista_lotes:
-                    lista_pagos=PagoDeCuotas.objects.filter(lote_id=lote.id,fecha_de_pago__range=(fecha_ini_parsed,fecha_fin_parsed))
-                    for p in lista_pagos:
-                        object_list.append(p)
-                                
-                     
-                
-                                
-            except Exception, error:
-                print error
-            a = len(object_list)
-            
-            if a>0:
-                lista_total_cuotas=[0]
-                lista_total_mora=[0]
-                lista_total_pagos=[0]
-                monto_total_cuotas=[0]
-                monto_total_mora=[0]
-                monto_total_pagos=[0]
-                #lista que guarda los indices de principio y fin de una determinada fraccion
-                lista_cambios=[0]
-                
-                total_acumulado_cuotas=0
-                total_acumulado_mora=0
-                total_acumulado_pagos=0
-                lista_totales_acumulados=[]
-                try:
-                    j=0  
-                    k=0 
-                    #guardamos la primera fraccion para tener algo con que comparar en el for
-                    fraccion_actual=object_list[0].lote.manzana.fraccion_id
-                    for i in object_list:
-                        #contador general de registros
-                        k+=1
-                         
-                        if(fraccion_actual==i.lote.manzana.fraccion_id):
-                            monto_total_cuotas[j]+=int(i.total_de_cuotas)
-                            monto_total_mora[j]+=int(i.total_de_mora)
-                            monto_total_pagos[j]+=int(i.total_de_pago)
-                            
-                            #acumulamos los totales para una lista de totales generales
-                            total_acumulado_cuotas+=int(i.total_de_cuotas)
-                            total_acumulado_mora+=int(i.total_de_mora)
-                            total_acumulado_pagos+=int(i.total_de_pago)
-                        else:
-                            #al cambiar de fraccion se guarda la posicion del cambio en la lista de cambios
-                            lista_cambios.append(k-1)
-                            #cambiamos de fraccion
-                            fraccion_actual= i.lote.manzana.fraccion_id
-                            
-                            #agregamos a la lista los totales acumulados
-                            monto_total_cuotas[j]=str('{:,}'.format(monto_total_cuotas[j])).replace(",", ".")
-                            monto_total_mora[j]=str('{:,}'.format(monto_total_mora[j])).replace(",", ".")
-                            monto_total_pagos[j]=str('{:,}'.format(monto_total_pagos[j])).replace(",", ".")
-                    
-
-                            lista_total_cuotas.append(monto_total_cuotas[j])
-                            lista_total_mora.append(monto_total_mora[j])
-                            lista_total_pagos.append(monto_total_pagos[j])
-                            
-                            #...y sumamos a los totales generales
-                            total_acumulado_cuotas+=int(i.total_de_cuotas)
-                            total_acumulado_mora+=int(i.total_de_mora)
-                            total_acumulado_pagos+=int(i.total_de_pago)
-                            #contador de los montos totales pertenecientes a una misma fraccion
-                            j+=1
-                            
-                            #agregamos a la lista de la nueva fraccion los totales acumulados
-                            monto_total_cuotas.append(int(i.total_de_cuotas))
-                            monto_total_mora.append(int(i.total_de_mora))
-                            monto_total_pagos.append(int(i.total_de_pago))
-                            
-                                         
-                        i.fecha_de_pago=i.fecha_de_pago.strftime("%d/%m/%Y")
-                        i.total_de_cuotas=str('{:,}'.format(i.total_de_cuotas)).replace(",", ".")
-                        i.total_de_mora=str('{:,}'.format(i.total_de_mora)).replace(",", ".")
-                        i.total_de_pago=str('{:,}'.format(i.total_de_pago)).replace(",", ".")
-                    
-                    #guardamos la posicion del ultimo cambio
-                    lista_cambios.append(k)
-                    
-                    
-                    #agregamos a la lista de totales los totales acumulados
-                    lista_total_cuotas.append(monto_total_cuotas[j])
-                    lista_total_mora.append(monto_total_mora[j])
-                    lista_total_pagos.append(monto_total_pagos[j])
-
-                    #parseamos los datos
-                    total_acumulado_cuotas=str('{:,}'.format(total_acumulado_cuotas)).replace(",", ".")
-                    total_acumulado_mora=str('{:,}'.format(total_acumulado_mora)).replace(",", ".")
-                    total_acumulado_pagos=str('{:,}'.format(total_acumulado_pagos)).replace(",", ".")
-                    
-                    lista_totales_acumulados.append(total_acumulado_cuotas)
-                    lista_totales_acumulados.append(total_acumulado_mora)
-                    lista_totales_acumulados.append(total_acumulado_pagos)
-                    
-                    paginator=Paginator(object_list,15)
-                    page=request.GET.get('page')
-                    try:
-                        lista=paginator.page(page)
-                    except PageNotAnInteger:
-                        lista=paginator.page(1)
-                    except EmptyPage:
-                        lista=paginator.page(paginator.num_pages)
-                    c = RequestContext(request, {
-                        'object_list': lista,
-                        'lista_total_cuotas': lista_total_cuotas,
-                        'lista_total_mora': lista_total_mora,
-                        'lista_total_pagos': lista_total_pagos,
-                        'lista_cambios': lista_cambios,
-                        'lista_totales_acumulados':lista_totales_acumulados,
-                    })
-                    return HttpResponse(t.render(c))
-                except Exception, error:
-                    print error
-        except:   
-            return HttpResponseServerError("No se pudo obtener el Listado de Pagos de Lotes.")
+        c = RequestContext(request, {
+            #'object_list': lista,
+            #'fraccion': f,
+        })
+        return HttpResponse(t.render(c))    
 
 def informe_movimientos(request):
     if request.method=='GET':
@@ -361,7 +224,7 @@ def informe_movimientos(request):
             return HttpResponseRedirect("/login") 
     
         try:
-            print "op"
+            #print "op"
             lote=request.POST['lote_id']
             x=str(lote)
             fraccion_int = int(x[0:3])
@@ -372,7 +235,10 @@ def informe_movimientos(request):
         
             fecha_ini=request.POST['fecha_ini']
             fecha_fin=request.POST['fecha_fin']
-            
+            total_cuotas=0
+            total_pagos=0            
+            total_mora=0
+            lista_totales=[]
             if not (fecha_ini and fecha_fin):
                 lista_pagos=PagoDeCuotas.objects.filter(lote_id=lote.id)
                 lista_ventas=Venta.objects.filter(lote_id=lote_int)
@@ -384,14 +250,25 @@ def informe_movimientos(request):
                 fecha_ini_parsed = datetime.strptime(fecha_ini, "%d/%m/%Y").date()
                 fecha_fin_parsed = datetime.strptime(fecha_fin, "%d/%m/%Y").date()
                 lista_pagos=PagoDeCuotas.objects.filter(lote_id=lote.id,fecha_de_pago__range=(fecha_ini_parsed,fecha_fin_parsed))
+                
                 lista_ventas=Venta.objects.filter(lote_id=lote_int,fecha_de_venta__range=(fecha_ini_parsed,fecha_fin_parsed))
                 lista_reservas=Reserva.objects.filter(lote_id=lote_int,fecha_de_reserva__range=(fecha_ini_parsed,fecha_fin_parsed))
                 lista_cambios=CambioDeLotes.objects.filter(lote_nuevo_id=lote_int,fecha_de_cambio__range=(fecha_ini_parsed,fecha_fin_parsed))
                 lista_recuperaciones=RecuperacionDeLotes.objects.filter(lote_id=lote_int,fecha_de_recuperacion__range=(fecha_ini_parsed,fecha_fin_parsed))
                 lista_transferencias=TransferenciaDeLotes.objects.filter(lote_id=lote_int,fecha_de_transferencia__range=(fecha_ini_parsed,fecha_fin_parsed))
-                
-            lista_aux=[]
-            lista_aux.append(lista_pagos)
+            for pago in lista_pagos:
+                total_cuotas+=pago.total_de_cuotas
+                total_pagos+=pago.total_de_pago
+                total_mora+=pago.total_de_mora
+                pago.total_de_cuotas=str('{:,}'.format(pago.total_de_cuotas)).replace(",", ".")
+                pago.total_de_mora=str('{:,}'.format(pago.total_de_mora)).replace(",", ".")
+                pago.total_de_pago=str('{:,}'.format(pago.total_de_pago)).replace(",", ".")
+                    
+            lista_totales.append((str('{:,}'.format(total_cuotas)).replace(",", ".")))
+            lista_totales.append((str('{:,}'.format(total_mora)).replace(",", ".")))
+            lista_totales.append((str('{:,}'.format(total_pagos)).replace(",", ".")))    
+            
+            '''    
             paginator=Paginator(lista_pagos,15)
             page=request.GET.get('page')
             try:
@@ -400,7 +277,10 @@ def informe_movimientos(request):
                 lista=paginator.page(1)
             except EmptyPage:
                 lista=paginator.page(paginator.num_pages)
-            
+            '''
+            lista_aux=[]
+            if(lista_pagos):                
+                lista_aux.append(lista_pagos)
             
             if(lista_ventas):
                 lista_aux.append(lista_ventas)
@@ -416,7 +296,7 @@ def informe_movimientos(request):
             
             if(lista_transferencias):
                 lista_aux.append(lista_transferencias)
-              
+            '''
             if(lista_aux):
                 lista_aux.append(lista_aux)
             
@@ -428,11 +308,12 @@ def informe_movimientos(request):
                 listaP=paginator.page(1)
             except EmptyPage:
                 listaP=paginator.page(paginator.num_pages)
-                   
+            '''       
             c = RequestContext(request, {
                 'lista_pagos': lista_pagos,
-                'lista': lista,
-                'listaP': listaP,
+                'lista_totales': lista_totales,
+                #'lista': lista,
+                #'listaP': listaP,
                 'lista_ventas': lista_ventas,
                 'lista_reservas': lista_reservas,
                 'lista_cambios': lista_cambios,
@@ -531,10 +412,10 @@ def liquidacion_propietarios(request):
                                 print error
                     
                     if pagos_list:
-                        lista_totales.append(total_monto_pagado)
-                        lista_totales.append(total_monto_inm)
-                        lista_totales.append(total_monto_prop)
-                        print('aca estoy')
+                        lista_totales.append(str('{:,}'.format(total_monto_pagado)).replace(",", "."))
+                        lista_totales.append(str('{:,}'.format(total_monto_inm)).replace(",", "."))
+                        lista_totales.append(str('{:,}'.format(total_monto_prop)).replace(",", "."))
+                        #print('aca estoy')
                             #print (str(pago.fecha_de_pago)+'\t'+str(pago.lote_id)+'\t'+str(cant_cuotas)+'/'+str(pago.plan_de_pago.cantidad_de_cuotas)+'\t'+str(pago.plan_de_pago_id)+'\t\t'+str(pago.total_de_cuotas)+'\t\t'+str(monto_inmobiliaria)+'\t\t'+str(monto_propietario)+'\n')
                             
                                                                 

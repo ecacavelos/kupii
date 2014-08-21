@@ -9,6 +9,23 @@ $(document).ready(function() {
 	$("#fecha_ini").datepicker({ dateFormat: 'dd/mm/yy' });
 	$('#fecha_fin').mask('##/##/####');
 	$("#fecha_fin").datepicker({ dateFormat: 'dd/mm/yy' });
+	
+	lista_totales=[];
+	
+		
+	lista_totales[1]="0";
+	lista_totales[2]="0";
+	lista_totales[3]="0";
+	
+	{%for lt in lista_totales%}
+	lista_totales[{{forloop.counter}}]= "{{lt}}";
+	{%endfor%} 
+
+		fila="<td colspan='7'>Liquidacion:</td><td>"+lista_totales[1]+"</td><td>"+lista_totales[2]+"</td><td>"+lista_totales[3]+"</td>";
+		$('#fila_totales').html(fila);
+		$('#fila_totales').show();	
+	
+	
 });
 
 
@@ -162,6 +179,7 @@ Pago</th><th>Total de Cuotas</th><th>Total de Mora</th><th>Total de Pago</th>
 			</td>
 		</tr>		
 {% endfor %}
+<tr id='fila_totales' style="display: none;"></tr>
 {%endif%}
 <div class="pagination">
     <span class="step-links">

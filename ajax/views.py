@@ -359,5 +359,10 @@ def get_informe_general(request):
     #print 'hola'
     return HttpResponse(json.dumps(cuotas), mimetype='application/json')
             
-
-
+   
+    
+    
+    
+    
+    
+    
