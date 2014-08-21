@@ -4,6 +4,7 @@
 <script type="text/javascript">
 $(document).ready(function() {
 	
+	$('#lote_id').mask('###/###/####');
 	$('#fecha_ini').mask('##/##/####');
 	$("#fecha_ini").datepicker({ dateFormat: 'dd/mm/yy' });
 	$('#fecha_fin').mask('##/##/####');
@@ -12,10 +13,12 @@ $(document).ready(function() {
 
 
 function validar(){
+	/*
 	if($('#fecha_ini').val()=="" || $('#fecha_fin').val()=="") {
 		alert("Debe ingresar un rango de fechas");
 		return; 		
 	}
+	*/
 	if($('#lote_id').val()==0 || $('#lote_id').val()=="") {
 		alert("Debe ingresar un lote");
 		return; 		

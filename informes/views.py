@@ -361,6 +361,7 @@ def informe_movimientos(request):
             return HttpResponseRedirect("/login") 
     
         try:
+            print "op"
             lote=request.POST['lote_id']
             x=str(lote)
             fraccion_int = int(x[0:3])
@@ -371,11 +372,25 @@ def informe_movimientos(request):
         
             fecha_ini=request.POST['fecha_ini']
             fecha_fin=request.POST['fecha_fin']
-            fecha_ini_parsed = datetime.strptime(fecha_ini, "%d/%m/%Y").date()
-            fecha_fin_parsed = datetime.strptime(fecha_fin, "%d/%m/%Y").date()
-            lista_aux=[]
-            lista_pagos=PagoDeCuotas.objects.filter(lote_id=lote.id,fecha_de_pago__range=(fecha_ini_parsed,fecha_fin_parsed))
             
+            if not (fecha_ini and fecha_fin):
+                lista_pagos=PagoDeCuotas.objects.filter(lote_id=lote.id)
+                lista_ventas=Venta.objects.filter(lote_id=lote_int)
+                lista_reservas=Reserva.objects.filter(lote_id=lote_int)
+                lista_cambios=CambioDeLotes.objects.filter(lote_nuevo_id=lote_int)
+                lista_recuperaciones=RecuperacionDeLotes.objects.filter(lote_id=lote_int)
+                lista_transferencias=TransferenciaDeLotes.objects.filter(lote_id=lote_int)
+            else:
+                fecha_ini_parsed = datetime.strptime(fecha_ini, "%d/%m/%Y").date()
+                fecha_fin_parsed = datetime.strptime(fecha_fin, "%d/%m/%Y").date()
+                lista_pagos=PagoDeCuotas.objects.filter(lote_id=lote.id,fecha_de_pago__range=(fecha_ini_parsed,fecha_fin_parsed))
+                lista_ventas=Venta.objects.filter(lote_id=lote_int,fecha_de_venta__range=(fecha_ini_parsed,fecha_fin_parsed))
+                lista_reservas=Reserva.objects.filter(lote_id=lote_int,fecha_de_reserva__range=(fecha_ini_parsed,fecha_fin_parsed))
+                lista_cambios=CambioDeLotes.objects.filter(lote_nuevo_id=lote_int,fecha_de_cambio__range=(fecha_ini_parsed,fecha_fin_parsed))
+                lista_recuperaciones=RecuperacionDeLotes.objects.filter(lote_id=lote_int,fecha_de_recuperacion__range=(fecha_ini_parsed,fecha_fin_parsed))
+                lista_transferencias=TransferenciaDeLotes.objects.filter(lote_id=lote_int,fecha_de_transferencia__range=(fecha_ini_parsed,fecha_fin_parsed))
+                
+            lista_aux=[]
             lista_aux.append(lista_pagos)
             paginator=Paginator(lista_pagos,15)
             page=request.GET.get('page')
@@ -386,19 +401,19 @@ def informe_movimientos(request):
             except EmptyPage:
                 lista=paginator.page(paginator.num_pages)
             
-            lista_ventas=Venta.objects.filter(lote_id=lote_int,fecha_de_venta__range=(fecha_ini_parsed,fecha_fin_parsed))
+            
             if(lista_ventas):
                 lista_aux.append(lista_ventas)
-            lista_reservas=Reserva.objects.filter(lote_id=lote_int,fecha_de_reserva__range=(fecha_ini_parsed,fecha_fin_parsed))
+            
             if(lista_reservas):
                 lista_aux.append(lista_reservas)
-            lista_cambios=CambioDeLotes.objects.filter(lote_nuevo_id=lote_int,fecha_de_cambio__range=(fecha_ini_parsed,fecha_fin_parsed))
+            
             if(lista_cambios):
                 lista_aux.append(lista_cambios)
-            lista_recuperaciones=RecuperacionDeLotes.objects.filter(lote_id=lote_int,fecha_de_recuperacion__range=(fecha_ini_parsed,fecha_fin_parsed))
+            
             if(lista_recuperaciones):
                 lista_aux.append(lista_recuperaciones)
-            lista_transferencias=TransferenciaDeLotes.objects.filter(lote_id=lote_int,fecha_de_transferencia__range=(fecha_ini_parsed,fecha_fin_parsed))
+            
             if(lista_transferencias):
                 lista_aux.append(lista_transferencias)
               

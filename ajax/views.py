@@ -356,7 +356,7 @@ def get_informe_general(request):
         cuota['total_de_pago']=i.total_de_pago
         cuotas.append(cuota)
     
-    print 'hola'
+    #print 'hola'
     return HttpResponse(json.dumps(cuotas), mimetype='application/json')
             
 
