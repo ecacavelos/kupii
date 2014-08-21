@@ -239,6 +239,7 @@ def informe_movimientos(request):
             total_pagos=0            
             total_mora=0
             lista_totales=[]
+            #pagos_list=[]
             if not (fecha_ini and fecha_fin):
                 lista_pagos=PagoDeCuotas.objects.filter(lote_id=lote.id)
                 lista_ventas=Venta.objects.filter(lote_id=lote_int)
@@ -260,6 +261,9 @@ def informe_movimientos(request):
                 total_cuotas+=pago.total_de_cuotas
                 total_pagos+=pago.total_de_pago
                 total_mora+=pago.total_de_mora
+                cuota_nro=get_nro_cuota(pago)
+                pago.cuota = str(cuota_nro)+'/'+str(pago.plan_de_pago.cantidad_de_cuotas)
+                #pagos_list.append(str(cuota_nro)+'/'+str(pago.plan_de_pago.cantidad_de_cuotas))
                 pago.total_de_cuotas=str('{:,}'.format(pago.total_de_cuotas)).replace(",", ".")
                 pago.total_de_mora=str('{:,}'.format(pago.total_de_mora)).replace(",", ".")
                 pago.total_de_pago=str('{:,}'.format(pago.total_de_pago)).replace(",", ".")
@@ -267,7 +271,7 @@ def informe_movimientos(request):
             lista_totales.append((str('{:,}'.format(total_cuotas)).replace(",", ".")))
             lista_totales.append((str('{:,}'.format(total_mora)).replace(",", ".")))
             lista_totales.append((str('{:,}'.format(total_pagos)).replace(",", ".")))    
-            
+            print "hola"
             '''    
             paginator=Paginator(lista_pagos,15)
             page=request.GET.get('page')
@@ -319,6 +323,7 @@ def informe_movimientos(request):
                 'lista_cambios': lista_cambios,
                 'lista_recuperaciones': lista_recuperaciones,
                 'lista_transferencias': lista_transferencias,
+                
              })
                 
         except Exception, error:

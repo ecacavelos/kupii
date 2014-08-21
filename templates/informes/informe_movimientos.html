@@ -21,7 +21,7 @@ $(document).ready(function() {
 	lista_totales[{{forloop.counter}}]= "{{lt}}";
 	{%endfor%} 
 
-		fila="<td colspan='7'>Liquidacion:</td><td>"+lista_totales[1]+"</td><td>"+lista_totales[2]+"</td><td>"+lista_totales[3]+"</td>";
+		fila="<td colspan='8'>Liquidacion:</td><td>"+lista_totales[1]+"</td><td>"+lista_totales[2]+"</td><td>"+lista_totales[3]+"</td>";
 		$('#fila_totales').html(fila);
 		$('#fila_totales').show();	
 	
@@ -142,7 +142,7 @@ function validar(){
 <h1>Listado de pagos</h1>
 <div id="listado-item-lote">
 <table width="50%" border="1" cellpadding="0" cellspacing="0" class="listado-pagos" align="center">
-<th>Pago ID</th><th>Fracci&oacute;n</th><th>Lote Nro</th><th>Cliente</th><th>Cuotas Pagadas</th><th>Plan de Pago</th><th>Fecha de 
+<th>Pago ID</th><th>Fracci&oacute;n</th><th>Lote Nro</th><th>Cliente</th><th>Cuota Nro</th><th>Cuotas Pagadas</th><th>Plan de Pago</th><th>Fecha de 
 
 Pago</th><th>Total de Cuotas</th><th>Total de Mora</th><th>Total de Pago</th>
 {% for lp in lista_pagos %}
@@ -151,7 +151,7 @@ Pago</th><th>Total de Cuotas</th><th>Total de Mora</th><th>Total de Pago</th>
 			    {{lp.id}}
 			</td>
 			<td>
-			    {{lp.venta.id}}
+			    {{lp.lote.manzana.fraccion}}
 			</td>	
 			<td>
 				{{lp.lote}}
@@ -159,6 +159,9 @@ Pago</th><th>Total de Cuotas</th><th>Total de Mora</th><th>Total de Pago</th>
 			<td>
 			    {{lp.cliente}}
 			</td>
+			<td>
+			    {{lp.cuota}}
+			</td>			
 			<td>
 			    {{lp.nro_cuotas_a_pagar}}
 			</td>
@@ -177,7 +180,8 @@ Pago</th><th>Total de Cuotas</th><th>Total de Mora</th><th>Total de Pago</th>
 			<td>
 				{{lp.total_de_pago}}
 			</td>
-		</tr>		
+			
+	</tr>		
 {% endfor %}
 <tr id='fila_totales' style="display: none;"></tr>
 {%endif%}
