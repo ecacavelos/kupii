@@ -2,112 +2,109 @@
 {% block header_scripts %}
 
 <script type="text/javascript">
-
-function buscar(){
-	
-		if($("#busqueda").val()==""){
-			alert("Debe ingresar un nro de lote para buscar.");
-		}else{
-			$("#frm_busqueda").submit();
+	function buscar() {
+		if($("#tipo_busqueda").val() == "lote"){
+			if ($("#busqueda").val() == "") {
+				alert("Debe ingresar un nro de lote para buscar.");
+			} else {
+				$("#frm_busqueda").submit();
+			}
 		}
+		else {
+				$("#frm_busqueda").submit();
+			}
+	}
 	
-}
+	
 
-$(document).ready(function() {
-	$('#busqueda').mask('###/###/####');
-	
-});	
-	
+
+	$(document).ready(function() {
+
+			$('#busqueda').mask('###/###/####');
+	});
+
 </script>
 {% endblock %}
 {% block content %}
 <div class="gri16 text-izquierda" id="breadcumb">
-						<a href="/">Inicio</a> <span class="verde-1">></span>  
-						<a href="/lotes/">Lotes</a> 
-						<span class="verde-1">> Listado de Lotes</span> 
-					</div>
+	<a href="/">Inicio</a><span class="verde-1">></span>
+	<a href="/lotes/">Lotes</a>
+	<span class="verde-1">> Listado de Lotes</span>
+</div>
 
-					<div class="clear"></div>
+<div class="clear"></div>
 
-					<div class="grid_10">
-  						<h1>Listado de Lotes</h1>
-					</div>
+<div class="grid_10">
+	<h1>Listado de Lotes</h1>
+</div>
 
-					<div class="grid_6">
-  						<form name="frm_busqueda" id="frm_busqueda" method="post" action="/lotes/listado_busqueda_lotes/">
-  							{% csrf_token %}
-  							<table>
-  								<tr>
-  									<tr>
-  										<td>
-  											Nro de Lote:
-  										</td>
-  										<td id="campo_busqueda">
-  											
-  										</td>
-  									</tr>
-  									<td>
-  										<input id="busqueda" type="" name="busqueda" placeholder="Ej: 001/001/0001"/>
-  									</td>
-  									<td>
-  										<input type="button" value="Buscar" onclick="buscar();" class="historico" style="cursor: pointer"/>
-  									</td>
-  								</tr>
-  								
-  								<input name="tabla" type="hidden" value="lote"/>
-  								 
-  							</table>		
-							
-						</form>
-					</div>
+<div class="grid_6">
+	<form name="frm_busqueda" id="frm_busqueda" method="post" action="/lotes/listado_busqueda_lotes/">
+		{% csrf_token %}
+		
+		<tr>
+			<td> Nro de Lote: </td>
+		</tr>
 
-					<div class="clear"></div>
-					<div id="listado-cuadro-busqueda">
-						<a href="/lotes/agregar" class="boton-verde">Agregar Lote</a>
-						<br><br>
-					</div>
-					<div id="listado-item-lote">
-						<table width="50%" border="1" cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
-							<th>Lote Nro</th><th>Manzana Nro</th><th>Nombre Fracci&oacute;n</th><th>ID Fracci&oacute;n</th><th>Estado</th>
-
-
-{% for hw in object_list %}
-
+		<td>
+		<input id="busqueda" type="" name="busqueda" placeholder="Ej: 001/001/0001"/>
+		</td>
+		
+		<tr>
+			<td> Lotes por cliente: </td>
+		</tr>
+		<select id="tipo_busqueda" name="tipo_busqueda">
+			<option value="0">Elija una opcion</option>
+			<option value="nombre">Nombre</option>
+			<option value="cedula">Cedula</option>
+			<option value="id">ID</option>	
+		</select>		
+		<input id="busqueda_cliente" name="busqueda_cliente" />
+		
+	
+		
 
 		<tr>
-			<td>
-				<a href="{{hw.id}}">{{hw.nro_lote}} <strong>(Ver Detalles)</strong></a>
-			</td>
-			<td>
-				{{hw.manzana}}
-			</td>
-			<td>
-				 {{hw.manzana.fraccion}}				
-			</td>
-			<td>
-				 {{hw.manzana.fraccion.id}}				
-			</td>
-			<td>
-				{{ hw.get_estado_display }}
-			</td>
+		<input type="button" value="Buscar" onclick="buscar();" class="historico" style="cursor: pointer"/>
 		</tr>
-{% endfor %}
-<div class="pagination">
-    <span class="step-links">
-        {%if object_list.has_previous%}
-        <a href="?page={{ object_list.previous_page_number }}"> Anterior</a>
-		{%endif%}
-    	P&aacute;gina
-    	|{{object_list.number}}|
-    	
-    	{%if object_list.has_next%}
-		<a href="?page={{ object_list.next_page_number }}"> Siguiente</a>
-		{%endif%}
-        
-    </span>
-</div>
-						</table>
-					</div>
+		
+		
 
-<div id="footer"><a href="/lotes" class="boton-verde">Volver al módulo de Lotes</a></div>
+
+	</form>
+</div>
+
+<div class="clear"></div>
+<div id="listado-cuadro-busqueda">
+	<a href="/lotes/agregar" class="boton-verde">Agregar Lote</a>
+	<br>
+	<br>
+</div>
+<div id="listado-item-lote">
+	<table width="50%" border="1" cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
+		<th>Lote Nro</th><th>Manzana Nro</th><th>Nombre Fracci&oacute;n</th><th>ID Fracci&oacute;n</th><th>Estado</th>
+
+		{% for hw in object_list %}
+
+		<tr>
+			<td><a href="{{hw.id}}">{{hw.nro_lote}} <strong>(Ver Detalles)</strong></a></td>
+			<td> {{hw.manzana}} </td>
+			<td> {{hw.manzana.fraccion}} </td>
+			<td> {{hw.manzana.fraccion.id}} </td>
+			<td> {{ hw.get_estado_display }} </td>
+		</tr>
+		{% endfor %}
+		<div class="pagination">
+			<span class="step-links"> {%if object_list.has_previous%} <a href="?page={{ object_list.previous_page_number }}"> Anterior</a> {%endif%}
+				P&aacute;gina
+				|{{object_list.number}}|
+
+				{%if object_list.has_next%} <a href="?page={{ object_list.next_page_number }}"> Siguiente</a> {%endif%} </span>
+		</div>
+	</table>
+</div>
+
+<div id="footer">
+	<a href="/lotes" class="boton-verde">Volver al módulo de Lotes</a>
+</div>
 {% endblock %}

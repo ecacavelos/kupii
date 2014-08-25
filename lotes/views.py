@@ -1,8 +1,9 @@
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError
 from django.template import RequestContext, loader
-from principal.models import Lote, Venta, Manzana, Fraccion
+from principal.models import Lote, Venta, Manzana, Fraccion, Propietario, Cliente
 from lotes.forms import LoteForm, FraccionManzana
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.db.models import Q
 
 # Funcion principal del modulo de lotes.
 def lotes(request):
@@ -139,9 +140,7 @@ def agregar_lotes(request):
     return HttpResponse(t.render(c))
 
 def listar_busqueda_lotes(request):
-    
-    busqueda = request.POST['busqueda']
-    
+       
     if request.user.is_authenticated():
         t = loader.get_template('lotes/listado.html')
         #c = RequestContext(request, {})
@@ -149,13 +148,45 @@ def listar_busqueda_lotes(request):
     else:
         return HttpResponseRedirect("/login") 
     
-    x=str(busqueda)
-    fraccion_int = int(x[0:3])
-    manzana_int =int(x[4:7])
-    lote_int = int(x[8:])
-    manzana= Manzana.objects.get(fraccion_id= fraccion_int, nro_manzana= manzana_int)
+    
+    busqueda = request.POST['busqueda']
+    tipo_busqueda=request.POST['tipo_busqueda']
+    #se busca un lote
+    if busqueda:        
+        x=str(busqueda)
+        fraccion_int = int(x[0:3])
+        manzana_int =int(x[4:7])
+        lote_int = int(x[8:])
+        manzana= Manzana.objects.get(fraccion_id= fraccion_int, nro_manzana= manzana_int)
+        object_list = Lote.objects.filter(manzana=manzana.id, nro_lote=lote_int)
+    if tipo_busqueda:
+        #se buscan los lotes de un determinado cliente
+        busqueda = request.POST['busqueda_cliente']                
+        lista_lotes=[]        
+        if(tipo_busqueda=='cedula'):            
+            cliente=Cliente.objects.get(Q(cedula=busqueda)| Q(ruc=busqueda))
+            ventas=Venta.objects.filter(cliente_id=cliente.id).order_by('cliente')
+            for venta in ventas:
+                lote=Lote.objects.get(pk=venta.lote_id)
+                lista_lotes.append(lote)
+    
+        if(tipo_busqueda=='nombre'):
+            lista_ventas=[]
+            clientes=Cliente.objects.filter(nombres__icontains=busqueda).order_by('id')
+            
+            for cliente in clientes:
+                ventas=Venta.objects.filter(cliente_id=cliente)
+                for venta in ventas:
+                    lote=Lote.objects.get(pk=venta.lote_id)
+                    lista_lotes.append(lote)
         
-    object_list = Lote.objects.filter(manzana=manzana.id, nro_lote=lote_int)
+        if(tipo_busqueda=='id'):
+            ventas=Venta.objects.filter(cliente_id=busqueda).order_by('cliente')
+            for venta in ventas:
+                lote=Lote.objects.get()
+                lista_lotes.append(lote)
+        object_list=lista_lotes
+            
     paginator=Paginator(object_list,15)
     page=request.GET.get('page')
     try:
