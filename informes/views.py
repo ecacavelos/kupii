@@ -39,8 +39,38 @@ def lotes_libres(request):
         lista=paginator.page(1)
     except EmptyPage:
         lista=paginator.page(paginator.num_pages)
+   
+    c = RequestContext(request, {
+        'object_list': lista,
+    })
+    return HttpResponse(t.render(c))
+
+def listar_busqueda_lotes(request):
     
-        
+    if request.user.is_authenticated():
+        t = loader.get_template('informes/lotes_libres.html')
+    else:
+        return HttpResponseRedirect("/login") 
+    
+    busqueda=request.POST['busqueda']
+    if busqueda:
+        x=str(busqueda)
+        fraccion_int = int(x[0:3])
+        manzana_int =int(x[4:7])
+        lote_int = int(x[8:])
+        manzana= Manzana.objects.get(fraccion_id= fraccion_int, nro_manzana= manzana_int)
+        lote = Lote.objects.get(manzana=manzana.id, nro_lote=lote_int)
+        object_list = Lote.objects.filter(pk=lote.id,estado="1").order_by('manzana', 'nro_lote')
+    
+    paginator=Paginator(object_list,15)
+    page=request.GET.get('page')
+    try:
+        lista=paginator.page(page)
+    except PageNotAnInteger:
+        lista=paginator.page(1)
+    except EmptyPage:
+        lista=paginator.page(paginator.num_pages)
+   
     c = RequestContext(request, {
         'object_list': lista,
     })

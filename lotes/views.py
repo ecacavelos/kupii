@@ -159,7 +159,7 @@ def listar_busqueda_lotes(request):
         lote_int = int(x[8:])
         manzana= Manzana.objects.get(fraccion_id= fraccion_int, nro_manzana= manzana_int)
         object_list = Lote.objects.filter(manzana=manzana.id, nro_lote=lote_int)
-    if tipo_busqueda:
+    elif tipo_busqueda:
         #se buscan los lotes de un determinado cliente
         busqueda = request.POST['busqueda_cliente']                
         lista_lotes=[]        
@@ -171,9 +171,7 @@ def listar_busqueda_lotes(request):
                 lista_lotes.append(lote)
     
         if(tipo_busqueda=='nombre'):
-            lista_ventas=[]
-            clientes=Cliente.objects.filter(nombres__icontains=busqueda).order_by('id')
-            
+            clientes=Cliente.objects.filter(nombres__icontains=busqueda).order_by('id')            
             for cliente in clientes:
                 ventas=Venta.objects.filter(cliente_id=cliente)
                 for venta in ventas:
@@ -183,7 +181,7 @@ def listar_busqueda_lotes(request):
         if(tipo_busqueda=='id'):
             ventas=Venta.objects.filter(cliente_id=busqueda).order_by('cliente')
             for venta in ventas:
-                lote=Lote.objects.get()
+                lote=Lote.objects.get(pk=venta.lote_id)
                 lista_lotes.append(lote)
         object_list=lista_lotes
             
