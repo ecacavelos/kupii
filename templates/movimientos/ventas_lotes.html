@@ -223,8 +223,9 @@ $("#id_plan_pago_vendedores").attr('readonly', true);
 		<tr>
 			<td><label>Cliente: </label></td>
 			<td class="noimage"><input id="id_cliente" type="hidden" name="cliente"  maxlength="100" onchange="retrieveCliente()" />
-				<input id="id_nombre_cliente" type="text" name="nombre_cliente" placeholder="Ingrese el Nombre"  maxlength="100" /> <br><br>
+				<input id="id_nombre_cliente" type="text" name="nombre_cliente" placeholder="Ingrese el Nombre"  maxlength="100" /> <br><br>				
 				<input id="id_cedula_cliente" type="text" name="cedula_cliente" placeholder="Ingrese el Nro. de C.I."  maxlength="100" />
+				o <a href="/clientes/agregar/" class="boton-verde" target="_blank">Agregar Nuevo Cliente</a> {{ field.errors }}<br><br>			
 			</td>
 			<td class="noimage"><div id="cliente_seleccionado"></div>
 			<ul class="errorlist"><li id="cliente_error"></li></ul></td>
@@ -237,8 +238,9 @@ $("#id_plan_pago_vendedores").attr('readonly', true);
 			<td class="noimage"><input id="id_vendedor" type="hidden" name="vendedor" maxlength="100" onbchange="retrieveVendedor()" />
 				<input id="id_nombre_vendedor" type="text" name="nombre_vendedor" placeholder="Ingrese el Nombre" maxlength="100" /> <br><br>
 				<input id="id_cedula_vendedor" type="text" name="cedula_vendedor" placeholder="Ingrese el Nro. de C.I."  maxlength="100" />
+				o <a href="/vendedores/agregar/" class="boton-verde" target="_blank">Agregar Nuevo Vendedor
 			</td>
-			<td class="noimage"><div id="vendedor_seleccionado"></div>
+			<td class="noimage"><div id="vendedor_seleccionado"></div>	
 			<ul class="errorlist"><li id="vendedor_error"></li></ul></td>
 		</tr>	
 	</div>
