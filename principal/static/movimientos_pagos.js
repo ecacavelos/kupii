@@ -105,7 +105,17 @@ function validatePago(event) {
 	
 	return false;
 }
-
+/*
+function retrieveData() {
+	
+	retrieveLotePago();
+	retrievePlanPagoVendedor();
+	retrieveCliente();
+	retrieveVendedor();		
+	retrievePlanPago();
+	retrievePlanPagoVendedor();
+}
+*/
 function retrieveLote() {
 	if ($("#id_lote").val().toString().length == 12) {
 		// Extraemos los identificadores correspondientes a la fraccion, manzana y lote.
@@ -128,7 +138,7 @@ function retrieveLote() {
 
 			$("#lote_error").html("");
 			$("#lote_superficie").html(msg.superficie);
-			$("#lote_seleccionado_detalles").html(s);
+			$("#lote_seleccionado_detalles").html(s);			
 			lote_id = msg.lote_id;
 			var d = new Date();
 			var month = d.getMonth() + 1;
@@ -139,6 +149,7 @@ function retrieveLote() {
 
 			$("#id_fecha").val(fecha_actual);
 			$("#id_cliente").removeAttr("disabled");
+			
 			//$("#id_cliente").focus();
 			$("#id_vendedor").removeAttr("disabled");
 			//$("#id_vendedor").focus();
@@ -173,22 +184,22 @@ function retrieveLotePago() {
 				lote : splitted_id[2]
 			},
 			dataType : "json"
+		
 		});
+		
 		// Actualizamos el formulario con los datos obtenidos del lote.
 		request.done(function(msg) {
 			global_lote_id = msg.lote_id;
 			var s = "<a class='boton-verde' href=\"/lotes/listado/" + msg.lote_id + "\" target=\"_blank\" \">" + msg.lote_tag + "</a>";
-
+			
 			$("#lote_error").html("");
-			$("#lote_superficie").html(msg.superficie);
+			$("#lote_superficie").html(msg.superficie);			
 			$("#lote_seleccionado_detalles").html(s);
 			lote_id = msg.lote_id;
 			var d = new Date();
 			var month = d.getMonth() + 1;
 			var day = d.getDate();
-			retrieveVenta();
-			//alert("llegue");
-			
+			retrieveVenta();			
 			//fecha_actual = (day < 10 ? '0' : '') + day + '/' + (month < 10 ? '0' : '') + month + '/' + d.getFullYear();
 			fecha_actual = new Date().toJSON().substring(0, 10);
 
@@ -258,11 +269,13 @@ function retrieveVenta() {
 			
 			$("#proximo_vencimiento").empty();
 			$("#proximo_vencimiento").append(msgaux.cuotas_details.proximo_vencimiento);
-						
+			
+
 			retrieveCliente();
 			retrieveVendedor();
 			retrievePlanPago();
-			
+			retrievePlanPagoVendedor();
+	
 		});
 //	}
 }
@@ -272,6 +285,7 @@ function retrieveCliente() {
 		// Hacemos un request POST AJAX para obtener los datos del cliente ingresado.
 		var request = $.ajax({
 			type : "GET",
+			
 			url : "/datos/2/",
 			data : {
 				cliente : $("#id_cliente").val()
@@ -348,7 +362,7 @@ function retrievePlanPagoVendedor() {
 }
 
 function retrievePlanes(){
-	// retrievePlanPago();
+	retrieveFraccion();
 	retrieveLotePago();
 	retrievePlanPagoVendedor(); 
 }

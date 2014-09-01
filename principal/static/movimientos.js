@@ -166,6 +166,27 @@ function retrieveVendedor() {
 	}
 };
 
+function retrieveFraccion() {
+	if ($("#id_lote").val().toString().length == 12) {
+		// Extraemos los identificadores correspondientes a la fraccion, manzana y lote.
+		splitted_id = $("#id_lote").val().split('/');
+		// Hacemos un request POST AJAX para obtener los datos del lote ingresado.
+		var request = $.ajax({
+			type : "GET",
+			url : "/datos/15/",
+			data : {
+				fraccion : splitted_id[0],
+				manzana : splitted_id[1],
+				lote : splitted_id[2]
+			},
+			dataType : "json"
+		});
+		request.done(function(msg) {
+			$("#lote_seleccionado_fraccion").append(msg.nombre);
+		});	
+	}
+}
+
 function retrievePlanPago() {
 	if ($("#id_plan_pago").val().toString().length > 0) {
 		// Hacemos un request POST AJAX para obtener los datos del plan de pagos ingresado.

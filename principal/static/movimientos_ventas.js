@@ -133,6 +133,7 @@ function retrieveLoteVenta() {
 			},
 			dataType : "json"
 		});
+		retrieveFraccion();
 		// Actualizamos el formulario con los datos obtenidos del lote.
 		request.done(function(msg) {
 			global_lote_id = msg.lote_id;

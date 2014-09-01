@@ -50,12 +50,25 @@ def retrieve_lote(request):
             response_data['lote_tag'] = str(r)
             response_data['precio_contado'] = r.precio_contado
             response_data['precio_credito'] = r.precio_credito
+            
             return HttpResponse(json.dumps(response_data), content_type="application/json")
         else:
             return HttpResponseServerError("No se encontraron lotes.")
 
     return HttpResponseServerError("No valido.")
 
+def retrieve_fraccion(request):
+     if request.method == 'GET':
+        data = request.GET
+        fraccion_int = int(data.get('fraccion', ''))
+        manzana_int = int(data.get('manzana', ''))
+        lote_int = int(data.get('lote', ''))
+        myfraccion = Fraccion.objects.get(id=fraccion_int)
+        response_data = {}
+        response_data['fraccion_id']=myfraccion.id
+        response_data['nombre']=myfraccion.nombre
+        return HttpResponse(json.dumps(response_data), content_type="application/json")
+        
 def retrieve_lote_venta(request):
     if request.method == 'GET':
         data = request.GET
@@ -84,12 +97,13 @@ def retrieve_lote_venta(request):
             response_data['lote_tag'] = str(r[0])
             response_data['precio_contado'] = r[0].precio_contado
             response_data['precio_credito'] = r[0].precio_credito
-            response_data['estado_lote'] = r[0].estado
+            response_data['estado_lote'] = r[0].estado            
             return HttpResponse(json.dumps(response_data), content_type="application/json")
         else:
             return HttpResponseServerError("No se encontraron lotes.")
 
     return HttpResponseServerError("No valido.")
+
 
 def retrieve_lote_cambio(request):
     if request.method == 'GET':
@@ -98,7 +112,7 @@ def retrieve_lote_cambio(request):
         fraccion_int = int(data.get('fraccion', ''))
         manzana_int = int(data.get('manzana', ''))
         lote_int = int(data.get('lote', ''))
-
+        
         #object_list = Lote.objects.get(fraccion=fraccion_int, manzana=manzana_int, nro_lote=lote_int)
         myfraccion = Fraccion.objects.get(id=fraccion_int)
         fraccion_manzanas = Manzana.objects.filter(fraccion=myfraccion)
@@ -287,6 +301,7 @@ def retrieve_venta(request):
             response_data['plan_de_pago'] = datos_venta.plan_de_pago
             response_data['precio_de_cuota'] = datos_venta.precio_de_cuota
             response_data['fecha_venta'] = datos_venta.fecha_de_venta
+            
             return HttpResponse(json.dumps(response_data), content_type="application/json")
         except:
             return HttpResponseServerError("No se encontro la venta.")
@@ -316,8 +331,7 @@ def retrieve_plan_pago_vendedores(request):
             datos_plan = PlanDePagoVendedor.objects.get(pk=data.get('plan_pago_vendedor', ''))
             # Creamos la respuesta al request.
             response_data = {}
-            # TODO: setear todo lo que necesites para tu vista.
-            
+            # TODO: setear todo lo que necesites para tu vista.            
             response_data['nombre_del_plan'] = str(datos_plan.nombre)
             response_data['credito'] = datos_plan.tipo
             response_data['cantidad_cuotas'] = datos_plan.cantidad_cuotas
@@ -335,18 +349,6 @@ def get_cuotas_lotes_detalles(request):
         print("buscando pagos del lote --> " + lote_id);
         datos = common_functions.get_cuotas_detail_by_lote(lote_id)
         return HttpResponse(json.dumps(datos), mimetype='application/json')
-  
-'''    
-def get_numero_de_cuota():
-    
-    if request.method == 'GET':
-        lote_id = request.GET['lote_id']
-        fecha_fin= request.GET['fecha_fin']
-        print("buscando pagos del lote --> " + lote_id);
-        datos = common_functions.get_nro_cuota(lote_id,fecha_fin)
-        return HttpResponse(json.dumps(datos), mimetype='application/json')
-''' 
-
 
 
 

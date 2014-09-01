@@ -170,7 +170,6 @@ def pago_de_cuotas(request):
             data = request.POST
     
             lote_id = data.get('pago_lote_id', '')
-            
             nro_cuotas_a_pagar = data.get('pago_nro_cuotas_a_pagar')
             venta_id = data.get('pago_venta_id')
             venta = Venta.objects.get(pk=venta_id)
