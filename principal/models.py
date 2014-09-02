@@ -1,10 +1,10 @@
 from django.db import models
 
-class Cliente(models.Model):
+class Cliente(models.Model):    
+    cedula = models.CharField(unique=True,max_length=8, blank=False, null=False)
     nombres = models.CharField(max_length=255)
     apellidos = models.CharField(max_length=255)
     fecha_nacimiento = models.DateField('fecha de nacimiento')
-    cedula = models.CharField(unique=True,max_length=8, blank=False, null=False)
     ruc = models.CharField(max_length=255)
     SEXO_CHOICES = (
         ("M", "Masculino"),
@@ -16,10 +16,11 @@ class Cliente(models.Model):
         ("C", "Casado(a)"),
         ("V", "Viudo(a)"),
     )
+    
     estado_civil = models.CharField(max_length=1, choices=ESTADOCIVIL_CHOICES)
     direccion_particular = models.CharField(max_length=255)
     direccion_cobro = models.CharField('direccion de cobro', max_length=255)    
-    telefono_particular = models.CharField(max_length=255)
+    telefono_particular = models.CharField(max_length=255, blank=True)
     telefono_laboral = models.CharField(max_length=255, blank=True)
     celular_1 = models.CharField(max_length=255)
     celular_2 = models.CharField(max_length=255, blank=True)

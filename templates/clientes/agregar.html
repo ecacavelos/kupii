@@ -5,6 +5,7 @@
 <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
 <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
 -->
+<script type="text/javascript" src="{{ STATIC_URL }}clientes_agregar.js"></script>
 <script type="text/javascript">
 
 var data = [
@@ -14,34 +15,8 @@ $(document).ready(function() {
 	$("#id_fecha_nacimiento").datepicker({ dateFormat: 'dd/mm/yy' });
 	$("#id_fecha_nacimiento").addClass("date");
 	$('.date').mask('##/##/####');
-	$('.grid_6').hide();
-	$("#id_manzana").attr('readonly', true);
-	var fraccion_id;
-	$("#id_manzana").empty();
-
-	base_url = "/ajax/get_fracciones_by_name/";
-	params = "";
-	 $( "#id_fraccion" ).autocomplete({
-	  source:  base_url,
-      minLength: 1,
-      select: function( event, ui ) {
-      	$("#id_manzana").attr('readonly', false);
-      	fraccion_id = ui.item.id;
-      	var request_manzanas = $.ajax({
-					url : '/ajax/get_manzanas_by_fraccion/',
-					type : "GET",
-					data : {
-						fraccion_id : fraccion_id
-					},
-					dataType : "json"
-				});
-			request_manzanas.done(function (data){
-				$.each(data, function (index,value) {
-					$("#id_manzana").append('<option value="'+ value.id +'">' + 'Manzana ' + value.label + '</option>') ;
-				});
-			});
-      }
-    });
+	
+	
 });
 </script>
 {% endblock %}

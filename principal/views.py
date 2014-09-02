@@ -23,6 +23,14 @@ def index(request):
     else:
         return HttpResponseRedirect("/login")
 
+def retrieve_cedula_cliente(request):
+    if request.method == 'GET':
+        data = request.GET
+        cedula_busqueda=data.get('cedula', '')
+        cliente=Cliente.objects.get(cedula=cedula_busqueda)
+        if cliente:
+            return HttpResponseServerError("Ya existe un cliente con esta cedula.")
+        
 def retrieve_lote(request):
     if request.method == 'GET':
         data = request.GET

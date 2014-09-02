@@ -4,9 +4,15 @@ from django.forms.models import modelformset_factory
 from principal.models import Cliente
 
 # Create the form class.
+
+DEFAULT_ERRORS={
+        "required" : "Este campo es requerido",
+        "invalid" : "Ingrese un valor valido"        
+    }
 class ClienteForm(ModelForm):
     required_css_class = 'required'
     fecha_nacimiento = forms.DateField(input_formats=('%Y-%m-%d', '%d/%m/%Y',))
+    cedula=forms.CharField(error_messages=DEFAULT_ERRORS)
     class Meta:
         model = Cliente
         exclude = ['deuda_contraida']
@@ -22,3 +28,5 @@ class SearchForm(Form):
     filtro = forms.ChoiceField(choices=SEARCH_CHOICES)
     
 ClienteFormSet = modelformset_factory(Cliente, extra=0, can_order=True)
+
+
