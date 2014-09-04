@@ -29,7 +29,9 @@ def retrieve_cedula_cliente(request):
         cedula_busqueda=data.get('cedula', '')
         cliente=Cliente.objects.get(cedula=cedula_busqueda)
         if cliente:
-            return HttpResponseServerError("Ya existe un cliente con esta cedula.")
+            #return HttpResponseServerError("Ya existe un cliente con esta cedula.")
+            return HttpResponse(json.dumps(cliente.as_json()), content_type="application/json")
+        
         
 def retrieve_lote(request):
     if request.method == 'GET':
