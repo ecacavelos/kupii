@@ -27,11 +27,13 @@ def retrieve_cedula_cliente(request):
     if request.method == 'GET':
         data = request.GET
         cedula_busqueda=data.get('cedula', '')
-        cliente=Cliente.objects.get(cedula=cedula_busqueda)
-        if cliente:
-            #return HttpResponseServerError("Ya existe un cliente con esta cedula.")
-            return HttpResponse(json.dumps(cliente.as_json()), content_type="application/json")
-        
+        try:
+            cliente=Cliente.objects.get(cedula=cedula_busqueda)        
+            if cliente:
+                return HttpResponseServerError(json.dumps(cliente.as_json()), content_type="application/json")
+        except:
+            
+            return HttpResponse(json.dumps("Valido"), content_type="application/json")
         
 def retrieve_lote(request):
     if request.method == 'GET':
@@ -68,11 +70,9 @@ def retrieve_lote(request):
     return HttpResponseServerError("No valido.")
 
 def retrieve_fraccion(request):
-     if request.method == 'GET':
+    if request.method == 'GET':
         data = request.GET
         fraccion_int = int(data.get('fraccion', ''))
-        manzana_int = int(data.get('manzana', ''))
-        lote_int = int(data.get('lote', ''))
         myfraccion = Fraccion.objects.get(id=fraccion_int)
         response_data = {}
         response_data['fraccion_id']=myfraccion.id
