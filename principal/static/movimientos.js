@@ -182,7 +182,7 @@ function retrieveFraccion() {
 			dataType : "json"
 		});
 		request.done(function(msg) {
-			$("#lote_seleccionado_fraccion").append(msg.nombre);
+			$("#lote_seleccionado_fraccion").html(msg.nombre);
 		});	
 	}
 }
