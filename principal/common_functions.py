@@ -1,7 +1,7 @@
 from django.db.models import Count, Min, Sum, Avg
 from principal.models import Lote, Cliente, Vendedor, PlanDePago, Fraccion, Manzana, Venta, Propietario, PlanDePagoVendedor,PagoDeCuotas
 from principal.monthdelta import MonthDelta 
-
+import datetime
 
 def get_cuotas_detail_by_lote(lote_id=None):
 
@@ -11,10 +11,15 @@ def get_cuotas_detail_by_lote(lote_id=None):
     venta = Venta.objects.get(lote_id=lote_id)
     plan_de_pago = PlanDePago.objects.get(id=venta.plan_de_pago.id)
     # calcular la fecha de vencimiento.
-    proximo_vencimiento = (venta.fecha_de_venta + MonthDelta(cant_cuotas_pagadas['nro_cuotas_a_pagar__sum'])).strftime('%d/%m/%Y')
+    if cant_cuotas_pagadas['nro_cuotas_a_pagar__sum']:
+        proximo_vencimiento = (venta.fecha_de_venta + MonthDelta(cant_cuotas_pagadas['nro_cuotas_a_pagar__sum'])).strftime('%d/%m/%Y')
+    else:
+        cant_cuotas_pagadas['nro_cuotas_a_pagar__sum']=0
+        proximo_vencimiento = (venta.fecha_de_venta + MonthDelta(1)).strftime('%d/%m/%Y')
     datos = dict([('cant_cuotas_pagadas', cant_cuotas_pagadas['nro_cuotas_a_pagar__sum']), ('cantidad_total_cuotas', plan_de_pago.cantidad_de_cuotas), ('proximo_vencimiento', proximo_vencimiento)])
     return datos    
-
+    
+    
 def get_nro_cuota(pago):
     PagoDeCuotas(pago)
     pago_id=pago.id
