@@ -6,7 +6,157 @@ $(document).ready(function() {
 	//$("#enviar_venta").click(validateVenta);
 
 	$("#main_venta_form").submit(validateVenta);
+
+	function solo_numeros_puntos_precio_venta () {
+		$('#id_precio_venta').val($('#id_precio_venta').val().replace(/[^\d.]+/g, ''));
+}
+
+function solo_numeros_puntos_entrega_inicial () {
+		$('#id_entrega_inicial ').val($('#id_entrega_inicial ').val().replace(/[^\d.]+/g, ''));
+}
+
+function solo_numeros_puntos_monto_cuota () {
+		$('#id_monto_cuota ').val($('#id_monto_cuota ').val().replace(/[^\d.]+/g, ''));
+}
+
+function format(comma, period) {
+		
+		var comma = comma || ',';
+		var period = period || '.';
+		var split = this.toString().split(',');
+		var numeric = split[0];
+		var decimal = split.length > 1 ? period + split[1] : '';
+		var reg = /(\d+)(\d{3})/;
+		for (var i = 1; i < numeric.length; i++) {
+			numeric = numeric.replace(".", "");
+		}
+		while (reg.test(numeric)) {
+
+			numeric = numeric.replace(reg, '$1' + comma + '$2');
+		}
+		//} else {
+		//	numeric = numeric.substr(0,numeric.length-1);
+		//}
+		
+		return numeric + decimal;
+	}
+
+
+	$('.grid_6').hide();
+	$('#id_fecha').mask('##/##/####');
+	$("#id_fecha").datepicker({ dateFormat: 'dd/mm/yy' });
+	$('#id_fecha_venta2').mask('##/##/####');
+	$("#id_fecha_venta2").datepicker({ dateFormat: 'dd/mm/yy' });
+	
+	
+	
+	//$("#id_fecha").datepicker.regional[""].dateFormat = 'dd/mm/yy';
+	//$("#id_fecha").datepicker("setDate", new Date());
+	//$("#id_fecha").attr('disabled', true);
+	
+	base_url = "/ajax/get_cliente_id_by_name/";
+		params = "value";
+		$("#id_nombre_cliente").autocomplete({
+			source : base_url,
+			minLength : 1,
+			select : function(event, ui) {
+				id_cliente = ui.item.id;
+				cedula_cliente = ui.item.cedula;
+				$("#id_cliente").val(id_cliente);
+				$("#id_cedula_cliente").val(cedula_cliente);
+								
+			}
+		});
+		
+		//cliente por cedula
+		base_url = "/ajax/get_cliente_name_id_by_cedula/";
+		params = "value";
+		$("#id_cedula_cliente").autocomplete({
+			source : base_url,
+			minLength : 1,
+			select : function(event, ui) {
+				id_cliente = ui.item.id;
+				name_cliente= ui.item.label;
+				cedula_cliente = ui.item.cedula;
+				ui.item.value = ui.item.cedula;
+				$("#id_cliente").val(id_cliente);
+				$("#id_cedula_cliente").val(cedula_cliente);
+				$("#id_nombre_cliente").val(name_cliente);
+			}
+		});
+		
+		//vendodor por cedula
+		base_url = "/ajax/get_vendedor_name_id_by_cedula/";
+		params = "value";
+		$("#id_cedula_vendedor").autocomplete({
+			source : base_url,
+			minLength : 1,
+			select : function(event, ui) {
+				id_vendedor = ui.item.id;
+				name_vendedor= ui.item.label;
+				cedula_vendedor = ui.item.cedula;
+				ui.item.value = ui.item.cedula;
+				$("#id_vendedor").val(id_vendedor);
+				$("#id_cedula_vendedor").val(cedula_vendedor);
+				$("#id_nombre_vendedor").val(name_vendedor);
+			}
+		});
+		
+		base_url = "/ajax/get_vendedor_id_by_name/";
+		params = "value";
+		$("#id_nombre_vendedor").autocomplete({
+			source : base_url,
+			minLength : 1,
+			select : function(event, ui) {
+				id_vendedor = ui.item.id;
+				cedula_vendedor = ui.item.cedula;
+				$("#id_vendedor").val(id_vendedor);
+				$("#id_cedula_vendedor").val(cedula_vendedor);
+				$('#id_plan_pago').prop('disabled', false);
+			}
+		});
+	
+	var id_plan_pago;
+	$("#id_plan_pago").empty();
+      	var get_all_planes = $.ajax({
+					url : '/datos/7/',
+					type : "GET",
+					data : {
+						id_plan_pago : id_plan_pago
+					},
+					dataType : "json"
+				});
+			get_all_planes.done(function (data){
+				$("#id_plan_pago").append('<option value="0">Elija un plan de pago</option>') ;
+				$.each(data, function (index,value) {
+					
+					$("#id_plan_pago").append('<option value="'+ value.id +'">' + 'Plan ' + value.label + '</option>') ;
+				});
+    });
+$("#id_plan_pago").attr('readonly', true);
+
+var id_plan_pago_vendedores;
+	$("#id_plan_pago_vendedores").empty();
+      	var get_all_planes_vendedores = $.ajax({
+					url : '/datos/13/',
+					type : "GET",
+					data : {
+						id_plan_pago_vendedores : id_plan_pago_vendedores
+					},
+					dataType : "json"
+				});
+			get_all_planes_vendedores.done(function (data){
+				$("#id_plan_pago_vendedores").append('<option value="0">Elija un plan de pago</option>') ;
+				$.each(data, function (index,value) {
+					
+					$("#id_plan_pago_vendedores").append('<option value="'+ value.id +'">' + 'Plan ' + value.label + '</option>') ;
+				});
+    });
+$("#id_plan_pago_vendedores").attr('readonly', true);
 });
+
+
+
 
 window.onload = function() {
 	//document.getElementById("id_lote").onblur = retrieveLote;
