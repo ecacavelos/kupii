@@ -7,6 +7,16 @@
 -->
 <script type="text/javascript" src="{{ STATIC_URL }}clientes_agregar.js"></script>
 <script type="text/javascript">
+	function _enviar(){
+	if (self.opener != null ){
+		self.opener.main_venta_form.id_name_cliente.value = $("#id_nombres").val() +' '+ $("#id_apellidos").val() ;
+		self.opener.main_venta_form.id_cedula_cliente.value = $("#id_cedula").val();
+		$("#form_add_cliente").submit();
+		//window.close();
+	} else {
+		$("#form_add_cliente").submit();
+	}
+}
 	var data = [{
 		"label" : "Aragorn"
 	}];
@@ -78,7 +88,7 @@
 			{% endfor %}
 			
 		</table>
-		<input name="" type="submit" value="Grabar" style="margin-bottom: 10px; cursor: pointer;" />
+		<input name="" type="button" value="Grabar" onclick="_enviar();" style=" margin-bottom: 10px; cursor: pointer;" />
 	</form>
 	<a class="boton-verde" href="/clientes/">Volver al menú de Clientes</a>
 	<br>

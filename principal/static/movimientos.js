@@ -236,8 +236,11 @@ function retrievePlanPago() {
 				calculatePrecioFinalVentaLote();
 			}
 			//fecha_actual = new Date().toJSON().substring(0, 10);
+			
 			$("#id_fecha_vencimiento").datepicker({ dateFormat: 'dd/mm/yy' });
-			$("#id_fecha_vencimiento").datepicker("setDate", new Date()).removeAttr("disabled");
+			
+			$("#id_fecha_vencimiento").datepicker("setDate", $('#id_fecha').val()).removeAttr("disabled");
+			$("#id_fecha_vencimiento").mask('##/##/####');
 			//$("#precio_final_venta").html("");
 		});
 		// En caso de no poder obtener los datos del plan de pagos, indicamos el error.
