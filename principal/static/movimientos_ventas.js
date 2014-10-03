@@ -14,6 +14,8 @@ $(document).ready(function() {
 		dateFormat : 'dd/mm/yy'
 	});
 
+	
+	//autocomplete para cliente
 	var cliente_id;
 	$("#id_name_cliente").empty();
 	base_url = "/ajax/get_cliente_id_by_name/";
@@ -33,7 +35,6 @@ $(document).ready(function() {
 	//autocomplete para cedula
 	var cliente_id;
 	$("#id_cedula_cliente").empty();
-
 	base_url = "/ajax/get_cliente_name_id_by_cedula/";
 	params = "value";
 	$("#id_cedula_cliente").autocomplete({
@@ -44,15 +45,50 @@ $(document).ready(function() {
 			name_cliente= ui.item.label;
 			cedula_cliente= ui.item.cedula;
 			ui.item.value = ui.item.cedula;
-			$("#id_cliente").val(id_propietario);
+			$("#id_cliente").val(id_cliente);
 			$("#id_name_cliente").val(name_cliente);
 			$("#id_cedula_cliente").val(cedula_cliente);
 				
 		}
 	});
-	
-	
-	
+		
+
+//autocomplete para vendedor
+	var vendedor_id;
+	$("#id_name_vendedor").empty();
+	base_url = "/ajax/get_vendedor_id_by_name/";
+	params = "value";
+	$("#id_name_vendedor").autocomplete({
+		source : base_url,
+		minLength : 1,
+		select : function(event, ui) {
+			id_vendedor = ui.item.id;
+			cedula_vendedor= ui.item.cedula;
+			$("#id_vendedor").val(id_vendedor);
+			$("#id_cedula_vendedor").val(cedula_vendedor);
+
+		}
+	});
+		
+	//autocomplete para cedula
+	var cliente_vendedor;
+	$("#id_cedula_vendedor").empty();
+	base_url = "/ajax/get_vendedor_name_id_by_cedula/";
+	params = "value";
+	$("#id_cedula_vendedor").autocomplete({
+		source : base_url,
+		minLength : 1,
+		select : function(event, ui) {
+			id_vendedor = ui.item.id;
+			name_vendedor= ui.item.label;
+			cedula_vendedor= ui.item.cedula;
+			ui.item.value = ui.item.cedula;
+			$("#id_vendedor").val(id_vendedor);
+			$("#id_name_vendedor").val(name_vendedor);
+			$("#id_cedula_vendedor").val(cedula_vendedor);
+				
+		}
+	});
 	
 
 	var id_plan_pago;

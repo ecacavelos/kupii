@@ -66,7 +66,7 @@ function buscar(){
 {% for hw in object_list %}
 		<tr>
 			<td>
-				<a href="{{hw.id}}">{{hw.cedula}} <strong>(Ver Detalles)</strong></a>
+				<a href="/vendedores/listado/{{hw.id}}">{{hw.cedula}} <strong>(Ver Detalles)</strong></a>
 			</td>
 			<td>
 				{{ hw.nombres }} {{ hw.apellidos }}
