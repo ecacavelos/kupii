@@ -91,43 +91,49 @@ $(document).ready(function() {
 	});
 	
 
+	//autocomplete para planes de pago
 	var id_plan_pago;
 	$("#id_plan_pago").empty();
-	var get_all_planes = $.ajax({
-		url : '/datos/7/',
-		type : "GET",
-		data : {
-			id_plan_pago : id_plan_pago
-		},
-		dataType : "json"
+	base_url="/ajax/get_plan_pago/";
+	params="value";
+	$("#id_plan_pago").autocomplete({
+		source : base_url,
+		minLenght : 1,
+		select : function(event, ui) {
+			id_plan = ui.item.id;
+			name_plan= ui.item.label;
+			ui.item.value = ui.item.label;
+			$("#id_plan_p").val(id_plan_p);
+			$("#id_plan_pago").val(name_plan);
+				
+		}
 	});
-	get_all_planes.done(function(data) {
-		$("#id_plan_pago").append('<option value="0">Elija un plan de pago</option>');
-		$.each(data, function(index, value) {
-
-			$("#id_plan_pago").append('<option value="' + value.id + '">' + 'Plan ' + value.label + '</option>');
-		});
-	});
-	$("#id_plan_pago").attr('readonly', true);
-
+	
+	//autocomplete para planes de pago de vendedores
 	var id_plan_pago_vendedores;
 	$("#id_plan_pago_vendedores").empty();
-	var get_all_planes_vendedores = $.ajax({
-		url : '/datos/13/',
-		type : "GET",
-		data : {
-			id_plan_pago_vendedores : id_plan_pago_vendedores
-		},
-		dataType : "json"
+	base_url="/ajax/get_plan_pago_vendedor/";
+	params="value";
+	$("#id_plan_pago_vendedores").autocomplete({
+		source : base_url,
+		minLenght : 1,
+		select : function(event, ui) {
+			id_plan = ui.item.id;
+			name_plan= ui.item.label;
+			ui.item.value = ui.item.label;
+			$("#id_plan_pv").val(id_plan_p);
+			$("#id_plan_pago_vendedores").val(name_plan);
+				
+		}
 	});
-	get_all_planes_vendedores.done(function(data) {
-		$("#id_plan_pago_vendedores").append('<option value="0">Elija un plan de pago</option>');
-		$.each(data, function(index, value) {
-
-			$("#id_plan_pago_vendedores").append('<option value="' + value.id + '">' + 'Plan ' + value.label + '</option>');
-		});
-	});
-	$("#id_plan_pago_vendedores").attr('readonly', true);
+	
+	
+	
+	
+	
+	
+	
+	
 
 	function solo_numeros_puntos_precio_venta() {
 		$('#id_precio_venta').val($('#id_precio_venta').val().replace(/[^\d.]+/g, ''));

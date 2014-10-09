@@ -220,7 +220,7 @@ def retrieve_lote_recuperacion(request):
 def retrieve_cliente(request):
     if request.method == 'GET':
         data = request.GET
-
+        
         try:
             object_list = Cliente.objects.get(pk=data.get('cliente', ''))
             # Creamos la respuesta al request.
@@ -249,15 +249,16 @@ def retrieve_vendedor(request):
 
 def get_all_planes(request):
     if request.method == 'GET':
-        #data = request.GET
+        data = request.GET
         try:
 #     callback = request.GET['callback']
 #    plan_id = request.GET['id_plan_pago']
 #    print("id_plan_pago ->" + plan_id);
-            object_list = PlanDePago.objects.all()
+
+            object_list = PlanDePago.objects.filter()
 #    object_list = PlanDePago.objects.filter(plan_id=plan_id)
             results = [ob.as_json() for ob in object_list]
-
+            
             return HttpResponse(json.dumps(results), mimetype='application/json')
         except:
             return HttpResponseServerError('No se pudo procesar el pedido')
@@ -265,15 +266,16 @@ def get_all_planes(request):
             
 def get_all_planes_vendedores(request):
     if request.method == 'GET':
-        #data = request.GET
+        data = request.GET
         try:
 #     callback = request.GET['callback']
 #    plan_id = request.GET['id_plan_pago']
 #    print("id_plan_pago ->" + plan_id);
-            object_list = PlanDePagoVendedor.objects.all()
+            
+            object_list = PlanDePagoVendedor.objects.filter()
 #    object_list = PlanDePago.objects.filter(plan_id=plan_id)
             results = [ob.as_json() for ob in object_list]
-
+            
             return HttpResponse(json.dumps(results), mimetype='application/json')
         except:
             return HttpResponseServerError('No se pudo procesar el pedido')

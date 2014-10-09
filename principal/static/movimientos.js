@@ -251,7 +251,7 @@ function retrievePlanPago() {
 		});
 	}
 };
-/*
+
 function retrievePlanPagoVendedor() {
 	if ($("#id_plan_pago_vendedores").val().toString().length > 0) {
 		// Hacemos un request POST AJAX para obtener los datos del plan de pagos ingresado.
@@ -313,4 +313,3 @@ function retrievePlanPagoVendedor() {
 		});
 	}
 };
-*/

@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.views.decorators.http import require_http_methods
 from django.template import RequestContext, loader
 from django.utils import simplejson as json
-from principal.models import Fraccion, Manzana, Venta, PagoDeCuotas, Propietario, Lote, Cliente, Vendedor
+from principal.models import Fraccion, Manzana, Venta, PagoDeCuotas, Propietario, Lote, Cliente, Vendedor, PlanDePago, PlanDePagoVendedor
 from principal.common_functions import get_cuotas_detail_by_lote, get_nro_cuota
 from datetime import datetime
 
@@ -13,8 +13,7 @@ from datetime import datetime
 def get_propietario_id_by_name(request):
     if request.method == 'GET':
         #data = request.GET
-        try:
-            
+        try:            
             name_propietario = request.GET['term']
             print("term ->" + name_propietario);
             object_list = Propietario.objects.filter(nombres__icontains= name_propietario)
@@ -30,8 +29,7 @@ def get_propietario_id_by_name(request):
 def get_vendedor_name_id_by_cedula(request):
     if request.method == 'GET':
         #data = request.GET
-        try:
-            
+        try:            
             cedula_vendedor = request.GET['term']
             print("term ->" + cedula_vendedor);
             object_list = Vendedor.objects.filter(cedula__icontains= cedula_vendedor)
@@ -265,7 +263,37 @@ def get_pagos_by_venta(request):
     json.dumps(results)
     return HttpResponse(json.dumps(results), mimetype='application/json')
 
+@require_http_methods(["GET"])
+def get_plan_pago(request):
+    if request.method == 'GET':
+        #data = request.GET
+        try:            
+            nombre_plan = request.GET['term']
+            print("term ->" + nombre_plan);
+            object_list = PlanDePago.objects.filter(nombre_del_plan__icontains= nombre_plan)
+#    object_list = PlanDePago.objects.filter(plan_id=plan_id)
+            results = [ob.as_json() for ob in object_list]
 
+            return HttpResponse(json.dumps(results), mimetype='application/json')
+        except:
+            return HttpResponseServerError('No se pudo procesar el pedido')
+            #return (e) 
+            
+@require_http_methods(["GET"])
+def get_plan_pago_vendedor(request):
+    if request.method == 'GET':
+        #data = request.GET
+        try:            
+            nombre_plan = request.GET['term']
+            print("term ->" + nombre_plan);
+            object_list = PlanDePagoVendedor.objects.filter(nombre__icontains= nombre_plan)
+#    object_list = PlanDePago.objects.filter(plan_id=plan_id)
+            results = [ob.as_json() for ob in object_list]
+
+            return HttpResponse(json.dumps(results), mimetype='application/json')
+        except:
+            return HttpResponseServerError('No se pudo procesar el pedido')
+            #return (e) 
 
 
 @require_http_methods(["GET"])
