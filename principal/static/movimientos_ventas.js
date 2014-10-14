@@ -96,16 +96,16 @@ $(document).ready(function() {
 	$("#id_plan_pago").empty();
 	base_url="/ajax/get_plan_pago/";
 	params="value";
-	$("#id_plan_pago").autocomplete({
+	$("#id_plan_p").autocomplete({
 		source : base_url,
 		minLenght : 1,
 		select : function(event, ui) {
 			id_plan = ui.item.id;
 			name_plan= ui.item.label;
 			ui.item.value = ui.item.label;
-			$("#id_plan_p").val(id_plan_p);
-			$("#id_plan_pago").val(name_plan);
-				
+			$("#id_plan_p").val(name_plan);
+			$("#id_plan_pago").val(id_plan);
+			retrievePlanPago();				
 		}
 	});
 	
@@ -114,27 +114,19 @@ $(document).ready(function() {
 	$("#id_plan_pago_vendedores").empty();
 	base_url="/ajax/get_plan_pago_vendedor/";
 	params="value";
-	$("#id_plan_pago_vendedores").autocomplete({
+	$("#id_plan_pv").autocomplete({
 		source : base_url,
 		minLenght : 1,
 		select : function(event, ui) {
 			id_plan = ui.item.id;
 			name_plan= ui.item.label;
 			ui.item.value = ui.item.label;
-			$("#id_plan_pv").val(id_plan_p);
-			$("#id_plan_pago_vendedores").val(name_plan);
-				
+			$("#id_plan_pv").val(name_plan);
+			$("#id_plan_pago_vendedores").val(id_plan);
+			//retrievePlanPagoVendedor();
 		}
 	});
 	
-	
-	
-	
-	
-	
-	
-	
-
 	function solo_numeros_puntos_precio_venta() {
 		$('#id_precio_venta').val($('#id_precio_venta').val().replace(/[^\d.]+/g, ''));
 	}

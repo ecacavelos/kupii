@@ -252,11 +252,11 @@ def get_all_planes(request):
         data = request.GET
         try:
 #     callback = request.GET['callback']
-#    plan_id = request.GET['id_plan_pago']
+            nombre_plan = request.GET['term']
 #    print("id_plan_pago ->" + plan_id);
 
-            object_list = PlanDePago.objects.filter()
-#    object_list = PlanDePago.objects.filter(plan_id=plan_id)
+            #object_list = PlanDePago.objects.filter()
+            object_list = PlanDePago.objects.filter(nombre_del_plan__icontains=nombre_plan)
             results = [ob.as_json() for ob in object_list]
             
             return HttpResponse(json.dumps(results), mimetype='application/json')
@@ -269,10 +269,10 @@ def get_all_planes_vendedores(request):
         data = request.GET
         try:
 #     callback = request.GET['callback']
-#    plan_id = request.GET['id_plan_pago']
+#            plan_id = request.GET['id_plan_pago']
 #    print("id_plan_pago ->" + plan_id);
-            
-            object_list = PlanDePagoVendedor.objects.filter()
+            nombre_plan = request.GET['term']
+            object_list = PlanDePagoVendedor.objects.filter(nombre__icontains=nombre_plan)
 #    object_list = PlanDePago.objects.filter(plan_id=plan_id)
             results = [ob.as_json() for ob in object_list]
             

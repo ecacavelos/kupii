@@ -100,21 +100,19 @@ var data = [
 	<div class="fieldWrapperMovimientos">
 		<tr>
 			<td><label>Plan de Pago: </label></td>
-			<td class="noimage"><input id="id_plan_p" name="plan_p" type="hidden" maxlength="100" onchange="retrievePlanPago()"/>
-				<input id="id_plan_pago" type="text" name="plan_pago" maxlength="100"/><br><br>
+			<td class="noimage"><input id="id_plan_pago" name="plan_pago" type="hidden" maxlength="100" onchange="retrievePlanPago()"/>
+				<input id="id_plan_p" type="text" name="plan_p" maxlength="100" /><br><br>
 			</td>
-			<td class="noimage"><div id="plan_pago_seleccionado"></div>	
-			<ul class="errorlist"><li id="plan_pago_error"></li></ul></td>
+			
 		</tr>
 	</div>
 	<div class="fieldWrapperMovimientos">
 		<tr>
 			<td><label>Plan de Pago Vendedor: </label></td>
-			<td class="noimage"><input id="id_plan_pv" name="plan_pv" type="hidden" maxlength="100" onchange="retrievePlanPagoVendedor()"/>
-				<input id="id_plan_pago_vendedores" type="text" name="plan_pago_vendedores" maxlength="100"/><br><br>
+			<td class="noimage"><input id="id_plan_pago_vendedores" name="plan_pago_vendedores" type="hidden" maxlength="100" onchange="retrievePlanPagoVendedor()"/>
+				<input id="id_plan_pv" type="text" name="plan_pv" maxlength="100" /><br><br>
 			</td>
-			<td class="noimage"><div id="plan_pago__vendedor_seleccionado"></div>	
-			<ul class="errorlist"><li id="plan_pago_vendedor_error"></li></ul></td>	
+			
 		</tr>
 	</div>
 	<div class="fieldWrapperMovimientos">
