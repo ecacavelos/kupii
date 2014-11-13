@@ -11,4 +11,5 @@ urlpatterns = patterns('informes.views',
     url(r'^liquidacion_propietarios/$', 'liquidacion_propietarios'),
     url(r'^liquidacion_vendedores/$', 'liquidacion_vendedores'),
     url(r'^liquidacion_gerentes/$', 'liquidacion_gerentes'),
+    url(r'^lotes_libres_reporte_excel/$', 'lotes_libres_reporte_excel'),
 )

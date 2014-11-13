@@ -9,6 +9,7 @@ from datetime import datetime, timedelta
 from calendar import monthrange
 from principal.common_functions import get_nro_cuota
 from django.utils import simplejson
+import xlwt
 
 # Funcion principal del modulo de lotes.
 def informes(request):
@@ -579,6 +580,39 @@ def liquidacion_gerentes(request):
                 return HttpResponseRedirect("/login") 
         except Exception, error:
                 print error
+                
+
+def lotes_libres_reporte_excel(request):
+    
+    #at = request.session.get('at', None)
+    #TODO: Danilo, utiliza este template para poner tu logi
+    if request.method=='GET':
+        print ('Ejemplo de uso de parametros --> Parametro1' + request.GET['parametro1'])        
+        book = xlwt.Workbook(encoding='utf8')
+        sheet1 = book.add_sheet('Sheet 1')
+        book.add_sheet('Sheet 2')
+        
+        sheet1.write(0,0,'A1')
+        sheet1.write(0,1,'B1')
+        row1 = sheet1.row(1)
+        row1.write(0,'A2')
+        row1.write(1,'B2')
+        sheet1.col(0).width = 10000
+        
+        sheet2 = book.get_sheet(1)
+        sheet2.row(0).write(0,'Sheet 2 A1')
+        sheet2.row(0).write(1,'Sheet 2 B1')
+        sheet2.flush_row_data()
+        sheet2.write(1,0,'Sheet 2 A3')
+        sheet2.col(0).width = 5000
+        sheet2.col(0).hidden = True
+        
+    
+        response = HttpResponse(content_type='application/vnd.ms-excel')
+        # Crear un nombre intuitivo         
+        response['Content-Disposition'] = 'attachment; filename=' + 'test.xls'
+        book.save(response)
+        return response
 
         
 

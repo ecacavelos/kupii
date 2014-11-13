@@ -27,17 +27,15 @@ $(document).ready(function() {
 						<a href="/">Inicio</a> <span class="verde-1">></span>  
 						<a href="/informes/">Informes</a> 
 						<span class="verde-1">> Lotes Libres</span> 
-					</div>
-
+					</div>					
 					<div class="clear"></div>
 
 					<div class="grid_10">
   						<h1>Listado de Lotes</h1>
-					</div>
-
+					</div>					
 					<div class="grid_6">
   						<form name="frm_busqueda" id="frm_busqueda" method="post" action="/informes/listado_busqueda_lotes/">
-  							{% csrf_token %}
+  							{% csrf_token %}  							  						
   							<table>
   								<tr>
   									<tr>
@@ -61,6 +59,9 @@ $(document).ready(function() {
   							</table>		
 							
 						</form>
+					</div>
+					<div class="grid_6">
+						<a class="boton-verde" href="/informes/lotes_libres_reporte_excel?parametro1=adsf">Descargar como Excel</a>
 					</div>
 
 					<div class="clear"></div>
