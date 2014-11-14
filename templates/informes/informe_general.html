@@ -1,0 +1,182 @@
+{% extends "lotes/base_lotes.html" %}
+{% block header_scripts %}
+
+<script type="text/javascript">
+	$(document).ready(function() {
+
+		$('#fecha_ini').mask('##/##/####');
+		$("#fecha_ini").datepicker({
+			dateFormat : 'dd/mm/yy'
+		});
+		$('#fecha_fin').mask('##/##/####');
+		$("#fecha_fin").datepicker({
+			dateFormat : 'dd/mm/yy'
+		});
+
+	});
+
+	function format(nro) {
+
+		var number = new String(nro);
+		var result = '';
+		while (number.length > 3) {
+			result = '.' + number.substr(number.length - 3) + result;
+			number = number.substring(0, number.length - 3);
+		}
+		result = number + result;
+		return result;
+	};
+
+	function validar() {
+		var request_pagos = $.ajax({
+			url : '/ajax/get_informe_general/',
+			type : "GET",
+			data : {
+				fecha_ini : $('#fecha_ini').val(),
+				fecha_fin : $('#fecha_fin').val(),
+				fraccion_ini : $('#fraccion_ini').val(),
+				fraccion_fin : $('#fraccion_fin').val()
+			},
+			dataType : "json"
+		});
+		request_pagos.success(function(data) {
+
+			calculartotales(data);
+		});
+	}
+
+	function calculartotales(data) {
+		var fraccion_actual = data[0].fraccion_id;
+		var total_cuotas = 0;
+		var total_mora = 0;
+		var total_pagos = 0;
+		var total_general_cuotas = 0;
+		var total_general_mora = 0;
+		var total_general_pagos = 0;
+		for (var i = 0; i < data.length; i++) {
+			//se suman los totales por fracion
+			if (data[i].fraccion_id == fraccion_actual) {
+				total_cuotas += data[i].total_de_cuotas;
+				total_mora += data[i].total_de_mora;
+				total_pagos += data[i].total_de_pago;
+				$('#tabla_pagos').append("<tr><td>" + data[i].fraccion + "</td><td>" + data[i].lote + "</td><td>" + data[i].cliente + "</td><td>" + data[i].cuota_nro + "</td><td>" + data[i].plan_de_pago + "</td><td>" + data[i].fecha_pago + "</td><td>" + format(data[i].total_de_cuotas) + "</td><td>" + format(data[i].total_de_mora) + "</td><td>" + format(data[i].total_de_pago) + "</td></tr>");
+				//... y acumulamos para los totales generales
+				total_general_cuotas += data[i].total_de_cuotas;
+				total_general_mora += data[i].total_de_mora;
+				total_general_pagos += data[i].total_de_pago;
+				//si es la ultima fila
+
+			} else {
+
+				$('#tabla_pagos').append("<tr><td colspan='6'>Totales de Fraccion: </td><td>" + format(total_cuotas) + "</td><td>" + format(total_mora) + "</td><td>" + format(total_pagos) + "</td></tr>");
+				$('#tabla_pagos').append("<tr><td>" + data[i].fraccion + "</td><td>" + data[i].lote + "</td><td>" + data[i].cliente + "</td><td>" + data[i].cuota_nro + "</td><td>" + data[i].plan_de_pago + "</td><td>" + data[i].fecha_pago + "</td><td>" + format(data[i].total_de_cuotas) + "</td><td>" + format(data[i].total_de_mora) + "</td><td>" + format(data[i].total_de_pago) + "</td></tr>");
+				fraccion_actual = data[i].fraccion_id;
+				total_cuotas = 0;
+				total_mora = 0;
+				total_pagos = 0;
+				total_cuotas += data[i].total_de_cuotas;
+				total_mora += data[i].total_de_mora;
+				total_pagos += data[i].total_de_pago;
+			}
+			if (i == data.length - 1) {
+				$('#tabla_pagos').append("<tr><td colspan='6'>Totales de Fraccion: </td><td>" + format(total_cuotas) + "</td><td>" + format(total_mora) + "</td><td>" + format(total_pagos) + "</td></tr>");				
+			}
+
+		}
+		$('#tabla_pagos').append("<tr><td colspan='6'>Totales Generales: </td><td>" + format(total_general_cuotas) + "</td><td>" + format(total_general_mora) + "</td><td>" + format(total_general_pagos) + "</td></tr>");
+	}
+	
+	function r_pagos() {
+		var request_pagos = $.ajax({
+			url : '/ajax/get_reporte_general_pagos/',
+			type : "GET",
+			data : {
+				fecha_ini : $('#fecha_ini').val(),
+				fecha_fin : $('#fecha_fin').val(),
+				fraccion_ini : $('#fraccion_ini').val(),
+				fraccion_fin : $('#fraccion_fin').val()
+			},
+			dataType : "json"
+		});
+		$('boton').click(function(e) {
+    		e.preventDefault();  //stop the browser from following
+    		window.location.href = '';
+		});
+	}
+</script>
+{% endblock %}
+{% block content %}
+<div class="gri16 text-izquierda" id="breadcumb">
+	<a href="/">Inicio</a><span class="verde-1">></span>
+	<a href="/informes/">Informes</a>
+	<span class="verde-1">> Informe general de pagos</span>
+</div>
+
+<div class="clear"></div>
+
+<div class="grid_10">
+	<h1>Informe General de Pagos</h1>
+</div>
+
+<div class="grid_6">
+	<form name="frm_busqueda" id="frm_busqueda" method="post" action="/informes/informe_general/">
+		{% csrf_token %}
+		<table>
+			<th></th><th>Desde:</th><th>Hasta:</th>
+			<tr>
+				<td> Rango de Fecha: </td>
+				<td>
+				<input name="fecha_ini" id="fecha_ini" type="text" value="" />
+				</td>
+				<td>
+				<input name="fecha_fin" id="fecha_fin" type="text" value="" />
+				</td>
+			</tr>
+			<tr>
+				<td> Rango de Fracci&oacute;n: </td>
+				<td>
+				<input name="fraccion_ini" id="fraccion_ini" type="text" value=""/>
+				</td>
+				<td>
+				<input name="fraccion_fin" id="fraccion_fin" type="text" value=""/>
+				</td>
+			</tr>
+			<tr>
+				<td>
+				<input type="button" value="Buscar" onclick="validar();" class="historico" style="cursor: pointer"/>
+				</td>
+				<td>
+				<input name="tabla" type="hidden" value="lote"/>
+				</td>
+			</tr>
+		</table>
+
+	</form>
+</div>
+
+<div class="clear"></div>
+<div id="listado-cuadro-busqueda">
+
+	<br>
+	<br>
+</div>
+<div id="listado-item-lote">
+	<table id="tabla_pagos" width="50%" border="1" cellpadding="0" cellspacing="0" class="listado-pagos" align="center">
+		<th>Fracci&oacute;n</th><th>Lote Nro</th><th>Cliente</th><th>Cuota Nº</th><th>Plan de Pago</th><th>Fecha de Pago</th><th>Total de Cuotas</th><th>Total de Mora</th><th>Total de Pago</th>
+
+		<tr id='fila_totales' style="display: none;"></tr>
+		<div class="pagination">
+			<span class="step-links"> {%if object_list.has_previous%} <a href="?page={{ object_list.previous_page_number }}"> Anterior</a> {%endif%}
+				P&aacute;gina
+				|{{object_list.number}}|
+
+				{%if object_list.has_next%} <a href="?page={{ object_list.next_page_number }}"> Siguiente</a> {%endif%} </span>
+		</div>
+	</table>
+</div>
+<input type="button"  name="boton" value="Reporte" onclick="r_pagos();" class="historico" style="cursor: pointer"/>
+
+<div id="footer">
+	<a href="/informes" class="boton-verde">Volver al módulo de Informes</a>
+</div>
+{% endblock %}

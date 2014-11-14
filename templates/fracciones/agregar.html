@@ -1,0 +1,20 @@
+{% extends "fracciones/base_fracciones.html" %}
+
+{% block content %}
+<div id="detalle-fraccion">
+	<form action="" method="post">
+		{% csrf_token %}
+		{% for field in form %}
+		<div class="fieldWrapper{% if field.field.required %} required{% endif %}">
+			{{ field.errors }}
+			{{ field.label_tag }} {{ field }}
+		</div>
+		{% endfor %}
+		<input class="fraccion-form-button" type="submit" value="Agregar esta Fraccion" />
+	</form>
+</div>
+<br>
+<div id="footer">
+	<a href="/fracciones">Volver al módulo de Fracciones</a>
+</div>
+{% endblock %}
