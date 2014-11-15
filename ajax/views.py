@@ -8,7 +8,7 @@ from django.utils import simplejson as json
 from principal.models import Fraccion, Manzana, Venta, PagoDeCuotas, Propietario, Lote, Cliente, Vendedor, PlanDePago, PlanDePagoVendedor
 from principal.common_functions import get_cuotas_detail_by_lote, get_nro_cuota
 from datetime import datetime
-from principal.reports import reporte_lotes_libres, reporte_general_pagos, reporte_liquidacion_vendedores,reporte_liquidacion_gerentes
+#from principal.reports import reporte_lotes_libres, reporte_general_pagos, reporte_liquidacion_vendedores,reporte_liquidacion_gerentes
 
 @require_http_methods(["GET"])
 def get_propietario_id_by_name(request):
@@ -340,7 +340,7 @@ def get_lista_pagos(request):
             cuota['importe']=i.total_de_cuotas
             cuota['comision']=int(i.total_de_cuotas*(i.plan_de_pago_vendedores.porcentaje_de_cuotas/100))
             cuotas.append(cuota)
-    reporte_liquidacion_vendedores(cuotas)
+    #reporte_liquidacion_vendedores(cuotas)
     #print 'hola'
     return HttpResponse(json.dumps(cuotas), mimetype='application/json')
 
@@ -380,7 +380,7 @@ def get_lista_pagos_gerentes(request):
             cuota['monto_pagado']=i.total_de_cuotas
             cuota['monto_gerente']=int(i.total_de_cuotas*(i.plan_de_pago.porcentaje_cuotas_gerente/100))
             cuotas.append(cuota)
-    reporte_liquidacion_gerentes(cuotas)
+    #reporte_liquidacion_gerentes(cuotas)
     #print 'hola'
     return HttpResponse(json.dumps(cuotas), mimetype='application/json')
     
@@ -427,60 +427,6 @@ def get_informe_general(request):
         cuotas.append(cuota)
     
     #print 'hola'
-    reporte_general_pagos(cuotas)
+    #reporte_general_pagos(cuotas)
     return HttpResponse(json.dumps(cuotas), mimetype='application/json')
 
-@require_http_methods(["GET"])          
-def get_reporte_lotes_libres(request):   
-    object_list = Lote.objects.filter(estado="1").order_by('manzana', 'nro_lote')
-    return reporte_lotes_libres(object_list,'lotes_libres')
-    
-# @require_http_methods(["GET"])   
-# def get_reporte_general_pagos(request):
-#     fecha_ini=request.GET['fecha_ini']
-#     fecha_fin=request.GET['fecha_fin']
-#     fecha_ini_parsed = datetime.strptime(fecha_ini, "%d/%m/%Y").date()
-#     fecha_fin_parsed = datetime.strptime(fecha_fin, "%d/%m/%Y").date()
-#     fraccion_ini=request.GET['fraccion_ini']
-#     fraccion_fin=request.GET['fraccion_fin']
-#     query=(
-#     '''
-#     select pc.* from principal_pagodecuotas pc, principal_lote l, principal_manzana m, principal_fraccion f
-#     where pc.fecha_de_pago >= \''''+ str(fecha_ini_parsed) +               
-#     '''\' and pc.fecha_de_pago <= \'''' + str(fecha_fin_parsed) +
-#     '''\' and f.id>=''' + fraccion_ini +
-#     '''
-#     and f.id<=''' + fraccion_fin +
-#     '''
-#     and (pc.lote_id = l.id and l.manzana_id=m.id and m.fraccion_id=f.id) order by f.id,pc.fecha_de_pago
-#     '''
-#     )
-#          
-#     print query
-#  
-#     object_list=list(PagoDeCuotas.objects.raw(query))
-#  
-#     cuotas=[]
-#     for i in object_list:
-#         nro_cuota=get_nro_cuota(i)
-#         cuota={}            
-#         cuota['fraccion_id']=i.lote.manzana.fraccion.id
-#         cuota['fraccion']=str(i.lote.manzana.fraccion)
-#         cuota['lote']=str(i.lote)
-#         cuota['cliente']=str(i.cliente)
-#         cuota['cuota_nro']=str(nro_cuota)+'/'+str(i.plan_de_pago.cantidad_de_cuotas)
-#         cuota['plan_de_pago']=i.plan_de_pago.nombre_del_plan
-#         cuota['fecha_pago']=str(i.fecha_de_pago)
-#         cuota['total_de_cuotas']=i.total_de_cuotas
-#         cuota['total_de_mora']=i.total_de_mora
-#         cuota['total_de_pago']=i.total_de_pago
-#         cuotas.append(cuota)
-#         
-#     #reporte_general_pagos(cuotas)
-    
-    
-    
-    
-    
-    
-    

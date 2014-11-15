@@ -6,6 +6,7 @@ function buscar(){
 	if($("#tipo_busqueda").val()==0){
 		alert("Debe elegir un tipo de busqueda.");
 	}
+	/*
 	else{
 		if($("#busqueda").val()==""){
 			alert("Debe ingresar un nro de lote para buscar.");
@@ -13,7 +14,12 @@ function buscar(){
 			$("#frm_busqueda").submit();
 		}
 	}
+	*/
 }
+function retrieve_clientes_atrasados(){
+	window.location.href = "/informes/clientes_atrasados_reporte_excel?meses_de_atraso="+$("#busqueda").val();
+}
+
 
 $(document).ready(function() {
 	$('#busqueda').mask('###/###/####');
@@ -61,6 +67,9 @@ $(document).ready(function() {
   							</table>		
 							
 						</form>
+					</div>
+					<div class="grid_6">
+						<a class="boton-verde" id="id_boton" onclick="retrieve_clientes_atrasados();">Descargar como Excel</a>
 					</div>
 
 					<div class="clear"></div>

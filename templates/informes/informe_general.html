@@ -14,6 +14,16 @@
 		});
 
 	});
+	function retrieve_informe_general(){		
+			
+		var fecha1=$("#fecha_ini").val();
+		var fecha2=$("#fecha_fin").val();
+		var frac1=$("#fraccion_ini").val();
+		var frac2=$("#fraccion_fin").val();
+		//window.location.href="/informes/informe_general_reporte_excel?fecha_ini="+fecha1+"&fecha_fin="+fecha2+"&fraccion_ini="+frac1+"&fraccion_fin="+frac2;
+		window.location.href="/informes/informe_general_reporte_excel?fecha_ini="+$('#fecha_ini').val()+"&fecha_fin="+$('#fecha_fin').val()+"&fraccion_ini="+$('#fraccion_ini').val()+"&fraccion_fin="+$('#fraccion_fin').val();
+	
+	}
 
 	function format(nro) {
 
@@ -118,6 +128,8 @@
 	<h1>Informe General de Pagos</h1>
 </div>
 
+
+
 <div class="grid_6">
 	<form name="frm_busqueda" id="frm_busqueda" method="post" action="/informes/informe_general/">
 		{% csrf_token %}
@@ -152,6 +164,10 @@
 		</table>
 
 	</form>
+	<div class="grid_6">
+	 	<a class="boton-verde" id="id_boton" onclick="retrieve_informe_general();">Descargar como Excel</a>
+	</div>
+	
 </div>
 
 <div class="clear"></div>
@@ -173,8 +189,8 @@
 				{%if object_list.has_next%} <a href="?page={{ object_list.next_page_number }}"> Siguiente</a> {%endif%} </span>
 		</div>
 	</table>
+	
 </div>
-<input type="button"  name="boton" value="Reporte" onclick="r_pagos();" class="historico" style="cursor: pointer"/>
 
 <div id="footer">
 	<a href="/informes" class="boton-verde">Volver al módulo de Informes</a>

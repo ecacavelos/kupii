@@ -9,7 +9,11 @@ from datetime import datetime, timedelta
 from calendar import monthrange
 from principal.common_functions import get_nro_cuota
 from django.utils import simplejson
-from principal.reports import reporte_lotes_libres, reporte_clientes_atrasados, reporte_liquidacion_propietarios
+
+
+
+
+import xlwt
 
 
 # Funcion principal del modulo de lotes.
@@ -41,7 +45,7 @@ def lotes_libres(request):
     except EmptyPage:
         lista=paginator.page(paginator.num_pages)
    
-    reporte_lotes_libres(object_list)
+    #reporte_lotes_libres(object_list)
     
     c = RequestContext(request, {
         'object_list': lista,
@@ -206,7 +210,7 @@ def clientes_atrasados(request):
             except EmptyPage:
                 lista = paginator.page(paginator.num_pages)
             
-            reporte_clientes_atrasados(object_list)
+            #reporte_clientes_atrasados(object_list)
         else:
             lista=object_list
                 
@@ -585,7 +589,271 @@ def liquidacion_gerentes(request):
                 return HttpResponseRedirect("/login") 
         except Exception, error:
                 print error
+                
 
+def lotes_libres_reporte_excel(request):
+    
+    #at = request.session.get('at', None)
+    #TODO: Danilo, utiliza este template para poner tu logi
+    if request.method=='GET':
+        #print ('Ejemplo de uso de parametros --> Parametro1' + request.GET['parametro1'])        
+#         book = xlwt.Workbook(encoding='utf8')
+#         sheet1 = book.add_sheet('Sheet 1')
+#         book.add_sheet('Sheet 2')
+#         
+#         sheet1.write(0,0,'A1')
+#         sheet1.write(0,1,'B1')
+#         row1 = sheet1.row(1)
+#         row1.write(0,'A2')
+#         row1.write(1,'B2')
+#         sheet1.col(0).width = 10000
+#         
+#         sheet2 = book.get_sheet(1)
+#         sheet2.row(0).write(0,'Sheet 2 A1')
+#         sheet2.row(0).write(1,'Sheet 2 B1')
+#         sheet2.flush_row_data()
+#         sheet2.write(1,0,'Sheet 2 A3')
+#         sheet2.col(0).width = 5000
+#         sheet2.col(0).hidden = True
+        object_list = Lote.objects.filter(estado="1").order_by('manzana', 'nro_lote')
+        wb=xlwt.Workbook(encoding='utf-8')
+        sheet=wb.add_sheet('test',cell_overwrite_ok=True)
+        style=xlwt.easyxf('pattern: pattern solid, fore_colour green;'
+                              'font: name Arial, bold True;')   
+    
+        sheet.write(0,0,"Nombre Fraccion",style)
+        sheet.write(0,1,"Fraccion ID",style)
+        sheet.write(0,2,"Manzana Nro.",style)
+        sheet.write(0,3,"Lote Nro.",style)
+        sheet.write(0,4,"Estado",style)
+    
+        i=0
+        c=1
+        while i <len(object_list):        
+            sheet.write(c,0,str(object_list[i].manzana.fraccion))
+            sheet.write(c,1,str(object_list[i].manzana.fraccion.id))
+            sheet.write(c,2,str(object_list[i].manzana))
+            sheet.write(c,3,str(object_list[i].nro_lote))
+            sheet.write(c,4,"Libre")
+            i+=1
+            c+=1
+        #wb.save('lotes_libres.xls')
+    
+    
+        response = HttpResponse(content_type='application/vnd.ms-excel')
+        # Crear un nombre intuitivo         
+        response['Content-Disposition'] = 'attachment; filename=' + 'lotes_libres.xls'
+        wb.save(response)
+        return response
+
+def clientes_atrasados_reporte_excel(request):
+    
+    wb=xlwt.Workbook(encoding='utf-8')
+    sheet=wb.add_sheet('test',cell_overwrite_ok=True)
+    style=xlwt.easyxf('pattern: pattern solid, fore_colour green;'
+                              'font: name Arial, bold True;')   
+    style2=xlwt.easyxf('font: name Arial, bold True;')
+    
+    meses_peticion = int(request.GET['meses_de_atraso'])
         
+    #dias = meses_peticion*30
+    fecha_actual= datetime.now()
+    ventas_a_cuotas = Venta.objects.filter(~Q(plan_de_pago = '2'), fecha_primer_vencimiento__lt=fecha_actual).order_by('cliente')
+    object_list=[]
+    for v in ventas_a_cuotas:
+        fecha_primer_vencimiento = v.fecha_primer_vencimiento
+        fecha_primer_vencimiento = datetime.combine(fecha_primer_vencimiento, datetime.min.time())
+        #diferencia = monthdelta(fecha_actual, d2)
+        fecha_resultante = fecha_actual - fecha_primer_vencimiento
+        cuotas_pagadas = v.pagos_realizados
+        print ("Id de venta: "+str(v.id))
+        print ("Fecha Actual: "+str(fecha_actual))
+        print ("Fecha 1er Vencimieto: "+str(fecha_primer_vencimiento))
+        print ("Fecha resultante: "+str(fecha_resultante))
+        f1 = fecha_actual.date()
+        f2 = fecha_primer_vencimiento.date()
+        diferencia = (f1-f2).days
+            
+        #diferencia = fecha_resultante.days()
+        print ("Dias de Diferencia: "+str(diferencia))
+        meses_diferencia = int (diferencia /30)
+        print ("Meses de diferencia: "+str(meses_diferencia))
+        print ("Meses de atraso solicitado: "+str(meses_peticion))
+        if meses_diferencia >= meses_peticion and cuotas_pagadas < ((meses_diferencia+1) - meses_peticion) :
+            object_list.append(v)
+            
+    a = len(object_list)
+    if a > 0:
+        #a=len(object_list)
+        sheet.write(0,0,"Cliente",style)
+        sheet.write(0,1,"Venta Nro.",style)
+        sheet.write(0,2,"Lote Nro.",style)
+        sheet.write(0,3,"Fraccion",style)
+        sheet.write(0,4,"Fecha 1er. vencimiento",style)
+        sheet.write(0,5,"Plan de Pago",style)
+        sheet.write(0,6,"Fecha de Venta",style)
+        sheet.write(0,7,"Precio Final de Venta",style)
+        i=0
+        c=1
+        for i in range(len(object_list)):        
+            sheet.write(c,0,str(object_list[i].cliente))
+            sheet.write(c,1,str(object_list[i].id))
+            sheet.write(c,2,str(object_list[i].lote.nro_lote))
+            sheet.write(c,3,str(object_list[i].lote.manzana.fraccion))
+            sheet.write(c,4,str(object_list[i].fecha_primer_vencimiento))
+            sheet.write(c,5,str(object_list[i].plan_de_pago))
+            sheet.write(c,6,str(object_list[i].fecha_de_venta))
+            sheet.write(c,7,str(object_list[i].precio_final_de_venta))
+            c+=1
+        
+    else:
+        lista=object_list
+    response = HttpResponse(content_type='application/vnd.ms-excel')
+    # Crear un nombre intuitivo         
+    response['Content-Disposition'] = 'attachment; filename=' + 'clientes_atrasados.xls'
+    wb.save(response)
+    return response
+        
+def informe_general_reporte_excel(request):   
+    fecha_ini=request.GET['fecha_ini']
+    fecha_fin=request.GET['fecha_fin']
+    fecha_ini_parsed = datetime.strptime(fecha_ini, "%d/%m/%Y").date()
+    fecha_fin_parsed = datetime.strptime(fecha_fin, "%d/%m/%Y").date()
+    fraccion_ini=request.GET['fraccion_ini']
+    fraccion_fin=request.GET['fraccion_fin']
+    query=(
+    '''
+    select pc.* from principal_pagodecuotas pc, principal_lote l, principal_manzana m, principal_fraccion f
+    where pc.fecha_de_pago >= \''''+ str(fecha_ini_parsed) +               
+    '''\' and pc.fecha_de_pago <= \'''' + str(fecha_fin_parsed) +
+    '''\' and f.id>=''' + fraccion_ini +
+    '''
+    and f.id<=''' + fraccion_fin +
+    '''
+    and (pc.lote_id = l.id and l.manzana_id=m.id and m.fraccion_id=f.id) order by f.id,pc.fecha_de_pago
+    '''
+    )
+         
+    print query
+ 
+    object_list=list(PagoDeCuotas.objects.raw(query))
+ 
+    cuotas=[]
+    for i in object_list:
+        nro_cuota=get_nro_cuota(i)
+        cuota={}            
+        cuota['fraccion_id']=i.lote.manzana.fraccion.id
+        cuota['fraccion']=str(i.lote.manzana.fraccion)
+        cuota['lote']=str(i.lote)
+        cuota['cliente']=str(i.cliente)
+        cuota['cuota_nro']=str(nro_cuota)+'/'+str(i.plan_de_pago.cantidad_de_cuotas)
+        cuota['plan_de_pago']=i.plan_de_pago.nombre_del_plan
+        cuota['fecha_pago']=str(i.fecha_de_pago)
+        cuota['total_de_cuotas']=i.total_de_cuotas
+        cuota['total_de_mora']=i.total_de_mora
+        cuota['total_de_pago']=i.total_de_pago
+        cuotas.append(cuota)
+        
+        #cuotas=object_list
+    wb=xlwt.Workbook(encoding='utf-8')
+    sheet=wb.add_sheet('test',cell_overwrite_ok=True)
+    style=xlwt.easyxf('pattern: pattern solid, fore_colour green;'
+                              'font: name Arial, bold True;')   
+    style2=xlwt.easyxf('font: name Arial, bold True;')
+    #cabeceras
+    sheet.write(0,0,"Fraccion",style)
+    sheet.write(0,1,"Lote Nro.",style)
+    sheet.write(0,2,"Cliente",style)
+    sheet.write(0,3,"Cuota Nro.",style)
+    sheet.write(0,4,"Plan de Pago",style)
+    sheet.write(0,5,"Fecha de Pago",style)
+    sheet.write(0,6,"Total de Cuotas",style)
+    sheet.write(0,7,"Total de Mora",style)
+    sheet.write(0,8,"Total de Pago",style)
+    
+    #wb.save('informe_general.xls')
+    #guardamos la primera fraccion para comparar
+    fraccion_actual = cuotas[0]['fraccion_id']
+    
+    total_cuotas = 0
+    total_mora = 0
+    total_pagos = 0
+    total_general_cuotas = 0
+    total_general_mora = 0
+    total_general_pagos = 0
+    
+    #i=0
+    #contador de filas
+    c=1
+    for i in range(len(cuotas)):
+    #for i,cuota in enumerate(cuotas,start=1):
+        #se suman los totales por fracion
+        if (cuotas[i]['fraccion_id'] == fraccion_actual):
+            total_cuotas += cuotas[i]['total_de_cuotas']
+            total_mora += cuotas[i]['total_de_mora']
+            total_pagos += cuotas[i]['total_de_pago']
+            
+            sheet.write(c,0,str(cuotas[i]['fraccion']))
+            sheet.write(c,1,str(cuotas[i]['lote']))
+            sheet.write(c,2,str(cuotas[i]['cliente']))
+            sheet.write(c,3,str(cuotas[i]['cuota_nro']))
+            sheet.write(c,4,str(cuotas[i]['plan_de_pago']))
+            sheet.write(c,5,str(cuotas[i]['fecha_pago']))
+            sheet.write(c,6,str(cuotas[i]['total_de_cuotas']))
+            sheet.write(c,7,str(cuotas[i]['total_de_mora']))
+            sheet.write(c,8,str(cuotas[i]['total_de_pago']))
+            c+=1
+            #... y acumulamos para los totales generales
+            total_general_cuotas += cuotas[i]['total_de_cuotas']
+            total_general_mora += cuotas[i]['total_de_mora'] 
+            total_general_pagos += cuotas[i]['total_de_pago'] 
+            #si es la ultima fila
+
+        else: 
+            
+            sheet.write(c,0,"Totales de Fraccion",style2)
+            sheet.write(c,6,total_cuotas)
+            sheet.write(c,7,total_mora)
+            sheet.write(c,8,total_pagos)
+            c+=1
+            
+            sheet.write(c,0,str(cuotas[i]['fraccion']))
+            sheet.write(c,1,str(cuotas[i]['lote']))
+            sheet.write(c,2,str(cuotas[i]['cliente']))
+            sheet.write(c,3,str(cuotas[i]['cuota_nro']))
+            sheet.write(c,4,str(cuotas[i]['plan_de_pago']))
+            sheet.write(c,5,str(cuotas[i]['fecha_pago']))
+            sheet.write(c,6,str(cuotas[i]['total_de_cuotas']))
+            sheet.write(c,7,str(cuotas[i]['total_de_mora']))
+            sheet.write(c,8,str(cuotas[i]['total_de_pago']))
+            
+            fraccion_actual = cuotas[i]['fraccion_id']
+            total_cuotas = 0;
+            total_mora = 0;
+            total_pagos = 0;
+            total_cuotas += cuotas[i]['total_de_cuotas'];
+            total_mora += cuotas[i]['total_de_mora'];
+            total_pagos += cuotas[i]['total_de_pago'];
+            
+        if (i == len(cuotas)-1):             
+            sheet.write(c,0,"Totales de Fraccion", style2)
+            sheet.write(c,6,total_cuotas,style2)
+            sheet.write(c,7,total_mora,style2)
+            sheet.write(c,8,total_pagos,style2)
+            
+            
+    sheet.write(c+1,0,"Totales Generales",style2)
+    sheet.write(c+1,6,total_general_cuotas,style2)
+    sheet.write(c+1,7,total_general_mora,style2)
+    sheet.write(c+1,8,total_general_pagos,style2)
+    response = HttpResponse(content_type='application/vnd.ms-excel')
+    # Crear un nombre intuitivo         
+    response['Content-Disposition'] = 'attachment; filename=' + 'informe_general.xls'
+    wb.save(response)
+    return response    
+   
+        
+        
+   
 
     

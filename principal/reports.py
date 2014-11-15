@@ -7,35 +7,6 @@ Created on Nov 6, 2014
 import xlwt
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError
 
-#def reporte_lotes_libres(object_list,fname):    
-def reporte_lotes_libres(object_list):
-    wb=xlwt.Workbook(encoding='utf-8')
-    sheet=wb.add_sheet('test',cell_overwrite_ok=True)
-    style=xlwt.easyxf('pattern: pattern solid, fore_colour green;'
-                              'font: name Arial, bold True;')   
-    
-    sheet.write(0,0,"Nombre Fraccion",style)
-    sheet.write(0,1,"Fraccion ID",style)
-    sheet.write(0,2,"Manzana Nro.",style)
-    sheet.write(0,3,"Lote Nro.",style)
-    sheet.write(0,4,"Estado",style)
-    
-    i=0
-    c=1
-    while i <len(object_list):        
-        sheet.write(c,0,str(object_list[i].manzana.fraccion))
-        sheet.write(c,1,str(object_list[i].manzana.fraccion.id))
-        sheet.write(c,2,str(object_list[i].manzana))
-        sheet.write(c,3,str(object_list[i].nro_lote))
-        sheet.write(c,4,"Libre")
-        i+=1
-        c+=1
-    wb.save('lotes_libres.xls')
-#     response = HttpResponse(mimetype="application/ms-excel")
-#     response['Content-Disposition'] = 'attachment; filename=%s' % fname
-#     wb.save(response)
-#     return response
-#         
 def reporte_general_pagos(object_list):
     cuotas=object_list
     wb=xlwt.Workbook(encoding='utf-8')
@@ -137,40 +108,7 @@ def reporte_general_pagos(object_list):
 #     return response
 #         
         
-def reporte_clientes_atrasados(object_list):       
-    wb=xlwt.Workbook(encoding='utf-8')
-    sheet=wb.add_sheet('test',cell_overwrite_ok=True)
-    style=xlwt.easyxf('pattern: pattern solid, fore_colour green;'
-                              'font: name Arial, bold True;')   
-    style2=xlwt.easyxf('font: name Arial, bold True;')
-    
-    sheet.write(0,0,"Cliente",style)
-    sheet.write(0,1,"Venta Nro.",style)
-    sheet.write(0,2,"Lote Nro.",style)
-    sheet.write(0,3,"Fraccion",style)
-    sheet.write(0,4,"Fecha 1er. vencimiento",style)
-    sheet.write(0,5,"Plan de Pago",style)
-    sheet.write(0,6,"Fecha de Venta",style)
-    sheet.write(0,7,"Precio Final de Venta",style)
-    
-    i=0
-    c=1
-    for i in range(len(object_list)):        
-        sheet.write(c,0,str(object_list[i].cliente))
-        sheet.write(c,1,str(object_list[i].id))
-        sheet.write(c,2,str(object_list[i].lote.nro_lote))
-        sheet.write(c,3,str(object_list[i].lote.manzana.fraccion))
-        sheet.write(c,4,str(object_list[i].fecha_primer_vencimiento))
-        sheet.write(c,5,str(object_list[i].plan_de_pago))
-        sheet.write(c,6,str(object_list[i].fecha_de_venta))
-        sheet.write(c,7,str(object_list[i].precio_final_de_venta))
-        #i+=1
-        c+=1
-    wb.save('clientes_atrasados.xls')
-#     response = HttpResponse(mimetype="application/ms-excel")
-#     response['Content-Disposition'] = 'attachment; filename=%s' % fname
-#     wb.save(response)
-#     return response
+
     
 def reporte_liquidacion_propietarios(object_list,totales): 
     
