@@ -403,6 +403,7 @@ def liquidacion_propietarios(request):
                 lista_totales=[]
                 pagos_list=[]
                 fracciones_list=[]
+                busqueda=request.POST['busqueda']
                 if tipo_busqueda == "fraccion":
                     fraccion_id=request.POST['busqueda']
                     fraccion=Fraccion.objects.get(pk=fraccion_id)
@@ -414,6 +415,8 @@ def liquidacion_propietarios(request):
                     total_monto_pagado=0
                     total_monto_inm=0
                     total_monto_prop=0
+                    monto_inmobiliaria=0
+                    monto_propietario=0
                     for m in manzana_list:
                         lotes_list=Lote.objects.filter(manzana_id=m.id)
                         for l in lotes_list:
@@ -422,8 +425,7 @@ def liquidacion_propietarios(request):
                             if pago:
                                 pagos_list.append(pago)
                     
-                    #print('Lotes:' +str(len(lista_lotes)))
-                    #print('FECHA'+'\t\t'+'LOTE ID'+'\t'+'CUOTA NRO'+'\t'+'MONTO PAG.'+'PLAN DE PAGO'+'\t'+'MONTO INMOBILIARIA'+'\t'+'MONTO PROPIETARIO')
+                    
                     for i in pagos_list:                        
                         for pago in i:
                             nro_cuota=get_nro_cuota(pago)
@@ -431,14 +433,15 @@ def liquidacion_propietarios(request):
                                 if nro_cuota<20:
                                     monto_inmobiliaria=pago.total_de_cuotas
                                     monto_propietario=0
-                                    total_monto_pagado+=pago.total_de_cuotas
-                                    total_monto_inm+=monto_inmobiliaria
+#                                     total_monto_pagado+=pago.total_de_cuotas
+#                                     total_monto_inm+=monto_inmobiliaria
                                 else:
                                     if pago.plan_de_pago.porcentaje_cuotas_inmobiliaria!=0:
                                         monto_inmobiliaria=pago.total_de_cuotas*int(pago.plan_de_pago.porcentaje_cuotas_inmobiliaria/100)
                                         monto_propietario=pago.total_de_cuotas-monto_inmobiliaria
-                                        total_monto_inm+=monto_inmobiliaria
-                                        total_monto_prop+=monto_propietario
+                                total_monto_inm+=monto_inmobiliaria
+                                total_monto_prop+=monto_propietario
+                                total_monto_pagado+=pago.total_de_cuotas
                             try:
                                 lista_fila.append(pago.fecha_de_pago)
                                 lista_fila.append(pago.lote)
@@ -447,9 +450,7 @@ def liquidacion_propietarios(request):
                                 lista_fila.append(str('{:,}'.format(pago.total_de_cuotas)).replace(",", "."))
                                 lista_fila.append(str('{:,}'.format(monto_inmobiliaria)).replace(",", "."))
                                 lista_fila.append(str('{:,}'.format(monto_propietario)).replace(",", "."))                    
-                                #lista_fila.zip()
                                 lista_pagos.append(lista_fila)
-                                #lista_pagos=zip(lista_fila)
                                 lista_fila=[]
                             except Exception, error:
                                 print error
@@ -458,10 +459,7 @@ def liquidacion_propietarios(request):
                         lista_totales.append(str('{:,}'.format(total_monto_pagado)).replace(",", "."))
                         lista_totales.append(str('{:,}'.format(total_monto_inm)).replace(",", "."))
                         lista_totales.append(str('{:,}'.format(total_monto_prop)).replace(",", "."))
-                        #print('aca estoy')
-                            #print (str(pago.fecha_de_pago)+'\t'+str(pago.lote_id)+'\t'+str(cant_cuotas)+'/'+str(pago.plan_de_pago.cantidad_de_cuotas)+'\t'+str(pago.plan_de_pago_id)+'\t\t'+str(pago.total_de_cuotas)+'\t\t'+str(monto_inmobiliaria)+'\t\t'+str(monto_propietario)+'\n')
-                            
-                                                                
+                                                                               
                 else:
                     try:
                         propietario=request.POST['busqueda']    
@@ -481,8 +479,7 @@ def liquidacion_propietarios(request):
                                     if pago:
                                         pagos_list.append(pago)
                                     
-                                    #print('Lotes:' +str(len(lista_lotes)))
-                                    
+                                                                    
                         for i in pagos_list:
                             nro_cuota=get_nro_cuota(pago)
                             for pago in i:
@@ -490,14 +487,15 @@ def liquidacion_propietarios(request):
                                     if nro_cuota<20:
                                         monto_inmobiliaria=pago.total_de_cuotas
                                         monto_propietario=0
-                                        total_monto_pagado+=pago.total_de_cuotas
-                                        total_monto_inm+=monto_inmobiliaria
+#                                         total_monto_pagado+=pago.total_de_cuotas
+#                                         total_monto_inm+=monto_inmobiliaria
                                     else:
                                         if pago.plan_de_pago.porcentaje_cuotas_inmobiliaria!=0:
                                             monto_inmobiliaria=pago.total_de_cuotas*int(pago.plan_de_pago.porcentaje_cuotas_inmobiliaria/100)
                                             monto_propietario=pago.total_de_cuotas-monto_inmobiliaria
-                                            total_monto_inm+=monto_inmobiliaria
-                                            total_monto_prop+=monto_propietario
+                                    total_monto_inm+=monto_inmobiliaria
+                                    total_monto_prop+=monto_propietario
+                                    total_monto_pagado+=pago.total_de_cuotas
                             try:
                                 lista_fila.append(pago.fecha_de_pago)
                                 lista_fila.append(pago.lote)
@@ -506,9 +504,7 @@ def liquidacion_propietarios(request):
                                 lista_fila.append(str('{:,}'.format(pago.total_de_cuotas)).replace(",", "."))
                                 lista_fila.append(str('{:,}'.format(monto_inmobiliaria)).replace(",", "."))
                                 lista_fila.append(str('{:,}'.format(monto_propietario)).replace(",", "."))                    
-                                #lista_fila.zip()
                                 lista_pagos.append(lista_fila)
-                                #lista_pagos=zip(lista_fila)
                                 lista_fila=[]
                             except Exception, error:
                                 print error
@@ -516,16 +512,19 @@ def liquidacion_propietarios(request):
                         if pagos_list:
                             lista_totales.append(total_monto_pagado)
                             lista_totales.append(total_monto_inm)
-                            lista_totales.append(total_monto_prop)
-                            print('aca estoy')                    
+                            lista_totales.append(total_monto_prop)     
                     except:
                         lista_pagos=[]
-                
-                #reporte_liquidacion_propietarios(lista_pagos,lista_totales)
+        
+                a=len(lista_pagos)
                 t = loader.get_template('informes/liquidacion_propietarios.html')
                 c = RequestContext(request, {
                     'object_list': lista_pagos,
-                    'lista_totales' : lista_totales
+                    'lista_totales' : lista_totales,
+                    'fecha_ini':fecha_ini,
+                    'fecha_fin':fecha_fin,
+                    'tipo_busqueda':tipo_busqueda,
+                    'busqueda':busqueda
                 })
                 return HttpResponse(t.render(c))
             else:
@@ -860,14 +859,11 @@ def informe_general_reporte_excel(request):
     return response    
    
 def liquidacion_propietarios_reporte_excel(request):
-    #fecha_ini=request.GET['fecha_ini']
-    #fecha_fin=request.GET['fecha_fin']
-    fecha_ini=request.POST['fecha_ini']
-    fecha_fin=request.POSTT['fecha_fin']
+    fecha_ini=request.GET['fecha_ini']
+    fecha_fin=request.GET['fecha_fin']
     fecha_ini_parsed = datetime.strptime(fecha_ini, "%d/%m/%Y").date()
     fecha_fin_parsed = datetime.strptime(fecha_fin, "%d/%m/%Y").date()
-    #tipo_busqueda=request.GET['tipo_busqueda']
-    tipo_busqueda=request.POST['tipo_busqueda']
+    tipo_busqueda=request.GET['tipo_busqueda']
     lista_fila=[]
     lista_pagos=[]
     lista_totales=[]
@@ -875,14 +871,15 @@ def liquidacion_propietarios_reporte_excel(request):
     fracciones_list=[]
     c=1
     if tipo_busqueda == "fraccion":
-        #fraccion_id=request.GET['busqueda']
-        fraccion_id=request.POST['busqueda']
+        fraccion_id=request.GET['busqueda']   
         manzana_list =  Manzana.objects.filter(fraccion_id= fraccion_id)
         lista_lotes=[]
         pagos_list=[]
         total_monto_pagado=0
         total_monto_inm=0
         total_monto_prop=0
+        monto_inmobiliaria=0
+        monto_propietario=0
         for m in manzana_list:
             lotes_list=Lote.objects.filter(manzana_id=m.id)
             for l in lotes_list:
@@ -897,23 +894,28 @@ def liquidacion_propietarios_reporte_excel(request):
                     if nro_cuota<20:
                         monto_inmobiliaria=pago.total_de_cuotas
                         monto_propietario=0
-                        total_monto_pagado+=pago.total_de_cuotas
-                        total_monto_inm+=monto_inmobiliaria
+#                         total_monto_pagado+=pago.total_de_cuotas
+#                         total_monto_inm+=monto_inmobiliaria
                     else:
                         if pago.plan_de_pago.porcentaje_cuotas_inmobiliaria!=0:
                             monto_inmobiliaria=pago.total_de_cuotas*int(pago.plan_de_pago.porcentaje_cuotas_inmobiliaria/100)
                             monto_propietario=pago.total_de_cuotas-monto_inmobiliaria
-                            total_monto_inm+=monto_inmobiliaria
-                            total_monto_prop+=monto_propietario                    
-                            lista_fila.append(pago.fecha_de_pago)
-                            lista_fila.append(pago.lote)
-                            lista_fila.append(pago.cliente)
-                            lista_fila.append(str(nro_cuota)+'/'+str(pago.plan_de_pago.cantidad_de_cuotas))
-                            lista_fila.append(str('{:,}'.format(pago.total_de_cuotas)).replace(",", "."))
-                            lista_fila.append(str('{:,}'.format(monto_inmobiliaria)).replace(",", "."))
-                            lista_fila.append(str('{:,}'.format(monto_propietario)).replace(",", "."))                    
-                            lista_pagos.append(lista_fila)
-                            lista_fila=[]
+                        
+                    total_monto_inm+=monto_inmobiliaria
+                    total_monto_prop+=monto_propietario
+                    total_monto_pagado+=pago.total_de_cuotas  
+                try:                      
+                    lista_fila.append(pago.fecha_de_pago)
+                    lista_fila.append(pago.lote)
+                    lista_fila.append(pago.cliente)
+                    lista_fila.append(str(nro_cuota)+'/'+str(pago.plan_de_pago.cantidad_de_cuotas))
+                    lista_fila.append(str('{:,}'.format(pago.total_de_cuotas)).replace(",", "."))
+                    lista_fila.append(str('{:,}'.format(monto_inmobiliaria)).replace(",", "."))
+                    lista_fila.append(str('{:,}'.format(monto_propietario)).replace(",", "."))                    
+                    lista_pagos.append(lista_fila)
+                    lista_fila=[]
+                except Exception, error:
+                    print error
                            
                     
         if pagos_list:
@@ -939,39 +941,43 @@ def liquidacion_propietarios_reporte_excel(request):
                         if pago:
                             pagos_list.append(pago)
                                                               
-                for i in pagos_list:
-                    nro_cuota=get_nro_cuota(pago)
-                    for pago in i:
-                        if(nro_cuota%2!=0 ): 
-                            if nro_cuota<20:
-                                monto_inmobiliaria=pago.total_de_cuotas
-                                monto_propietario=0
-                                total_monto_pagado+=pago.total_de_cuotas
-                                total_monto_inm+=monto_inmobiliaria
-                            else:
-                                if pago.plan_de_pago.porcentaje_cuotas_inmobiliaria!=0:
-                                    monto_inmobiliaria=pago.total_de_cuotas*int(pago.plan_de_pago.porcentaje_cuotas_inmobiliaria/100)
-                                    monto_propietario=pago.total_de_cuotas-monto_inmobiliaria
-                                    total_monto_inm+=monto_inmobiliaria
-                                    total_monto_prop+=monto_propietario                        
-                                    lista_fila.append(pago.fecha_de_pago)
-                                    lista_fila.append(pago.lote)
-                                    lista_fila.append(pago.cliente)
-                                    lista_fila.append(str(nro_cuota)+'/'+str(pago.plan_de_pago.cantidad_de_cuotas))
-                                    lista_fila.append(str('{:,}'.format(pago.total_de_cuotas)).replace(",", "."))
-                                    lista_fila.append(str('{:,}'.format(monto_inmobiliaria)).replace(",", "."))
-                                    lista_fila.append(str('{:,}'.format(monto_propietario)).replace(",", "."))                    
-                                    lista_pagos.append(lista_fila)                                
-                                    lista_fila=[]
-                                
-                    if pagos_list:
-                        lista_totales.append(total_monto_pagado)
-                        lista_totales.append(total_monto_inm)
-                        lista_totales.append(total_monto_prop)
+            for i in pagos_list:
+                nro_cuota=get_nro_cuota(pago)
+                for pago in i:
+                    if(nro_cuota%2!=0 ): 
+                        if nro_cuota<20:
+                            monto_inmobiliaria=pago.total_de_cuotas                            
+                            monto_propietario=0
+#                                 total_monto_pagado+=pago.total_de_cuotas
+#                                 total_monto_inm+=monto_inmobiliaria
+                        else:
+                            if pago.plan_de_pago.porcentaje_cuotas_inmobiliaria!=0:
+                                monto_inmobiliaria=pago.total_de_cuotas*int(pago.plan_de_pago.porcentaje_cuotas_inmobiliaria/100)
+                                monto_propietario=pago.total_de_cuotas-monto_inmobiliaria
+                        total_monto_inm+=monto_inmobiliaria
+                        total_monto_prop+=monto_propietario 
+                        total_monto_pagado+=pago.total_de_cuotas                       
+                    try:
+                        lista_fila.append(pago.fecha_de_pago)
+                        lista_fila.append(pago.lote)
+                        lista_fila.append(pago.cliente)
+                        lista_fila.append(str(nro_cuota)+'/'+str(pago.plan_de_pago.cantidad_de_cuotas))
+                        lista_fila.append(str('{:,}'.format(pago.total_de_cuotas)).replace(",", "."))
+                        lista_fila.append(str('{:,}'.format(monto_inmobiliaria)).replace(",", "."))
+                        lista_fila.append(str('{:,}'.format(monto_propietario)).replace(",", "."))                    
+                        lista_pagos.append(lista_fila)                                
+                        lista_fila=[]
+                    except Exception, error:
+                        print error            
+            if pagos_list:
+                lista_totales.append(total_monto_pagado)
+                lista_totales.append(total_monto_inm)
+                lista_totales.append(total_monto_prop)
                                     
         except:
             lista_pagos=[]
     
+    a=len(lista_pagos)
     wb=xlwt.Workbook(encoding='utf-8')
     sheet=wb.add_sheet('test',cell_overwrite_ok=True)
     style=xlwt.easyxf('pattern: pattern solid, fore_colour green;'
@@ -985,7 +991,7 @@ def liquidacion_propietarios_reporte_excel(request):
     sheet.write(0,5,"Monto Inmobiliaria",style)
     sheet.write(0,6,"Monto Propietario",style)
     
-   
+    
     for i in range(len(lista_pagos)):                      
         sheet.write(c,0,str(lista_pagos[i][0]))
         sheet.write(c,1,str(lista_pagos[i][1]))
