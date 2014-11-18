@@ -24,6 +24,12 @@ function format(nro){
 		return result;
 	};
 	
+	function retrieve_liquidacion_gerentes(){		
+			
+		window.location.href="/informes/liquidacion_gerentes_reporte_excel?fecha_ini="+$('#fecha_ini').val()+"&fecha_fin="+$('#fecha_fin').val()+"&fraccion="+$('#id_fraccion').val();
+	
+	}
+	
 	function validar(){
 		var request_pagos= $.ajax({
 					url : '/ajax/get_lista_pagos_gerentes/',
@@ -52,7 +58,7 @@ function format(nro){
 			if(data[i].fraccion_id==fraccion_actual){
 				monto_pagado+=data[i].monto_pagado;
 				monto_gerente+=data[i].monto_gerente;
-				$('#tabla_gerentes').append("<tr><td>"+data[i].fecha_pago+"</td><td>"+data[i].lote+"</td><td>"+data[i].cliente+"</td><td>"+data[i].monto_pagado+"</td><td>"+data[i].monto_pagado+"</td><td>" +data[i].monto_gerente+"</td></tr>");
+				$('#tabla_gerentes').append("<tr><td>"+data[i].fecha_pago+"</td><td>"+data[i].fraccion+"</td><td>"+data[i].lote+"</td><td>"+data[i].cliente+"</td><td>"+data[i].cuota_nro+"</td><td>"+data[i].monto_pagado+"</td><td>" +data[i].monto_gerente+"</td></tr>");
 				total_monto_pagado+=data[i].monto_pagado;
 				total_monto_gerente+=data[i].monto_gerente;
 				
@@ -60,8 +66,8 @@ function format(nro){
 			}
 			else{
 				//al cambiar de fraccion, se imprimen los totales acumulados, y se suman los totales para la siguiente
-				$('#tabla_gerentes').append("<tr><td colspan='3'>Totales de Fraccion</td><td>"+format(monto_pagado)+"</td><td>"+format(monto_gerente)+"</td></tr>");
-				$('#tabla_gerentes').append("<tr><td>"+data[i].fecha_pago+"</td><td>"+data[i].lote+"</td><td>"+data[i].cliente+"</td><td>"+data[i].monto_pagado+"</td><td>"+data[i].monto_pagado+"</td><td>" +data[i].monto_gerente+"</td></tr>");
+				$('#tabla_gerentes').append("<tr><td colspan='5'>Totales de Fraccion</td><td>"+format(monto_pagado)+"</td><td>"+format(monto_gerente)+"</td></tr>");
+				$('#tabla_gerentes').append("<tr><td>"+data[i].fecha_pago+"</td><td>"+data[i].fraccion+"</td><td>"+data[i].lote+"</td><td>"+data[i].cliente+"</td><td>"+data[i].cuota_nro+"</td><td>"+data[i].monto_pagado+"</td><td>" +data[i].monto_gerente+"</td></tr>");
 				total_monto_pagado+=data[i].monto_pagado;
 				total_monto_gerente+=data[i].monto_gerente;
 				fraccion_actual=data[i].fraccion_id;
@@ -74,10 +80,10 @@ function format(nro){
 			}
 			//preguntamos si es la ultima fila de la tabla, para imprimir los totales generales del vendedor
 			if (i==(data.length)-1){
-							$('#tabla_gerentes').append("<tr><td colspan='4'>Totales de Fraccion</td><td>"+format(monto_pagado)+"</td><td>"+format(monto_gerente)+"</td></tr>");
+							$('#tabla_gerentes').append("<tr><td colspan='5'>Totales de Fraccion</td><td>"+format(monto_pagado)+"</td><td>"+format(monto_gerente)+"</td></tr>");
 				}		
 		}
-		$('#tabla_gerentes').append("<tr><td colspan='3'>Total General</td><td>"+format(total_monto_pagado)+"</td><td>"+format(total_monto_gerente)+"</td></tr>");	
+		$('#tabla_gerentes').append("<tr><td colspan='5'>Total General</td><td>"+format(total_monto_pagado)+"</td><td>"+format(total_monto_gerente)+"</td></tr>");	
 	}	
 	
 
@@ -134,6 +140,9 @@ function format(nro){
   							    
   								
   						</form>
+  						<div class="grid_6">
+	 						<a class="boton-verde" id="id_boton" onclick="retrieve_liquidacion_gerentes();">Descargar como Excel</a>
+						</div>
 					</div>
 
 					<div class="clear"></div>
@@ -143,7 +152,7 @@ function format(nro){
 					</div>
 					<div id="listado-item-lote">
 						<table id="tabla_gerentes" width="50%" border="1" cellpadding="0" cellspacing="0" class="listado-pagos" align="center">
-						<th>Fecha</th><th>Lote Nro</th><th>Cliente</th><th>Monto Pagado</th><th>Monto Gerente</th><th>Fracci&oacute;n</th>
+						<th>Fecha</th><th>Fracci&oacute;n</th><th>Lote Nro</th><th>Cliente</th><th>Cuota Nro</th><th>Monto Pagado</th><th>Monto Gerente</th>
 
 		<tr id='fila_totales' style="display: none;"></tr>
 <div class="pagination">

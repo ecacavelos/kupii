@@ -424,12 +424,11 @@ def liquidacion_propietarios(request):
                     
                     #print('Lotes:' +str(len(lista_lotes)))
                     #print('FECHA'+'\t\t'+'LOTE ID'+'\t'+'CUOTA NRO'+'\t'+'MONTO PAG.'+'PLAN DE PAGO'+'\t'+'MONTO INMOBILIARIA'+'\t'+'MONTO PROPIETARIO')
-                    for i in pagos_list:
-                        cant_cuotas=0
+                    for i in pagos_list:                        
                         for pago in i:
-                            cant_cuotas+=1
-                            if(cant_cuotas%2!=0 ): 
-                                if cant_cuotas<20:
+                            nro_cuota=get_nro_cuota(pago)
+                            if(nro_cuota%2!=0 ): 
+                                if nro_cuota<20:
                                     monto_inmobiliaria=pago.total_de_cuotas
                                     monto_propietario=0
                                     total_monto_pagado+=pago.total_de_cuotas
@@ -444,7 +443,7 @@ def liquidacion_propietarios(request):
                                 lista_fila.append(pago.fecha_de_pago)
                                 lista_fila.append(pago.lote)
                                 lista_fila.append(pago.cliente)
-                                lista_fila.append(str(cant_cuotas)+'/'+str(pago.plan_de_pago.cantidad_de_cuotas))
+                                lista_fila.append(str(nro_cuota)+'/'+str(pago.plan_de_pago.cantidad_de_cuotas))
                                 lista_fila.append(str('{:,}'.format(pago.total_de_cuotas)).replace(",", "."))
                                 lista_fila.append(str('{:,}'.format(monto_inmobiliaria)).replace(",", "."))
                                 lista_fila.append(str('{:,}'.format(monto_propietario)).replace(",", "."))                    
@@ -484,42 +483,45 @@ def liquidacion_propietarios(request):
                                     
                                     #print('Lotes:' +str(len(lista_lotes)))
                                     
-                                    for i in pagos_list:
-                                        cant_cuotas=0
-                                        for pago in i:
-                                            cant_cuotas+=1
-                                            if(cant_cuotas%2!=0): 
-                                                if cant_cuotas<20:
-                                                    monto_inmobiliaria=pago.total_de_cuotas
-                                                    monto_propietario=0
-                                                else:
-                                                    if pago.plan_de_pago.porcentaje_cuotas_inmobiliaria!=0:
-                                                        monto_inmobiliaria=pago.total_de_cuotas*int(pago.plan_de_pago.porcentaje_cuotas_inmobiliaria/100)
-                                                        monto_propietario=pago.total_de_cuotas-monto_inmobiliaria
-                                            #print (str(pago.fecha_de_pago)+'\t'+str(pago.lote_id)+'\t'+str(cant_cuotas)+'/'+str(pago.plan_de_pago.cantidad_de_cuotas)+'\t'+str(pago.plan_de_pago_id)+'\t\t'+str(pago.total_de_cuotas)+'\t\t'+str(monto_inmobiliaria)+'\t\t'+str(monto_propietario)+'\n')    
-                                            try:
-                                                lista_fila.append(pago.fecha_de_pago)
-                                                lista_fila.append(pago.lote)
-                                                lista_fila.append(pago.cliente)
-                                                lista_fila.append(str(cant_cuotas)+'/'+str(pago.plan_de_pago.cantidad_de_cuotas))
-                                                lista_fila.append(str('{:,}'.format(pago.total_de_cuotas)).replace(",", "."))
-                                                lista_fila.append(str('{:,}'.format(monto_inmobiliaria)).replace(",", "."))
-                                                lista_fila.append(str('{:,}'.format(monto_propietario)).replace(",", "."))                    
-                                                #lista_fila.zip()
-                                                lista_pagos.append(lista_fila)
-                                                #lista_pagos=zip(lista_fila)
-                                                lista_fila=[]
-                                            except Exception, error:
-                                                print error
-                            if pagos_list:
-                                lista_totales.append(total_monto_pagado)
-                                lista_totales.append(total_monto_inm)
-                                lista_totales.append(total_monto_prop)
-                                print('aca estoy')                    
+                        for i in pagos_list:
+                            nro_cuota=get_nro_cuota(pago)
+                            for pago in i:
+                                if(nro_cuota%2!=0 ): 
+                                    if nro_cuota<20:
+                                        monto_inmobiliaria=pago.total_de_cuotas
+                                        monto_propietario=0
+                                        total_monto_pagado+=pago.total_de_cuotas
+                                        total_monto_inm+=monto_inmobiliaria
+                                    else:
+                                        if pago.plan_de_pago.porcentaje_cuotas_inmobiliaria!=0:
+                                            monto_inmobiliaria=pago.total_de_cuotas*int(pago.plan_de_pago.porcentaje_cuotas_inmobiliaria/100)
+                                            monto_propietario=pago.total_de_cuotas-monto_inmobiliaria
+                                            total_monto_inm+=monto_inmobiliaria
+                                            total_monto_prop+=monto_propietario
+                            try:
+                                lista_fila.append(pago.fecha_de_pago)
+                                lista_fila.append(pago.lote)
+                                lista_fila.append(pago.cliente)
+                                lista_fila.append(str(nro_cuota)+'/'+str(pago.plan_de_pago.cantidad_de_cuotas))
+                                lista_fila.append(str('{:,}'.format(pago.total_de_cuotas)).replace(",", "."))
+                                lista_fila.append(str('{:,}'.format(monto_inmobiliaria)).replace(",", "."))
+                                lista_fila.append(str('{:,}'.format(monto_propietario)).replace(",", "."))                    
+                                #lista_fila.zip()
+                                lista_pagos.append(lista_fila)
+                                #lista_pagos=zip(lista_fila)
+                                lista_fila=[]
+                            except Exception, error:
+                                print error
+                                
+                        if pagos_list:
+                            lista_totales.append(total_monto_pagado)
+                            lista_totales.append(total_monto_inm)
+                            lista_totales.append(total_monto_prop)
+                            print('aca estoy')                    
                     except:
                         lista_pagos=[]
                 
-                reporte_liquidacion_propietarios(lista_pagos,lista_totales)
+                #reporte_liquidacion_propietarios(lista_pagos,lista_totales)
                 t = loader.get_template('informes/liquidacion_propietarios.html')
                 c = RequestContext(request, {
                     'object_list': lista_pagos,
@@ -654,7 +656,12 @@ def clientes_atrasados_reporte_excel(request):
                               'font: name Arial, bold True;')   
     style2=xlwt.easyxf('font: name Arial, bold True;')
     
-    meses_peticion = int(request.GET['meses_de_atraso'])
+    #meses_peticion = int(request.GET['meses_de_atraso'])
+    
+    if request.GET['meses_de_atraso'] =='':
+        meses_peticion = 0
+    else:
+        meses_peticion = int(request.GET['meses_de_atraso']) 
         
     #dias = meses_peticion*30
     fecha_actual= datetime.now()
@@ -852,8 +859,422 @@ def informe_general_reporte_excel(request):
     wb.save(response)
     return response    
    
-        
-        
-   
-
+def liquidacion_propietarios_reporte_excel(request):
+    #fecha_ini=request.GET['fecha_ini']
+    #fecha_fin=request.GET['fecha_fin']
+    fecha_ini=request.POST['fecha_ini']
+    fecha_fin=request.POSTT['fecha_fin']
+    fecha_ini_parsed = datetime.strptime(fecha_ini, "%d/%m/%Y").date()
+    fecha_fin_parsed = datetime.strptime(fecha_fin, "%d/%m/%Y").date()
+    #tipo_busqueda=request.GET['tipo_busqueda']
+    tipo_busqueda=request.POST['tipo_busqueda']
+    lista_fila=[]
+    lista_pagos=[]
+    lista_totales=[]
+    pagos_list=[]
+    fracciones_list=[]
+    c=1
+    if tipo_busqueda == "fraccion":
+        #fraccion_id=request.GET['busqueda']
+        fraccion_id=request.POST['busqueda']
+        manzana_list =  Manzana.objects.filter(fraccion_id= fraccion_id)
+        lista_lotes=[]
+        pagos_list=[]
+        total_monto_pagado=0
+        total_monto_inm=0
+        total_monto_prop=0
+        for m in manzana_list:
+            lotes_list=Lote.objects.filter(manzana_id=m.id)
+            for l in lotes_list:
+                lista_lotes.append(l)
+                pago=PagoDeCuotas.objects.filter(lote_id= l.id ,fecha_de_pago__range= [fecha_ini_parsed, fecha_fin_parsed])
+                if pago:
+                    pagos_list.append(pago)                  
+        for i in pagos_list:                        
+            for pago in i:
+                nro_cuota=get_nro_cuota(pago)
+                if(nro_cuota%2!=0 ): 
+                    if nro_cuota<20:
+                        monto_inmobiliaria=pago.total_de_cuotas
+                        monto_propietario=0
+                        total_monto_pagado+=pago.total_de_cuotas
+                        total_monto_inm+=monto_inmobiliaria
+                    else:
+                        if pago.plan_de_pago.porcentaje_cuotas_inmobiliaria!=0:
+                            monto_inmobiliaria=pago.total_de_cuotas*int(pago.plan_de_pago.porcentaje_cuotas_inmobiliaria/100)
+                            monto_propietario=pago.total_de_cuotas-monto_inmobiliaria
+                            total_monto_inm+=monto_inmobiliaria
+                            total_monto_prop+=monto_propietario                    
+                            lista_fila.append(pago.fecha_de_pago)
+                            lista_fila.append(pago.lote)
+                            lista_fila.append(pago.cliente)
+                            lista_fila.append(str(nro_cuota)+'/'+str(pago.plan_de_pago.cantidad_de_cuotas))
+                            lista_fila.append(str('{:,}'.format(pago.total_de_cuotas)).replace(",", "."))
+                            lista_fila.append(str('{:,}'.format(monto_inmobiliaria)).replace(",", "."))
+                            lista_fila.append(str('{:,}'.format(monto_propietario)).replace(",", "."))                    
+                            lista_pagos.append(lista_fila)
+                            lista_fila=[]
+                           
+                    
+        if pagos_list:
+            lista_totales.append(str('{:,}'.format(total_monto_pagado)).replace(",", "."))
+            lista_totales.append(str('{:,}'.format(total_monto_inm)).replace(",", "."))
+            lista_totales.append(str('{:,}'.format(total_monto_prop)).replace(",", "."))
+                                                                   
+    else:
+        try:
+            propietario=request.GET['busqueda']    
+            propietario_id=Propietario.objects.get(nombres__icontains=propietario)
+            fracciones_list=Fraccion.objects.filter(propietario_id=propietario_id)
+            for f in fracciones_list:
+                manzana_list =  Manzana.objects.filter(fraccion_id= f.id)
+                lista_lotes=[]
+                pagos_list=[]
+                monto_propietario=0
+                for m in manzana_list:
+                    lotes_list=Lote.objects.filter(manzana_id=m.id)
+                    for l in lotes_list:
+                        lista_lotes.append(l)
+                        pago=PagoDeCuotas.objects.filter(lote_id= l.id ,fecha_de_pago__range= [fecha_ini_parsed, fecha_fin_parsed])
+                        if pago:
+                            pagos_list.append(pago)
+                                                              
+                for i in pagos_list:
+                    nro_cuota=get_nro_cuota(pago)
+                    for pago in i:
+                        if(nro_cuota%2!=0 ): 
+                            if nro_cuota<20:
+                                monto_inmobiliaria=pago.total_de_cuotas
+                                monto_propietario=0
+                                total_monto_pagado+=pago.total_de_cuotas
+                                total_monto_inm+=monto_inmobiliaria
+                            else:
+                                if pago.plan_de_pago.porcentaje_cuotas_inmobiliaria!=0:
+                                    monto_inmobiliaria=pago.total_de_cuotas*int(pago.plan_de_pago.porcentaje_cuotas_inmobiliaria/100)
+                                    monto_propietario=pago.total_de_cuotas-monto_inmobiliaria
+                                    total_monto_inm+=monto_inmobiliaria
+                                    total_monto_prop+=monto_propietario                        
+                                    lista_fila.append(pago.fecha_de_pago)
+                                    lista_fila.append(pago.lote)
+                                    lista_fila.append(pago.cliente)
+                                    lista_fila.append(str(nro_cuota)+'/'+str(pago.plan_de_pago.cantidad_de_cuotas))
+                                    lista_fila.append(str('{:,}'.format(pago.total_de_cuotas)).replace(",", "."))
+                                    lista_fila.append(str('{:,}'.format(monto_inmobiliaria)).replace(",", "."))
+                                    lista_fila.append(str('{:,}'.format(monto_propietario)).replace(",", "."))                    
+                                    lista_pagos.append(lista_fila)                                
+                                    lista_fila=[]
+                                
+                    if pagos_list:
+                        lista_totales.append(total_monto_pagado)
+                        lista_totales.append(total_monto_inm)
+                        lista_totales.append(total_monto_prop)
+                                    
+        except:
+            lista_pagos=[]
     
+    wb=xlwt.Workbook(encoding='utf-8')
+    sheet=wb.add_sheet('test',cell_overwrite_ok=True)
+    style=xlwt.easyxf('pattern: pattern solid, fore_colour green;'
+                              'font: name Arial, bold True;')   
+    style2=xlwt.easyxf('font: name Arial, bold True;')
+    sheet.write(0,0,"Fecha de Venta",style)
+    sheet.write(0,1,"Lote Nro.",style)
+    sheet.write(0,2,"Cliente",style)
+    sheet.write(0,3,"Cuota Nro.",style)
+    sheet.write(0,4,"Monto Pagado",style)
+    sheet.write(0,5,"Monto Inmobiliaria",style)
+    sheet.write(0,6,"Monto Propietario",style)
+    
+   
+    for i in range(len(lista_pagos)):                      
+        sheet.write(c,0,str(lista_pagos[i][0]))
+        sheet.write(c,1,str(lista_pagos[i][1]))
+        sheet.write(c,2,str(lista_pagos[i][2]))
+        sheet.write(c,3,str(lista_pagos[i][3]))
+        sheet.write(c,4,str(lista_pagos[i][4]))
+        sheet.write(c,5,str(lista_pagos[i][5]))
+        sheet.write(c,6,str(lista_pagos[i][6]))
+        
+        c+=1
+        if (i == len(lista_pagos)-1):             
+            sheet.write(c,0,"Liquidacion", style2)
+            sheet.write(c,4,total_monto_pagado)
+            sheet.write(c,5,total_monto_inm)
+            sheet.write(c,6,total_monto_prop)
+        
+  
+    response = HttpResponse(content_type='application/vnd.ms-excel')
+    # Crear un nombre intuitivo         
+    response['Content-Disposition'] = 'attachment; filename=' + 'liquidacion_propietarios.xls'
+    wb.save(response)
+    return response 
+
+def liquidacion_vendedores_reporte_excel(request):   
+    
+    vendedor_id = request.GET['busqueda']
+    #print("vendedor_id ->" + vendedor_id);
+    fecha_ini=request.GET['fecha_ini']
+    fecha_fin=request.GET['fecha_fin']
+    fecha_ini_parsed = str(datetime.strptime(fecha_ini, "%d/%m/%Y").date())
+    fecha_fin_parsed = str(datetime.strptime(fecha_fin, "%d/%m/%Y").date())
+    
+    tipo_busqueda=request.GET['tipo_busqueda']
+    if(tipo_busqueda=='vendedor_id'):
+        vendedor_id=request.GET['busqueda']
+        print("vendedor_id ->" + vendedor_id)
+    if(tipo_busqueda=='nombre'):
+        nombre_vendedor=request.GET['busqueda']
+        print("nombre_vendedor ->" + nombre_vendedor)
+        vendedor=Vendedor.objects.get(nombres__icontains=nombre_vendedor)
+        vendedor_id=str(vendedor.id)
+    query=(
+    '''
+    select pc.* from principal_pagodecuotas pc, principal_lote l, principal_manzana m, principal_fraccion f
+    where pc.fecha_de_pago >= \''''+ fecha_ini_parsed +               
+    '''\' and pc.fecha_de_pago <= \'''' + fecha_fin_parsed +
+    '''\' and pc.vendedor_id=''' + vendedor_id +                
+    ''' 
+    and (pc.lote_id = l.id and l.manzana_id=m.id and m.fraccion_id=f.id) order by f.id,pc.fecha_de_pago
+    '''
+    )
+        
+        
+    object_list=list(PagoDeCuotas.objects.raw(query))
+    cuotas=[]
+    for i in object_list:
+        nro_cuota=get_nro_cuota(i)
+        if(nro_cuota%2!=0 and nro_cuota<10):
+            cuota={}            
+            cuota['fraccion']=str(i.lote.manzana.fraccion)
+            cuota['cliente']=str(i.cliente)
+            cuota['fraccion_id']=i.lote.manzana.fraccion.id
+            cuota['lote']=str(i.lote)
+            cuota['cuota_nro']=str(nro_cuota)+'/'+str(i.plan_de_pago.cantidad_de_cuotas)
+            cuota['fecha_pago']=str(i.fecha_de_pago)
+            cuota['importe']=i.total_de_cuotas
+            cuota['comision']=int(i.total_de_cuotas*(i.plan_de_pago_vendedores.porcentaje_de_cuotas/100))
+            cuotas.append(cuota)
+            
+    wb=xlwt.Workbook(encoding='utf-8')
+    sheet=wb.add_sheet('test',cell_overwrite_ok=True)
+    style=xlwt.easyxf('pattern: pattern solid, fore_colour green;'
+                              'font: name Arial, bold True;')   
+    style2=xlwt.easyxf('font: name Arial, bold True;')
+    #cabeceras
+    sheet.write(0,0,"Cliente",style)
+    sheet.write(0,1,"Lote Nro.",style)    
+    sheet.write(0,2,"Cuota Nro.",style)
+    sheet.write(0,3,"Fecha de Pago",style)
+    sheet.write(0,4,"Importe",style)
+    sheet.write(0,5,"Comision",style)
+    sheet.write(0,6,"Fraccion",style)
+    #wb.save('informe_general.xls')
+    #guardamos la primera fraccion para comparar
+    fraccion_actual = cuotas[0]['fraccion_id']
+    
+    total_importe = 0
+    total_comision = 0
+    total_general_importe = 0
+    total_general_comision = 0
+    
+    #i=0
+    #contador de filas
+    c=1
+    for i in range(len(cuotas)):
+    #for i,cuota in enumerate(cuotas,start=1):
+        #se suman los totales por fracion
+        if (cuotas[i]['fraccion_id'] == fraccion_actual):
+            
+            total_importe += cuotas[i]['importe']
+            total_comision += cuotas[i]['comision']
+            
+            sheet.write(c,0,str(cuotas[i]['cliente']))
+            sheet.write(c,1,str(cuotas[i]['lote']))
+            sheet.write(c,2,str(cuotas[i]['cuota_nro']))
+            sheet.write(c,3,str(cuotas[i]['fecha_pago']))
+            sheet.write(c,4,str(cuotas[i]['importe']))
+            sheet.write(c,5,str(cuotas[i]['comision']))
+            sheet.write(c,6,str(cuotas[i]['fraccion']))
+            #print str(cuotas[i]['importe'])
+            
+            
+            #... y acumulamos para los totales generales
+            total_general_importe += cuotas[i]['importe']
+            total_general_comision += cuotas[i]['comision'] 
+            c+=1 
+           
+
+        else: 
+            c+=1
+            sheet.write(c,0,"Totales de Fraccion",style2)
+            sheet.write(c,4,total_importe)
+            sheet.write(c,5,total_comision)
+            
+            c+=1
+            sheet.write(c,0,str(cuotas[i]['cliente']))
+            sheet.write(c,1,str(cuotas[i]['lote']))
+            sheet.write(c,2,str(cuotas[i]['cuota_nro']))
+            sheet.write(c,3,str(cuotas[i]['fecha_pago']))
+            sheet.write(c,4,str(cuotas[i]['importe']))
+            sheet.write(c,5,str(cuotas[i]['comision']))
+            sheet.write(c,6,str(cuotas[i]['fraccion']))
+            
+            total_general_importe += cuotas[i]['importe']
+            total_general_comision += cuotas[i]['comision'] 
+            fraccion_actual = cuotas[i]['fraccion_id']
+            total_importe = 0
+            total_comision = 0
+            
+            total_importe += cuotas[i]['importe']
+            total_comision += cuotas[i]['comision']
+        #si es la ultima fila    
+        if (i == len(cuotas)-1):   
+            c+=1           
+            sheet.write(c,0,"Totales de Fraccion", style2)
+            sheet.write(c,4,total_importe,style2)
+            sheet.write(c,5,total_comision,style2)
+            
+    c+=1
+    sheet.write(c,0,"Totales del Vendedor",style2)
+    sheet.write(c,4,total_general_importe,style2)
+    sheet.write(c,5,total_general_comision,style2)
+    response = HttpResponse(content_type='application/vnd.ms-excel')
+    # Crear un nombre intuitivo         
+    response['Content-Disposition'] = 'attachment; filename=' + 'liquidacion_vendedores.xls'
+    wb.save(response)
+    return response 
+
+def liquidacion_gerentes_reporte_excel(request): 
+     
+    #vendedor_id = request.GET['busqueda']
+    #print("vendedor_id ->" + vendedor_id);
+    fecha_ini=request.GET['fecha_ini']
+    fecha_fin=request.GET['fecha_fin']
+    fecha_ini_parsed = str(datetime.strptime(fecha_ini, "%d/%m/%Y").date())
+    fecha_fin_parsed = str(datetime.strptime(fecha_fin, "%d/%m/%Y").date())
+    fraccion_id=request.GET['fraccion']
+    
+    
+    query=(
+    '''
+    select pc.* from principal_pagodecuotas pc, principal_lote l, principal_manzana m, principal_fraccion f
+    where pc.fecha_de_pago >= \''''+ fecha_ini_parsed +               
+    '''\' and pc.fecha_de_pago <= \'''' + fecha_fin_parsed +
+    '''\' and f.id=''' + fraccion_id +                
+    ''' 
+    and (pc.lote_id = l.id and l.manzana_id=m.id and m.fraccion_id=f.id) order by f.id,pc.fecha_de_pago
+    '''
+    )
+        
+        
+    object_list=list(PagoDeCuotas.objects.raw(query))
+    cuotas=[]
+    for i in object_list:
+        nro_cuota=get_nro_cuota(i)
+        if(nro_cuota%2!=0 and nro_cuota<10):
+            cuota={}            
+            cuota['fraccion_id']=i.lote.manzana.fraccion.id
+            cuota['fraccion']=str(i.lote.manzana.fraccion)
+            cuota['cuota_nro']=str(nro_cuota)+'/'+str(i.plan_de_pago.cantidad_de_cuotas)
+            cuota['cliente']=str(i.cliente)
+            cuota['lote']=str(i.lote)
+            cuota['fecha_pago']=str(i.fecha_de_pago)
+            cuota['monto_pagado']=i.total_de_cuotas
+            cuota['monto_gerente']=int(i.total_de_cuotas*(i.plan_de_pago.porcentaje_cuotas_gerente/100))
+            cuotas.append(cuota)
+    wb=xlwt.Workbook(encoding='utf-8')
+    sheet=wb.add_sheet('test',cell_overwrite_ok=True)
+    style=xlwt.easyxf('pattern: pattern solid, fore_colour green;'
+                              'font: name Arial, bold True;')   
+    style2=xlwt.easyxf('font: name Arial, bold True;')
+    #cabeceras
+    sheet.write(0,0,"Fecha de Pago",style)
+    sheet.write(0,1,"Fraccion",style)    
+    sheet.write(0,2,"Lote Nro.",style)
+    sheet.write(0,3,"Cliente",style)    
+    sheet.write(0,4,"Cuota Nro.",style)    
+    sheet.write(0,5,"Monto Pagado",style)
+    sheet.write(0,6,"Monto Gerente",style)
+    
+    #wb.save('informe_general.xls')
+    #guardamos la primera fraccion para comparar
+    fraccion_actual = cuotas[0]['fraccion_id']
+    
+    total_monto_pagado = 0
+    total_monto_gerente = 0
+    total_general_pagado = 0
+    total_general_gerente = 0
+    
+    #i=0
+    #contador de filas
+    c=1
+    for i in range(len(cuotas)):
+    #for i,cuota in enumerate(cuotas,start=1):
+        #se suman los totales por fracion
+        if (cuotas[i]['fraccion_id'] == fraccion_actual):
+            
+            total_monto_pagado += cuotas[i]['monto_pagado']
+            total_monto_gerente += cuotas[i]['monto_gerente']
+                    
+            
+            sheet.write(c,0,str(cuotas[i]['fecha_pago']))
+            sheet.write(c,1,str(cuotas[i]['fraccion']))
+            sheet.write(c,2,str(cuotas[i]['lote']))
+            sheet.write(c,3,str(cuotas[i]['cliente']))
+            sheet.write(c,4,str(cuotas[i]['cuota_nro']))
+            sheet.write(c,5,str(cuotas[i]['monto_pagado']))
+            sheet.write(c,6,str(cuotas[i]['monto_gerente']))
+            
+            
+            
+            #... y acumulamos para los totales generales
+            total_general_pagado += cuotas[i]['monto_pagado']
+            total_general_gerente += cuotas[i]['monto_gerente'] 
+             
+            c+=1
+
+        else: 
+            c+=1
+            sheet.write(c,0,"Totales de Fraccion",style2)
+            sheet.write(c,4,total_monto_pagado)
+            sheet.write(c,5,total_monto_gerente)
+            
+            c+=1
+            sheet.write(c,0,str(cuotas[i]['fecha_pago']))
+            sheet.write(c,1,str(cuotas[i]['fraccion']))
+            sheet.write(c,2,str(cuotas[i]['lote']))
+            sheet.write(c,3,str(cuotas[i]['cliente']))
+            sheet.write(c,4,str(cuotas[i]['cuota_nro']))
+            sheet.write(c,5,str(cuotas[i]['monto_pagado']))
+            sheet.write(c,6,str(cuotas[i]['monto_gerente']))
+            
+            
+            total_general_pagado += cuotas[i]['monto_pagado']
+            total_general_gerente += cuotas[i]['monto_gerente'] 
+            fraccion_actual = cuotas[i]['fraccion_id']
+        
+            
+            total_monto_pagado += cuotas[i]['monto_pagado']
+            total_monto_gerente += cuotas[i]['monto_gerente']
+        #si es la ultima fila    
+        if (i == len(cuotas)-1):   
+            c+=1           
+            sheet.write(c,0,"Totales de Fraccion", style2)
+            sheet.write(c,4,total_monto_pagado,style2)
+            sheet.write(c,5,total_monto_gerente,style2)
+            
+    c+=1
+    sheet.write(c,0,"Totales Generales",style2)
+    sheet.write(c,5,total_general_pagado,style2)
+    sheet.write(c,6,total_general_gerente,style2)
+    response = HttpResponse(content_type='application/vnd.ms-excel')
+    # Crear un nombre intuitivo         
+    response['Content-Disposition'] = 'attachment; filename=' + 'liquidacion_gerentes.xls'
+    wb.save(response)
+    return response 
+    
+    
+    
+    
+     
+

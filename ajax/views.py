@@ -300,10 +300,13 @@ def get_plan_pago_vendedor(request):
 @require_http_methods(["GET"])
 def get_lista_pagos(request):
     
-    #vendedor_id = request.GET['busqueda']
+    vendedor_id = request.GET['busqueda']
     #print("vendedor_id ->" + vendedor_id);
     fecha_ini=request.GET['fecha_ini']
     fecha_fin=request.GET['fecha_fin']
+    fecha_ini_parsed = str(datetime.strptime(fecha_ini, "%d/%m/%Y").date())
+    fecha_fin_parsed = str(datetime.strptime(fecha_fin, "%d/%m/%Y").date())
+    
     tipo_busqueda=request.GET['tipo_busqueda']
     if(tipo_busqueda=='vendedor_id'):
         vendedor_id=request.GET['busqueda']
@@ -316,8 +319,8 @@ def get_lista_pagos(request):
     query=(
     '''
     select pc.* from principal_pagodecuotas pc, principal_lote l, principal_manzana m, principal_fraccion f
-    where pc.fecha_de_pago >= \''''+ fecha_ini +               
-    '''\' and pc.fecha_de_pago <= \'''' + fecha_fin +
+    where pc.fecha_de_pago >= \''''+ fecha_ini_parsed +               
+    '''\' and pc.fecha_de_pago <= \'''' + fecha_fin_parsed +
     '''\' and pc.vendedor_id=''' + vendedor_id +                
     ''' 
     and (pc.lote_id = l.id and l.manzana_id=m.id and m.fraccion_id=f.id) order by f.id,pc.fecha_de_pago
@@ -331,9 +334,9 @@ def get_lista_pagos(request):
         nro_cuota=get_nro_cuota(i)
         if(nro_cuota%2!=0 and nro_cuota<10):
             cuota={}            
-            cuota['fraccion_id']=i.lote.manzana.fraccion.id
             cuota['fraccion']=str(i.lote.manzana.fraccion)
             cuota['cliente']=str(i.cliente)
+            cuota['fraccion_id']=i.lote.manzana.fraccion.id
             cuota['lote']=str(i.lote)
             cuota['cuota_nro']=str(nro_cuota)+'/'+str(i.plan_de_pago.cantidad_de_cuotas)
             cuota['fecha_pago']=str(i.fecha_de_pago)
@@ -351,14 +354,16 @@ def get_lista_pagos_gerentes(request):
     #print("vendedor_id ->" + vendedor_id);
     fecha_ini=request.GET['fecha_ini']
     fecha_fin=request.GET['fecha_fin']
+    fecha_ini_parsed = str(datetime.strptime(fecha_ini, "%d/%m/%Y").date())
+    fecha_fin_parsed = str(datetime.strptime(fecha_fin, "%d/%m/%Y").date())
     fraccion_id=request.GET['fraccion']
     
     
     query=(
     '''
     select pc.* from principal_pagodecuotas pc, principal_lote l, principal_manzana m, principal_fraccion f
-    where pc.fecha_de_pago >= \''''+ fecha_ini +               
-    '''\' and pc.fecha_de_pago <= \'''' + fecha_fin +
+    where pc.fecha_de_pago >= \''''+ fecha_ini_parsed +               
+    '''\' and pc.fecha_de_pago <= \'''' + fecha_fin_parsed +
     '''\' and f.id=''' + fraccion_id +                
     ''' 
     and (pc.lote_id = l.id and l.manzana_id=m.id and m.fraccion_id=f.id) order by f.id,pc.fecha_de_pago
@@ -374,6 +379,7 @@ def get_lista_pagos_gerentes(request):
             cuota={}            
             cuota['fraccion_id']=i.lote.manzana.fraccion.id
             cuota['fraccion']=str(i.lote.manzana.fraccion)
+            cuota['cuota_nro']=str(nro_cuota)+'/'+str(i.plan_de_pago.cantidad_de_cuotas)
             cuota['cliente']=str(i.cliente)
             cuota['lote']=str(i.lote)
             cuota['fecha_pago']=str(i.fecha_de_pago)

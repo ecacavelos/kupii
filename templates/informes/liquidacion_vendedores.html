@@ -26,6 +26,12 @@
 		return result;
 	};
 	
+	function retrieve_liquidacion_vendedores(){		
+			
+		window.location.href="/informes/liquidacion_vendedores_reporte_excel?fecha_ini="+$('#fecha_ini').val()+"&fecha_fin="+$('#fecha_fin').val()+"&busqueda="+$('#id_busqueda').val()+"&tipo_busqueda="+$('#id_tipo_busqueda').val();
+	
+	}
+	
 	function validar(){
 		var request_pagos= $.ajax({
 					url : '/ajax/get_lista_pagos/',
@@ -55,7 +61,7 @@
 			if(data[i].fraccion_id==fraccion_actual){
 				importe+=data[i].importe;
 				comision+=data[i].comision;
-				$('#tabla_vendedores').append("<tr><td>"+data[i].cliente+"</td><td>"+data[i].lote+"</td><td>"+data[i].cuota_nro+"</td><td>"+data[i].fecha_pago+"</td><td>"+format(data[i].importe)+"</td><td>"+format(data[i].comision)+"</td><td>"+data[i].fraccion+"</td></tr>");
+				$('#tabla_vendedores').append("<tr><td>"+data[i].cliente+"</td><td>"+data[i].fraccion+"</td><td>"+data[i].lote+"</td><td>"+data[i].cuota_nro+"</td><td>"+data[i].fecha_pago+"</td><td>"+format(data[i].importe)+"</td><td>"+format(data[i].comision)+"</td></tr>");
 				total_importe_vendedor+=data[i].importe;
 				total_comision_vendedor+=data[i].comision;
 				
@@ -63,8 +69,8 @@
 			}
 			else{
 				//al cambiar de fraccion, se imprimen los totales acumulados, y se suman los totales para la siguiente
-				$('#tabla_vendedores').append("<tr><td colspan='4'>Totales de Fraccion</td><td>"+format(importe)+"</td><td>"+format(comision)+"</td></tr>");
-				$('#tabla_vendedores').append("<tr><td>"+data[i].cliente+"</td><td>"+data[i].lote+"</td><td>"+data[i].cuota_nro+"</td><td>"+data[i].fecha_pago+"</td><td>"+format(data[i].importe)+"</td><td>"+format(data[i].comision)+"</td><td>"+data[i].fraccion+"</td></tr>");
+				$('#tabla_vendedores').append("<tr><td colspan='5'>Totales de Fraccion</td><td>"+format(importe)+"</td><td>"+format(comision)+"</td></tr>");
+				$('#tabla_vendedores').append("<tr><td>"+data[i].cliente+"</td><td>"+data[i].fraccion+"</td><td>"+data[i].lote+"</td><td>"+data[i].cuota_nro+"</td><td>"+data[i].fecha_pago+"</td><td>"+format(data[i].importe)+"</td><td>"+format(data[i].comision)+"</td></tr>");
 				total_importe_vendedor+=data[i].importe;
 				total_comision_vendedor+=data[i].comision;
 				fraccion_actual=data[i].fraccion_id;
@@ -77,11 +83,11 @@
 			}
 			//preguntamos si es la ultima fila de la tabla, para imprimir los totales generales del vendedor
 			if (i==(data.length)-1){
-					$('#tabla_vendedores').append("<tr><td colspan='4'>Totales de Fraccion</td><td>"+format(importe)+"</td><td>"+format(comision)+"</td></tr>");
+					$('#tabla_vendedores').append("<tr><td colspan='5'>Totales de Fraccion</td><td>"+format(importe)+"</td><td>"+format(comision)+"</td></tr>");
 					
 				}		
 		}
-		$('#tabla_vendedores').append("<tr><td colspan='4'>Totales del Vendedor</td><td>"+format(total_importe_vendedor)+"</td><td>"+format(total_comision_vendedor)+"</td></tr>");	
+		$('#tabla_vendedores').append("<tr><td colspan='5'>Totales del Vendedor</td><td>"+format(total_importe_vendedor)+"</td><td>"+format(total_comision_vendedor)+"</td></tr>");	
 	}		
 
 
@@ -137,6 +143,9 @@
 		</table>
 
 	</form>
+	<div class="grid_6">
+	 	<a class="boton-verde" id="id_boton" onclick="retrieve_liquidacion_vendedores();">Descargar como Excel</a>
+	</div>
 </div>
 
 <div class="clear"></div>
@@ -147,7 +156,7 @@
 </div>
 <div id="listado-item-lote">
 	<table id="tabla_vendedores" width="50%" border="1" cellpadding="0" cellspacing="0" class="listado-pagos" align="center">
-		<th>Cliente</th><th>Lote Nro</th><th>Cuota Nº</th><th>Fecha de Pago</th><th>Importe</th><th>Comisi&oacute;n</th><th>Fracci&oacute;n</th>
+		<th>Cliente</th><th>Fracci&oacute;n</th><th>Lote Nro</th><th>Cuota Nº</th><th>Fecha de Pago</th><th>Importe</th><th>Comisi&oacute;n</th>
 
 		
 		
