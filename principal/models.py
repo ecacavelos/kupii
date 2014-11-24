@@ -192,6 +192,7 @@ class Lote(models.Model):
     manzana = models.ForeignKey(Manzana)
     precio_contado = models.IntegerField()
     precio_credito = models.IntegerField()
+    precio_costo = models.IntegerField()
     superficie = models.DecimalField('superficie (m2)', max_digits=8, decimal_places=2)
     cuenta_corriente_catastral = models.CharField(max_length=255, blank=True)
     boleto_nro = models.CharField(max_length=255,blank=True, null=True)

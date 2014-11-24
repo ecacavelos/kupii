@@ -27,30 +27,23 @@ def informes(request):
         return HttpResponseRedirect("/login") 
 
 def lotes_libres(request): 
-    if request.user.is_authenticated():
-        t = loader.get_template('informes/lotes_libres.html')
-        #c = RequestContext(request, {})
-        #return HttpResponse(t.render(c))
+    if request.method=='GET':
+
+        if request.user.is_authenticated():
+            t = loader.get_template('informes/lotes_libres.html')
+            c = RequestContext(request, {
+                'object_list': [],
+            })
+            return HttpResponse(t.render(c))                
+        else:
+            return HttpResponseRedirect("/login") 
+    
     else:
-        return HttpResponseRedirect("/login") 
-    
-    object_list = Lote.objects.filter(estado="1").order_by('manzana', 'nro_lote')
-    
-    paginator=Paginator(object_list,15)
-    page=request.GET.get('page')
-    try:
-        lista=paginator.page(page)
-    except PageNotAnInteger:
-        lista=paginator.page(1)
-    except EmptyPage:
-        lista=paginator.page(paginator.num_pages)
-   
-    #reporte_lotes_libres(object_list)
-    
-    c = RequestContext(request, {
-        'object_list': lista,
-    })
-    return HttpResponse(t.render(c))
+        c = RequestContext(request, {
+            #'object_list': lista,
+            #'fraccion': f,
+        })
+        return HttpResponse(t.render(c))    
 
 def listar_busqueda_lotes(request):
     
@@ -210,13 +203,11 @@ def clientes_atrasados(request):
             except EmptyPage:
                 lista = paginator.page(paginator.num_pages)
             
-            #reporte_clientes_atrasados(object_list)
         else:
             lista=object_list
                 
         c = RequestContext(request, {
             'object_list': lista,
-            #'fraccion': f,
         })
         return HttpResponse(t.render(c))    
            
@@ -240,143 +231,75 @@ def informe_general(request):
     
     else:
         c = RequestContext(request, {
-            #'object_list': lista,
-            #'fraccion': f,
+
         })
         return HttpResponse(t.render(c))    
 
 def informe_movimientos(request):
-    if request.method=='GET':
-            if request.user.is_authenticated():
-                t = loader.get_template('informes/informe_movimientos.html')
-                c = RequestContext(request, {
-                    'object_list': [],
-                })
-                return HttpResponse(t.render(c))                
-            else:
-                return HttpResponseRedirect("/login") 
-    else:
-        
-        if request.user.is_authenticated():
-            t = loader.get_template('informes/informe_movimientos.html')                
-        else:
-            return HttpResponseRedirect("/login") 
     
+    lote = request.GET['lote_id']
+    fecha_ini = request.GET['fecha_ini']
+    fecha_fin=request.GET['fecha_fin']    
+
+    if request.user.is_authenticated():
+        t = loader.get_template('informes/informe_movimientos.html')
+    else:
+        return HttpResponseRedirect("/login") 
+
+    if lote != '' and fecha_ini !='' and fecha_fin !="":    
+        fecha_ini_parsed = datetime.strptime(fecha_ini, "%d/%m/%Y").date()
+        fecha_fin_parsed = datetime.strptime(fecha_fin, "%d/%m/%Y").date()
+        x=str(lote)
+        fraccion_int = int(x[0:3])
+        manzana_int =int(x[4:7])
+        lote_int = int(x[8:])
+        manzana= Manzana.objects.get(fraccion_id= fraccion_int, nro_manzana= manzana_int)
+        lote = Lote.objects.get(manzana=manzana.id, nro_lote=lote_int)
+        lista_pagos=PagoDeCuotas.objects.filter(lote_id=lote.id,fecha_de_pago__range=(fecha_ini_parsed,fecha_fin_parsed))
+    else:
+        lista_pagos=PagoDeCuotas.objects.all().order_by('fecha_de_pago')
+#                 lista_ventas=Venta.objects.filter(lote_id=lote_int)
+#                 lista_reservas=Reserva.objects.filter(lote_id=lote_int)
+#                 lista_cambios=CambioDeLotes.objects.filter(lote_nuevo_id=lote_int)
+#                 lista_recuperaciones=RecuperacionDeLotes.objects.filter(lote_id=lote_int)
+#                 lista_transferencias=TransferenciaDeLotes.objects.filter(lote_id=lote_int)
+    for pago in lista_pagos:
+        cuota_nro=get_nro_cuota(pago)
+        pago.cuota = str(cuota_nro)+'/'+str(pago.plan_de_pago.cantidad_de_cuotas)
+        #pagos_list.append(str(cuota_nro)+'/'+str(pago.plan_de_pago.cantidad_de_cuotas))
+#         pago.total_de_cuotas=str('{:,}'.format(pago.total_de_cuotas)).replace(",", ".")
+#         ago.total_de_mora=str('{:,}'.format(pago.total_de_mora)).replace(",", ".")
+#         pago.total_de_pago=str('{:,}'.format(pago.total_de_pago)).replace(",", ".")
+#                     
+#         lista_totales.append((str('{:,}'.format(total_cuotas)).replace(",", ".")))
+#         lista_totales.append((str('{:,}'.format(total_mora)).replace(",", ".")))
+#         lista_totales.append((str('{:,}'.format(total_pagos)).replace(",", ".")))    
+            
+        '''    
+        paginator=Paginator(lista_pagos,15)
+        page=request.GET.get('page')
         try:
-            #print "op"
-            lote=request.POST['lote_id']
-            x=str(lote)
-            fraccion_int = int(x[0:3])
-            manzana_int =int(x[4:7])
-            lote_int = int(x[8:])
-            manzana= Manzana.objects.get(fraccion_id= fraccion_int, nro_manzana= manzana_int)
-            lote = Lote.objects.get(manzana=manzana.id, nro_lote=lote_int)
+            lista=paginator.page(page)
+        except PageNotAnInteger:
+            lista=paginator.page(1)
+        except EmptyPage:
+            lista=paginator.page(paginator.num_pages)
+        '''
+            
+        c = RequestContext(request, {
+            'lista_pagos': lista_pagos,
+
+            #'lista': lista,
+            #'listaP': listaP,
+#             'lista_ventas': lista_ventas,
+#             'lista_reservas': lista_reservas,
+#             'lista_cambios': lista_cambios,
+#             'lista_recuperaciones': lista_recuperaciones,
+#             'lista_transferencias': lista_transferencias,
+                
+        })
+                
         
-            fecha_ini=request.POST['fecha_ini']
-            fecha_fin=request.POST['fecha_fin']
-            total_cuotas=0
-            total_pagos=0            
-            total_mora=0
-            lista_totales=[]
-            #pagos_list=[]
-            if not (fecha_ini and fecha_fin):
-                lista_pagos=PagoDeCuotas.objects.filter(lote_id=lote.id)
-                lista_ventas=Venta.objects.filter(lote_id=lote_int)
-                lista_reservas=Reserva.objects.filter(lote_id=lote_int)
-                lista_cambios=CambioDeLotes.objects.filter(lote_nuevo_id=lote_int)
-                lista_recuperaciones=RecuperacionDeLotes.objects.filter(lote_id=lote_int)
-                lista_transferencias=TransferenciaDeLotes.objects.filter(lote_id=lote_int)
-            else:
-                fecha_ini_parsed = datetime.strptime(fecha_ini, "%d/%m/%Y").date()
-                fecha_fin_parsed = datetime.strptime(fecha_fin, "%d/%m/%Y").date()
-                lista_pagos=PagoDeCuotas.objects.filter(lote_id=lote.id,fecha_de_pago__range=(fecha_ini_parsed,fecha_fin_parsed))
-                
-                lista_ventas=Venta.objects.filter(lote_id=lote_int,fecha_de_venta__range=(fecha_ini_parsed,fecha_fin_parsed))
-                lista_reservas=Reserva.objects.filter(lote_id=lote_int,fecha_de_reserva__range=(fecha_ini_parsed,fecha_fin_parsed))
-                lista_cambios=CambioDeLotes.objects.filter(lote_nuevo_id=lote_int,fecha_de_cambio__range=(fecha_ini_parsed,fecha_fin_parsed))
-                lista_recuperaciones=RecuperacionDeLotes.objects.filter(lote_id=lote_int,fecha_de_recuperacion__range=(fecha_ini_parsed,fecha_fin_parsed))
-                lista_transferencias=TransferenciaDeLotes.objects.filter(lote_id=lote_int,fecha_de_transferencia__range=(fecha_ini_parsed,fecha_fin_parsed))
-            for pago in lista_pagos:
-                total_cuotas+=pago.total_de_cuotas
-                total_pagos+=pago.total_de_pago
-                total_mora+=pago.total_de_mora
-                cuota_nro=get_nro_cuota(pago)
-                pago.cuota = str(cuota_nro)+'/'+str(pago.plan_de_pago.cantidad_de_cuotas)
-                #pagos_list.append(str(cuota_nro)+'/'+str(pago.plan_de_pago.cantidad_de_cuotas))
-                pago.total_de_cuotas=str('{:,}'.format(pago.total_de_cuotas)).replace(",", ".")
-                pago.total_de_mora=str('{:,}'.format(pago.total_de_mora)).replace(",", ".")
-                pago.total_de_pago=str('{:,}'.format(pago.total_de_pago)).replace(",", ".")
-                    
-            lista_totales.append((str('{:,}'.format(total_cuotas)).replace(",", ".")))
-            lista_totales.append((str('{:,}'.format(total_mora)).replace(",", ".")))
-            lista_totales.append((str('{:,}'.format(total_pagos)).replace(",", ".")))    
-            
-            '''    
-            paginator=Paginator(lista_pagos,15)
-            page=request.GET.get('page')
-            try:
-                lista=paginator.page(page)
-            except PageNotAnInteger:
-                lista=paginator.page(1)
-            except EmptyPage:
-                lista=paginator.page(paginator.num_pages)
-            '''
-            lista_aux=[]
-            if(lista_pagos):                
-                lista_aux.append(lista_pagos)
-            
-            if(lista_ventas):
-                lista_aux.append(lista_ventas)
-            
-            if(lista_reservas):
-                lista_aux.append(lista_reservas)
-            
-            if(lista_cambios):
-                lista_aux.append(lista_cambios)
-            
-            if(lista_recuperaciones):
-                lista_aux.append(lista_recuperaciones)
-            
-            if(lista_transferencias):
-                lista_aux.append(lista_transferencias)
-            '''
-            if(lista_aux):
-                lista_aux.append(lista_aux)
-            
-            paginator=Paginator(lista_aux,6)
-            page=request.GET.get('page')
-            try:
-                listaP=paginator.page(page)
-            except PageNotAnInteger:
-                listaP=paginator.page(1)
-            except EmptyPage:
-                listaP=paginator.page(paginator.num_pages)
-            '''       
-            c = RequestContext(request, {
-                'lista_pagos': lista_pagos,
-                'lista_totales': lista_totales,
-                #'lista': lista,
-                #'listaP': listaP,
-                'lista_ventas': lista_ventas,
-                'lista_reservas': lista_reservas,
-                'lista_cambios': lista_cambios,
-                'lista_recuperaciones': lista_recuperaciones,
-                'lista_transferencias': lista_transferencias,
-                
-             })
-                
-        except Exception, error:
-            print error
-            c = RequestContext(request, {
-                    'lista_pagos': [],
-                    'lista': [],
-                    'listaP': [],
-                    'lista_ventas': [],
-                    'lista_reservas': [],
-                    'lista_cambios': [],
-                    'lista_recuperaciones': [],
-                    'lista_transferencias': [],
-                })
         return HttpResponse(t.render(c))
  
 def liquidacion_propietarios(request):
@@ -429,19 +352,22 @@ def liquidacion_propietarios(request):
                     for i in pagos_list:                        
                         for pago in i:
                             nro_cuota=get_nro_cuota(pago)
+                            c=0
                             if(nro_cuota%2!=0 ): 
-                                if nro_cuota<20:
+                                c+=1
+                                if c<pago.plan_de_pago.cantidad_cuotas_inmobiliaria:
                                     monto_inmobiliaria=pago.total_de_cuotas
                                     monto_propietario=0
-#                                     total_monto_pagado+=pago.total_de_cuotas
-#                                     total_monto_inm+=monto_inmobiliaria
                                 else:
-                                    if pago.plan_de_pago.porcentaje_cuotas_inmobiliaria!=0:
-                                        monto_inmobiliaria=pago.total_de_cuotas*int(pago.plan_de_pago.porcentaje_cuotas_inmobiliaria/100)
-                                        monto_propietario=pago.total_de_cuotas-monto_inmobiliaria
-                                total_monto_inm+=monto_inmobiliaria
-                                total_monto_prop+=monto_propietario
-                                total_monto_pagado+=pago.total_de_cuotas
+                                    monto_inmobiliaria=pago.total_de_cuotas*(pago.plan_de_pago.porcentaje_cuotas_inmobiliaria/100)
+                                    monto_propietario=pago.total_de_cuotas-monto_inmobiliaria
+                            else:
+                                monto_inmobiliaria=pago.total_de_cuotas*(pago.plan_de_pago.porcentaje_cuotas_inmobiliaria/100)
+                                monto_propietario=pago.total_de_cuotas-monto_inmobiliaria
+                                
+                            total_monto_inm+=monto_inmobiliaria
+                            total_monto_prop+=monto_propietario
+                            total_monto_pagado+=pago.total_de_cuotas
                             try:
                                 lista_fila.append(pago.fecha_de_pago)
                                 lista_fila.append(pago.lote)
@@ -454,7 +380,7 @@ def liquidacion_propietarios(request):
                                 lista_fila=[]
                             except Exception, error:
                                 print error
-                    
+                                
                     if pagos_list:
                         lista_totales.append(str('{:,}'.format(total_monto_pagado)).replace(",", "."))
                         lista_totales.append(str('{:,}'.format(total_monto_inm)).replace(",", "."))
@@ -593,59 +519,145 @@ def liquidacion_gerentes(request):
                 
 
 def lotes_libres_reporte_excel(request):
-    
+    fraccion_ini=request.GET['fraccion_ini']
+    fraccion_fin=request.GET['fraccion_fin']
     #at = request.session.get('at', None)
     #TODO: Danilo, utiliza este template para poner tu logi
-    if request.method=='GET':
-        #print ('Ejemplo de uso de parametros --> Parametro1' + request.GET['parametro1'])        
-#         book = xlwt.Workbook(encoding='utf8')
-#         sheet1 = book.add_sheet('Sheet 1')
-#         book.add_sheet('Sheet 2')
-#         
-#         sheet1.write(0,0,'A1')
-#         sheet1.write(0,1,'B1')
-#         row1 = sheet1.row(1)
-#         row1.write(0,'A2')
-#         row1.write(1,'B2')
-#         sheet1.col(0).width = 10000
-#         
-#         sheet2 = book.get_sheet(1)
-#         sheet2.row(0).write(0,'Sheet 2 A1')
-#         sheet2.row(0).write(1,'Sheet 2 B1')
-#         sheet2.flush_row_data()
-#         sheet2.write(1,0,'Sheet 2 A3')
-#         sheet2.col(0).width = 5000
-#         sheet2.col(0).hidden = True
-        object_list = Lote.objects.filter(estado="1").order_by('manzana', 'nro_lote')
-        wb=xlwt.Workbook(encoding='utf-8')
-        sheet=wb.add_sheet('test',cell_overwrite_ok=True)
-        style=xlwt.easyxf('pattern: pattern solid, fore_colour green;'
+    #print ('Ejemplo de uso de parametros --> Parametro1' + request.GET['parametro1'])        
+    wb=xlwt.Workbook(encoding='utf-8')
+    sheet=wb.add_sheet('test',cell_overwrite_ok=True)
+    style=xlwt.easyxf('pattern: pattern solid, fore_colour green;'
                               'font: name Arial, bold True;')   
-    
-        sheet.write(0,0,"Nombre Fraccion",style)
-        sheet.write(0,1,"Fraccion ID",style)
-        sheet.write(0,2,"Manzana Nro.",style)
-        sheet.write(0,3,"Lote Nro.",style)
-        sheet.write(0,4,"Estado",style)
-    
-        i=0
-        c=1
-        while i <len(object_list):        
-            sheet.write(c,0,str(object_list[i].manzana.fraccion))
-            sheet.write(c,1,str(object_list[i].manzana.fraccion.id))
-            sheet.write(c,2,str(object_list[i].manzana))
-            sheet.write(c,3,str(object_list[i].nro_lote))
-            sheet.write(c,4,"Libre")
-            i+=1
+    style2=xlwt.easyxf('font: name Arial, bold True;')
+    #cabeceras
+    sheet.write(0,0,"Fraccion",style)
+    sheet.write(0,1,"Fraccion ID",style)    
+    sheet.write(0,2,"Lote Nro.",style)
+    sheet.write(0,3,"Superficie",style)    
+    sheet.write(0,4,"Precio Contado",style)    
+    sheet.write(0,5,"Precio Crediro",style)
+    sheet.write(0,6,"Precio Costo",style)
+    #totales por fraccion
+    total_lotes=0
+    total_superficie = 0
+    total_contado = 0
+    total_credito = 0
+    total_costo = 0
+    #totales generales
+    total_general_lotes=0
+    total_general_superficie = 0
+    total_general_contado = 0
+    total_general_credito = 0
+    total_general_costo = 0
+        
+    object_list=[]#lista de lotes
+    if fraccion_ini and fraccion_fin:
+        manzanas= Manzana.objects.filter(fraccion_id__range=(fraccion_ini,fraccion_fin))
+        for m in manzanas:
+            lotes = Lote.objects.filter(manzana=m.id)
+            for l in lotes:
+                object_list.append(l)
+             
+    else:       
+        object_list = Lote.objects.filter(estado="1").order_by('manzana', 'nro_lote')
+     
+    lotes=[]
+    for i in object_list:
+        lote={}
+        lote['fraccion_id']=str(i.manzana.fraccion.id)
+        lote['fraccion']=str(i.manzana.fraccion)
+        lote['lote']=str(i.manzana).zfill(3) + "/" + str(i.nro_lote).zfill(4)
+        lote['superficie']=i.superficie
+        lote['precio_contado']=i.precio_contado
+        lote['precio_credito']=i.precio_credito
+        lote['precio_costo']=i.precio_costo
+        lotes.append(lote)
+    #contador de filas
+    c=1
+    fraccion_actual = lotes[0]['fraccion_id']
+    for i in range(len(lotes)):
+        #se suman los totales generales
+        total_general_lotes+=1
+        total_general_superficie += lotes[i]['superficie'] 
+        total_general_contado += lotes[i]['precio_contado'] 
+        total_general_credito += lotes[i]['precio_credito']
+        total_general_costo += lotes[i]['precio_costo']
+        #se suman los totales por fracion
+        if (lotes[i]['fraccion_id'] == fraccion_actual):
+            
+            total_lotes+=1
+            total_superficie += lotes[i]['superficie'] 
+            total_contado += lotes[i]['precio_contado'] 
+            total_credito += lotes[i]['precio_credito']
+            total_costo += lotes[i]['precio_costo']
+                    
+            sheet.write(c,0,str(lotes[i]['fraccion']))
+            sheet.write(c,1,str(lotes[i]['fraccion_id']))
+            sheet.write(c,2,str(lotes[i]['lote']))
+            sheet.write(c,3,str(lotes[i]['superficie']))
+            sheet.write(c,4,str(lotes[i]['precio_contado']))
+            sheet.write(c,5,str(lotes[i]['precio_credito']))
+            sheet.write(c,6,str(lotes[i]['precio_costo']))
             c+=1
-        #wb.save('lotes_libres.xls')
+
+        else: 
+            c+=1
+            sheet.write(c,0,"Totales de Fraccion",style2)  
+            sheet.write(c,2,str('{:,}'.format(total_lotes)).replace(",", "."))
+            sheet.write(c,3,total_superficie)
+            sheet.write(c,4,str('{:,}'.format(total_contado)).replace(",", "."))
+            sheet.write(c,5,str('{:,}'.format(total_credito)).replace(",", "."))
+            sheet.write(c,6,str('{:,}'.format(total_costo)).replace(",", "."))
+            c+=1
+            
+            sheet.write(c,0,str(lotes[i]['fraccion']))
+            sheet.write(c,1,str(lotes[i]['fraccion_id']))
+            sheet.write(c,2,str(lotes[i]['lote']))
+            sheet.write(c,3,str(lotes[i]['superficie']))
+            sheet.write(c,4,str(lotes[i]['precio_contado']))
+            sheet.write(c,5,str(lotes[i]['precio_credito']))
+            sheet.write(c,6,str(lotes[i]['precio_costo']))           
+            fraccion_actual = lotes[i]['fraccion_id']
+            total_lotes=0
+            total_superficie = 0
+            total_contado = 0
+            total_credito = 0
+            total_costo = 0  
+            
+            
+            
+            total_superficie += lotes[i]['superficie'] 
+            total_contado += lotes[i]['precio_contado'] 
+            total_credito += lotes[i]['precio_credito']
+            total_costo += lotes[i]['precio_costo']
+            total_lotes+=1
+            c+=1
+        #si es la ultima fila    
+        if (i == len(lotes)-1):   
+            c+=1           
+            sheet.write(c,0,"Totales de Fraccion",style2)  
+            sheet.write(c,2,str('{:,}'.format(total_lotes)).replace(",", "."))
+            sheet.write(c,3,total_superficie)
+            sheet.write(c,4,str('{:,}'.format(total_contado)).replace(",", "."))
+            sheet.write(c,5,str('{:,}'.format(total_credito)).replace(",", "."))
+            sheet.write(c,6,str('{:,}'.format(total_costo)).replace(",", "."))
+            
+        
+            
+    c+=1
+    sheet.write(c,0,"Totales Generales",style2)
+    sheet.write(c,2,str('{:,}'.format(total_general_lotes)).replace(",", "."))
+    sheet.write(c,3,total_general_superficie)
+    sheet.write(c,4,str('{:,}'.format(total_general_contado)).replace(",", "."))
+    sheet.write(c,5,str('{:,}'.format(total_general_credito)).replace(",", "."))
+    sheet.write(c,6,str('{:,}'.format(total_general_costo)).replace(",", "."))
     
     
-        response = HttpResponse(content_type='application/vnd.ms-excel')
-        # Crear un nombre intuitivo         
-        response['Content-Disposition'] = 'attachment; filename=' + 'lotes_libres.xls'
-        wb.save(response)
-        return response
+    response = HttpResponse(content_type='application/vnd.ms-excel')
+    # Crear un nombre intuitivo         
+    response['Content-Disposition'] = 'attachment; filename=' + 'lotes_libres.xls'
+    wb.save(response)
+    return response
 
 def clientes_atrasados_reporte_excel(request):
     

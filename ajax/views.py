@@ -431,8 +431,35 @@ def get_informe_general(request):
         cuota['total_de_mora']=i.total_de_mora
         cuota['total_de_pago']=i.total_de_pago
         cuotas.append(cuota)
-    
-    #print 'hola'
-    #reporte_general_pagos(cuotas)
     return HttpResponse(json.dumps(cuotas), mimetype='application/json')
 
+@require_http_methods(["GET"])
+def get_lotes_libres(request):
+    fraccion_ini=request.GET['fraccion_ini']
+    fraccion_fin=request.GET['fraccion_fin']    
+    object_list=[]#lista de lotes
+    if fraccion_ini and fraccion_fin:
+        manzanas= Manzana.objects.filter(fraccion_id__range=(fraccion_ini,fraccion_fin))
+        for m in manzanas:
+            lotes = Lote.objects.filter(manzana=m.id)
+            for l in lotes:
+                object_list.append(l)
+         
+    else:       
+        object_list = Lote.objects.filter(estado="1").order_by('manzana', 'nro_lote')
+     
+    lotes=[]
+    for i in object_list:
+        lote={}
+        lote['fraccion_id']=str(i.manzana.fraccion.id)
+        lote['fraccion']=str(i.manzana.fraccion)
+        lote['lote']=str(i.manzana).zfill(3) + "/" + str(i.nro_lote).zfill(4)
+        lote['superficie']=i.superficie
+        lote['precio_contado']=i.precio_contado
+        lote['precio_credito']=i.precio_credito
+        lote['precio_costo']=i.precio_costo
+        lotes.append(lote)
+    return HttpResponse(json.dumps(lotes), mimetype='application/json')
+          
+            
+    
