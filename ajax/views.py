@@ -332,7 +332,7 @@ def get_lista_pagos(request):
     cuotas=[]
     for i in object_list:
         nro_cuota=get_nro_cuota(i)
-        if(nro_cuota%2!=0 and nro_cuota<10):
+        if(nro_cuota%2!=0 and nro_cuota<=i.plan_de_pago_vendedores.cantidad_cuotas):
             cuota={}            
             cuota['fraccion']=str(i.lote.manzana.fraccion)
             cuota['cliente']=str(i.cliente)
@@ -341,10 +341,8 @@ def get_lista_pagos(request):
             cuota['cuota_nro']=str(nro_cuota)+'/'+str(i.plan_de_pago.cantidad_de_cuotas)
             cuota['fecha_pago']=str(i.fecha_de_pago)
             cuota['importe']=i.total_de_cuotas
-            cuota['comision']=int(i.total_de_cuotas*(i.plan_de_pago_vendedores.porcentaje_de_cuotas/100))
+            cuota['comision']=int(i.total_de_cuotas*(float(i.plan_de_pago_vendedores.porcentaje_de_cuotas)/float(100)))
             cuotas.append(cuota)
-    #reporte_liquidacion_vendedores(cuotas)
-    #print 'hola'
     return HttpResponse(json.dumps(cuotas), mimetype='application/json')
 
 @require_http_methods(["GET"])
@@ -384,7 +382,7 @@ def get_lista_pagos_gerentes(request):
             cuota['lote']=str(i.lote)
             cuota['fecha_pago']=str(i.fecha_de_pago)
             cuota['monto_pagado']=i.total_de_cuotas
-            cuota['monto_gerente']=int(i.total_de_cuotas*(i.plan_de_pago.porcentaje_cuotas_gerente/100))
+            cuota['monto_gerente']=int(i.total_de_cuotas*(float(i.plan_de_pago.porcentaje_cuotas_gerente)/float(100)))
             cuotas.append(cuota)
     #reporte_liquidacion_gerentes(cuotas)
     #print 'hola'
