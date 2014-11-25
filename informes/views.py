@@ -351,18 +351,18 @@ def liquidacion_propietarios(request):
                     
                     for i in pagos_list:                        
                         for pago in i:
+                            print pago.id
                             nro_cuota=get_nro_cuota(pago)
-                            c=0
                             if(nro_cuota%2!=0 ): 
-                                c+=1
-                                if c<pago.plan_de_pago.cantidad_cuotas_inmobiliaria:
+                                if nro_cuota<pago.plan_de_pago.cantidad_cuotas_inmobiliaria:
                                     monto_inmobiliaria=pago.total_de_cuotas
                                     monto_propietario=0
                                 else:
-                                    monto_inmobiliaria=pago.total_de_cuotas*(pago.plan_de_pago.porcentaje_cuotas_inmobiliaria/100)
+                                             
+                                    monto_inmobiliaria=int(pago.total_de_cuotas*(float(pago.plan_de_pago.porcentaje_cuotas_inmobiliaria)/float(100)))
                                     monto_propietario=pago.total_de_cuotas-monto_inmobiliaria
                             else:
-                                monto_inmobiliaria=pago.total_de_cuotas*(pago.plan_de_pago.porcentaje_cuotas_inmobiliaria/100)
+                                monto_inmobiliaria=int(pago.total_de_cuotas*(float(pago.plan_de_pago.porcentaje_cuotas_inmobiliaria)/float(100)))
                                 monto_propietario=pago.total_de_cuotas-monto_inmobiliaria
                                 
                             total_monto_inm+=monto_inmobiliaria
@@ -379,8 +379,7 @@ def liquidacion_propietarios(request):
                                 lista_pagos.append(lista_fila)
                                 lista_fila=[]
                             except Exception, error:
-                                print error
-                                
+                                print error            
                     if pagos_list:
                         lista_totales.append(str('{:,}'.format(total_monto_pagado)).replace(",", "."))
                         lista_totales.append(str('{:,}'.format(total_monto_inm)).replace(",", "."))
