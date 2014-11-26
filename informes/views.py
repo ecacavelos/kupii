@@ -237,15 +237,16 @@ def informe_general(request):
 
 def informe_movimientos(request):
     
-    lote = request.GET['lote_id']
-    fecha_ini = request.GET['fecha_ini']
-    fecha_fin=request.GET['fecha_fin']    
-
     if request.user.is_authenticated():
         t = loader.get_template('informes/informe_movimientos.html')
     else:
         return HttpResponseRedirect("/login") 
 
+
+    lote = request.GET['lote_id']
+    fecha_ini = request.GET['fecha_ini']
+    fecha_fin=request.GET['fecha_fin']  
+    
     if lote != '' and fecha_ini !='' and fecha_fin !="":    
         fecha_ini_parsed = datetime.strptime(fecha_ini, "%d/%m/%Y").date()
         fecha_fin_parsed = datetime.strptime(fecha_fin, "%d/%m/%Y").date()
