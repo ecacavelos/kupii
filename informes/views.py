@@ -1,4 +1,4 @@
-# -*- encoding: utf-8 -*-
+#-*- encoding: utf-8 -*-
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError
 from django.template import RequestContext, loader
 from principal.models import Propietario, Fraccion, Lote, Manzana, PagoDeCuotas, Venta, Reserva, CambioDeLotes, RecuperacionDeLotes, TransferenciaDeLotes 
@@ -905,19 +905,19 @@ def liquidacion_propietarios_reporte_excel(request):
             for pago in i:
                 nro_cuota=get_nro_cuota(pago)
                 if(nro_cuota%2!=0 ): 
-                    if nro_cuota<20:
+                    if nro_cuota<=pago.plan_de_pago.cantidad_cuotas_inmobiliaria:
                         monto_inmobiliaria=pago.total_de_cuotas
                         monto_propietario=0
-#                         total_monto_pagado+=pago.total_de_cuotas
-#                         total_monto_inm+=monto_inmobiliaria
                     else:
-                        if pago.plan_de_pago.porcentaje_cuotas_inmobiliaria!=0:
-                            monto_inmobiliaria=pago.total_de_cuotas*int(pago.plan_de_pago.porcentaje_cuotas_inmobiliaria/100)
-                            monto_propietario=pago.total_de_cuotas-monto_inmobiliaria
+                        monto_inmobiliaria=int(pago.total_de_cuotas*(float(pago.plan_de_pago.porcentaje_cuotas_inmobiliaria)/float(100)))
+                        monto_propietario=pago.total_de_cuotas-monto_inmobiliaria
                         
-                    total_monto_inm+=monto_inmobiliaria
-                    total_monto_prop+=monto_propietario
-                    total_monto_pagado+=pago.total_de_cuotas  
+                else:
+                    monto_inmobiliaria=int(pago.total_de_cuotas*(float(pago.plan_de_pago.porcentaje_cuotas_inmobiliaria)/float(100)))
+                    monto_propietario=pago.total_de_cuotas-monto_inmobiliaria   
+                total_monto_inm+=monto_inmobiliaria
+                total_monto_prop+=monto_propietario
+                total_monto_pagado+=pago.total_de_cuotas  
                 try:                      
                     lista_fila.append(pago.fecha_de_pago)
                     lista_fila.append(pago.lote)
@@ -959,18 +959,19 @@ def liquidacion_propietarios_reporte_excel(request):
                 nro_cuota=get_nro_cuota(pago)
                 for pago in i:
                     if(nro_cuota%2!=0 ): 
-                        if nro_cuota<20:
-                            monto_inmobiliaria=pago.total_de_cuotas                            
+                        if nro_cuota<=pago.plan_de_pago.cantidad_cuotas_inmobiliaria:
+                            monto_inmobiliaria=pago.total_de_cuotas
                             monto_propietario=0
-#                                 total_monto_pagado+=pago.total_de_cuotas
-#                                 total_monto_inm+=monto_inmobiliaria
                         else:
-                            if pago.plan_de_pago.porcentaje_cuotas_inmobiliaria!=0:
-                                monto_inmobiliaria=pago.total_de_cuotas*int(pago.plan_de_pago.porcentaje_cuotas_inmobiliaria/100)
-                                monto_propietario=pago.total_de_cuotas-monto_inmobiliaria
-                        total_monto_inm+=monto_inmobiliaria
-                        total_monto_prop+=monto_propietario 
-                        total_monto_pagado+=pago.total_de_cuotas                       
+                            monto_inmobiliaria=int(pago.total_de_cuotas*(float(pago.plan_de_pago.porcentaje_cuotas_inmobiliaria)/float(100)))
+                            monto_propietario=pago.total_de_cuotas-monto_inmobiliaria
+                            
+                    else:
+                        monto_inmobiliaria=int(pago.total_de_cuotas*(float(pago.plan_de_pago.porcentaje_cuotas_inmobiliaria)/float(100)))
+                        monto_propietario=pago.total_de_cuotas-monto_inmobiliaria   
+                    total_monto_inm+=monto_inmobiliaria
+                    total_monto_prop+=monto_propietario
+                    total_monto_pagado+=pago.total_de_cuotas              
                     try:
                         lista_fila.append(pago.fecha_de_pago)
                         lista_fila.append(pago.lote)
