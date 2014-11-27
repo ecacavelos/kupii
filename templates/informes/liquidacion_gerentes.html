@@ -42,7 +42,7 @@ function format(nro){
 					dataType : "json"
 				});
   				request_pagos.success(function (data){
-  				
+  				$(".custom_class").empty();
 				calculartotales(data);					
 				});			
 	}
@@ -58,7 +58,7 @@ function format(nro){
 			if(data[i].fraccion_id==fraccion_actual){
 				monto_pagado+=data[i].monto_pagado;
 				monto_gerente+=data[i].monto_gerente;
-				$('#tabla_gerentes').append("<tr><td>"+data[i].fecha_pago+"</td><td>"+data[i].fraccion+"</td><td>"+data[i].lote+"</td><td>"+data[i].cliente+"</td><td>"+data[i].cuota_nro+"</td><td>"+data[i].monto_pagado+"</td><td>" +data[i].monto_gerente+"</td></tr>");
+				$('#tabla_gerentes').append('<tr class="custom_class"><td>'+data[i].fecha_pago+"</td><td>"+data[i].fraccion+"</td><td>"+data[i].lote+"</td><td>"+data[i].cliente+"</td><td>"+data[i].cuota_nro+"</td><td>"+data[i].monto_pagado+"</td><td>" +data[i].monto_gerente+"</td></tr>");
 				total_monto_pagado+=data[i].monto_pagado;
 				total_monto_gerente+=data[i].monto_gerente;
 				
@@ -66,8 +66,8 @@ function format(nro){
 			}
 			else{
 				//al cambiar de fraccion, se imprimen los totales acumulados, y se suman los totales para la siguiente
-				$('#tabla_gerentes').append("<tr><td colspan='5'>Totales de Fraccion</td><td>"+format(monto_pagado)+"</td><td>"+format(monto_gerente)+"</td></tr>");
-				$('#tabla_gerentes').append("<tr><td>"+data[i].fecha_pago+"</td><td>"+data[i].fraccion+"</td><td>"+data[i].lote+"</td><td>"+data[i].cliente+"</td><td>"+data[i].cuota_nro+"</td><td>"+data[i].monto_pagado+"</td><td>" +data[i].monto_gerente+"</td></tr>");
+				$('#tabla_gerentes').append('<tr class="custom_class"><td colspan="5">Totales de Fraccion</td><td>'+format(monto_pagado)+"</td><td>"+format(monto_gerente)+"</td></tr>");
+				$('#tabla_gerentes').append('<tr class="custom_class"><td>'+data[i].fecha_pago+"</td><td>"+data[i].fraccion+"</td><td>"+data[i].lote+"</td><td>"+data[i].cliente+"</td><td>"+data[i].cuota_nro+"</td><td>"+data[i].monto_pagado+"</td><td>" +data[i].monto_gerente+"</td></tr>");
 				total_monto_pagado+=data[i].monto_pagado;
 				total_monto_gerente+=data[i].monto_gerente;
 				fraccion_actual=data[i].fraccion_id;
@@ -80,10 +80,10 @@ function format(nro){
 			}
 			//preguntamos si es la ultima fila de la tabla, para imprimir los totales generales del vendedor
 			if (i==(data.length)-1){
-							$('#tabla_gerentes').append("<tr><td colspan='5'>Totales de Fraccion</td><td>"+format(monto_pagado)+"</td><td>"+format(monto_gerente)+"</td></tr>");
+							$('#tabla_gerentes').append('<tr class="custom_class"><td colspan="5">Totales de Fraccion</td><td>'+format(monto_pagado)+"</td><td>"+format(monto_gerente)+"</td></tr>");
 				}		
 		}
-		$('#tabla_gerentes').append("<tr><td colspan='5'>Total General</td><td>"+format(total_monto_pagado)+"</td><td>"+format(total_monto_gerente)+"</td></tr>");	
+		$('#tabla_gerentes').append('<tr class="custom_class"><td colspan="5">Total General</td><td>'+format(total_monto_pagado)+"</td><td>"+format(total_monto_gerente)+"</td></tr>");	
 	}	
 	
 

@@ -313,7 +313,6 @@ def liquidacion_propietarios(request):
             return HttpResponse(t.render(c))
         else:
             return HttpResponseRedirect("/login")
-            
     else:
         try:  
             if request.user.is_authenticated():

@@ -16,11 +16,6 @@
 	});
 	function retrieve_informe_general(){		
 			
-		var fecha1=$("#fecha_ini").val();
-		var fecha2=$("#fecha_fin").val();
-		var frac1=$("#fraccion_ini").val();
-		var frac2=$("#fraccion_fin").val();
-		//window.location.href="/informes/informe_general_reporte_excel?fecha_ini="+fecha1+"&fecha_fin="+fecha2+"&fraccion_ini="+frac1+"&fraccion_fin="+frac2;
 		window.location.href="/informes/informe_general_reporte_excel?fecha_ini="+$('#fecha_ini').val()+"&fecha_fin="+$('#fecha_fin').val()+"&fraccion_ini="+$('#fraccion_ini').val()+"&fraccion_fin="+$('#fraccion_fin').val();
 	
 	}
@@ -69,7 +64,7 @@
 				total_cuotas += data[i].total_de_cuotas;
 				total_mora += data[i].total_de_mora;
 				total_pagos += data[i].total_de_pago;
-				$('#tabla_pagos').append("<tr><td>" + data[i].fraccion + "</td><td>" + data[i].lote + "</td><td>" + data[i].cliente + "</td><td>" + data[i].cuota_nro + "</td><td>" + data[i].plan_de_pago + "</td><td>" + data[i].fecha_pago + "</td><td>" + format(data[i].total_de_cuotas) + "</td><td>" + format(data[i].total_de_mora) + "</td><td>" + format(data[i].total_de_pago) + "</td></tr>");
+				$('#tabla_pagos').append('<tr class="custom_class"><td>' + data[i].fraccion + "</td><td>" + data[i].lote + "</td><td>" + data[i].cliente + "</td><td>" + data[i].cuota_nro + "</td><td>" + data[i].plan_de_pago + "</td><td>" + data[i].fecha_pago + "</td><td>" + format(data[i].total_de_cuotas) + "</td><td>" + format(data[i].total_de_mora) + "</td><td>" + format(data[i].total_de_pago) + "</td></tr>");
 				//... y acumulamos para los totales generales
 				total_general_cuotas += data[i].total_de_cuotas;
 				total_general_mora += data[i].total_de_mora;
@@ -78,8 +73,8 @@
 
 			} else {
 
-				$('#tabla_pagos').append("<tr><td colspan='6'>Totales de Fraccion: </td><td>" + format(total_cuotas) + "</td><td>" + format(total_mora) + "</td><td>" + format(total_pagos) + "</td></tr>");
-				$('#tabla_pagos').append("<tr><td>" + data[i].fraccion + "</td><td>" + data[i].lote + "</td><td>" + data[i].cliente + "</td><td>" + data[i].cuota_nro + "</td><td>" + data[i].plan_de_pago + "</td><td>" + data[i].fecha_pago + "</td><td>" + format(data[i].total_de_cuotas) + "</td><td>" + format(data[i].total_de_mora) + "</td><td>" + format(data[i].total_de_pago) + "</td></tr>");
+				$('#tabla_pagos').append('<tr class="custom_class"><td colspan="6">Totales de Fraccion: </td><td>' + format(total_cuotas) + "</td><td>" + format(total_mora) + "</td><td>" + format(total_pagos) + "</td></tr>");
+				$('#tabla_pagos').append('<tr class="custom_class"><td>' + data[i].fraccion + "</td><td>" + data[i].lote + "</td><td>" + data[i].cliente + "</td><td>" + data[i].cuota_nro + "</td><td>" + data[i].plan_de_pago + "</td><td>" + data[i].fecha_pago + "</td><td>" + format(data[i].total_de_cuotas) + "</td><td>" + format(data[i].total_de_mora) + "</td><td>" + format(data[i].total_de_pago) + "</td></tr>");
 				fraccion_actual = data[i].fraccion_id;
 				total_cuotas = 0;
 				total_mora = 0;
@@ -89,11 +84,11 @@
 				total_pagos += data[i].total_de_pago;
 			}
 			if (i == data.length - 1) {
-				$('#tabla_pagos').append("<tr><td colspan='6'>Totales de Fraccion: </td><td>" + format(total_cuotas) + "</td><td>" + format(total_mora) + "</td><td>" + format(total_pagos) + "</td></tr>");				
+				$('#tabla_pagos').append('<tr class="custom_class"><td colspan="6">Totales de Fraccion: </td><td>' + format(total_cuotas) + "</td><td>" + format(total_mora) + "</td><td>" + format(total_pagos) + "</td></tr>");				
 			}
 
 		}
-		$('#tabla_pagos').append("<tr><td colspan='6'>Totales Generales: </td><td>" + format(total_general_cuotas) + "</td><td>" + format(total_general_mora) + "</td><td>" + format(total_general_pagos) + "</td></tr>");
+		$('#tabla_pagos').append('<tr class="custom_class"><td colspan="6">Totales Generales: </td><td>' + format(total_general_cuotas) + "</td><td>" + format(total_general_mora) + "</td><td>" + format(total_general_pagos) + "</td></tr>");
 	}
 	
 	function r_pagos() {

@@ -45,7 +45,7 @@
 					dataType : "json"
 				});
   				request_pagos.success(function (data){
-  				
+  				$(".custom_class").empty();
 				calculartotales(data);					
 				});			
 	}
@@ -61,7 +61,7 @@
 			if(data[i].fraccion_id==fraccion_actual){
 				importe+=data[i].importe;
 				comision+=data[i].comision;
-				$('#tabla_vendedores').append("<tr><td>"+data[i].cliente+"</td><td>"+data[i].fraccion+"</td><td>"+data[i].lote+"</td><td>"+data[i].cuota_nro+"</td><td>"+data[i].fecha_pago+"</td><td>"+format(data[i].importe)+"</td><td>"+format(data[i].comision)+"</td></tr>");
+				$('#tabla_vendedores').append('<tr class="custom_class"><td>'+data[i].cliente+"</td><td>"+data[i].fraccion+"</td><td>"+data[i].lote+"</td><td>"+data[i].cuota_nro+"</td><td>"+data[i].fecha_pago+"</td><td>"+format(data[i].importe)+"</td><td>"+format(data[i].comision)+"</td></tr>");
 				total_importe_vendedor+=data[i].importe;
 				total_comision_vendedor+=data[i].comision;
 				
@@ -69,8 +69,8 @@
 			}
 			else{
 				//al cambiar de fraccion, se imprimen los totales acumulados, y se suman los totales para la siguiente
-				$('#tabla_vendedores').append("<tr><td colspan='5'>Totales de Fraccion</td><td>"+format(importe)+"</td><td>"+format(comision)+"</td></tr>");
-				$('#tabla_vendedores').append("<tr><td>"+data[i].cliente+"</td><td>"+data[i].fraccion+"</td><td>"+data[i].lote+"</td><td>"+data[i].cuota_nro+"</td><td>"+data[i].fecha_pago+"</td><td>"+format(data[i].importe)+"</td><td>"+format(data[i].comision)+"</td></tr>");
+				$('#tabla_vendedores').append('<tr class="custom_class"><td colspan="5">Totales de Fraccion</td><td>'+format(importe)+"</td><td>"+format(comision)+"</td></tr>");
+				$('#tabla_vendedores').append('<tr class="custom_class"><td>'+data[i].cliente+"</td><td>"+data[i].fraccion+"</td><td>"+data[i].lote+"</td><td>"+data[i].cuota_nro+"</td><td>"+data[i].fecha_pago+"</td><td>"+format(data[i].importe)+"</td><td>"+format(data[i].comision)+"</td></tr>");
 				total_importe_vendedor+=data[i].importe;
 				total_comision_vendedor+=data[i].comision;
 				fraccion_actual=data[i].fraccion_id;
@@ -83,11 +83,11 @@
 			}
 			//preguntamos si es la ultima fila de la tabla, para imprimir los totales generales del vendedor
 			if (i==(data.length)-1){
-					$('#tabla_vendedores').append("<tr><td colspan='5'>Totales de Fraccion</td><td>"+format(importe)+"</td><td>"+format(comision)+"</td></tr>");
+					$('#tabla_vendedores').append('<tr class="custom_class"><td colspan="5">Totales de Fraccion</td><td>'+format(importe)+"</td><td>"+format(comision)+"</td></tr>");
 					
 				}		
 		}
-		$('#tabla_vendedores').append("<tr><td colspan='5'>Totales del Vendedor</td><td>"+format(total_importe_vendedor)+"</td><td>"+format(total_comision_vendedor)+"</td></tr>");	
+		$('#tabla_vendedores').append('<tr class="custom_class"><td colspan="5">Totales del Vendedor</td><td>'+format(total_importe_vendedor)+"</td><td>"+format(total_comision_vendedor)+"</td></tr>");	
 	}		
 
 
