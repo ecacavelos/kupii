@@ -63,14 +63,17 @@
 
 <div class="clear"></div>
 
-<div class="grid_10">
-	<h1>Liquidaci&oacute;n de Propietarios</h1>
-</div>
+
+<h1>Liquidaci&oacute;n de Propietarios</h1>
+
 
 <div class="grid_6">
-	<form name="frm_busqueda" id="frm_busqueda" method="post" action="/informes/liquidacion_propietarios/">
-		{% csrf_token %}
-		<table>
+	<form name="frm_busqueda" id="frm_busqueda" method="get" action="/informes/liquidacion_propietarios/">
+		
+		<table id="lista-categoria" frame="box">
+			<tr>
+			<th class="acciones" colspan="3"><strong><a href="#" style="color: white;">Filtrar</a></strong></th>
+			</tr>
 			<tr>
 				<td>
 				<select id="id_tipo_busqueda" name="tipo_busqueda">
@@ -98,15 +101,12 @@
 				<input type="button" value="Buscar" onclick="validar();" class="historico" style="cursor: pointer"/>
 				</td>
 				<td>
-				<input name="tabla" type="hidden" value="lote"/>
+				<a class="boton-verde" id="id_boton" onclick="retrieve_liquidacion_propietarios();">Descargar como Excel</a>
 				</td>
 			</tr>
 		</table>
 
 	</form>
-	<div class="grid_6">
-		<a class="boton-verde" id="id_boton" onclick="retrieve_liquidacion_propietarios();">Descargar como Excel</a>
-	</div>
 
 </div>
 
