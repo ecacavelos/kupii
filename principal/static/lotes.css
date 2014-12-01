@@ -24,9 +24,10 @@ li{
 }
 
 table.listado-lotes {
-	border:2px solid #CCC;
+	border: 5px solid #CCC;
 	margin-bottom:15px;
-	margin-left: 250px;
+	margin-left: 15px;
+	margin-right: 15px;
 }
 
 table.listado-ventas {
@@ -139,7 +140,7 @@ table.listado-clientes-atrasados tr th {
 }
 
 table.listado-pagos {
-	border:2px solid #CCC;
+	border: 5px solid #CCC;
 	margin-bottom:15px;
 	margin-left: 15px;
 	margin-right: 15px;
@@ -170,8 +171,8 @@ table.listado-lotes tr th {
 }
 
 table.listado-pagos tr th {
-	padding:10px 10px 10px 40px;
-	/* font-size:16px; */
+	padding: 10px 10px 10px 0px;
+	font-size: 14px;
 	font-weight:400;
 	text-align:center;
 	background-color:#02B06B;
@@ -487,4 +488,7 @@ table.listado-lotes tr td.last {
 	padding-top:10px;
 	padding-bottom:30px;
 	
+}
+.bkg_gris{
+	background-color:#ECECEC; 
 }

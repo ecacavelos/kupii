@@ -32,7 +32,15 @@
 
 	fila = "<td colspan='4'>Liquidacion:</td><td>" + lista_totales[1] + "</td><td>" + lista_totales[2] + "</td><td>" + lista_totales[3] + "</td>";
 	$('#fila_totales').html(fila);
-	$('#fila_totales').show();
+	if ($("#fecha_ini").val() == "" &&  $("#fecha_fin").val() == ""){ //parametros no seteados
+		$('.listado-pagos').hide();
+		$('.pagination').hide();
+	}
+	else{
+		$('.listado-pagos').show();
+		$('.pagination').hide();
+	}
+	
 	});
 
 	function retrieve_liquidacion_propietarios() {
@@ -117,21 +125,31 @@
 	<br>
 </div>
 <div id="listado-item-lote">
-	<table width="50%" border="1" cellpadding="0" cellspacing="0" class="listado-pagos" align="center">
+	<table width="50%" cellpadding="0" cellspacing="0" class="listado-pagos" align="center">
 		<th>Fecha</th><th>Lote</th><th>Cliente</th><th>Cuota Nº</th><th>Monto Pagado</th><th>Monto Inmobiliaria</th><th>Monto Propietario</th>
 
 		{% for hw in object_list %}
-
-		<tr>
-			<td>{{hw.0}}</td>
-			<td>{{hw.1}}</td>
-			<td>{{hw.2}}</td>
-			<td>{{hw.3}}</td>
-			<td>{{hw.4}}</td>
-			<td>{{hw.5}}</td>
-			<td>{{hw.6}}</td>
-		</tr>
-
+			{% if forloop.counter|divisibleby:2 %}
+				<tr>
+					<td>{{hw.0}}</td>
+					<td>{{hw.1}}</td>
+					<td>{{hw.2}}</td>
+					<td>{{hw.3}}</td>
+					<td>{{hw.4}}</td>
+					<td>{{hw.5}}</td>
+					<td>{{hw.6}}</td>
+				</tr>
+			{% else %}
+				<tr class="bkg_gris">
+					<td>{{hw.0}}</td>
+					<td>{{hw.1}}</td>
+					<td>{{hw.2}}</td>
+					<td>{{hw.3}}</td>
+					<td>{{hw.4}}</td>
+					<td>{{hw.5}}</td>
+					<td>{{hw.6}}</td>
+				</tr>			
+			{% endif %}
 		<tr id='fila-{{forloop.counter}}' style="display: none;"></tr>
 		{% endfor %}
 		<tr id='fila_totales' style="display: none;"></tr>
