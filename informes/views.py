@@ -268,72 +268,78 @@ def informe_general(request):
         return HttpResponse(t.render(c))    
 
 def informe_movimientos(request):
-    
-    if request.user.is_authenticated():
+    lista_movimientos = []
+    if request.method == 'GET':
+        if request.user.is_authenticated():
+            t = loader.get_template('informes/informe_movimientos.html')
+        else:
+            return HttpResponseRedirect("/login") 
+    else:
         t = loader.get_template('informes/informe_movimientos.html')
-    else:
-        return HttpResponseRedirect("/login") 
-
-
-    lote = request.GET['lote_id']
-    fecha_ini = request.GET['fecha_ini']
-    fecha_fin = request.GET['fecha_fin']  
-    
-    if lote != '' and fecha_ini != '' and fecha_fin != "":    
-        fecha_ini_parsed = datetime.strptime(fecha_ini, "%d/%m/%Y").date()
-        fecha_fin_parsed = datetime.strptime(fecha_fin, "%d/%m/%Y").date()
-        x = str(lote)
-        fraccion_int = int(x[0:3])
-        manzana_int = int(x[4:7])
-        lote_int = int(x[8:])
-        manzana = Manzana.objects.get(fraccion_id=fraccion_int, nro_manzana=manzana_int)
-        lote = Lote.objects.get(manzana=manzana.id, nro_lote=lote_int)
-        lista_pagos = PagoDeCuotas.objects.filter(lote_id=lote.id, fecha_de_pago__range=(fecha_ini_parsed, fecha_fin_parsed))
-    else:
-        lista_pagos = PagoDeCuotas.objects.all().order_by('fecha_de_pago')
-#                 lista_ventas=Venta.objects.filter(lote_id=lote_int)
-#                 lista_reservas=Reserva.objects.filter(lote_id=lote_int)
-#                 lista_cambios=CambioDeLotes.objects.filter(lote_nuevo_id=lote_int)
-#                 lista_recuperaciones=RecuperacionDeLotes.objects.filter(lote_id=lote_int)
-#                 lista_transferencias=TransferenciaDeLotes.objects.filter(lote_id=lote_int)
-    for pago in lista_pagos:
-        cuota_nro = get_nro_cuota(pago)
-        pago.cuota = str(cuota_nro) + '/' + str(pago.plan_de_pago.cantidad_de_cuotas)
-        # pagos_list.append(str(cuota_nro)+'/'+str(pago.plan_de_pago.cantidad_de_cuotas))
-#         pago.total_de_cuotas=str('{:,}'.format(pago.total_de_cuotas)).replace(",", ".")
-#         ago.total_de_mora=str('{:,}'.format(pago.total_de_mora)).replace(",", ".")
-#         pago.total_de_pago=str('{:,}'.format(pago.total_de_pago)).replace(",", ".")
-#                     
-#         lista_totales.append((str('{:,}'.format(total_cuotas)).replace(",", ".")))
-#         lista_totales.append((str('{:,}'.format(total_mora)).replace(",", ".")))
-#         lista_totales.append((str('{:,}'.format(total_pagos)).replace(",", ".")))    
-            
-        '''    
-        paginator=Paginator(lista_pagos,15)
-        page=request.GET.get('page')
-        try:
-            lista=paginator.page(page)
-        except PageNotAnInteger:
-            lista=paginator.page(1)
-        except EmptyPage:
-            lista=paginator.page(paginator.num_pages)
-        '''
-            
-        c = RequestContext(request, {
-            'lista_pagos': lista_pagos,
-
-            # 'lista': lista,
-            # 'listaP': listaP,
-#             'lista_ventas': lista_ventas,
-#             'lista_reservas': lista_reservas,
-#             'lista_cambios': lista_cambios,
-#             'lista_recuperaciones': lista_recuperaciones,
-#             'lista_transferencias': lista_transferencias,
-                
-        })
-                
+        lote_int = request.POST['lote_id']
+        fecha_ini = request.POST['fecha_ini']
+        fecha_fin = request.POST['fecha_fin']  
         
-        return HttpResponse(t.render(c))
+    
+        if lote_int != '' and fecha_ini != '' and fecha_fin != "":    
+            try:
+                fecha_ini_parsed = datetime.strptime(fecha_ini, "%d/%m/%Y").date()
+                fecha_fin_parsed = datetime.strptime(fecha_fin, "%d/%m/%Y").date()
+                x = str(lote_int)
+                fraccion_int = int(x[0:3])
+                manzana_int = int(x[4:7])
+                lote_int = int(x[8:])
+                manzana = Manzana.objects.get(fraccion_id=fraccion_int, nro_manzana=manzana_int)
+                lote = Lote.objects.get(manzana=manzana.id, nro_lote=lote_int)
+                lista_pagos = PagoDeCuotas.objects.filter(lote_id=lote.id, fecha_de_pago__range=(fecha_ini_parsed, fecha_fin_parsed))
+                lista_ventas = Venta.objects.get(lote_id=lote.id, fecha_de_venta__range=(fecha_ini_parsed, fecha_fin_parsed))
+                lista_reservas = Reserva.objects.get(lote_id=lote.id, fecha_de_reserva__range=(fecha_ini_parsed, fecha_fin_parsed))
+                lista_cambios = CambioDeLotes.objects.get(lote_id=lote.id, fecha_de_cambio__range=(fecha_ini_parsed, fecha_fin_parsed))
+                lista_recuperaciones = RecuperacionDeLotes.objects.get(lote_id=lote.id, fecha_de_recuperacion__range=(fecha_ini_parsed, fecha_fin_parsed))
+                lista_transferencias = TransferenciaDeLotes.objects.get(lote_id=lote.id, fecha_de_transferencia__range=(fecha_ini_parsed, fecha_fin_parsed))
+            except Exception, error:
+                print error 
+#            else:
+#             lista_pagos = PagoDeCuotas.objects.filter(lote_id=lote_int).order_by('fecha_de_pago')
+#             lista_ventas = Venta.objects.get(lote_id=lote_int)
+#             lista_reservas = Reserva.objects.get(lote_id=lote_int)
+#             lista_cambios = CambioDeLotes.objects.get(lote_nuevo_id=lote_int)
+#             lista_recuperaciones = RecuperacionDeLotes.objects.get(lote_id=lote_int)
+#             lista_transferencias = TransferenciaDeLotes.objects.get(lote_id=lote_int)
+#       
+
+            venta = []
+            venta.append(lista_ventas.fecha_de_venta)
+            venta.append(lista_ventas.cliente)
+            venta.append(str(0) + '/' + str(lista_ventas.plan_de_pago.cantidad_de_cuotas))
+            venta.append("Entrega inicial")
+            venta.append(str('{:,}'.format(lista_ventas.precio_final_de_venta)).replace(",","."))
+            venta.append(str('{:,}'.format(lista_ventas.entrega_inicial)).replace(",","."))
+            venta.append(str('{:,}'.format(lista_ventas.precio_final_de_venta-lista_ventas.entrega_inicial)).replace(",","."))
+            lista_movimientos.append(venta)
+        if lista_pagos:  
+            saldo_anterior=lista_ventas.precio_final_de_venta
+            monto=lista_ventas.entrega_inicial
+            saldo=saldo_anterior-monto
+            for pago in lista_pagos:
+                saldo_anterior=saldo
+                monto=pago.total_de_cuotas
+                saldo=saldo_anterior-monto
+                cuota =[]
+                cuota.append(pago.fecha_de_pago)
+                cuota.append(pago.cliente)
+                cuota.append(str(get_nro_cuota(pago)) + '/' + str(pago.plan_de_pago.cantidad_de_cuotas))
+                cuota.append("Pago de Cuota")
+                cuota.append(str('{:,}'.format(saldo_anterior)).replace(",","."))
+                cuota.append(str('{:,}'.format(monto)).replace(",","."))
+                cuota.append(str('{:,}'.format(saldo)).replace(",","."))
+                lista_movimientos.append(cuota)
+                            
+    c = RequestContext(request, {
+        'lista_movimientos': lista_movimientos,     
+    })
+    return HttpResponse(t.render(c)) 
+   
  
 def liquidacion_propietarios(request):
     if request.method == 'GET':

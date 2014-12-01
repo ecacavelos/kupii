@@ -3,36 +3,27 @@
 
 <script type="text/javascript">
 	$(document).ready(function() {
-	var d=new Date();
-	var curr_date = d.getDate();
-	var curr_month = d.getMonth();
-	var curr_year = d.getFullYear();
-	if (curr_date<10){
-		curr_date="0"+curr_date.toString();
-	}
-	var hoy=(curr_date + "/" + curr_month+ "/" + curr_year);
-	$("#fecha_fin").val(hoy);
-	$('#lote_id').mask('###/###/####');
-	$('#fecha_ini').mask('##/##/####');
-	$("#fecha_ini").datepicker({ dateFormat: 'dd/mm/yy' });
-	$('#fecha_fin').mask('##/##/####');
-	$("#fecha_fin").datepicker({ dateFormat: 'dd/mm/yy' });
-	
-
-	lista_totales=[];
-
-	lista_totales[1]="0";
-	lista_totales[2]="0";
-	lista_totales[3]="0";
-
-	{%for lt in lista_totales%}
-	lista_totales[{{forloop.counter}}]=
-	"{{lt}}";
-	{%endfor%}
-
-	fila = "<td colspan='8'>Liquidacion:</td><td>" + lista_totales[1] + "</td><td>" + lista_totales[2] + "</td><td>" + lista_totales[3] + "</td>";
-	$('#fila_totales').html(fila);
-	$('#fila_totales').show();
+		var d = new Date();
+		var curr_date = d.getDate();
+		var curr_month = d.getMonth() + 1;
+		var curr_year = d.getFullYear();
+		if (curr_date < 10) {
+			curr_date = "0" + curr_date.toString();
+		}
+		if (curr_month < 10) {
+			curr_month = "0" + curr_month.toString();
+		}
+		var hoy = (curr_date + "/" + curr_month + "/" + curr_year);
+		$("#fecha_fin").val(hoy);
+		$('#lote_id').mask('###/###/####');
+		$('#fecha_ini').mask('##/##/####');
+		$("#fecha_ini").datepicker({
+			dateFormat : 'dd/mm/yy'
+		});
+		$('#fecha_fin').mask('##/##/####');
+		$("#fecha_fin").datepicker({
+			dateFormat : 'dd/mm/yy'
+		});
 
 	});
 
@@ -107,25 +98,21 @@
 	<br>
 </div>
 <div id="listado-item-lote">
-
-	{%if lista_ventas %}
-	<h1>Listado de ventas</h1>
+	<h1>Listado de Movimientos</h1>
 	<table width="50%" border="1" cellpadding="0" cellspacing="0" class="listado-ventas" align="center">
-		<th>Venta Nro</th><th>Lote Nro</th><th>Fracci&oacute;n</th><th>Cliente</th><th>Vendedor</th><th>Fecha de Venta</th><th>Precio Final de Venta</th>
-		{% for lv in lista_ventas %}
-		{%for lot in hw%}
+		<th>Fecha</th><th>Cliente</th><th>Cuota Nº</th><th>Tipo Cuota</th><th>Saldo Anterior</th><th>Monto</th><th>Saldo</th>
+		{% for hw in lista_movimientos %}
+
 		<tr>
-			<td> {{lot.id}} </td>
-			<td> {{lot.lote}} </td>
-			<td> {{lot.lote.manzana.fraccion_id}} </td>
-			<td> {{lot.cliente}} </td>
-			<td> {{lot.vendedor}} </td>
-			<td> {{lot.fecha_de_venta}} </td>
-			<td> {{lot.precio_final_de_venta}} </td>
+			<td>{{hw.0}}</td>
+			<td>{{hw.1}}</td>
+			<td>{{hw.2}}</td>
+			<td>{{hw.3}}</td>
+			<td>{{hw.4}}</td>
+			<td>{{hw.5}}</td>
+			<td>{{hw.6}}</td>
 		</tr>
 		{%endfor%}
-		{% endfor %}
-		{%endif%}
 	</table>
 </div>
 
