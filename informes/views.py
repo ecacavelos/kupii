@@ -135,64 +135,94 @@ def clientes_atrasados(request):
     
     if request.user.is_authenticated():
         t = loader.get_template('informes/clientes_atrasados.html')
-        # c = RequestContext(request, {})
-        # return HttpResponse(t.render(c))
+        #c = RequestContext(request, {})
+        #return HttpResponse(t.render(c))
     else:
         return HttpResponseRedirect("/login")
-    
-    
-    try:
         
+    try:
+                
         if request.method == 'GET':
             meses_peticion = 0
         else:
-            if request.POST['meses_de_atraso'] == '':
+            if request.POST['meses_de_atraso'] =='':
                 meses_peticion = 0
             else:
                 meses_peticion = int(request.POST['meses_de_atraso'])    
-        dias = meses_peticion * 30
-        fecha_actual = datetime.now()
-        ventas_a_cuotas = Venta.objects.filter(~Q(plan_de_pago='2'), fecha_primer_vencimiento__lt=fecha_actual).order_by('cliente')
-        object_list = []
+        dias = meses_peticion*30
+        fecha_actual= datetime.now()
+        ventas_a_cuotas = Venta.objects.filter(plan_de_pago_id__tipo_de_plan__iexact = 'credito', fecha_primer_vencimiento__lt=fecha_actual).order_by('cliente')
+        object_list=[]
+        clientes_atrasados=[]
         for v in ventas_a_cuotas:
+            cliente_atrasado={}       
+            cuotas_pagadas = v.pagos_realizados
+            lote_ventas = v.lote
+            cuotas_totales = v.plan_de_pago.cantidad_de_cuotas
+            cuotas_atrasadas = cuotas_totales - cuotas_pagadas
+            try:
+                ultimo_pago = PagoDeCuotas.objects.filter(lote= lote_ventas.id).order_by('-fecha_de_pago')[:1].get()
+            except PagoDeCuotas.DoesNotExist:
+                ultimo_pago = None
+            if ultimo_pago == None:
+                fecha_ultimo_pago = v.fecha_primer_vencimiento
+            else:
+                fecha_ultimo_pago = ultimo_pago.fecha_de_pago
+            
+            if cuotas_totales != 0:
+                porcentaje_pagado = (cuotas_pagadas * 100) / cuotas_totales
+            else:
+                porcentaje_pagado = 0
+            cliente_atrasado['manzana']= lote_ventas.manzana.nro_manzana
+            cliente_atrasado['lote']= lote_ventas.nro_lote
+            cliente_atrasado['cliente']= v.cliente
+            cliente_atrasado['cuotas_atrasadas']= cuotas_atrasadas
+            cliente_atrasado['cuotas_pagadas']= v.pagos_realizados
+            cliente_atrasado['importe_cuota']= str('{:,}'.format(v.precio_de_cuota)).replace(",", ".")
+            cliente_atrasado['total_atrasado']= str('{:,}'.format(cuotas_atrasadas * v.precio_de_cuota)).replace(",", ".")
+            cliente_atrasado['total_pagado']= str('{:,}'.format(cuotas_pagadas * v.precio_de_cuota)).replace(",", ".")
+            cliente_atrasado['valor_total_lote']= str('{:,}'.format(v.precio_de_cuota * cuotas_totales)).replace(",", ".")
+            cliente_atrasado['porc_pagado']=  porcentaje_pagado
+            cliente_atrasado['fecha_ultimo_pago']= fecha_ultimo_pago
             fecha_primer_vencimiento = v.fecha_primer_vencimiento
             fecha_primer_vencimiento = datetime.combine(fecha_primer_vencimiento, datetime.min.time())
-            # diferencia = monthdelta(fecha_actual, d2)
+            #diferencia = monthdelta(fecha_actual, d2)
             fecha_resultante = fecha_actual - fecha_primer_vencimiento
-            cuotas_pagadas = v.pagos_realizados
-            print ("Id de venta: " + str(v.id))
-            print ("Fecha Actual: " + str(fecha_actual))
-            print ("Fecha 1er Vencimieto: " + str(fecha_primer_vencimiento))
-            print ("Fecha resultante: " + str(fecha_resultante))
+            
+                        
+            print ("Id de venta: "+str(v.id))
+            print ("Fecha Actual: "+str(fecha_actual))
+            print ("Fecha 1er Vencimieto: "+str(fecha_primer_vencimiento))
+            print ("Fecha resultante: "+str(fecha_resultante))
             f1 = fecha_actual.date()
-            f2 = fecha_primer_vencimiento.date()
-            diferencia = (f1 - f2).days
+            f2 = fecha_ultimo_pago
+            diferencia = (f1-f2).days
             
-            # diferencia = fecha_resultante.days()
-            print ("Dias de Diferencia: " + str(diferencia))
-            meses_diferencia = int (diferencia / 30)
-            print ("Meses de diferencia: " + str(meses_diferencia))
-            print ("Meses de atraso solicitado: " + str(meses_peticion))
+            #diferencia = fecha_resultante.days()
+            print ("Dias de Diferencia: "+str(diferencia))
+            meses_diferencia = int (diferencia /30)
+            print ("Meses de diferencia: "+str(meses_diferencia))
+            print ("Meses de atraso solicitado: "+str(meses_peticion))
             
-            if meses_diferencia >= meses_peticion and cuotas_pagadas < ((meses_diferencia + 1) - meses_peticion) :
-                object_list.append(v)
+            if meses_diferencia >= meses_peticion:
+                object_list.append(cliente_atrasado)
                 print ("Venta agregada")
                 print (" ")
             else:
                 print ("Venta no agregada")
                 print (" ")    
-            # print (object_list)
+            #print (object_list)
             
-        # f = []
+        #f = []
         a = len(object_list)
         if a > 0:
-            for i in object_list:
-                # lote = Lote.objects.get(pk=i.lote_id)
-                # manzana = Manzana.objects.get(pk=lote.manzana_id)
-                # f.append(Fraccion.objects.get(pk=manzana.fraccion_id))
-                # i.fecha_de_venta = i.fecha_de_venta.strftime("%d/%m/%Y")
-                # i.fecha_primer_vencimiento = i.fecha_primer_vencimiento.strftime("%d/%m/%Y")
-                i.precio_final_de_venta = str('{:,}'.format(i.precio_final_de_venta)).replace(",", ".")
+            #for i in object_list:
+                #lote = Lote.objects.get(pk=i.lote_id)
+                #manzana = Manzana.objects.get(pk=lote.manzana_id)
+                #f.append(Fraccion.objects.get(pk=manzana.fraccion_id))
+                #i.fecha_de_venta = i.fecha_de_venta.strftime("%d/%m/%Y")
+                #i.fecha_primer_vencimiento = i.fecha_primer_vencimiento.strftime("%d/%m/%Y")
+                #i.precio_final_de_venta = str('{:,}'.format(i.precio_final_de_venta)).replace(",", ".")
                 
             paginator = Paginator(object_list, 15)
             page = request.GET.get('page')
@@ -203,11 +233,13 @@ def clientes_atrasados(request):
             except EmptyPage:
                 lista = paginator.page(paginator.num_pages)
             
+            #reporte_clientes_atrasados(object_list)
         else:
-            lista = object_list
+            lista=object_list
                 
         c = RequestContext(request, {
             'object_list': lista,
+            #'fraccion': f,
         })
         return HttpResponse(t.render(c))    
            
@@ -651,63 +683,86 @@ def clientes_atrasados_reporte_excel(request):
     sheet = wb.add_sheet('test', cell_overwrite_ok=True)
     style = xlwt.easyxf('pattern: pattern solid, fore_colour green;'
                               'font: name Arial, bold True;')   
-    style2 = xlwt.easyxf('font: name Arial, bold True;')
-    
-    # meses_peticion = int(request.GET['meses_de_atraso'])
+    style2 = xlwt.easyxf('font: name Arial,66666 bold True;')
     
     if request.GET['meses_de_atraso'] == '':
         meses_peticion = 0
     else:
         meses_peticion = int(request.GET['meses_de_atraso']) 
-        
-    # dias = meses_peticion*30
-    fecha_actual = datetime.now()
-    ventas_a_cuotas = Venta.objects.filter(~Q(plan_de_pago='2'), fecha_primer_vencimiento__lt=fecha_actual).order_by('cliente')
-    object_list = []
+    
+    fecha_actual= datetime.now()
+    ventas_a_cuotas = Venta.objects.filter(plan_de_pago_id__tipo_de_plan__iexact = 'credito', fecha_primer_vencimiento__lt=fecha_actual).order_by('cliente')
+    object_list=[]
     for v in ventas_a_cuotas:
-        fecha_primer_vencimiento = v.fecha_primer_vencimiento
-        fecha_primer_vencimiento = datetime.combine(fecha_primer_vencimiento, datetime.min.time())
-        # diferencia = monthdelta(fecha_actual, d2)
-        fecha_resultante = fecha_actual - fecha_primer_vencimiento
+        cliente_atrasado={}       
         cuotas_pagadas = v.pagos_realizados
-        print ("Id de venta: " + str(v.id))
-        print ("Fecha Actual: " + str(fecha_actual))
-        print ("Fecha 1er Vencimieto: " + str(fecha_primer_vencimiento))
-        print ("Fecha resultante: " + str(fecha_resultante))
+        lote_ventas = v.lote
+        cuotas_totales = v.plan_de_pago.cantidad_de_cuotas
+        cuotas_atrasadas = cuotas_totales - cuotas_pagadas
+        try:
+            ultimo_pago = PagoDeCuotas.objects.filter(lote= lote_ventas.id).order_by('-fecha_de_pago')[:1].get()
+        except PagoDeCuotas.DoesNotExist:
+            ultimo_pago = None
+        if ultimo_pago == None:
+            fecha_ultimo_pago = v.fecha_primer_vencimiento
+        else:
+            fecha_ultimo_pago = ultimo_pago.fecha_de_pago
+        
+        if cuotas_totales != 0:
+            porcentaje_pagado = (cuotas_pagadas * 100) / cuotas_totales
+        else:
+            porcentaje_pagado = 0
+        cliente_atrasado['manzana']= lote_ventas.manzana.nro_manzana
+        cliente_atrasado['lote']= lote_ventas.nro_lote
+        cliente_atrasado['cliente']= v.cliente
+        cliente_atrasado['cuotas_atrasadas']= cuotas_atrasadas
+        cliente_atrasado['cuotas_pagadas']= v.pagos_realizados
+        cliente_atrasado['importe_cuota']= str('{:,}'.format(v.precio_de_cuota)).replace(",", ".")
+        cliente_atrasado['total_atrasado']= str('{:,}'.format(cuotas_atrasadas * v.precio_de_cuota)).replace(",", ".")
+        cliente_atrasado['total_pagado']= str('{:,}'.format(cuotas_pagadas * v.precio_de_cuota)).replace(",", ".")
+        cliente_atrasado['valor_total_lote']= str('{:,}'.format(v.precio_de_cuota * cuotas_totales)).replace(",", ".")
+        cliente_atrasado['porc_pagado']=  porcentaje_pagado
+        cliente_atrasado['fecha_ultimo_pago']= fecha_ultimo_pago
+        
         f1 = fecha_actual.date()
-        f2 = fecha_primer_vencimiento.date()
+        f2 = fecha_ultimo_pago.date()
         diferencia = (f1 - f2).days
             
-        # diferencia = fecha_resultante.days()
         print ("Dias de Diferencia: " + str(diferencia))
         meses_diferencia = int (diferencia / 30)
         print ("Meses de diferencia: " + str(meses_diferencia))
         print ("Meses de atraso solicitado: " + str(meses_peticion))
-        if meses_diferencia >= meses_peticion and cuotas_pagadas < ((meses_diferencia + 1) - meses_peticion) :
-            object_list.append(v)
-            
+        if meses_diferencia >= meses_peticion:
+            object_list.append(cliente_atrasado)
+                          
     a = len(object_list)
     if a > 0:
         # a=len(object_list)
-        sheet.write(0, 0, "Cliente", style)
-        sheet.write(0, 1, "Venta Nro.", style)
-        sheet.write(0, 2, "Lote Nro.", style)
-        sheet.write(0, 3, "Fraccion", style)
-        sheet.write(0, 4, "Fecha 1er. vencimiento", style)
-        sheet.write(0, 5, "Plan de Pago", style)
-        sheet.write(0, 6, "Fecha de Venta", style)
-        sheet.write(0, 7, "Precio Final de Venta", style)
+        sheet.write(0, 0, "Manzana", style)
+        sheet.write(0, 1, "Lote", style)
+        sheet.write(0, 2, "Cliente", style)
+        sheet.write(0, 3, "Cuotas Atras.", style)
+        sheet.write(0, 4, "Cuotas Pagadas", style)
+        sheet.write(0, 5, "Importe c/ cuota", style)
+        sheet.write(0, 6, "Total Atrasado", style)
+        sheet.write(0, 7, "Total Pagado", style)
+        sheet.write(0, 8, "Valor Total del Lote", style)
+        sheet.write(0, 9, "% Pagado", style)
+        sheet.write(0, 10, "Fec. Ult. Pago", style)
         i = 0
         c = 1
         for i in range(len(object_list)):        
-            sheet.write(c, 0, str(object_list[i].cliente))
-            sheet.write(c, 1, str(object_list[i].id))
-            sheet.write(c, 2, str(object_list[i].lote.nro_lote))
-            sheet.write(c, 3, str(object_list[i].lote.manzana.fraccion))
-            sheet.write(c, 4, str(object_list[i].fecha_primer_vencimiento))
-            sheet.write(c, 5, str(object_list[i].plan_de_pago))
-            sheet.write(c, 6, str(object_list[i].fecha_de_venta))
-            sheet.write(c, 7, str(object_list[i].precio_final_de_venta))
+            sheet.write(c, 0, str(object_list[i].manzana))
+            sheet.write(c, 1, str(object_list[i].lote))
+            sheet.write(c, 2, str(object_list[i].cliente))
+            sheet.write(c, 3, str(object_list[i].cuotas_atrasadas))
+            sheet.write(c, 4, str(object_list[i].cuotas_pagadas))
+            sheet.write(c, 5, str(object_list[i].importe_cuota))
+            sheet.write(c, 6, str(object_list[i].total_atrasado))
+            sheet.write(c, 7, str(object_list[i].total_pagado))
+            sheet.write(c, 8, str(object_list[i].valor_total_lote))
+            sheet.write(c, 9, str(object_list[i].porc_pagado))
+            sheet.write(c, 10, str(object_list[i].fecha_ultimo_pago))
             c += 1
         
     else:
