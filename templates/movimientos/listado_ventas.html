@@ -1,0 +1,169 @@
+{% extends "lotes/base_lotes.html" %}
+{% block header_scripts %}
+
+<script type="text/javascript">
+$(document).ready(function() {
+	if($("#tipo_busqueda").val()=='lote'){
+		$('#busqueda').mask('###/###/####');
+	}
+	$("#fecha_hasta").hide();
+	$('#fecha_hasta').mask('##/##/####');
+	$("#fecha_hasta").datepicker({ dateFormat: 'dd/mm/yy' });
+});	
+function buscar(){
+	if($("#tipo_busqueda").val()==0){
+		alert("Debe elegir un tipo de busqueda.");
+	}
+	else{
+		if($("#busqueda").val()==""){
+			alert("Debe ingresar un nombre para buscar.");
+		}else{
+			$("#frm_busqueda").submit();
+		}
+	}
+}
+
+function desplegar_fecha(){
+	if($("#tipo_busqueda").val()=='fecha'){
+		$("#fecha_hasta").show();		
+		$('#busqueda').mask('##/##/####');
+	    $("#busqueda").datepicker({ dateFormat: 'dd/mm/yy' });
+	} else{
+		$("#fecha_hasta").hide();
+		$("#busqueda").datepicker("destroy");
+		$("#busqueda").removeClass("hasDatepicker");
+		//$("#busqueda").unmask();
+		$("#fecha_hasta").val("");
+		$("#busqueda").val("");
+	}	
+}	
+</script>
+{% endblock %}
+{% block content %}
+<div class="gri16 text-izquierda" id="breadcumb">
+	<a href="/">Inicio</a> <span class="verde-1">></span>  
+	<a href="/movimientos/">Movimientos</a> 
+	<span class="verde-1">> Listado de Ventas</span> 
+</div>
+<div class="clear"></div>
+
+					<div class="grid_10">
+  						<h1>Listado de Ventas</h1>
+					</div>
+
+					<div class="grid_6">
+  						<form name="frm_busqueda" id="frm_busqueda" method="post" action="/movimientos/listado_busqueda_ventas/">
+							
+							{% csrf_token %}
+							
+							<select id="tipo_busqueda" name="tipo_busqueda" onchange="desplegar_fecha();">
+								<option value="0">Elija una opcion</option>
+								<option value="lote">Lote</option>
+								<option value="cliente">Cliente</option>
+								<option value="vendedor">Vendedor</option>
+								<option value="fecha">Fecha de Venta</option>
+								
+							</select>
+							
+							
+							
+							<input id="busqueda" name="busqueda" />
+							
+							<input name="fecha_hasta" id="fecha_hasta" type="text" value=""/>
+  							<input name="tabla" type="hidden" value="venta"/>
+  							<input type="button" value="Buscar" onclick="buscar();" class="historico" style="cursor: pointer"/>
+  							
+  							
+  						</form>
+					</div>
+
+					<div class="clear"></div>
+					<div id="listado-cuadro-busqueda">
+						<a href="/movimientos/ventas_lotes/" class="boton-verde">Agregar Venta</a>
+						<br><br>
+					</div>
+					<div id="listado-item-lote">
+						<table width="50%" border="1" cellpadding="0" cellspacing="0" class="listado-ventas" align="center">
+							<th>Venta Nro</th><th>Lote Nro</th><th>Fracci&oacute;n</th><th>Cliente</th><th>Vendedor</th><th>Fecha de Venta</th><th>Precio Final de Venta</th>
+{%if busqueda == 'cliente'%}
+{% for hw in object_list %}
+	{%for lot in hw%}
+		<tr>
+			<td>
+				<a href="/lotes/listado/ventas/{{ lot.id }}/">{{lot.id}} <strong>(Ver Detalles)</strong></a>
+			</td>
+			<td>
+				{{lot.lote}}				
+			</td>
+			<td>
+				{{lot.lote.manzana.fraccion}}			
+			</td>
+			<td>
+			    {{lot.cliente}}
+			</td>
+			<td>
+			    {{lot.vendedor}}
+			</td>			
+			<td>
+				{{lot.fecha_de_venta}}
+			</td>
+			<td>
+				{{lot.precio_final_de_venta}}
+			</td>
+		</tr>
+{%endfor%}
+{% endfor %}
+{%else%}
+{% for hw in object_list %}
+		<tr>
+			<td>
+				<a href="/lotes/listado/ventas/{{ hw.id }}/">{{hw.id}} <strong>(Ver Detalles)</strong></a>
+			</td>
+			<td>
+				
+				{{hw.lote}}
+				
+			</td>
+			<td>
+				 {{hw.lote.manzana.fraccion_id}}				
+			</td>
+			<td>
+			    {{hw.cliente}}
+			</td>
+			<td>
+			    {{hw.vendedor}}
+			</td>			
+			<td>
+				{{hw.fecha_de_venta}}
+			</td>
+			<td>
+				{{hw.precio_final_de_venta}}
+			</td>
+			
+		</tr>
+
+{% endfor %}
+{%endif%}
+<div class="pagination">
+    <span class="step-links">
+       <div class="pagination">
+    <span class="step-links">
+        {%if object_list.has_previous%}
+        <a href="?page={{ object_list.previous_page_number }}{{ultima_busqueda}}"> Anterior</a>
+		{%endif%}
+    	P&aacute;gina
+    	|{{object_list.number}}|
+    	
+    	{%if object_list.has_next%}
+		<a href="?page={{ object_list.next_page_number }}{{ultima_busqueda}}"> Siguiente</a>
+		{%endif%}
+    </span>
+</div>
+
+    </span>
+</div>
+						</table>
+					</div>
+
+<div id="footer"><a href="/movimientos" class="boton-verde">Volver al módulo de Movimientos</a></div>
+{% endblock %}

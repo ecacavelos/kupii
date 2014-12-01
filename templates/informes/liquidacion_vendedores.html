@@ -1,0 +1,177 @@
+{% extends "lotes/base_lotes.html" %}
+{% block header_scripts %}
+
+
+<script type="text/javascript" >
+	$(document).ready(function() {
+
+	$('#fecha_ini').mask('##/##/####');
+	$("#fecha_ini").datepicker({ dateFormat: 'dd/mm/yy' });
+	$('#fecha_fin').mask('##/##/####');
+	$("#fecha_fin").datepicker({ dateFormat: 'dd/mm/yy' });
+	
+	
+	
+	});
+	
+	function format(nro){
+
+		var number = new String(nro);
+		var result = '';
+		while( number.length > 3 ){
+			result = '.' + number.substr(number.length - 3) + result;
+	 		number = number.substring(0, number.length - 3);
+		}
+		result = number + result;
+		return result;
+	};
+	
+	function retrieve_liquidacion_vendedores(){		
+			
+		window.location.href="/informes/liquidacion_vendedores_reporte_excel?fecha_ini="+$('#fecha_ini').val()+"&fecha_fin="+$('#fecha_fin').val()+"&busqueda="+$('#id_busqueda').val()+"&tipo_busqueda="+$('#id_tipo_busqueda').val();
+	
+	}
+	
+	function validar(){
+		var request_pagos= $.ajax({
+					url : '/ajax/get_lista_pagos/',
+					type : "GET",
+					data : {
+						tipo_busqueda: $('#id_tipo_busqueda').val(),
+						busqueda : $('#id_busqueda').val(),
+						fecha_ini: $('#fecha_ini').val(),
+						fecha_fin: $('#fecha_fin').val()
+					},
+					dataType : "json"
+				});
+  				request_pagos.success(function (data){
+  				$(".custom_class").empty();
+				calculartotales(data);					
+				});			
+	}
+	
+	function calculartotales(data){
+		var fraccion_actual=data[0].fraccion_id;
+		var importe=0;
+		var comision=0;
+		var total_importe_vendedor=0;
+		var total_comision_vendedor=0;
+		for(var i=0;i<data.length;i++){
+			//mientras estemos en una determinada fraccion, vamos sumando los totales correspondientes
+			if(data[i].fraccion_id==fraccion_actual){
+				importe+=data[i].importe;
+				comision+=data[i].comision;
+				$('#tabla_vendedores').append('<tr class="custom_class"><td>'+data[i].cliente+"</td><td>"+data[i].fraccion+"</td><td>"+data[i].lote+"</td><td>"+data[i].cuota_nro+"</td><td>"+data[i].fecha_pago+"</td><td>"+format(data[i].importe)+"</td><td>"+format(data[i].comision)+"</td></tr>");
+				total_importe_vendedor+=data[i].importe;
+				total_comision_vendedor+=data[i].comision;
+				
+				
+			}
+			else{
+				//al cambiar de fraccion, se imprimen los totales acumulados, y se suman los totales para la siguiente
+				$('#tabla_vendedores').append('<tr class="custom_class"><td colspan="5">Totales de Fraccion</td><td>'+format(importe)+"</td><td>"+format(comision)+"</td></tr>");
+				$('#tabla_vendedores').append('<tr class="custom_class"><td>'+data[i].cliente+"</td><td>"+data[i].fraccion+"</td><td>"+data[i].lote+"</td><td>"+data[i].cuota_nro+"</td><td>"+data[i].fecha_pago+"</td><td>"+format(data[i].importe)+"</td><td>"+format(data[i].comision)+"</td></tr>");
+				total_importe_vendedor+=data[i].importe;
+				total_comision_vendedor+=data[i].comision;
+				fraccion_actual=data[i].fraccion_id;
+				importe=0;
+				comision=0;					
+				importe+=data[i].importe;
+				comision+=data[i].comision;
+
+						
+			}
+			//preguntamos si es la ultima fila de la tabla, para imprimir los totales generales del vendedor
+			if (i==(data.length)-1){
+					$('#tabla_vendedores').append('<tr class="custom_class"><td colspan="5">Totales de Fraccion</td><td>'+format(importe)+"</td><td>"+format(comision)+"</td></tr>");
+					
+				}		
+		}
+		$('#tabla_vendedores').append('<tr class="custom_class"><td colspan="5">Totales del Vendedor</td><td>'+format(total_importe_vendedor)+"</td><td>"+format(total_comision_vendedor)+"</td></tr>");	
+	}		
+
+
+</script>
+{% endblock %}
+{% block content %}
+<div class="gri16 text-izquierda" id="breadcumb">
+	<a href="/">Inicio</a><span class="verde-1">></span>
+	<a href="/informes/">Informes</a>
+	<span class="verde-1">>Liquidaci&oacute;n de Vendedores</span>
+</div>
+
+<div class="clear"></div>
+
+<div class="grid_10">
+	<h1>Liquidaci&oacute;n de Vendedores</h1>
+</div>
+
+<div class="grid_6">
+	<form name="frm_busqueda" id="frm_busqueda" method="post" action="/informes/liquidacion_vendedores/">
+		{% csrf_token %}
+		<table>
+			<tr>
+				<td>
+				<select id="id_tipo_busqueda" name="tipo_busqueda">
+					<option value="0">Elija una opcion</option>
+					<option value="vendedor_id">Vendedor ID</option>
+					<option value="nombre">Nombre de Vendedor</option>
+				</select></td>
+				<td>
+				<input name="busqueda" id="id_busqueda" type="text" value=""/>
+				</td>
+			</tr>
+
+			<th></th><th>Desde:</th><th>Hasta:</th>
+			<tr>
+				<td> Rango de Fecha: </td>
+				<td>
+				<input name="fecha_ini" id="fecha_ini" type="text" value="" />
+				</td>
+				<td>
+				<input name="fecha_fin" id="fecha_fin" type="text" value="" />
+				</td>
+			</tr>
+			<tr>
+				<td>
+				<input type="button" value="Buscar" onclick="validar();" class="historico" style="cursor: pointer"/>
+				</td>
+				<td>
+				<input name="tabla" type="hidden" value="lote"/>
+				</td>
+			</tr>
+		</table>
+
+	</form>
+	<div class="grid_6">
+	 	<a class="boton-verde" id="id_boton" onclick="retrieve_liquidacion_vendedores();">Descargar como Excel</a>
+	</div>
+</div>
+
+<div class="clear"></div>
+<div id="listado-cuadro-busqueda">
+
+	<br>
+	<br>
+</div>
+<div id="listado-item-lote">
+	<table id="tabla_vendedores" width="50%" border="1" cellpadding="0" cellspacing="0" class="listado-pagos" align="center">
+		<th>Cliente</th><th>Fracci&oacute;n</th><th>Lote Nro</th><th>Cuota Nº</th><th>Fecha de Pago</th><th>Importe</th><th>Comisi&oacute;n</th>
+
+		
+		
+		<tr id='fila_totales_fraccion' style="display: none;"></tr>
+		<div class="pagination">
+			<span class="step-links"> {%if object_list.has_previous%} <a href="?page={{ object_list.previous_page_number }}"> Anterior</a> {%endif%}
+				P&aacute;gina
+				|{{object_list.number}}|
+
+				{%if object_list.has_next%} <a href="?page={{ object_list.next_page_number }}"> Siguiente</a> {%endif%} </span>
+		</div>
+	</table>
+</div>
+
+<div id="footer">
+	<a href="/informes" class="boton-verde">Volver al módulo de Informes</a>
+</div>
+{% endblock %}

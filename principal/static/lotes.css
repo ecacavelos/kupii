@@ -1,0 +1,491 @@
+@charset "utf-8";
+/* CSS Document */
+#lote-ventas {
+	border: 1px solid green;
+	padding: 8px 12px;
+	width: 25%;
+	margin-left:355px;
+	margin-top:10px;
+	margin-bottom:10px;
+	
+}
+
+#lote-ventas table {
+	border-color: black;
+}
+
+#detalle-venta {
+	border: 1px solid rgb(204,204,204);
+	padding: 8px 12px;
+}
+
+li{
+	list-style: none;
+}
+
+table.listado-lotes {
+	border:2px solid #CCC;
+	margin-bottom:15px;
+	margin-left: 250px;
+}
+
+table.listado-ventas {
+	border:2px solid #CCC;
+	margin-bottom:15px;
+	margin-left: 125px;
+}
+
+table.listado-ventas tr td {
+	padding:7px;
+	font-size:14px;
+	text-align:center;
+	border-bottom:thin solid #CCC
+}
+
+table.listado-ventas tr th {
+	padding:10px 10px 10px 40px;
+	font-size:16px;
+	font-weight:400;
+	text-align:center;
+	background-color:#02B06B;
+	color:#FFF
+}
+
+table.listado-transferencias {
+	border:2px solid #CCC;
+	margin-bottom:15px;
+	margin-left: 125px;
+}
+
+table.listado-transferencias tr td {
+	padding:7px;
+	font-size:14px;
+	text-align:center;
+	border-bottom:thin solid #CCC
+}
+
+table.listado-transferencias tr th {
+	padding:10px 10px 10px 40px;
+	font-size:16px;
+	font-weight:400;
+	text-align:center;
+	background-color:#02B06B;
+	color:#FFF
+}
+
+table.listado-pagos-atrasados {
+	border:2px solid #CCC;
+	margin-bottom:15px;
+	margin-left: 50px;
+}
+
+table.listado-pagos-atrasados tr td {
+	padding:7px;
+	font-size:14px;
+	text-align:center;
+	border-bottom:thin solid #CCC
+}
+
+table.listado-pagos-atrasados tr th {
+	padding:10px 10px 10px 40px;
+	font-size:16px;
+	font-weight:400;
+	text-align:center;
+	background-color:#02B06B;
+	color:#FFF
+}
+
+table.listado-movimientos {
+	border:2px solid #CCC;
+	margin-bottom:15px;
+	margin-left: 305px;
+}
+
+table.listado-movimientos tr td {
+	padding:7px;
+	font-size:14px;
+	text-align:center;
+	border-bottom:thin solid #CCC
+}
+
+table.listado-movimientos tr th {
+	padding:10px 10px 10px 40px;
+	font-size:16px;
+	font-weight:400;
+	text-align:center;
+	background-color:#02B06B;
+	color:#FFF
+}
+
+table.listado-clientes-atrasados {
+	border:2px solid #CCC;
+	margin-bottom:15px;
+	margin-left: 95px;
+}
+
+table.listado-clientes-atrasados tr td {
+	padding:7px;
+	font-size:14px;
+	text-align:center;
+	border-bottom:thin solid #CCC
+}
+
+table.listado-clientes-atrasados tr th {
+	padding:10px 10px 10px 40px;
+	font-size:16px;
+	font-weight:400;
+	text-align:center;
+	background-color:#02B06B;
+	color:#FFF
+}
+
+table.listado-pagos {
+	border:2px solid #CCC;
+	margin-bottom:15px;
+	margin-left: 15px;
+	margin-right: 15px;
+	/* max-width: 100px; */
+	width: auto;
+}
+
+table.listado-lotes2 {
+	border:2px solid #CCC;
+	margin-bottom:15px;
+	margin-left: 345px;
+}
+
+table.listado-lotes2 tr td {
+	padding:7px;
+	font-size:14px;
+	text-align:center;
+	
+}
+
+table.listado-lotes tr th {
+	padding:10px 10px 10px 40px;
+	font-size:16px;
+	font-weight:400;
+	text-align:center;
+	background-color:#02B06B;
+	color:#FFF
+}
+
+table.listado-pagos tr th {
+	padding:10px 10px 10px 40px;
+	/* font-size:16px; */
+	font-weight:400;
+	text-align:center;
+	background-color:#02B06B;
+	color:#FFF
+}
+
+table.listado-lotes tr td {
+	padding:7px;
+	font-size:14px;
+	text-align:center;
+	border-bottom:thin solid #CCC
+}
+
+table.listado-pagos tr td {
+	padding:7px;
+	font-size:14px;
+	text-align:center;
+	border-bottom:thin solid #CCC
+}
+
+table.listado-lotes tr td.last {
+	border-bottom: none
+}
+
+	a.boton-verde
+	{
+    background-color: #006633;
+    border: thin solid #FFFFFF;
+    color: #FFFFFF;
+    font-size: 13px;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+	}
+
+	#listado-item-lote{
+		alignment-adjust: center;
+	
+}
+	
+	.lote-form-button{
+		background-color: #006633;
+    	border: thin solid #FFFFFF;
+    	color: #FFFFFF;
+    	font-size: 13px;
+    	margin-right: 5px;
+    	margin-top: 5px;
+    	padding: 5px 10px;
+    	cursor: pointer;
+	}
+	
+	h3.detalle-lote-header{
+		text-align: center;
+		color:#006633;
+	}
+	
+	#id_manzana {
+		background-color: #FFFFFF;
+    	border: thin solid #CCCCCC;
+    	box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3) inset;
+    	font-size: 13px;
+    	font-weight: 400;
+    	padding-left: 60px;
+    	padding-top: 5px;
+    	padding-bottom: 5px;
+    	
+	}
+	
+	#id_estado {
+		background-color: #FFFFFF;
+    	border: thin solid #CCCCCC;
+    	box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3) inset;
+    	font-size: 13px;
+    	font-weight: 400;
+    	padding-left: 60px;
+    	padding-top: 5px;
+    	padding-bottom: 5px;
+    	
+	}
+	
+	#id_propietario {
+		background-color: #FFFFFF;
+    	border: thin solid #CCCCCC;
+    	box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3) inset;
+    	font-size: 13px;
+    	font-weight: 400;
+    	padding-left: 40px;
+    	padding-top: 5px;
+    	padding-bottom: 5px;
+    	
+	}
+	
+	#id_fraccion {
+		background-color: #FFFFFF;
+    	border: thin solid #CCCCCC;
+    	box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3) inset;
+    	font-size: 13px;
+    	font-weight: 400;
+    	padding-left: 68px;
+    	padding-top: 5px;
+    	padding-bottom: 5px;
+    	
+	}
+	
+	#id_sexo {
+		background-color: #FFFFFF;
+    	border: thin solid #CCCCCC;
+    	box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3) inset;
+    	font-size: 13px;
+    	font-weight: 400;
+    	padding-left: 72px;
+    	padding-top: 5px;
+    	padding-bottom: 5px;
+    	
+	}
+	
+	#id_estado_civil {
+		background-color: #FFFFFF;
+    	border: thin solid #CCCCCC;
+    	box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3) inset;
+    	font-size: 13px;
+    	font-weight: 400;
+    	padding-left: 70px;
+    	padding-top: 5px;
+    	padding-bottom: 5px;
+    	
+	}
+	
+	#id_tipo_de_plan {
+		background-color: #FFFFFF;
+    	border: thin solid #CCCCCC;
+    	box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3) inset;
+    	font-size: 13px;
+    	font-weight: 400;
+    	padding-left: 70px;
+    	padding-top: 5px;
+    	padding-bottom: 5px;
+    	
+	}
+	
+	#id_entrega_inicial{
+		/*display:block;
+		width:280px;
+		height:30px;
+		float:left;
+		padding:5px 10px;
+		color:#000;
+		*/
+		font-size:13px;
+		padding:4px;
+		font-weight:400;
+		background-color:#fff;
+		-webkit-box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+        box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+		border:thin #CCC solid;
+	}
+	
+	#id_monto_cuota{
+		/*display:block;
+		width:280px;
+		height:30px;
+		float:left;
+		padding:5px 10px;
+		color:#000;
+		*/
+		font-size:13px;
+		padding:4px;
+		font-weight:400;
+		background-color:#fff;
+		-webkit-box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+        box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+		border:thin #CCC solid;
+	}
+	
+	#id_fecha_vencimiento{
+		/*display:block;
+		width:280px;
+		height:30px;
+		float:left;
+		padding:5px 10px;
+		color:#000;
+		*/
+		font-size:13px;
+		padding:4px;
+		font-weight:400;
+		background-color:#fff;
+		-webkit-box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+        box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+		border:thin #CCC solid;
+	}
+	
+	#id_fecha{
+		/*display:block;
+		width:280px;
+		height:30px;
+		float:left;
+		padding:5px 10px;
+		color:#000;
+		*/
+		font-size:13px;
+		padding:4px;
+		font-weight:400;
+		background-color:#fff;
+		-webkit-box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+        box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+		border:thin #CCC solid;
+	}
+	
+	#nro_cuotas_a_pagar{
+		font-size:13px;
+		padding:4px;
+		font-weight:400;
+		background-color:#fff;
+		-webkit-box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+        box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+		border:thin #CCC solid;
+	}
+	
+	#monto_cuota{
+		font-size:13px;
+		padding:4px;
+		font-weight:400;
+		background-color:#fff;
+		-webkit-box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+        box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+		border:thin #CCC solid;
+	}
+	
+	#total_cuotas{
+		font-size:13px;
+		padding:4px;
+		font-weight:400;
+		background-color:#fff;
+		-webkit-box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+        box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+		border:thin #CCC solid;
+	}
+	
+	#id_cantidad_manzanas{
+		font-size:13px;
+		padding:4px;
+		font-weight:400;
+		background-color:#fff;
+		-webkit-box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+        box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+		border:thin #CCC solid;
+	}
+	
+	#id_cantidad_lotes{
+		font-size:13px;
+		padding:4px;
+		font-weight:400;
+		background-color:#fff;
+		-webkit-box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+        box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+		border:thin #CCC solid;
+	}
+	
+	#id_superficie_total{
+		font-size:13px;
+		padding:4px;
+		font-weight:400;
+		background-color:#fff;
+		-webkit-box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+        box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+		border:thin #CCC solid;
+	}
+	
+	#total_mora{
+		font-size:13px;
+		padding:4px;
+		font-weight:400;
+		background-color:#fff;
+		-webkit-box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+        box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+		border:thin #CCC solid;
+	}
+	
+	#total_pago{
+		font-size:13px;
+		padding:4px;
+		font-weight:400;
+		background-color:#fff;
+		-webkit-box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+        box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+		border:thin #CCC solid;
+	}
+	
+	#fecha_vencimiento{
+		font-size:13px;
+		padding:4px;
+		font-weight:400;
+		background-color:#fff;
+		-webkit-box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+        box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+		border:thin #CCC solid;
+	}
+	
+	#password{
+		font-size:13px;
+		padding:4px;
+		font-weight:400;
+		background-color:#fff;
+		-webkit-box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+        box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+		border:thin #CCC solid;
+	}
+	
+	#caja-contenido {
+	min-height:500px;
+	background-color:#fff;
+	padding-top:10px;
+	padding-bottom:30px;
+	
+}

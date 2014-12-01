@@ -1,0 +1,176 @@
+{% extends "lotes/base_lotes.html" %}
+{% block header_scripts %}
+
+<script type="text/javascript">
+$(document).ready(function() {
+	
+	$('#fecha_ini').mask('##/##/####');
+	$("#fecha_ini").datepicker({ dateFormat: 'dd/mm/yy' });
+	$('#fecha_fin').mask('##/##/####');
+	$("#fecha_fin").datepicker({ dateFormat: 'dd/mm/yy' });
+
+
+});
+
+function format(nro){
+
+		var number = new String(nro);
+		var result = '';
+		while( number.length > 3 ){
+			result = '.' + number.substr(number.length - 3) + result;
+	 		number = number.substring(0, number.length - 3);
+		}
+		result = number + result;
+		return result;
+	};
+	
+	function retrieve_liquidacion_gerentes(){		
+			
+		window.location.href="/informes/liquidacion_gerentes_reporte_excel?fecha_ini="+$('#fecha_ini').val()+"&fecha_fin="+$('#fecha_fin').val()+"&fraccion="+$('#id_fraccion').val();
+	
+	}
+	
+	function validar(){
+		var request_pagos= $.ajax({
+					url : '/ajax/get_lista_pagos_gerentes/',
+					type : "GET",
+					data : {
+						fraccion: $('#id_fraccion').val(),
+						fecha_ini: $('#fecha_ini').val(),
+						fecha_fin: $('#fecha_fin').val()
+					},
+					dataType : "json"
+				});
+  				request_pagos.success(function (data){
+  				$(".custom_class").empty();
+				calculartotales(data);					
+				});			
+	}
+	
+	function calculartotales(data){
+		var fraccion_actual=data[0].fraccion_id;
+		var monto_pagado=0;
+		var monto_gerente=0;
+		var total_monto_pagado=0;
+		var total_monto_gerente=0;
+		for(var i=0;i<data.length;i++){
+			//mientras estemos en una determinada fraccion, vamos sumando los totales correspondientes
+			if(data[i].fraccion_id==fraccion_actual){
+				monto_pagado+=data[i].monto_pagado;
+				monto_gerente+=data[i].monto_gerente;
+				$('#tabla_gerentes').append('<tr class="custom_class"><td>'+data[i].fecha_pago+"</td><td>"+data[i].fraccion+"</td><td>"+data[i].lote+"</td><td>"+data[i].cliente+"</td><td>"+data[i].cuota_nro+"</td><td>"+data[i].monto_pagado+"</td><td>" +data[i].monto_gerente+"</td></tr>");
+				total_monto_pagado+=data[i].monto_pagado;
+				total_monto_gerente+=data[i].monto_gerente;
+				
+				
+			}
+			else{
+				//al cambiar de fraccion, se imprimen los totales acumulados, y se suman los totales para la siguiente
+				$('#tabla_gerentes').append('<tr class="custom_class"><td colspan="5">Totales de Fraccion</td><td>'+format(monto_pagado)+"</td><td>"+format(monto_gerente)+"</td></tr>");
+				$('#tabla_gerentes').append('<tr class="custom_class"><td>'+data[i].fecha_pago+"</td><td>"+data[i].fraccion+"</td><td>"+data[i].lote+"</td><td>"+data[i].cliente+"</td><td>"+data[i].cuota_nro+"</td><td>"+data[i].monto_pagado+"</td><td>" +data[i].monto_gerente+"</td></tr>");
+				total_monto_pagado+=data[i].monto_pagado;
+				total_monto_gerente+=data[i].monto_gerente;
+				fraccion_actual=data[i].fraccion_id;
+				monto_pagado=0;
+				monto_gerente=0;					
+				monto_pagado+=data[i].monto_pagado;
+				monto_gerente+=data[i].monto_gerente;
+
+						
+			}
+			//preguntamos si es la ultima fila de la tabla, para imprimir los totales generales del vendedor
+			if (i==(data.length)-1){
+							$('#tabla_gerentes').append('<tr class="custom_class"><td colspan="5">Totales de Fraccion</td><td>'+format(monto_pagado)+"</td><td>"+format(monto_gerente)+"</td></tr>");
+				}		
+		}
+		$('#tabla_gerentes').append('<tr class="custom_class"><td colspan="5">Total General</td><td>'+format(total_monto_pagado)+"</td><td>"+format(total_monto_gerente)+"</td></tr>");	
+	}	
+	
+
+
+	 
+</script>
+{% endblock %}
+{% block content %}
+<div class="gri16 text-izquierda" id="breadcumb">
+						<a href="/">Inicio</a> <span class="verde-1">></span>  
+						<a href="/informes/">Informes</a> 
+						<span class="verde-1">>Liquidaci&oacute;n de Gerentes</span> 
+					</div>
+
+					<div class="clear"></div>
+
+					<div class="grid_10">
+  						<h1>Liquidaci&oacute;n de Gerentes</h1>
+					</div>
+
+					<div class="grid_6">
+  						<form name="frm_busqueda" id="frm_busqueda" method="post" action="/informes/liquidacion_gerentes/">
+  							{% csrf_token %}
+  								<table>
+  									<tr>
+  										<td>
+  											Fracci&oacute;n:
+  										</td>
+  										<td>
+  											<input name="fraccion" id="id_fraccion" type="text" value=""/>
+  										</td>
+  									</tr>
+  										<th>Desde:</th><th>Hasta:</th>
+  									<tr>
+  										<td>
+  											Rango de Fecha:
+  										</td>
+  										<td>
+  											<input name="fecha_ini" id="fecha_ini" type="text" value="" />
+  										</td>
+  										<td>
+  											<input name="fecha_fin" id="fecha_fin" type="text" value="" />
+  										</td>
+  									</tr>
+  									<tr>
+  										<td>
+  											<input type="button" value="Buscar" onclick="validar();" class="historico" style="cursor: pointer"/>
+  										</td>
+  										<td>
+  											<input name="tabla" type="hidden" value="lote"/>
+  										</td>
+  									</tr>
+  								</table>
+  							    
+  								
+  						</form>
+  						<div class="grid_6">
+	 						<a class="boton-verde" id="id_boton" onclick="retrieve_liquidacion_gerentes();">Descargar como Excel</a>
+						</div>
+					</div>
+
+					<div class="clear"></div>
+					<div id="listado-cuadro-busqueda">
+						
+						<br><br>
+					</div>
+					<div id="listado-item-lote">
+						<table id="tabla_gerentes" width="50%" border="1" cellpadding="0" cellspacing="0" class="listado-pagos" align="center">
+						<th>Fecha</th><th>Fracci&oacute;n</th><th>Lote Nro</th><th>Cliente</th><th>Cuota Nro</th><th>Monto Pagado</th><th>Monto Gerente</th>
+
+		<tr id='fila_totales' style="display: none;"></tr>
+<div class="pagination">
+    <span class="step-links">
+        {%if object_list.has_previous%}
+        <a href="?page={{ object_list.previous_page_number }}"> Anterior</a>
+		{%endif%}
+    	P&aacute;gina
+    	|{{object_list.number}}|
+    	
+    	{%if object_list.has_next%}
+		<a href="?page={{ object_list.next_page_number }}"> Siguiente</a>
+		{%endif%}
+        
+    </span>
+</div>
+						</table>
+					</div>
+
+<div id="footer"><a href="/informes" class="boton-verde">Volver al módulo de Informes</a></div>
+{% endblock %}
