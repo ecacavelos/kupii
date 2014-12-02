@@ -28,13 +28,76 @@ def informes(request):
 
 def lotes_libres(request): 
     if request.method == 'GET':
-
         if request.user.is_authenticated():
-            t = loader.get_template('informes/lotes_libres.html')
-            c = RequestContext(request, {
-                'object_list': [],
-            })
-            return HttpResponse(t.render(c))                
+            if (filtros_establecidos(request.GET,'lotes_libres') == False):
+                t = loader.get_template('informes/lotes_libres.html')
+                c = RequestContext(request, {
+                    'object_list': [],
+                })
+                return HttpResponse(t.render(c))
+            else: #Parametros seteados
+                fraccion_ini=request.GET['fraccion_ini']
+                fraccion_fin=request.GET['fraccion_fin']
+                object_list=[]#lista de lotes
+                if fraccion_ini and fraccion_fin:
+                    manzanas= Manzana.objects.filter(fraccion_id__range=(fraccion_ini,fraccion_fin))
+                    for m in manzanas:
+                        lotes = Lote.objects.filter(manzana=m.id)
+                        for l in lotes:
+                            object_list.append(l)                     
+                else:       
+                    object_list = Lote.objects.filter(estado="1").order_by('manzana', 'nro_lote')
+                 
+                lotes=[]
+                total_costo_fraccion = 0
+                total_contado_fraccion = 0
+                total_credito_fraccion = 0
+                total_superficie_fraccion = 0
+                total_lotes = 0
+                for index, lote_item in enumerate(object_list):
+                    lote={}
+                # Se setean los datos de cada fila 
+                    lote['fraccion_id']=str(lote_item.manzana.fraccion.id)
+                    lote['fraccion']=str(lote_item.manzana.fraccion)
+                    lote['lote']=str(lote_item.manzana).zfill(3) + "/" + str(lote_item.nro_lote).zfill(4)
+                    lote['superficie']=lote_item.superficie                                    
+                    lote['precio_contado']=str('{:,}'.format(lote_item.precio_contado)).replace(",", ".")                    
+                    lote['precio_credito']=str('{:,}'.format(lote_item.precio_credito)).replace(",", ".")                    
+                    lote['precio_costo']=str('{:,}'.format(lote_item.precio_credito)).replace(",", ".")
+                # Se suman los TOTALES por FRACCION
+                    total_superficie_fraccion += lote_item.superficie 
+                    total_contado_fraccion += lote_item.precio_contado
+                    total_credito_fraccion += lote_item.precio_credito
+                    total_costo_fraccion += lote_item.precio_costo
+                    total_lotes += 1
+                #Es el ultimo lote, cerrar totales de fraccion
+                    if (len(object_list)-1 == index):
+                        lote['total_costo_fraccion'] = str('{:,}'.format(total_costo_fraccion)).replace(",", ".") 
+                        lote['total_credito_fraccion'] =  str('{:,}'.format(total_credito_fraccion)).replace(",", ".")
+                        lote['total_contado_fraccion'] =  str('{:,}'.format(total_contado_fraccion)).replace(",", ".")
+                        lote['total_superficie_fraccion'] =  str('{:,}'.format(total_superficie_fraccion)).replace(",", ".")
+                        lote['total_lotes'] =  str('{:,}'.format(total_lotes)).replace(",", ".")
+                #Hay cambio de lote pero NO es el ultimo elemento todavia
+                    elif (lote_item.manzana.fraccion.id != object_list[index+1].manzana.fraccion.id):
+                        lote['total_costo_fraccion'] = str('{:,}'.format(total_costo_fraccion)).replace(",", ".") 
+                        lote['total_credito_fraccion'] =  str('{:,}'.format(total_credito_fraccion)).replace(",", ".")
+                        lote['total_contado_fraccion'] =  str('{:,}'.format(total_contado_fraccion)).replace(",", ".")
+                        lote['total_superficie_fraccion'] =  str('{:,}'.format(total_superficie_fraccion)).replace(",", ".")
+                        lote['total_lotes'] =  str('{:,}'.format(total_lotes)).replace(",", ".")
+                    # Se CERAN  los TOTALES por FRACCION
+                        total_costo_fraccion = 0
+                        total_contado_fraccion = 0
+                        total_credito_fraccion = 0
+                        total_superficie_fraccion = 0
+                        total_lotes = 0
+                    lotes.append(lote)
+                t = loader.get_template('informes/lotes_libres.html')
+                c = RequestContext(request, {
+                    'fraccion_ini': fraccion_ini,
+                    'fraccion_fin': fraccion_fin,
+                    'lista_lotes': lotes,
+                })
+                return HttpResponse(t.render(c))                
         else:
             return HttpResponseRedirect("/login") 
     
@@ -1367,5 +1430,11 @@ def filtros_establecidos(request, tipo_informe):
             return True
         except:
             print('Parametros no seteados')
-        
+    elif tipo_informe == 'lotes_libres':
+        try:
+            fraccion_ini=request['fraccion_ini']
+            fraccion_fin=request['fraccion_fin']
+            return True
+        except:
+            print('Parametros no seteados')        
     return False

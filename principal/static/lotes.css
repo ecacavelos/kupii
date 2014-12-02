@@ -162,7 +162,7 @@ table.listado-lotes2 tr td {
 }
 
 table.listado-lotes tr th {
-	padding:10px 10px 10px 40px;
+	padding: 10px 10px 10px 10px;
 	font-size:16px;
 	font-weight:400;
 	text-align:center;
@@ -491,4 +491,20 @@ table.listado-lotes tr td.last {
 }
 .bkg_gris{
 	background-color:#ECECEC; 
+}
+.fila_resumen_fraccion{
+	background-color:#3FA9F5;
+}
+.fila_resumen_fraccion{
+	background-color: #3FA9F5 !important;	
+}
+
+.celda_resumen_fraccion{ 	
+	padding: 10px 10px 10px 10px !important;
+	font-size: 16px !important;
+	font-weight: 400 !important;
+	text-align: center !important;
+	color: #000000 !important;
+	background-color: #068DED !important;
+	color: #FFFFFF !important;
 }
