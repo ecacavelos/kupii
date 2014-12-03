@@ -1404,7 +1404,6 @@ def liquidacion_vendedores_reporte_excel(request):
     sheet.write(0, 4, "Importe", style)
     sheet.write(0, 5, "Comision", style)
     sheet.write(0, 6, "Fraccion", style)
-    # wb.save('informe_general.xls')
     # guardamos la primera fraccion para comparar
     fraccion_actual = cuotas[0]['fraccion_id']
     
@@ -1427,11 +1426,11 @@ def liquidacion_vendedores_reporte_excel(request):
             sheet.write(c, 1, str(cuotas[i]['lote']))
             sheet.write(c, 2, str(cuotas[i]['cuota_nro']))
             sheet.write(c, 3, str(cuotas[i]['fecha_pago']))
-            sheet.write(c, 4, str(cuotas[i]['importe']))
-            sheet.write(c, 5, str(cuotas[i]['comision']))
+            sheet.write(c, 4, str('{:,}'.format(cuotas[i]['importe']).replace(",",".")))
+            sheet.write(c, 5, str('{:,}'.format(cuotas[i]['comision']).replace(",",".")))
             sheet.write(c, 6, str(cuotas[i]['fraccion']))
-            # print str(cuotas[i]['importe'])
             
+            #str('{:,}'.format(lista_ventas.precio_final_de_venta)).replace(",",".")
             
             # ... y acumulamos para los totales generales
             total_general_importe += cuotas[i]['importe']
@@ -1442,8 +1441,8 @@ def liquidacion_vendedores_reporte_excel(request):
         else: 
             c += 1
             sheet.write(c, 0, "Totales de Fraccion", style2)
-            sheet.write(c, 4, total_importe)
-            sheet.write(c, 5, total_comision)
+            sheet.write(c, 4, str('{:,}'.format(total_importe)).replace(",","."))
+            sheet.write(c, 5, str('{:,}'.format(total_comision)).replace(",","."))
             
             c += 1
             sheet.write(c, 0, str(cuotas[i]['cliente']))
@@ -1451,8 +1450,8 @@ def liquidacion_vendedores_reporte_excel(request):
             sheet.write(c, 2, str(cuotas[i]['cuota_nro']))
             sheet.write(c, 3, str(cuotas[i]['fecha_pago']))
             sheet.write(c, 4, str(cuotas[i]['importe']))
-            sheet.write(c, 5, str(cuotas[i]['comision']))
-            sheet.write(c, 6, str(cuotas[i]['fraccion']))
+            sheet.write(c, 4, str('{:,}'.format(cuotas[i]['importe']).replace(",",".")))
+            sheet.write(c, 5, str('{:,}'.format(cuotas[i]['comision']).replace(",",".")))
             
             total_general_importe += cuotas[i]['importe']
             total_general_comision += cuotas[i]['comision'] 
@@ -1466,13 +1465,13 @@ def liquidacion_vendedores_reporte_excel(request):
         if (i == len(cuotas) - 1):   
             c += 1           
             sheet.write(c, 0, "Totales de Fraccion", style2)
-            sheet.write(c, 4, total_importe, style2)
-            sheet.write(c, 5, total_comision, style2)
+            sheet.write(c, 4, str('{:,}'.format(total_importe)).replace(",","."))
+            sheet.write(c, 5, str('{:,}'.format(total_comision)).replace(",","."))
             
     c += 1
     sheet.write(c, 0, "Totales del Vendedor", style2)
-    sheet.write(c, 4, total_general_importe, style2)
-    sheet.write(c, 5, total_general_comision, style2)
+    sheet.write(c, 4,  str('{:,}'.format(total_general_importe, style2).replace(",",".")))
+    sheet.write(c, 5, str('{:,}'.format(total_general_comision, style2).replace(",",".")))
     response = HttpResponse(content_type='application/vnd.ms-excel')
     # Crear un nombre intuitivo         
     response['Content-Disposition'] = 'attachment; filename=' + 'liquidacion_vendedores.xls'
