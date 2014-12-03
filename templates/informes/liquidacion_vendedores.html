@@ -130,7 +130,12 @@
 				</tr>			
 			{% endif %}
 			{% if hw.total_importe %}
-		
+				<tr>
+					<th colspan="6" class="celda_resumen_fraccion">Resumen de la Fracción</th>
+					<td class="celda_resumen_fraccion">{{hw.total_importe}}</td>
+					<td class="celda_resumen_fraccion">{{hw.total_comision}}</td>
+									
+				</tr>
 			{% endif %}
 		<tr id='fila_totales_fraccion' style="display: none;"></tr>
 		{% endfor %}

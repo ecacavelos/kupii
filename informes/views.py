@@ -1369,21 +1369,27 @@ def liquidacion_vendedores_reporte_excel(request):
     )
         
         
-    object_list = list(PagoDeCuotas.objects.raw(query))
-    cuotas = []
-    for i in object_list:
-        nro_cuota = get_nro_cuota(i)
-        if(nro_cuota % 2 != 0 and nro_cuota < 10):
-            cuota = {}            
-            cuota['fraccion'] = str(i.lote.manzana.fraccion)
-            cuota['cliente'] = str(i.cliente)
-            cuota['fraccion_id'] = i.lote.manzana.fraccion.id
-            cuota['lote'] = str(i.lote)
-            cuota['cuota_nro'] = str(nro_cuota) + '/' + str(i.plan_de_pago.cantidad_de_cuotas)
-            cuota['fecha_pago'] = str(i.fecha_de_pago)
-            cuota['importe'] = i.total_de_cuotas
-            cuota['comision'] = int(i.total_de_cuotas * (i.plan_de_pago_vendedores.porcentaje_de_cuotas / 100))
-            cuotas.append(cuota)
+    object_list=list(PagoDeCuotas.objects.raw(query))
+    cuotas=[]
+    total_importe=0
+    total_comision=0
+    #Seteamos los datos de las filas
+    for i, cuota_item in enumerate (object_list):
+        nro_cuota=get_nro_cuota(cuota_item)
+        cuota={}
+        com=0
+        if(nro_cuota%2!=0 and nro_cuota<=cuota_item.plan_de_pago_vendedores.cantidad_cuotas):
+            com=int(cuota_item.total_de_cuotas*(float(cuota_item.plan_de_pago_vendedores.porcentaje_de_cuotas)/float(100)))
+        cuota['fraccion']=str(cuota_item.lote.manzana.fraccion)
+        cuota['cliente']=str(cuota_item.cliente)
+        cuota['fraccion_id']=cuota_item.lote.manzana.fraccion.id
+        cuota['lote']=str(cuota_item.lote)
+        cuota['cuota_nro']=str(nro_cuota)+'/'+str(cuota_item.plan_de_pago.cantidad_de_cuotas)
+        cuota['fecha_pago']=str(cuota_item.fecha_de_pago)
+        cuota['importe']=cuota_item.total_de_cuotas
+        cuota['comision']=com
+                        
+        cuotas.append(cuota)
             
     wb = xlwt.Workbook(encoding='utf-8')
     sheet = wb.add_sheet('test', cell_overwrite_ok=True)
@@ -1413,8 +1419,7 @@ def liquidacion_vendedores_reporte_excel(request):
     for i in range(len(cuotas)):
     # for i,cuota in enumerate(cuotas,start=1):
         # se suman los totales por fracion
-        if (cuotas[i]['fraccion_id'] == fraccion_actual):
-            
+        if (cuotas[i]['fraccion_id'] == fraccion_actual):            
             total_importe += cuotas[i]['importe']
             total_comision += cuotas[i]['comision']
             
