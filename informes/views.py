@@ -307,7 +307,6 @@ def clientes_atrasados(request):
             print error    
             return HttpResponseServerError("No se pudo obtener el Listado de Clientes Atrasados.")
 
-
 def informe_general(request):    
     if request.method == 'GET':
         if request.user.is_authenticated():
@@ -544,38 +543,97 @@ def liquidacion_propietarios(request):
         else:
             return HttpResponseRedirect("/login")
 
-                         
-
-        
 def liquidacion_vendedores(request):
     if request.method == 'GET':
         if request.user.is_authenticated():
-            t = loader.get_template('informes/liquidacion_vendedores.html')
+            if (filtros_establecidos(request.GET,'liquidacion_vendedores') == False):                
+                t = loader.get_template('informes/liquidacion_vendedores.html')
+                c = RequestContext(request, {
+                   'object_list': [],
+                })
+                return HttpResponse(t.render(c))                
+            else:#Parametros seteados
+                fecha_ini = request.GET['fecha_ini']
+                fecha_fin = request.GET['fecha_fin']
+                fecha_ini_parsed = str(datetime.strptime(fecha_ini, "%d/%m/%Y").date())
+                fecha_fin_parsed = str(datetime.strptime(fecha_fin, "%d/%m/%Y").date())
+                tipo_busqueda = request.GET['tipo_busqueda']
+                busqueda = request.GET['busqueda']
+                if(tipo_busqueda=='vendedor_id'):
+                    vendedor_id=request.GET['busqueda']
+                    print("vendedor_id ->" + vendedor_id)
+                if(tipo_busqueda=='nombre'):
+                    nombre_vendedor=request.GET['busqueda']
+                    print("nombre_vendedor ->" + nombre_vendedor)
+                    vendedor=Vendedor.objects.get(nombres__icontains=nombre_vendedor)
+                    vendedor_id=str(vendedor.id)
+                query=(
+                '''
+                select pc.* from principal_pagodecuotas pc, principal_lote l, principal_manzana m, principal_fraccion f
+                where pc.fecha_de_pago >= \''''+ fecha_ini_parsed +               
+                '''\' and pc.fecha_de_pago <= \'''' + fecha_fin_parsed +
+                '''\' and pc.vendedor_id=''' + vendedor_id +                
+                ''' 
+                and (pc.lote_id = l.id and l.manzana_id=m.id and m.fraccion_id=f.id) order by f.id,pc.fecha_de_pago
+                '''
+                )                    
+                    
+                object_list=list(PagoDeCuotas.objects.raw(query))
+                cuotas=[]
+                total_importe=0
+                total_comision=0
+                #Seteamos los datos de las filas
+                for i, cuota_item in enumerate (object_list):
+                    nro_cuota=get_nro_cuota(cuota_item)
+                    cuota={}
+                    com=0
+                    if(nro_cuota%2!=0 and nro_cuota<=cuota_item.plan_de_pago_vendedores.cantidad_cuotas):
+                        com=int(cuota_item.total_de_cuotas*(float(cuota_item.plan_de_pago_vendedores.porcentaje_de_cuotas)/float(100)))
+                    cuota['fraccion']=str(cuota_item.lote.manzana.fraccion)
+                    cuota['cliente']=str(cuota_item.cliente)
+                    cuota['fraccion_id']=cuota_item.lote.manzana.fraccion.id
+                    cuota['lote']=str(cuota_item.lote)
+                    cuota['cuota_nro']=str(nro_cuota)+'/'+str(cuota_item.plan_de_pago.cantidad_de_cuotas)
+                    cuota['fecha_pago']=str(cuota_item.fecha_de_pago)
+                    cuota['importe']=str('{:,}'.format(cuota_item.total_de_cuotas)).replace(",", ".") 
+                    cuota['comision']=str('{:,}'.format(com)).replace(",", ".") 
+                        
+                    #Sumamos los totales por fraccion
+                    total_importe+=cuota_item.total_de_cuotas
+                    total_comision+=com
+                    #Si es el ultimo lote, cerramos totales de fraccion
+                    if (len(object_list)-1 == i):
+                        cuota['total_importe']=str('{:,}'.format(total_importe)).replace(",", ".") 
+                        cuota['total_comision']=str('{:,}'.format(total_comision)).replace(",", ".")
+                        
+                    #Hay cambio de lote pero NO es el ultimo elemento todavia
+                    elif (cuota_item.lote.manzana.fraccion.id != object_list[i+1].lote.manzana.fraccion.id):
+                        cuota['total_importe']=str('{:,}'.format(total_importe)).replace(",", ".") 
+                        cuota['total_comision']=str('{:,}'.format(total_comision)).replace(",", ".")
+                        #Se CERAN  los TOTALES por FRACCION
+                        total_importe=0
+                        total_comision=0
+                    cuotas.append(cuota)
+                            
+            t = loader.get_template('informes/liquidacion_vendedores.html')         
             c = RequestContext(request, {
-                'object_list': [],
+                'lista_cuotas': cuotas,
+                'fecha_ini':fecha_ini,
+                'fecha_fin':fecha_fin,
+                'tipo_busqueda':tipo_busqueda,
+                'busqueda':busqueda
             })
-            return HttpResponse(t.render(c))                
-        else:
+            return HttpResponse(t.render(c))    
+        else:    
             return HttpResponseRedirect("/login") 
-
-    if request.method == 'GET':
-        if request.user.is_authenticated():
-            t = loader.get_template('informes/liquidacion_vendedores.html')
-            c = RequestContext(request, {
-                'object_list': [],
-            })
-            return HttpResponse(t.render(c))                
-        else:
-            return HttpResponseRedirect("/login") 
-        
-    else:
-        
-        t = loader.get_template('informes/liquidacion_vendedores.html')
-        c = RequestContext(request, {
-            # 'pagos_list': pagos_list,
-            # 'lista_totales_vendedor': lista_totales_vendedor,
-        })
-        return HttpResponse(t.render(c))
+#          
+#     else:        
+#         t = loader.get_template('informes/liquidacion_vendedores.html')
+#         c = RequestContext(request, {
+#             # 'pagos_list': pagos_list,
+#             # 'lista_totales_vendedor': lista_totales_vendedor,
+#         })
+#         return HttpResponse(t.render(c))
                 
 def liquidacion_gerentes(request):
     if request.method == 'GET':
@@ -1732,6 +1790,15 @@ def filtros_establecidos(request, tipo_informe):
             fraccion_fin=request['fraccion_fin']
             fecha_ini=request['fecha_ini']
             fecha_fin=request['fecha_fin']
+            return True
+        except:
+            print('Parametros no seteados')
+    elif tipo_informe == "liquidacion_vendedores":
+        try:
+            fecha_ini=request['fecha_ini']
+            fecha_fin=request['fecha_fin']
+            tipo_busqueda=request['tipo_busqueda']
+            busqueda=request['busqueda']
             return True
         except:
             print('Parametros no seteados')      

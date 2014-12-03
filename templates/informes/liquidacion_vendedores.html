@@ -4,6 +4,16 @@
 
 <script type="text/javascript" >
 	$(document).ready(function() {
+	
+	var fecha_ini = "{{fecha_ini}}";
+	var fecha_fin= "{{fecha_fin}}";
+	var tipo_busqueda="{{tipo_busqueda}}";
+	var busqueda="{{busqueda}}";
+
+	$('#fecha_ini').val(fecha_ini);
+	$('#fecha_fin').val(fecha_fin);
+	$('#id_tipo_busqueda').val(tipo_busqueda);
+	$('#id_busqueda').val(busqueda);
 
 	$('#fecha_ini').mask('##/##/####');
 	$("#fecha_ini").datepicker({ dateFormat: 'dd/mm/yy' });
@@ -14,82 +24,21 @@
 	
 	});
 	
-	function format(nro){
-
-		var number = new String(nro);
-		var result = '';
-		while( number.length > 3 ){
-			result = '.' + number.substr(number.length - 3) + result;
-	 		number = number.substring(0, number.length - 3);
-		}
-		result = number + result;
-		return result;
-	};
-	
-	function retrieve_liquidacion_vendedores(){		
-			
+	function retrieve_liquidacion_vendedores(){					
 		window.location.href="/informes/liquidacion_vendedores_reporte_excel?fecha_ini="+$('#fecha_ini').val()+"&fecha_fin="+$('#fecha_fin').val()+"&busqueda="+$('#id_busqueda').val()+"&tipo_busqueda="+$('#id_tipo_busqueda').val();
-	
 	}
 	
 	function validar(){
-		var request_pagos= $.ajax({
-					url : '/ajax/get_lista_pagos/',
-					type : "GET",
-					data : {
-						tipo_busqueda: $('#id_tipo_busqueda').val(),
-						busqueda : $('#id_busqueda').val(),
-						fecha_ini: $('#fecha_ini').val(),
-						fecha_fin: $('#fecha_fin').val()
-					},
-					dataType : "json"
-				});
-  				request_pagos.success(function (data){
-  				$(".custom_class").empty();
-				calculartotales(data);					
-				});			
-	}
-	
-	function calculartotales(data){
-		var fraccion_actual=data[0].fraccion_id;
-		var importe=0;
-		var comision=0;
-		var total_importe_vendedor=0;
-		var total_comision_vendedor=0;
-		for(var i=0;i<data.length;i++){
-			//mientras estemos en una determinada fraccion, vamos sumando los totales correspondientes
-			if(data[i].fraccion_id==fraccion_actual){
-				importe+=data[i].importe;
-				comision+=data[i].comision;
-				$('#tabla_vendedores').append('<tr class="custom_class"><td>'+data[i].cliente+"</td><td>"+data[i].fraccion+"</td><td>"+data[i].lote+"</td><td>"+data[i].cuota_nro+"</td><td>"+data[i].fecha_pago+"</td><td>"+format(data[i].importe)+"</td><td>"+format(data[i].comision)+"</td></tr>");
-				total_importe_vendedor+=data[i].importe;
-				total_comision_vendedor+=data[i].comision;
-				
-				
-			}
-			else{
-				//al cambiar de fraccion, se imprimen los totales acumulados, y se suman los totales para la siguiente
-				$('#tabla_vendedores').append('<tr class="custom_class"><td colspan="5">Totales de Fraccion</td><td>'+format(importe)+"</td><td>"+format(comision)+"</td></tr>");
-				$('#tabla_vendedores').append('<tr class="custom_class"><td>'+data[i].cliente+"</td><td>"+data[i].fraccion+"</td><td>"+data[i].lote+"</td><td>"+data[i].cuota_nro+"</td><td>"+data[i].fecha_pago+"</td><td>"+format(data[i].importe)+"</td><td>"+format(data[i].comision)+"</td></tr>");
-				total_importe_vendedor+=data[i].importe;
-				total_comision_vendedor+=data[i].comision;
-				fraccion_actual=data[i].fraccion_id;
-				importe=0;
-				comision=0;					
-				importe+=data[i].importe;
-				comision+=data[i].comision;
-
-						
-			}
-			//preguntamos si es la ultima fila de la tabla, para imprimir los totales generales del vendedor
-			if (i==(data.length)-1){
-					$('#tabla_vendedores').append('<tr class="custom_class"><td colspan="5">Totales de Fraccion</td><td>'+format(importe)+"</td><td>"+format(comision)+"</td></tr>");
-					
-				}		
+		if ($('#fecha_ini').val() == "" || $('#fecha_fin').val() == "") {
+			alert("Debe ingresar un rango de fechas");
+			return;
 		}
-		$('#tabla_vendedores').append('<tr class="custom_class"><td colspan="5">Totales del Vendedor</td><td>'+format(total_importe_vendedor)+"</td><td>"+format(total_comision_vendedor)+"</td></tr>");	
-	}		
-
+		if ($('#fraccion_ini').val() == 0 || $('#fraccion_fin').val() == 0 || $('#fraccion_ini').val() == "" || $('#fraccion_fin').val() == "") {
+			alert("Debe ingresar un rango de fracciones");
+			return;
+		}
+		$("#frm_busqueda").submit();
+	}
 
 </script>
 {% endblock %}
@@ -107,8 +56,7 @@
 </div>
 
 <div class="grid_6">
-	<form name="frm_busqueda" id="frm_busqueda" method="post" action="/informes/liquidacion_vendedores/">
-		{% csrf_token %}
+	<form name="frm_busqueda" id="frm_busqueda" method="get" action="/informes/liquidacion_vendedores/">
 		<table>
 			<tr>
 				<td>
@@ -155,12 +103,37 @@
 	<br>
 </div>
 <div id="listado-item-lote">
-	<table id="tabla_vendedores" width="50%" border="1" cellpadding="0" cellspacing="0" class="listado-pagos" align="center">
-		<th>Cliente</th><th>Fracci&oacute;n</th><th>Lote Nro</th><th>Cuota Nº</th><th>Fecha de Pago</th><th>Importe</th><th>Comisi&oacute;n</th>
-
+	<table width="50%" border="1" cellpadding="0" cellspacing="0" class="listado-pagos" align="center">
+		<th>Cliente</th><th>Nombre Fracci&oacute;n</th><th>Fracci&oacute;n</th><th>Lote Nro</th><th>Cuota Nº</th><th>Fecha de Pago</th><th>Importe</th><th>Comisi&oacute;n</th>
+			{% for hw in lista_cuotas %}
+			{% if forloop.counter|divisibleby:2 %}
+				<tr>
+					<td>{{hw.cliente}}</td>
+					<td>{{hw.fraccion}}</td>
+					<td>{{hw.fraccion_id}}</td>
+					<td>{{hw.lote}}</td>
+					<td>{{hw.cuota_nro}}</td>
+					<td>{{hw.fecha_pago}}</td>
+					<td>{{hw.importe}}</td>
+					<td>{{hw.comision}}</td>
+				</tr>
+			{% else %}
+				<tr class="bkg_gris">
+					<td>{{hw.cliente}}</td>
+					<td>{{hw.fraccion}}</td>
+					<td>{{hw.fraccion_id}}</td>
+					<td>{{hw.lote}}</td>
+					<td>{{hw.cuota_nro}}</td>
+					<td>{{hw.fecha_pago}}</td>
+					<td>{{hw.importe}}</td>
+					<td>{{hw.comision}}</td>
+				</tr>			
+			{% endif %}
+			{% if hw.total_importe %}
 		
-		
+			{% endif %}
 		<tr id='fila_totales_fraccion' style="display: none;"></tr>
+		{% endfor %}
 		<div class="pagination">
 			<span class="step-links"> {%if object_list.has_previous%} <a href="?page={{ object_list.previous_page_number }}"> Anterior</a> {%endif%}
 				P&aacute;gina
