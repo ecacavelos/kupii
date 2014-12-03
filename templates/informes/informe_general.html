@@ -4,6 +4,16 @@
 <script type="text/javascript">
 	$(document).ready(function() {
 
+		var fraccion_ini = "{{fraccion_ini}}";
+		var fraccion_fin= "{{fraccion_fin}}";
+		var fecha_ini = "{{fecha_ini}}";
+		var fecha_fin= "{{fecha_fin}}";
+		$('#fraccion_ini').val(fraccion_ini);
+		$('#fraccion_fin').val(fraccion_fin);
+		$('#fecha_ini').val(fecha_ini);
+		$('#fecha_fin').val(fecha_fin);
+		
+		
 		$('#fecha_ini').mask('##/##/####');
 		$("#fecha_ini").datepicker({
 			dateFormat : 'dd/mm/yy'
@@ -33,6 +43,7 @@
 	};
 
 	function validar() {
+		/*
 		var request_pagos = $.ajax({
 			url : '/ajax/get_informe_general/',
 			type : "GET",
@@ -48,6 +59,16 @@
 
 			calculartotales(data);
 		});
+		*/
+		if ($('#fraccion_ini').val() == 0 || $('#fraccion_fin').val() == 0 || $('#fraccion_ini').val() == "" || $('#fraccion_fin').val() == "") {
+			alert("Debe ingresar un rango de fracciones");
+			return;
+		}		
+		if ($('#fecha_ini').val() == 0 || $('#fecha_fin').val() == 0 || $('#fecha_ini').val() == "" || $('#fecha_fin').val() == "") {
+			alert("Debe ingresar un rango de fechas");
+			return;
+		}
+		$("#frm_busqueda").submit();
 	}
 
 	function calculartotales(data) {
@@ -126,7 +147,7 @@
 
 
 <div class="grid_6">
-	<form name="frm_busqueda" id="frm_busqueda" method="post" action="/informes/informe_general/">
+	<form name="frm_busqueda" id="frm_busqueda" method="get" action="/informes/informe_general/">
 		{% csrf_token %}
 		<table>
 			<th></th><th>Desde:</th><th>Hasta:</th>
@@ -173,9 +194,47 @@
 </div>
 <div id="listado-item-lote">
 	<table id="tabla_pagos" width="50%" border="1" cellpadding="0" cellspacing="0" class="listado-pagos" align="center">
-		<th>Fracci&oacute;n</th><th>Lote Nro</th><th>Cliente</th><th>Cuota Nº</th><th>Plan de Pago</th><th>Fecha de Pago</th><th>Total de Cuotas</th><th>Total de Mora</th><th>Total de Pago</th>
+		<th>Nombre Fracci&oacute;n</th><th>Fracci&oacute;n</th><th>Lote Nro</th><th>Cliente</th><th>Cuota Nº</th><th>Plan de Pago</th><th>Fecha de Pago</th><th>Total de Cuotas</th><th>Total de Mora</th><th>Total de Pago</th>
+		{% for cuota in lista_cuotas %}
+				{% if forloop.counter|divisibleby:2 %}
+					<tr>
+						<td>{{cuota.fraccion}}</td>
+						<td>{{cuota.fraccion_id}}</td>
+						<td>{{cuota.lote}}</td>
+						<td>{{cuota.cliente}}</td>
+						<td>{{cuota.cuota_nro}}</td>
+						<td>{{cuota.plan_de_pago}}</td>
+						<td>{{cuota.fecha_pago}}</td>
+						<td>{{cuota.total_de_cuotas}}</td>
+						<td>{{cuota.total_de_mora}}</td>
+						<td>{{cuota.total_de_pago}}</td>
+					</tr>
+				{% else %}
+					<tr class="bkg_gris">
+						<td>{{cuota.fraccion}}</td>
+						<td>{{cuota.fraccion_id}}</td>
+						<td>{{cuota.lote}}</td>
+						<td>{{cuota.cliente}}</td>
+						<td>{{cuota.cuota_nro}}</td>
+						<td>{{cuota.plan_de_pago}}</td>
+						<td>{{cuota.fecha_pago}}</td>
+						<td>{{cuota.total_de_cuotas}}</td>
+						<td>{{cuota.total_de_mora}}</td>
+						<td>{{cuota.total_de_pago}}</td>				
+					</tr>			
+				{% endif %}
+				{% if cuota.total_cuotas %}
+					<tr>
+						<th colspan="7" class="celda_resumen_fraccion">Resumen de la Fracción</th>
+						<td class="celda_resumen_fraccion">{{cuota.total_cuotas}}</td>
+						<td class="celda_resumen_fraccion">{{cuota.total_mora}}</td>
+						<td class="celda_resumen_fraccion">{{cuota.total_pagos}}</td>						
+					</tr>
+				{% endif %}
+			{% endfor %}
+				
 
-		<tr id='fila_totales' style="display: none;"></tr>
+
 		<div class="pagination">
 			<span class="step-links"> {%if object_list.has_previous%} <a href="?page={{ object_list.previous_page_number }}"> Anterior</a> {%endif%}
 				P&aacute;gina

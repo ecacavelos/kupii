@@ -180,9 +180,6 @@ def listar_clientes_atrasados(request):
     else:
         return HttpResponseRedirect("/informes/clientes_atrasados") 
 
-
-
-
 def monthdelta(d1, d2):
     delta = 0
     while True:
@@ -311,22 +308,98 @@ def clientes_atrasados(request):
             return HttpResponseServerError("No se pudo obtener el Listado de Clientes Atrasados.")
 
 
-def informe_general(request):
-    
+def informe_general(request):    
     if request.method == 'GET':
-
         if request.user.is_authenticated():
-            t = loader.get_template('informes/informe_general.html')
-            c = RequestContext(request, {
-                'object_list': [],
-            })
-            return HttpResponse(t.render(c))                
+            if (filtros_establecidos(request.GET,'informe_general') == False):
+                t = loader.get_template('informes/informe_general.html')
+                c = RequestContext(request, {
+                    'object_list': [],
+                })
+                return HttpResponse(t.render(c))
+            else: #Parametros seteados
+                fraccion_ini=request.GET['fraccion_ini']
+                fraccion_fin=request.GET['fraccion_fin']
+                fecha_ini=request.GET['fecha_ini']
+                fecha_fin=request.GET['fecha_fin']
+                fecha_ini_parsed = datetime.strptime(fecha_ini, "%d/%m/%Y").date()
+                fecha_fin_parsed = datetime.strptime(fecha_fin, "%d/%m/%Y").date()
+    
+                query=(
+                '''
+                select pc.* from principal_pagodecuotas pc, principal_lote l, principal_manzana m, principal_fraccion f
+                where pc.fecha_de_pago >= \''''+ str(fecha_ini_parsed) +               
+                '''\' and pc.fecha_de_pago <= \'''' + str(fecha_fin_parsed) +
+                '''\' and f.id>=''' + fraccion_ini +
+                '''
+                and f.id<=''' + fraccion_fin +
+                '''
+                and (pc.lote_id = l.id and l.manzana_id=m.id and m.fraccion_id=f.id) order by f.id,pc.fecha_de_pago
+                '''
+                )
+                
+                object_list=list(PagoDeCuotas.objects.raw(query))
+ 
+                cuotas=[]
+                total_cuotas=0
+                total_mora=0
+                total_pagos=0
+                for i, cuota_item in enumerate(object_list):
+                    #Se setean los datos de cada fila
+                    cuota={}
+                    nro_cuota=get_nro_cuota(cuota_item)
+                    cuota['fraccion_id']=str(cuota_item.lote.manzana.fraccion.id)
+                    cuota['fraccion']=str(cuota_item.lote.manzana.fraccion)
+                    cuota['lote']=str(cuota_item.lote)
+                    cuota['cliente']=str(cuota_item.cliente)
+                    cuota['cuota_nro']=str(nro_cuota)+'/'+str(cuota_item.plan_de_pago.cantidad_de_cuotas)
+                    cuota['plan_de_pago']=cuota_item.plan_de_pago.nombre_del_plan
+                    cuota['fecha_pago']=str(cuota_item.fecha_de_pago)
+                    cuota['total_de_cuotas']=str('{:,}'.format(cuota_item.total_de_cuotas)).replace(",", ".") 
+                    cuota['total_de_mora']=str('{:,}'.format(cuota_item.total_de_mora)).replace(",", ".")
+                    cuota['total_de_pago']=str('{:,}'.format(cuota_item.total_de_pago)).replace(",", ".")
+
+                    #Se suman los totales por fraccion
+                    total_cuotas+=cuota_item.total_de_cuotas
+                    total_mora+=cuota_item.total_de_mora
+                    total_pagos+=cuota_item.total_de_pago
+                    
+                    #Es el ultimo lote, cerramos los totales de fraccion
+                    if (len(object_list)-1 == i):
+                        cuota['total_cuotas']=str('{:,}'.format(total_cuotas)).replace(",", ".") 
+                        cuota['total_mora']=str('{:,}'.format(total_mora)).replace(",", ".")
+                        cuota['total_pago']=str('{:,}'.format(total_pagos)).replace(",", ".")
+                        
+                    #Hay cambio de lote pero NO es el ultimo elemento todavia
+                    elif (cuota_item.lote.manzana.fraccion.id != object_list[i+1].lote.manzana.fraccion.id):
+                        cuota['total_cuotas']=str('{:,}'.format(total_cuotas)).replace(",", ".") 
+                        cuota['total_mora']=str('{:,}'.format(total_mora)).replace(",", ".")
+                        cuota['total_pago']=str('{:,}'.format(total_pagos)).replace(",", ".")
+                    
+                    #Se CERAN  los TOTALES por FRACCION
+                        total_cuotas=0
+                        total_mora=0
+                        total_pagos=0
+                    
+                    cuotas.append(cuota)                
+                t = loader.get_template('informes/informe_general.html')
+                c = RequestContext(request, {
+                    'fraccion_ini': fraccion_ini,
+                    'fraccion_fin': fraccion_fin,
+                    'fecha_ini': fecha_ini,
+                    'fecha_fin': fecha_fin,
+                    'lista_cuotas': cuotas,
+                })
+                return HttpResponse(t.render(c))                
         else:
             return HttpResponseRedirect("/login") 
-    
+                
+            
     else:
+        t = loader.get_template('informes/informe_general.html')
         c = RequestContext(request, {
-
+            # 'object_list': lista,
+            # 'fraccion': f,
         })
         return HttpResponse(t.render(c))    
 
@@ -540,10 +613,10 @@ def informe_movimientos(request):
                 })
                 return HttpResponse(t.render(c))
             else: #Parametros seteados
-                lote=request.GET['lote_id']
+                lote_id=request.GET['lote_id']
                 fecha_ini=request.GET['fecha_ini']
                 fecha_fin=request.GET['fecha_fin']
-                x = str(lote)
+                x = str(lote_id)
                 fraccion_int = int(x[0:3])
                 manzana_int = int(x[4:7])
                 lote_int = int(x[8:])
@@ -666,7 +739,10 @@ def informe_movimientos(request):
                         lista_movimientos.append(cuota)
             t = loader.get_template('informes/informe_movimientos.html')
             c = RequestContext(request, {
-                'lista_movimientos': lista_movimientos,     
+                'lista_movimientos': lista_movimientos,
+                'lote_id' : lote_id,
+                'fecha_ini' : fecha_ini,
+                'fecha_fin' : fecha_fin     
             })
             return HttpResponse(t.render(c)) 
         else:
@@ -1650,4 +1726,13 @@ def filtros_establecidos(request, tipo_informe):
             return True
         except:
             print('Parametros no seteados')
+    elif tipo_informe == "informe_general":
+        try:
+            fraccion_ini=request['fraccion_ini']
+            fraccion_fin=request['fraccion_fin']
+            fecha_ini=request['fecha_ini']
+            fecha_fin=request['fecha_fin']
+            return True
+        except:
+            print('Parametros no seteados')      
     return False

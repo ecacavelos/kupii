@@ -384,52 +384,50 @@ def get_lista_pagos_gerentes(request):
             cuota['monto_pagado']=i.total_de_cuotas
             cuota['monto_gerente']=int(i.total_de_cuotas*(float(i.plan_de_pago.porcentaje_cuotas_gerente)/float(100)))
             cuotas.append(cuota)
-    #reporte_liquidacion_gerentes(cuotas)
-    #print 'hola'
     return HttpResponse(json.dumps(cuotas), mimetype='application/json')
     
-@require_http_methods(["GET"])
-def get_informe_general(request):
-   
-    fecha_ini=request.GET['fecha_ini']
-    fecha_fin=request.GET['fecha_fin']
-    fecha_ini_parsed = datetime.strptime(fecha_ini, "%d/%m/%Y").date()
-    fecha_fin_parsed = datetime.strptime(fecha_fin, "%d/%m/%Y").date()
-    fraccion_ini=request.GET['fraccion_ini']
-    fraccion_fin=request.GET['fraccion_fin']
-    query=(
-    '''
-    select pc.* from principal_pagodecuotas pc, principal_lote l, principal_manzana m, principal_fraccion f
-    where pc.fecha_de_pago >= \''''+ str(fecha_ini_parsed) +               
-    '''\' and pc.fecha_de_pago <= \'''' + str(fecha_fin_parsed) +
-    '''\' and f.id>=''' + fraccion_ini +
-    '''
-    and f.id<=''' + fraccion_fin +
-    '''
-    and (pc.lote_id = l.id and l.manzana_id=m.id and m.fraccion_id=f.id) order by f.id,pc.fecha_de_pago
-    '''
-    )
-         
-    print query
- 
-    object_list=list(PagoDeCuotas.objects.raw(query))
- 
-    cuotas=[]
-    for i in object_list:
-        nro_cuota=get_nro_cuota(i)
-        cuota={}            
-        cuota['fraccion_id']=i.lote.manzana.fraccion.id
-        cuota['fraccion']=str(i.lote.manzana.fraccion)
-        cuota['lote']=str(i.lote)
-        cuota['cliente']=str(i.cliente)
-        cuota['cuota_nro']=str(nro_cuota)+'/'+str(i.plan_de_pago.cantidad_de_cuotas)
-        cuota['plan_de_pago']=i.plan_de_pago.nombre_del_plan
-        cuota['fecha_pago']=str(i.fecha_de_pago)
-        cuota['total_de_cuotas']=i.total_de_cuotas
-        cuota['total_de_mora']=i.total_de_mora
-        cuota['total_de_pago']=i.total_de_pago
-        cuotas.append(cuota)
-    return HttpResponse(json.dumps(cuotas), mimetype='application/json')
+# @require_http_methods(["GET"])
+# def get_informe_general(request):
+#    
+#     fecha_ini=request.GET['fecha_ini']
+#     fecha_fin=request.GET['fecha_fin']
+#     fecha_ini_parsed = datetime.strptime(fecha_ini, "%d/%m/%Y").date()
+#     fecha_fin_parsed = datetime.strptime(fecha_fin, "%d/%m/%Y").date()
+#     fraccion_ini=request.GET['fraccion_ini']
+#     fraccion_fin=request.GET['fraccion_fin']
+#     query=(
+#     '''
+#     select pc.* from principal_pagodecuotas pc, principal_lote l, principal_manzana m, principal_fraccion f
+#     where pc.fecha_de_pago >= \''''+ str(fecha_ini_parsed) +               
+#     '''\' and pc.fecha_de_pago <= \'''' + str(fecha_fin_parsed) +
+#     '''\' and f.id>=''' + fraccion_ini +
+#     '''
+#     and f.id<=''' + fraccion_fin +
+#     '''
+#     and (pc.lote_id = l.id and l.manzana_id=m.id and m.fraccion_id=f.id) order by f.id,pc.fecha_de_pago
+#     '''
+#     )
+#          
+#     print query
+#  
+#     object_list=list(PagoDeCuotas.objects.raw(query))
+#  
+#     cuotas=[]
+#     for i in object_list:
+#         nro_cuota=get_nro_cuota(i)
+#         cuota={}            
+#         cuota['fraccion_id']=i.lote.manzana.fraccion.id
+#         cuota['fraccion']=str(i.lote.manzana.fraccion)
+#         cuota['lote']=str(i.lote)
+#         cuota['cliente']=str(i.cliente)
+#         cuota['cuota_nro']=str(nro_cuota)+'/'+str(i.plan_de_pago.cantidad_de_cuotas)
+#         cuota['plan_de_pago']=i.plan_de_pago.nombre_del_plan
+#         cuota['fecha_pago']=str(i.fecha_de_pago)
+#         cuota['total_de_cuotas']=i.total_de_cuotas
+#         cuota['total_de_mora']=i.total_de_mora
+#         cuota['total_de_pago']=i.total_de_pago
+#         cuotas.append(cuota)
+#     return HttpResponse(json.dumps(cuotas), mimetype='application/json')
 
 # @require_http_methods(["GET"])
 # def get_lotes_libres(request):

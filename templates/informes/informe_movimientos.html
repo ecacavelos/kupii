@@ -2,8 +2,7 @@
 {% block header_scripts %}
 
 <script type="text/javascript">
-	$(document).ready(function() {
-				
+	$(document).ready(function() {		
 		var d = new Date();
 		var curr_date = d.getDate();
 		var curr_month = d.getMonth() + 1;
@@ -14,15 +13,14 @@
 		if (curr_month < 10) {
 			curr_month = "0" + curr_month.toString();
 		}
-		var hoy = (curr_date + "/" + curr_month + "/" + curr_year);
-		$("#fecha_fin").val(hoy);
+		var hoy = (curr_date + "/" + curr_month + "/" + curr_year);		
 		
-		var lote_id= "{{lote_id}}";
 		var fecha_ini = "{{fecha_ini}}";
-		var fecha_fin= "{{fecha_fin}}";		
+		var fecha_fin= "{{fecha_fin}}";
+		var lote_id= "{{lote_id}}";
 		$('#lote_id').val(lote_id);
 		$('#fecha_ini').val(fecha_ini);
-		$('#fecha_fin').val(fecha_fin);	
+		$('#fecha_fin').val(fecha_fin);
 		$('#lote_id').mask('###/###/####');		
 		$('#fecha_ini').mask('##/##/####');
 		$("#fecha_ini").datepicker({dateFormat : 'dd/mm/yy'});
