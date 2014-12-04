@@ -92,8 +92,7 @@ def lotes_libres(request):
                         total_superficie_fraccion = 0
                         total_lotes = 0
                     lotes.append(lote)
-                    
-                #t = loader.get_template('informes/lotes_libres.html')
+                
                 ultimo="&fraccion_ini="+fraccion_ini+"&fraccion_fin="+fraccion_fin
                 paginator = Paginator(lotes, 25)
                 page = request.GET.get('page')
@@ -329,6 +328,7 @@ def informe_general(request):
                 })
                 return HttpResponse(t.render(c))
             else: #Parametros seteados
+                t = loader.get_template('informes/informe_general.html')
                 fraccion_ini=request.GET['fraccion_ini']
                 fraccion_fin=request.GET['fraccion_fin']
                 fecha_ini=request.GET['fecha_ini']
@@ -393,13 +393,23 @@ def informe_general(request):
                         total_pagos=0
                     
                     cuotas.append(cuota)                
-                t = loader.get_template('informes/informe_general.html')
+                
+                ultimo="&fraccion_ini="+fraccion_ini+"&fraccion_fin="+fraccion_fin+"&fecha_ini="+fecha_ini+"&fecha_fin="+fecha_fin
+                paginator = Paginator(cuotas, 25)
+                page = request.GET.get('page')
+                try:
+                    lista = paginator.page(page)
+                except PageNotAnInteger:
+                    lista = paginator.page(1)
+                except EmptyPage:
+                    lista = paginator.page(paginator.num_pages) 
                 c = RequestContext(request, {
                     'fraccion_ini': fraccion_ini,
                     'fraccion_fin': fraccion_fin,
                     'fecha_ini': fecha_ini,
                     'fecha_fin': fecha_fin,
-                    'lista_cuotas': cuotas,
+                    'lista_cuotas': lista,
+                    'ultimo': ultimo
                 })
                 return HttpResponse(t.render(c))                
         else:

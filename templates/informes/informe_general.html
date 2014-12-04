@@ -5,15 +5,14 @@
 	$(document).ready(function() {
 
 		var fraccion_ini = "{{fraccion_ini}}";
-		var fraccion_fin= "{{fraccion_fin}}";
+		var fraccion_fin = "{{fraccion_fin}}";
 		var fecha_ini = "{{fecha_ini}}";
-		var fecha_fin= "{{fecha_fin}}";
+		var fecha_fin = "{{fecha_fin}}";
 		$('#fraccion_ini').val(fraccion_ini);
 		$('#fraccion_fin').val(fraccion_fin);
 		$('#fecha_ini').val(fecha_ini);
 		$('#fecha_fin').val(fecha_fin);
-		
-		
+
 		$('#fecha_ini').mask('##/##/####');
 		$("#fecha_ini").datepicker({
 			dateFormat : 'dd/mm/yy'
@@ -22,46 +21,45 @@
 		$("#fecha_fin").datepicker({
 			dateFormat : 'dd/mm/yy'
 		});
-		
-		if ($("#fecha_ini").val() == "" &&  $("#fecha_fin").val() == ""){ //parametros no seteados
+
+		if ($("#fecha_ini").val() == "" && $("#fecha_fin").val() == "") {//parametros no seteados
 			$('.listado-pagos').hide();
 			$('.pagination').hide();
 		}
-		if ($("#fraccion_ini").val() == "" &&  $("#fraccion_fin").val() == ""){ //parametros no seteados
+		if ($("#fraccion_ini").val() == "" && $("#fraccion_fin").val() == "") {//parametros no seteados
 			$('.listado-pagos').hide();
 			$('.pagination').hide();
-		}
-		else{
+		} else {
 			$('.listado-pagos').show();
-			$('.pagination').hide();
+			$('.pagination').show();
 		}
 
 	});
-	function retrieve_informe_general(){
+	function retrieve_informe_general() {
 		if ($('#fraccion_ini').val() == 0 || $('#fraccion_fin').val() == 0 || $('#fraccion_ini').val() == "" || $('#fraccion_fin').val() == "") {
 			alert("Debe ingresar un rango de fracciones");
 			return;
-		}		
+		}
 		if ($('#fecha_ini').val() == 0 || $('#fecha_fin').val() == 0 || $('#fecha_ini').val() == "" || $('#fecha_fin').val() == "") {
 			alert("Debe ingresar un rango de fechas");
 			return;
-		}			
-		window.location.href="/informes/informe_general_reporte_excel?fecha_ini="+$('#fecha_ini').val()+"&fecha_fin="+$('#fecha_fin').val()+"&fraccion_ini="+$('#fraccion_ini').val()+"&fraccion_fin="+$('#fraccion_fin').val();
+		}
+		window.location.href = "/informes/informe_general_reporte_excel?fecha_ini=" + $('#fecha_ini').val() + "&fecha_fin=" + $('#fecha_fin').val() + "&fraccion_ini=" + $('#fraccion_ini').val() + "&fraccion_fin=" + $('#fraccion_fin').val();
 	}
 
 	function validar() {
-			
+
 		if ($('#fraccion_ini').val() == 0 || $('#fraccion_fin').val() == 0 || $('#fraccion_ini').val() == "" || $('#fraccion_fin').val() == "") {
 			alert("Debe ingresar un rango de fracciones");
 			return;
-		}		
+		}
 		if ($('#fecha_ini').val() == 0 || $('#fecha_fin').val() == 0 || $('#fecha_ini').val() == "" || $('#fecha_fin').val() == "") {
 			alert("Debe ingresar un rango de fechas");
 			return;
 		}
 		$("#frm_busqueda").submit();
-	
-	}	
+
+	}
 </script>
 {% endblock %}
 {% block content %}
@@ -104,12 +102,10 @@
 				<td>
 				<input type="button" value="Buscar" onclick="validar();" class="historico" style="cursor: pointer"/>
 				</td>
-				<td>
-	 			<a class="boton-verde" id="id_boton" onclick="retrieve_informe_general();">Descargar como Excel</a>
-				</td>
+				<td><a class="boton-verde" id="id_boton" onclick="retrieve_informe_general();">Descargar como Excel</a></td>
 			</tr>
 		</table>
-	</form>	
+	</form>
 </div>
 
 <div class="clear"></div>
@@ -122,56 +118,55 @@
 	<table id="tabla_pagos" width="50%" border="1" cellpadding="0" cellspacing="0" class="listado-pagos" align="center">
 		<th>Nombre Fracci&oacute;n</th><th>Fracci&oacute;n</th><th>Lote Nro</th><th>Cliente</th><th>Cuota Nº</th><th>Plan de Pago</th><th>Fecha de Pago</th><th>Total de Cuotas</th><th>Total de Mora</th><th>Total de Pago</th>
 		{% for cuota in lista_cuotas %}
-				{% if forloop.counter|divisibleby:2 %}
-					<tr>
-						<td>{{cuota.fraccion}}</td>
-						<td>{{cuota.fraccion_id}}</td>
-						<td>{{cuota.lote}}</td>
-						<td>{{cuota.cliente}}</td>
-						<td>{{cuota.cuota_nro}}</td>
-						<td>{{cuota.plan_de_pago}}</td>
-						<td>{{cuota.fecha_pago}}</td>
-						<td>{{cuota.total_de_cuotas}}</td>
-						<td>{{cuota.total_de_mora}}</td>
-						<td>{{cuota.total_de_pago}}</td>
-					</tr>
-				{% else %}
-					<tr class="bkg_gris">
-						<td>{{cuota.fraccion}}</td>
-						<td>{{cuota.fraccion_id}}</td>
-						<td>{{cuota.lote}}</td>
-						<td>{{cuota.cliente}}</td>
-						<td>{{cuota.cuota_nro}}</td>
-						<td>{{cuota.plan_de_pago}}</td>
-						<td>{{cuota.fecha_pago}}</td>
-						<td>{{cuota.total_de_cuotas}}</td>
-						<td>{{cuota.total_de_mora}}</td>
-						<td>{{cuota.total_de_pago}}</td>				
-					</tr>			
-				{% endif %}
-				{% if cuota.total_cuotas %}
-					<tr>
-						<th colspan="7" class="celda_resumen_fraccion">Resumen de la Fracción</th>
-						<td class="celda_resumen_fraccion">{{cuota.total_cuotas}}</td>
-						<td class="celda_resumen_fraccion">{{cuota.total_mora}}</td>
-						<td class="celda_resumen_fraccion">{{cuota.total_pago}}</td>						
-					</tr>
-				{% endif %}
-			{% endfor %}
-				
-
-
+		{% if forloop.counter|divisibleby:2 %}
+		<tr>
+			<td>{{cuota.fraccion}}</td>
+			<td>{{cuota.fraccion_id}}</td>
+			<td>{{cuota.lote}}</td>
+			<td>{{cuota.cliente}}</td>
+			<td>{{cuota.cuota_nro}}</td>
+			<td>{{cuota.plan_de_pago}}</td>
+			<td>{{cuota.fecha_pago}}</td>
+			<td>{{cuota.total_de_cuotas}}</td>
+			<td>{{cuota.total_de_mora}}</td>
+			<td>{{cuota.total_de_pago}}</td>
+		</tr>
+		{% else %}
+		<tr class="bkg_gris">
+			<td>{{cuota.fraccion}}</td>
+			<td>{{cuota.fraccion_id}}</td>
+			<td>{{cuota.lote}}</td>
+			<td>{{cuota.cliente}}</td>
+			<td>{{cuota.cuota_nro}}</td>
+			<td>{{cuota.plan_de_pago}}</td>
+			<td>{{cuota.fecha_pago}}</td>
+			<td>{{cuota.total_de_cuotas}}</td>
+			<td>{{cuota.total_de_mora}}</td>
+			<td>{{cuota.total_de_pago}}</td>
+		</tr>
+		{% endif %}
+		{% if cuota.total_cuotas %}
+		<tr>
+			<th colspan="7" class="celda_resumen_fraccion">Resumen de la Fracción</th>
+			<td class="celda_resumen_fraccion">{{cuota.total_cuotas}}</td>
+			<td class="celda_resumen_fraccion">{{cuota.total_mora}}</td>
+			<td class="celda_resumen_fraccion">{{cuota.total_pago}}</td>
+		</tr>
+		{% endif %}
+		{% endfor %}
 		<div class="pagination">
-			<span class="step-links"> {%if object_list.has_previous%} <a href="?page={{ object_list.previous_page_number }}"> Anterior</a> {%endif%}
-				P&aacute;gina
-				|{{object_list.number}}|
-
-				{%if object_list.has_next%} <a href="?page={{ object_list.next_page_number }}"> Siguiente</a> {%endif%} </span>
+			<span class="step-links"> 
+			{%if lista_cuotas.has_previous%} 
+			<a href="?page={{ lista_cuotas.previous_page_number }}{{ultimo}}"> Anterior</a> 
+			{%endif%}
+			P&aacute;gina |{{lista_cuotas.number}}|
+			{%if lista_cuotas.has_next%} 
+			<a href="?page={{ lista_cuotas.next_page_number }}{{ultimo}}"> Siguiente</a> 
+			{%endif%} 
+			</span>
 		</div>
 	</table>
-	
 </div>
-
 <div id="footer">
 	<a href="/informes" class="boton-verde">Volver al módulo de Informes</a>
 </div>
