@@ -27,32 +27,26 @@
 		$('#fecha_fin').mask('##/##/####');
 		$("#fecha_fin").datepicker({dateFormat : 'dd/mm/yy'});
 		
-		if ($("#fecha_ini").val() == "" &&  $("#fecha_fin").val() == ""){ //parametros no seteados
-			$('.listado-pagos').hide();
-			$('.pagination').hide();
-		}
 		if ($("#lote_id").val() == ""){ //parametros no seteados
-			$('.listado-pagos').hide();
+			$('.listado-ventas').hide();
 			$('.pagination').hide();
 		}
 		else{
-			$('.listado-pagos').show();
+			$('.listado-ventas').show();
 			$('.pagination').hide();
 		}
 
 	});
 
 	function retrieve_informe_movimientos() {
+		if ($('#lote_id').val() == 0 || $('#lote_id').val() == "") {
+			alert("Debe ingresar un lote");
+			return;
+		}
 		window.location.href = "/informes/informe_movimientos_reporte_excel?fecha_ini=" + $('#fecha_ini').val() + "&fecha_fin=" + $('#fecha_fin').val() +"&lote_id="+$('#lote_id').val();
 	}
 	
 	function validar() {
-		/*
-		 if($('#fecha_ini').val()=="" || $('#fecha_fin').val()=="") {
-		 alert("Debe ingresar un rango de fechas");
-		 return;
-		 }
-		 */
 		if ($('#lote_id').val() == 0 || $('#lote_id').val() == "") {
 			alert("Debe ingresar un lote");
 			return;
@@ -113,7 +107,6 @@
 	<br>
 </div>
 <div id="listado-item-lote">
-	<h1>Listado de Movimientos</h1>
 	<table width="50%" border="1" cellpadding="0" cellspacing="0" class="listado-ventas" align="center">
 		<th>Fecha</th><th>Cliente</th><th>Cuota Nº</th><th>Tipo Cuota</th><th>Saldo Anterior</th><th>Monto</th><th>Saldo</th>
 		{% for hw in lista_movimientos %}
@@ -152,6 +145,6 @@
 </div>
 
 <div id="footer">
-	<a href="/movimientos" class="boton-verde">Volver al módulo de Movimientos</a>
+	<a href="/informes" class="boton-verde">Volver al módulo de Informes</a>
 </div>
 {% endblock %} 

@@ -9,11 +9,11 @@
 		$('#fraccion_fin').val(fraccion_fin);
 		
 		if($('#fraccion_ini').val()!="" && $('#fraccion_fin').val()!=""){ // parametros seteados
-			$("#tabla_lotes").show();
+			$('.listado-lotes').show();
 			$('.pagination').show();
 		}
 		else{
-			$("#tabla_lotes").hide();
+			$('.listado-lotes').hide();
 			$('.pagination').hide();
 		}		
 	});
@@ -25,67 +25,14 @@
 		$("#frm_busqueda").submit();
 	}
 	function retrieve_lotes_libres() {
+		if ($('#fraccion_ini').val() == 0 || $('#fraccion_fin').val() == 0 || $('#fraccion_ini').val() == "" || $('#fraccion_fin').val() == "") {
+			alert("Debe ingresar un rango de fracciones");
+			return;
+		}
 		window.location.href = "/informes/lotes_libres_reporte_excel?fraccion_ini=" + $('#fraccion_ini').val() + "&fraccion_fin=" + $('#fraccion_fin').val();
 	}
 	
-	function calculartotales(data) {
-		var fraccion_actual = data[0].fraccion_id;
-		//totales por fraccion
-		var total_lotes = 0;
-		var total_superficie = 0;
-		var total_contado = 0;
-		var total_credito = 0;
-		var total_costo = 0;
-		//totales generales
-		var total_general_lotes = 0;
-		var total_general_superficie = 0;
-		var total_general_contado = 0;
-		var total_general_credito = 0;
-		var total_general_costo = 0;
-
-		for (var i = 0; i < data.length; i++) {
-			//se suman los totales generales
-			total_general_lotes += 1;
-			total_general_superficie += data[i].superficie;
-			total_general_contado += data[i].precio_contado;
-			total_general_credito += data[i].precio_credito;
-			total_general_costo += data[i].precio_costo;
-			if (data[i].fraccion_id == fraccion_actual) {
-				total_lotes += 1;
-				total_superficie += data[i].superficie;
-				total_contado += data[i].precio_contado;
-				total_credito += data[i].precio_credito;
-				total_costo += data[i].precio_costo;
-				$('#tabla_lotes').append('<tr class="custom_class"><td>' + data[i].fraccion + "</td><td>" + data[i].fraccion_id + "</td><td>" + data[i].lote + "</td><td>" + data[i].superficie + "</td><td>" + format(data[i].precio_contado) + "</td><td>" + format(data[i].precio_credito) + "</td><td>" + format(data[i].precio_costo) + "</td></tr>");
-				//... y acumulamos para los totales generales
-
-			} else {
-				//si es la ultima fila correspondiente a la fraccion actual
-				$('#tabla_lotes').append('<tr class="custom_class"><td colspan="2">'+"Totales de Fraccion: </td><td>" + total_lotes + "</td><td>" + total_superficie + "</td><td>" + format(total_contado) + "</td><td>" + format(total_credito) + "</td><td>" + format(total_costo) + "</td></tr>");
-				$('#tabla_lotes').append('<tr class="custom_class"><td>' + data[i].fraccion + "</td><td>" + data[i].fraccion_id + "</td><td>" + data[i].lote + "</td><td>" + data[i].superficie + "</td><td>" + format(data[i].precio_contado) + "</td><td>" + format(data[i].precio_credito) + "</td><td>" + format(data[i].precio_costo) + "</td></tr>");
-				fraccion_actual = data[i].fraccion_id;
-				total_lotes=0;
-				total_superficie = 0;
-				total_contado = 0;
-				total_credito = 0;
-				total_costo = 0;
-
-				total_superficie += data[i].superficie;
-				total_contado += data[i].precio_contado;
-				total_credito += data[i].precio_credito;
-				total_costo += data[i].precio_costo;
-				total_lotes+=1;
-			}
-
-			if (i == data.length - 1) {
-				$('#tabla_lotes').append('<tr class="custom_class"><td colspan="2">'+"Totales de Fraccion: </td><td>" + total_lotes + "</td><td>" + total_superficie + "</td><td>" + format(total_contado) + "</td><td>" + format(total_credito) + "</td><td>" + format(total_costo) + "</td></tr>");
-			}
-
-		}
-		$('#tabla_lotes').append('<tr class="custom_class"><td colspan="2">'+"Totales Generales: </td><td>" + total_general_lotes + "</td><td>" + total_general_superficie + "</td><td>" + format(total_general_contado) + "</td><td>" + format(total_general_credito) + "</td><td>" + format(total_general_costo) + "</td></tr>");
-
-	}
-
+	
 </script>
 {% endblock %}
 {% block content %}

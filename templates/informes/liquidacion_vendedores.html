@@ -34,6 +34,18 @@
 	});
 
 	function retrieve_liquidacion_vendedores() {
+		if ($('#fecha_ini').val() == "" || $('#fecha_fin').val() == "") {
+			alert("Debe ingresar un rango de fechas");
+			return;
+		}
+		if ($('#id_tipo_busqueda').val() == null) {
+			alert("Debe elegir un criterio de busqueda");
+			return;
+		}
+		if ($('#id_busqueda').val() == "") {
+			alert("Debe ingresar un valor para buscar");
+			return;
+		}
 		window.location.href = "/informes/liquidacion_vendedores_reporte_excel?fecha_ini=" + $('#fecha_ini').val() + "&fecha_fin=" + $('#fecha_fin').val() + "&busqueda=" + $('#id_busqueda').val() + "&tipo_busqueda=" + $('#id_tipo_busqueda').val();
 	}
 
@@ -76,7 +88,7 @@
 			<tr>
 				<td>
 				<select id="id_tipo_busqueda" name="tipo_busqueda">
-					<option value="0">Elija una opcion</option>
+					<option value="">Elija una opcion</option>
 					<option value="vendedor_id">Vendedor ID</option>
 					<option value="nombre">Nombre de Vendedor</option>
 				</select></td>

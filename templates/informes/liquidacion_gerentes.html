@@ -31,7 +31,14 @@
 	});
 
 	function retrieve_liquidacion_gerentes() {
-
+		if ($('#fecha_ini').val() == "" || $('#fecha_fin').val() == "") {
+			alert("Debe ingresar un rango de fechas");
+			return;
+		}
+		if ($('#id_fraccion').val() == "") {
+			alert("Debe ingresar una fraccion");
+			return;
+		}
 		window.location.href = "/informes/liquidacion_gerentes_reporte_excel?fecha_ini=" + $('#fecha_ini').val() + "&fecha_fin=" + $('#fecha_fin').val() + "&fraccion=" + $('#id_fraccion').val();
 
 	}

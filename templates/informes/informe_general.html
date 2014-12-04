@@ -37,7 +37,15 @@
 		}
 
 	});
-	function retrieve_informe_general(){			
+	function retrieve_informe_general(){
+		if ($('#fraccion_ini').val() == 0 || $('#fraccion_fin').val() == 0 || $('#fraccion_ini').val() == "" || $('#fraccion_fin').val() == "") {
+			alert("Debe ingresar un rango de fracciones");
+			return;
+		}		
+		if ($('#fecha_ini').val() == 0 || $('#fecha_fin').val() == 0 || $('#fecha_ini').val() == "" || $('#fecha_fin').val() == "") {
+			alert("Debe ingresar un rango de fechas");
+			return;
+		}			
 		window.location.href="/informes/informe_general_reporte_excel?fecha_ini="+$('#fecha_ini').val()+"&fecha_fin="+$('#fecha_fin').val()+"&fraccion_ini="+$('#fraccion_ini').val()+"&fraccion_fin="+$('#fraccion_fin').val();
 	}
 
