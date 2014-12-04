@@ -33,7 +33,7 @@
 		}
 		else{
 			$('.listado-ventas').show();
-			$('.pagination').hide();
+			$('.pagination').show();
 		}
 
 	});
@@ -133,14 +133,17 @@
 		{% endif %}
 		{%endfor%}
 		<div class="pagination">
-			<span class="step-links">
-				<div class="pagination">
-					<span class="step-links"> {%if listaP.has_previous%} <a href="?page={{ listaP.previous_page_number }}"> Anterior</a> {%endif%}
-						P&aacute;gina
-						|{{listaP.number}}|
-
-						{%if listaP.has_next%} <a href="?page={{ listaP.next_page_number }}"> Siguiente</a> {%endif%} </span>
-				</div>
+			<span class="step-links"> 
+				{%if lista_movimientos.has_previous%} 
+				<a href="?page={{ lista_movimientos.previous_page_number }}{{ultimo}}"> Anterior</a> 
+				{%endif%}
+				P&aacute;gina |{{lista_movimientos.number}}|
+				
+				{%if lista_movimientos.has_next%} 
+				<a href="?page={{ lista_movimientos.next_page_number }}{{ultimo}}"> Siguiente</a> 
+				{%endif%} 
+			</span>
+		</div>
 	</table>
 </div>
 
