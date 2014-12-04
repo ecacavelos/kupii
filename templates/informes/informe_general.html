@@ -22,6 +22,19 @@
 		$("#fecha_fin").datepicker({
 			dateFormat : 'dd/mm/yy'
 		});
+		
+		if ($("#fecha_ini").val() == "" &&  $("#fecha_fin").val() == ""){ //parametros no seteados
+			$('.listado-pagos').hide();
+			$('.pagination').hide();
+		}
+		if ($("#fraccion_ini").val() == "" &&  $("#fraccion_fin").val() == ""){ //parametros no seteados
+			$('.listado-pagos').hide();
+			$('.pagination').hide();
+		}
+		else{
+			$('.listado-pagos').show();
+			$('.pagination').hide();
+		}
 
 	});
 	function retrieve_informe_general(){			
@@ -52,16 +65,14 @@
 
 <div class="clear"></div>
 
-<div class="grid_10">
-	<h1>Informe General de Pagos</h1>
-</div>
-
-
+<h1>Informe General de Pagos</h1>
 
 <div class="grid_6">
 	<form name="frm_busqueda" id="frm_busqueda" method="get" action="/informes/informe_general/">
-		{% csrf_token %}
-		<table>
+		<table id="lista-categoria" frame="box">
+			<tr>
+				<th class="acciones" colspan="3"><strong><a href="#" style="color: white;">Filtrar</a></strong></th>
+			</tr>
 			<th></th><th>Desde:</th><th>Hasta:</th>
 			<tr>
 				<td> Rango de Fecha: </td>
@@ -86,16 +97,11 @@
 				<input type="button" value="Buscar" onclick="validar();" class="historico" style="cursor: pointer"/>
 				</td>
 				<td>
-				<input name="tabla" type="hidden" value="lote"/>
+	 			<a class="boton-verde" id="id_boton" onclick="retrieve_informe_general();">Descargar como Excel</a>
 				</td>
 			</tr>
 		</table>
-
-	</form>
-	<div class="grid_6">
-	 	<a class="boton-verde" id="id_boton" onclick="retrieve_informe_general();">Descargar como Excel</a>
-	</div>
-	
+	</form>	
 </div>
 
 <div class="clear"></div>
