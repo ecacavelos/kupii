@@ -31,9 +31,16 @@ table.listado-lotes {
 }
 
 table.listado-ventas {
-	border:2px solid #CCC;
+	/*border:2px solid #CCC;
 	margin-bottom:15px;
 	margin-left: 125px;
+	*/
+	border: 5px solid #CCC;
+	margin-bottom:15px;
+	margin-left: 15px;
+	margin-right: 15px;
+	/* max-width: 100px; */
+	width: auto;
 }
 
 table.listado-ventas tr td {

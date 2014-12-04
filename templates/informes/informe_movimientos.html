@@ -26,6 +26,19 @@
 		$("#fecha_ini").datepicker({dateFormat : 'dd/mm/yy'});
 		$('#fecha_fin').mask('##/##/####');
 		$("#fecha_fin").datepicker({dateFormat : 'dd/mm/yy'});
+		
+		if ($("#fecha_ini").val() == "" &&  $("#fecha_fin").val() == ""){ //parametros no seteados
+			$('.listado-pagos').hide();
+			$('.pagination').hide();
+		}
+		if ($("#lote_id").val() == ""){ //parametros no seteados
+			$('.listado-pagos').hide();
+			$('.pagination').hide();
+		}
+		else{
+			$('.listado-pagos').show();
+			$('.pagination').hide();
+		}
 
 	});
 
@@ -57,14 +70,14 @@
 </div>
 
 <div class="clear"></div>
+
 <h1>Informe General de Movimientos de lotes </h1>
+
 <div class="grid_6">
 	<form name="frm_busqueda" id="frm_busqueda" method="get" action="/informes/informe_movimientos/">
-		<table id="lista_categoria" frame="box">
+		<table id="lista-categoria" frame="box">
 			<tr>
-				<th class="acciones" ><strong><a href="#" style="color: white;">Filtrar</a></strong></th>
-				<th>Desde:</th>
-				<th>Hasta:</th>
+				<th class="acciones" colspan="3"><strong><a href="#" style="color: white;">Filtrar</a></strong></th>				
 			</tr>
 			<tr>
 				<td> Lote: </td>
@@ -72,6 +85,7 @@
 				<input name="lote_id" id="lote_id" type="text" value=""/>
 				</td>
 			</tr>
+			<th></th><th>Desde:</th><th>Hasta:</th>
 			<tr>
 				<td> Rango de Fecha: </td>
 				<td>
