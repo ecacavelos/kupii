@@ -1513,8 +1513,6 @@ def liquidacion_vendedores_reporte_excel(request):
 
 def liquidacion_gerentes_reporte_excel(request): 
      
-    # vendedor_id = request.GET['busqueda']
-    # print("vendedor_id ->" + vendedor_id);
     fecha_ini = request.GET['fecha_ini']
     fecha_fin = request.GET['fecha_fin']
     fecha_ini_parsed = str(datetime.strptime(fecha_ini, "%d/%m/%Y").date())
@@ -1535,91 +1533,90 @@ def liquidacion_gerentes_reporte_excel(request):
         
         
     object_list = list(PagoDeCuotas.objects.raw(query))
-    cuotas = []
-    for i in object_list:
-        nro_cuota = get_nro_cuota(i)
-        if(nro_cuota % 2 != 0 and nro_cuota < 10):
-            cuota = {}            
-            cuota['fraccion_id'] = i.lote.manzana.fraccion.id
-            cuota['fraccion'] = str(i.lote.manzana.fraccion)
-            cuota['cuota_nro'] = str(nro_cuota) + '/' + str(i.plan_de_pago.cantidad_de_cuotas)
-            cuota['cliente'] = str(i.cliente)
-            cuota['lote'] = str(i.lote)
-            cuota['fecha_pago'] = str(i.fecha_de_pago)
-            cuota['monto_pagado'] = i.total_de_cuotas
-            cuota['monto_gerente'] = int(i.total_de_cuotas * (i.plan_de_pago.porcentaje_cuotas_gerente / 100))
-            cuotas.append(cuota)
+    cuotas=[]
+    #Seteamos los datos de las filas
+    for i, cuota_item in enumerate (object_list):
+        nro_cuota=get_nro_cuota(cuota_item)
+        cuota={}
+        monto_gerente=0
+        if(nro_cuota%2!=0 and nro_cuota<=cuota_item.plan_de_pago_vendedores.cantidad_cuotas):
+            monto_gerente=int(cuota_item.total_de_cuotas*(float(cuota_item.plan_de_pago.porcentaje_cuotas_gerente)/float(100)))
+        cuota['fraccion']=str(cuota_item.lote.manzana.fraccion)
+        cuota['cliente']=str(cuota_item.cliente)
+        cuota['fraccion_id']=cuota_item.lote.manzana.fraccion.id
+        cuota['lote']=str(cuota_item.lote)
+        cuota['cuota_nro']=str(nro_cuota)+'/'+str(cuota_item.plan_de_pago.cantidad_de_cuotas)
+        cuota['fecha_pago']=str(cuota_item.fecha_de_pago)
+        cuota['monto_pagado']=cuota_item.total_de_cuotas
+        cuota['monto_gerente']=monto_gerente
+                        
+        cuotas.append(cuota)
+            
     wb = xlwt.Workbook(encoding='utf-8')
     sheet = wb.add_sheet('test', cell_overwrite_ok=True)
     style = xlwt.easyxf('pattern: pattern solid, fore_colour green;'
                               'font: name Arial, bold True;')   
     style2 = xlwt.easyxf('font: name Arial, bold True;')
     # cabeceras
-    sheet.write(0, 0, "Fecha de Pago", style)
-    sheet.write(0, 1, "Fraccion", style)    
-    sheet.write(0, 2, "Lote Nro.", style)
-    sheet.write(0, 3, "Cliente", style)    
-    sheet.write(0, 4, "Cuota Nro.", style)    
-    sheet.write(0, 5, "Monto Pagado", style)
-    sheet.write(0, 6, "Monto Gerente", style)
+    sheet.write(0, 0, "Cliente", style)
+    sheet.write(0, 1, "Nombre Fraccion", style)
+    sheet.write(0, 2, "Fraccion", style)
+    sheet.write(0, 3, "Lote Nro.", style)    
+    sheet.write(0, 4, "Cuota Nro.", style)
+    sheet.write(0, 5, "Fecha de Pago", style)
+    sheet.write(0, 6, "Monto Pagado", style)
+    sheet.write(0, 7, "Monto Gerente", style)
     
-    # wb.save('informe_general.xls')
     # guardamos la primera fraccion para comparar
     fraccion_actual = cuotas[0]['fraccion_id']
     
     total_monto_pagado = 0
-    total_monto_gerente = 0
+    total_monto_gerente= 0
     total_general_pagado = 0
     total_general_gerente = 0
     
-    # i=0
     # contador de filas
-    c = 1
+    c = 0
     for i in range(len(cuotas)):
-    # for i,cuota in enumerate(cuotas,start=1):
         # se suman los totales por fracion
         if (cuotas[i]['fraccion_id'] == fraccion_actual):
-            
+            c+=1            
             total_monto_pagado += cuotas[i]['monto_pagado']
             total_monto_gerente += cuotas[i]['monto_gerente']
-                    
             
-            sheet.write(c, 0, str(cuotas[i]['fecha_pago']))
+            sheet.write(c, 0, str(cuotas[i]['cliente']))
             sheet.write(c, 1, str(cuotas[i]['fraccion']))
-            sheet.write(c, 2, str(cuotas[i]['lote']))
-            sheet.write(c, 3, str(cuotas[i]['cliente']))
+            sheet.write(c, 2, str(cuotas[i]['fraccion_id']))
+            sheet.write(c, 3, str(cuotas[i]['lote']))
             sheet.write(c, 4, str(cuotas[i]['cuota_nro']))
-            sheet.write(c, 5, str(cuotas[i]['monto_pagado']))
-            sheet.write(c, 6, str(cuotas[i]['monto_gerente']))
-            
+            sheet.write(c, 5, str(cuotas[i]['fecha_pago']))
+            sheet.write(c, 6, str('{:,}'.format(cuotas[i]['monto_pagado']).replace(",",".")))
+            sheet.write(c, 7, str('{:,}'.format(cuotas[i]['monto_gerente']).replace(",",".")))
             
             
             # ... y acumulamos para los totales generales
             total_general_pagado += cuotas[i]['monto_pagado']
             total_general_gerente += cuotas[i]['monto_gerente'] 
-             
-            c += 1
-
-        else: 
-            c += 1
+        else:
+            c+=1 
             sheet.write(c, 0, "Totales de Fraccion", style2)
-            sheet.write(c, 4, total_monto_pagado)
-            sheet.write(c, 5, total_monto_gerente)
-            
+            sheet.write(c, 6, str('{:,}'.format(total_monto_pagado)).replace(",","."))
+            sheet.write(c, 7, str('{:,}'.format(total_monto_gerente)).replace(",","."))            
             c += 1
-            sheet.write(c, 0, str(cuotas[i]['fecha_pago']))
+            fraccion_actual = cuotas[i]['fraccion_id']
+            sheet.write(c, 0, str(cuotas[i]['cliente']))
             sheet.write(c, 1, str(cuotas[i]['fraccion']))
-            sheet.write(c, 2, str(cuotas[i]['lote']))
-            sheet.write(c, 3, str(cuotas[i]['cliente']))
+            sheet.write(c, 2, str(cuotas[i]['fraccion_id']))
+            sheet.write(c, 3, str(cuotas[i]['lote']))
             sheet.write(c, 4, str(cuotas[i]['cuota_nro']))
-            sheet.write(c, 5, str(cuotas[i]['monto_pagado']))
-            sheet.write(c, 6, str(cuotas[i]['monto_gerente']))
-            
-            
+            sheet.write(c, 5, str(cuotas[i]['fecha_pago']))
+            sheet.write(c, 6, str('{:,}'.format(cuotas[i]['monto_pagado']).replace(",",".")))
+            sheet.write(c, 7, str('{:,}'.format(cuotas[i]['monto_gerente']).replace(",",".")))         
             total_general_pagado += cuotas[i]['monto_pagado']
             total_general_gerente += cuotas[i]['monto_gerente'] 
-            fraccion_actual = cuotas[i]['fraccion_id']
-        
+            
+            total_monto_pagado = 0
+            total_monto_gerente= 0
             
             total_monto_pagado += cuotas[i]['monto_pagado']
             total_monto_gerente += cuotas[i]['monto_gerente']
@@ -1627,13 +1624,13 @@ def liquidacion_gerentes_reporte_excel(request):
         if (i == len(cuotas) - 1):   
             c += 1           
             sheet.write(c, 0, "Totales de Fraccion", style2)
-            sheet.write(c, 4, total_monto_pagado, style2)
-            sheet.write(c, 5, total_monto_gerente, style2)
+            sheet.write(c, 6, str('{:,}'.format(total_monto_pagado)).replace(",","."))
+            sheet.write(c, 7, str('{:,}'.format(total_monto_gerente)).replace(",","."))
             
     c += 1
-    sheet.write(c, 0, "Totales Generales", style2)
-    sheet.write(c, 5, total_general_pagado, style2)
-    sheet.write(c, 6, total_general_gerente, style2)
+    sheet.write(c, 0, "Totales del Gerente", style2)
+    sheet.write(c, 6,  str('{:,}'.format(total_general_pagado, style2).replace(",",".")))
+    sheet.write(c, 7, str('{:,}'.format(total_general_gerente, style2).replace(",",".")))
     response = HttpResponse(content_type='application/vnd.ms-excel')
     # Crear un nombre intuitivo         
     response['Content-Disposition'] = 'attachment; filename=' + 'liquidacion_gerentes.xls'
