@@ -94,7 +94,8 @@ def lotes_libres(request):
                     lotes.append(lote)
                     
                 #t = loader.get_template('informes/lotes_libres.html')
-                paginator = Paginator(lotes, 15)
+                ultimo="&fraccion_ini="+fraccion_ini+"&fraccion_fin="+fraccion_fin
+                paginator = Paginator(lotes, 25)
                 page = request.GET.get('page')
                 try:
                     lista = paginator.page(page)
@@ -105,7 +106,7 @@ def lotes_libres(request):
                 c = RequestContext(request, {
                     'fraccion_ini': fraccion_ini,
                     'fraccion_fin': fraccion_fin,
-                    #'lista_lotes': lotes,
+                    'ultimo': ultimo,
                     'lista_lotes': lista,
                 })
                 return HttpResponse(t.render(c))                

@@ -108,11 +108,16 @@
 				{% endif %}
 			{% endfor %}
 		<div class="pagination">
-			<span class="step-links"> {%if object_list.has_previous%} <a href="?page={{ object_list.previous_page_number }}"> Anterior</a> {%endif%}
-				P&aacute;gina
-				|{{object_list.number}}|
-
-				{%if object_list.has_next%} <a href="?page={{ object_list.next_page_number }}"> Siguiente</a> {%endif%} </span>
+			<span class="step-links"> 
+				{%if lista_lotes.has_previous%} 
+				<a href="?page={{ lista_lotes.previous_page_number }}{{ultimo}}"> Anterior</a> 
+				{%endif%}
+				P&aacute;gina |{{lista_lotes.number}}|
+				
+				{%if lista_lotes.has_next%} 
+				<a href="?page={{ lista_lotes.next_page_number }}{{ultimo}}"> Siguiente</a> 
+				{%endif%} 
+			</span>
 		</div>
 	</table>
 </div>
