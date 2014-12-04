@@ -1,40 +1,53 @@
 {% extends "lotes/base_lotes.html" %}
 {% block header_scripts %}
 
-
 <script type="text/javascript" >
 	$(document).ready(function() {
-	
-	var fecha_ini = "{{fecha_ini}}";
-	var fecha_fin= "{{fecha_fin}}";
-	var tipo_busqueda="{{tipo_busqueda}}";
-	var busqueda="{{busqueda}}";
 
-	$('#fecha_ini').val(fecha_ini);
-	$('#fecha_fin').val(fecha_fin);
-	$('#id_tipo_busqueda').val(tipo_busqueda);
-	$('#id_busqueda').val(busqueda);
+		var fecha_ini = "{{fecha_ini}}";
+		var fecha_fin = "{{fecha_fin}}";
+		var tipo_busqueda = "{{tipo_busqueda}}";
+		var busqueda = "{{busqueda}}";
 
-	$('#fecha_ini').mask('##/##/####');
-	$("#fecha_ini").datepicker({ dateFormat: 'dd/mm/yy' });
-	$('#fecha_fin').mask('##/##/####');
-	$("#fecha_fin").datepicker({ dateFormat: 'dd/mm/yy' });
-	
-	
-	
-	});
-	
-	function retrieve_liquidacion_vendedores(){					
-		window.location.href="/informes/liquidacion_vendedores_reporte_excel?fecha_ini="+$('#fecha_ini').val()+"&fecha_fin="+$('#fecha_fin').val()+"&busqueda="+$('#id_busqueda').val()+"&tipo_busqueda="+$('#id_tipo_busqueda').val();
+		$('#fecha_ini').val(fecha_ini);
+		$('#fecha_fin').val(fecha_fin);
+		$('#id_tipo_busqueda').val(tipo_busqueda);
+		$('#id_busqueda').val(busqueda);
+
+		$('#fecha_ini').mask('##/##/####');
+		$("#fecha_ini").datepicker({
+			dateFormat : 'dd/mm/yy'
+		});
+		$('#fecha_fin').mask('##/##/####');
+		$("#fecha_fin").datepicker({
+			dateFormat : 'dd/mm/yy'
+		});
+		
+		if ($("#fecha_ini").val() == "" &&  $("#fecha_fin").val() == ""){ //parametros no seteados
+			$('.listado-pagos').hide();
+			$('.pagination').hide();
+		}
+		else{
+			$('.listado-pagos').show();
+			$('.pagination').hide();
 	}
-	
-	function validar(){
+	});
+
+	function retrieve_liquidacion_vendedores() {
+		window.location.href = "/informes/liquidacion_vendedores_reporte_excel?fecha_ini=" + $('#fecha_ini').val() + "&fecha_fin=" + $('#fecha_fin').val() + "&busqueda=" + $('#id_busqueda').val() + "&tipo_busqueda=" + $('#id_tipo_busqueda').val();
+	}
+
+	function validar() {
 		if ($('#fecha_ini').val() == "" || $('#fecha_fin').val() == "") {
 			alert("Debe ingresar un rango de fechas");
 			return;
 		}
-		if ($('#fraccion_ini').val() == 0 || $('#fraccion_fin').val() == 0 || $('#fraccion_ini').val() == "" || $('#fraccion_fin').val() == "") {
-			alert("Debe ingresar un rango de fracciones");
+		if ($('#id_tipo_busqueda').val() == null) {
+			alert("Debe elegir un criterio de busqueda");
+			return;
+		}
+		if ($('#id_busqueda').val() == "") {
+			alert("Debe ingresar un valor para buscar");
 			return;
 		}
 		$("#frm_busqueda").submit();
@@ -51,13 +64,15 @@
 
 <div class="clear"></div>
 
-<div class="grid_10">
-	<h1>Liquidaci&oacute;n de Vendedores</h1>
-</div>
+<h1>Liquidaci&oacute;n de Vendedores</h1>
+
 
 <div class="grid_6">
 	<form name="frm_busqueda" id="frm_busqueda" method="get" action="/informes/liquidacion_vendedores/">
-		<table>
+		<table id="lista-categoria" frame="box">
+			<tr>
+				<th class="acciones" colspan="3"><strong><a href="#" style="color: white;">Filtrar</a></strong></th>
+			</tr>
 			<tr>
 				<td>
 				<select id="id_tipo_busqueda" name="tipo_busqueda">
@@ -85,15 +100,12 @@
 				<input type="button" value="Buscar" onclick="validar();" class="historico" style="cursor: pointer"/>
 				</td>
 				<td>
-				<input name="tabla" type="hidden" value="lote"/>
+				<a class="boton-verde" id="id_boton" onclick="retrieve_liquidacion_vendedores();">Descargar como Excel</a>
 				</td>
 			</tr>
 		</table>
 
-	</form>
-	<div class="grid_6">
-	 	<a class="boton-verde" id="id_boton" onclick="retrieve_liquidacion_vendedores();">Descargar como Excel</a>
-	</div>
+	</form>	
 </div>
 
 <div class="clear"></div>
@@ -105,38 +117,38 @@
 <div id="listado-item-lote">
 	<table width="50%" border="1" cellpadding="0" cellspacing="0" class="listado-pagos" align="center">
 		<th>Cliente</th><th>Nombre Fracci&oacute;n</th><th>Fracci&oacute;n</th><th>Lote Nro</th><th>Cuota Nº</th><th>Fecha de Pago</th><th>Importe</th><th>Comisi&oacute;n</th>
-			{% for hw in lista_cuotas %}
-			{% if forloop.counter|divisibleby:2 %}
-				<tr>
-					<td>{{hw.cliente}}</td>
-					<td>{{hw.fraccion}}</td>
-					<td>{{hw.fraccion_id}}</td>
-					<td>{{hw.lote}}</td>
-					<td>{{hw.cuota_nro}}</td>
-					<td>{{hw.fecha_pago}}</td>
-					<td>{{hw.importe}}</td>
-					<td>{{hw.comision}}</td>
-				</tr>
-			{% else %}
-				<tr class="bkg_gris">
-					<td>{{hw.cliente}}</td>
-					<td>{{hw.fraccion}}</td>
-					<td>{{hw.fraccion_id}}</td>
-					<td>{{hw.lote}}</td>
-					<td>{{hw.cuota_nro}}</td>
-					<td>{{hw.fecha_pago}}</td>
-					<td>{{hw.importe}}</td>
-					<td>{{hw.comision}}</td>
-				</tr>			
-			{% endif %}
-			{% if hw.total_importe %}
-				<tr>
-					<th colspan="6" class="celda_resumen_fraccion">Resumen de la Fracción</th>
-					<td class="celda_resumen_fraccion">{{hw.total_importe}}</td>
-					<td class="celda_resumen_fraccion">{{hw.total_comision}}</td>
-									
-				</tr>
-			{% endif %}
+		{% for hw in lista_cuotas %}
+		{% if forloop.counter|divisibleby:2 %}
+		<tr>
+			<td>{{hw.cliente}}</td>
+			<td>{{hw.fraccion}}</td>
+			<td>{{hw.fraccion_id}}</td>
+			<td>{{hw.lote}}</td>
+			<td>{{hw.cuota_nro}}</td>
+			<td>{{hw.fecha_pago}}</td>
+			<td>{{hw.importe}}</td>
+			<td>{{hw.comision}}</td>
+		</tr>
+		{% else %}
+		<tr class="bkg_gris">
+			<td>{{hw.cliente}}</td>
+			<td>{{hw.fraccion}}</td>
+			<td>{{hw.fraccion_id}}</td>
+			<td>{{hw.lote}}</td>
+			<td>{{hw.cuota_nro}}</td>
+			<td>{{hw.fecha_pago}}</td>
+			<td>{{hw.importe}}</td>
+			<td>{{hw.comision}}</td>
+		</tr>
+		{% endif %}
+		{% if hw.total_importe %}
+		<tr>
+			<th colspan="6" class="celda_resumen_fraccion">Resumen de la Fracción</th>
+			<td class="celda_resumen_fraccion">{{hw.total_importe}}</td>
+			<td class="celda_resumen_fraccion">{{hw.total_comision}}</td>
+
+		</tr>
+		{% endif %}
 		<tr id='fila_totales_fraccion' style="display: none;"></tr>
 		{% endfor %}
 		<div class="pagination">

@@ -1113,11 +1113,12 @@ def informe_general_reporte_excel(request):
     
     # i=0
     # contador de filas
-    c = 1
+    c = 0
     for i in range(len(cuotas)):
     # for i,cuota in enumerate(cuotas,start=1):
         # se suman los totales por fracion
         if (cuotas[i]['fraccion_id'] == fraccion_actual):
+            c += 1
             total_cuotas += cuotas[i]['total_de_cuotas']
             total_mora += cuotas[i]['total_de_mora']
             total_pagos += cuotas[i]['total_de_pago']
@@ -1131,21 +1132,21 @@ def informe_general_reporte_excel(request):
             sheet.write(c, 6, str(cuotas[i]['total_de_cuotas']))
             sheet.write(c, 7, str(cuotas[i]['total_de_mora']))
             sheet.write(c, 8, str(cuotas[i]['total_de_pago']))
-            c += 1
+            
             # ... y acumulamos para los totales generales
             total_general_cuotas += cuotas[i]['total_de_cuotas']
             total_general_mora += cuotas[i]['total_de_mora'] 
             total_general_pagos += cuotas[i]['total_de_pago'] 
-            # si es la ultima fila
-
-        else: 
             
+            # si es la ultima fila
+            
+        else:
+            c += 1            
             sheet.write(c, 0, "Totales de Fraccion", style2)
             sheet.write(c, 6, total_cuotas)
             sheet.write(c, 7, total_mora)
-            sheet.write(c, 8, total_pagos)
+            sheet.write(c, 8, total_pagos)            
             c += 1
-            
             sheet.write(c, 0, str(cuotas[i]['fraccion']))
             sheet.write(c, 1, str(cuotas[i]['lote']))
             sheet.write(c, 2, str(cuotas[i]['cliente']))
@@ -1154,7 +1155,7 @@ def informe_general_reporte_excel(request):
             sheet.write(c, 5, str(cuotas[i]['fecha_pago']))
             sheet.write(c, 6, str(cuotas[i]['total_de_cuotas']))
             sheet.write(c, 7, str(cuotas[i]['total_de_mora']))
-            sheet.write(c, 8, str(cuotas[i]['total_de_pago']))
+            sheet.write(c, 8, str(cuotas[i]['total_de_pago']))          
             
             fraccion_actual = cuotas[i]['fraccion_id']
             total_cuotas = 0;
@@ -1367,12 +1368,9 @@ def liquidacion_vendedores_reporte_excel(request):
     and (pc.lote_id = l.id and l.manzana_id=m.id and m.fraccion_id=f.id) order by f.id,pc.fecha_de_pago
     '''
     )
-        
-        
+                
     object_list=list(PagoDeCuotas.objects.raw(query))
     cuotas=[]
-    total_importe=0
-    total_comision=0
     #Seteamos los datos de las filas
     for i, cuota_item in enumerate (object_list):
         nro_cuota=get_nro_cuota(cuota_item)
@@ -1412,13 +1410,12 @@ def liquidacion_vendedores_reporte_excel(request):
     total_general_importe = 0
     total_general_comision = 0
     
-    # i=0
     # contador de filas
-    c = 1
+    c = 0
     for i in range(len(cuotas)):
-    # for i,cuota in enumerate(cuotas,start=1):
         # se suman los totales por fracion
-        if (cuotas[i]['fraccion_id'] == fraccion_actual):            
+        if (cuotas[i]['fraccion_id'] == fraccion_actual):
+            c+=1            
             total_importe += cuotas[i]['importe']
             total_comision += cuotas[i]['comision']
             
@@ -1430,32 +1427,26 @@ def liquidacion_vendedores_reporte_excel(request):
             sheet.write(c, 5, str('{:,}'.format(cuotas[i]['comision']).replace(",",".")))
             sheet.write(c, 6, str(cuotas[i]['fraccion']))
             
-            #str('{:,}'.format(lista_ventas.precio_final_de_venta)).replace(",",".")
-            
             # ... y acumulamos para los totales generales
             total_general_importe += cuotas[i]['importe']
             total_general_comision += cuotas[i]['comision'] 
-            c += 1 
-           
-
-        else: 
-            c += 1
+        else:
+            c+=1 
             sheet.write(c, 0, "Totales de Fraccion", style2)
             sheet.write(c, 4, str('{:,}'.format(total_importe)).replace(",","."))
-            sheet.write(c, 5, str('{:,}'.format(total_comision)).replace(",","."))
-            
+            sheet.write(c, 5, str('{:,}'.format(total_comision)).replace(",","."))            
             c += 1
+            fraccion_actual = cuotas[i]['fraccion_id']
             sheet.write(c, 0, str(cuotas[i]['cliente']))
             sheet.write(c, 1, str(cuotas[i]['lote']))
             sheet.write(c, 2, str(cuotas[i]['cuota_nro']))
             sheet.write(c, 3, str(cuotas[i]['fecha_pago']))
             sheet.write(c, 4, str(cuotas[i]['importe']))
             sheet.write(c, 4, str('{:,}'.format(cuotas[i]['importe']).replace(",",".")))
-            sheet.write(c, 5, str('{:,}'.format(cuotas[i]['comision']).replace(",",".")))
-            
+            sheet.write(c, 5, str('{:,}'.format(cuotas[i]['comision']).replace(",",".")))            
             total_general_importe += cuotas[i]['importe']
             total_general_comision += cuotas[i]['comision'] 
-            fraccion_actual = cuotas[i]['fraccion_id']
+            
             total_importe = 0
             total_comision = 0
             
@@ -1803,6 +1794,14 @@ def filtros_establecidos(request, tipo_informe):
             fecha_fin=request['fecha_fin']
             tipo_busqueda=request['tipo_busqueda']
             busqueda=request['busqueda']
+            return True
+        except:
+            print('Parametros no seteados')      
+    elif tipo_informe == "liquidacion_gerentes":
+        try:
+            fecha_ini=request['fecha_ini']
+            fecha_fin=request['fecha_fin']
+            fraccion=request['id_fraccion']
             return True
         except:
             print('Parametros no seteados')      
