@@ -36,6 +36,7 @@ def lotes_libres(request):
                 })
                 return HttpResponse(t.render(c))
             else: #Parametros seteados
+                t = loader.get_template('informes/lotes_libres.html')
                 fraccion_ini=request.GET['fraccion_ini']
                 fraccion_fin=request.GET['fraccion_fin']
                 object_list=[]#lista de lotes
@@ -91,11 +92,21 @@ def lotes_libres(request):
                         total_superficie_fraccion = 0
                         total_lotes = 0
                     lotes.append(lote)
-                t = loader.get_template('informes/lotes_libres.html')
+                    
+                #t = loader.get_template('informes/lotes_libres.html')
+                paginator = Paginator(lotes, 15)
+                page = request.GET.get('page')
+                try:
+                    lista = paginator.page(page)
+                except PageNotAnInteger:
+                    lista = paginator.page(1)
+                except EmptyPage:
+                    lista = paginator.page(paginator.num_pages)                
                 c = RequestContext(request, {
                     'fraccion_ini': fraccion_ini,
                     'fraccion_fin': fraccion_fin,
-                    'lista_lotes': lotes,
+                    #'lista_lotes': lotes,
+                    'lista_lotes': lista,
                 })
                 return HttpResponse(t.render(c))                
         else:
@@ -903,7 +914,7 @@ def lotes_libres_reporte_excel(request):
         lote['precio_costo'] = i.precio_costo
         lotes.append(lote)
     # contador de filas
-    c = 1
+    c = 0
     fraccion_actual = lotes[0]['fraccion_id']
     for i in range(len(lotes)):
         # se suman los totales generales
@@ -914,7 +925,7 @@ def lotes_libres_reporte_excel(request):
         total_general_costo += lotes[i]['precio_costo']
         # se suman los totales por fracion
         if (lotes[i]['fraccion_id'] == fraccion_actual):
-            
+            c+=1
             total_lotes += 1
             total_superficie += lotes[i]['superficie'] 
             total_contado += lotes[i]['precio_contado'] 
@@ -925,11 +936,9 @@ def lotes_libres_reporte_excel(request):
             sheet.write(c, 1, str(lotes[i]['fraccion_id']))
             sheet.write(c, 2, str(lotes[i]['lote']))
             sheet.write(c, 3, str(lotes[i]['superficie']))
-            sheet.write(c, 4, str(lotes[i]['precio_contado']))
-            sheet.write(c, 5, str(lotes[i]['precio_credito']))
-            sheet.write(c, 6, str(lotes[i]['precio_costo']))
-            c += 1
-
+            sheet.write(c, 4, str('{:,}'.format(lotes[i]['precio_contado']).replace(",", ".")))
+            sheet.write(c, 5, str('{:,}'.format(lotes[i]['precio_credito']).replace(",", ".")))
+            sheet.write(c, 6, str('{:,}'.format(lotes[i]['precio_costo']).replace(",", ".")))
         else: 
             c += 1
             sheet.write(c, 0, "Totales de Fraccion", style2)  
@@ -944,24 +953,21 @@ def lotes_libres_reporte_excel(request):
             sheet.write(c, 1, str(lotes[i]['fraccion_id']))
             sheet.write(c, 2, str(lotes[i]['lote']))
             sheet.write(c, 3, str(lotes[i]['superficie']))
-            sheet.write(c, 4, str(lotes[i]['precio_contado']))
-            sheet.write(c, 5, str(lotes[i]['precio_credito']))
-            sheet.write(c, 6, str(lotes[i]['precio_costo']))           
+            sheet.write(c, 4, str('{:,}'.format(lotes[i]['precio_contado']).replace(",", ".")))
+            sheet.write(c, 5, str('{:,}'.format(lotes[i]['precio_credito']).replace(",", ".")))
+            sheet.write(c, 6, str('{:,}'.format(lotes[i]['precio_costo']).replace(",", ".")))     
             fraccion_actual = lotes[i]['fraccion_id']
             total_lotes = 0
             total_superficie = 0
             total_contado = 0
             total_credito = 0
-            total_costo = 0  
-            
-            
+            total_costo = 0           
             
             total_superficie += lotes[i]['superficie'] 
             total_contado += lotes[i]['precio_contado'] 
             total_credito += lotes[i]['precio_credito']
             total_costo += lotes[i]['precio_costo']
             total_lotes += 1
-            c += 1
         # si es la ultima fila    
         if (i == len(lotes) - 1):   
             c += 1           
@@ -1171,9 +1177,9 @@ def informe_general_reporte_excel(request):
             sheet.write(c, 3, str(cuotas[i]['cuota_nro']))
             sheet.write(c, 4, str(cuotas[i]['plan_de_pago']))
             sheet.write(c, 5, str(cuotas[i]['fecha_pago']))
-            sheet.write(c, 6, str(cuotas[i]['total_de_cuotas']))
-            sheet.write(c, 7, str(cuotas[i]['total_de_mora']))
-            sheet.write(c, 8, str(cuotas[i]['total_de_pago']))
+            sheet.write(c, 6, str('{:,}'.format(cuotas[i]['total_de_cuotas'])).replace(",","."))
+            sheet.write(c, 7, str('{:,}'.format(cuotas[i]['total_de_mora'])).replace(",","."))
+            sheet.write(c, 8, str('{:,}'.format(cuotas[i]['total_de_pago'])).replace(",","."))
             
             # ... y acumulamos para los totales generales
             total_general_cuotas += cuotas[i]['total_de_cuotas']
@@ -1185,9 +1191,9 @@ def informe_general_reporte_excel(request):
         else:
             c += 1            
             sheet.write(c, 0, "Totales de Fraccion", style2)
-            sheet.write(c, 6, total_cuotas)
-            sheet.write(c, 7, total_mora)
-            sheet.write(c, 8, total_pagos)            
+            sheet.write(c, 6, str('{:,}'.format(total_cuotas)).replace(",","."))
+            sheet.write(c, 7, str('{:,}'.format(total_mora)).replace(",","."))
+            sheet.write(c, 8, str('{:,}'.format(total_pagos)).replace(",","."))            
             c += 1
             sheet.write(c, 0, str(cuotas[i]['fraccion']))
             sheet.write(c, 1, str(cuotas[i]['lote']))
@@ -1195,9 +1201,9 @@ def informe_general_reporte_excel(request):
             sheet.write(c, 3, str(cuotas[i]['cuota_nro']))
             sheet.write(c, 4, str(cuotas[i]['plan_de_pago']))
             sheet.write(c, 5, str(cuotas[i]['fecha_pago']))
-            sheet.write(c, 6, str(cuotas[i]['total_de_cuotas']))
-            sheet.write(c, 7, str(cuotas[i]['total_de_mora']))
-            sheet.write(c, 8, str(cuotas[i]['total_de_pago']))          
+            sheet.write(c, 6, str('{:,}'.format(cuotas[i]['total_de_cuotas'])).replace(",","."))
+            sheet.write(c, 7, str('{:,}'.format(cuotas[i]['total_de_mora'])).replace(",","."))
+            sheet.write(c, 8, str('{:,}'.format(cuotas[i]['total_de_pago'])).replace(",","."))      
             
             fraccion_actual = cuotas[i]['fraccion_id']
             total_cuotas = 0;
@@ -1207,17 +1213,18 @@ def informe_general_reporte_excel(request):
             total_mora += cuotas[i]['total_de_mora'];
             total_pagos += cuotas[i]['total_de_pago'];
             
-        if (i == len(cuotas) - 1):             
+        if (i == len(cuotas) - 1):  
+            c+=1           
             sheet.write(c, 0, "Totales de Fraccion", style2)
-            sheet.write(c, 6, total_cuotas, style2)
-            sheet.write(c, 7, total_mora, style2)
-            sheet.write(c, 8, total_pagos, style2)
+            sheet.write(c, 6, str('{:,}'.format(total_cuotas)).replace(",","."))
+            sheet.write(c, 7, str('{:,}'.format(total_mora)).replace(",","."))
+            sheet.write(c, 8, str('{:,}'.format(total_pagos)).replace(",","."))  
             
             
     sheet.write(c + 1, 0, "Totales Generales", style2)
-    sheet.write(c + 1, 6, total_general_cuotas, style2)
-    sheet.write(c + 1, 7, total_general_mora, style2)
-    sheet.write(c + 1, 8, total_general_pagos, style2)
+    sheet.write(c + 1, 6, str('{:,}'.format(total_general_cuotas)).replace(",","."), style2)
+    sheet.write(c + 1, 7, str('{:,}'.format(total_general_mora)).replace(",","."), style2)
+    sheet.write(c + 1, 8, str('{:,}'.format(total_general_pagos)).replace(",","."), style2)
     response = HttpResponse(content_type='application/vnd.ms-excel')
     # Crear un nombre intuitivo         
     response['Content-Disposition'] = 'attachment; filename=' + 'informe_general.xls'
@@ -1371,9 +1378,9 @@ def liquidacion_propietarios_reporte_excel(request):
         c += 1
         if (i == len(lista_pagos) - 1):             
             sheet.write(c, 0, "Liquidacion", style2)
-            sheet.write(c, 4, total_monto_pagado)
-            sheet.write(c, 5, total_monto_inm)
-            sheet.write(c, 6, total_monto_prop)
+            sheet.write(c, 4, str('{:,}'.format(total_monto_pagado, style2)).replace(",", "."))
+            sheet.write(c, 5, str('{:,}'.format(total_monto_inm, style2)).replace(",", "."))
+            sheet.write(c, 6, str('{:,}'.format(total_monto_prop, style2)).replace(",", "."))
         
   
     response = HttpResponse(content_type='application/vnd.ms-excel')
@@ -1438,12 +1445,14 @@ def liquidacion_vendedores_reporte_excel(request):
     style2 = xlwt.easyxf('font: name Arial, bold True;')
     # cabeceras
     sheet.write(0, 0, "Cliente", style)
-    sheet.write(0, 1, "Lote Nro.", style)    
-    sheet.write(0, 2, "Cuota Nro.", style)
-    sheet.write(0, 3, "Fecha de Pago", style)
-    sheet.write(0, 4, "Importe", style)
-    sheet.write(0, 5, "Comision", style)
-    sheet.write(0, 6, "Fraccion", style)
+    sheet.write(0, 1, "Nombre Fraccion", style)
+    sheet.write(0, 2, "Fraccion", style)
+    sheet.write(0, 3, "Lote Nro.", style)    
+    sheet.write(0, 4, "Cuota Nro.", style)
+    sheet.write(0, 5, "Fecha de Pago", style)
+    sheet.write(0, 6, "Importe", style)
+    sheet.write(0, 7, "Comision", style)
+    
     # guardamos la primera fraccion para comparar
     fraccion_actual = cuotas[0]['fraccion_id']
     
@@ -1462,12 +1471,14 @@ def liquidacion_vendedores_reporte_excel(request):
             total_comision += cuotas[i]['comision']
             
             sheet.write(c, 0, str(cuotas[i]['cliente']))
-            sheet.write(c, 1, str(cuotas[i]['lote']))
-            sheet.write(c, 2, str(cuotas[i]['cuota_nro']))
-            sheet.write(c, 3, str(cuotas[i]['fecha_pago']))
-            sheet.write(c, 4, str('{:,}'.format(cuotas[i]['importe']).replace(",",".")))
-            sheet.write(c, 5, str('{:,}'.format(cuotas[i]['comision']).replace(",",".")))
-            sheet.write(c, 6, str(cuotas[i]['fraccion']))
+            sheet.write(c, 1, str(cuotas[i]['fraccion']))
+            sheet.write(c, 2, str(cuotas[i]['fraccion_id']))
+            sheet.write(c, 3, str(cuotas[i]['lote']))
+            sheet.write(c, 4, str(cuotas[i]['cuota_nro']))
+            sheet.write(c, 5, str(cuotas[i]['fecha_pago']))
+            sheet.write(c, 6, str('{:,}'.format(cuotas[i]['importe']).replace(",",".")))
+            sheet.write(c, 7, str('{:,}'.format(cuotas[i]['comision']).replace(",",".")))
+            
             
             # ... y acumulamos para los totales generales
             total_general_importe += cuotas[i]['importe']
@@ -1475,17 +1486,18 @@ def liquidacion_vendedores_reporte_excel(request):
         else:
             c+=1 
             sheet.write(c, 0, "Totales de Fraccion", style2)
-            sheet.write(c, 4, str('{:,}'.format(total_importe)).replace(",","."))
-            sheet.write(c, 5, str('{:,}'.format(total_comision)).replace(",","."))            
+            sheet.write(c, 6, str('{:,}'.format(total_importe)).replace(",","."))
+            sheet.write(c, 7, str('{:,}'.format(total_comision)).replace(",","."))            
             c += 1
             fraccion_actual = cuotas[i]['fraccion_id']
             sheet.write(c, 0, str(cuotas[i]['cliente']))
-            sheet.write(c, 1, str(cuotas[i]['lote']))
-            sheet.write(c, 2, str(cuotas[i]['cuota_nro']))
-            sheet.write(c, 3, str(cuotas[i]['fecha_pago']))
-            sheet.write(c, 4, str(cuotas[i]['importe']))
-            sheet.write(c, 4, str('{:,}'.format(cuotas[i]['importe']).replace(",",".")))
-            sheet.write(c, 5, str('{:,}'.format(cuotas[i]['comision']).replace(",",".")))            
+            sheet.write(c, 1, str(cuotas[i]['fraccion']))
+            sheet.write(c, 2, str(cuotas[i]['fraccion_id']))
+            sheet.write(c, 3, str(cuotas[i]['lote']))
+            sheet.write(c, 4, str(cuotas[i]['cuota_nro']))
+            sheet.write(c, 5, str(cuotas[i]['fecha_pago']))
+            sheet.write(c, 6, str('{:,}'.format(cuotas[i]['importe']).replace(",",".")))
+            sheet.write(c, 7, str('{:,}'.format(cuotas[i]['comision']).replace(",",".")))          
             total_general_importe += cuotas[i]['importe']
             total_general_comision += cuotas[i]['comision'] 
             
@@ -1498,13 +1510,13 @@ def liquidacion_vendedores_reporte_excel(request):
         if (i == len(cuotas) - 1):   
             c += 1           
             sheet.write(c, 0, "Totales de Fraccion", style2)
-            sheet.write(c, 4, str('{:,}'.format(total_importe)).replace(",","."))
-            sheet.write(c, 5, str('{:,}'.format(total_comision)).replace(",","."))
+            sheet.write(c, 6, str('{:,}'.format(total_importe)).replace(",","."))
+            sheet.write(c, 7, str('{:,}'.format(total_comision)).replace(",","."))
             
     c += 1
     sheet.write(c, 0, "Totales del Vendedor", style2)
-    sheet.write(c, 4,  str('{:,}'.format(total_general_importe, style2).replace(",",".")))
-    sheet.write(c, 5, str('{:,}'.format(total_general_comision, style2).replace(",",".")))
+    sheet.write(c, 6,  str('{:,}'.format(total_general_importe, style2).replace(",",".")))
+    sheet.write(c, 7, str('{:,}'.format(total_general_comision, style2).replace(",",".")))
     response = HttpResponse(content_type='application/vnd.ms-excel')
     # Crear un nombre intuitivo         
     response['Content-Disposition'] = 'attachment; filename=' + 'liquidacion_vendedores.xls'
