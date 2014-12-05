@@ -35,7 +35,6 @@ table.listado-ventas {
 	margin-bottom:15px;
 	margin-left: 15px;
 	margin-right: 15px;
-	/* max-width: 100px; */
 	width: auto;
 }
 
@@ -47,12 +46,13 @@ table.listado-ventas tr td {
 }
 
 table.listado-ventas tr th {
-	padding:10px 10px 10px 40px;
+	padding: 10px 10px 10px 10px;
 	font-size:16px;
 	font-weight:400;
 	text-align:center;
 	background-color:#02B06B;
 	color:#FFF
+
 }
 
 table.listado-transferencias {
@@ -147,7 +147,6 @@ table.listado-pagos {
 	margin-bottom:15px;
 	margin-left: 15px;
 	margin-right: 15px;
-	/* max-width: 100px; */
 	width: auto;
 }
 
@@ -174,12 +173,12 @@ table.listado-lotes tr th {
 }
 
 table.listado-pagos tr th {
-	padding: 10px 10px 10px 0px;
-	font-size: 14px;
-	font-weight:400;
+	padding: 10px 10px 10px 10px;
+	font-size: 16px;
+	font-weight: 400;
 	text-align:center;
 	background-color:#02B06B;
-	color:#FFF
+	color:#FFF;
 }
 
 table.listado-lotes tr td {
