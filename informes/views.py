@@ -413,17 +413,8 @@ def informe_general(request):
                 })
                 return HttpResponse(t.render(c))                
         else:
-            return HttpResponseRedirect("/login") 
-                
-            
-    else:
-        t = loader.get_template('informes/informe_general.html')
-        c = RequestContext(request, {
-            # 'object_list': lista,
-            # 'fraccion': f,
-        })
-        return HttpResponse(t.render(c))    
-
+            return HttpResponseRedirect("/login")
+         
 def liquidacion_propietarios(request):
     if request.method == 'GET':
         if request.user.is_authenticated():
@@ -433,7 +424,8 @@ def liquidacion_propietarios(request):
                     'object_list': [],
                 })
                 return HttpResponse(t.render(c))
-            else: # Parametros SETEADOS   
+            else: # Parametros SETEADOS
+                t = loader.get_template('informes/liquidacion_propietarios.html')   
                 try:             
                     fecha_ini = request.GET['fecha_ini']
                     fecha_fin = request.GET['fecha_fin']
@@ -550,14 +542,24 @@ def liquidacion_propietarios(request):
                             lista_totales.append(total_monto_prop)     
                         except Exception, error:
                             print error        
-                    t = loader.get_template('informes/liquidacion_propietarios.html')         
+                    
+                    ultimo="&busqueda="+busqueda+"&tipo_busqueda="+tipo_busqueda+"&fecha_ini="+fecha_ini+"&fecha_fin="+fecha_fin
+                    paginator = Paginator(lista_pagos, 25)
+                    page = request.GET.get('page')
+                    try:
+                        lista = paginator.page(page)
+                    except PageNotAnInteger:
+                        lista = paginator.page(1)
+                    except EmptyPage:
+                        lista = paginator.page(paginator.num_pages)          
                     c = RequestContext(request, {
-                        'object_list': lista_pagos,
+                        'object_list': lista,
                         'lista_totales' : lista_totales,
                         'fecha_ini':fecha_ini,
                         'fecha_fin':fecha_fin,
                         'tipo_busqueda':tipo_busqueda,
-                        'busqueda':busqueda
+                        'busqueda':busqueda,
+                        'ultimo': ultimo
                     })
                     return HttpResponse(t.render(c))    
                 except Exception, error:
@@ -575,6 +577,7 @@ def liquidacion_vendedores(request):
                 })
                 return HttpResponse(t.render(c))                
             else:#Parametros seteados
+                t = loader.get_template('informes/liquidacion_vendedores.html')
                 fecha_ini = request.GET['fecha_ini']
                 fecha_fin = request.GET['fecha_fin']
                 fecha_ini_parsed = str(datetime.strptime(fecha_ini, "%d/%m/%Y").date())
@@ -637,13 +640,23 @@ def liquidacion_vendedores(request):
                         total_comision=0
                     cuotas.append(cuota)
                             
-            t = loader.get_template('informes/liquidacion_vendedores.html')         
+            
+            ultimo="&busqueda="+busqueda+"&tipo_busqueda="+tipo_busqueda+"&fecha_ini="+fecha_ini+"&fecha_fin="+fecha_fin         
+            paginator = Paginator(cuotas, 25)
+            page = request.GET.get('page')
+            try:
+                lista = paginator.page(page)
+            except PageNotAnInteger:
+                lista = paginator.page(1)
+            except EmptyPage:
+                lista = paginator.page(paginator.num_pages) 
             c = RequestContext(request, {
-                'lista_cuotas': cuotas,
+                'lista_cuotas': lista,
                 'fecha_ini':fecha_ini,
                 'fecha_fin':fecha_fin,
                 'tipo_busqueda':tipo_busqueda,
-                'busqueda':busqueda
+                'busqueda':busqueda,
+                'ultimo': ultimo
             })
             return HttpResponse(t.render(c))    
         else:    
@@ -714,12 +727,22 @@ def liquidacion_gerentes(request):
                         total_monto_gerente=0
                     cuotas.append(cuota)
                             
-            t = loader.get_template('informes/liquidacion_gerentes.html')         
+            t = loader.get_template('informes/liquidacion_gerentes.html')
+            ultimo="&fraccion="+fraccion_id+"&fecha_ini="+fecha_ini+"&fecha_fin="+fecha_fin         
+            paginator = Paginator(cuotas, 25)
+            page = request.GET.get('page')
+            try:
+                lista = paginator.page(page)
+            except PageNotAnInteger:
+                lista = paginator.page(1)
+            except EmptyPage:
+                lista = paginator.page(paginator.num_pages)          
             c = RequestContext(request, {
-                'lista_cuotas': cuotas,
+                'lista_cuotas': lista,
                 'fecha_ini':fecha_ini,
                 'fecha_fin':fecha_fin,
-                'fraccion': fraccion_id
+                'fraccion': fraccion_id,
+                'ultimo' : ultimo
             })
             return HttpResponse(t.render(c))    
         else:    
@@ -735,6 +758,7 @@ def informe_movimientos(request):
                 })
                 return HttpResponse(t.render(c))
             else: #Parametros seteados
+                t = loader.get_template('informes/informe_movimientos.html')
                 lote_id=request.GET['lote_id']
                 fecha_ini=request.GET['fecha_ini']
                 fecha_fin=request.GET['fecha_fin']
@@ -859,14 +883,24 @@ def informe_movimientos(request):
                         cuota.append(str('{:,}'.format(pago.total_de_cuotas)).replace(",","."))
                         cuota.append(" ")
                         lista_movimientos.append(cuota)
-            t = loader.get_template('informes/informe_movimientos.html')
-            c = RequestContext(request, {
-                'lista_movimientos': lista_movimientos,
-                'lote_id' : lote_id,
-                'fecha_ini' : fecha_ini,
-                'fecha_fin' : fecha_fin     
-            })
-            return HttpResponse(t.render(c)) 
+            
+                ultimo="&lote_id="+lote_id+"&fecha_ini="+fecha_ini+"&fecha_fin="+fecha_fin
+                paginator = Paginator(lista_movimientos, 25)
+                page = request.GET.get('page')
+                try:
+                    lista = paginator.page(page)
+                except PageNotAnInteger:
+                    lista = paginator.page(1)
+                except EmptyPage:
+                    lista = paginator.page(paginator.num_pages) 
+                c = RequestContext(request, {
+                    'lista_movimientos': lista,
+                    'lote_id' : lote_id,
+                    'fecha_ini' : fecha_ini,
+                    'fecha_fin' : fecha_fin,
+                    'ultimo': ultimo
+                })
+                return HttpResponse(t.render(c)) 
         else:
             return HttpResponseRedirect("/login") 
 

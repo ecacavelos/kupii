@@ -25,7 +25,7 @@
 		}
 		else{
 			$('.listado-pagos').show();
-			$('.pagination').hide();
+			$('.pagination').show();
 		}
 
 	});
@@ -147,11 +147,18 @@
 		<tr id='fila_totales' style="display: none;"></tr>
 		{% endfor %}
 		<div class="pagination">
-			<span class="step-links"> {%if object_list.has_previous%} <a href="?page={{ object_list.previous_page_number }}"> Anterior</a> {%endif%}
-				P&aacute;gina
-				|{{object_list.number}}|
-
-				{%if object_list.has_next%} <a href="?page={{ object_list.next_page_number }}"> Siguiente</a> {%endif%} </span>
+			<span class="step-links">
+				Mostrando {{ lista_cuotas.start_index }}-{{ lista_cuotas.end_index }} de {{ lista_cuotas.paginator.count }} Resultados
+				{%if lista_cuotas.has_previous%} 
+				<a href="?page={{ lista_cuotas.first_index}}{{ultimo}}"> Primera </a> 
+				<a href="?page={{ lista_cuotas.previous_page_number }}{{ultimo}}"> Anterior</a> 
+				{%endif%}
+				P&aacute;gina |{{lista_cuotas.number}}|		
+				{%if lista_cuotas.has_next%} 
+				<a href="?page={{ lista_cuotas.next_page_number }}{{ultimo}}"> Siguiente </a> 				
+				<a href="?page={{ lista_cuotas.end_index}}{{ultimo}}"> Ultima </a> 
+				{%endif%} 
+			</span>
 		</div>
 	</table>
 </div>

@@ -108,14 +108,16 @@
 				{% endif %}
 			{% endfor %}
 		<div class="pagination">
-			<span class="step-links"> 
+			<span class="step-links">
+				Mostrando {{ lista_lotes.start_index }}-{{ lista_lotes.end_index }} de {{ lista_lotes.paginator.count }} Resultados
 				{%if lista_lotes.has_previous%} 
+				<a href="?page={{ lista_lotes.first_index}}{{ultimo}}"> Primera </a> 
 				<a href="?page={{ lista_lotes.previous_page_number }}{{ultimo}}"> Anterior</a> 
 				{%endif%}
-				P&aacute;gina |{{lista_lotes.number}}|
-				
+				P&aacute;gina |{{lista_lotes.number}}|		
 				{%if lista_lotes.has_next%} 
-				<a href="?page={{ lista_lotes.next_page_number }}{{ultimo}}"> Siguiente</a> 
+				<a href="?page={{ lista_lotes.next_page_number }}{{ultimo}}"> Siguiente </a> 				
+				<a href="?page={{ lista_lotes.end_index}}{{ultimo}}"> Ultima </a> 
 				{%endif%} 
 			</span>
 		</div>
