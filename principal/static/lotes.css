@@ -26,7 +26,7 @@ li{
 table.listado-lotes {
 	border: 5px solid #CCC;
 	margin-bottom:15px;
-	margin-left: 15px;
+	margin-left: 70px;
 	margin-right: 15px;
 }
 
@@ -122,9 +122,10 @@ table.listado-movimientos tr th {
 }
 
 table.listado-clientes-atrasados {
-	border:2px solid #CCC;
+	border: 5px solid #CCC;
 	margin-bottom:15px;
-	margin-left: 95px;
+	margin-left: 40px;
+	margin-right: 15px;
 }
 
 table.listado-clientes-atrasados tr td {
@@ -135,6 +136,12 @@ table.listado-clientes-atrasados tr td {
 }
 
 table.listado-clientes-atrasados tr th {
+	/*font-size:16px;
+	font-weight:400;
+	text-align:center;
+	background-color:#02B06B;
+	color:#FFF*/
+	padding: 10px 10px 10px 10px;
 	font-size:16px;
 	font-weight:400;
 	text-align:center;
