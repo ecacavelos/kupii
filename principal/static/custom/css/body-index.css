@@ -487,4 +487,15 @@ input[type=button]:active {
         box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.7);
 	}
 
+input:enabled {
+    /*background: #FFFFFF;*/
+}
+
+input:disabled {
+    background: #dddddd;
+}
+a[disabled] {
+    pointer-events: none;
+    background-color: #dddddd !important;
+}
 /*FIN Form*/

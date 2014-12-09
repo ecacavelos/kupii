@@ -1,17 +1,18 @@
 {% extends "lotes/base_lotes.html" %}
 {% block header_scripts %}
-
 <script type="text/javascript">
-	$(document).ready(function() {
+$(document).ready(function() {
 
 	var fecha_ini = "{{fecha_ini}}";
 	var fecha_fin= "{{fecha_fin}}";
 	var tipo_busqueda="{{tipo_busqueda}}";
+	var busqueda_label="{{busqueda_label}}";
 	var busqueda="{{busqueda}}";
 
 	$('#fecha_ini').val(fecha_ini);
 	$('#fecha_fin').val(fecha_fin);
 	$('#id_tipo_busqueda').val(tipo_busqueda);
+	$('#id_busqueda_label').val(busqueda_label);
 	$('#id_busqueda').val(busqueda);
 
 	$('#fecha_ini').mask('##/##/####');
@@ -19,19 +20,6 @@
 	$('#fecha_fin').mask('##/##/####');
 	$("#fecha_fin").datepicker({ dateFormat: 'dd/mm/yy' });
 
-	lista_totales=[];
-
-	lista_totales[1]="0";
-	lista_totales[2]="0";
-	lista_totales[3]="0";
-
-	{%for lt in lista_totales%}
-	lista_totales[{{forloop.counter}}]=
-	"{{lt}}";
-	{%endfor%}
-
-	fila = "<td colspan='4'>Liquidacion:</td><td>" + lista_totales[1] + "</td><td>" + lista_totales[2] + "</td><td>" + lista_totales[3] + "</td>";
-	$('#fila_totales').html(fila);
 	if ($("#fecha_ini").val() == "" &&  $("#fecha_fin").val() == ""){ //parametros no seteados
 		$('.listado-pagos').hide();
 		$('.pagination').hide();
@@ -40,34 +28,10 @@
 		$('.listado-pagos').show();
 		$('.pagination').show();
 	}
-	
+	setup_inputs();		
 	});
-
-	function retrieve_liquidacion_propietarios() {
-		if ($('#fecha_ini').val() == "" || $('#fecha_fin').val() == "") {
-			alert("Debe ingresar un rango de fechas");
-			return;
-		}
-		if ($('#fraccion_ini').val() == 0 || $('#fraccion_fin').val() == 0 || $('#fraccion_ini').val() == "" || $('#fraccion_fin').val() == "") {
-			alert("Debe ingresar un rango de fracciones");
-			return;
-		}
-		window.location.href = "/informes/liquidacion_propietarios_reporte_excel?fecha_ini=" + $('#fecha_ini').val() + "&fecha_fin=" + $('#fecha_fin').val() + "&tipo_busqueda=" + $('#id_tipo_busqueda').val() + "&busqueda=" + $('#id_busqueda').val();
-	}
-
-	function validar() {
-		if ($('#fecha_ini').val() == "" || $('#fecha_fin').val() == "") {
-			alert("Debe ingresar un rango de fechas");
-			return;
-		}
-		if ($('#fraccion_ini').val() == 0 || $('#fraccion_fin').val() == 0 || $('#fraccion_ini').val() == "" || $('#fraccion_fin').val() == "") {
-			alert("Debe ingresar un rango de fracciones");
-			return;
-		}
-		$("#frm_busqueda").submit();
-	}
-
 </script>
+<script type="text/javascript" src="{{ STATIC_URL }}informes/liquidacion_propietarios.js"></script>
 {% endblock %}
 {% block content %}
 <div class="gri16 text-izquierda" id="breadcumb">
@@ -96,7 +60,8 @@
 					<option value="propietario">Propietario</option>
 				</select></td>
 				<td>
-				<input name="busqueda" id="id_busqueda" type="text" value=""/>
+				<input name="busqueda_label" id="id_busqueda_label" type="text" value=""/>
+				<input name="busqueda" id="id_busqueda" type="hidden" value=""/>
 				</td>
 			</tr>
 
@@ -112,7 +77,7 @@
 			</tr>
 			<tr>
 				<td>
-				<input type="button" value="Buscar" onclick="validar();" class="historico" style="cursor: pointer"/>
+				<input id="boton_buscar" type="button" value="Buscar" onclick="validar();" class="historico" style="cursor: pointer"/>
 				</td>
 				<td>
 				<a class="boton-verde" id="id_boton" onclick="retrieve_liquidacion_propietarios();">Descargar como Excel</a>

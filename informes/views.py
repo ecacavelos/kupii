@@ -439,6 +439,7 @@ def liquidacion_propietarios(request):
                     monto_inmobiliaria = 0
                     monto_propietario = 0
                     busqueda = request.GET['busqueda']
+                    busqueda_label = request.GET['busqueda_label']                    
                     if tipo_busqueda == "fraccion":
                         try:
                             fraccion_id = request.GET['busqueda']
@@ -553,6 +554,7 @@ def liquidacion_propietarios(request):
                         'fecha_fin':fecha_fin,
                         'tipo_busqueda':tipo_busqueda,
                         'busqueda':busqueda,
+                        'busqueda_label':busqueda_label,
                         'ultimo': ultimo
                     })
                     return HttpResponse(t.render(c))    
