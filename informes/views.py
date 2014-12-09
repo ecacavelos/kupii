@@ -45,7 +45,8 @@ def lotes_libres(request):
                     for m in manzanas:
                         lotes = Lote.objects.filter(manzana=m.id)
                         for l in lotes:
-                            object_list.append(l)                     
+                            object_list.append(l)
+                                         
                 else:       
                     object_list = Lote.objects.filter(estado="1").order_by('manzana', 'nro_lote')
                  
@@ -846,15 +847,16 @@ def informe_movimientos(request):
                         print error
                         lista_transferencias = []
                         pass
-                venta = []
-                venta.append(lista_ventas.fecha_de_venta)
-                venta.append(lista_ventas.cliente)
-                venta.append(str(0) + '/' + str(lista_ventas.plan_de_pago.cantidad_de_cuotas))
-                venta.append("Entrega inicial")
-                venta.append(str('{:,}'.format(lista_ventas.precio_final_de_venta)).replace(",","."))
-                venta.append(str('{:,}'.format(lista_ventas.entrega_inicial)).replace(",","."))
-                venta.append(str('{:,}'.format(lista_ventas.precio_final_de_venta-lista_ventas.entrega_inicial)).replace(",","."))
-                lista_movimientos.append(venta)
+                if lista_ventas:
+                    venta = []
+                    venta.append(lista_ventas.fecha_de_venta)
+                    venta.append(lista_ventas.cliente)
+                    venta.append(str(0) + '/' + str(lista_ventas.plan_de_pago.cantidad_de_cuotas))
+                    venta.append("Entrega inicial")
+                    venta.append(str('{:,}'.format(lista_ventas.precio_final_de_venta)).replace(",","."))
+                    venta.append(str('{:,}'.format(lista_ventas.entrega_inicial)).replace(",","."))
+                    venta.append(str('{:,}'.format(lista_ventas.precio_final_de_venta-lista_ventas.entrega_inicial)).replace(",","."))
+                    lista_movimientos.append(venta)
                 if lista_pagos:  
                     saldo_anterior=lista_ventas.precio_final_de_venta
                     monto=lista_ventas.entrega_inicial
