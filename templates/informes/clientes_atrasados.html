@@ -17,13 +17,25 @@ function buscar(){
 	*/
 }
 function retrieve_clientes_atrasados(){
-	window.location.href = "/informes/clientes_atrasados_reporte_excel?meses_de_atraso="+$("#busqueda").val();
+	var filter_get_parameters = "?";
+	filter_get_parameters += "meses_atraso=" + $('#meses_atraso').val();
+	filter_get_parameters += "&" + "fraccion=" + $('#fraccion').val();
+	window.location.href = "/informes/clientes_atrasados_reporte_excel" + filter_get_parameters;
 }
-
+function validar() {
+	var filter_get_parameters = "?";
+	filter_get_parameters += "meses_atraso=" + $('#meses_atraso').val();
+	filter_get_parameters += "&" + "fraccion=" + $('#fraccion').val();
+	window.location.href = "/informes/clientes_atrasados_reporte_excel" + filter_get_parameters;
+	$("#frm_busqueda").submit();
+}
 
 $(document).ready(function() {
 	$('#busqueda').mask('###/###/####');
-	
+	var fraccion = "{{fraccion}}";
+	$('#fraccion').val(fraccion);
+	var meses_atraso ="{{meses_atraso}}";
+	$('#meses_atraso').val(meses_atraso);
 });	
 	
 </script>
@@ -36,37 +48,24 @@ $(document).ready(function() {
 					</div>
 
 					<div class="clear"></div>
-
-					<div class="grid_10">
-  						<h1>Listado de Clientes Atrasados</h1>
-					</div>
+  					<h1>Listado de Clientes Atrasados</h1>
 
 					<div class="grid_6">
-  						<form name="frm_busqueda" id="frm_busqueda" method="post" action="/informes/clientes_atrasados/">
-  							<!--<table id="lista-categoria" frame="box">
+  						<form name="frm_busqueda" id="frm_busqueda" method="get" action="/informes/clientes_atrasados/">
+  							<table id="lista-categoria" frame="box">
 								<tr>
 								<th class="acciones" colspan="3"><strong><a href="#" style="color: white;">Filtrar</a></strong></th>
 								</tr>
 								<tr>
+									<td>Por Nro. Faccion:</td>
 									<td>
-									<select id="id_tipo_busqueda" name="tipo_busqueda">
-										<option value="">Elija una opcion</option>
-										<option value="fraccion">Fraccion</option>
-										<option value="propietario">Propietario</option>
-									</select></td>
-									<td>
-									<input name="busqueda" id="id_busqueda" type="text" value=""/>
+									<input name="fraccion" id="fraccion" type="text" value="" placeholder="Nro. Fraccion"/>
 									</td>
 								</tr>
-					
-								<th></th><th>Desde:</th><th>Hasta:</th>
 								<tr>
-									<td> Rango de Fecha: </td>
+									<td> Meses de Atraso: </td>
 									<td>
-									<input name="fecha_ini" id="fecha_ini" type="text" value="" />
-									</td>
-									<td>
-									<input name="fecha_fin" id="fecha_fin" type="text" value="" />
+									<input name="meses_atraso" id="meses_atraso" type="text" value="" placeholder="Ej:2"/>
 									</td>
 								</tr>
 								<tr>
@@ -74,21 +73,17 @@ $(document).ready(function() {
 									<input type="button" value="Buscar" onclick="validar();" class="historico" style="cursor: pointer"/>
 									</td>
 									<td>
-									<a class="boton-verde" id="id_boton" onclick="retrieve_liquidacion_propietarios();">Descargar como Excel</a>
+									<input name="tabla" type="hidden" value="lote" />
+									<a class="boton-verde" id="id_boton" onclick="retrieve_clientes_atrasados();">Descargar como Excel</a>
 									</td>
 								</tr>
-						  </table>-->
-  							{% csrf_token %}								
+						  </table>								
 						</form>
 					</div>
-					<div class="grid_6">
-						<a class="boton-verde" id="id_boton" onclick="retrieve_clientes_atrasados();">Descargar como Excel</a>
-					</div>
-
 					<div class="clear"></div>
-					<div id="listado-cuadro-busqueda">
-						
-						<br><br>
+					<div id="listado-cuadro-busqueda">						
+						<br>
+						<br>
 					</div>
 					<div id="listado-item-lote">
 						<table width="50%" border="1" cellpadding="0" cellspacing="0" class="listado-clientes-atrasados" align="center">
@@ -99,7 +94,7 @@ $(document).ready(function() {
 {% for hw in object_list %}
 		<tr>
 			<td>			    
-			    <a href="/informes/detalle_pagos_clientes?venta_id={{hw.id}}&cliente_id={{ hw.cliente_id }}">{{hw.cliente}} <strong>(Ver Detalles)</strong></a>
+			    {{hw.cliente}}
 			</td>
 			<td>				
 				{{hw.manzana}} 
@@ -137,13 +132,13 @@ $(document).ready(function() {
 <div class="pagination">
     <span class="step-links">
         {%if object_list.has_previous%}
-        <a href="?page={{ object_list.previous_page_number }}"> Anterior</a>
+        <a href="?page={{ object_list.previous_page_number }}{{ultimo}}"> Anterior</a>
 		{%endif%}
     	P&aacute;gina
     	|{{object_list.number}}|
     	
     	{%if object_list.has_next%}
-		<a href="?page={{ object_list.next_page_number }}"> Siguiente</a>
+		<a href="?page={{ object_list.next_page_number }}{{ultimo}}"> Siguiente</a>
 		{%endif%}
         
     </span>
