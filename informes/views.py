@@ -491,8 +491,7 @@ def liquidacion_propietarios(request):
                             print error                    
                                                                                        
                     else:                
-                        propietario = request.GET['busqueda']    
-                        propietario_id = Propietario.objects.get(nombres__icontains=propietario)
+                        propietario_id = request.GET['busqueda']
                         fracciones_list = Fraccion.objects.filter(propietario_id=propietario_id)
                         for f in fracciones_list:
                             manzana_list = Manzana.objects.filter(fraccion_id=f.id)

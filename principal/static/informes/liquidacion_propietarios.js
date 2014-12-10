@@ -79,8 +79,8 @@
 							minLength : 1,
 							select : function(event, ui) {
 								id_propietario = ui.item.id;
-								alert(id_propietario);
 								$("#id_busqueda").val(id_propietario);
+								//alert(id_propietario);
 							}
 						});												
 					}
