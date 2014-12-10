@@ -1,12 +1,4 @@
 	function retrieve_liquidacion_propietarios() {
-		if ($('#fecha_ini').val() == "" || $('#fecha_fin').val() == "") {
-			alert("Debe ingresar un rango de fechas");
-			return;
-		}
-		if ($('#fraccion_ini').val() == 0 || $('#fraccion_fin').val() == 0 || $('#fraccion_ini').val() == "" || $('#fraccion_fin').val() == "") {
-			alert("Debe ingresar un rango de fracciones");
-			return;
-		}
 		window.location.href = "/informes/liquidacion_propietarios_reporte_excel?fecha_ini=" + $('#fecha_ini').val() + "&fecha_fin=" + $('#fecha_fin').val() + "&tipo_busqueda=" + $('#id_tipo_busqueda').val() + "&busqueda=" + $('#id_busqueda').val();
 	}
 

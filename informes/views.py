@@ -537,7 +537,7 @@ def liquidacion_propietarios(request):
                         except Exception, error:
                             print error        
                     
-                    ultimo="&busqueda="+busqueda+"&tipo_busqueda="+tipo_busqueda+"&fecha_ini="+fecha_ini+"&fecha_fin="+fecha_fin
+                    ultimo="&tipo_busqueda="+tipo_busqueda+"&busqueda="+busqueda+"&busqueda_label="+busqueda_label+"&fecha_ini="+fecha_ini+"&fecha_fin="+fecha_fin
                     paginator = Paginator(lista_pagos, 25)
                     page = request.GET.get('page')
                     try:
@@ -577,16 +577,10 @@ def liquidacion_vendedores(request):
                 fecha_fin = request.GET['fecha_fin']
                 fecha_ini_parsed = str(datetime.strptime(fecha_ini, "%d/%m/%Y").date())
                 fecha_fin_parsed = str(datetime.strptime(fecha_fin, "%d/%m/%Y").date())
-                tipo_busqueda = request.GET['tipo_busqueda']
-                busqueda = request.GET['busqueda']
-                if(tipo_busqueda=='vendedor_id'):
-                    vendedor_id=request.GET['busqueda']
-                    print("vendedor_id ->" + vendedor_id)
-                if(tipo_busqueda=='nombre'):
-                    nombre_vendedor=request.GET['busqueda']
-                    print("nombre_vendedor ->" + nombre_vendedor)
-                    vendedor=Vendedor.objects.get(nombres__icontains=nombre_vendedor)
-                    vendedor_id=str(vendedor.id)
+                busqueda_label = request.GET['busqueda_label']
+                vendedor_id=request.GET['busqueda']
+                print("vendedor_id ->" + vendedor_id)
+                
                 query=(
                 '''
                 select pc.* from principal_pagodecuotas pc, principal_lote l, principal_manzana m, principal_fraccion f
@@ -636,7 +630,7 @@ def liquidacion_vendedores(request):
                     cuotas.append(cuota)
                             
             
-            ultimo="&busqueda="+busqueda+"&tipo_busqueda="+tipo_busqueda+"&fecha_ini="+fecha_ini+"&fecha_fin="+fecha_fin         
+            ultimo="&busqueda_label="+busqueda_label+"&busqueda="+vendedor_id+"&fecha_ini="+fecha_ini+"&fecha_fin="+fecha_fin         
             paginator = Paginator(cuotas, 25)
             page = request.GET.get('page')
             try:
@@ -649,8 +643,8 @@ def liquidacion_vendedores(request):
                 'lista_cuotas': lista,
                 'fecha_ini':fecha_ini,
                 'fecha_fin':fecha_fin,
-                'tipo_busqueda':tipo_busqueda,
-                'busqueda':busqueda,
+                'busqueda':vendedor_id,
+                'busqueda_label':busqueda_label,
                 'ultimo': ultimo
             })
             return HttpResponse(t.render(c))    
@@ -1903,7 +1897,6 @@ def filtros_establecidos(request, tipo_informe):
         try:
             fecha_ini=request['fecha_ini']
             fecha_fin=request['fecha_fin']
-            tipo_busqueda=request['tipo_busqueda']
             busqueda=request['busqueda']
             return True
         except:

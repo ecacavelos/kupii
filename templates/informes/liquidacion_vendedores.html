@@ -1,18 +1,17 @@
 {% extends "lotes/base_lotes.html" %}
 {% block header_scripts %}
-
 <script type="text/javascript" >
 	$(document).ready(function() {
 
 		var fecha_ini = "{{fecha_ini}}";
 		var fecha_fin = "{{fecha_fin}}";
-		var tipo_busqueda = "{{tipo_busqueda}}";
 		var busqueda = "{{busqueda}}";
+		var busqueda_label="{{busqueda_label}}";
 
 		$('#fecha_ini').val(fecha_ini);
 		$('#fecha_fin').val(fecha_fin);
-		$('#id_tipo_busqueda').val(tipo_busqueda);
 		$('#id_busqueda').val(busqueda);
+		$('#id_busqueda_label').val(busqueda_label);
 
 		$('#fecha_ini').mask('##/##/####');
 		$("#fecha_ini").datepicker({
@@ -31,41 +30,10 @@
 			$('.listado-pagos').show();
 			$('.pagination').show();
 		}
+		setup_inputs();
 	});
-
-	function retrieve_liquidacion_vendedores() {
-		if ($('#fecha_ini').val() == "" || $('#fecha_fin').val() == "") {
-			alert("Debe ingresar un rango de fechas");
-			return;
-		}
-		if ($('#id_tipo_busqueda').val() == null) {
-			alert("Debe elegir un criterio de busqueda");
-			return;
-		}
-		if ($('#id_busqueda').val() == "") {
-			alert("Debe ingresar un valor para buscar");
-			return;
-		}
-		window.location.href = "/informes/liquidacion_vendedores_reporte_excel?fecha_ini=" + $('#fecha_ini').val() + "&fecha_fin=" + $('#fecha_fin').val() + "&busqueda=" + $('#id_busqueda').val() + "&tipo_busqueda=" + $('#id_tipo_busqueda').val();
-	}
-
-	function validar() {
-		if ($('#fecha_ini').val() == "" || $('#fecha_fin').val() == "") {
-			alert("Debe ingresar un rango de fechas");
-			return;
-		}
-		if ($('#id_tipo_busqueda').val() == null) {
-			alert("Debe elegir un criterio de busqueda");
-			return;
-		}
-		if ($('#id_busqueda').val() == "") {
-			alert("Debe ingresar un valor para buscar");
-			return;
-		}
-		$("#frm_busqueda").submit();
-	}
-
 </script>
+<script type="text/javascript" src="{{ STATIC_URL }}informes/liquidacion_vendedores.js"></script>
 {% endblock %}
 {% block content %}
 <div class="gri16 text-izquierda" id="breadcumb">
@@ -86,17 +54,12 @@
 				<th class="acciones" colspan="3"><strong><a href="#" style="color: white;">Filtrar</a></strong></th>
 			</tr>
 			<tr>
-				<td>
-				<select id="id_tipo_busqueda" name="tipo_busqueda">
-					<option value="">Elija una opcion</option>
-					<option value="vendedor_id">Vendedor ID</option>
-					<option value="nombre">Nombre de Vendedor</option>
-				</select></td>
-				<td>
-				<input name="busqueda" id="id_busqueda" type="text" value=""/>
+				<td> Vendedor: </td>
+				<td>				
+				<input name="busqueda_label" id="id_busqueda_label" type="text" value=""/>
+				<input name="busqueda" id="id_busqueda" type="hidden" value=""/>
 				</td>
 			</tr>
-
 			<th></th><th>Desde:</th><th>Hasta:</th>
 			<tr>
 				<td> Rango de Fecha: </td>
