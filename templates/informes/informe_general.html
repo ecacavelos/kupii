@@ -3,6 +3,26 @@
 
 <script type="text/javascript">
 	$(document).ready(function() {
+		//Cambiar calendario a español
+		$.datepicker.regional['es'] = {
+			closeText : 'Cerrar',
+			prevText : '<Ant',
+			nextText : 'Sig>',
+			currentText : 'Hoy',
+			monthNames : ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+			monthNamesShort : ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+			dayNames : ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
+			dayNamesShort : ['Dom', 'Lun', 'Mar', 'Mié', 'Juv', 'Vie', 'Sáb'],
+			dayNamesMin : ['Do', 'Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sá'],
+			weekHeader : 'Sm',
+			dateFormat : 'dd/mm/yy',
+			firstDay : 1,
+			isRTL : false,
+			showMonthAfterYear : false,
+			yearSuffix : ''
+		};
+		// Setear idioma al calendario
+		$.datepicker.setDefaults($.datepicker.regional['es']);
 
 		var fraccion_ini = "{{fraccion_ini}}";
 		var fraccion_fin = "{{fraccion_fin}}";
@@ -155,18 +175,10 @@
 		{% endif %}
 		{% endfor %}
 		<div class="pagination">
-			<span class="step-links">
-				Mostrando {{ lista_cuotas.start_index }}-{{ lista_cuotas.end_index }} de {{ lista_cuotas.paginator.count }} Resultados
-				{%if lista_cuotas.has_previous%} 
-				<a href="?page={{ lista_cuotas.first_index}}{{ultimo}}"> Primera </a> 
-				<a href="?page={{ lista_cuotas.previous_page_number }}{{ultimo}}"> Anterior</a> 
-				{%endif%}
-				P&aacute;gina |{{lista_cuotas.number}}|		
-				{%if lista_cuotas.has_next%} 
-				<a href="?page={{ lista_cuotas.next_page_number }}{{ultimo}}"> Siguiente </a> 				
-				<a href="?page={{ lista_cuotas.end_index}}{{ultimo}}"> Ultima </a> 
-				{%endif%} 
-			</span>
+			<span class="step-links"> Mostrando {{ lista_cuotas.start_index }}-{{ lista_cuotas.end_index }} de {{ lista_cuotas.paginator.count }} Resultados
+				{%if lista_cuotas.has_previous%} <a href="?page={{ lista_cuotas.first_index}}{{ultimo}}"> Primera </a> <a href="?page={{ lista_cuotas.previous_page_number }}{{ultimo}}"> Anterior</a> {%endif%}
+				P&aacute;gina |{{lista_cuotas.number}}|
+				{%if lista_cuotas.has_next%} <a href="?page={{ lista_cuotas.next_page_number }}{{ultimo}}"> Siguiente </a> <a href="?page={{ lista_cuotas.end_index}}{{ultimo}}"> Ultima </a> {%endif%} </span>
 		</div>
 	</table>
 </div>

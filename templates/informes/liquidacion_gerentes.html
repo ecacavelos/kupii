@@ -3,10 +3,30 @@
 
 <script type="text/javascript">
 	$(document).ready(function() {
+		//Cambiar calendario a español
+		$.datepicker.regional['es'] = {
+			closeText : 'Cerrar',
+			prevText : '<Ant',
+			nextText : 'Sig>',
+			currentText : 'Hoy',
+			monthNames : ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+			monthNamesShort : ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+			dayNames : ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
+			dayNamesShort : ['Dom', 'Lun', 'Mar', 'Mié', 'Juv', 'Vie', 'Sáb'],
+			dayNamesMin : ['Do', 'Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sá'],
+			weekHeader : 'Sm',
+			dateFormat : 'dd/mm/yy',
+			firstDay : 1,
+			isRTL : false,
+			showMonthAfterYear : false,
+			yearSuffix : ''
+		};
+		// Setear idioma al calendario
+		$.datepicker.setDefaults($.datepicker.regional['es']);
 		var fecha_ini = "{{fecha_ini}}";
 		var fecha_fin = "{{fecha_fin}}";
 		var fraccion = "{{fraccion}}";
-		var busqueda_label="{{busqueda_label}}";
+		var busqueda_label = "{{busqueda_label}}";
 
 		$('#fecha_ini').val(fecha_ini);
 		$('#fecha_fin').val(fecha_fin);
@@ -21,17 +41,16 @@
 		$("#fecha_fin").datepicker({
 			dateFormat : 'dd/mm/yy'
 		});
-		if ($("#fecha_ini").val() == "" &&  $("#fecha_fin").val() == ""){ //parametros no seteados
+		if ($("#fecha_ini").val() == "" && $("#fecha_fin").val() == "") {//parametros no seteados
 			$('.listado-pagos').hide();
 			$('.pagination').hide();
-		}
-		else{
+		} else {
 			$('.listado-pagos').show();
 			$('.pagination').show();
 		}
 		setup_inputs();
 	});
-	
+
 </script>
 <script type="text/javascript" src="{{ STATIC_URL }}informes/liquidacion_gerentes.js"></script>
 {% endblock %}
@@ -73,13 +92,11 @@
 				<td>
 				<input type="button" value="Buscar" onclick="validar();" class="historico" style="cursor: pointer"/>
 				</td>
-				<td>
-				<a class="boton-verde" id="id_boton" onclick="retrieve_liquidacion_gerentes();">Descargar como Excel</a>
-				</td>
+				<td><a class="boton-verde" id="id_boton" onclick="retrieve_liquidacion_gerentes();">Descargar como Excel</a></td>
 			</tr>
 		</table>
 	</form>
-	
+
 </div>
 
 <div class="clear"></div>
@@ -126,18 +143,10 @@
 		<tr id='fila_totales' style="display: none;"></tr>
 		{% endfor %}
 		<div class="pagination">
-			<span class="step-links">
-				Mostrando {{ lista_cuotas.start_index }}-{{ lista_cuotas.end_index }} de {{ lista_cuotas.paginator.count }} Resultados
-				{%if lista_cuotas.has_previous%} 
-				<a href="?page={{ lista_cuotas.first_index}}{{ultimo}}"> Primera </a> 
-				<a href="?page={{ lista_cuotas.previous_page_number }}{{ultimo}}"> Anterior</a> 
-				{%endif%}
-				P&aacute;gina |{{lista_cuotas.number}}|		
-				{%if lista_cuotas.has_next%} 
-				<a href="?page={{ lista_cuotas.next_page_number }}{{ultimo}}"> Siguiente </a> 				
-				<a href="?page={{ lista_cuotas.end_index}}{{ultimo}}"> Ultima </a> 
-				{%endif%} 
-			</span>
+			<span class="step-links"> Mostrando {{ lista_cuotas.start_index }}-{{ lista_cuotas.end_index }} de {{ lista_cuotas.paginator.count }} Resultados
+				{%if lista_cuotas.has_previous%} <a href="?page={{ lista_cuotas.first_index}}{{ultimo}}"> Primera </a> <a href="?page={{ lista_cuotas.previous_page_number }}{{ultimo}}"> Anterior</a> {%endif%}
+				P&aacute;gina |{{lista_cuotas.number}}|
+				{%if lista_cuotas.has_next%} <a href="?page={{ lista_cuotas.next_page_number }}{{ultimo}}"> Siguiente </a> <a href="?page={{ lista_cuotas.end_index}}{{ultimo}}"> Ultima </a> {%endif%} </span>
 		</div>
 	</table>
 </div>

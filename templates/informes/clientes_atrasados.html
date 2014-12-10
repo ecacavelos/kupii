@@ -39,6 +39,12 @@
 		$('#fraccion').val(fraccion);
 		var meses_atraso = "{{meses_atraso}}";
 		$('#meses_atraso').val(meses_atraso);
+		
+		
+		if ($("#fraccion").val() == "" || $("#meses_atraso").val() == "") {//parametros no seteados
+			$('.listado-clientes-atrasados').hide();
+			$('.pagination').hide();
+		}
 	});
 
 </script>
