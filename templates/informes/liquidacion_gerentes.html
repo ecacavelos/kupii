@@ -6,10 +6,12 @@
 		var fecha_ini = "{{fecha_ini}}";
 		var fecha_fin = "{{fecha_fin}}";
 		var fraccion = "{{fraccion}}";
+		var busqueda_label="{{busqueda_label}}";
 
 		$('#fecha_ini').val(fecha_ini);
 		$('#fecha_fin').val(fecha_fin);
 		$('#id_fraccion').val(fraccion);
+		$('#id_busqueda_label').val(busqueda_label);
 
 		$('#fecha_ini').mask('##/##/####');
 		$("#fecha_ini").datepicker({
@@ -27,35 +29,11 @@
 			$('.listado-pagos').show();
 			$('.pagination').show();
 		}
-
+		setup_inputs();
 	});
-
-	function retrieve_liquidacion_gerentes() {
-		if ($('#fecha_ini').val() == "" || $('#fecha_fin').val() == "") {
-			alert("Debe ingresar un rango de fechas");
-			return;
-		}
-		if ($('#id_fraccion').val() == "") {
-			alert("Debe ingresar una fraccion");
-			return;
-		}
-		window.location.href = "/informes/liquidacion_gerentes_reporte_excel?fecha_ini=" + $('#fecha_ini').val() + "&fecha_fin=" + $('#fecha_fin').val() + "&fraccion=" + $('#id_fraccion').val();
-
-	}
-
-	function validar() {
-		if ($('#fecha_ini').val() == "" || $('#fecha_fin').val() == "") {
-			alert("Debe ingresar un rango de fechas");
-			return;
-		}
-		if ($('#id_fraccion').val() == "") {
-			alert("Debe ingresar una fraccion");
-			return;
-		}
-		$("#frm_busqueda").submit();
-	}
-
+	
 </script>
+<script type="text/javascript" src="{{ STATIC_URL }}informes/liquidacion_gerentes.js"></script>
 {% endblock %}
 {% block content %}
 <div class="gri16 text-izquierda" id="breadcumb">
@@ -77,7 +55,8 @@
 			<tr>
 				<td> Fracci&oacute;n: </td>
 				<td>
-				<input name="fraccion" id="id_fraccion" type="text" value=""/>
+				<input name="busqueda_label" id="id_busqueda_label" type="text" value=""/>
+				<input name="busqueda" id="id_busqueda" type="hidden" value=""/>
 				</td>
 			</tr>
 			<th></th><th>Desde:</th><th>Hasta:</th>

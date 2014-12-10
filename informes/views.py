@@ -661,13 +661,14 @@ def liquidacion_gerentes(request):
                 })
                 return HttpResponse(t.render(c))                
             else:#Parametros seteados
+                t = loader.get_template('informes/liquidacion_gerentes.html')
                 fecha_ini=request.GET['fecha_ini']
                 fecha_fin=request.GET['fecha_fin']
                 fecha_ini_parsed = str(datetime.strptime(fecha_ini, "%d/%m/%Y").date())
                 fecha_fin_parsed = str(datetime.strptime(fecha_fin, "%d/%m/%Y").date())
-                fraccion_id=request.GET['fraccion']
-                
-                
+                fraccion_id=request.GET['busqueda']
+                busqueda_label = request.GET['busqueda_label']
+                print("fraccion_id ->" + fraccion_id)
                 query=(
                 '''
                 select pc.* from principal_pagodecuotas pc, principal_lote l, principal_manzana m, principal_fraccion f
@@ -716,8 +717,8 @@ def liquidacion_gerentes(request):
                         total_monto_gerente=0
                     cuotas.append(cuota)
                             
-            t = loader.get_template('informes/liquidacion_gerentes.html')
-            ultimo="&fraccion="+fraccion_id+"&fecha_ini="+fecha_ini+"&fecha_fin="+fecha_fin         
+            
+            ultimo="&busqueda_label="+busqueda_label+"&busqueda="+fraccion_id+"&fecha_ini="+fecha_ini+"&fecha_fin="+fecha_fin         
             paginator = Paginator(cuotas, 25)
             page = request.GET.get('page')
             try:
@@ -731,6 +732,7 @@ def liquidacion_gerentes(request):
                 'fecha_ini':fecha_ini,
                 'fecha_fin':fecha_fin,
                 'fraccion': fraccion_id,
+                'busqueda_label' : busqueda_label,
                 'ultimo' : ultimo
             })
             return HttpResponse(t.render(c))    
@@ -1905,7 +1907,7 @@ def filtros_establecidos(request, tipo_informe):
         try:
             fecha_ini=request['fecha_ini']
             fecha_fin=request['fecha_fin']
-            fraccion=request['fraccion']
+            busqueda=request['busqueda']
             return True
         except:
             print('Parametros no seteados')      

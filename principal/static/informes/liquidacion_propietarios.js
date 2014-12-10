@@ -48,7 +48,7 @@
 							source : base_url,
 							minLength : 1,
 							select : function(event, ui) {
-								id_fraccion = id_propietario = ui.item.id;
+								id_fraccion = ui.item.id;
 								$("#id_busqueda").val(id_fraccion);
 							}
 						});												
