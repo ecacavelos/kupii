@@ -287,8 +287,8 @@ def clientes_atrasados(request):
                 if meses_peticion == 0:
                     meses_peticion =''  
                 a = len(clientes_atrasados)
-                if a > 0:  
-                    ultimo="&fraccion="+fraccion+"&meses_atraso="+meses_peticion
+                if a > 0:                    
+                    ultimo="&fraccion="+str(fraccion)+"&meses_atraso="+str(meses_peticion)
                     paginator = Paginator(clientes_atrasados, 25)
                     page = request.GET.get('page')
                     try:
@@ -302,8 +302,9 @@ def clientes_atrasados(request):
                         'meses_atraso': meses_peticion,
                         'ultimo': ultimo,
                         'object_list': lista,
+                        'clientes_atrasados' : clientes_atrasados                        
                     })                     
-                return HttpResponse(t.render(c))                   
+                    return HttpResponse(t.render(c))                   
             except Exception, error:
                 print error    
                 return HttpResponseServerError("No se pudo obtener el Listado de Clientes Atrasados.")
