@@ -84,7 +84,6 @@
 						$("#boton_buscar").prop('disabled', true);
 						$("#id_boton").prop('disabled', true);
 					}
-			}			
-		);
+			});
 
 	}

@@ -3,37 +3,35 @@
 
 <script type="text/javascript">
 	$(document).ready(function() {
-		var fraccion_ini = "{{fraccion_ini}}";
-		var fraccion_fin= "{{fraccion_fin}}";
-		$('#fraccion_ini').val(fraccion_ini);
-		$('#fraccion_fin').val(fraccion_fin);
+		var tipo_busqueda="{{tipo_busqueda}}";
+		$('#id_tipo_busqueda').val(tipo_busqueda);		
+		if($('#id_tipo_busqueda').val()=="nombre"){
+			var fraccion_ini = "{{frac1}}";
+			var fraccion_fin= "{{frac2}}";
+		}else{
+			var fraccion_ini = "{{fraccion_ini}}";
+			var fraccion_fin= "{{fraccion_fin}}";
+		}
+		$('#id_fraccion_ini').val(fraccion_ini);
+		$('#id_fraccion_fin').val(fraccion_fin);
+	
 		
-		if($('#fraccion_ini').val()!="" && $('#fraccion_fin').val()!=""){ // parametros seteados
+		if($('#id_fraccion_ini').val()!="" && $('#id_fraccion_fin').val()!=""){ // parametros seteados
 			$('.listado-lotes').show();
 			$('.pagination').show();
-		}
+		}		
 		else{
 			$('.listado-lotes').hide();
 			$('.pagination').hide();
-		}		
+		}
+		
+		setup_inputs();		
 	});
-	function validar() {
-		if ($('#fraccion_ini').val() == 0 || $('#fraccion_fin').val() == 0 || $('#fraccion_ini').val() == "" || $('#fraccion_fin').val() == "") {
-			alert("Debe ingresar un rango de fracciones");
-			return;
-		}
-		$("#frm_busqueda").submit();
-	}
-	function retrieve_lotes_libres() {
-		if ($('#fraccion_ini').val() == 0 || $('#fraccion_fin').val() == 0 || $('#fraccion_ini').val() == "" || $('#fraccion_fin').val() == "") {
-			alert("Debe ingresar un rango de fracciones");
-			return;
-		}
-		window.location.href = "/informes/lotes_libres_reporte_excel?fraccion_ini=" + $('#fraccion_ini').val() + "&fraccion_fin=" + $('#fraccion_fin').val();
-	}
+	
 	
 	
 </script>
+<script type="text/javascript" src="{{ STATIC_URL }}informes/lotes_libres.js"></script>
 {% endblock %}
 {% block content %}
 <div class="gri16 text-izquierda" id="breadcumb">
@@ -52,13 +50,21 @@
 				<th>Hasta:</th>
 			</tr>
 			<tr>
-				<td> Rango de Fracciones: </td>
+			<tr>
 				<td>
-				<input name="fraccion_ini" id="fraccion_ini" type="text" value="" />
-				</td>
-				<td>
-				<input name="fraccion_fin" id="fraccion_fin" type="text" value="" />
-				</td>
+				<select id="id_tipo_busqueda" name="tipo_busqueda">
+					<option value="">Elija una opcion</option>
+					<option value="nombre">Nombre de Fraccion</option>
+					<option value="codigo">Codigo de Fraccion</option>
+				</select></td>
+			<td>
+				<input name="fraccion_ini" id="id_fraccion_ini" type="text" value=""/>
+				<input name="frac1" id="id_frac1" type="hidden" value=""/>
+			</td>
+			<td>	
+				<input name="fraccion_fin" id="id_fraccion_fin" type="text" value=""/>
+				<input name="frac2" id="id_frac2" type="hidden" value=""/>
+			</td>
 			</tr>
 			<tr>
 				<td>
