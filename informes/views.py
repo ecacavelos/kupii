@@ -607,40 +607,61 @@ def liquidacion_vendedores(request):
                     
                 object_list=list(PagoDeCuotas.objects.raw(query))
                 cuotas=[]
+                #totales por fraccion
                 total_importe=0
                 total_comision=0
+                #totales generales
+                total_general_importe=0
+                total_general_comision=0
                 #Seteamos los datos de las filas
                 for i, cuota_item in enumerate (object_list):
                     nro_cuota=get_nro_cuota(cuota_item)
                     cuota={}
                     com=0
-                    if(nro_cuota%2!=0 and nro_cuota<=cuota_item.plan_de_pago_vendedores.cantidad_cuotas):
-                        com=int(cuota_item.total_de_cuotas*(float(cuota_item.plan_de_pago_vendedores.porcentaje_de_cuotas)/float(100)))
-                    cuota['fraccion']=str(cuota_item.lote.manzana.fraccion)
-                    cuota['cliente']=str(cuota_item.cliente)
-                    cuota['fraccion_id']=cuota_item.lote.manzana.fraccion.id
-                    cuota['lote']=str(cuota_item.lote)
-                    cuota['cuota_nro']=str(nro_cuota)+'/'+str(cuota_item.plan_de_pago.cantidad_de_cuotas)
-                    cuota['fecha_pago']=str(cuota_item.fecha_de_pago)
-                    cuota['importe']=str('{:,}'.format(cuota_item.total_de_cuotas)).replace(",", ".") 
-                    cuota['comision']=str('{:,}'.format(com)).replace(",", ".") 
-                        
-                    #Sumamos los totales por fraccion
-                    total_importe+=cuota_item.total_de_cuotas
-                    total_comision+=com
-                    #Si es el ultimo lote, cerramos totales de fraccion
-                    if (len(object_list)-1 == i):
-                        cuota['total_importe']=str('{:,}'.format(total_importe)).replace(",", ".") 
-                        cuota['total_comision']=str('{:,}'.format(total_comision)).replace(",", ".")
-                        
-                    #Hay cambio de lote pero NO es el ultimo elemento todavia
-                    elif (cuota_item.lote.manzana.fraccion.id != object_list[i+1].lote.manzana.fraccion.id):
-                        cuota['total_importe']=str('{:,}'.format(total_importe)).replace(",", ".") 
-                        cuota['total_comision']=str('{:,}'.format(total_comision)).replace(",", ".")
-                        #Se CERAN  los TOTALES por FRACCION
-                        total_importe=0
-                        total_comision=0
-                    cuotas.append(cuota)
+                    c=0
+                    #Esta es una regla de negocio, los vendedores cobran comisiones segun el numero de cuota, maximo hasta la cuota Nro 9.
+                    cuotas_para_vendedores=9
+                    if(nro_cuota%2!=0 and nro_cuota<=cuotas_para_vendedores):
+                        #A los vendedores le corresponde comision por las primeras 4 (maximo 5) cuotas impares.
+                        c+=1
+                        #Se controla si ya se llego al limite de cantidad de cuotas correspondientes al vendedor.
+                        if(c<=cuota_item.plan_de_pago_vendedores.cantidad_cuotas):
+                            
+                            com=int(cuota_item.total_de_cuotas*(float(cuota_item.plan_de_pago_vendedores.porcentaje_de_cuotas)/float(100)))
+                            cuota['fraccion']=str(cuota_item.lote.manzana.fraccion)
+                            cuota['cliente']=str(cuota_item.cliente)
+                            cuota['fraccion_id']=cuota_item.lote.manzana.fraccion.id
+                            cuota['lote']=str(cuota_item.lote)
+                            cuota['cuota_nro']=str(nro_cuota)+'/'+str(cuota_item.plan_de_pago.cantidad_de_cuotas)
+                            cuota['fecha_pago']=str(cuota_item.fecha_de_pago)
+                            cuota['importe']=str('{:,}'.format(cuota_item.total_de_cuotas)).replace(",", ".") 
+                            cuota['comision']=str('{:,}'.format(com)).replace(",", ".") 
+                                
+                            #Sumamos los totales por fraccion
+                            total_importe+=cuota_item.total_de_cuotas
+                            total_comision+=com
+                            
+                            #Y acumulamos para los totales generales
+                            total_general_importe+=total_importe
+                            total_general_comision+=total_comision
+                            
+                            #Si es el ultimo lote, cerramos totales de fraccion
+                            if (len(object_list)-1 == i):
+                                print (total_importe)
+                                print (total_comision)
+                                cuota['total_importe']=str('{:,}'.format(total_importe)).replace(",", ".") 
+                                cuota['total_comision']=str('{:,}'.format(total_comision)).replace(",", ".")
+                                
+                            #Hay cambio de lote pero NO es el ultimo elemento todavia
+                            elif (cuota_item.lote.manzana.fraccion.id != object_list[i+1].lote.manzana.fraccion.id):
+                                cuota['total_importe']=str('{:,}'.format(total_importe)).replace(",", ".") 
+                                cuota['total_comision']=str('{:,}'.format(total_comision)).replace(",", ".")
+                                #Se CERAN  los TOTALES por FRACCION
+                                total_importe=0
+                                total_comision=0
+                                c=0
+                            cuotas.append(cuota)
+            print 'hola'
                             
             
             ultimo="&busqueda_label="+busqueda_label+"&busqueda="+vendedor_id+"&fecha_ini="+fecha_ini+"&fecha_fin="+fecha_fin         
