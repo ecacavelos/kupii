@@ -36,17 +36,27 @@ def lotes_libres(request):
                 })
                 return HttpResponse(t.render(c))
             else: #Parametros seteados
+                tipo_busqueda=request.GET['tipo_busqueda']
                 t = loader.get_template('informes/lotes_libres.html')
-                fraccion_ini=request.GET['fraccion_ini']
-                fraccion_fin=request.GET['fraccion_fin']
+                if(tipo_busqueda=='codigo'):
+                    fraccion_ini=request.GET['fraccion_ini']
+                    fraccion_fin=request.GET['fraccion_fin']
+                    f1=""
+                    f2=""
+                    ultimo="&tipo_busqueda="+tipo_busqueda+"&fraccion_ini="+fraccion_ini+"&frac1="+f1+"&fraccion_fin="+fraccion_fin+"&frac2="+f2               
+                if(tipo_busqueda=='nombre'):
+                    fraccion_ini=request.GET['frac1']
+                    fraccion_fin=request.GET['frac2']
+                    f1=request.GET['fraccion_ini']
+                    f2=request.GET['fraccion_fin']
+                    ultimo="&tipo_busqueda="+tipo_busqueda+"&fraccion_ini="+f1+"&frac1="+fraccion_ini+"&fraccion_fin="+f2+"&frac2="+fraccion_fin
                 object_list=[]#lista de lotes
                 if fraccion_ini and fraccion_fin:
                     manzanas= Manzana.objects.filter(fraccion_id__range=(fraccion_ini,fraccion_fin))
                     for m in manzanas:
                         lotes = Lote.objects.filter(manzana=m.id)
                         for l in lotes:
-                            object_list.append(l)
-                                         
+                            object_list.append(l)                                         
                 else:       
                     object_list = Lote.objects.filter(estado="1").order_by('manzana', 'nro_lote')
                  
@@ -94,7 +104,6 @@ def lotes_libres(request):
                         total_lotes = 0
                     lotes.append(lote)
                 
-                ultimo="&fraccion_ini="+fraccion_ini+"&fraccion_fin="+fraccion_fin
                 paginator = Paginator(lotes, 25)
                 page = request.GET.get('page')
                 try:
@@ -104,10 +113,13 @@ def lotes_libres(request):
                 except EmptyPage:
                     lista = paginator.page(paginator.num_pages)                
                 c = RequestContext(request, {
+                    'tipo_busqueda' : tipo_busqueda,
                     'fraccion_ini': fraccion_ini,
                     'fraccion_fin': fraccion_fin,
                     'ultimo': ultimo,
                     'lista_lotes': lista,
+                    'frac1' : f1,
+                    'frac2' : f2
                 })
                 return HttpResponse(t.render(c))                
         else:
@@ -898,8 +910,14 @@ def informe_movimientos(request):
             return HttpResponseRedirect("/login") 
 
 def lotes_libres_reporte_excel(request):
-    fraccion_ini = request.GET['fraccion_ini']
-    fraccion_fin = request.GET['fraccion_fin']
+    #tipo_busqueda=request.GET['tipo_busqueda']
+    #if(tipo_busqueda=='codigo'):
+    fraccion_ini=request.GET['fraccion_ini']
+    fraccion_fin=request.GET['fraccion_fin']
+    #if(tipo_busqueda=='nombre'):
+    #    fraccion_ini=request.GET['frac1']
+    #    fraccion_fin=request.GET['frac2']    
+    
     # at = request.session.get('at', None)
     # TODO: Danilo, utiliza este template para poner tu logi
     # print ('Ejemplo de uso de parametros --> Parametro1' + request.GET['parametro1'])        
@@ -931,7 +949,7 @@ def lotes_libres_reporte_excel(request):
         
     object_list = []  # lista de lotes
     if fraccion_ini and fraccion_fin:
-        manzanas = Manzana.objects.filter(fraccion_id__range=(fraccion_ini, fraccion_fin))
+        manzanas = Manzana.objects.filter(fraccion_id__range=(fraccion_ini, fraccion_fin)).order_by('fraccion')
         for m in manzanas:
             lotes = Lote.objects.filter(manzana=m.id)
             for l in lotes:

@@ -7,7 +7,13 @@ function validar() {
 }
 
 function retrieve_lotes_libres() {
-	window.location.href = "/informes/lotes_libres_reporte_excel?fraccion_ini=" + $('#fraccion_ini').val() + "&fraccion_fin=" + $('#fraccion_fin').val();
+	if($('#id_tipo_busqueda').val()=='nombre'){
+		window.location.href = "/informes/lotes_libres_reporte_excel?fraccion_ini=" + $('#id_frac1').val() + "&fraccion_fin=" + $('#id_frac2').val();
+	}
+	if($('#id_tipo_busqueda').val()=='codigo'){
+		window.location.href = "/informes/lotes_libres_reporte_excel?fraccion_ini=" + $('#id_fraccion_ini').val() + "&fraccion_fin=" + $('#id_fraccion_fin').val();
+	}
+	
 }
 
 function setup_inputs() {
@@ -39,8 +45,7 @@ function setup_inputs() {
 				minLength : 1,
 				select : function(event, ui) {
 					id_fraccion = ui.item.id;
-					$("#id_frac2").val(id_fraccion);
-					
+					$("#id_frac2").val(id_fraccion);					
 					//alert(id_fraccion);
 				}
 			});

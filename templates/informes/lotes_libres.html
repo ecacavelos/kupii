@@ -3,19 +3,26 @@
 
 <script type="text/javascript">
 	$(document).ready(function() {
-		var tipo_busqueda="{{tipo_busqueda}}";
-		$('#id_tipo_busqueda').val(tipo_busqueda);		
-		if($('#id_tipo_busqueda').val()=="nombre"){
-			var fraccion_ini = "{{frac1}}";
-			var fraccion_fin= "{{frac2}}";
-		}else{
-			var fraccion_ini = "{{fraccion_ini}}";
-			var fraccion_fin= "{{fraccion_fin}}";
-		}
-		$('#id_fraccion_ini').val(fraccion_ini);
-		$('#id_fraccion_fin').val(fraccion_fin);
-	
+		var tipo_busqueda = "{{tipo_busqueda}}";
+		$('#id_tipo_busqueda').val(tipo_busqueda);
+		var fraccion_ini="{{fraccion_ini}}";
+		var fraccion_fin="{{fraccion_fin}}";
+		var frac1="{{frac1}}";
+		var frac2="{{frac2}}";
 		
+		if($('#id_tipo_busqueda').val()=='nombre'){
+			$('#id_fraccion_ini').val(frac1);
+			$('#id_fraccion_fin').val(frac2);
+			$('#id_frac1').val(fraccion_ini);
+			$('#id_frac2').val(fraccion_fin);
+		}
+		if($('#id_tipo_busqueda').val()=='codigo'){
+			$('#id_fraccion_ini').val(fraccion_ini);
+			$('#id_fraccion_fin').val(fraccion_fin);
+		}	
+	
+	
+			
 		if($('#id_fraccion_ini').val()!="" && $('#id_fraccion_fin').val()!=""){ // parametros seteados
 			$('.listado-lotes').show();
 			$('.pagination').show();
