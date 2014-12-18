@@ -138,7 +138,14 @@
 
 		</tr>
 		{% endif %}
-		<tr id='fila_totales_fraccion' style="display: none;"></tr>
+		{% if hw.total_general_importe %}
+		<tr>
+			<th colspan="6" class="celda_resumen_fraccion">Resumen del Vendedor</th>
+			<td class="celda_resumen_fraccion">{{hw.total_general_importe}}</td>
+			<td class="celda_resumen_fraccion">{{hw.total_general_comision}}</td>
+
+		</tr>
+		{% endif %}
 		{% endfor %}
 		<div class="pagination">
 			<span class="step-links"> Mostrando {{ lista_cuotas.start_index }}-{{ lista_cuotas.end_index }} de {{ lista_cuotas.paginator.count }} Resultados
