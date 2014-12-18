@@ -1,0 +1,501 @@
+* {
+	padding:0px;
+	margin:0px;
+}
+
+body {
+	margin:0pt auto;
+	text-align:center;
+	font-family: 'Maven Pro', sans-serif;
+	font-size:10px;
+	color:#555;
+	height:100%;
+	letter-spacing:0;
+	padding:0px 0px;
+	-webkit-font-smoothing: subpixel-antialiased;
+	background-color:#fff
+}
+
+html {
+	height:100%;
+	overflow-Y:none;
+	background-color:#fff
+}
+
+p {
+	font-family: 'Maven Pro', sans-serif;
+	font-weight:400;
+	font-size:15px;
+	line-height:22px;
+	padding-bottom:8px;
+	margin-left:60px;
+	text-align:left;
+}
+
+strong {
+	font-weight:700 !important;
+}
+
+.medium {
+	font-weight:500 !important;
+}
+
+.ultra-bold {
+	font-weight:900 !important;
+}
+
+.gris {
+	color:#999 !important
+}
+
+.blanco {
+	color:#fff !important
+}
+
+.rojo {
+	color:#e30613 !important
+}
+
+.negro {
+	color:#000 !important
+}
+
+.verde-1 {
+	color:#02B06B
+}
+
+.text-derecha {
+	text-align:right !important
+}
+
+.text-izquierda {
+	text-align:left !important
+}
+
+h1 {
+	font-weight: 400; 
+	font-size:30px;
+	font-family: 'Maven Pro', sans-serif;
+	text-align:left;
+	padding-bottom:10px;
+	color:#02B06B;
+	margin-left:40px
+}
+
+h2 {
+	font-weight: 400; 
+	font-size:30px;
+	font-family: 'Maven Pro', sans-serif;
+	text-align:left;
+	padding-bottom:10px;
+	color:#e30613;
+}
+
+h3 {
+	font-weight: 700; 
+	font-size:19px;
+	font-family: 'Maven Pro', sans-serif;
+	text-align:left;
+	padding-bottom:10px;
+	color:#000
+}
+
+
+h4 {
+	font-weight: 400; 
+	font-size:16px;
+	text-align:left;
+	margin-left:10px;
+	padding-bottom:5px;
+	padding-top:5px;
+	color:#3FA9F5
+}
+
+h5 {
+	font-weight: 400; 
+	font-size:16px;
+	text-align:left;
+	padding-left:20px;
+	padding-bottom:8px;
+	color:#3FA9F5
+}
+
+a {
+	color:#555;
+	text-decoration:none
+}
+
+
+
+/* NAVIGATION */
+
+#wrap {
+	width:100%;
+	margin:0px auto 0px auto;
+	text-align:center;
+	position:relative;
+	min-height:100%;
+	background:url(../img/back-body.png) top #FFF repeat-x;
+}
+
+#header {
+   height:98px;
+   background: url(../img/header-back.png) repeat-x;
+   background-position:0px 53px
+}
+
+#header h1{
+   font-weight: 400;
+   font-size:24px;
+   font-family: 'Maven Pro', sans-serif;
+   /*text-align:center;*/ 
+   color:#FFF
+}
+
+#titulo {
+	margin-top:10px !important;
+}
+
+#caja-contenido {
+	min-height:500px;
+	background-color:#fff;
+	padding-top:10px
+}
+
+table#lista-categoria {
+	border:2px solid #CCC;
+	margin-bottom:15px}
+
+table#lista-categoria tr th {
+	padding:10px 10px 10px 40px;
+	font-size:16px;
+	font-weight:400;
+	text-align:left;
+	background-color:#02B06B;
+	color:#FFF
+}
+
+table#lista-categoria tr td {
+	padding:7px;
+	font-size:14px;
+	text-align:left;
+	border-bottom:thin solid #CCC
+}
+
+table#lista-categoria tr td.last {
+	border-bottom: none
+}
+
+.fondo-gris {
+	background-color:#eee
+}
+
+
+table#forms {
+	border:2px solid #006633;
+	border-left:none;
+	border-right:none;
+	margin-bottom:15px
+}
+
+table#forms tr td {
+	padding:10px;
+	font-size:14px;
+	text-align:left;
+	border-bottom:thin solid #CCC;
+	background:url(../img/icon-td-form.png) no-repeat;
+	background-position:bottom left
+}
+
+table#forms tr td.noimage {
+	background-image:none
+}
+
+table#forms td.last {
+	border-top:2px solid #006633;
+	border-bottom:none;
+	background-image:none
+}
+
+
+
+
+a.add {
+	display:block;
+	width:20px;
+	height:20px;
+	background:url(../img/icon-add.png) no-repeat top;
+	background-size:20px 47px
+}
+
+a:hover.add {
+	background-position:bottom
+}
+
+a.edit {
+	display:block;
+	width:20px;
+	height:20px;
+	background:url(../img/icon-edit.png) no-repeat top;
+	background-size:20px 47px
+}
+
+a:hover.edit {
+	background-position:bottom
+}
+
+a.add-manzana {
+	display:block;
+	font-family: 'Maven Pro', sans-serif;
+	font-size:14px;
+	line-height:35px;
+	text-align:left;
+	font-weight:400; 
+	color:#888;
+	text-decoration:none;
+	height:35px;
+	min-width:80px; 
+	padding:0px 10px 0px 30px;
+	float:right;
+	color:#063;
+	background:url(../img/icon-plus.png) no-repeat;
+	background-position:5px 7px;
+	background-size:20px 20px;
+	margin-right:30px
+}
+
+a:hover.add-manzana {
+	background-color:#D5F4D4
+}
+
+a:active.add-manzana {
+	color:#02B06B;
+	background-color:#FFF
+}
+
+a.historico {
+	display:block;
+	font-family: 'Maven Pro', sans-serif;
+	font-size:14px;
+	line-height:35px;
+	text-align:left;
+	font-weight:400; 
+	color:#888;
+	text-decoration:none;
+	height:35px;
+	min-width:50px; 
+	padding:0px 10px 0px 30px;
+	float:right;
+	color:#063;
+	background:url(../img/icon-ver.png) no-repeat;
+	background-position:5px 7px;
+	background-size:20px 20px;
+	margin-right:30px
+}
+
+a:hover.historico {
+	background-color:#D5F4D4
+}
+
+a:active.historico {
+	color:#02B06B;
+	background-color:#FFF
+}
+
+a.eliminar {
+	display:block;
+	font-family: 'Maven Pro', sans-serif;
+	font-size:14px;
+	line-height:35px;
+	text-align:left;
+	font-weight:400; 
+	color:#888;
+	text-decoration:none;
+	height:35px;
+	min-width:50px; 
+	padding:0px 10px 0px 30px;
+	float:left;
+	color:#063;
+	background:url(../img/icon-trash.png) no-repeat;
+	background-position:5px 7px;
+	background-size:20px 20px;
+	margin-right:30px
+}
+
+a:hover.eliminar {
+	background-color:#D5F4D4
+}
+
+a:active.eliminar {
+	color:#02B06B;
+	background-color:#FFF
+}
+
+
+
+/*MENU Main*/
+
+
+#menu {
+	padding:0px 0px;
+	height:35px;
+	margin-top:15px !important;
+	
+}
+
+ul#boton ul{ 
+}
+
+ul#boton li {
+	list-style:none;
+	float:right;
+	font-family: 'Maven Pro', sans-serif;
+	font-weight:400; 
+	font-size:14px;
+	line-height:35px;
+}
+
+ul#boton li a {
+	display:block;
+	font-family: 'Maven Pro', sans-serif;
+	font-weight:400; 
+	color:#888;
+	text-decoration:none;
+	height:35px;
+	padding:0px 25px;
+	background-size:20px 20px
+/*	text-shadow:1px 1px 2px rgba(0,0,0,1);*/
+}
+
+ul#boton li a.salir {
+	background:url(../img/icon-salir.png) no-repeat;
+	background-position:0px 6px;
+}
+
+ul#boton li a.usuario {
+	background:url(../img/icon-user.png) no-repeat;
+	background-position:0px 6px;
+}
+
+ul#boton li a.configurar {
+	background:url(../img/icon-config.png) no-repeat;
+	background-position:0px 6px;
+}
+
+ul#boton li a:hover {
+	color:#000;
+}
+
+/*FIN MENU Main*/
+
+.users {
+	background:url(../img/icon-users.png) no-repeat;
+	background-position:7px 5px;
+}
+
+.categorias {
+	background:url(../img/icon-cat.png) no-repeat;
+	background-position:7px 5px;
+}
+
+.acciones {
+	background:url(../img/icon-acciones.png) no-repeat;
+	background-position:7px 5px;
+}
+
+#breadcumb {
+	padding:10px 10px 10px 40px;
+	border-bottom:#CCC thin solid;
+	margin-bottom:10px;
+	font-size:13px
+}
+
+
+
+/*Form*/
+/*label {
+		font-size:15px;
+		font-weight:300;
+		color:#000;
+		float:left;
+		padding-top:10px
+	}*/
+	
+input[type=text]{
+		/*display:block;
+		width:280px;
+		height:30px;
+		float:left;
+		padding:5px 10px;
+		color:#000;
+		*/
+		font-size:13px;
+		padding:4px;
+		font-weight:400;
+		background-color:#fff;
+		-webkit-box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+        box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+		border:thin #CCC solid;
+	}
+
+input[type=number]{
+		/*display:block;
+		width:280px;
+		height:30px;
+		float:left;
+		padding:5px 10px;
+		color:#000;
+		*/
+		font-size:13px;
+		padding:4px;
+		font-weight:400;
+		background-color:#fff;
+		-webkit-box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+        box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+		border:thin #CCC solid;
+	}
+
+input[type=button] {
+		padding:5px 10px;
+		margin-right:5px;
+		font-size:13px;
+		color:#FFF;
+		border:thin #FFF solid;
+		background-color:#006633;
+	}
+input[type=submit] {
+		padding:5px 10px;
+		margin-right:5px;
+		font-size:13px;
+		color:#FFF;
+		border:thin #FFF solid;
+		background-color:#006633;
+	}
+
+
+input.verdecito[type=button] {
+	background-color:#02B06B;
+	}
+
+input[type=button]:hover {
+		-webkit-box-shadow: inset 0px 0px 5px 0px rgba(255, 255, 255, 0.7);
+        box-shadow: inset 0px 0px 5px 0px rgba(255, 255, 255, 0.7);
+	}
+
+input[type=button]:active {
+		-webkit-box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.7);
+        box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.7);
+	}
+
+input:enabled {
+    /*background: #FFFFFF;*/
+}
+
+input:disabled {
+    background: #dddddd;
+}
+a[disabled] {
+    pointer-events: none;
+    background-color: #dddddd !important;
+}
+/*FIN Form*/

@@ -1,0 +1,168 @@
+{% extends "lotes/base_lotes.html" %}
+{% block header_scripts %}
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		//Cambiar calendario a español
+		$.datepicker.regional['es'] = {
+			closeText : 'Cerrar',
+			prevText : '<Ant',
+			nextText : 'Sig>',
+			currentText : 'Hoy',
+			monthNames : ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+			monthNamesShort : ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+			dayNames : ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
+			dayNamesShort : ['Dom', 'Lun', 'Mar', 'Mié', 'Juv', 'Vie', 'Sáb'],
+			dayNamesMin : ['Do', 'Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sá'],
+			weekHeader : 'Sm',
+			dateFormat : 'dd/mm/yy',
+			firstDay : 1,
+			isRTL : false,
+			showMonthAfterYear : false,
+			yearSuffix : ''
+		};
+		// Setear idioma al calendario
+		$.datepicker.setDefaults($.datepicker.regional['es']);
+		var d = new Date();
+		var curr_date = d.getDate();
+		var curr_month = d.getMonth() + 1;
+		var curr_year = d.getFullYear();
+		if (curr_date < 10) {
+			curr_date = "0" + curr_date.toString();
+		}
+		if (curr_month < 10) {
+			curr_month = "0" + curr_month.toString();
+		}
+		var hoy = (curr_date + "/" + curr_month + "/" + curr_year);
+
+		var fecha_ini = "{{fecha_ini}}";
+		var fecha_fin = "{{fecha_fin}}";
+		var lote_id = "{{lote_id}}";
+		$('#lote_id').val(lote_id);
+		$('#fecha_ini').val(fecha_ini);
+		$('#fecha_fin').val(fecha_fin);
+		$('#lote_id').mask('###/###/####');
+		$('#fecha_ini').mask('##/##/####');
+		$("#fecha_ini").datepicker({
+			dateFormat : 'dd/mm/yy'
+		});
+		$('#fecha_fin').mask('##/##/####');
+		$("#fecha_fin").datepicker({
+			dateFormat : 'dd/mm/yy'
+		});
+
+		if ($("#lote_id").val() == "") {//parametros no seteados
+			$('.listado-ventas').hide();
+			$('.pagination').hide();
+		} else {
+			$('.listado-ventas').show();
+			$('.pagination').show();
+		}
+
+	});
+
+	function retrieve_informe_movimientos() {
+		if ($('#lote_id').val() == 0 || $('#lote_id').val() == "") {
+			alert("Debe ingresar un lote");
+			return;
+		}
+		window.location.href = "/informes/informe_movimientos_reporte_excel?fecha_ini=" + $('#fecha_ini').val() + "&fecha_fin=" + $('#fecha_fin').val() + "&lote_id=" + $('#lote_id').val();
+	}
+
+	function validar() {
+		if ($('#lote_id').val() == 0 || $('#lote_id').val() == "") {
+			alert("Debe ingresar un lote");
+			return;
+		}
+		$("#frm_busqueda").submit();
+	}
+
+</script>
+{% endblock %}
+{% block content %}
+<div class="gri16 text-izquierda" id="breadcumb">
+	<a href="/">Inicio</a><span class="verde-1">></span>
+	<a href="/informes/">Informes</a>
+	<span class="verde-1">> Informe general de movimientos</span>
+</div>
+
+<div class="clear"></div>
+
+<h1>Informe General de Movimientos de lotes </h1>
+
+<div class="grid_6">
+	<form name="frm_busqueda" id="frm_busqueda" method="get" action="/informes/informe_movimientos/">
+		<table id="lista-categoria" frame="box">
+			<tr>
+				<th class="acciones" colspan="3"><strong><a href="#" style="color: white;">Filtrar</a></strong></th>
+			</tr>
+			<tr>
+				<td> Lote: </td>
+				<td>
+				<input name="lote_id" id="lote_id" type="text" value=""/>
+				</td>
+			</tr>
+			<th></th><th>Desde:</th><th>Hasta:</th>
+			<tr>
+				<td> Rango de Fecha: </td>
+				<td>
+				<input name="fecha_ini" id="fecha_ini" type="text" value="" />
+				</td>
+				<td>
+				<input name="fecha_fin" id="fecha_fin" type="text" value="" />
+				</td>
+			</tr>
+			<tr>
+				<td>
+				<input type="button" value="Buscar" onclick="validar();" class="historico" style="cursor: pointer"/>
+				</td>
+				<td><a class="boton-verde" id="id_boton" onclick="retrieve_informe_movimientos();">Descargar como Excel</a></td>
+			</tr>
+		</table>
+	</form>
+</div>
+<div class="clear"></div>
+<div id="listado-cuadro-busqueda">
+
+	<br>
+	<br>
+</div>
+<div id="listado-item-lote">
+	<table width="50%" cellpadding="0" cellspacing="0" class="listado-ventas" align="center">
+		<th>Fecha</th><th>Cliente</th><th>Cuota Nº</th><th>Tipo Cuota</th><th>Saldo Anterior</th><th>Monto</th><th>Saldo</th>
+		{% for hw in lista_movimientos %}
+		{% if forloop.counter|divisibleby:2 %}
+		<tr>
+			<td>{{hw.0}}</td>
+			<td>{{hw.1}}</td>
+			<td>{{hw.2}}</td>
+			<td>{{hw.3}}</td>
+			<td>{{hw.4}}</td>
+			<td>{{hw.5}}</td>
+			<td>{{hw.6}}</td>
+		</tr>
+		{% else %}
+		<tr class="bkg_gris">
+			<td>{{hw.0}}</td>
+			<td>{{hw.1}}</td>
+			<td>{{hw.2}}</td>
+			<td>{{hw.3}}</td>
+			<td>{{hw.4}}</td>
+			<td>{{hw.5}}</td>
+			<td>{{hw.6}}</td>
+		</tr>
+		{% endif %}
+		{%endfor%}
+		<div class="pagination">
+			<span class="step-links"> Mostrando {{ lista_movimientos.start_index }}-{{ lista_movimientos.end_index }} de {{ lista_movimientos.paginator.count }} Resultados
+				{%if lista_movimientos.has_previous%} <a href="?page={{ lista_movimientos.first_index}}{{ultimo}}"> Primera </a> <a href="?page={{ lista_movimientos.previous_page_number }}{{ultimo}}"> Anterior</a> {%endif%}
+				P&aacute;gina |{{lista_movimientos.number}}|
+				{%if lista_movimientos.has_next%} <a href="?page={{ lista_movimientos.next_page_number }}{{ultimo}}"> Siguiente </a> <a href="?page={{ lista_movimientos.end_index}}{{ultimo}}"> Ultima </a> {%endif%} </span>
+		</div>
+	</table>
+</div>
+
+<div id="footer">
+	<a href="/informes" class="boton-verde">Volver al módulo de Informes</a>
+</div>
+{% endblock %} 
