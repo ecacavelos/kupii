@@ -1523,32 +1523,23 @@ def liquidacion_propietarios_reporte_excel(request):
 def liquidacion_vendedores_reporte_excel(request):   
     
     vendedor_id = request.GET['busqueda']
-    # print("vendedor_id ->" + vendedor_id);
+    print("vendedor_id ->" + vendedor_id);
     fecha_ini = request.GET['fecha_ini']
     fecha_fin = request.GET['fecha_fin']
     fecha_ini_parsed = str(datetime.strptime(fecha_ini, "%d/%m/%Y").date())
     fecha_fin_parsed = str(datetime.strptime(fecha_fin, "%d/%m/%Y").date())
     
-    tipo_busqueda = request.GET['tipo_busqueda']
-    if(tipo_busqueda == 'vendedor_id'):
-        vendedor_id = request.GET['busqueda']
-        print("vendedor_id ->" + vendedor_id)
-    if(tipo_busqueda == 'nombre'):
-        nombre_vendedor = request.GET['busqueda']
-        print("nombre_vendedor ->" + nombre_vendedor)
-        vendedor = Vendedor.objects.get(nombres__icontains=nombre_vendedor)
-        vendedor_id = str(vendedor.id)
-    query = (
+    query=(
     '''
     select pc.* from principal_pagodecuotas pc, principal_lote l, principal_manzana m, principal_fraccion f
-    where pc.fecha_de_pago >= \'''' + fecha_ini_parsed + 
-    '''\' and pc.fecha_de_pago <= \'''' + fecha_fin_parsed + 
-    '''\' and pc.vendedor_id=''' + vendedor_id + 
+    where pc.fecha_de_pago >= \''''+ fecha_ini_parsed +               
+    '''\' and pc.fecha_de_pago <= \'''' + fecha_fin_parsed +
+    '''\' and pc.vendedor_id=''' + vendedor_id +                
     ''' 
     and (pc.lote_id = l.id and l.manzana_id=m.id and m.fraccion_id=f.id) order by f.id,pc.fecha_de_pago
     '''
-    )
-                
+    )                    
+           
     object_list=list(PagoDeCuotas.objects.raw(query))
     cuotas=[]
     #totales por fraccion
@@ -1570,49 +1561,50 @@ def liquidacion_vendedores_reporte_excel(request):
             if k==0:
                 #Guardamos la primera fraccion que cumple con la condicion, para tener algo con que comparar.
                 fraccion_actual=cuota_item.lote.manzana.fraccion.id
-            k+=1
-        if(cuota_item.lote.manzana.fraccion.id==fraccion_actual):                              
-            com=int(cuota_item.total_de_cuotas*(float(cuota_item.plan_de_pago_vendedores.porcentaje_de_cuotas)/float(100)))
-            cuota['fraccion']=str(cuota_item.lote.manzana.fraccion)
-            cuota['cliente']=str(cuota_item.cliente)
-            cuota['fraccion_id']=cuota_item.lote.manzana.fraccion.id
-            cuota['lote']=str(cuota_item.lote)
-            cuota['cuota_nro']=str(nro_cuota)+'/'+str(cuota_item.plan_de_pago.cantidad_de_cuotas)
-            cuota['fecha_pago']=str(cuota_item.fecha_de_pago)
-            cuota['importe']=cuota_item.total_de_cuotas
-            cuota['comision']=com 
-    
-            #Sumamos los totales por fraccion
-            total_importe+=cuota_item.total_de_cuotas
-            total_comision+=com
-            print cuota_item  
-            #Guardamos el ultimo lote que cumple la condicion en dos variables, por si se covnierta en el ultimo lote para cerrar la fraccion
-            #actual, o por si sea el ultimo lote de la lista.
-            anterior=cuota                            
-            ultimo=cuota                       
-            #Hay cambio de lote pero NO es el ultimo elemento todavia
-        else:
-            anterior['total_importe']=str('{:,}'.format(total_importe)).replace(",", ".")
-            anterior['total_comision']=str('{:,}'.format(total_comision)).replace(",", ".")
-            #Se CERAN  los TOTALES por FRACCION                            
-            total_importe=0
-            total_comision=0                                                                                
-            com=int(cuota_item.total_de_cuotas*(float(cuota_item.plan_de_pago_vendedores.porcentaje_de_cuotas)/float(100)))
-            cuota['fraccion']=str(cuota_item.lote.manzana.fraccion)
-            cuota['cliente']=str(cuota_item.cliente)
-            cuota['fraccion_id']=cuota_item.lote.manzana.fraccion.id
-            cuota['lote']=str(cuota_item.lote)
-            cuota['cuota_nro']=str(nro_cuota)+'/'+str(cuota_item.plan_de_pago.cantidad_de_cuotas)
-            cuota['fecha_pago']=str(cuota_item.fecha_de_pago)
-            cuota['importe']=cuota_item.total_de_cuotas
-            cuota['comision']=com
-            #Sumamos los totales por fraccion
-            total_importe+=cuota_item.total_de_cuotas
-            total_comision+=com 
-            fraccion_actual=cuota_item.lote.manzana.fraccion.id
-            ultimo=cuota
+            k+=1            
+            if(cuota_item.lote.manzana.fraccion.id==fraccion_actual):                              
+                com=int(cuota_item.total_de_cuotas*(float(cuota_item.plan_de_pago_vendedores.porcentaje_de_cuotas)/float(100)))
+                cuota['fraccion']=str(cuota_item.lote.manzana.fraccion)
+                cuota['cliente']=str(cuota_item.cliente)
+                cuota['fraccion_id']=cuota_item.lote.manzana.fraccion.id
+                cuota['lote']=str(cuota_item.lote)
+                cuota['cuota_nro']=str(nro_cuota)+'/'+str(cuota_item.plan_de_pago.cantidad_de_cuotas)
+                cuota['fecha_pago']=str(cuota_item.fecha_de_pago)
+                cuota['importe']=str('{:,}'.format(cuota_item.total_de_cuotas)).replace(",", ".") 
+                cuota['comision']=str('{:,}'.format(com)).replace(",", ".")
+                    
+                #Sumamos los totales por fraccion
+                total_importe+=cuota_item.total_de_cuotas
+                total_comision+=com
+                print cuota_item  
+                #Guardamos el ultimo lote que cumple la condicion en dos variables, por si se covnierta en el ultimo lote para cerrar la fraccion
+                #actual, o por si sea el ultimo lote de la lista.
+                anterior=cuota                            
+                ultimo=cuota                       
+                #Hay cambio de lote pero NO es el ultimo elemento todavia
+            else:
+                anterior['total_importe']=str('{:,}'.format(total_importe)).replace(",", ".")
+                anterior['total_comision']=str('{:,}'.format(total_comision)).replace(",", ".")
+                #Se CERAN  los TOTALES por FRACCION                            
+                total_importe=0
+                total_comision=0                                                                                
+                com=int(cuota_item.total_de_cuotas*(float(cuota_item.plan_de_pago_vendedores.porcentaje_de_cuotas)/float(100)))
+                cuota['fraccion']=str(cuota_item.lote.manzana.fraccion)
+                cuota['cliente']=str(cuota_item.cliente)
+                cuota['fraccion_id']=cuota_item.lote.manzana.fraccion.id
+                cuota['lote']=str(cuota_item.lote)
+                cuota['cuota_nro']=str(nro_cuota)+'/'+str(cuota_item.plan_de_pago.cantidad_de_cuotas)
+                cuota['fecha_pago']=str(cuota_item.fecha_de_pago)
+                cuota['importe']=str('{:,}'.format(cuota_item.total_de_cuotas)).replace(",", ".") 
+                cuota['comision']=str('{:,}'.format(com)).replace(",", ".") 
+                #Sumamos los totales por fraccion
+                total_importe+=cuota_item.total_de_cuotas
+                total_comision+=com 
+                fraccion_actual=cuota_item.lote.manzana.fraccion.id
+                ultimo=cuota
             total_general_importe+=cuota_item.total_de_cuotas
             total_general_comision+=com
+            print(cuota)
             cuotas.append(cuota)                        
         #Si es el ultimo lote, cerramos totales de fraccion
         if (len(object_list)-1 == i):
@@ -1635,71 +1627,33 @@ def liquidacion_vendedores_reporte_excel(request):
     sheet.write(0, 5, "Fecha de Pago", style)
     sheet.write(0, 6, "Importe", style)
     sheet.write(0, 7, "Comision", style)
-    
-    # guardamos la primera fraccion para comparar
-    fraccion_actual = cuotas[0]['fraccion_id']
-    
-    total_importe = 0
-    total_comision = 0
-    total_general_importe = 0
-    total_general_comision = 0
-    
+     
     # contador de filas
     c = 0
-    for i in range(len(cuotas)):
-        # se suman los totales por fracion
-        if (cuotas[i]['fraccion_id'] == fraccion_actual):
-            c+=1            
-            total_importe += cuotas[i]['importe']
-            total_comision += cuotas[i]['comision']
-            
-            sheet.write(c, 0, str(cuotas[i]['cliente']))
-            sheet.write(c, 1, str(cuotas[i]['fraccion']))
-            sheet.write(c, 2, str(cuotas[i]['fraccion_id']))
-            sheet.write(c, 3, str(cuotas[i]['lote']))
-            sheet.write(c, 4, str(cuotas[i]['cuota_nro']))
-            sheet.write(c, 5, str(cuotas[i]['fecha_pago']))
-            sheet.write(c, 6, str('{:,}'.format(cuotas[i]['importe']).replace(",",".")))
-            sheet.write(c, 7, str('{:,}'.format(cuotas[i]['comision']).replace(",",".")))
-            
-            
-            # ... y acumulamos para los totales generales
-            total_general_importe += cuotas[i]['importe']
-            total_general_comision += cuotas[i]['comision'] 
-        else:
-            c+=1 
-            sheet.write(c, 0, "Totales de Fraccion", style2)
-            sheet.write(c, 6, str('{:,}'.format(total_importe)).replace(",","."))
-            sheet.write(c, 7, str('{:,}'.format(total_comision)).replace(",","."))            
-            c += 1
-            fraccion_actual = cuotas[i]['fraccion_id']
-            sheet.write(c, 0, str(cuotas[i]['cliente']))
-            sheet.write(c, 1, str(cuotas[i]['fraccion']))
-            sheet.write(c, 2, str(cuotas[i]['fraccion_id']))
-            sheet.write(c, 3, str(cuotas[i]['lote']))
-            sheet.write(c, 4, str(cuotas[i]['cuota_nro']))
-            sheet.write(c, 5, str(cuotas[i]['fecha_pago']))
-            sheet.write(c, 6, str('{:,}'.format(cuotas[i]['importe']).replace(",",".")))
-            sheet.write(c, 7, str('{:,}'.format(cuotas[i]['comision']).replace(",",".")))          
-            total_general_importe += cuotas[i]['importe']
-            total_general_comision += cuotas[i]['comision'] 
-            
-            total_importe = 0
-            total_comision = 0
-            
-            total_importe += cuotas[i]['importe']
-            total_comision += cuotas[i]['comision']
-        # si es la ultima fila    
-        if (i == len(cuotas) - 1):   
-            c += 1           
-            sheet.write(c, 0, "Totales de Fraccion", style2)
-            sheet.write(c, 6, str('{:,}'.format(total_importe)).replace(",","."))
-            sheet.write(c, 7, str('{:,}'.format(total_comision)).replace(",","."))
-            
-    c += 1
-    sheet.write(c, 0, "Totales del Vendedor", style2)
-    sheet.write(c, 6,  str('{:,}'.format(total_general_importe, style2).replace(",",".")))
-    sheet.write(c, 7, str('{:,}'.format(total_general_comision, style2).replace(",",".")))
+    for cuota in cuotas:
+        c+=1            
+        sheet.write(c, 0, cuota['cliente'])
+        sheet.write(c, 1, cuota['fraccion'])
+        sheet.write(c, 2, cuota['fraccion_id'])
+        sheet.write(c, 3, cuota['lote'])
+        sheet.write(c, 4, cuota['cuota_nro'])
+        sheet.write(c, 5, cuota['fecha_pago'])
+        sheet.write(c, 6, cuota['importe']) 
+        sheet.write(c, 7, cuota['comision'])
+        try: 
+            if cuota['total_importe']:
+                c+=1 
+                sheet.write(c, 0, "Totales de Fraccion", style2)
+                sheet.write(c, 6, cuota['total_importe'])
+                sheet.write(c, 7, cuota['total_comision'])           
+                # si es la ultima fila    
+            if (cuota['total_general_importe']):
+                c+=1
+                sheet.write(c, 0, "Totales del Vendedor", style2)
+                sheet.write(c, 6, cuota['total_general_importe'])
+                sheet.write(c, 7, cuota['total_general_comision'])
+        except:
+            pass
     response = HttpResponse(content_type='application/vnd.ms-excel')
     # Crear un nombre intuitivo         
     response['Content-Disposition'] = 'attachment; filename=' + 'liquidacion_vendedores.xls'
