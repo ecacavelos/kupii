@@ -10,11 +10,8 @@ from calendar import monthrange
 from principal.common_functions import get_nro_cuota
 from django.utils import simplejson
 from django.db import connection
-
-
-
 import xlwt
-
+import math
 
 # Funcion principal del modulo de lotes.
 def informes(request):
@@ -61,7 +58,7 @@ def lotes_libres(request):
                     object_list = Lote.objects.filter(estado="1").order_by('manzana', 'nro_lote')
                  
                 lotes=[]
-                total_costo_fraccion = 0
+                total_importe_cuotas = 0
                 total_contado_fraccion = 0
                 total_credito_fraccion = 0
                 total_superficie_fraccion = 0
@@ -69,35 +66,36 @@ def lotes_libres(request):
                 for index, lote_item in enumerate(object_list):
                     lote={}
                 # Se setean los datos de cada fila 
+                    precio_cuota=int(math.ceil(lote_item.precio_credito/130))
                     lote['fraccion_id']=str(lote_item.manzana.fraccion.id)
                     lote['fraccion']=str(lote_item.manzana.fraccion)
                     lote['lote']=str(lote_item.manzana).zfill(3) + "/" + str(lote_item.nro_lote).zfill(4)
                     lote['superficie']=lote_item.superficie                                    
                     lote['precio_contado']=str('{:,}'.format(lote_item.precio_contado)).replace(",", ".")                    
                     lote['precio_credito']=str('{:,}'.format(lote_item.precio_credito)).replace(",", ".")                    
-                    lote['precio_costo']=str('{:,}'.format(lote_item.precio_credito)).replace(",", ".")
+                    lote['importe_cuota']=str('{:,}'.format(precio_cuota)).replace(",", ".")
                 # Se suman los TOTALES por FRACCION
                     total_superficie_fraccion += lote_item.superficie 
                     total_contado_fraccion += lote_item.precio_contado
                     total_credito_fraccion += lote_item.precio_credito
-                    total_costo_fraccion += lote_item.precio_costo
+                    total_importe_cuotas += precio_cuota
                     total_lotes += 1
                 #Es el ultimo lote, cerrar totales de fraccion
                     if (len(object_list)-1 == index):
-                        lote['total_costo_fraccion'] = str('{:,}'.format(total_costo_fraccion)).replace(",", ".") 
+                        lote['total_importe_cuotas'] = str('{:,}'.format(total_importe_cuotas)).replace(",", ".") 
                         lote['total_credito_fraccion'] =  str('{:,}'.format(total_credito_fraccion)).replace(",", ".")
                         lote['total_contado_fraccion'] =  str('{:,}'.format(total_contado_fraccion)).replace(",", ".")
                         lote['total_superficie_fraccion'] =  str('{:,}'.format(total_superficie_fraccion)).replace(",", ".")
                         lote['total_lotes'] =  str('{:,}'.format(total_lotes)).replace(",", ".")
                 #Hay cambio de lote pero NO es el ultimo elemento todavia
                     elif (lote_item.manzana.fraccion.id != object_list[index+1].manzana.fraccion.id):
-                        lote['total_costo_fraccion'] = str('{:,}'.format(total_costo_fraccion)).replace(",", ".") 
+                        lote['total_importe_cuotas'] = str('{:,}'.format(total_importe_cuotas)).replace(",", ".") 
                         lote['total_credito_fraccion'] =  str('{:,}'.format(total_credito_fraccion)).replace(",", ".")
                         lote['total_contado_fraccion'] =  str('{:,}'.format(total_contado_fraccion)).replace(",", ".")
                         lote['total_superficie_fraccion'] =  str('{:,}'.format(total_superficie_fraccion)).replace(",", ".")
                         lote['total_lotes'] =  str('{:,}'.format(total_lotes)).replace(",", ".")
                     # Se CERAN  los TOTALES por FRACCION
-                        total_costo_fraccion = 0
+                        total_importe_cuotas = 0
                         total_contado_fraccion = 0
                         total_credito_fraccion = 0
                         total_superficie_fraccion = 0
