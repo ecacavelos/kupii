@@ -979,13 +979,13 @@ def lotes_libres_reporte_excel(request):
     total_superficie = 0
     total_contado = 0
     total_credito = 0
-    total_costo = 0
+    total_importe_cuotas = 0
     # totales generales
     total_general_lotes = 0
     total_general_superficie = 0
     total_general_contado = 0
     total_general_credito = 0
-    total_general_costo = 0
+    total_general_importe_cuotas = 0
         
     object_list = []  # lista de lotes
     if fraccion_ini and fraccion_fin:
@@ -1001,13 +1001,14 @@ def lotes_libres_reporte_excel(request):
     lotes = []
     for i in object_list:
         lote = {}
+        precio_cuota = int(math.ceil(i.precio_credito/130))
         lote['fraccion_id'] = str(i.manzana.fraccion.id)
         lote['fraccion'] = str(i.manzana.fraccion)
         lote['lote'] = str(i.manzana).zfill(3) + "/" + str(i.nro_lote).zfill(4)
         lote['superficie'] = i.superficie
         lote['precio_contado'] = i.precio_contado
         lote['precio_credito'] = i.precio_credito
-        lote['precio_costo'] = i.precio_costo
+        lote['importe_cuota'] =  precio_cuota
         lotes.append(lote)
     # contador de filas
     c = 0
@@ -1018,7 +1019,7 @@ def lotes_libres_reporte_excel(request):
         total_general_superficie += lotes[i]['superficie'] 
         total_general_contado += lotes[i]['precio_contado'] 
         total_general_credito += lotes[i]['precio_credito']
-        total_general_costo += lotes[i]['precio_costo']
+        total_general_importe_cuotas += lotes[i]['importe_cuota']
         # se suman los totales por fracion
         if (lotes[i]['fraccion_id'] == fraccion_actual):
             c+=1
@@ -1026,7 +1027,7 @@ def lotes_libres_reporte_excel(request):
             total_superficie += lotes[i]['superficie'] 
             total_contado += lotes[i]['precio_contado'] 
             total_credito += lotes[i]['precio_credito']
-            total_costo += lotes[i]['precio_costo']
+            total_importe_cuotas += lotes[i]['importe_cuota']
                     
             sheet.write(c, 0, str(lotes[i]['fraccion']))
             sheet.write(c, 1, str(lotes[i]['fraccion_id']))
@@ -1034,7 +1035,7 @@ def lotes_libres_reporte_excel(request):
             sheet.write(c, 3, str(lotes[i]['superficie']))
             sheet.write(c, 4, str('{:,}'.format(lotes[i]['precio_contado']).replace(",", ".")))
             sheet.write(c, 5, str('{:,}'.format(lotes[i]['precio_credito']).replace(",", ".")))
-            sheet.write(c, 6, str('{:,}'.format(lotes[i]['precio_costo']).replace(",", ".")))
+            sheet.write(c, 6, str('{:,}'.format(lotes[i]['importe_cuota']).replace(",", ".")))
         else: 
             c += 1
             sheet.write(c, 0, "Totales de Fraccion", style2)  
@@ -1042,7 +1043,7 @@ def lotes_libres_reporte_excel(request):
             sheet.write(c, 3, total_superficie)
             sheet.write(c, 4, str('{:,}'.format(total_contado)).replace(",", "."))
             sheet.write(c, 5, str('{:,}'.format(total_credito)).replace(",", "."))
-            sheet.write(c, 6, str('{:,}'.format(total_costo)).replace(",", "."))
+            sheet.write(c, 6, total_importe_cuotas)
             c += 1
             
             sheet.write(c, 0, str(lotes[i]['fraccion']))
@@ -1051,7 +1052,7 @@ def lotes_libres_reporte_excel(request):
             sheet.write(c, 3, str(lotes[i]['superficie']))
             sheet.write(c, 4, str('{:,}'.format(lotes[i]['precio_contado']).replace(",", ".")))
             sheet.write(c, 5, str('{:,}'.format(lotes[i]['precio_credito']).replace(",", ".")))
-            sheet.write(c, 6, str('{:,}'.format(lotes[i]['precio_costo']).replace(",", ".")))     
+            sheet.write(c, 6, str('{:,}'.format(lotes[i]['importe_cuota']).replace(",", ".")))     
             fraccion_actual = lotes[i]['fraccion_id']
             total_lotes = 0
             total_superficie = 0
@@ -1062,7 +1063,7 @@ def lotes_libres_reporte_excel(request):
             total_superficie += lotes[i]['superficie'] 
             total_contado += lotes[i]['precio_contado'] 
             total_credito += lotes[i]['precio_credito']
-            total_costo += lotes[i]['precio_costo']
+            total_costo += lotes[i]['importe_cuota']
             total_lotes += 1
         # si es la ultima fila    
         if (i == len(lotes) - 1):   
@@ -1072,7 +1073,7 @@ def lotes_libres_reporte_excel(request):
             sheet.write(c, 3, total_superficie)
             sheet.write(c, 4, str('{:,}'.format(total_contado)).replace(",", "."))
             sheet.write(c, 5, str('{:,}'.format(total_credito)).replace(",", "."))
-            sheet.write(c, 6, str('{:,}'.format(total_costo)).replace(",", "."))
+            sheet.write(c, 6, str('{:,}'.format(total_importe_cuotas)).replace(",", "."))
             
         
             
@@ -1082,7 +1083,7 @@ def lotes_libres_reporte_excel(request):
     sheet.write(c, 3, total_general_superficie)
     sheet.write(c, 4, str('{:,}'.format(total_general_contado)).replace(",", "."))
     sheet.write(c, 5, str('{:,}'.format(total_general_credito)).replace(",", "."))
-    sheet.write(c, 6, str('{:,}'.format(total_general_costo)).replace(",", "."))
+    sheet.write(c, 6, str('{:,}'.format(total_general_importe_cuotas)).replace(",", "."))
     
     
     response = HttpResponse(content_type='application/vnd.ms-excel')
