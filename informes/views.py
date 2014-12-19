@@ -347,21 +347,32 @@ def informe_general(request):
                 fraccion_fin=request.GET['fraccion_fin']
                 fecha_ini=request.GET['fecha_ini']
                 fecha_fin=request.GET['fecha_fin']
-                fecha_ini_parsed = datetime.strptime(fecha_ini, "%d/%m/%Y").date()
-                fecha_fin_parsed = datetime.strptime(fecha_fin, "%d/%m/%Y").date()
-    
-                query=(
-                '''
-                select pc.* from principal_pagodecuotas pc, principal_lote l, principal_manzana m, principal_fraccion f
-                where pc.fecha_de_pago >= \''''+ str(fecha_ini_parsed) +               
-                '''\' and pc.fecha_de_pago <= \'''' + str(fecha_fin_parsed) +
-                '''\' and f.id>=''' + fraccion_ini +
-                '''
-                and f.id<=''' + fraccion_fin +
-                '''
-                and (pc.lote_id = l.id and l.manzana_id=m.id and m.fraccion_id=f.id) order by f.id,pc.fecha_de_pago
-                '''
-                )
+                if fecha_ini == '' and fecha_fin == '':
+                    query=(
+                    '''
+                    select pc.* from principal_pagodecuotas pc, principal_lote l, principal_manzana m, principal_fraccion f
+                    where f.id>=''' + fraccion_ini +
+                    '''
+                    and f.id<=''' + fraccion_fin +
+                    '''
+                    and (pc.lote_id = l.id and l.manzana_id=m.id and m.fraccion_id=f.id) order by f.id
+                    '''
+                    )
+                else:
+                    fecha_ini_parsed = datetime.strptime(fecha_ini, "%d/%m/%Y").date()
+                    fecha_fin_parsed = datetime.strptime(fecha_fin, "%d/%m/%Y").date()
+                    query=(
+                    '''
+                    select pc.* from principal_pagodecuotas pc, principal_lote l, principal_manzana m, principal_fraccion f
+                    where pc.fecha_de_pago >= \''''+ str(fecha_ini_parsed) +               
+                    '''\' and pc.fecha_de_pago <= \'''' + str(fecha_fin_parsed) +
+                    '''\' and f.id>=''' + fraccion_ini +
+                    '''
+                    and f.id<=''' + fraccion_fin +
+                    '''
+                    and (pc.lote_id = l.id and l.manzana_id=m.id and m.fraccion_id=f.id) order by f.id,pc.fecha_de_pago
+                    '''
+                    )
                 
                 object_list=list(PagoDeCuotas.objects.raw(query))
  
@@ -1224,22 +1235,34 @@ def clientes_atrasados_reporte_excel(request):
 def informe_general_reporte_excel(request):   
     fecha_ini = request.GET['fecha_ini']
     fecha_fin = request.GET['fecha_fin']
-    fecha_ini_parsed = datetime.strptime(fecha_ini, "%d/%m/%Y").date()
-    fecha_fin_parsed = datetime.strptime(fecha_fin, "%d/%m/%Y").date()
     fraccion_ini = request.GET['fraccion_ini']
     fraccion_fin = request.GET['fraccion_fin']
-    query = (
-    '''
-    select pc.* from principal_pagodecuotas pc, principal_lote l, principal_manzana m, principal_fraccion f
-    where pc.fecha_de_pago >= \'''' + str(fecha_ini_parsed) + 
-    '''\' and pc.fecha_de_pago <= \'''' + str(fecha_fin_parsed) + 
-    '''\' and f.id>=''' + fraccion_ini + 
-    '''
-    and f.id<=''' + fraccion_fin + 
-    '''
-    and (pc.lote_id = l.id and l.manzana_id=m.id and m.fraccion_id=f.id) order by f.id,pc.fecha_de_pago
-    '''
-    )
+    if fecha_ini == '' and fecha_fin == '':
+        query=(
+        '''
+        select pc.* from principal_pagodecuotas pc, principal_lote l, principal_manzana m, principal_fraccion f
+        where f.id>=''' + fraccion_ini +
+        '''
+        and f.id<=''' + fraccion_fin +
+        '''
+        and (pc.lote_id = l.id and l.manzana_id=m.id and m.fraccion_id=f.id) order by f.id
+        '''
+        )
+    else:
+        fecha_ini_parsed = datetime.strptime(fecha_ini, "%d/%m/%Y").date()
+        fecha_fin_parsed = datetime.strptime(fecha_fin, "%d/%m/%Y").date()
+        query = (
+        '''
+        select pc.* from principal_pagodecuotas pc, principal_lote l, principal_manzana m, principal_fraccion f
+        where pc.fecha_de_pago >= \'''' + str(fecha_ini_parsed) + 
+        '''\' and pc.fecha_de_pago <= \'''' + str(fecha_fin_parsed) + 
+        '''\' and f.id>=''' + fraccion_ini + 
+        '''
+        and f.id<=''' + fraccion_fin + 
+        '''
+        and (pc.lote_id = l.id and l.manzana_id=m.id and m.fraccion_id=f.id) order by f.id,pc.fecha_de_pago
+        '''
+        )
          
     print query
  
