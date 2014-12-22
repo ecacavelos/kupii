@@ -1271,58 +1271,96 @@ def clientes_atrasados_reporte_excel(request):
     return response
         
 def informe_general_reporte_excel(request):   
-    fecha_ini = request.GET['fecha_ini']
-    fecha_fin = request.GET['fecha_fin']
-    fraccion_ini = request.GET['fraccion_ini']
-    fraccion_fin = request.GET['fraccion_fin']
+    fecha_ini=request.GET['fecha_ini']
+    fecha_fin=request.GET['fecha_fin']
+    fraccion_ini=request.GET['fraccion_ini']
+    fraccion_fin=request.GET['fraccion_fin']
+    cuotas=[]    
     if fecha_ini == '' and fecha_fin == '':
         query=(
-        '''
-        select pc.* from principal_pagodecuotas pc, principal_lote l, principal_manzana m, principal_fraccion f
-        where f.id>=''' + fraccion_ini +
-        '''
-        and f.id<=''' + fraccion_fin +
-        '''
-        and (pc.lote_id = l.id and l.manzana_id=m.id and m.fraccion_id=f.id) order by f.id
-        '''
+            '''
+            select pc.* from principal_pagodecuotas pc, principal_lote l, principal_manzana m, principal_fraccion f
+            where f.id>=''' + fraccion_ini +
+            '''
+            and f.id<=''' + fraccion_fin +
+            '''
+            and (pc.lote_id = l.id and l.manzana_id=m.id and m.fraccion_id=f.id) order by f.id
+            '''
         )
     else:
         fecha_ini_parsed = datetime.strptime(fecha_ini, "%d/%m/%Y").date()
         fecha_fin_parsed = datetime.strptime(fecha_fin, "%d/%m/%Y").date()
-        query = (
-        '''
-        select pc.* from principal_pagodecuotas pc, principal_lote l, principal_manzana m, principal_fraccion f
-        where pc.fecha_de_pago >= \'''' + str(fecha_ini_parsed) + 
-        '''\' and pc.fecha_de_pago <= \'''' + str(fecha_fin_parsed) + 
-        '''\' and f.id>=''' + fraccion_ini + 
-        '''
-        and f.id<=''' + fraccion_fin + 
-        '''
-        and (pc.lote_id = l.id and l.manzana_id=m.id and m.fraccion_id=f.id) order by f.id,pc.fecha_de_pago
-        '''
+        query=(
+            '''
+            select pc.* from principal_pagodecuotas pc, principal_lote l, principal_manzana m, principal_fraccion f
+            where pc.fecha_de_pago >= \''''+ str(fecha_ini_parsed) +               
+            '''\' and pc.fecha_de_pago <= \'''' + str(fecha_fin_parsed) +
+            '''\' and f.id>=''' + fraccion_ini +
+            '''
+            and f.id<=''' + fraccion_fin +
+            '''
+            and (pc.lote_id = l.id and l.manzana_id=m.id and m.fraccion_id=f.id) order by f.id,pc.fecha_de_pago
+            '''
         )
-         
-    print query
- 
-    object_list = list(PagoDeCuotas.objects.raw(query))
- 
-    cuotas = []
-    for i in object_list:
-        nro_cuota = get_nro_cuota(i)
-        cuota = {}            
-        cuota['fraccion_id'] = i.lote.manzana.fraccion.id
-        cuota['fraccion'] = str(i.lote.manzana.fraccion)
-        cuota['lote'] = str(i.lote)
-        cuota['cliente'] = str(i.cliente)
-        cuota['cuota_nro'] = str(nro_cuota) + '/' + str(i.plan_de_pago.cantidad_de_cuotas)
-        cuota['plan_de_pago'] = i.plan_de_pago.nombre_del_plan
-        cuota['fecha_pago'] = str(i.fecha_de_pago)
-        cuota['total_de_cuotas'] = i.total_de_cuotas
-        cuota['total_de_mora'] = i.total_de_mora
-        cuota['total_de_pago'] = i.total_de_pago
+    object_list=list(PagoDeCuotas.objects.raw(query)) 
+    #Totales por FRACCION
+    total_cuotas=0
+    total_mora=0
+    total_pagos=0
+      
+    #Totales GENERALES
+    total_general_cuotas=0
+    total_general_mora=0
+    total_general_pagos=0
+        
+    for i, cuota_item in enumerate(object_list):
+        #Se setean los datos de cada fila
+        cuota={}
+        nro_cuota=get_nro_cuota(cuota_item)
+        cuota['fraccion_id']=str(cuota_item.lote.manzana.fraccion.id)
+        cuota['fraccion']=str(cuota_item.lote.manzana.fraccion)
+        cuota['lote']=str(cuota_item.lote)
+        cuota['cliente']=str(cuota_item.cliente)
+        cuota['cuota_nro']=str(nro_cuota)+'/'+str(cuota_item.plan_de_pago.cantidad_de_cuotas)
+        cuota['plan_de_pago']=cuota_item.plan_de_pago.nombre_del_plan
+        cuota['fecha_pago']=str(cuota_item.fecha_de_pago)
+        cuota['total_de_cuotas']=str('{:,}'.format(cuota_item.total_de_cuotas)).replace(",", ".") 
+        cuota['total_de_mora']=str('{:,}'.format(cuota_item.total_de_mora)).replace(",", ".")
+        cuota['total_de_pago']=str('{:,}'.format(cuota_item.total_de_pago)).replace(",", ".")
+
+        #Se suman los totales por fraccion
+        total_cuotas+=cuota_item.total_de_cuotas
+        total_mora+=cuota_item.total_de_mora
+        total_pagos+=cuota_item.total_de_pago
+            
+        #Y acumulamos para los totales generales
+        total_general_cuotas+=cuota_item.total_de_cuotas
+        total_general_mora+=cuota_item.total_de_mora
+        total_general_pagos+=cuota_item.total_de_pago
+            
+        #Es el ultimo lote, cerramos los totales de fraccion y los totales generales
+        if (len(object_list)-1 == i):
+            cuota['total_cuotas']=str('{:,}'.format(total_cuotas)).replace(",", ".") 
+            cuota['total_mora']=str('{:,}'.format(total_mora)).replace(",", ".")
+            cuota['total_pago']=str('{:,}'.format(total_pagos)).replace(",", ".")
+                
+            cuota['total_general_cuotas']=str('{:,}'.format(total_general_cuotas)).replace(",", ".") 
+            cuota['total_general_mora']=str('{:,}'.format(total_general_mora)).replace(",", ".")
+            cuota['total_general_pago']=str('{:,}'.format(total_general_pagos)).replace(",", ".")
+                        
+        #Hay cambio de lote pero NO es el ultimo elemento todavia
+        elif (cuota_item.lote.manzana.fraccion.id != object_list[i+1].lote.manzana.fraccion.id):
+            cuota['total_cuotas']=str('{:,}'.format(total_cuotas)).replace(",", ".") 
+            cuota['total_mora']=str('{:,}'.format(total_mora)).replace(",", ".")
+            cuota['total_pago']=str('{:,}'.format(total_pagos)).replace(",", ".")
+                    
+            #Se CERAN  los TOTALES por FRACCION
+            total_cuotas=0
+            total_mora=0
+            total_pagos=0
+                    
         cuotas.append(cuota)
         
-        # cuotas=object_list
     wb = xlwt.Workbook(encoding='utf-8')
     sheet = wb.add_sheet('test', cell_overwrite_ok=True)
     style = xlwt.easyxf('pattern: pattern solid, fore_colour green;'
@@ -1338,84 +1376,39 @@ def informe_general_reporte_excel(request):
     sheet.write(0, 6, "Total de Cuotas", style)
     sheet.write(0, 7, "Total de Mora", style)
     sheet.write(0, 8, "Total de Pago", style)
-    
-    # wb.save('informe_general.xls')
-    # guardamos la primera fraccion para comparar
-    fraccion_actual = cuotas[0]['fraccion_id']
-    
-    total_cuotas = 0
-    total_mora = 0
-    total_pagos = 0
-    total_general_cuotas = 0
-    total_general_mora = 0
-    total_general_pagos = 0
-    
-    # i=0
+
     # contador de filas
     c = 0
-    for i in range(len(cuotas)):
-    # for i,cuota in enumerate(cuotas,start=1):
-        # se suman los totales por fracion
-        if (cuotas[i]['fraccion_id'] == fraccion_actual):
-            c += 1
-            total_cuotas += cuotas[i]['total_de_cuotas']
-            total_mora += cuotas[i]['total_de_mora']
-            total_pagos += cuotas[i]['total_de_pago']
-            
-            sheet.write(c, 0, str(cuotas[i]['fraccion']))
-            sheet.write(c, 1, str(cuotas[i]['lote']))
-            sheet.write(c, 2, str(cuotas[i]['cliente']))
-            sheet.write(c, 3, str(cuotas[i]['cuota_nro']))
-            sheet.write(c, 4, str(cuotas[i]['plan_de_pago']))
-            sheet.write(c, 5, str(cuotas[i]['fecha_pago']))
-            sheet.write(c, 6, str('{:,}'.format(cuotas[i]['total_de_cuotas'])).replace(",","."))
-            sheet.write(c, 7, str('{:,}'.format(cuotas[i]['total_de_mora'])).replace(",","."))
-            sheet.write(c, 8, str('{:,}'.format(cuotas[i]['total_de_pago'])).replace(",","."))
-            
-            # ... y acumulamos para los totales generales
-            total_general_cuotas += cuotas[i]['total_de_cuotas']
-            total_general_mora += cuotas[i]['total_de_mora'] 
-            total_general_pagos += cuotas[i]['total_de_pago'] 
-            
-            # si es la ultima fila
-            
-        else:
-            c += 1            
-            sheet.write(c, 0, "Totales de Fraccion", style2)
-            sheet.write(c, 6, str('{:,}'.format(total_cuotas)).replace(",","."))
-            sheet.write(c, 7, str('{:,}'.format(total_mora)).replace(",","."))
-            sheet.write(c, 8, str('{:,}'.format(total_pagos)).replace(",","."))            
-            c += 1
-            sheet.write(c, 0, str(cuotas[i]['fraccion']))
-            sheet.write(c, 1, str(cuotas[i]['lote']))
-            sheet.write(c, 2, str(cuotas[i]['cliente']))
-            sheet.write(c, 3, str(cuotas[i]['cuota_nro']))
-            sheet.write(c, 4, str(cuotas[i]['plan_de_pago']))
-            sheet.write(c, 5, str(cuotas[i]['fecha_pago']))
-            sheet.write(c, 6, str('{:,}'.format(cuotas[i]['total_de_cuotas'])).replace(",","."))
-            sheet.write(c, 7, str('{:,}'.format(cuotas[i]['total_de_mora'])).replace(",","."))
-            sheet.write(c, 8, str('{:,}'.format(cuotas[i]['total_de_pago'])).replace(",","."))      
-            
-            fraccion_actual = cuotas[i]['fraccion_id']
-            total_cuotas = 0;
-            total_mora = 0;
-            total_pagos = 0;
-            total_cuotas += cuotas[i]['total_de_cuotas'];
-            total_mora += cuotas[i]['total_de_mora'];
-            total_pagos += cuotas[i]['total_de_pago'];
-            
-        if (i == len(cuotas) - 1):  
-            c+=1           
-            sheet.write(c, 0, "Totales de Fraccion", style2)
-            sheet.write(c, 6, str('{:,}'.format(total_cuotas)).replace(",","."))
-            sheet.write(c, 7, str('{:,}'.format(total_mora)).replace(",","."))
-            sheet.write(c, 8, str('{:,}'.format(total_pagos)).replace(",","."))  
-            
-            
-    sheet.write(c + 1, 0, "Totales Generales", style2)
-    sheet.write(c + 1, 6, str('{:,}'.format(total_general_cuotas)).replace(",","."), style2)
-    sheet.write(c + 1, 7, str('{:,}'.format(total_general_mora)).replace(",","."), style2)
-    sheet.write(c + 1, 8, str('{:,}'.format(total_general_pagos)).replace(",","."), style2)
+    for cuota in cuotas:
+        c += 1
+        sheet.write(c, 0, cuota['fraccion'])
+        sheet.write(c, 1, cuota['lote'])
+        sheet.write(c, 2, cuota['cliente'])
+        sheet.write(c, 3, cuota['cuota_nro'])
+        sheet.write(c, 4, cuota['plan_de_pago'])
+        sheet.write(c, 5, cuota['fecha_pago'])
+        sheet.write(c, 6, cuota['total_de_cuotas'])
+        sheet.write(c, 7, cuota['total_de_mora'])
+        sheet.write(c, 8, cuota['total_de_pago'])
+                       
+        try:
+            if cuota['total_cuotas']:
+                c += 1            
+                sheet.write(c, 0, "Totales de Fraccion", style2)
+                sheet.write(c, 6, cuota['total_cuotas'], style2)
+                sheet.write(c, 7, cuota['total_mora'], style2)
+                sheet.write(c, 8, cuota['total_pago'], style2)
+                           
+            if cuota['total_general_cuotas']:
+                c += 1            
+                sheet.write(c, 0, "Totales Generales", style2)
+                sheet.write(c, 6, cuota['total_general_cuotas'], style2)
+                sheet.write(c, 7, cuota['total_general_mora'], style2)
+                sheet.write(c, 8, cuota['total_general_pago'], style2)                
+        except:
+            pass
+       
+    
     response = HttpResponse(content_type='application/vnd.ms-excel')
     # Crear un nombre intuitivo         
     response['Content-Disposition'] = 'attachment; filename=' + 'informe_general.xls'
