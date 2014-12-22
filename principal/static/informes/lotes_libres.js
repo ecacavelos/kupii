@@ -49,9 +49,34 @@ function setup_inputs() {
 					//alert(id_fraccion);
 				}
 			});
-
 			$("#id_busqueda_label").empty();
 			base_url = "/ajax/get_fracciones_by_name/";
+			params = "value";
+			$("#id_fraccion_fin").autocomplete({
+				source : base_url,
+				minLength : 1,
+				select : function(event, ui) {
+					id_fraccion = ui.item.id;
+					$("#id_frac2").val(id_fraccion);					
+					//alert(id_fraccion);
+				}
+			});
+		}else if($("#id_tipo_busqueda").val() == "codigo"){
+			var id_fraccion;
+			$("#id_busqueda_label").empty();
+			base_url = "/ajax/get_fracciones_by_id/";
+			params = "value";
+			$("#id_fraccion_ini").autocomplete({
+				source : base_url,
+				minLength : 1,
+				select : function(event, ui) {
+					id_fraccion = ui.item.id;
+					$("#id_frac1").val(id_fraccion);
+					//alert(id_fraccion);
+				}
+			});
+			$("#id_busqueda_label").empty();
+			base_url = "/ajax/get_fracciones_by_id/";
 			params = "value";
 			$("#id_fraccion_fin").autocomplete({
 				source : base_url,

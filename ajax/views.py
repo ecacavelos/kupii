@@ -209,6 +209,14 @@ def get_fracciones_by_name(request):
     nombre_fraccion = request.GET['term']
     print("term ->" + nombre_fraccion);
     object_list = Fraccion.objects.filter(nombre__icontains=nombre_fraccion)
+  
+@require_http_methods(["GET"])
+def get_fracciones_by_id(request):
+    
+#     callback = request.GET['callback']
+    id_fraccion = request.GET['term']
+    print("term ->" + id_fraccion);
+    object_list = Fraccion.objects.filter(id__icontains=id_fraccion).order_by('id')
     results = [ob.as_json() for ob in object_list]
     return HttpResponse(json.dumps(results), mimetype='application/json')
 
