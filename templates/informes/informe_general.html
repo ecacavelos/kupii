@@ -28,8 +28,21 @@
 		var fraccion_fin = "{{fraccion_fin}}";
 		var fecha_ini = "{{fecha_ini}}";
 		var fecha_fin = "{{fecha_fin}}";
-		$('#fraccion_ini').val(fraccion_ini);
-		$('#fraccion_fin').val(fraccion_fin);
+		var frac1="{{frac1}}";
+		var frac2="{{frac2}}";
+		var tipo_busqueda = "{{tipo_busqueda}}";
+		$('#id_tipo_busqueda').val(tipo_busqueda);
+		if($('#id_tipo_busqueda').val()=='nombre'){
+			$('#id_fraccion_ini').val(frac1);
+			$('#id_fraccion_fin').val(frac2);
+			$('#id_frac1').val(fraccion_ini);
+			$('#id_frac2').val(fraccion_fin);
+		}
+		if($('#id_tipo_busqueda').val()=='codigo'){
+			$('#id_fraccion_ini').val(fraccion_ini);
+			$('#id_fraccion_fin').val(fraccion_fin);
+		}		
+		
 		$('#fecha_ini').val(fecha_ini);
 		$('#fecha_fin').val(fecha_fin);
 
@@ -53,26 +66,12 @@
 			$('.listado-pagos').show();
 			$('.pagination').show();
 		}
+		setup_inputs();	
 
 	});
-	function retrieve_informe_general() {
-		if ($('#fraccion_ini').val() == 0 || $('#fraccion_fin').val() == 0 || $('#fraccion_ini').val() == "" || $('#fraccion_fin').val() == "") {
-			alert("Debe ingresar un rango de fracciones");
-			return;
-		}
-		window.location.href = "/informes/informe_general_reporte_excel?fecha_ini=" + $('#fecha_ini').val() + "&fecha_fin=" + $('#fecha_fin').val() + "&fraccion_ini=" + $('#fraccion_ini').val() + "&fraccion_fin=" + $('#fraccion_fin').val();
-	}
-
-	function validar() {
-
-		if ($('#fraccion_ini').val() == 0 || $('#fraccion_fin').val() == 0 || $('#fraccion_ini').val() == "" || $('#fraccion_fin').val() == "") {
-			alert("Debe ingresar un rango de fracciones");
-			return;
-		}
-		$("#frm_busqueda").submit();
-
-	}
+	
 </script>
+<script type="text/javascript" src="{{ STATIC_URL }}informes/informe_general.js"></script>
 {% endblock %}
 {% block content %}
 <div class="gri16 text-izquierda" id="breadcumb">
@@ -102,13 +101,20 @@
 				</td>
 			</tr>
 			<tr>
-				<td> Rango de Fracci&oacute;n: </td>
 				<td>
-				<input name="fraccion_ini" id="fraccion_ini" type="text" value=""/>
-				</td>
-				<td>
-				<input name="fraccion_fin" id="fraccion_fin" type="text" value=""/>
-				</td>
+				<select id="id_tipo_busqueda" name="tipo_busqueda">
+					<option value="">Elija una opcion</option>
+					<option value="nombre">Nombre de Fraccion</option>
+					<option value="codigo">Codigo de Fraccion</option>
+				</select></td>
+			<td>
+				<input name="fraccion_ini" id="id_fraccion_ini" type="text" value=""/>
+				<input name="frac1" id="id_frac1" type="hidden" value=""/>
+			</td>
+			<td>	
+				<input name="fraccion_fin" id="id_fraccion_fin" type="text" value=""/>
+				<input name="frac2" id="id_frac2" type="hidden" value=""/>
+			</td>
 			</tr>
 			<tr>
 				<td>
