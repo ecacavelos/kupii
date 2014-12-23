@@ -510,11 +510,11 @@ def liquidacion_propietarios(request):
                                     #print pago.id
                                     nro_cuota = get_nro_cuota(pago)
                                     cuotas_para_propietario=((pago.plan_de_pago.cantidad_de_cuotas)*(pago.plan_de_pago.intervalos_cuotas_inmobiliaria))-pago.plan_de_pago.inicio_cuotas_inmobiliaria
-                                    if(nro_cuota % 2 != 0 and nro_cuota<=cuotas_para_propietario): 
-                                        if nro_cuota <= pago.plan_de_pago.cantidad_cuotas_inmobiliaria:
+                                    if(nro_cuota<=cuotas_para_propietario): 
+                                        if(nro_cuota % 2 != 0):    
                                             monto_inmobiliaria = pago.total_de_cuotas
                                             monto_propietario = 0
-                                        else:                                             
+                                        else:
                                             monto_inmobiliaria = int(pago.total_de_cuotas * (float(pago.plan_de_pago.porcentaje_cuotas_inmobiliaria) / float(100)))
                                             monto_propietario = pago.total_de_cuotas - monto_inmobiliaria
                                     else:
@@ -559,13 +559,14 @@ def liquidacion_propietarios(request):
                         try:                                           
                             for pagos in lista_pagos:
                                 for i, pago in enumerate(pagos):
-                                    print pago.id
+                                    #print pago.id
                                     nro_cuota = get_nro_cuota(pago)
-                                    if(nro_cuota % 2 != 0): 
-                                        if nro_cuota <= pago.plan_de_pago.cantidad_cuotas_inmobiliaria:
+                                    cuotas_para_propietario=((pago.plan_de_pago.cantidad_de_cuotas)*(pago.plan_de_pago.intervalos_cuotas_inmobiliaria))-pago.plan_de_pago.inicio_cuotas_inmobiliaria
+                                    if(nro_cuota<=cuotas_para_propietario): 
+                                        if(nro_cuota % 2 != 0):    
                                             monto_inmobiliaria = pago.total_de_cuotas
                                             monto_propietario = 0
-                                        else:                                             
+                                        else:
                                             monto_inmobiliaria = int(pago.total_de_cuotas * (float(pago.plan_de_pago.porcentaje_cuotas_inmobiliaria) / float(100)))
                                             monto_propietario = pago.total_de_cuotas - monto_inmobiliaria
                                     else:
@@ -1447,17 +1448,17 @@ def liquidacion_propietarios_reporte_excel(request):
         for i in pagos_list:                        
             for pago in i:
                 nro_cuota = get_nro_cuota(pago)
-                if(nro_cuota % 2 != 0): 
-                    if nro_cuota <= pago.plan_de_pago.cantidad_cuotas_inmobiliaria:
+                cuotas_para_propietario=((pago.plan_de_pago.cantidad_de_cuotas)*(pago.plan_de_pago.intervalos_cuotas_inmobiliaria))-pago.plan_de_pago.inicio_cuotas_inmobiliaria
+                if(nro_cuota<=cuotas_para_propietario): 
+                    if(nro_cuota % 2 != 0):    
                         monto_inmobiliaria = pago.total_de_cuotas
                         monto_propietario = 0
                     else:
                         monto_inmobiliaria = int(pago.total_de_cuotas * (float(pago.plan_de_pago.porcentaje_cuotas_inmobiliaria) / float(100)))
                         monto_propietario = pago.total_de_cuotas - monto_inmobiliaria
-                        
                 else:
                     monto_inmobiliaria = int(pago.total_de_cuotas * (float(pago.plan_de_pago.porcentaje_cuotas_inmobiliaria) / float(100)))
-                    monto_propietario = pago.total_de_cuotas - monto_inmobiliaria   
+                    monto_propietario = pago.total_de_cuotas - monto_inmobiliaria
                 total_monto_inm += monto_inmobiliaria
                 total_monto_prop += monto_propietario
                 total_monto_pagado += pago.total_de_cuotas  
@@ -1498,20 +1499,21 @@ def liquidacion_propietarios_reporte_excel(request):
                         if pago:
                             pagos_list.append(pago)
                                                               
-            for i in pagos_list:
-                nro_cuota = get_nro_cuota(pago)
+            for i in pagos_list:                
                 for pago in i:
-                    if(nro_cuota % 2 != 0): 
-                        if nro_cuota <= pago.plan_de_pago.cantidad_cuotas_inmobiliaria:
+                    nro_cuota = get_nro_cuota(pago)
+                    cuotas_para_propietario=((pago.plan_de_pago.cantidad_de_cuotas)*(pago.plan_de_pago.intervalos_cuotas_inmobiliaria))-pago.plan_de_pago.inicio_cuotas_inmobiliaria
+                    if(nro_cuota<=cuotas_para_propietario): 
+                        if(nro_cuota % 2 != 0):    
                             monto_inmobiliaria = pago.total_de_cuotas
                             monto_propietario = 0
                         else:
                             monto_inmobiliaria = int(pago.total_de_cuotas * (float(pago.plan_de_pago.porcentaje_cuotas_inmobiliaria) / float(100)))
                             monto_propietario = pago.total_de_cuotas - monto_inmobiliaria
-                            
                     else:
                         monto_inmobiliaria = int(pago.total_de_cuotas * (float(pago.plan_de_pago.porcentaje_cuotas_inmobiliaria) / float(100)))
-                        monto_propietario = pago.total_de_cuotas - monto_inmobiliaria   
+                        monto_propietario = pago.total_de_cuotas - monto_inmobiliaria
+                            
                     total_monto_inm += monto_inmobiliaria
                     total_monto_prop += monto_propietario
                     total_monto_pagado += pago.total_de_cuotas              
