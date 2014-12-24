@@ -744,10 +744,13 @@ def liquidacion_vendedores(request):
                         cuotas.append(cuota)                        
                     #Si es el ultimo lote, cerramos totales de fraccion
                     if (len(object_list)-1 == i):
-                        ultimo['total_importe']=str('{:,}'.format(total_importe)).replace(",", ".") 
-                        ultimo['total_comision']=str('{:,}'.format(total_comision)).replace(",", ".")             
-                        ultimo['total_general_importe']=str('{:,}'.format(total_general_importe)).replace(",", ".") 
-                        ultimo['total_general_comision']=str('{:,}'.format(total_general_comision)).replace(",", ".")          
+                        try:
+                            ultimo['total_importe']=str('{:,}'.format(total_importe)).replace(",", ".") 
+                            ultimo['total_comision']=str('{:,}'.format(total_comision)).replace(",", ".")             
+                            ultimo['total_general_importe']=str('{:,}'.format(total_general_importe)).replace(",", ".") 
+                            ultimo['total_general_comision']=str('{:,}'.format(total_general_comision)).replace(",", ".")          
+                        except:
+                            pass
             ultimo="&busqueda_label="+busqueda_label+"&busqueda="+vendedor_id+"&fecha_ini="+fecha_ini+"&fecha_fin="+fecha_fin         
             paginator = Paginator(cuotas, 25)
             page = request.GET.get('page')
