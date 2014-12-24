@@ -500,52 +500,51 @@ def liquidacion_propietarios(request):
                                 for l in lotes_list:
                                     pagos = PagoDeCuotas.objects.filter(lote_id=l.id , fecha_de_pago__range=[fecha_ini_parsed, fecha_fin_parsed]).order_by('fecha_de_pago')
                                     if pagos:
-                                        lista_pagos.append(pagos)
+                                        for pago in pagos:
+                                            lista_pagos.append(pago)
                         except Exception, error:
                             print error
                             return HttpResponseServerError("La Fraccion no existe")                       
                         try:
-                            for pagos in lista_pagos:                        
-                                for i, pago in enumerate(pagos):
-                                    #print pago.id
-                                    nro_cuota = get_nro_cuota(pago)
-                                    cuotas_para_propietario=((pago.plan_de_pago.cantidad_de_cuotas)*(pago.plan_de_pago.intervalos_cuotas_inmobiliaria))-pago.plan_de_pago.inicio_cuotas_inmobiliaria
-                                    if(nro_cuota<=cuotas_para_propietario): 
-                                        if(nro_cuota % 2 != 0):    
-                                            monto_inmobiliaria = pago.total_de_cuotas
-                                            monto_propietario = 0
-                                        else:
-                                            monto_inmobiliaria = int(pago.total_de_cuotas * (float(pago.plan_de_pago.porcentaje_cuotas_inmobiliaria) / float(100)))
-                                            monto_propietario = pago.total_de_cuotas - monto_inmobiliaria
+                            for i, pago in enumerate(lista_pagos):                        
+                                #print pago.id
+                                nro_cuota = get_nro_cuota(pago)
+                                cuotas_para_propietario=((pago.plan_de_pago.cantidad_cuotas_inmobiliaria)*(pago.plan_de_pago.intervalos_cuotas_inmobiliaria))-pago.plan_de_pago.inicio_cuotas_inmobiliaria
+                                if(nro_cuota<=cuotas_para_propietario): 
+                                    if(nro_cuota % 2 != 0):    
+                                        monto_inmobiliaria = pago.total_de_cuotas
+                                        monto_propietario = 0
                                     else:
                                         monto_inmobiliaria = int(pago.total_de_cuotas * (float(pago.plan_de_pago.porcentaje_cuotas_inmobiliaria) / float(100)))
                                         monto_propietario = pago.total_de_cuotas - monto_inmobiliaria
+                                else:
+                                    monto_inmobiliaria = int(pago.total_de_cuotas * (float(pago.plan_de_pago.porcentaje_cuotas_inmobiliaria) / float(100)))
+                                    monto_propietario = pago.total_de_cuotas - monto_inmobiliaria
                                     
-                                    fila={}
-                                    total_monto_inm += monto_inmobiliaria
-                                    total_monto_prop += monto_propietario
-                                    total_monto_pagado += pago.total_de_cuotas
-                                    fila['fecha_de_pago']=str(pago.fecha_de_pago)
-                                    fila['lote']=str(pago.lote)
-                                    fila['cliente']=str(pago.cliente)
-                                    fila['nro_cuota']=str(nro_cuota) + '/' + str(pago.plan_de_pago.cantidad_de_cuotas)
-                                    fila['total_de_cuotas']=str('{:,}'.format(pago.total_de_cuotas)).replace(",", ".")
-                                    fila['monto_inmobiliaria']=str('{:,}'.format(monto_inmobiliaria)).replace(",", ".")
-                                    fila['monto_propietario']=str('{:,}'.format(monto_propietario)).replace(",", ".")
-                                    
-                                    total_general_pagado += pago.total_de_cuotas
-                                    total_general_inm += monto_inmobiliaria
-                                    total_general_prop += monto_propietario
-                                    ultimo=fila
-                                    print(fila)
-                                    filas.append(fila)
-                            ultimo['total_general_pagado']=str('{:,}'.format(total_general_pagado)).replace(",", ".")
-                            ultimo['total_general_inmobiliaria']=str('{:,}'.format(total_general_inm)).replace(",", ".")
-                            ultimo['total_general_propietario']=str('{:,}'.format(total_general_prop)).replace(",", ".")
+                                fila={}
+                                total_monto_inm += monto_inmobiliaria
+                                total_monto_prop += monto_propietario
+                                total_monto_pagado += pago.total_de_cuotas
+                                fila['fraccion']=str(pago.lote.manzana.fraccion)
+                                fila['fecha_de_pago']=str(pago.fecha_de_pago)
+                                fila['lote']=str(pago.lote)
+                                fila['cliente']=str(pago.cliente)
+                                fila['nro_cuota']=str(nro_cuota) + '/' + str(pago.plan_de_pago.cantidad_de_cuotas)
+                                fila['total_de_cuotas']=str('{:,}'.format(pago.total_de_cuotas)).replace(",", ".")
+                                fila['monto_inmobiliaria']=str('{:,}'.format(monto_inmobiliaria)).replace(",", ".")
+                                fila['monto_propietario']=str('{:,}'.format(monto_propietario)).replace(",", ".")
+                                
+                                total_general_pagado += pago.total_de_cuotas
+                                total_general_inm += monto_inmobiliaria
+                                total_general_prop += monto_propietario
+                                filas.append(fila)
+                            fila['total_general_pagado']=str('{:,}'.format(total_general_pagado)).replace(",", ".")
+                            fila['total_general_inmobiliaria']=str('{:,}'.format(total_general_inm)).replace(",", ".")
+                            fila['total_general_propietario']=str('{:,}'.format(total_general_prop)).replace(",", ".")
                         except Exception, error:
                             print error                    
                                                                                        
-                    else:                
+                    else:                               
                         propietario_id = request.GET['busqueda']
                         fracciones = Fraccion.objects.filter(propietario_id=propietario_id).order_by('id')
                         for f in fracciones:
@@ -555,65 +554,69 @@ def liquidacion_propietarios(request):
                                 for l in lotes:
                                     pagos = PagoDeCuotas.objects.filter(lote_id=l.id , fecha_de_pago__range=[fecha_ini_parsed, fecha_fin_parsed]).order_by('fecha_de_pago')
                                     if pagos:
-                                        lista_pagos.append(pagos)                              
-                        try:                                           
-                            for pagos in lista_pagos:
-                                for i, pago in enumerate(pagos):
-                                    #print pago.id
-                                    nro_cuota = get_nro_cuota(pago)
-                                    cuotas_para_propietario=((pago.plan_de_pago.cantidad_de_cuotas)*(pago.plan_de_pago.intervalos_cuotas_inmobiliaria))-pago.plan_de_pago.inicio_cuotas_inmobiliaria
-                                    if(nro_cuota<=cuotas_para_propietario): 
-                                        if(nro_cuota % 2 != 0):    
-                                            monto_inmobiliaria = pago.total_de_cuotas
-                                            monto_propietario = 0
-                                        else:
-                                            monto_inmobiliaria = int(pago.total_de_cuotas * (float(pago.plan_de_pago.porcentaje_cuotas_inmobiliaria) / float(100)))
-                                            monto_propietario = pago.total_de_cuotas - monto_inmobiliaria
-                                    else:
-                                        monto_inmobiliaria = int(pago.total_de_cuotas * (float(pago.plan_de_pago.porcentaje_cuotas_inmobiliaria) / float(100)))
-                                        monto_propietario = pago.total_de_cuotas - monto_inmobiliaria
-                                             
-                                    fila={}
-                                    total_monto_inm += monto_inmobiliaria
-                                    total_monto_prop += monto_propietario
-                                    total_monto_pagado += pago.total_de_cuotas
-                                    fila['fecha_de_pago']=str(pago.fecha_de_pago)
-                                    fila['lote']=str(pago.lote)
-                                    fila['cliente']=str(pago.cliente)
-                                    fila['nro_cuota']=str(nro_cuota) + '/' + str(pago.plan_de_pago.cantidad_de_cuotas)
-                                    fila['total_de_cuotas']=str('{:,}'.format(pago.total_de_cuotas)).replace(",", ".")
-                                    fila['monto_inmobiliaria']=str('{:,}'.format(monto_inmobiliaria)).replace(",", ".")
-                                    fila['monto_propietario']=str('{:,}'.format(monto_propietario)).replace(",", ".")
-                                       
-                                    
-                                    #Si es el ultimo lote, cerramos totales de fraccion
-                                    if(len(pagos)-1==i):
-                                        fila['total_monto_pagado']=str('{:,}'.format(total_monto_pagado)).replace(",", ".")
-                                        fila['total_monto_inmobiliaria']=str('{:,}'.format(total_monto_inm)).replace(",", ".")
-                                        fila['total_monto_propietario']=str('{:,}'.format(total_monto_prop)).replace(",", ".")
-                                        #Y agregamos los totales generales
-                                        fila['total_general_pagado']=str('{:,}'.format(total_general_pagado)).replace(",", ".")
-                                        fila['total_general_inmobiliaria']=str('{:,}'.format(total_general_inm)).replace(",", ".")
-                                        fila['total_general_propietario']=str('{:,}'.format(total_general_prop)).replace(",", ".")
-                                        
-                                    #Hay cambio de lote pero NO es el ultimo elemento todavia
-                                    elif (pago.lote.manzana.fraccion.id != pagos[i+1].lote.manzana.fraccion.id):
-                                        fila['total_monto_pagado']=str('{:,}'.format(total_monto_pagado)).replace(",", ".")
-                                        fila['total_monto_inmobiliaria']=str('{:,}'.format(total_monto_inm)).replace(",", ".")
-                                        fila['total_monto_propietario']=str('{:,}'.format(total_monto_prop)).replace(",", ".")
-                                        
-                                        #Se CERAN  los TOTALES por FRACCION
-                                        total_monto_pagado = 0
-                                        total_monto_inm = 0
-                                        total_monto_prop = 0
-                                    
-                                    total_general_pagado += pago.total_de_cuotas
-                                    total_general_inm += monto_inmobiliaria
-                                    total_general_prop += monto_propietario
-                                    filas.append(fila)                             
-                        except Exception, error:
-                            print error        
-                    
+                                        for pago in pagos:
+                                            lista_pagos.append(pago)                              
+                                          
+                        for i, pago in enumerate(lista_pagos):
+                            print pago.id
+                            nro_cuota = get_nro_cuota(pago)
+                            cuotas_para_propietario=((pago.plan_de_pago.cantidad_cuotas_inmobiliaria)*(pago.plan_de_pago.intervalos_cuotas_inmobiliaria))-pago.plan_de_pago.inicio_cuotas_inmobiliaria
+                            if(nro_cuota<=cuotas_para_propietario): 
+                                if(nro_cuota % 2 != 0):    
+                                    monto_inmobiliaria = pago.total_de_cuotas
+                                    monto_propietario = 0
+                                else:
+                                    monto_inmobiliaria = int(pago.total_de_cuotas * (float(pago.plan_de_pago.porcentaje_cuotas_inmobiliaria) / float(100)))
+                                    monto_propietario = pago.total_de_cuotas - monto_inmobiliaria
+                            else:
+                                monto_inmobiliaria = int(pago.total_de_cuotas * (float(pago.plan_de_pago.porcentaje_cuotas_inmobiliaria) / float(100)))
+                                monto_propietario = pago.total_de_cuotas - monto_inmobiliaria
+
+                            # Se setean los datos de cada fila
+                            fila={}
+                            fila['fraccion']=str(pago.lote.manzana.fraccion)
+                            fila['fecha_de_pago']=str(pago.fecha_de_pago)
+                            fila['lote']=str(pago.lote)
+                            fila['cliente']=str(pago.cliente)
+                            fila['nro_cuota']=str(nro_cuota) + '/' + str(pago.plan_de_pago.cantidad_de_cuotas)
+                            fila['total_de_cuotas']=str('{:,}'.format(pago.total_de_cuotas)).replace(",", ".")
+                            fila['monto_inmobiliaria']=str('{:,}'.format(monto_inmobiliaria)).replace(",", ".")
+                            fila['monto_propietario']=str('{:,}'.format(monto_propietario)).replace(",", ".")
+                            
+                            # Se suman los TOTALES por FRACCION
+                            total_monto_inm += monto_inmobiliaria
+                            total_monto_prop += monto_propietario
+                            total_monto_pagado += pago.total_de_cuotas
+                                
+                            #Es el ultimo lote, cerrar totales de fraccion
+                            if (len(lista_pagos)-1 == i):                                
+                                #Totales por FRACCION
+                                fila['total_monto_pagado']=str('{:,}'.format(total_monto_pagado)).replace(",", ".")
+                                fila['total_monto_inmobiliaria']=str('{:,}'.format(total_monto_inm)).replace(",", ".")
+                                fila['total_monto_propietario']=str('{:,}'.format(total_monto_prop)).replace(",", ".")
+                                
+                                #Totales GENERALES
+                                fila['total_general_pagado']=str('{:,}'.format(total_general_pagado)).replace(",", ".")
+                                fila['total_general_inmobiliaria']=str('{:,}'.format(total_general_inm)).replace(",", ".")
+                                fila['total_general_propietario']=str('{:,}'.format(total_general_prop)).replace(",", ".")
+                                
+                            #Hay cambio de lote pero NO es el ultimo elemento todavia
+                            elif (pago.lote.manzana.fraccion.id != lista_pagos[i+1].lote.manzana.fraccion.id):
+                                #Totales por FRACCION
+                                fila['total_monto_pagado']=str('{:,}'.format(total_monto_pagado)).replace(",", ".")
+                                fila['total_monto_inmobiliaria']=str('{:,}'.format(total_monto_inm)).replace(",", ".")
+                                fila['total_monto_propietario']=str('{:,}'.format(total_monto_prop)).replace(",", ".")
+                                
+                                # Se CERAN  los TOTALES por FRACCION
+                                total_monto_pagado = 0
+                                total_monto_inm = 0
+                                total_monto_prop = 0
+                            
+                            #Acumulamos para los TOTALES GENERALES
+                            total_general_pagado += pago.total_de_cuotas
+                            total_general_inm += monto_inmobiliaria
+                            total_general_prop += monto_propietario
+                            filas.append(fila)
                     ultimo="&tipo_busqueda="+tipo_busqueda+"&busqueda="+busqueda+"&busqueda_label="+busqueda_label+"&fecha_ini="+fecha_ini+"&fecha_fin="+fecha_fin
                     paginator = Paginator(filas, 25)
                     page = request.GET.get('page')
@@ -1422,85 +1425,40 @@ def liquidacion_propietarios_reporte_excel(request):
     fecha_ini_parsed = datetime.strptime(fecha_ini, "%d/%m/%Y").date()
     fecha_fin_parsed = datetime.strptime(fecha_fin, "%d/%m/%Y").date()
     tipo_busqueda = request.GET['tipo_busqueda']
-    lista_fila = []
+    filas = []
     lista_pagos = []
-    lista_totales = []
-    pagos_list = []
-    fracciones_list = []
-    c = 1
-    if tipo_busqueda == "fraccion":
-        fraccion_id = request.GET['busqueda']   
-        manzana_list = Manzana.objects.filter(fraccion_id=fraccion_id)
-        lista_lotes = []
-        pagos_list = []
-        total_monto_pagado = 0
-        total_monto_inm = 0
-        total_monto_prop = 0
-        monto_inmobiliaria = 0
-        monto_propietario = 0
-        for m in manzana_list:
-            lotes_list = Lote.objects.filter(manzana_id=m.id)
-            for l in lotes_list:
-                lista_lotes.append(l)
-                pago = PagoDeCuotas.objects.filter(lote_id=l.id , fecha_de_pago__range=[fecha_ini_parsed, fecha_fin_parsed])
-                if pago:
-                    pagos_list.append(pago)                  
-        for i in pagos_list:                        
-            for pago in i:
-                nro_cuota = get_nro_cuota(pago)
-                cuotas_para_propietario=((pago.plan_de_pago.cantidad_de_cuotas)*(pago.plan_de_pago.intervalos_cuotas_inmobiliaria))-pago.plan_de_pago.inicio_cuotas_inmobiliaria
-                if(nro_cuota<=cuotas_para_propietario): 
-                    if(nro_cuota % 2 != 0):    
-                        monto_inmobiliaria = pago.total_de_cuotas
-                        monto_propietario = 0
-                    else:
-                        monto_inmobiliaria = int(pago.total_de_cuotas * (float(pago.plan_de_pago.porcentaje_cuotas_inmobiliaria) / float(100)))
-                        monto_propietario = pago.total_de_cuotas - monto_inmobiliaria
-                else:
-                    monto_inmobiliaria = int(pago.total_de_cuotas * (float(pago.plan_de_pago.porcentaje_cuotas_inmobiliaria) / float(100)))
-                    monto_propietario = pago.total_de_cuotas - monto_inmobiliaria
-                total_monto_inm += monto_inmobiliaria
-                total_monto_prop += monto_propietario
-                total_monto_pagado += pago.total_de_cuotas  
-                try:                      
-                    lista_fila.append(pago.fecha_de_pago)
-                    lista_fila.append(pago.lote)
-                    lista_fila.append(pago.cliente)
-                    lista_fila.append(str(nro_cuota) + '/' + str(pago.plan_de_pago.cantidad_de_cuotas))
-                    lista_fila.append(str('{:,}'.format(pago.total_de_cuotas)).replace(",", "."))
-                    lista_fila.append(str('{:,}'.format(monto_inmobiliaria)).replace(",", "."))
-                    lista_fila.append(str('{:,}'.format(monto_propietario)).replace(",", "."))                    
-                    lista_pagos.append(lista_fila)
-                    lista_fila = []
-                except Exception, error:
-                    print error
-                           
+    lotes = []
+    #Totales por FRACCION
+    total_monto_pagado = 0
+    total_monto_inm = 0
+    total_monto_prop = 0
                     
-        if pagos_list:
-            lista_totales.append(str('{:,}'.format(total_monto_pagado)).replace(",", "."))
-            lista_totales.append(str('{:,}'.format(total_monto_inm)).replace(",", "."))
-            lista_totales.append(str('{:,}'.format(total_monto_prop)).replace(",", "."))
-                                                                   
-    else:
+    #Totales GENERALES
+    total_general_pagado = 0
+    total_general_inm = 0
+    total_general_prop = 0
+                    
+    monto_inmobiliaria = 0
+    monto_propietario = 0                 
+    if tipo_busqueda == "fraccion":
         try:
-            propietario = request.GET['busqueda']    
-            propietario_id = Propietario.objects.get(nombres__icontains=propietario)
-            fracciones_list = Fraccion.objects.filter(propietario_id=propietario_id)
-            for f in fracciones_list:
-                manzana_list = Manzana.objects.filter(fraccion_id=f.id)
-                lista_lotes = []
-                pagos_list = []
-                monto_propietario = 0
-                for m in manzana_list:
-                    lotes_list = Lote.objects.filter(manzana_id=m.id)
-                    for l in lotes_list:
-                        lista_lotes.append(l)
-                        pago = PagoDeCuotas.objects.filter(lote_id=l.id , fecha_de_pago__range=[fecha_ini_parsed, fecha_fin_parsed])
-                        if pago:
-                            pagos_list.append(pago)
-                                                              
-            for i in pagos_list:                
-                for pago in i:
+            fraccion_id = request.GET['busqueda']
+            fraccion = Fraccion.objects.get(pk=fraccion_id)                 
+            print('Fraccion: ' + fraccion.nombre + '\n')
+            manzana_list = Manzana.objects.filter(fraccion_id=fraccion_id).order_by('id')                
+            for m in manzana_list:
+                lotes_list = Lote.objects.filter(manzana_id=m.id).order_by('id')
+                for l in lotes_list:
+                    pagos = PagoDeCuotas.objects.filter(lote_id=l.id , fecha_de_pago__range=[fecha_ini_parsed, fecha_fin_parsed]).order_by('fecha_de_pago')
+                    if pagos:
+                        lista_pagos.append(pagos)
+        except Exception, error:
+            print error
+            return HttpResponseServerError("La Fraccion no existe")                       
+        try:
+            for pagos in lista_pagos:                        
+                for i, pago in enumerate(pagos):
+                    #print pago.id
                     nro_cuota = get_nro_cuota(pago)
                     cuotas_para_propietario=((pago.plan_de_pago.cantidad_de_cuotas)*(pago.plan_de_pago.intervalos_cuotas_inmobiliaria))-pago.plan_de_pago.inicio_cuotas_inmobiliaria
                     if(nro_cuota<=cuotas_para_propietario): 
@@ -1513,31 +1471,100 @@ def liquidacion_propietarios_reporte_excel(request):
                     else:
                         monto_inmobiliaria = int(pago.total_de_cuotas * (float(pago.plan_de_pago.porcentaje_cuotas_inmobiliaria) / float(100)))
                         monto_propietario = pago.total_de_cuotas - monto_inmobiliaria
-                            
+                                    
+                    fila={}
                     total_monto_inm += monto_inmobiliaria
                     total_monto_prop += monto_propietario
-                    total_monto_pagado += pago.total_de_cuotas              
-                    try:
-                        lista_fila.append(pago.fecha_de_pago)
-                        lista_fila.append(pago.lote)
-                        lista_fila.append(pago.cliente)
-                        lista_fila.append(str(nro_cuota) + '/' + str(pago.plan_de_pago.cantidad_de_cuotas))
-                        lista_fila.append(str('{:,}'.format(pago.total_de_cuotas)).replace(",", "."))
-                        lista_fila.append(str('{:,}'.format(monto_inmobiliaria)).replace(",", "."))
-                        lista_fila.append(str('{:,}'.format(monto_propietario)).replace(",", "."))                    
-                        lista_pagos.append(lista_fila)                                
-                        lista_fila = []
-                    except Exception, error:
-                        print error            
-            if pagos_list:
-                lista_totales.append(total_monto_pagado)
-                lista_totales.append(total_monto_inm)
-                lista_totales.append(total_monto_prop)
+                    total_monto_pagado += pago.total_de_cuotas
+                    fila['fecha_de_pago']=str(pago.fecha_de_pago)
+                    fila['lote']=str(pago.lote)
+                    fila['cliente']=str(pago.cliente)
+                    fila['nro_cuota']=str(nro_cuota) + '/' + str(pago.plan_de_pago.cantidad_de_cuotas)
+                    fila['total_de_cuotas']=str('{:,}'.format(pago.total_de_cuotas)).replace(",", ".")
+                    fila['monto_inmobiliaria']=str('{:,}'.format(monto_inmobiliaria)).replace(",", ".")
+                    fila['monto_propietario']=str('{:,}'.format(monto_propietario)).replace(",", ".")
                                     
-        except:
-            lista_pagos = []
+                    total_general_pagado += pago.total_de_cuotas
+                    total_general_inm += monto_inmobiliaria
+                    total_general_prop += monto_propietario
+                    ultimo=fila
+                    print(fila)
+                    filas.append(fila)
+            ultimo['total_general_pagado']=str('{:,}'.format(total_general_pagado)).replace(",", ".")
+            ultimo['total_general_inmobiliaria']=str('{:,}'.format(total_general_inm)).replace(",", ".")
+            ultimo['total_general_propietario']=str('{:,}'.format(total_general_prop)).replace(",", ".")
+        except Exception, error:
+            print error                                                                                     
+    else:                
+        propietario_id = request.GET['busqueda']
+        fracciones = Fraccion.objects.filter(propietario_id=propietario_id).order_by('id')
+        for f in fracciones:
+            manzanas = Manzana.objects.filter(fraccion_id=f.id).order_by('id')
+            for m in manzanas:
+                lotes = Lote.objects.filter(manzana_id=m.id).order_by('id')
+                for l in lotes:
+                    pagos = PagoDeCuotas.objects.filter(lote_id=l.id , fecha_de_pago__range=[fecha_ini_parsed, fecha_fin_parsed]).order_by('fecha_de_pago')
+                    if pagos:
+                        lista_pagos.append(pagos)                              
+        try:                                           
+            for pagos in lista_pagos:
+                for i, pago in enumerate(pagos):
+                    #print pago.id
+                    nro_cuota = get_nro_cuota(pago)
+                    cuotas_para_propietario=((pago.plan_de_pago.cantidad_de_cuotas)*(pago.plan_de_pago.intervalos_cuotas_inmobiliaria))-pago.plan_de_pago.inicio_cuotas_inmobiliaria
+                    if(nro_cuota<=cuotas_para_propietario): 
+                        if(nro_cuota % 2 != 0):    
+                            monto_inmobiliaria = pago.total_de_cuotas
+                            monto_propietario = 0
+                        else:
+                            monto_inmobiliaria = int(pago.total_de_cuotas * (float(pago.plan_de_pago.porcentaje_cuotas_inmobiliaria) / float(100)))
+                            monto_propietario = pago.total_de_cuotas - monto_inmobiliaria
+                    else:
+                        monto_inmobiliaria = int(pago.total_de_cuotas * (float(pago.plan_de_pago.porcentaje_cuotas_inmobiliaria) / float(100)))
+                        monto_propietario = pago.total_de_cuotas - monto_inmobiliaria
+                                             
+                    fila={}
+                    total_monto_inm += monto_inmobiliaria
+                    total_monto_prop += monto_propietario
+                    total_monto_pagado += pago.total_de_cuotas
+                    fila['fecha_de_pago']=str(pago.fecha_de_pago)
+                    fila['lote']=str(pago.lote)
+                    fila['cliente']=str(pago.cliente)
+                    fila['nro_cuota']=str(nro_cuota) + '/' + str(pago.plan_de_pago.cantidad_de_cuotas)
+                    fila['total_de_cuotas']=str('{:,}'.format(pago.total_de_cuotas)).replace(",", ".")
+                    fila['monto_inmobiliaria']=str('{:,}'.format(monto_inmobiliaria)).replace(",", ".")
+                    fila['monto_propietario']=str('{:,}'.format(monto_propietario)).replace(",", ".")
+                                       
+                                    
+                    #Si es el ultimo lote, cerramos totales de fraccion
+                    if(len(pagos)-1==i):
+                        fila['total_monto_pagado']=str('{:,}'.format(total_monto_pagado)).replace(",", ".")
+                        fila['total_monto_inmobiliaria']=str('{:,}'.format(total_monto_inm)).replace(",", ".")
+                        fila['total_monto_propietario']=str('{:,}'.format(total_monto_prop)).replace(",", ".")
+                        #Y agregamos los totales generales
+                        fila['total_general_pagado']=str('{:,}'.format(total_general_pagado)).replace(",", ".")
+                        fila['total_general_inmobiliaria']=str('{:,}'.format(total_general_inm)).replace(",", ".")
+                        fila['total_general_propietario']=str('{:,}'.format(total_general_prop)).replace(",", ".")
+                                        
+                    #Hay cambio de lote pero NO es el ultimo elemento todavia
+                    elif (pago.lote.manzana.fraccion.id != pagos[i+1].lote.manzana.fraccion.id):
+                        fila['total_monto_pagado']=str('{:,}'.format(total_monto_pagado)).replace(",", ".")
+                        fila['total_monto_inmobiliaria']=str('{:,}'.format(total_monto_inm)).replace(",", ".")
+                        fila['total_monto_propietario']=str('{:,}'.format(total_monto_prop)).replace(",", ".")
+                                        
+                        #Se CERAN  los TOTALES por FRACCION
+                        total_monto_pagado = 0
+                        total_monto_inm = 0
+                        total_monto_prop = 0
+                                    
+                    total_general_pagado += pago.total_de_cuotas
+                    total_general_inm += monto_inmobiliaria
+                    total_general_prop += monto_propietario
+                    filas.append(fila)                             
+        except Exception, error:
+            print error        
     
-    a = len(lista_pagos)
+    a = len(filas)
     wb = xlwt.Workbook(encoding='utf-8')
     sheet = wb.add_sheet('test', cell_overwrite_ok=True)
     style = xlwt.easyxf('pattern: pattern solid, fore_colour green;'
@@ -1551,23 +1578,36 @@ def liquidacion_propietarios_reporte_excel(request):
     sheet.write(0, 5, "Monto Inmobiliaria", style)
     sheet.write(0, 6, "Monto Propietario", style)
     
-    
-    for i in range(len(lista_pagos)):                      
-        sheet.write(c, 0, str(lista_pagos[i][0]))
-        sheet.write(c, 1, str(lista_pagos[i][1]))
-        sheet.write(c, 2, str(lista_pagos[i][2]))
-        sheet.write(c, 3, str(lista_pagos[i][3]))
-        sheet.write(c, 4, str(lista_pagos[i][4]))
-        sheet.write(c, 5, str(lista_pagos[i][5]))
-        sheet.write(c, 6, str(lista_pagos[i][6]))
+    c=0
+    for pago in filas: 
+        c += 1                     
+        sheet.write(c, 0, pago['fecha_de_pago'])
+        sheet.write(c, 1, pago['lote'])
+        sheet.write(c, 2, pago['cliente'])
+        sheet.write(c, 3, pago['nro_cuota'])
+        sheet.write(c, 4, pago['total_de_cuotas'])
+        sheet.write(c, 5, pago['monto_inmobiliaria'])
+        sheet.write(c, 6, pago['monto_propietario'])
         
-        c += 1
-        if (i == len(lista_pagos) - 1):             
-            sheet.write(c, 0, "Liquidacion", style2)
-            sheet.write(c, 4, str('{:,}'.format(total_monto_pagado, style2)).replace(",", "."))
-            sheet.write(c, 5, str('{:,}'.format(total_monto_inm, style2)).replace(",", "."))
-            sheet.write(c, 6, str('{:,}'.format(total_monto_prop, style2)).replace(",", "."))
         
+        try:
+            if (pago['total_monto_pagado']): 
+                c+=1            
+                sheet.write(c, 0, "Liquidacion", style2)
+                sheet.write(c, 4, pago['total_monto_pagado'],style2)
+                sheet.write(c, 5, pago['total_monto_inmobiliaria'], style2)
+                sheet.write(c, 6, pago['total_monto_propietario'], style2)
+        except:
+            pass
+        try:
+            if (pago['total_general_pagado']): 
+                c+=1            
+                sheet.write(c, 0, "Liquidacion", style2)
+                sheet.write(c, 4, pago['total_general_pagado'],style2)
+                sheet.write(c, 5, pago['total_general_inmobiliaria'], style2)
+                sheet.write(c, 6, pago['total_general_propietario'], style2)
+        except:
+            pass
   
     response = HttpResponse(content_type='application/vnd.ms-excel')
     # Crear un nombre intuitivo         
