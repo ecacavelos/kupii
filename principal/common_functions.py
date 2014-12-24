@@ -1,5 +1,5 @@
 from django.db.models import Count, Min, Sum, Avg
-from principal.models import Lote, Cliente, Vendedor, PlanDePago, Fraccion, Manzana, Venta, Propietario, PlanDePagoVendedor,PagoDeCuotas
+from principal.models import Lote, Cliente, Vendedor, PlanDePago, Fraccion, Manzana, Venta, Propietario, PlanDePagoVendedor,PagoDeCuotas, RecuperacionDeLotes
 from principal.monthdelta import MonthDelta 
 import datetime
 
@@ -8,7 +8,16 @@ def get_cuotas_detail_by_lote(lote_id=None):
     print("buscando pagos del lote --> " + lote_id);    
     # El query es: select sum(nro_cuotas_a_pagar) from principal_pagodecuotas where lote_id = 16108;
     cant_cuotas_pagadas=PagoDeCuotas.objects.filter(lote=lote_id).aggregate(Sum('nro_cuotas_a_pagar'))
-    venta = Venta.objects.get(lote_id=lote_id)
+    ventas = Venta.objects.filter(lote_id=lote_id)
+    
+    for item_venta in ventas:
+        print 'Obteniendo la ultima venta'
+        try: 
+            RecuperacionDeLotes.objects.get(venta=item_venta.id)
+        except RecuperacionDeLotes.DoesNotExist:
+            print 'se encontro la venta no recuperada, la venta actual'
+            venta = item_venta
+    
     plan_de_pago = PlanDePago.objects.get(id=venta.plan_de_pago.id)
     # calcular la fecha de vencimiento.
     
@@ -29,4 +38,14 @@ def get_nro_cuota(pago):
     cant_cuotas = PagoDeCuotas.objects.filter(lote_id=lote_id, pk__lte=pago_id).count()
     
     return cant_cuotas
+
+def pagos_db_to_custom_pagos(lista_pagos_db):
+    
+    lista_custom = []
+    for pago_db in lista_pagos_db:
+        item = {}
+        item['fecha'] = pago_db.fecha_de_pago
+        lista_custom.append(item)
+    return lista_custom
+         
 

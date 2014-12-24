@@ -859,6 +859,165 @@ def liquidacion_gerentes(request):
         else:    
             return HttpResponseRedirect("/login") 
 
+# def informe_movimientos(request):
+#     if request.method == 'GET':
+#         if request.user.is_authenticated():
+#             if (filtros_establecidos(request.GET,'informe_movimientos') == False):
+#                 t = loader.get_template('informes/informe_movimientos.html')
+#                 c = RequestContext(request, {
+#                     'object_list': [],
+#                 })
+#                 return HttpResponse(t.render(c))
+#             else: #Parametros seteados
+#                 t = loader.get_template('informes/informe_movimientos.html')
+#                 lote_id=request.GET['lote_id']
+#                 fecha_ini=request.GET['fecha_ini']
+#                 fecha_fin=request.GET['fecha_fin']
+#                 x = str(lote_id)
+#                 fraccion_int = int(x[0:3])
+#                 manzana_int = int(x[4:7])
+#                 lote_int = int(x[8:])
+#                 manzana = Manzana.objects.get(fraccion_id=fraccion_int, nro_manzana=manzana_int)
+#                 lote = Lote.objects.get(manzana=manzana.id, nro_lote=lote_int)
+#                 lista_movimientos=[]
+#                 print 'lote->'+str(lote.id)
+#                 if fecha_ini != '' and fecha_fin != "":    
+#                     fecha_ini_parsed = datetime.strptime(fecha_ini, "%d/%m/%Y").date()
+#                     fecha_fin_parsed = datetime.strptime(fecha_fin, "%d/%m/%Y").date()                
+#                     try:
+#                         lista_pagos = PagoDeCuotas.objects.filter(lote_id=lote.id, fecha_de_pago__range=(fecha_ini_parsed, fecha_fin_parsed))
+#                     except Exception, error:
+#                         print error
+#                         lista_pagos = []
+#                         pass 
+#                     try:
+#                         lista_ventas = Venta.objects.get(lote_id=lote.id, fecha_de_venta__range=(fecha_ini_parsed, fecha_fin_parsed))
+#                     except Exception, error:
+#                         print error
+#                         lista_ventas = []
+#                         pass 
+#                     try:
+#                         lista_reservas = Reserva.objects.get(lote_id=lote.id, fecha_de_reserva__range=(fecha_ini_parsed, fecha_fin_parsed))
+#                     except Exception, error:
+#                         print error
+#                         lista_reservas = []
+#                         pass 
+#                     try:
+#                         lista_cambios = CambioDeLotes.objects.get(lote_id=lote.id, fecha_de_cambio__range=(fecha_ini_parsed, fecha_fin_parsed))
+#                     except Exception, error:
+#                         print error
+#                         lista_cambios = []
+#                         pass 
+#                     try:
+#                         lista_recuperaciones = RecuperacionDeLotes.objects.get(lote_id=lote.id, fecha_de_recuperacion__range=(fecha_ini_parsed, fecha_fin_parsed))
+#                     except Exception, error:
+#                         print error
+#                         lista_recuperaciones = []
+#                         pass
+#                     try: 
+#                         lista_transferencias = TransferenciaDeLotes.objects.get(lote_id=lote.id, fecha_de_transferencia__range=(fecha_ini_parsed, fecha_fin_parsed))
+#                     except Exception, error:
+#                         print error
+#                         lista_transferencias = []
+#                         pass                 
+#                 else:
+#                     try:
+#                         lista_pagos = PagoDeCuotas.objects.filter(lote_id=lote.id).order_by('fecha_de_pago')
+#                     except Exception, error:
+#                         print error
+#                         lista_pagos = []
+#                         pass
+#                     try:
+#                         lista_ventas = Venta.objects.get(lote_id=lote.id)
+#                     except Exception, error:
+#                         print error
+#                         lista_ventas =[] 
+#                         pass
+#                     try:
+#                         lista_reservas = Reserva.objects.get(lote_id=lote.id)
+#                     except Exception, error:
+#                         print error
+#                         lista_reservas = []
+#                         pass    
+#                     try:    
+#                         lista_cambios = CambioDeLotes.objects.get(lote_nuevo_id=lote.id)
+#                     except Exception, error:
+#                         print error
+#                         lista_cambios = []
+#                         pass
+#                     try:    
+#                         lista_recuperaciones = RecuperacionDeLotes.objects.get(lote_id=lote.id)
+#                     except Exception, error:
+#                         print error
+#                         lista_recuperaciones = []
+#                         pass
+#                     try:    
+#                         lista_transferencias = TransferenciaDeLotes.objects.get(lote_id=lote.id)
+#                     except Exception, error:
+#                         print error
+#                         lista_transferencias = []
+#                         pass
+#                 if lista_ventas:
+#                     venta = []
+#                     venta.append(lista_ventas.fecha_de_venta)
+#                     venta.append(lista_ventas.cliente)
+#                     venta.append(str(0) + '/' + str(lista_ventas.plan_de_pago.cantidad_de_cuotas))
+#                     venta.append("Entrega inicial")
+#                     venta.append(str('{:,}'.format(lista_ventas.precio_final_de_venta)).replace(",","."))
+#                     venta.append(str('{:,}'.format(lista_ventas.entrega_inicial)).replace(",","."))
+#                     venta.append(str('{:,}'.format(lista_ventas.precio_final_de_venta-lista_ventas.entrega_inicial)).replace(",","."))
+#                     lista_movimientos.append(venta)
+#                 if lista_pagos:  
+#                     saldo_anterior=lista_ventas.precio_final_de_venta
+#                     monto=lista_ventas.entrega_inicial
+#                     saldo=saldo_anterior-monto
+#                     for pago in lista_pagos:
+#                         saldo_anterior=saldo
+#                         monto=pago.total_de_cuotas
+#                         saldo=saldo_anterior-monto
+#                         cuota =[]
+#                         cuota.append(pago.fecha_de_pago)
+#                         cuota.append(pago.cliente)
+#                         cuota.append(str(get_nro_cuota(pago)) + '/' + str(pago.plan_de_pago.cantidad_de_cuotas))
+#                         cuota.append("Pago de Cuota")
+#                         cuota.append(str('{:,}'.format(saldo_anterior)).replace(",","."))
+#                         cuota.append(str('{:,}'.format(monto)).replace(",","."))
+#                         cuota.append(str('{:,}'.format(saldo)).replace(",","."))
+#                         lista_movimientos.append(cuota)
+#                 if lista_recuperaciones:
+#                     for pago in lista_pagos:
+#                         cuota =[]
+#                         cuota.append(pago.fecha_de_pago)
+#                         cuota.append(pago.cliente)
+#                         cuota.append(str(get_nro_cuota(pago)) + '/' + str(pago.plan_de_pago.cantidad_de_cuotas))
+#                         cuota.append("Cuota Recuperada")
+#                         cuota.append(" ")
+#                         cuota.append(str('{:,}'.format(pago.total_de_cuotas)).replace(",","."))
+#                         cuota.append(" ")
+#                         lista_movimientos.append(cuota)
+#             
+#                 ultimo="&lote_id="+lote_id+"&fecha_ini="+fecha_ini+"&fecha_fin="+fecha_fin
+#                 paginator = Paginator(lista_movimientos, 25)
+#                 page = request.GET.get('page')
+#                 try:
+#                     lista = paginator.page(page)
+#                 except PageNotAnInteger:
+#                     lista = paginator.page(1)
+#                 except EmptyPage:
+#                     lista = paginator.page(paginator.num_pages) 
+#                 c = RequestContext(request, {
+#                     'lista_movimientos': lista,
+#                     'lote_id' : lote_id,
+#                     'fecha_ini' : fecha_ini,
+#                     'fecha_fin' : fecha_fin,
+#                     'ultimo': ultimo
+#                 })
+#                 return HttpResponse(t.render(c)) 
+#         else:
+#             return HttpResponseRedirect("/login") 
+
+
+
 def informe_movimientos(request):
     if request.method == 'GET':
         if request.user.is_authenticated():
@@ -881,121 +1040,93 @@ def informe_movimientos(request):
                 lote = Lote.objects.get(manzana=manzana.id, nro_lote=lote_int)
                 lista_movimientos=[]
                 print 'lote->'+str(lote.id)
-                if fecha_ini != '' and fecha_fin != "":    
+                if fecha_ini != '' and fecha_fin != '':    
                     fecha_ini_parsed = datetime.strptime(fecha_ini, "%d/%m/%Y").date()
                     fecha_fin_parsed = datetime.strptime(fecha_fin, "%d/%m/%Y").date()                
                     try:
-                        lista_pagos = PagoDeCuotas.objects.filter(lote_id=lote.id, fecha_de_pago__range=(fecha_ini_parsed, fecha_fin_parsed))
-                    except Exception, error:
-                        print error
-                        lista_pagos = []
-                        pass 
-                    try:
-                        lista_ventas = Venta.objects.get(lote_id=lote.id, fecha_de_venta__range=(fecha_ini_parsed, fecha_fin_parsed))
+                        lista_ventas = Venta.objects.filter(lote_id=lote.id, fecha_de_venta__range=(fecha_ini_parsed, fecha_fin_parsed)).order_by('-fecha_de_venta')
+                        lista_reservas = Reserva.objects.filter(lote_id=lote.id, fecha_de_reserva__range=(fecha_ini_parsed, fecha_fin_parsed))
+                        lista_cambios = CambioDeLotes.objects.filter(Q(lote_nuevo_id=lote.id) |Q(lote_a_cambiar=lote.id), fecha_de_cambio__range=(fecha_ini_parsed, fecha_fin_parsed))
+                        lista_transferencias = TransferenciaDeLotes.objects.filter(lote_id=lote.id, fecha_de_transferencia__range=(fecha_ini_parsed, fecha_fin_parsed))
                     except Exception, error:
                         print error
                         lista_ventas = []
-                        pass 
-                    try:
-                        lista_reservas = Reserva.objects.get(lote_id=lote.id, fecha_de_reserva__range=(fecha_ini_parsed, fecha_fin_parsed))
-                    except Exception, error:
-                        print error
                         lista_reservas = []
-                        pass 
-                    try:
-                        lista_cambios = CambioDeLotes.objects.get(lote_id=lote.id, fecha_de_cambio__range=(fecha_ini_parsed, fecha_fin_parsed))
-                    except Exception, error:
-                        print error
                         lista_cambios = []
-                        pass 
-                    try:
-                        lista_recuperaciones = RecuperacionDeLotes.objects.get(lote_id=lote.id, fecha_de_recuperacion__range=(fecha_ini_parsed, fecha_fin_parsed))
-                    except Exception, error:
-                        print error
-                        lista_recuperaciones = []
-                        pass
-                    try: 
-                        lista_transferencias = TransferenciaDeLotes.objects.get(lote_id=lote.id, fecha_de_transferencia__range=(fecha_ini_parsed, fecha_fin_parsed))
-                    except Exception, error:
-                        print error
                         lista_transferencias = []
-                        pass                 
-                else:
+                        pass 
+                else:                  
                     try:
-                        lista_pagos = PagoDeCuotas.objects.filter(lote_id=lote.id).order_by('fecha_de_pago')
-                    except Exception, error:
-                        print error
-                        lista_pagos = []
-                        pass
-                    try:
-                        lista_ventas = Venta.objects.get(lote_id=lote.id)
+                        lista_ventas = Venta.objects.filter(lote_id=lote.id).order_by('-fecha_de_venta')
+                        lista_cambios = CambioDeLotes.objects.filter(Q(lote_nuevo_id=lote.id) |Q(lote_a_cambiar=lote.id))
+                        lista_reservas = Reserva.objects.filter(lote_id=lote.id)                        
+                        lista_transferencias = TransferenciaDeLotes.objects.filter(lote_id=lote.id)
                     except Exception, error:
                         print error
                         lista_ventas =[] 
-                        pass
-                    try:
-                        lista_reservas = Reserva.objects.get(lote_id=lote.id)
-                    except Exception, error:
-                        print error
                         lista_reservas = []
-                        pass    
-                    try:    
-                        lista_cambios = CambioDeLotes.objects.get(lote_nuevo_id=lote.id)
-                    except Exception, error:
-                        print error
                         lista_cambios = []
-                        pass
-                    try:    
-                        lista_recuperaciones = RecuperacionDeLotes.objects.get(lote_id=lote.id)
-                    except Exception, error:
-                        print error
-                        lista_recuperaciones = []
-                        pass
-                    try:    
-                        lista_transferencias = TransferenciaDeLotes.objects.get(lote_id=lote.id)
-                    except Exception, error:
-                        print error
                         lista_transferencias = []
                         pass
                 if lista_ventas:
-                    venta = []
-                    venta.append(lista_ventas.fecha_de_venta)
-                    venta.append(lista_ventas.cliente)
-                    venta.append(str(0) + '/' + str(lista_ventas.plan_de_pago.cantidad_de_cuotas))
-                    venta.append("Entrega inicial")
-                    venta.append(str('{:,}'.format(lista_ventas.precio_final_de_venta)).replace(",","."))
-                    venta.append(str('{:,}'.format(lista_ventas.entrega_inicial)).replace(",","."))
-                    venta.append(str('{:,}'.format(lista_ventas.precio_final_de_venta-lista_ventas.entrega_inicial)).replace(",","."))
-                    lista_movimientos.append(venta)
-                if lista_pagos:  
-                    saldo_anterior=lista_ventas.precio_final_de_venta
-                    monto=lista_ventas.entrega_inicial
-                    saldo=saldo_anterior-monto
-                    for pago in lista_pagos:
-                        saldo_anterior=saldo
-                        monto=pago.total_de_cuotas
+                    print('Hay ventas asociadas a este lote')
+                    lista_movimientos = []
+                    # En este punto tenemos ventas asociadas a este lote
+                    for item_venta in lista_ventas:
+                        try: 
+                            resumen_venta = {}
+                            resumen_venta['fecha_de_venta'] = item_venta.fecha_de_venta 
+                            resumen_venta['cliente'] = item_venta.cliente 
+                            resumen_venta['cantidad_de_cuotas'] = item_venta.plan_de_pago.cantidad_de_cuotas 
+                            resumen_venta['precio_final'] = str('{:,}'.format(item_venta.precio_final_de_venta)).replace(",",".")
+                            resumen_venta['entrega_inicial'] = str('{:,}'.format(item_venta.entrega_inicial)).replace(",",".") 
+                            RecuperacionDeLotes.objects.get(venta=item_venta.id)
+                            try: 
+                                venta_pagos_query_set = PagoDeCuotas.objects.filter(venta_id=item_venta).order_by('fecha_de_pago')
+                                resumen_venta['recuperacion'] = True
+                            except PagoDeCuotas.DoesNotExist:
+                                venta_pagos_query_set = []
+                        except RecuperacionDeLotes.DoesNotExist:
+                            print 'se encontro la venta no recuperada, la venta actual'                            
+                            try: 
+                                venta_pagos_query_set = PagoDeCuotas.objects.filter(venta_id=item_venta).order_by('fecha_de_pago')
+                                resumen_venta['recuperacion'] = False
+                            except PagoDeCuotas.DoesNotExist:
+                                venta_pagos_query_set = [] 
+                        
+                        ventas_pagos_list = []
+                        ventas_pagos_list.insert(0,resumen_venta) #El primer elemento de la lista de pagos es el resumen de la venta
+                        saldo_anterior=item_venta.precio_final_de_venta
+                        monto=item_venta.entrega_inicial
                         saldo=saldo_anterior-monto
-                        cuota =[]
-                        cuota.append(pago.fecha_de_pago)
-                        cuota.append(pago.cliente)
-                        cuota.append(str(get_nro_cuota(pago)) + '/' + str(pago.plan_de_pago.cantidad_de_cuotas))
-                        cuota.append("Pago de Cuota")
-                        cuota.append(str('{:,}'.format(saldo_anterior)).replace(",","."))
-                        cuota.append(str('{:,}'.format(monto)).replace(",","."))
-                        cuota.append(str('{:,}'.format(saldo)).replace(",","."))
-                        lista_movimientos.append(cuota)
-                if lista_recuperaciones:
-                    for pago in lista_pagos:
-                        cuota =[]
-                        cuota.append(pago.fecha_de_pago)
-                        cuota.append(pago.cliente)
-                        cuota.append(str(get_nro_cuota(pago)) + '/' + str(pago.plan_de_pago.cantidad_de_cuotas))
-                        cuota.append("Cuota Recuperada")
-                        cuota.append(" ")
-                        cuota.append(str('{:,}'.format(pago.total_de_cuotas)).replace(",","."))
-                        cuota.append(" ")
-                        lista_movimientos.append(cuota)
-            
+                        for pago in venta_pagos_query_set:
+                            saldo_anterior=saldo
+                            monto=pago.total_de_cuotas
+                            saldo=saldo_anterior-monto
+                            cuota ={}
+                            cuota['fecha_de_pago'] = pago.fecha_de_pago
+                            cuota['nro_cuota'] = str(get_nro_cuota(pago)) + '/' + str(pago.plan_de_pago.cantidad_de_cuotas)
+                            cuota['saldo_anterior'] = str('{:,}'.format(saldo_anterior)).replace(",",".")
+                            cuota['monto'] = str('{:,}'.format(monto)).replace(",",".")
+                            cuota['saldo'] = str('{:,}'.format(saldo)).replace(",",".")
+                            ventas_pagos_list.append(cuota)
+                        lista_movimientos.append(ventas_pagos_list)
+
+                mostrar_transferencias = False
+                mostrar_mvtos = False
+                mostrar_reservas = False
+                mostrar_cambios = False
+                
+                if lista_movimientos:
+                    mostrar_mvtos = True
+                if lista_cambios:
+                    mostrar_cambios = True
+                if lista_reservas:
+                    mostrar_reservas = True
+                if lista_transferencias:
+                    mostrar_transferencias = True
+
+                    
                 ultimo="&lote_id="+lote_id+"&fecha_ini="+fecha_ini+"&fecha_fin="+fecha_fin
                 paginator = Paginator(lista_movimientos, 25)
                 page = request.GET.get('page')
@@ -1006,7 +1137,14 @@ def informe_movimientos(request):
                 except EmptyPage:
                     lista = paginator.page(paginator.num_pages) 
                 c = RequestContext(request, {
-                    'lista_movimientos': lista,
+                    'lista_ventas': lista,
+                    'lista_cambios': lista_cambios,
+                    'lista_transferencias': lista_transferencias,
+                    'lista_reservas': lista_reservas,
+                    'mostrar_transferencias': mostrar_transferencias,
+                    'mostrar_reservas': mostrar_reservas,
+                    'mostrar_cambios': mostrar_cambios,
+                    'mostrar_mvtos': mostrar_mvtos,
                     'lote_id' : lote_id,
                     'fecha_ini' : fecha_ini,
                     'fecha_fin' : fecha_fin,
@@ -1015,7 +1153,9 @@ def informe_movimientos(request):
                 return HttpResponse(t.render(c)) 
         else:
             return HttpResponseRedirect("/login") 
-
+        
+        
+        
 def lotes_libres_reporte_excel(request):
     fraccion_ini=request.GET['fraccion_ini']
     fraccion_fin=request.GET['fraccion_fin']

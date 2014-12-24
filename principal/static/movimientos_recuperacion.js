@@ -162,15 +162,15 @@ function retrieveVenta() {
 		});
 		// Actualizamos el formulario con los datos obtenidos del lote.
 		request.done(function(msg) {
-			$("#id_cliente").val(msg[0]['cliente_id']);
-			$("#cliente_seleccionado").val(msg[0]['cliente']);
-			$("#id_vendedor").val(msg[0]['vendedor_id']);
-			$("#vendedor_seleccionado").val(msg[0]['vendedor']);
-			$("#plan_pago").val(msg[0]['plan_de_pago']);
-			$("#id_plan_pago").val(msg[0]['plan_de_pago_id']);
-			venta_id = (msg[0]['venta_id']);
-			PrecioVenta = (msg[0]['precio_de_venta']);
-			EntregaInicial = (msg[0]['entrega_inicial']);
+			$("#id_cliente").val(msg.venta[0]['cliente_id']);
+			$("#cliente_seleccionado").val(msg.venta[0]['cliente']);
+			$("#id_vendedor").val(msg.venta[0]['vendedor_id']);
+			$("#vendedor_seleccionado").val(msg.venta[0]['vendedor']);
+			$("#plan_pago").val(msg.venta[0]['plan_de_pago']);
+			$("#id_plan_pago").val(msg.venta[0]['plan_de_pago_id']);
+			venta_id = (msg.venta[0]['venta_id']);
+			PrecioVenta = (msg.venta[0]['precio_de_venta']);
+			EntregaInicial = (msg.venta[0]['entrega_inicial']);
 			retrievePagos();
 		});
 		request.fail(function(jqXHR, textStatus) {

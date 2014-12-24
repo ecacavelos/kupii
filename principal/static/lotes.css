@@ -517,3 +517,25 @@ table.listado-lotes tr td.last {
 	background-color: #068DED !important;
 	color: #FFFFFF !important;
 }
+.celda_resumen_venta{
+	padding: 10px 10px 10px 10px !important;
+	font-size: 14px !important;
+	font-weight: 400 !important;
+	text-align: center !important;
+	color: #000000 !important;
+	background-color: #068DED !important;
+	color: #FFFFFF !important;
+}
+.celda_resumen_venta.recuperada{
+	padding: 10px 10px 10px 10px !important;
+	font-size: 14px !important;
+	font-weight: 400 !important;
+	text-align: center !important;
+	color: #000000 !important;
+	background-color: #0F4062 !important;
+	color: #FFFFFF !important;
+}
+
+.informe_tabla_titulo{
+	
+}

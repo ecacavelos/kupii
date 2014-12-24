@@ -197,9 +197,9 @@ function retrieveVenta() {
 		});
 		// Actualizamos el formulario con los datos obtenidos del lote.
 		request.done(function(msg) {
-			var cliente_venta = parseInt(msg[0]['cliente_id']);
-			var venta_id = msg[0]['venta_id'];
-			$("#id_cliente").val(msg[0]['cliente_id']);
+			var cliente_venta = parseInt(msg.venta[0]['cliente_id']);
+			var venta_id = msg.venta[0]['venta_id'];
+			$("#id_cliente").val(msg.venta[0]['cliente_id']);
 			retrieveCliente();
 			//$("#cliente_original_seleccionado").val(msg[0]['cliente']);
 			//$("#id_vendedor").val(msg[0]['vendedor_id']);

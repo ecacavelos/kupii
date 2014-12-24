@@ -152,12 +152,12 @@ function retrieveVenta() {
 		});
 		// Actualizamos el formulario con los datos obtenidos del lote.
 		request.done(function(msg) {
-			$("#id_cliente_original").val(msg[0]['cliente_id']);
-			$("#cliente_original_seleccionado").html(msg[0]['cliente']);
-			$("#id_vendedor").val(msg[0]['vendedor_id']);
-			$("#vendedor_seleccionado").html(msg[0]['vendedor']);
-			$("#plan_pago_seleccionado").html(msg[0]['plan_de_pago']);
-			$("#id_plan_pago").val(msg[0]['plan_de_pago_id']);
+			$("#id_cliente_original").val(msg.venta[0]['cliente_id']);
+			$("#cliente_original_seleccionado").html(msg.venta[0]['cliente']);
+			$("#id_vendedor").val(msg.venta[0]['vendedor_id']);
+			$("#vendedor_seleccionado").html(msg.venta[0]['vendedor']);
+			$("#plan_pago_seleccionado").html(msg.venta[0]['plan_de_pago']);
+			$("#id_plan_pago").val(msg.venta[0]['plan_de_pago_id']);
 		});
 //	}
 }

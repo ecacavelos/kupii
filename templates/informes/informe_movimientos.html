@@ -38,6 +38,10 @@
 		var fecha_ini = "{{fecha_ini}}";
 		var fecha_fin = "{{fecha_fin}}";
 		var lote_id = "{{lote_id}}";
+		mostrar_mvtos = "{{mostrar_mvtos}}";
+		mostrar_transferencias = "{{mostrar_transferencias}}";
+		mostrar_reservas = "{{mostrar_reservas}}";
+		mostrar_cambios = "{{mostrar_cambios}}";
 		$('#lote_id').val(lote_id);
 		$('#fecha_ini').val(fecha_ini);
 		$('#fecha_fin').val(fecha_fin);
@@ -52,10 +56,28 @@
 		});
 
 		if ($("#lote_id").val() == "") {//parametros no seteados
-			$('.listado-ventas').hide();
+			$('#listado-ventas').hide();
+			$("#listado-transferencias").hide();
+			$("#listado-reservas").hide();
+			$("#listado-cambios").hide();
 			$('.pagination').hide();
 		} else {
-			$('.listado-ventas').show();
+			if (mostrar_mvtos == 'True')
+				$('#listado-ventas').show();
+			else
+				$('#listado-ventas').hide();
+			if (mostrar_transferencias == 'True')
+				$('#listado-transferencias').show();
+			else
+				$('#listado-transferencias').hide();
+			if (mostrar_cambios == 'True')
+				$('#listado-cambios').show();
+			else
+				$('#listado-cambios').hide();
+			if (mostrar_reservas == 'True')
+				$('#listado-reservas').show();		
+			else
+				$('#listado-reservas').hide();	
 			$('.pagination').show();
 		}
 
@@ -127,31 +149,56 @@
 	<br>
 	<br>
 </div>
-<div id="listado-item-lote">
-	<table width="50%" cellpadding="0" cellspacing="0" class="listado-ventas" align="center">
+<div id="listado-ventas">
+	<h2>Historial de cuotas en VENTAS</h2>
+	<table  cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
 		<th>Fecha</th><th>Cliente</th><th>Cuota Nº</th><th>Tipo Cuota</th><th>Saldo Anterior</th><th>Monto</th><th>Saldo</th>
-		{% for hw in lista_movimientos %}
-		{% if forloop.counter|divisibleby:2 %}
-		<tr>
-			<td>{{hw.0}}</td>
-			<td>{{hw.1}}</td>
-			<td>{{hw.2}}</td>
-			<td>{{hw.3}}</td>
-			<td>{{hw.4}}</td>
-			<td>{{hw.5}}</td>
-			<td>{{hw.6}}</td>
-		</tr>
-		{% else %}
-		<tr class="bkg_gris">
-			<td>{{hw.0}}</td>
-			<td>{{hw.1}}</td>
-			<td>{{hw.2}}</td>
-			<td>{{hw.3}}</td>
-			<td>{{hw.4}}</td>
-			<td>{{hw.5}}</td>
-			<td>{{hw.6}}</td>
-		</tr>
-		{% endif %}
+		{% for venta in lista_ventas %}
+			{% for pago in venta %}			
+			
+			{% if forloop.counter == 1 %}
+				<tr>
+					{% if pago.recuperacion %}
+						<td class="celda_resumen_venta recuperada">{{pago.fecha_de_venta}}</td>
+						<td class="celda_resumen_venta recuperada">{{pago.cliente}}</td>
+						<td colspan="5" class="celda_resumen_venta recuperada">::::::VENTA RECUPERADA:::::</td>											
+						<!-- <td class="celda_resumen_venta recuperada">Cuotas Plan: {{pago.cantidad_de_cuotas}}</td>
+						<td class="celda_resumen_venta recuperada">Entrega Inicial: {{pago.entrega_incial}}</td>
+						<td class="celda_resumen_venta recuperada">Precio Final: {{pago.precio_final}}</td> -->
+						
+					{% else %}
+						<td class="celda_resumen_venta">{{pago.fecha_de_venta}}</td>
+						<td class="celda_resumen_venta">{{pago.cliente}}</td>
+						<td colspan="5" class="celda_resumen_venta">::::::VENTA ACTUAL::::::</td>											
+						<!-- <td class="celda_resumen_venta">Cuotas Plan: {{pago.cantidad_de_cuotas}}</td>
+						<td class="celda_resumen_venta">Entrega Inicial: {{pago.entrega_incial}}</td>
+						<td class="celda_resumen_venta">Precio Final: {{pago.precio_final}}</td> -->
+					{% endif %}
+				</tr>
+			{% else %}
+				{% if forloop.counter|divisibleby:2 %}				
+				<tr>
+					<td>{{pago.fecha_de_pago}}</td>
+					<td></td>
+					<td>{{pago.nro_cuota}}</td>
+					<td></td>
+					<td>{{pago.saldo_anterior}}</td>
+					<td>{{pago.monto}}</td>
+					<td>{{pago.saldo}}</td>
+				</tr>
+				{% else %}
+				<tr class="bkg_gris">
+					<td>{{pago.fecha_de_pago}}</td>
+					<td></td>
+					<td>{{pago.nro_cuota}}</td>
+					<td></td>
+					<td>{{pago.saldo_anterior}}</td>
+					<td>{{pago.monto}}</td>
+					<td>{{pago.saldo}}</td>
+				</tr>
+				{% endif %}
+			{% endif %}
+			{%endfor%}
 		{%endfor%}
 		<div class="pagination">
 			<span class="step-links"> Mostrando {{ lista_movimientos.start_index }}-{{ lista_movimientos.end_index }} de {{ lista_movimientos.paginator.count }} Resultados
@@ -161,6 +208,63 @@
 		</div>
 	</table>
 </div>
+
+<div id="listado-transferencias">
+<h2>Historial TRANSFERENCIAS</h2>
+	<table  cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
+		<th>Fecha</th><th>Cliente</th><th>Cliente Beneficiario</th><th>Vendedor</th><th>Plan de pago</th>
+		{% for transferencia in lista_transferencias %}						
+				{% if forloop.counter|divisibleby:2 %}				
+				<tr>				
+				{% else %}
+				<tr class="bkg_gris">
+				{% endif %}
+					<td>{{transferencia.fecha_de_transferencia}}</td>
+					<td>{{transferencia.cliente_original}}</td>
+					<td>{{transferencia.cliente}}</td>
+					<td>{{transferencia.vendedor}}</td>
+					<td>{{transferencia.plan_de_pago}}</td>
+				</tr>				
+			{%endfor%}
+	</table>
+</div>
+
+<div id="listado-reservas">
+<h2>Historial RESERVAS</h2>
+	<table  cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
+		<th>Fecha</th><th>Cliente</th>
+		{% for reserva in lista_reservas %}						
+				{% if forloop.counter|divisibleby:2 %}				
+				<tr>				
+				{% else %}
+				<tr class="bkg_gris">
+				{% endif %}
+					<td>{{reserva.fecha_de_reserva}}</td>
+					<td>{{reserva.cliente}}</td>
+				</tr>				
+			{%endfor%}
+	</table>
+</div>
+
+<div id="listado-cambios">
+<h2>Historial CAMBIOS</h2>
+	<table  cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
+		<th>Fecha</th><th>Cliente</th><th>Lote a cambiar</th><th>Lote nuevo</th>
+		{% for cambio in lista_cambios %}						
+				{% if forloop.counter|divisibleby:2 %}				
+				<tr>				
+				{% else %}
+				<tr class="bkg_gris">
+				{% endif %}
+					<td>{{cambio.fecha_de_cambio}}</td>
+					<td>{{cambio.cliente}}</td>
+					<td>{{cambio.lote_a_cambiar}}</td>
+					<td>{{cambio.lote_nuevo}}</td>
+				</tr>				
+			{%endfor%}
+	</table>
+</div>
+
 
 <div id="footer">
 	<a href="/informes" class="boton-verde">Volver al módulo de Informes</a>
