@@ -1781,18 +1781,29 @@ def liquidacion_vendedores_reporte_excel(request):
             if k==0:
                 #Guardamos la primera fraccion que cumple con la condicion, para tener algo con que comparar.
                 fraccion_actual=cuota_item.lote.manzana.fraccion.id
-            k+=1            
+            k+=1
             if(cuota_item.lote.manzana.fraccion.id==fraccion_actual):                              
+                #comision de las cuotas
                 com=int(cuota_item.total_de_cuotas*(float(cuota_item.plan_de_pago_vendedores.porcentaje_de_cuotas)/float(100)))
+                if(cuota_item.venta.entrega_inicial):
+                    #comision de la entrega inicial, si la hubiere
+                    com_inicial=int(cuota_item.venta.entrega_inicial*(float(cuota_item.plan_de_pago_vendedores.porcentaje_cuota_inicial)/float(100)))
+                    cuota['concepto']="Entrega Inicial"
+                    cuota['cuota_nro']=str(0)+'/'+str(cuota_item.plan_de_pago.cantidad_de_cuotas)
+                    cuota['comision']=str('{:,}'.format(com_inicial)).replace(",", ".")
+                else:
+                    cuota['concepto']="Pago de Cuota" 
+                    cuota['cuota_nro']=str(nro_cuota)+'/'+str(cuota_item.plan_de_pago.cantidad_de_cuotas)
+                    cuota['comision']=str('{:,}'.format(com)).replace(",", ".")
+                    
                 cuota['fraccion']=str(cuota_item.lote.manzana.fraccion)
                 cuota['cliente']=str(cuota_item.cliente)
                 cuota['fraccion_id']=cuota_item.lote.manzana.fraccion.id
                 cuota['lote']=str(cuota_item.lote)
-                cuota['cuota_nro']=str(nro_cuota)+'/'+str(cuota_item.plan_de_pago.cantidad_de_cuotas)
                 cuota['fecha_pago']=str(cuota_item.fecha_de_pago)
                 cuota['importe']=str('{:,}'.format(cuota_item.total_de_cuotas)).replace(",", ".") 
-                cuota['comision']=str('{:,}'.format(com)).replace(",", ".")
-                    
+  
+    
                 #Sumamos los totales por fraccion
                 total_importe+=cuota_item.total_de_cuotas
                 total_comision+=com
@@ -1801,22 +1812,33 @@ def liquidacion_vendedores_reporte_excel(request):
                 #actual, o por si sea el ultimo lote de la lista.
                 anterior=cuota                            
                 ultimo=cuota                       
-                #Hay cambio de lote pero NO es el ultimo elemento todavia
+            #Hay cambio de lote pero NO es el ultimo elemento todavia
             else:
                 anterior['total_importe']=str('{:,}'.format(total_importe)).replace(",", ".")
                 anterior['total_comision']=str('{:,}'.format(total_comision)).replace(",", ".")
+        
                 #Se CERAN  los TOTALES por FRACCION                            
                 total_importe=0
                 total_comision=0                                                                                
                 com=int(cuota_item.total_de_cuotas*(float(cuota_item.plan_de_pago_vendedores.porcentaje_de_cuotas)/float(100)))
+                if(cuota_item.venta.entrega_inicial):
+                    #comision de la entrega inicial, si la hubiere
+                    com_inicial=int(cuota_item.venta.entrega_inicial*(float(cuota_item.plan_de_pago_vendedores.porcentaje_cuota_inicial)/float(100)))
+                    cuota['concepto']="Entrega Inicial"
+                    cuota['cuota_nro']=str(0)+'/'+str(cuota_item.plan_de_pago.cantidad_de_cuotas)
+                    cuota['comision']=str('{:,}'.format(com_inicial)).replace(",", ".")
+                else:
+                    cuota['concepto']="Pago de Cuota" 
+                    cuota['cuota_nro']=str(nro_cuota)+'/'+str(cuota_item.plan_de_pago.cantidad_de_cuotas)
+                    cuota['comision']=str('{:,}'.format(com)).replace(",", ".")
+                    
                 cuota['fraccion']=str(cuota_item.lote.manzana.fraccion)
                 cuota['cliente']=str(cuota_item.cliente)
                 cuota['fraccion_id']=cuota_item.lote.manzana.fraccion.id
                 cuota['lote']=str(cuota_item.lote)
-                cuota['cuota_nro']=str(nro_cuota)+'/'+str(cuota_item.plan_de_pago.cantidad_de_cuotas)
                 cuota['fecha_pago']=str(cuota_item.fecha_de_pago)
                 cuota['importe']=str('{:,}'.format(cuota_item.total_de_cuotas)).replace(",", ".") 
-                cuota['comision']=str('{:,}'.format(com)).replace(",", ".") 
+                
                 #Sumamos los totales por fraccion
                 total_importe+=cuota_item.total_de_cuotas
                 total_comision+=com 
@@ -1824,14 +1846,17 @@ def liquidacion_vendedores_reporte_excel(request):
                 ultimo=cuota
             total_general_importe+=cuota_item.total_de_cuotas
             total_general_comision+=com
-            print(cuota)
             cuotas.append(cuota)                        
+                    
         #Si es el ultimo lote, cerramos totales de fraccion
         if (len(object_list)-1 == i):
-            ultimo['total_importe']=str('{:,}'.format(total_importe)).replace(",", ".") 
-            ultimo['total_comision']=str('{:,}'.format(total_comision)).replace(",", ".")             
-            ultimo['total_general_importe']=str('{:,}'.format(total_general_importe)).replace(",", ".") 
-            ultimo['total_general_comision']=str('{:,}'.format(total_general_comision)).replace(",", ".")          
+            try:
+                ultimo['total_importe']=str('{:,}'.format(total_importe)).replace(",", ".") 
+                ultimo['total_comision']=str('{:,}'.format(total_comision)).replace(",", ".")             
+                ultimo['total_general_importe']=str('{:,}'.format(total_general_importe)).replace(",", ".") 
+                ultimo['total_general_comision']=str('{:,}'.format(total_general_comision)).replace(",", ".")          
+            except:
+                pass
             
     wb = xlwt.Workbook(encoding='utf-8')
     sheet = wb.add_sheet('test', cell_overwrite_ok=True)
@@ -1842,11 +1867,12 @@ def liquidacion_vendedores_reporte_excel(request):
     sheet.write(0, 0, "Cliente", style)
     sheet.write(0, 1, "Nombre Fraccion", style)
     sheet.write(0, 2, "Fraccion", style)
-    sheet.write(0, 3, "Lote Nro.", style)    
-    sheet.write(0, 4, "Cuota Nro.", style)
-    sheet.write(0, 5, "Fecha de Pago", style)
-    sheet.write(0, 6, "Importe", style)
-    sheet.write(0, 7, "Comision", style)
+    sheet.write(0, 3, "Lote Nro.", style)
+    sheet.write(0, 4, "Tipo Cuota", style)
+    sheet.write(0, 5, "Cuota Nro.", style)
+    sheet.write(0, 6, "Fecha de Pago", style)
+    sheet.write(0, 7, "Importe", style)
+    sheet.write(0, 8, "Comision", style)
      
     # contador de filas
     c = 0
@@ -1856,22 +1882,23 @@ def liquidacion_vendedores_reporte_excel(request):
         sheet.write(c, 1, cuota['fraccion'])
         sheet.write(c, 2, cuota['fraccion_id'])
         sheet.write(c, 3, cuota['lote'])
-        sheet.write(c, 4, cuota['cuota_nro'])
-        sheet.write(c, 5, cuota['fecha_pago'])
-        sheet.write(c, 6, cuota['importe']) 
-        sheet.write(c, 7, cuota['comision'])
+        sheet.write(c, 4, cuota['concepto'])
+        sheet.write(c, 5, cuota['cuota_nro'])
+        sheet.write(c, 6, cuota['fecha_pago'])
+        sheet.write(c, 7, cuota['importe']) 
+        sheet.write(c, 8, cuota['comision'])
         try: 
             if cuota['total_importe']:
                 c+=1 
                 sheet.write(c, 0, "Totales de Fraccion", style2)
-                sheet.write(c, 6, cuota['total_importe'])
-                sheet.write(c, 7, cuota['total_comision'])           
+                sheet.write(c, 7, cuota['total_importe'])
+                sheet.write(c, 8, cuota['total_comision'])           
                 # si es la ultima fila    
             if (cuota['total_general_importe']):
                 c+=1
                 sheet.write(c, 0, "Totales del Vendedor", style2)
-                sheet.write(c, 6, cuota['total_general_importe'])
-                sheet.write(c, 7, cuota['total_general_comision'])
+                sheet.write(c, 7, cuota['total_general_importe'])
+                sheet.write(c, 8, cuota['total_general_comision'])
         except:
             pass
     response = HttpResponse(content_type='application/vnd.ms-excel')
@@ -1902,6 +1929,7 @@ def liquidacion_gerentes_reporte_excel(request):
         
         
     object_list = list(PagoDeCuotas.objects.raw(query))
+    a=len(object_list)
     cuotas=[]
     #Seteamos los datos de las filas
     for i, cuota_item in enumerate (object_list):
