@@ -1,15 +1,10 @@
 $(document).ready(function() {
 	$("#id_lote").keydown(validateLotePre);
 	$("#id_lote").keyup(validateLotePost);
-	
-	//$("#enviar_reserva").click(validateReserva);
-
 	$("#main_recuperacion_form").submit(validateRecuperacion);
 });
 
 window.onload = function() {
-	//document.getElementById("id_lote").onblur = retrieveLote;
-	//document.getElementById("id_cliente").onblur = retrieveCliente;
 };
 
 // Funciones individuales
@@ -63,7 +58,6 @@ function validateRecuperacion(event) {
 		}
 	});
 	request7.done(function(msg) {
-		alert("Se procesó la recuperacion exitosamente.");
 		top.location.href = "/movimientos/listado_recuperacion";
 	});
 	request7.fail(function(jqXHR, textStatus) {
@@ -87,11 +81,7 @@ function validateRecuperacion(event) {
 		while (reg.test(numeric)) {
 
 			numeric = numeric.replace(reg, '$1' + comma + '$2');
-		}
-		//} else {
-		//	numeric = numeric.substr(0,numeric.length-1);
-		//}
-		
+		}		
 		return numeric + decimal;
 	}
 
@@ -116,10 +106,8 @@ function retrieveLote() {
 			var s = "<a class='boton-verde' href=\"/lotes/listado/" + msg.lote_id + "\" target=\"_blank\" \">" + msg.lote_tag + "</a>";
 
 			$("#lote_error").html("");
-			//$("#lote_superficie").html(msg.superficie);
 			sup = msg.superficie.replace(".",",");
 			$("#lote_superficie").html(sup);
-			//alert("hola");
 			$("#lote_superficie").html(String(format.call($("#lote_superficie").html().split(' ').join(''),'.',',')));
 			$("#lote_seleccionado_detalles").html(s);
 			lote_id = msg.lote_id;
@@ -127,20 +115,10 @@ function retrieveLote() {
 			var month = d.getMonth() + 1;
 			var day = d.getDate();
 			retrieveVenta();
-			//fecha_actual = (day < 10 ? '0' : '') + day + '/' + (month < 10 ? '0' : '') + month + '/' + d.getFullYear();
 			fecha_actual = new Date().toJSON().substring(0, 10);
-
-			//$("#id_fecha").val(fecha_actual);
-			//$("#id_cliente").removeAttr("disabled");
-			
-			//$("#id_vendedor").removeAttr("disabled");
-			
-			//$("#id_plan_pago").removeAttr("disabled");
-			
 		});
 		// En caso de no poder obtener los datos del lote, indicamos el error.
 		request.fail(function(jqXHR, textStatus) {
-			//alert("Request failed: " + jqXHR);
 			$("#lote_error").html("El Lote no existe o no fue vendido ni reservado.");
 		});
 	} else {
@@ -151,7 +129,6 @@ function retrieveLote() {
 }
 
 function retrieveVenta() {
-	//if ($("#lote_id").val().toString().length > 0) {
 		var request = $.ajax({
 			type : "GET",
 			url : "/ajax/get_ventas_by_lote/",
@@ -192,7 +169,6 @@ function retrieveCliente() {
 		});
 		// Actualizamos el formulario con los datos obtenidos del cliente.
 		request.done(function(msg) {
-			//alert("Response: " + msg);
 			$("#cliente_error").html("");
 			$("#cliente_seleccionado").html(msg);
 			retrieveVendedor();
@@ -200,7 +176,6 @@ function retrieveCliente() {
 		});
 		// En caso de no poder obtener los datos del cliente, indicamos el error.
 		request.fail(function(jqXHR, textStatus) {
-			//alert("Request failed: " + jqXHR);
 			$("#cliente_error").html("No se pueden obtener los datos del Cliente.");
 			$("#cliente_seleccionado").html("");
 			$("#id_cliente").select().focus();
@@ -220,7 +195,6 @@ function retrieveVendedor() {
 		});
 		// Actualizamos el formulario con los datos obtenidos del vendedor.
 		request.done(function(msg) {
-			//alert("Response: " + msg);
 			$("#vendedor_error").html("");
 			$("#vendedor_seleccionado").html(msg);
 			retrievePlanPago();
@@ -228,7 +202,6 @@ function retrieveVendedor() {
 		});
 		// En caso de no poder obtener los datos del vendedor, indicamos el error.
 		request.fail(function(jqXHR, textStatus) {
-			//alert("Request failed: " + jqXHR);
 			$("#vendedor_error").html("No se pueden obtener los datos del Vendedor.");
 			$("#vendedor_seleccionado").html("");
 			$("#id_vendedor").select().focus();
@@ -248,7 +221,6 @@ function retrievePlanPago() {
 		});
 		// Actualizamos el formulario con los datos obtenidos del plan de pagos.
 		request.done(function(msg) {
-			//alert("Response: " + msg);
 			$("#plan_pago_error").html("");
 			$("#plan_pago_seleccionado").html(msg.nombre_del_plan);
 
@@ -290,7 +262,6 @@ function recuperable() {
 	if (TotalPagado <= ((PrecioVenta/4) - EntregaInicial) ) {
 		$("#recuperar_lote").removeAttr("disabled");
 		$("#recuperar_lote").focus();
-		//alert("Lote recuperable");
 	}
 	else {
 		$("#recuperar_lote").attr("disabled", "disabled");

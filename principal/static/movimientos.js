@@ -13,11 +13,7 @@
 		while (reg.test(numeric)) {
 
 			numeric = numeric.replace(reg, '$1' + comma + '$2');
-		}
-		//} else {
-		//	numeric = numeric.substr(0,numeric.length-1);
-		//}
-		
+		}		
 		return numeric + decimal;
 	}
 
@@ -74,7 +70,6 @@ function retrieveLote() {
 			$("#lote_error").html("");
 			sup = msg.superficie.replace(".",",");
 			$("#lote_superficie").html(sup);
-			//alert("hola");
 			$("#lote_superficie").html(String(format.call($("#lote_superficie").html().split(' ').join(''),'.',',')));
 			$("#lote_seleccionado_detalles").html(s);
 			precio_contado = msg.precio_contado;
@@ -82,18 +77,10 @@ function retrieveLote() {
 			var d = new Date();
 			var month = d.getMonth() + 1;
 			var day = d.getDate();
-
-			//fecha_actual = (day < 10 ? '0' : '') + day + '/' + (month < 10 ? '0' : '') + month + '/' + d.getFullYear();
-			//fecha_actual = new Date().toJSON().substring(0, 10);
-
-			//$("#id_fecha").val(fecha_actual);
-
 			$("#id_nombre_cliente").removeAttr("disabled");
-			//$("#id_cliente").focus();
 		});
 		// En caso de no poder obtener los datos del lote, indicamos el error.
 		request.fail(function(jqXHR, textStatus) {
-			//alert("Request failed: " + jqXHR);
 			$("#lote_error").html("El Lote no existe o fue vendido.");
 		});
 	} else {
@@ -115,24 +102,18 @@ function retrieveCliente() {
 		});
 		// Actualizamos el formulario con los datos obtenidos del cliente.
 		request.done(function(msg) {
-			//alert("Response: " + msg);
 			$("#cliente_error").html("");
 			$("#cliente_seleccionado").html(msg);
 
 			$("#id_nombre_vendedor").removeAttr("disabled");
 			$("#id_nombre_vendedor").focus();
 			$("#enviar_reserva").removeAttr("disabled");
-			//$("#enviar_reserva").focus();
 		});
-		
-		
-		
+						
 		// En caso de no poder obtener los datos del cliente, indicamos el error.
 		request.fail(function(jqXHR, textStatus) {
-			//alert("Request failed: " + jqXHR);
 			$("#cliente_error").html("No se pueden obtener los datos del Cliente.");
 			$("#cliente_seleccionado").html("");
-			//$("#id_cliente").select().focus();
 		});
 	}
 };
@@ -149,19 +130,15 @@ function retrieveVendedor() {
 		});
 		// Actualizamos el formulario con los datos obtenidos del vendedor.
 		request.done(function(msg) {
-			//alert("Response: " + msg);
 			$("#vendedor_error").html("");
 			$("#vendedor_seleccionado").html(msg);
 
 			$("#id_plan_pago").removeAttr("disabled");
-			//$("#id_plan_pago").focus();
 		});
 		// En caso de no poder obtener los datos del vendedor, indicamos el error.
 		request.fail(function(jqXHR, textStatus) {
-			//alert("Request failed: " + jqXHR);
 			$("#vendedor_error").html("No se pueden obtener los datos del Vendedor.");
 			$("#vendedor_seleccionado").html("");
-			//$("#id_vendedor").select().focus();
 		});
 	}
 };
@@ -199,7 +176,6 @@ function retrievePlanPago() {
 		});
 		// Actualizamos el formulario con los datos obtenidos del plan de pagos.
 		request.done(function(msg) {
-			//alert("Response: " + msg);
 			$("#plan_pago_error").html("");
 			$("#plan_pago_seleccionado").html(msg.nombre_del_plan);
 
@@ -207,7 +183,6 @@ function retrievePlanPago() {
 			if (msg.credito == "credito") {
 				$("#id_precio_venta").removeAttr("disabled").val(precio_credito);
 				$('#id_precio_venta').val(format.call($('#id_precio_venta').val().split(' ').join(''),'.',','));
-				//$("#id_precio_venta").select().focus();
 
 				$("#tipo_pago_contado").removeAttr("checked").attr("disabled", "disabled");
 				$("#tipo_pago_credito").prop("checked", true).removeAttr("disabled");
@@ -222,32 +197,26 @@ function retrievePlanPago() {
 			} else {
 				$("#id_precio_venta").removeAttr("disabled").val(precio_contado);
 				$('#id_precio_venta').val(format.call($('#id_precio_venta').val().split(' ').join(''),'.',','));
-				//$("#id_precio_venta").select().focus();
 
 				$("#tipo_pago_credito").removeAttr("checked").attr("disabled", "disabled");
 				$("#tipo_pago_contado").prop("checked", true).removeAttr("disabled");
 
 				$("#cantidad_cuotas_venta").html("");
-				//alert(precio_contado);
 				$("#precio_final_venta").html(precio_contado);
 				$("#id_entrega_inicial").val(0).attr("disabled", "disabled");
 				$("#id_monto_cuota").val(0).attr("disabled", "disabled");
-				//alert("hola");
 				calculatePrecioFinalVentaLote();
 			}
-			//fecha_actual = new Date().toJSON().substring(0, 10);
 			
 			$("#id_fecha_vencimiento").datepicker({ dateFormat: 'dd/mm/yy' });
 			
 			$("#id_fecha_vencimiento").datepicker("setDate", $('#id_fecha').val()).removeAttr("disabled");
 			$("#id_fecha_vencimiento").mask('##/##/####');
-			//$("#precio_final_venta").html("");
 		});
 		// En caso de no poder obtener los datos del plan de pagos, indicamos el error.
 		request.fail(function(jqXHR, textStatus) {
 			$("#plan_pago_error").html("No se pueden obtener los datos del Plan de Pago.");
 			$("#plan_pago_seleccionado").html("");
-			//$("#id_plan_pago").select().focus();
 		});
 	}
 };

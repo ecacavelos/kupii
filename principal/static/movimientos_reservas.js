@@ -1,15 +1,11 @@
 $(document).ready(function() {
 	$("#id_lote").keydown(validateLotePre);
 	$("#id_lote").keyup(validateLotePost);
-	
-	//$("#enviar_reserva").click(validateReserva);
 
 	$("#main_reserva_form").submit(validateReserva);
 });
 
 window.onload = function() {
-	//document.getElementById("id_lote").onblur = retrieveLote;
-	//document.getElementById("id_cliente").onblur = retrieveCliente;
 };
 
 // Funciones individuales
@@ -29,7 +25,6 @@ function validateReserva(event) {
 		}
 	});
 	request3.done(function(msg) {
-		alert("Se procesó la reserva satisfactoriamente.");
 		top.location.href = "/movimientos/listado_reservas";
 	});
 	request3.fail(function(jqXHR, textStatus) {
@@ -61,7 +56,6 @@ function retrieveLoteReservas() {
 			$("#lote_error").html("");
 			sup = msg.superficie.replace(".",",");
 			$("#lote_superficie").html(sup);
-			//alert("hola");
 			$("#lote_superficie").html(String(format.call($("#lote_superficie").html().split(' ').join(''),'.',',')));
 			$("#lote_seleccionado_detalles").html(s);
 			precio_contado = msg.precio_contado;
@@ -70,17 +64,10 @@ function retrieveLoteReservas() {
 			var month = d.getMonth() + 1;
 			var day = d.getDate();
 
-			//fecha_actual = (day < 10 ? '0' : '') + day + '/' + (month < 10 ? '0' : '') + month + '/' + d.getFullYear();
-			//fecha_actual = new Date().toJSON().substring(0, 10);
-
-			//$("#id_fecha").val(fecha_actual);
-
 			$("#id_nombre_cliente").removeAttr("disabled");
-			//$("#id_cliente").focus();
 		});
 		// En caso de no poder obtener los datos del lote, indicamos el error.
 		request.fail(function(jqXHR, textStatus) {
-			//alert("Request failed: " + jqXHR);
 			$("#lote_error").html("El Lote no existe o ya ha sido reservado.");
 		});
 	} else {

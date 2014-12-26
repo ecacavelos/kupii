@@ -123,7 +123,6 @@ $(document).ready(function() {
 			ui.item.value = ui.item.label;
 			$("#id_plan_pv").val(name_plan);
 			$("#id_plan_pago_vendedores").val(id_plan);
-			//retrievePlanPagoVendedor();
 		}
 	});
 	
@@ -154,18 +153,12 @@ $(document).ready(function() {
 
 			numeric = numeric.replace(reg, '$1' + comma + '$2');
 		}
-		//} else {
-		//	numeric = numeric.substr(0,numeric.length-1);
-		//}
-
 		return numeric + decimal;
 	}
 
 });
 
 window.onload = function() {
-	//document.getElementById("id_lote").onblur = retrieveLote;
-	//document.getElementById("id_cliente").onblur = retrieveCliente;
 };
 
 // Funciones individuales
@@ -214,7 +207,6 @@ function validateVenta(event) {
 
 		});
 		request2.done(function(msg) {
-			alert("Se procesó la venta satisfactoriamente.");
 			top.location.href = "/movimientos/listado_ventas/";
 		});
 		request2.fail(function(jqXHR, textStatus) {
@@ -254,8 +246,6 @@ function calculatePrecioFinalVentaLote() {
 		}
 	});
 	request.complete(function(msg) {
-		//$("#precio_final_venta").html(msg.responseJSON.monto_total);
-		//$("#precio_final_venta").html(format.call($('#precio_final_venta').html().split(' ').join(''),'.',','));
 		$("#precio_final_venta").html($("#id_precio_venta").val());
 		monto_final_validado = msg.responseJSON.monto_valido;
 		if (msg.responseJSON.monto_valido == false) {
@@ -297,7 +287,6 @@ function retrieveLoteVenta() {
 			$("#lote_error").html("");
 			sup = msg.superficie.replace(".", ",");
 			$("#lote_superficie").html(sup);
-			//alert("hola");
 			$("#lote_superficie").html(String(format.call($("#lote_superficie").html().split(' ').join(''), '.', ',')));
 			$("#lote_seleccionado_detalles").html(s);
 			precio_contado = msg.precio_contado;
@@ -307,17 +296,10 @@ function retrieveLoteVenta() {
 			var month = d.getMonth() + 1;
 			var day = d.getDate();
 
-			//fecha_actual = (day < 10 ? '0' : '') + day + '/' + (month < 10 ? '0' : '') + month + '/' + d.getFullYear();
-			//fecha_actual = new Date().toJSON().substring(0, 10);
-
-			//$("#id_fecha").val(fecha_actual);
-
 			$("#id_nombre_cliente").removeAttr("disabled");
-			//$("#id_cliente").focus();
 		});
 		// En caso de no poder obtener los datos del lote, indicamos el error.
 		request.fail(function(jqXHR, textStatus) {
-			//alert("Request failed: " + jqXHR);
 			$("#lote_error").html("El Lote no existe o fue vendido.");
 		});
 	} else {
@@ -348,7 +330,6 @@ function calculateMontoCuotas() {
 	console.log("entrega_inicial: " + entrega_inicial);
 	console.log("cantidad_credito: " + cantidad_cuotas);
 	var monto_cuota = Math.ceil((precio_venta - entrega_inicial) / cantidad_cuotas);
-	//monto_cuota = Math.round(monto_cuota);
 	if (precio_venta < entrega_inicial) {
 		alert("La entrega inicial debe ser menor al precio de venta.");
 		$("#id_monto_cuota").val("");

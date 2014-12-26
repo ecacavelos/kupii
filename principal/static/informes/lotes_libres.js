@@ -17,21 +17,18 @@ function retrieve_lotes_libres() {
 }
 
 function setup_inputs() {
-	/*
-	if ($("#id_tipo_busqueda").val() == ""){
-			$("#id_fraccion_ini").prop('disabled', true);
-			$("#id_fraccion_fin").prop('disabled', true);
-			$("#boton_buscar").prop('disabled', true);
-			$("#id_boton").prop('disabled', true);
-	}
-	else{
-		$("#id_fraccion_ini").prop('disabled', false);
-		$("#id_fraccion_fin").prop('disabled', false);
-		$("#boton_buscar").prop('disabled', false);
-		$("#id_boton").prop('disabled', false);
-	}*/
 	$("#id_tipo_busqueda").change(function() {
-		$("#id_fraccion_ini").empty();
+		autocompleteFraccion();		
+	});
+	$("#id_fraccion_ini").change(function() {
+		autocompleteFraccion();		
+	});
+	$("#id_fraccion_fin").change(function() {
+		autocompleteFraccion();		
+	});
+}
+function autocompleteFraccion(){
+	$("#id_fraccion_ini").empty();
 		$("#id_fraccion_ini").val("");
 		$("#id_fraccion_fin").empty();
 		$("#id_fraccion_fin").val("");
@@ -89,8 +86,4 @@ function setup_inputs() {
 			});
 		}
 		 
-		
-	});
-
 }
-
