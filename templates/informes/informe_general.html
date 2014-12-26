@@ -55,11 +55,7 @@
 			dateFormat : 'dd/mm/yy'
 		});
 
-		if ($("#fecha_ini").val() == "" && $("#fecha_fin").val() == "") {//parametros no seteados
-			$('.listado-pagos').hide();
-			$('.pagination').hide();
-		}
-		if ($("#fraccion_ini").val() == "" && $("#fraccion_fin").val() == "") {//parametros no seteados
+		if ($("#id_fraccion_ini").val() == "" && $("#id_fraccion_fin").val() == "") {//parametros no seteados
 			$('.listado-pagos').hide();
 			$('.pagination').hide();
 		} else {
@@ -107,14 +103,14 @@
 					<option value="nombre">Nombre de Fraccion</option>
 					<option value="codigo">Codigo de Fraccion</option>
 				</select></td>
-			<td>
-				<input name="fraccion_ini" id="id_fraccion_ini" type="text" value=""/>
-				<input name="frac1" id="id_frac1" type="hidden" value=""/>
-			</td>
-			<td>	
-				<input name="fraccion_fin" id="id_fraccion_fin" type="text" value=""/>
-				<input name="frac2" id="id_frac2" type="hidden" value=""/>
-			</td>
+				<td>
+					<input name="fraccion_ini" id="id_fraccion_ini" type="text" value="" />
+					<input name="frac1" id="id_frac1" type="hidden" value="" />
+				</td>
+				<td>
+					<input name="fraccion_fin" id="id_fraccion_fin" type="text" value="" />
+					<input name="frac2" id="id_frac2" type="hidden" value="" />
+				</td>
 			</tr>
 			<tr>
 				<td>
