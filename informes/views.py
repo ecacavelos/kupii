@@ -771,6 +771,7 @@ def liquidacion_vendedores(request):
             return HttpResponse(t.render(c))    
         else:    
             return HttpResponseRedirect("/login") 
+        
 def liquidacion_gerentes(request):
     if request.method == 'GET':
         if request.user.is_authenticated():
@@ -782,78 +783,41 @@ def liquidacion_gerentes(request):
                 return HttpResponse(t.render(c))                
             else:#Parametros seteados
                 t = loader.get_template('informes/liquidacion_gerentes.html')
-                fecha_ini=request.GET['fecha_ini']
-                fecha_fin=request.GET['fecha_fin']
-                fecha_ini_parsed = str(datetime.strptime(fecha_ini, "%d/%m/%Y").date())
-                fecha_fin_parsed = str(datetime.strptime(fecha_fin, "%d/%m/%Y").date())
-                fraccion_id=request.GET['busqueda']
-                busqueda_label = request.GET['busqueda_label']
-                print("fraccion_id ->" + fraccion_id)
-                query=(
-                '''
-                select pc.* from principal_pagodecuotas pc, principal_lote l, principal_manzana m, principal_fraccion f
-                where pc.fecha_de_pago >= \''''+ fecha_ini_parsed +               
-                '''\' and pc.fecha_de_pago <= \'''' + fecha_fin_parsed +
-                '''\' and f.id=''' + fraccion_id +                
-                ''' 
-                and (pc.lote_id = l.id and l.manzana_id=m.id and m.fraccion_id=f.id) order by f.id,pc.fecha_de_pago
-                '''
-                )                   
-                    
-                object_list=list(PagoDeCuotas.objects.raw(query))
-                cuotas=[]
-                total_monto_pagado=0
-                total_monto_gerente=0
+                fecha = request.GET['fecha']
+                tipo_liquidacion = request.GET['tipo_liquidacion']
+                fecha_ini = request.GET['fecha_ini']
+                fecha_fin = request.GET['fecha_fin']
+                fecha_ini_parsed = datetime.strptime(fecha_ini, "%d/%m/%Y").date()
+                fecha_fin_parsed = datetime.strptime(fecha_fin, "%d/%m/%Y").date()
+                lista_pagos = PagoDeCuotas.objects.filter(fecha_de_pago__range=[fecha_ini_parsed, fecha_fin_parsed])
+                if tipo_liquidacion == 'gerente_ventas':
+                    tipo_gerente="Gerente de Ventas"
+                if tipo_liquidacion == 'gerente_admin':
+                    tipo_gerente="Gerente Administrativo"
+                #totales generales
+                total_general_importe=0
+                total_general_comision=0
+                k=0 #variable de control
                 #Seteamos los datos de las filas
-                for i, cuota_item in enumerate (object_list):
+                for i, cuota_item in enumerate (lista_pagos):                
                     nro_cuota=get_nro_cuota(cuota_item)
-                    cuota={}
-                    monto_gerente=0
-                    if(nro_cuota%2!=0 and nro_cuota<=cuota_item.plan_de_pago_vendedores.cantidad_cuotas):
-                        monto_gerente=int(cuota_item.total_de_cuotas*(float(cuota_item.plan_de_pago.porcentaje_cuotas_gerente)/float(100)))
-                    cuota['fraccion_id']=cuota_item.lote.manzana.fraccion.id
-                    cuota['fraccion']=str(cuota_item.lote.manzana.fraccion)
-                    cuota['cuota_nro']=str(nro_cuota)+'/'+str(cuota_item.plan_de_pago.cantidad_de_cuotas)
-                    cuota['cliente']=str(cuota_item.cliente)                    
-                    cuota['lote']=str(cuota_item.lote)                   
-                    cuota['fecha_pago']=str(cuota_item.fecha_de_pago)
-                    cuota['monto_pagado']=str('{:,}'.format(cuota_item.total_de_cuotas)).replace(",", ".") 
-                    cuota['monto_gerente']=str('{:,}'.format(monto_gerente)).replace(",", ".") 
-                        
-                    #Sumamos los totales por fraccion
-                    total_monto_pagado+=cuota_item.total_de_cuotas
-                    total_monto_gerente+=monto_gerente
-                    #Si es el ultimo lote, cerramos totales de fraccion
-                    if (len(object_list)-1 == i):
-                        cuota['total_monto_pagado']=str('{:,}'.format(total_monto_pagado)).replace(",", ".") 
-                        cuota['total_monto_gerente']=str('{:,}'.format(total_monto_gerente)).replace(",", ".")
-                        
-                    #Hay cambio de lote pero NO es el ultimo elemento todavia
-                    elif (cuota_item.lote.manzana.fraccion.id != object_list[i+1].lote.manzana.fraccion.id):
-                        cuota['total_monto_pagado']=str('{:,}'.format(total_monto_pagado)).replace(",", ".") 
-                        cuota['total_monto_gerente']=str('{:,}'.format(total_monto_gerente)).replace(",", ".")
-                        #Se CERAN  los TOTALES por FRACCION
-                        total_monto_pagado=0
-                        total_monto_gerente=0
-                    cuotas.append(cuota)
-                            
-            
-            ultimo="&busqueda_label="+busqueda_label+"&busqueda="+fraccion_id+"&fecha_ini="+fecha_ini+"&fecha_fin="+fecha_fin         
-            paginator = Paginator(cuotas, 25)
-            page = request.GET.get('page')
-            try:
-                lista = paginator.page(page)
-            except PageNotAnInteger:
-                lista = paginator.page(1)
-            except EmptyPage:
-                lista = paginator.page(paginator.num_pages)          
+                    com=0        
+                    #Esta es una regla de negocio, los vendedores cobran comisiones segun el numero de cuota, maximo hasta la cuota Nro 9.
+                    cuotas_para_vendedor=((cuota_item.plan_de_pago_vendedores.cantidad_cuotas)*(cuota_item.plan_de_pago_vendedores.intervalos))-cuota_item.plan_de_pago_vendedores.cuota_inicial                  
+                    #A los vendedores le corresponde comision por las primeras 4 (maximo 5) cuotas impares.
+                    if(nro_cuota%2!=0 and nro_cuota<=cuotas_para_vendedor):                                                                        
+                        com=int(cuota_item.total_de_cuotas*(float(cuota_item.plan_de_pago_vendedores.porcentaje_de_cuotas)/float(100)))
+                        total_general_importe+=cuota_item.total_de_cuotas
+                        total_general_comision+=com                    
+                
+                monto_calculado=int(math.ceil((float(total_general_importe)*float(0.1))/float(2)))   
+                monto_calculado=str('{:,}'.format(monto_calculado)).replace(",", ".")
+        
             c = RequestContext(request, {
-                'lista_cuotas': lista,
-                'fecha_ini':fecha_ini,
-                'fecha_fin':fecha_fin,
-                'fraccion': fraccion_id,
-                'busqueda_label' : busqueda_label,
-                'ultimo' : ultimo
+                'monto_calculado' : monto_calculado,
+                'fecha_' : fecha,
+                'tipo_liquidacion' : tipo_liquidacion,
+                'tipo_gerente' : tipo_gerente
             })
             return HttpResponse(t.render(c))    
         else:    
@@ -2255,9 +2219,7 @@ def filtros_establecidos(request, tipo_informe):
             print('Parametros no seteados')      
     elif tipo_informe == "liquidacion_gerentes":
         try:
-            fecha_ini=request['fecha_ini']
-            fecha_fin=request['fecha_fin']
-            busqueda=request['busqueda']
+            fecha=request['fecha']
             return True
         except:
             print('Parametros no seteados')      
