@@ -1,15 +1,10 @@
 $(document).ready(function() {
 	$("#id_lote").keydown(validateLotePre);
 	$("#id_lote").keyup(validateLotePost);
-	
-	//$("#enviar_reserva").click(validateReserva);
-
 	$("#main_transferencia_form").submit(validateTransferencia);
 });
 
 window.onload = function() {
-	//document.getElementById("id_lote").onblur = retrieveLote;
-	//document.getElementById("id_cliente").onblur = retrieveCliente;
 };
 
 // Funciones individuales
@@ -50,9 +45,6 @@ function validateLotePre(event) {
 
 			numeric = numeric.replace(reg, '$1' + comma + '$2');
 		}
-		//} else {
-		//	numeric = numeric.substr(0,numeric.length-1);
-		//}
 		
 		return numeric + decimal;
 	}
@@ -82,7 +74,6 @@ function validateTransferencia(event) {
 		}
 	});
 	request5.done(function(msg) {
-		alert("Se procesó la transferencia exitosamente.");
 		top.location.href = "/movimientos/listado_transferencias";
 	});
 	request5.fail(function(jqXHR, textStatus) {
@@ -119,18 +110,12 @@ function retrieveLote() {
 			var month = d.getMonth() + 1;
 			var day = d.getDate();
 			retrieveVenta();
-			//fecha_actual = (day < 10 ? '0' : '') + day + '/' + (month < 10 ? '0' : '') + month + '/' + d.getFullYear();
-			//fecha_actual = new Date().toJSON().substring(0, 10);
 			$("#id_fecha").datepicker({ dateFormat: 'dd/mm/yy' });
-			//$("#id_fecha").datepicker("setDate", new Date());
-			//$("#id_fecha").attr('disabled', true);
-			//$("#id_fecha").val(fecha_actual);
 			$("#id_cliente").removeAttr("disabled");
 			$("#id_cliente").focus();
 		});
 		// En caso de no poder obtener los datos del lote, indicamos el error.
 		request.fail(function(jqXHR, textStatus) {
-			//alert("Request failed: " + jqXHR);
 			$("#lote_error").html("El Lote no existe o no fue vendido.");
 		});
 	} else {
@@ -174,7 +159,6 @@ function retrieveCliente() {
 		});
 		// Actualizamos el formulario con los datos obtenidos del cliente.
 		request.done(function(msg) {
-			//alert("Response: " + msg);
 			$("#cliente_error").html("");
 			$("#cliente_seleccionado").html(msg);
 
@@ -183,7 +167,6 @@ function retrieveCliente() {
 		});
 		// En caso de no poder obtener los datos del cliente, indicamos el error.
 		request.fail(function(jqXHR, textStatus) {
-			//alert("Request failed: " + jqXHR);
 			$("#cliente_error").html("No se pueden obtener los datos del Cliente.");
 			$("#cliente_seleccionado").html("");
 			$("#id_cliente").select().focus();

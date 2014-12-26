@@ -5,14 +5,10 @@ $(document).ready(function() {
 	$("#id_lote2").keydown(validateLotePre);
 	$("#id_lote2").keyup(validateLotePost);
 
-	//$("#enviar_reserva").click(validateReserva);
-
 	$("#main_cambios_form").submit(validateCambio);
 });
 
 window.onload = function() {
-	//document.getElementById("id_lote").onblur = retrieveLote;
-	//document.getElementById("id_cliente").onblur = retrieveCliente;
 };
 
 // Funciones individuales
@@ -57,9 +53,6 @@ function validateLotePre(event) {
 
 			numeric = numeric.replace(reg, '$1' + comma + '$2');
 		}
-		//} else {
-		//	numeric = numeric.substr(0,numeric.length-1);
-		//}
 		
 		return numeric + decimal;
 	}
@@ -91,7 +84,6 @@ function validateCambio(event) {
 		}
 	});
 	request6.done(function(msg) {
-		alert("Se procesó el cambio exitosamente.");
 		top.location.href = "/movimientos/listado_cambios";
 	});
 	request6.fail(function(jqXHR, textStatus) {
@@ -112,22 +104,18 @@ function retrieveCliente() {
 		});
 		// Actualizamos el formulario con los datos obtenidos del cliente.
 		request.done(function(msg) {
-			//alert("Response: " + msg);
 			$("#cliente_error").html("");
 			$("#cliente_seleccionado").html(msg);
 			var cliente_id = parseInt($("#id_cliente").val());
 			var d = new Date();
 			var month = d.getMonth() + 1;
 			var day = d.getDate();
-			//fecha_actual = (day < 10 ? '0' : '') + day + '/' + (month < 10 ? '0' : '') + month + '/' + d.getFullYear();
 			fecha_actual = new Date().toJSON().substring(0, 10);
 			
-			//$("#id_fecha").val(fecha_actual);
 			$("#id_lote").removeAttr("disabled");
 		});
 		// En caso de no poder obtener los datos del cliente, indicamos el error.
 		request.fail(function(jqXHR, textStatus) {
-			//alert("Request failed: " + jqXHR);
 			$("#cliente_error").html("No se pueden obtener los datos del Cliente.");
 			$("#cliente_seleccionado").html("");
 			$("#id_cliente").select().focus();
@@ -158,24 +146,17 @@ function retrieveLoteCambio() {
 			$("#lote_error").html("");
 			sup = msg.superficie.replace(".",",");
 			$("#lote_superficie").html(sup);
-			//alert("hola");
 			$("#lote_superficie").html(String(format.call($("#lote_superficie").html().split(' ').join(''),'.',',')));
 			$("#lote_seleccionado_detalles").html(s);
 			$('#id_fecha').mask('##/##/####');
 			$("#id_fecha").datepicker({ dateFormat: 'dd/mm/yy' });
-			//$("#id_fecha").datepicker("setDate", new Date());
-			//$("#id_fecha").datepicker('disable');
 			lote_id = msg.lote_id;
 			lote_precio = msg.precio_credito;
 			retrieveVenta();
 			
-			
-			
-			//$("#id_lote2").focus();
 		});
 		// En caso de no poder obtener los datos del lote, indicamos el error.
 		request.fail(function(jqXHR, textStatus) {
-			//alert("Request failed: " + jqXHR);
 			$("#lote_error").html("El Lote no existe o fue vendido.");
 		});
 	} else {
@@ -186,7 +167,6 @@ function retrieveLoteCambio() {
 }
 
 function retrieveVenta() {
-	//if ($("#lote_id").val().toString().length > 0) {
 		var request = $.ajax({
 			type : "GET",
 			url : "/ajax/get_ventas_by_lote/",
@@ -201,11 +181,6 @@ function retrieveVenta() {
 			var venta_id = msg.venta[0]['venta_id'];
 			$("#id_cliente").val(msg.venta[0]['cliente_id']);
 			retrieveCliente();
-			//$("#cliente_original_seleccionado").val(msg[0]['cliente']);
-			//$("#id_vendedor").val(msg[0]['vendedor_id']);
-			//$("#vendedor_seleccionado").val(msg[0]['vendedor']);
-			//$("#plan_pago").val(msg[0]['plan_de_pago']);
-			//$("#id_plan_pago").val(msg[0]['plan_de_pago_id']);
 		});
 		if (cliente_id == cliente_venta) {
 			$("#id_lote2").removeAttr("disabled");
@@ -214,11 +189,9 @@ function retrieveVenta() {
 			$("#lote_error").html("El lote no pertenece al cliente seleccionado.");
 			$("#id_lote").focus();
 		}
-//	}
 }
 
 function retrievePagos() {
-	//if ($("#lote_id").val().toString().length > 0) {
 		var request = $.ajax({
 			type : "GET",
 			url : "/ajax/get_pagos_by_venta/",
@@ -234,9 +207,7 @@ function retrievePagos() {
 			for(var i=0; i < length; i++){
     			TotalPagado += msg[i]['total_de_cuotas'];  
 			}
-			//alert(TotalPagado);
 		});
-//	}	
 }
 
 function retrieveLote2() {
@@ -267,14 +238,11 @@ function retrieveLote2() {
 			lote2_id = msg.lote_id;
 			lote2_precio = msg.precio_credito;
 			$("#cambiar_lotes").removeAttr("disabled");
-			//alert("Exito ajax");
 			cambiable();
 		});
 		// En caso de no poder obtener los datos del lote, indicamos el error.
 		request.fail(function(jqXHR, textStatus) {
-			//alert("Request failed: " + jqXHR);
 			$("#lote2_error").html("El Lote no existe o fue vendido.");
-			//alert("Error ajax");
 			cambiable();
 		});
 		
@@ -282,7 +250,6 @@ function retrieveLote2() {
 		if ($("#id_lote2").val().toString().length > 0) {
 			$("#lote2_error").html("No se encuentra el Lote indicado.");
 			$("#id_lote2").focus();
-			//alert("No se encuentra el Lote indicado.");
 			cambiable();
 		}
 	}

@@ -20,21 +20,17 @@ function retrieve_informe_general() {
 	}
 	
 function setup_inputs() {
-	/*
-	if ($("#id_tipo_busqueda").val() == ""){
-			$("#id_fraccion_ini").prop('disabled', true);
-			$("#id_fraccion_fin").prop('disabled', true);
-			$("#boton_buscar").prop('disabled', true);
-			$("#id_boton").prop('disabled', true);
-	}
-	else{
-		$("#id_fraccion_ini").prop('disabled', false);
-		$("#id_fraccion_fin").prop('disabled', false);
-		$("#boton_buscar").prop('disabled', false);
-		$("#id_boton").prop('disabled', false);
-	}*/
 	$("#id_tipo_busqueda").change(function() {
-		$("#id_fraccion_ini").empty();
+		autocompleteFraccion();	
+	});
+	$("#id_fraccion_ini").change(function() {
+		autocompleteFraccion();		
+	});
+	$("#id_fraccion_fin").change(function() {
+		autocompleteFraccion();		
+	});
+function autocompleteFraccion(){
+	$("#id_fraccion_ini").empty();
 		$("#id_fraccion_ini").val("");
 		$("#id_fraccion_fin").empty();
 		$("#id_fraccion_fin").val("");
@@ -65,9 +61,32 @@ function setup_inputs() {
 					//alert(id_fraccion);
 				}
 			});
+		}else if($("#id_tipo_busqueda").val() == "codigo"){
+			var id_fraccion;
+			$("#id_busqueda_label").empty();
+			base_url = "/ajax/get_fracciones_by_id/";
+			params = "value";
+			$("#id_fraccion_ini").autocomplete({
+				source : base_url,
+				minLength : 1,
+				select : function(event, ui) {
+					id_fraccion = ui.item.id;
+					$("#id_frac1").val(id_fraccion);
+					//alert(id_fraccion);
+				}
+			});
+			$("#id_busqueda_label").empty();
+			base_url = "/ajax/get_fracciones_by_id/";
+			params = "value";
+			$("#id_fraccion_fin").autocomplete({
+				source : base_url,
+				minLength : 1,
+				select : function(event, ui) {
+					id_fraccion = ui.item.id;
+					$("#id_frac2").val(id_fraccion);					
+					//alert(id_fraccion);
+				}
+			});
 		}
-		 
-		
-	});
-
+}
 }

@@ -35,18 +35,11 @@ def lotes_libres(request):
             else: #Parametros seteados
                 tipo_busqueda=request.GET['tipo_busqueda']
                 t = loader.get_template('informes/lotes_libres.html')
-                if(tipo_busqueda=='codigo'):
-                    fraccion_ini=request.GET['fraccion_ini']
-                    fraccion_fin=request.GET['fraccion_fin']
-                    f1=""
-                    f2=""
-                    ultimo="&tipo_busqueda="+tipo_busqueda+"&fraccion_ini="+fraccion_ini+"&frac1="+f1+"&fraccion_fin="+fraccion_fin+"&frac2="+f2               
-                if(tipo_busqueda=='nombre'):
-                    fraccion_ini=request.GET['frac1']
-                    fraccion_fin=request.GET['frac2']
-                    f1=request.GET['fraccion_ini']
-                    f2=request.GET['fraccion_fin']
-                    ultimo="&tipo_busqueda="+tipo_busqueda+"&fraccion_ini="+f1+"&frac1="+fraccion_ini+"&fraccion_fin="+f2+"&frac2="+fraccion_fin
+                fraccion_ini=request.GET['frac1']
+                fraccion_fin=request.GET['frac2']
+                f1=request.GET['fraccion_ini']
+                f2=request.GET['fraccion_fin']
+                ultimo="&tipo_busqueda="+tipo_busqueda+"&fraccion_ini="+f1+"&frac1="+fraccion_ini+"&fraccion_fin="+f2+"&frac2="+fraccion_fin
                 object_list=[]#lista de lotes
                 if fraccion_ini and fraccion_fin:
                     manzanas= Manzana.objects.filter(fraccion_id__range=(fraccion_ini,fraccion_fin))
@@ -346,18 +339,12 @@ def informe_general(request):
                 tipo_busqueda=request.GET['tipo_busqueda']
                 fecha_ini=request.GET['fecha_ini']
                 fecha_fin=request.GET['fecha_fin']
-                if(tipo_busqueda=='codigo'):
-                    fraccion_ini=request.GET['fraccion_ini']
-                    fraccion_fin=request.GET['fraccion_fin']
-                    f1=""
-                    f2=""
-                    ultimo="&tipo_busqueda="+tipo_busqueda+"&fraccion_ini="+fraccion_ini+"&frac1="+f1+"&fraccion_fin="+fraccion_fin+"&frac2="+f2+"&fecha_ini="+fecha_ini+"&fecha_fin="+fecha_fin                              
-                if(tipo_busqueda=='nombre'):
-                    fraccion_ini=request.GET['frac1']
-                    fraccion_fin=request.GET['frac2']
-                    f1=request.GET['fraccion_ini']
-                    f2=request.GET['fraccion_fin']
-                    ultimo="&tipo_busqueda="+tipo_busqueda+"&fraccion_ini="+f1+"&frac1="+fraccion_ini+"&fraccion_fin="+f2+"&frac2="+fraccion_fin+"&fecha_ini="+fecha_ini+"&fecha_fin="+fecha_fin
+
+                fraccion_ini=request.GET['frac1']
+                fraccion_fin=request.GET['frac2']
+                f1=request.GET['fraccion_ini']
+                f2=request.GET['fraccion_fin']
+                ultimo="&tipo_busqueda="+tipo_busqueda+"&fraccion_ini="+f1+"&frac1="+fraccion_ini+"&fraccion_fin="+f2+"&frac2="+fraccion_fin+"&fecha_ini="+fecha_ini+"&fecha_fin="+fecha_fin
                 if fecha_ini == '' and fecha_fin == '':
                     query=(
                     '''
