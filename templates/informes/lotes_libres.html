@@ -1,0 +1,142 @@
+{% extends "lotes/base_lotes.html" %}
+{% block header_scripts %}
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		var tipo_busqueda = "{{tipo_busqueda}}";
+		$('#id_tipo_busqueda').val(tipo_busqueda);
+		var fraccion_ini="{{fraccion_ini}}";
+		var fraccion_fin="{{fraccion_fin}}";
+		var frac1="{{frac1}}";
+		var frac2="{{frac2}}";
+		
+		if($('#id_tipo_busqueda').val()=='nombre'){
+			$('#id_fraccion_ini').val(frac1);
+			$('#id_fraccion_fin').val(frac2);
+			$('#id_frac1').val(fraccion_ini);
+			$('#id_frac2').val(fraccion_fin);
+		}
+		if($('#id_tipo_busqueda').val()=='codigo'){
+			$('#id_fraccion_ini').val(fraccion_ini);
+			$('#id_fraccion_fin').val(fraccion_fin);
+		}	
+	
+	
+			
+		if($('#id_fraccion_ini').val()!="" && $('#id_fraccion_fin').val()!=""){ // parametros seteados
+			$('.listado-lotes').show();
+			$('.pagination').show();
+		}		
+		else{
+			$('.listado-lotes').hide();
+			$('.pagination').hide();
+		}
+		
+		setup_inputs();		
+	});
+	
+	
+	
+</script>
+<script type="text/javascript" src="{{ STATIC_URL }}informes/lotes_libres.js"></script>
+{% endblock %}
+{% block content %}
+<div class="gri16 text-izquierda" id="breadcumb">
+	<a href="/">Inicio</a><span class="verde-1">></span>
+	<a href="/informes/">Informes</a>
+	<span class="verde-1">> Lotes Libres</span>
+</div>
+<div class="clear"></div>
+<h1>Listado de Lotes Libres</h1>
+<div class="grid_6">	
+	<form name="frm_busqueda" id="frm_busqueda" method="get" action="/informes/lotes_libres/">		
+		<table id="lista-categoria" frame="box">			
+			<tr>
+				<th class="acciones" ><strong><a href="#" style="color: white;">Filtrar</a></strong></th>
+				<th>Desde:</th>
+				<th>Hasta:</th>
+			</tr>
+			<tr>
+			<tr>
+				<td>
+				<select id="id_tipo_busqueda" name="tipo_busqueda">
+					<option value="">Elija una opcion</option>
+					<option value="nombre">Nombre de Fraccion</option>
+					<option value="codigo">Codigo de Fraccion</option>
+				</select></td>
+			<td>
+				<input name="fraccion_ini" id="id_fraccion_ini" type="text" value=""/>
+				<input name="frac1" id="id_frac1" type="hidden" value=""/>
+			</td>
+			<td>	
+				<input name="fraccion_fin" id="id_fraccion_fin" type="text" value=""/>
+				<input name="frac2" id="id_frac2" type="hidden" value=""/>
+			</td>
+			</tr>
+			<tr>
+				<td>
+				<input id="boton_buscar" type="button" value="Buscar"  onclick="validar();" class="historico" style="cursor: pointer"/>
+				</td>
+				<td>
+				<a class="boton-verde" id="id_boton" onclick="retrieve_lotes_libres();">Descargar como Excel</a>
+				</td>
+			</tr>
+		</table>
+	</form>
+</div>
+<div class="clear"></div>
+<div id="listado-item-lote">
+	<table   cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
+		<th>Nombre Fracci&oacute;n</th><th>Fracci&oacute;n</th><th>Lote Nro</th><th>Superficie</th><th>Precio Contado</th><th>Precio Credito</th><th>Precio Cuota</th>
+			{% for lote in lista_lotes %}
+				{% if forloop.counter|divisibleby:2 %}
+					<tr>
+						<td>{{lote.fraccion}}</td>
+						<td>{{lote.fraccion_id}}</td>
+						<td>{{lote.lote}}</td>
+						<td>{{lote.superficie}}</td>
+						<td>{{lote.precio_contado}}</td>
+						<td>{{lote.precio_credito}}</td>
+						<td>{{lote.importe_cuota}}</td>						
+					</tr>
+				{% else %}
+					<tr class="bkg_gris">
+						<td>{{lote.fraccion}}</td>
+						<td>{{lote.fraccion_id}}</td>
+						<td>{{lote.lote}}</td>
+						<td>{{lote.superficie}}</td>
+						<td>{{lote.precio_contado}}</td>
+						<td>{{lote.precio_credito}}</td>
+						<td>{{lote.importe_cuota}}</td>						
+					</tr>			
+				{% endif %}
+				{% if lote.total_importe_cuotas %}
+					<tr>
+						<th colspan="3" class="celda_resumen_fraccion">Resumen de la Fracción</th>
+						<td class="celda_resumen_fraccion">{{lote.total_superficie_fraccion}}</td>
+						<td class="celda_resumen_fraccion">{{lote.total_contado_fraccion}}</td>
+						<td class="celda_resumen_fraccion">{{lote.total_credito_fraccion}}</td>
+						<td class="celda_resumen_fraccion">{{lote.total_importe_cuotas}}</td>						
+					</tr>
+				{% endif %}
+			{% endfor %}
+		<div class="pagination">
+			<span class="step-links">
+				Mostrando {{ lista_lotes.start_index }}-{{ lista_lotes.end_index }} de {{ lista_lotes.paginator.count }} Resultados
+				{%if lista_lotes.has_previous%} 
+				<a href="?page={{ lista_lotes.first_index}}{{ultimo}}"> Primera </a> 
+				<a href="?page={{ lista_lotes.previous_page_number }}{{ultimo}}"> Anterior</a> 
+				{%endif%}
+				P&aacute;gina |{{lista_lotes.number}}|		
+				{%if lista_lotes.has_next%} 
+				<a href="?page={{ lista_lotes.next_page_number }}{{ultimo}}"> Siguiente </a> 				
+				<a href="?page={{ lista_lotes.end_index}}{{ultimo}}"> Ultima </a> 
+				{%endif%} 
+			</span>
+		</div>
+	</table>
+</div>
+<div id="footer">
+	<a href="/informes" class="boton-verde">Volver al módulo de Informes</a>
+</div>
+{% endblock %}

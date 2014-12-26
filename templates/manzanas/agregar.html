@@ -1,0 +1,75 @@
+{% extends "lotes/base_lotes.html" %}
+
+{% block header_resources %}
+<!--<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />-->
+
+{% endblock %}
+
+{% block header_scripts %}
+<!--
+<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+-->
+<script type="text/javascript">
+$(document).ready(function() {
+	
+	
+});
+
+function _enviar(){
+	//$("#form_add_lote_por_manzana").submit();
+	cantidad_manzanas = parseInt($("#total_manzanas").val());
+	var total_lotes = 0;
+	var lote = 0;
+	var lotes_por_manzana ="";
+	for (i=1;i<cantidad_manzanas+1;i++){
+		lote = parseInt($("#id_cantidad_lotes_"+i).val());
+		total_lotes = total_lotes + lote;
+		if (i == cantidad_manzanas){
+			lotes_por_manzana = lotes_por_manzana + $("#id_cantidad_lotes_"+i).val();
+		}else{
+			lotes_por_manzana = lotes_por_manzana + $("#id_cantidad_lotes_"+i).val()+",";
+		}
+		//console.log("\nManzana "+i+" cantidad de lotes: "+$("#id_cantidad_lotes_"+i).val());
+	}
+	self.opener.form_add_fraccion.id_cantidad_lotes.value = total_lotes;
+	self.opener.form_add_fraccion.lotes_por_manzana.value = lotes_por_manzana;
+	alert("Lotes Por manzana Agregados!");
+	window.close();
+}
+
+</script>
+
+{% endblock %}
+{% block content %}
+<div class="grid_16" align="center">
+	<form action="" method="post" id="form_add_lote_por_manzana">
+		{% csrf_token %}
+			{% for hidden in form.hidden_fields %}
+			{{ hidden }}
+		{% endfor %}
+		
+	<table width="94%" border="0" cellpadding="0" cellspacing="0" id="forms" align="center">
+		<script type="text/javascript">
+			if (self.opener != null ){
+				var cant_manzanas = parseInt(self.opener.form_add_fraccion.id_cantidad_manzanas.value);
+				document.write("<input type='hidden' id='total_manzanas' name='total_manzanas' value='"+cant_manzanas+"'/>");
+				for (i=1;i<cant_manzanas+1;i++){
+					document.write("<tr>");
+					document.write("<td class='noimage'><strong>Manzana "+i+"</strong><input type='hidden' id='id_nro_manzana' name='nro_manzana' value='"+i+"'/></td>");
+					document.write("</tr>");
+					document.write("<tr>");
+					document.write("<td><strong><label for='id_cantidad_lotes'>Cantidad Lotes</label></strong></td>");
+					document.write("<td class='noimage'><input type='number' id='id_cantidad_lotes_"+i+"' name='cantidad_lotes_"+i+"' value=''/></td>");
+					document.write("</tr>");
+				}
+			}
+		</script>
+</table>
+		<input class="manzana-form-button" type="button" value="Agregar cantidad de lotes" style="margin-bottom: 10px; cursor: pointer;" onclick="_enviar();" />
+		
+	</form>
+
+	<div class="clear"></div>
+</div>
+{% endblock %}
