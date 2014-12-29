@@ -10,6 +10,7 @@
 $(document).ready(function() {
 	$('.grid_6').hide();
 	$('#id_fecha').mask('##/##/####');
+	$("#id_fecha").datepicker({ dateFormat: 'dd/mm/yy' });
 base_url = "/ajax/get_cliente_id_by_name/";
 		params = "value";
 		$("#id_nombre_cliente").autocomplete({
@@ -83,7 +84,7 @@ base_url = "/ajax/get_cliente_id_by_name/";
 	<div class="fieldWrapperMovimientos">
 		<tr>
 			<td><label for="id_fecha">Fecha de Transferencia: </label></td>
-			<td class="noimage"><input id="id_fecha" type="date" name="fecha" maxlength="10" /></td>
+			<td class="noimage"><input id="id_fecha" type="text" name="fecha" maxlength="10" /></td>
 		</tr>
 	</div>
 	<div class="fieldWrapperMovimientos">

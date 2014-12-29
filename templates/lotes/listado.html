@@ -1,6 +1,5 @@
 {% extends "lotes/base_lotes.html" %}
 {% block header_scripts %}
-
 <script type="text/javascript">
 	function buscar() {
 		if($("#tipo_busqueda").val() == "lote"){
@@ -14,10 +13,6 @@
 				$("#frm_busqueda").submit();
 			}
 	}
-	
-	
-
-
 	$(document).ready(function() {
 
 			$('#busqueda').mask('###/###/####');
@@ -33,44 +28,36 @@
 </div>
 
 <div class="clear"></div>
-
-<div class="grid_10">
-	<h1>Listado de Lotes</h1>
-</div>
+<h1>Listado de Lotes</h1>
 
 <div class="grid_6">
 	<form name="frm_busqueda" id="frm_busqueda" method="post" action="/lotes/listado_busqueda_lotes/">
 		{% csrf_token %}
-		
-		<tr>
-			<td> Nro de Lote: </td>
-		</tr>
-
-		<td>
-		<input id="busqueda" type="" name="busqueda" placeholder="Ej: 001/001/0001"/>
-		</td>
-		
-		<tr>
-			<td> Lotes por cliente: </td>
-		</tr>
-		<select id="tipo_busqueda" name="tipo_busqueda">
-			<option value="0">Elija una opcion</option>
-			<option value="nombre">Nombre</option>
-			<option value="cedula">Cedula</option>
-			<option value="id">ID</option>	
-		</select>		
-		<input id="busqueda_cliente" name="busqueda_cliente" />
-		
-	
-		
-
-		<tr>
-		<input type="button" value="Buscar" onclick="buscar();" class="historico" style="cursor: pointer"/>
-		</tr>
-		
-		
-
-
+		<table id="lista-categoria" frame="box">
+			<tr>
+				<th class="acciones"  colspan="3"><strong><a href="#" style="color: white;">Filtrar</a></strong></th>
+			</tr>
+			<tr>
+				<td>Nro de Lote:</td>
+				<td><input id="busqueda" type="" name="busqueda" placeholder="Ej: 001/001/0001"/></td>
+			</tr>
+			<tr>
+				<td> Lotes por cliente: </td>
+				<td>
+					<select id="tipo_busqueda" name="tipo_busqueda">
+						<option value="0">Elija una opcion</option>
+						<option value="nombre">Nombre</option>
+						<option value="cedula">Cedula</option>
+						<option value="id">ID</option>	
+					</select>	
+				</td>
+				
+			</tr>
+			<tr>
+				<td></td>
+				<td><input type="button" value="Buscar" onclick="buscar();" class="historico" style="cursor: pointer"/></td>
+			</tr>
+		</table>
 	</form>
 </div>
 

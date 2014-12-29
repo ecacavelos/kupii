@@ -6,6 +6,8 @@ $(document).ready(function() {
 	$("#id_lote2").keyup(validateLotePost);
 
 	$("#main_cambios_form").submit(validateCambio);
+	$('#id_fecha').mask('##/##/####');
+	$("#id_fecha").datepicker({ dateFormat: 'dd/mm/yy' });
 });
 
 window.onload = function() {

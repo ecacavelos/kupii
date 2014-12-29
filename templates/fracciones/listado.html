@@ -22,48 +22,41 @@ function buscar(){
 	<span class="verde-1">> Listado de Fracciones</span> 
 </div>
 <div class="clear"></div>
+<h1>Listado de Fracciones</h1>
+<div class="grid_6">
+	<form name="frm_busqueda" id="frm_busqueda" method="post" action="/fracciones/listado_busqueda_fracciones/">
+		{% csrf_token %}
+		<table id="lista-categoria" frame="box">
+			<tr>
+				<th class="acciones"  colspan="3"><strong><a href="#" style="color: white;">Filtrar</a></strong></th>
+			</tr>
+			<tr>
+				<td>
+					<select id="tipo_busqueda" name="tipo_busqueda">
+						<option value="0">Elija una opcion</option>
+						<option value="numero">Numero de Fracci&oacute;n</option>
+						<option value="propietario">Nombre de Propietario</option>
+					</select>
+				</td>
+				<td>
+					<input id="busqueda" type="text" name="busqueda" />				
+				</td>
+				<td>
+					<input type="button" value="Buscar" onclick="buscar();" class="historico" style="cursor: pointer"/>
+				</td>
+			</tr>
+		</table>
+	</form>
+</div>
 
-					<div class="grid_10" style="width: 555px;">
-  						<h1>Listado de Fracciones</h1>
-					</div>
-
-					<div class="grid_6">
-  						<form name="frm_busqueda" id="frm_busqueda" method="post" action="/fracciones/listado_busqueda_fracciones/">
-  							{% csrf_token %}
-  							<table>
-  								<tr>
-  									<td>
-  										Tipo de b&uacute;squeda:
-  									</td>
-  									
-  								</tr>
-  								<tr>
-  									<td>
-  										<select id="tipo_busqueda" name="tipo_busqueda">
-											<option value="0">Elija una opcion</option>
-											<option value="numero">Numero de Fracci&oacute;n</option>
-											<option value="propietario">Nombre de Propietario</option>
-										</select>
-  									</td>
-  									<td>
-  										<input id="busqueda" type="text" name="busqueda" />				
-  									</td>
-  									<td>
-  										<input type="button" value="Buscar" onclick="buscar();" class="historico" style="cursor: pointer"/>
-  									</td>
-  								</tr>
-  							</table>
-  						</form>
-					</div>
-
-					<div class="clear"></div>
-					<div id="listado-cuadro-busqueda">
-						<a href="/fracciones/agregar" class="boton-verde">Agregar Fracci&oacute;n</a>
-						<br><br>
-					</div>
-					<div id="listado-item-lote">
-						<table width="50%" border="1" cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
-							<th>Fracci&oacute;n Nro</th><th>Nombre</th><th>Ubicaci&oacute;n</th><th>Distrito</th><th>Propietario</th>
+<div class="clear"></div>
+<div id="listado-cuadro-busqueda">
+	<a href="/fracciones/agregar" class="boton-verde">Agregar Fracci&oacute;n</a>
+	<br><br>
+</div>
+<div id="listado-item-lote" align="center">
+	<table width="50%" border="1" cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
+		<th>Fracci&oacute;n Nro</th><th>Nombre</th><th>Ubicaci&oacute;n</th><th>Distrito</th><th>Propietario</th>
 {% for hw in object_list %}
 		<tr>
 			<td>

@@ -16,7 +16,8 @@ $(document).ready(function() {
 	//$("#id_fecha").datepicker("setDate", new Date());
 	//$("#id_fecha").datepicker('disable');
 	$("#id_fecha_venta2").datepicker({ dateFormat: 'dd/mm/yy' });
-	
+	$('#id_fecha_venta2').mask('##/##/####');
+	$("#id_fecha_venta2").datepicker({ dateFormat: 'dd/mm/yy' });
 });
 </script>
 {% endblock %}
@@ -144,8 +145,8 @@ $(document).ready(function() {
 		<tr>
 			<td><label for="fecha_vencimiento">Fecha de &Uacute;ltima Venta: </label></td>
 			<td class="noimage">
-				<input id="id_fecha_venta" type="hidden" name="fecha_venta" readonly maxlength="10" />
-				<input id="id_fecha_venta2" type="text" name="fecha_venta2" readonly maxlength="10" />
+				<input id="id_fecha_venta" type="hidden" name="fecha_venta" maxlength="10" />
+				<input id="id_fecha_venta2" type="text" name="fecha_venta2" maxlength="10" />
 			</td>
 		</tr>	
 	</div>

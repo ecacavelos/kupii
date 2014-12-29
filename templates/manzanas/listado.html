@@ -23,68 +23,66 @@ function buscar(){
 {% endblock %}
 {% block content %}
 <div class="gri16 text-izquierda" id="breadcumb">
-						<a href="/">Inicio</a> <span class="verde-1">></span>  
-						<a href="/manzanas">Manzanas</a> 
-						<span class="verde-1">> Listado de Manzanas</span> 
-					</div>
+	<a href="/">Inicio</a> <span class="verde-1">></span>  
+	<a href="/manzanas">Manzanas</a> 
+	<span class="verde-1">> Listado de Manzanas</span> 
+</div>
+<div class="clear"></div>
+<h1>Listado de Manzanas</h1>
 
-					<div class="clear"></div>
-
-					<div class="grid_10">
-  						<h1>Listado de Manzanas</h1>
-					</div>
-
-					<div class="grid_6">
-  						<form name="frm_busqueda" id="frm_busqueda" method="post" action="/manzanas/listado_busqueda_manzanas/">
-  							{% csrf_token %}
-  							<label for="busqueda">Nro. Manzana</label><br>		
-							<input id="busqueda" type="text" name="busqueda" placeholder="Ej: 001/001" />
-  							<input name="tabla" type="hidden" value="manzana"/>
-  							
-  							<input type="button" value="Buscar" onclick="buscar();" class="historico" style="cursor: pointer"/>
-						</form>
-					</div>
-
-					<div class="clear"></div>
-					<div id="listado-cuadro-busqueda">
-						
-					</div>
-					<div id="listado-item-lote">
-						<table width="50%" border="1" cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
-							<th>Nro Manzana</th>
-							<th>Nro Fracci&oacute;n</th>
-							<th>Cantidad de Lotes</th>
-{% for hw in object_list %}
-		<tr>
-			<td>
-				<!--<a href="{{hw.id}}">Manzana nro: {{hw.nro_manzana}} <strong>(Ver Detalles)</strong></a>-->
-				{{hw.nro_manzana}}
-			</td>
-			<td>
-				{{hw.fraccion_id}}
-			</td>
-			<td>
-				{{hw.cantidad_lotes}}
-			</td>
-		</tr>
-
-{% endfor %}
-<div class="pagination">
-    <span class="step-links">
-        {%if object_list.has_previous%}
-        <a href="?page={{ object_list.previous_page_number }}"> Anterior</a>
-		{%endif%}
-    	P&aacute;gina
-    	|{{object_list.number}}|
-    	
-    	{%if object_list.has_next%}
-		<a href="?page={{ object_list.next_page_number }}"> Siguiente</a>
-		{%endif%}
-        
-    </span>
-</div>	
-						</table>
-					</div>
+<div class="grid_6">
+	<form name="frm_busqueda" id="frm_busqueda" method="post" action="/manzanas/listado_busqueda_manzanas/">
+		{% csrf_token %}
+		<table id="lista-categoria" frame="box">
+			<tr>
+				<th class="acciones"  colspan="3"><strong><a href="#" style="color: white;">Filtrar</a></strong></th>
+			</tr>
+			<tr>
+				<td>Nro. Manzana</td>
+				<td><input id="busqueda" type="text" name="busqueda" placeholder="Ej: 001/001"></td>
+				<td><input type="button" value="Buscar" onclick="buscar();" class="historico" style="cursor: pointer"/></td>
+			</tr>
+		</table>
+	</form>
+</div>
+<div class="clear"></div>
+<div id="listado-cuadro-busqueda">
+	
+</div>
+<div id="listado-item-lote" align="center">
+	<table width="50%" border="1" cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
+		<th>Nro Manzana</th>
+		<th>Nro Fracci&oacute;n</th>
+		<th>Cantidad de Lotes</th>
+		{% for hw in object_list %}
+			<tr>
+				<td>
+					<!--<a href="{{hw.id}}">Manzana nro: {{hw.nro_manzana}} <strong>(Ver Detalles)</strong></a>-->
+					{{hw.nro_manzana}}
+				</td>
+				<td>
+					{{hw.fraccion_id}}
+				</td>
+				<td>
+					{{hw.cantidad_lotes}}
+				</td>
+			</tr>		
+		{% endfor %}
+		<div class="pagination">
+		    <span class="step-links">
+		        {%if object_list.has_previous%}
+		        <a href="?page={{ object_list.previous_page_number }}"> Anterior</a>
+				{%endif%}
+		    	P&aacute;gina
+		    	|{{object_list.number}}|
+		    	
+		    	{%if object_list.has_next%}
+				<a href="?page={{ object_list.next_page_number }}"> Siguiente</a>
+				{%endif%}		        
+		    </span>
+		</div>	
+	</table>
+</div>
 
 <div id="footer"><a href="/manzanas" class="boton-verde">Volver al módulo de Manzanas</a></div>
 {% endblock %}
