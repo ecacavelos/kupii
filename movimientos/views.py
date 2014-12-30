@@ -668,146 +668,106 @@ def listar_busqueda_personas(request):
 def listar_busqueda_ventas(request):    
     if request.user.is_authenticated():
         if request.method == 'GET':
-            try:
-                t = loader.get_template('movimientos/listado_ventas.html')                
-                tipo_busqueda=request.GET['tipo_busqueda']                
-                if tipo_busqueda=='lote':
-                    try:
-                        busqueda= request.GET['busqueda_label']
-                        x=str(busqueda)
-                        fraccion_int = int(x[0:3])
-                        manzana_int =int(x[4:7])
-                        lote_int = int(x[8:])
-                    except:
-                        return HttpResponseServerError("Datos erroneos, favor cargar el numero de lote con el formato Fraccion/Manzana/Lote.")       
-                    try:
-                        manzana_id=Manzana.objects.get(fraccion_id=fraccion_int,nro_manzana=manzana_int)
-                        lote_id=Lote.objects.get(manzana_id=manzana_id,nro_lote=lote_int)
-                        object_list = Venta.objects.filter(lote_id=lote_id.id)                    
-                        a = len(object_list)    
-                        if a > 0:
-                            for i in object_list:
-                                i.precio_final_de_venta = str('{:,}'.format(i.precio_final_de_venta)).replace(",", ".")
+            t = loader.get_template('movimientos/listado_ventas.html')                
+            tipo_busqueda=request.GET['tipo_busqueda']
+            ultima_busqueda=""
+            busqueda_label=""
+            fecha_hasta=""
+            busqueda=""
+            if tipo_busqueda=='lote':
+                try:
+                    lote = request.GET['busqueda_label']                    
+                    busqueda_label = request.GET['busqueda_label']
+                    fecha_hasta=""
+                    busqueda=""                    
+                    x=str(lote)
+                    fraccion_int = int(x[0:3])
+                    manzana_int =int(x[4:7])
+                    lote_int = int(x[8:])
+                except:
+                    return HttpResponseServerError("Datos erroneos, favor cargar el numero de lote con el formato Fraccion/Manzana/Lote.")       
+                try:
+                    manzana_id=Manzana.objects.get(fraccion_id=fraccion_int,nro_manzana=manzana_int)
+                    lote_id=Lote.objects.get(manzana_id=manzana_id,nro_lote=lote_int)
+                    object_list = Venta.objects.filter(lote_id=lote_id.id)                    
+                    if object_list:
+                        for i in object_list:
+                            i.precio_final_de_venta = str('{:,}'.format(i.precio_final_de_venta)).replace(",", ".")
                         
-                        ultima_busqueda = "&tipo_busqueda="+tipo_busqueda+"&busqueda_label="+busqueda +"&tabla=&fecha_ini="
-                        paginator=Paginator(object_list,15)
-                        page=request.GET.get('page')
-                        try:
-                            lista=paginator.page(page)
-                        except PageNotAnInteger:
-                            lista=paginator.page(1)
-                        except EmptyPage:
-                            lista=paginator.page(paginator.num_pages)
+                    ultima_busqueda = "&tipo_busqueda="+tipo_busqueda+"&busqueda_label="+busqueda                     
+                except Exception, error:
+                    print error
+                    object_list= []
                 
-                        c = RequestContext(request, {
-                            'object_list': lista,
-                            'ultima_busqueda': ultima_busqueda,
-                        })
-                    except:
-                        c = RequestContext(request, {
-                            'object_list': [],                        
-                        })
-                    return HttpResponse(t.render(c))
-                
-                if tipo_busqueda=='cliente':
-                    try:
-                        cliente_id = request.GET['busqueda']
-                        object_list = Venta.objects.filter(cliente_id=cliente_id)
-                        if object_list:
-                            for i in object_list:
-                                i.precio_final_de_venta = str('{:,}'.format(i.precio_final_de_venta)).replace(",", ".")
-                                           
-                            ultima_busqueda = "&tabla=&cliente="+cliente_id+"&tipo_busqueda="+tipo_busqueda      
-                            paginator=Paginator(object_list,15)
-                            page=request.GET.get('page')
-                            try:
-                                lista=paginator.page(page)
-                            except PageNotAnInteger:
-                                lista=paginator.page(1)
-                            except EmptyPage:
-                                lista=paginator.page(paginator.num_pages)
-                    
-                            c = RequestContext(request, {
-                                'object_list': lista,
-                                'ultima_busqueda': ultima_busqueda,
-                              
-                            })
-                    except Exception, error:
-                        print error
-                        c = RequestContext(request, {
-                            'object_list': [],
-                        })
-                    return HttpResponse(t.render(c))        
-            
-                if tipo_busqueda=='vendedor':
-                    try:
-                        vendedor_id = request.GET['busqueda']
-                        object_list = Venta.objects.filter(vendedor_id=vendedor_id)
-                        if object_list:
-                            for i in object_list:
-                                i.precio_final_de_venta = str('{:,}'.format(i.precio_final_de_venta)).replace(",", ".")
-                   
-                        ultima_busqueda = "&tabla=&vendedor="+vendedor_id+"&tipo_busqueda="+tipo_busqueda      
-                        paginator=Paginator(object_list,15)
-                        page=request.GET.get('page')
-                        try:
-                            lista=paginator.page(page)
-                        except PageNotAnInteger:
-                            lista=paginator.page(1)
-                        except EmptyPage:
-                            lista=paginator.page(paginator.num_pages)
-                
-                        c = RequestContext(request, {
-                            'object_list': lista,
-                            'ultima_busqueda': ultima_busqueda,
-                      
-                        })
-                    except:
-                        c = RequestContext(request, {
-                            'object_list': [],                        
-                        })
-                    return HttpResponse(t.render(c))     
+            if tipo_busqueda=='cliente':
+                try:
+                    cliente_id = request.GET['busqueda']
+                    busqueda=request.GET['busqueda']
+                    busqueda_label = request.GET['busqueda_label']
+                    fecha_hasta=""
+                    object_list = Venta.objects.filter(cliente_id=cliente_id)
+                    if object_list:
+                        for i in object_list:
+                            i.precio_final_de_venta = str('{:,}'.format(i.precio_final_de_venta)).replace(",", ".")
+                                       
+                    ultima_busqueda = "&tabla=&cliente="+cliente_id+"&tipo_busqueda="+tipo_busqueda                
+                except Exception, error:
+                    print error
+                    object_list= []
+           
+            if tipo_busqueda=='vendedor':
+                try:
+                    vendedor_id = request.GET['busqueda']
+                    busqueda = request.GET['busqueda']
+                    busqueda_label = request.GET['busqueda_label']
+                    fecha_hasta=""
+                    object_list = Venta.objects.filter(vendedor_id=vendedor_id)
+                    if object_list:
+                        for i in object_list:
+                            i.precio_final_de_venta = str('{:,}'.format(i.precio_final_de_venta)).replace(",", ".")                   
+                        
+                    ultima_busqueda = "&tabla=&vendedor="+vendedor_id+"&tipo_busqueda="+tipo_busqueda                  
+                except Exception, error:
+                    print error
+                    object_list= []    
                          
-                if tipo_busqueda=='fecha':
-                    try:
-                        busqueda = request.GET['busqueda_label']
-                        fecha_hasta=request.GET['fecha_hasta']
-                        fecha_venta_parsed = datetime.strptime(busqueda, "%d/%m/%Y").date()
-                        fecha_hasta_parsed=datetime.strptime(fecha_hasta,"%d/%m/%Y").date()
-                        object_list = Venta.objects.filter(fecha_de_venta__range=(fecha_venta_parsed,fecha_hasta_parsed)) 
-                        a = len(object_list)    
-                        if a > 0:
-                            for i in object_list:
-                                i.precio_final_de_venta = str('{:,}'.format(i.precio_final_de_venta)).replace(",", ".")
-                                
-                        
-                        ultima_busqueda = "&tipo_busqueda="+tipo_busqueda+"&busqueda_label="+busqueda +"&fecha_hasta="+fecha_hasta+"&tabla=&venta"   
-                        paginator=Paginator(object_list,15)
-                        page=request.GET.get('page')
-                        try:
-                            lista=paginator.page(page)
-                        except PageNotAnInteger:
-                            lista=paginator.page(1)
-                        except EmptyPage:
-                            lista=paginator.page(paginator.num_pages)
+            if tipo_busqueda=='fecha':
+                try:
+                    fecha_venta = request.GET['busqueda_label']
+                    busqueda_label=busqueda
+                    fecha_hasta=request.GET['fecha_hasta']
+                    fecha_venta_parsed = datetime.strptime(fecha_venta, "%d/%m/%Y").date()
+                    fecha_hasta_parsed=datetime.strptime(fecha_hasta,"%d/%m/%Y").date()
+                    object_list = Venta.objects.filter(fecha_de_venta__range=(fecha_venta_parsed,fecha_hasta_parsed)).order_by('-fecha_de_venta') 
+                    for i in object_list:
+                        i.precio_final_de_venta = str('{:,}'.format(i.precio_final_de_venta)).replace(",", ".")                                
+                            
+                    ultima_busqueda = "&tipo_busqueda="+tipo_busqueda+"&busqueda_label="+busqueda+"&fecha_hasta="+fecha_hasta+"&tabla=&venta"
+                except Exception, error:
+                    print error
+                    object_list= []   
+            paginator=Paginator(object_list,15)
+            page=request.GET.get('page')
+            try:
+                lista=paginator.page(page)
+            except PageNotAnInteger:
+                lista=paginator.page(1)
+            except EmptyPage:
+                lista=paginator.page(paginator.num_pages)
                 
-                        c = RequestContext(request, {
-                            'object_list': lista,
-                            'ultima_busqueda': ultima_busqueda,        
-                        })
-                    except:
-                        c = RequestContext(request, {
-                            'object_list': [],
-                        })
-                    return HttpResponse(t.render(c))  
-            except Exception, error:
-                print error
-                return HttpResponseServerError("Error en la ejecucion")
+            c = RequestContext(request, {
+                'object_list': lista,
+                'ultima_busqueda': ultima_busqueda,
+                'tipo_busqueda' : tipo_busqueda,
+                'busqueda_label' : busqueda_label,
+                'fecha_hasta' : fecha_hasta,
+                'busqueda' : busqueda                      
+            })                             
+            return HttpResponse(t.render(c))     
     else:
         return HttpResponseRedirect("/login")
 
-def listar_busqueda_pagos(request):
-    
+def listar_busqueda_pagos(request):    
     if request.user.is_authenticated():
         if request.method=='POST':
             try:

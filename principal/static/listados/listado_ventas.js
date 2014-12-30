@@ -13,11 +13,24 @@
 	function desplegar_campos() {	
 		if ($("#tipo_busqueda").val() == 'fecha') {
 			$('#id_busqueda_label').val("");
-			desplegar_fecha();
+			$('#id_busqueda_label').unmask('');
+			$('#fecha_hasta').val("");
+			$("#id_busqueda_label").datepicker({
+				dateFormat : 'dd/mm/yy'
+			});
+			$('#id_busqueda_label').mask('##/##/####');
+			$("#fecha_hasta").datepicker({
+				dateFormat : 'dd/mm/yy'
+			});
+			$("#fecha_hasta").mask('##/##/####');
+			$("#fecha_hasta").show();
 		}
 		if ($("#tipo_busqueda").val() == 'lote') {
 			$('#id_busqueda_label').val("");
-			desplegar_lote();
+			$("#fecha_hasta").hide();
+			$("#id_busqueda_label").datepicker("destroy");
+			$("#id_busqueda_label").removeClass("hasDatepicker");
+			$('#id_busqueda_label').mask('###/###/####');
 		}
 		if ($("#tipo_busqueda").val() == 'vendedor') {
 			$("#id_busqueda_label").val("");
@@ -34,10 +47,9 @@
 				select : function(event, ui) {
 					id_vendedor = ui.item.id;
 					$("#id_busqueda").val(id_vendedor);
-					alert(id_vendedor);
+					//alert(id_vendedor);
 					}
-				});			
-
+				});
 		}
 		if ($("#tipo_busqueda").val() == 'cliente'){
 			$("#id_busqueda_label").val("");
@@ -61,24 +73,4 @@
 	}
 	
 
-	function desplegar_fecha() {
-		$("#id_busqueda_label").datepicker({
-			dateFormat : 'dd/mm/yy'
-		});
-		$('#id_busqueda_label').mask('##/##/####');
-		$("#fecha_hasta").datepicker({
-			dateFormat : 'dd/mm/yy'
-		});
-		$("#fecha_hasta").mask('##/##/####');
-		$("#fecha_hasta").show();
-	}
-
-	function desplegar_lote() {
-		if ($("#tipo_busqueda").val() == 'lote') {
-			$("#fecha_hasta").hide();
-			$("#id_busqueda_label").datepicker("destroy");
-			$("#id_busqueda_label").removeClass("hasDatepicker");
-			$('#id_busqueda_label').mask('###/###/####');
-
-		}
-	}
+	

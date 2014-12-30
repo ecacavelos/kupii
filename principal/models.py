@@ -27,8 +27,7 @@ class Cliente(models.Model):
     nombre_conyuge = models.CharField('nombre del conyuge', max_length=255, blank=True)
     deuda_contraida = models.BigIntegerField(blank=True, null=True)
     def __unicode__(self):
-        #return u'%s %s' % (self.nombres, self.apellidos)
-        return (self.nombres + ' ' + self.apellidos)
+        return u'%s %s' % (self.nombres, self.apellidos)
     def as_json(self):
         return dict(
             label= self.nombres + ' ' + self.apellidos,
@@ -48,8 +47,7 @@ class Propietario(models.Model):
     celular_1 = models.CharField(max_length=255, blank=True)
     celular_2 = models.CharField(max_length=255, blank=True)
     def __unicode__(self):
-        return (self.nombres + ' ' + self.apellidos)
-        
+        return u'%s %s' % (self.nombres, self.apellidos)
     def as_json(self):
         return dict(
             label= self.nombres + ' ' + self.apellidos,
@@ -106,7 +104,7 @@ class Vendedor(models.Model):
     fecha_ingreso = models.DateField('fecha de ingreso')
     sucursal = models.CharField(max_length=255)
     def __unicode__(self):
-        return (self.nombres + ' ' + self.apellidos)
+        return u'%s %s' % (self.nombres, self.apellidos)
     class Meta:
         verbose_name_plural = "vendedores"
     

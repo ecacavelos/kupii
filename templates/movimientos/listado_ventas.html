@@ -23,7 +23,17 @@
 		};
 		// Setear idioma al calendario
 		$.datepicker.setDefaults($.datepicker.regional['es']);
-		
+		var busqueda_label="{{busqueda_label}}";
+		var busqueda="{{busqueda}}";
+		var fecha_hasta="{{busqueda_label}}";
+		var tipo_busqueda="{{tipo_busqueda}}";
+		/*
+		$('#tipo_busqueda').val(tipo_busqueda);
+		$('#id_busqueda_label').val(busqueda_label);
+		$('#fecha_hasta').val(fecha_hasta);
+		$('#id_busqueda').val(busqueda);
+		desplegar_campos();
+		*/
 	});
 </script>
 <script type="text/javascript" src="{{ STATIC_URL }}listados/listado_ventas.js"></script>
@@ -47,7 +57,7 @@
 			<tr>
 				<td>
 				<select id="tipo_busqueda" name="tipo_busqueda" onchange="desplegar_campos();">
-					<option value="0">Elija una opcion</option>
+					<option value="">Elija una opcion</option>
 					<option value="lote">Lote</option>
 					<option value="cliente">Cliente</option>
 					<option value="vendedor">Vendedor</option>
@@ -101,13 +111,17 @@
 		{%endfor%}
 		<div class="pagination">
 			<span class="step-links">
-				<div class="pagination">
-					<span class="step-links"> {%if object_list.has_previous%} <a href="?page={{ object_list.previous_page_number }}{{ultima_busqueda}}"> Anterior</a> {%endif%}
-						P&aacute;gina
-						|{{object_list.number}}|
-
-						{%if object_list.has_next%} <a href="?page={{ object_list.next_page_number }}{{ultima_busqueda}}"> Siguiente</a> {%endif%} </span>
-				</div> </span>
+				Mostrando {{ object_list.start_index }}-{{ object_list.end_index }} de {{ object_list.paginator.count }} Resultados
+				{%if object_list.has_previous%} 
+				<a href="?page={{ object_list.first_index}}{{ultimo}}"> Primera </a> 
+				<a href="?page={{ object_list.previous_page_number }}{{ultimo}}"> Anterior</a> 
+				{%endif%}
+				P&aacute;gina |{{object_list.number}}|		
+				{%if object_list.has_next%} 
+				<a href="?page={{ object_list.next_page_number }}{{ultimo}}"> Siguiente </a> 				
+				<a href="?page={{ object_list.end_index}}{{ultimo}}"> Ultima </a> 
+				{%endif%} 
+			</span>
 		</div>
 	</table>
 </div>
