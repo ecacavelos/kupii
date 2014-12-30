@@ -417,33 +417,32 @@ def listar_ventas(request):
         return HttpResponseRedirect("/login")
             
 #Funcion para consultar el listado de todos los pagos.
-def listar_pagos(request):
-    
+def listar_pagos(request):  
     if request.user.is_authenticated():
         t = loader.get_template('movimientos/listado_pagos.html')
-        try:
-            object_list = PagoDeCuotas.objects.all().order_by('id')
-            a = len(object_list)
-            if a>0:
-                for i in object_list:
-                    #i.fecha_de_pago=i.fecha_de_pago.strftime("%d/%m/%Y")
+        object_list = PagoDeCuotas.objects.all().order_by('-fecha_de_pago')
+        if object_list:
+            for i in object_list:
+                try:
+                    i.fecha_de_pago=i.fecha_de_pago.strftime("%d/%m/%Y")
                     i.total_de_cuotas=str('{:,}'.format(i.total_de_cuotas)).replace(",", ".")
                     i.total_de_mora=str('{:,}'.format(i.total_de_mora)).replace(",", ".")
                     i.total_de_pago=str('{:,}'.format(i.total_de_pago)).replace(",", ".")
-            paginator=Paginator(object_list,15)
-            page=request.GET.get('page')
-            try:
-                lista=paginator.page(page)
-            except PageNotAnInteger:
-                lista=paginator.page(1)
-            except EmptyPage:
-                lista=paginator.page(paginator.num_pages)
-            c = RequestContext(request, {
-                'object_list': lista,
-            })
-            return HttpResponse(t.render(c))
-        except:   
-            return HttpResponseServerError("No se pudo obtener el Listado de Pagos de Lotes.")
+                except Exception, error:
+                    print i.id
+                    pass
+        paginator=Paginator(object_list,15)
+        page=request.GET.get('page')
+        try:
+            lista=paginator.page(page)
+        except PageNotAnInteger:
+            lista=paginator.page(1)
+        except EmptyPage:
+            lista=paginator.page(paginator.num_pages)
+        c = RequestContext(request, {
+            'object_list': lista,
+        })
+        return HttpResponse(t.render(c))        
     else:
         return HttpResponseRedirect("/login")
         
@@ -769,253 +768,83 @@ def listar_busqueda_ventas(request):
 
 def listar_busqueda_pagos(request):    
     if request.user.is_authenticated():
-        if request.method=='POST':
-            try:
-                t = loader.get_template('movimientos/listado_pagos.html')
-                busqueda = request.POST['busqueda']
-                tipo_busqueda=request.POST['tipo_busqueda']
-                fecha_hasta=request.POST['fecha_hasta']
-            
-                if tipo_busqueda=='lote':
-                    try:
-                        x=str(busqueda)
-                        fraccion_int = int(x[0:3])
-                        manzana_int =int(x[4:7])
-                        lote_int = int(x[8:])
-                    except:
-                        return HttpResponseServerError("Datos erroneos, favor cargar el numero de lote con el formato Fraccion/Manzana/Lote.")       
-                    try:
-                        manzana_id=Manzana.objects.get(fraccion_id=fraccion_int,nro_manzana=manzana_int)
-                        lote_id=Lote.objects.get(manzana_id=manzana_id,nro_lote=lote_int)
-                        object_list = PagoDeCuotas.objects.filter(lote_id=lote_id.id)
-                        a = len(object_list)    
-                        if a > 0:
-                            for i in object_list:
-                                i.total_de_cuotas=str('{:,}'.format(i.total_de_cuotas)).replace(",", ".")
-                                i.total_de_mora=str('{:,}'.format(i.total_de_mora)).replace(",", ".")
-                                i.total_de_pago=str('{:,}'.format(i.total_de_pago)).replace(",", ".")
-                        
-                        ultima_busqueda = "&tabla=&busqueda="+busqueda+"&tipo_busqueda="+tipo_busqueda          
-                        paginator=Paginator(object_list,15)
-                        page=request.GET.get('page')
-                        try:
-                            lista=paginator.page(page)
-                        except PageNotAnInteger:
-                            lista=paginator.page(1)
-                        except EmptyPage:
-                            lista=paginator.page(paginator.num_pages)
-                         
-                        c = RequestContext(request, {
-                            'object_list': lista,
-                            'ultima_busqueda': ultima_busqueda,
-                        })
-                    except:
-                        c = RequestContext(request, {
-                            'object_list': [],
-                            'fraccion': [],
-                        })
-                    return HttpResponse(t.render(c))
-     
-                if tipo_busqueda=='cliente':
-                    try:
-                        object_list = Cliente.objects.filter(nombres__icontains=busqueda)    
-                        pago=[]
-                        cantPagos=0
-                        cantClientes=0
+        if request.method=='GET':
+            t = loader.get_template('movimientos/listado_pagos.html')
+            tipo_busqueda=request.GET['tipo_busqueda']       
+            ultima_busqueda=""
+            busqueda_label=""
+            fecha_hasta=""
+            busqueda=""
+            if tipo_busqueda=='lote':
+                try:
+                    lote = request.GET['busqueda_label']       
+                    x=str(lote)
+                    fraccion_int = int(x[0:3])
+                    manzana_int =int(x[4:7])
+                    lote_int = int(x[8:])
+                except:
+                    return HttpResponseServerError("Datos erroneos, favor cargar el numero de lote con el formato Fraccion/Manzana/Lote.")       
+                try:
+                    manzana_id=Manzana.objects.get(fraccion_id=fraccion_int,nro_manzana=manzana_int)
+                    lote_id=Lote.objects.get(manzana_id=manzana_id,nro_lote=lote_int)
+                    object_list = PagoDeCuotas.objects.filter(lote_id=lote_id.id)
+                    if object_list:
                         for i in object_list:
-                            pagoAux=list(PagoDeCuotas.objects.filter(cliente_id=i.id))
-                            if pagoAux:
-                                pago.append(pagoAux)
-                    
-                        a = len(object_list)
-                        cantClientes=len(pago)    
-                        if a > 0:
-                            for c in range(0,cantClientes):
-                                cantPagos=len(pago[c])
-                                for v in range (0,cantPagos):
-                                    pago[c][v].total_de_cuotas=str('{:,}'.format(pago[c][v].total_de_cuotas)).replace(",", ".")
-                                    pago[c][v].total_de_mora=str('{:,}'.format(pago[c][v].total_de_mora)).replace(",", ".")
-                                    pago[c][v].total_de_pago=str('{:,}'.format(pago[c][v].total_de_pago)).replace(",", ".")             
-                        ultima_busqueda = "&tabla=&busqueda="+busqueda+"&tipo_busqueda="+tipo_busqueda      
-                        paginator=Paginator(pago,15)
-                        page=request.GET.get('page')
-                        try:
-                            lista=paginator.page(page)
-                        except PageNotAnInteger:
-                            lista=paginator.page(1)
-                        except EmptyPage:
-                            lista=paginator.page(paginator.num_pages)
-                
-                        c = RequestContext(request, {
-                            'object_list': lista,
-                            'ultima_busqueda': ultima_busqueda,
-                            'busqueda': 'cliente',
-                        })
-                    except:
-                        c = RequestContext(request, {
-                            'object_list': [],
-                        })
-                    return HttpResponse(t.render(c))         
-                        
-                if tipo_busqueda=='fecha':
-                    try:
-                        fecha_pago_parsed = datetime.strptime(busqueda, "%d/%m/%Y").date()
-                        fecha_hasta_parsed = datetime.strptime(fecha_hasta, "%d/%m/%Y").date()
-                        object_list = PagoDeCuotas.objects.filter(fecha_de_pago__range=(fecha_pago_parsed,fecha_hasta_parsed)) 
-                    
-                        a = len(object_list)    
-                        if a > 0:
-                            for i in object_list:
-                                i.total_de_cuotas=str('{:,}'.format(i.total_de_cuotas)).replace(",", ".")
-                                i.total_de_mora=str('{:,}'.format(i.total_de_mora)).replace(",", ".")
-                                i.total_de_pago=str('{:,}'.format(i.total_de_pago)).replace(",", ".")
-              
-                       
-                        ultima_busqueda = "&tabla=&busqueda="+busqueda+"&tipo_busqueda="+tipo_busqueda       
-                        paginator=Paginator(object_list,15)
-                        page=request.GET.get('page')
-                        try:
-                            lista=paginator.page(page)
-                        except PageNotAnInteger:
-                            lista=paginator.page(1)
-                        except EmptyPage:
-                            lista=paginator.page(paginator.num_pages)
-            
-                        c = RequestContext(request, {
-                            'object_list': lista,
-                            'ultima_busqueda': ultima_busqueda,
-                        })                    
-                    except:
-                        c = RequestContext(request, {
-                            'object_list': [],                        
-                        })
-                    return HttpResponse(t.render(c))  
-        
-            except:
-                return HttpResponseServerError("Error en la ejecucion") 
-        else:
-            try:
-                t = loader.get_template('movimientos/listado_pagos.html')
-                busqueda = request.GET['busqueda']
-                tipo_busqueda=request.GET['tipo_busqueda']
-                fecha_hasta=request.GET['fecha_hasta']
-            
-                if tipo_busqueda=='lote':
-                    try:
-                        x=str(busqueda)
-                        fraccion_int = int(x[0:3])
-                        manzana_int =int(x[4:7])
-                        lote_int = int(x[8:])
-                    except:
-                        return HttpResponseServerError("Datos erroneos, favor cargar el numero de lote con el formato Fraccion/Manzana/Lote.")       
-                    try:
-                        manzana_id=Manzana.objects.get(fraccion_id=fraccion_int,nro_manzana=manzana_int)
-                        lote_id=Lote.objects.get(manzana_id=manzana_id,nro_lote=lote_int)
-                        object_list = PagoDeCuotas.objects.filter(lote_id=lote_id.id)
-                        a = len(object_list)    
-                        if a > 0:
-                            for i in object_list:
-                                i.total_de_cuotas=str('{:,}'.format(i.total_de_cuotas)).replace(",", ".")
-                                i.total_de_mora=str('{:,}'.format(i.total_de_mora)).replace(",", ".")
-                                i.total_de_pago=str('{:,}'.format(i.total_de_pago)).replace(",", ".")
-                        
-                        ultima_busqueda = "&tabla=&busqueda="+busqueda+"&tipo_busqueda="+tipo_busqueda      
-                        paginator=Paginator(object_list,15)
-                        page=request.GET.get('page')
-                        try:
-                            lista=paginator.page(page)
-                        except PageNotAnInteger:
-                            lista=paginator.page(1)
-                        except EmptyPage:
-                            lista=paginator.page(paginator.num_pages)
-                         
-                        c = RequestContext(request, {
-                            'object_list': lista,
-                            'ultima_busqueda': ultima_busqueda,
-                        })
-                    except:
-                        c = RequestContext(request, {
-                            'object_list': [],
-                        })
-                    
-                    return HttpResponse(t.render(c))
-     
-                if tipo_busqueda=='cliente':
-                    try:
-                        object_list = Cliente.objects.filter(nombres__icontains=busqueda)    
-                        pago=[]
-                        cantPagos=0
-                        cantClientes=0
+                            i.total_de_cuotas=str('{:,}'.format(i.total_de_cuotas)).replace(",", ".")
+                            i.total_de_mora=str('{:,}'.format(i.total_de_mora)).replace(",", ".")
+                            i.total_de_pago=str('{:,}'.format(i.total_de_pago)).replace(",", ".")                        
+                    ultima_busqueda = "&tabla=&busqueda="+busqueda+"&tipo_busqueda="+tipo_busqueda                       
+                except Exception, error:
+                    print error
+                    object_list= []   
+            if tipo_busqueda=='cliente':
+                try:
+                    cliente_id = request.GET['busqueda']
+                    object_list = PagoDeCuotas.objects.filter(cliente_id=cliente_id)    
+                    if object_list:
                         for i in object_list:
-                            pagoAux=list(PagoDeCuotas.objects.filter(cliente_id=i.id))
-                            if pagoAux:
-                                pago.append(pagoAux)                
-                        a = len(object_list)
-                        cantClientes=len(pago)    
-                        if a > 0:
-                            for c in range(0,cantClientes):
-                                cantPagos=len(pago[c])
-                                for v in range (0,cantPagos):
-                                    pago[c][v].total_de_cuotas=str('{:,}'.format(pago[c][v].total_de_cuotas)).replace(",", ".")
-                                    pago[c][v].total_de_mora=str('{:,}'.format(pago[c][v].total_de_mora)).replace(",", ".")
-                                    pago[c][v].total_de_pago=str('{:,}'.format(pago[c][v].total_de_pago)).replace(",", ".")             
-                        
-                        ultima_busqueda = "&tabla=&busqueda="+busqueda+"&tipo_busqueda="+tipo_busqueda      
-                        paginator=Paginator(pago,15)
-                        page=request.GET.get('page')
-                        try:
-                            lista=paginator.page(page)
-                        except PageNotAnInteger:
-                            lista=paginator.page(1)
-                        except EmptyPage:
-                            lista=paginator.page(paginator.num_pages)
-                
-                        c = RequestContext(request, {
-                            'object_list': lista,
-                            'ultima_busqueda': ultima_busqueda,
-                            'busqueda': 'cliente',
-                        })
-                    except:
-                        c = RequestContext(request, {
-                            'object_list': [],
-                        })
-                    return HttpResponse(t.render(c))         
-                        
-                if tipo_busqueda=='fecha':
-                    try:
-                        fecha_pago_parsed = datetime.strptime(busqueda, "%d/%m/%Y").date()
-                        fecha_hasta_parsed = datetime.strptime(fecha_hasta, "%d/%m/%Y").date()
-                        object_list = PagoDeCuotas.objects.filter(fecha_de_pago__range=(fecha_pago_parsed,fecha_hasta_parsed)) 
-                    
-                        a = len(object_list)    
-                        if a > 0:
-                            for i in object_list:
-                                i.total_de_cuotas=str('{:,}'.format(i.total_de_cuotas)).replace(",", ".")
-                                i.total_de_mora=str('{:,}'.format(i.total_de_mora)).replace(",", ".")
-                                i.total_de_pago=str('{:,}'.format(i.total_de_pago)).replace(",", ".")
-               
-                        ultima_busqueda = "&tabla=&busqueda="+busqueda+"&tipo_busqueda="+tipo_busqueda      
-                        paginator=Paginator(object_list,15)
-                        page=request.GET.get('page')
-                        try:
-                            lista=paginator.page(page)
-                        except PageNotAnInteger:
-                            lista=paginator.page(1)
-                        except EmptyPage:
-                            lista=paginator.page(paginator.num_pages)
+                            i.total_de_cuotas=str('{:,}'.format(i.total_de_cuotas)).replace(",", ".")
+                            i.total_de_mora=str('{:,}'.format(i.total_de_mora)).replace(",", ".")
+                            i.total_de_pago=str('{:,}'.format(i.total_de_pago)).replace(",", ".")             
+                    ultima_busqueda = "&tabla=&busqueda="+busqueda+"&tipo_busqueda="+tipo_busqueda                 
+                except Exception, error:
+                    print error
+                    object_list= []      
+            if tipo_busqueda=='fecha':
+                try:
+                    fecha_pago = request.GET['busqueda_label']
+                    fecha_hasta = request.GET['fecha_hasta']
+                    fecha_pago_parsed = datetime.strptime(fecha_pago, "%d/%m/%Y").date()
+                    fecha_hasta_parsed = datetime.strptime(fecha_hasta, "%d/%m/%Y").date()
+                    object_list = PagoDeCuotas.objects.filter(fecha_de_pago__range=(fecha_pago_parsed,fecha_hasta_parsed)).order_by('-fecha_de_pago') 
+                    if object_list:    
+                        for i in object_list:
+                            i.total_de_cuotas=str('{:,}'.format(i.total_de_cuotas)).replace(",", ".")
+                            i.total_de_mora=str('{:,}'.format(i.total_de_mora)).replace(",", ".")
+                            i.total_de_pago=str('{:,}'.format(i.total_de_pago)).replace(",", ".")              
+                    ultima_busqueda = "&tabla=&busqueda="+busqueda+"&tipo_busqueda="+tipo_busqueda       
+                except Exception, error:
+                    print error
+                    object_list= [] 
             
-                        c = RequestContext(request, {
-                            'object_list': lista,
-                            'ultima_busqueda': ultima_busqueda,
-                        })
-                    except:
-                        c = RequestContext(request, {
-                            'object_list': [],
-                        })
-                    return HttpResponse(t.render(c))  
-        
-            except:
-                return HttpResponseServerError("Error en la ejecucion")
+            paginator=Paginator(object_list,15)
+            page=request.GET.get('page')
+            try:
+                lista=paginator.page(page)
+            except PageNotAnInteger:
+                lista=paginator.page(1)
+            except EmptyPage:
+                lista=paginator.page(paginator.num_pages)
+            
+            c = RequestContext(request, {
+                'object_list': lista,
+                'ultima_busqueda': ultima_busqueda,
+                'tipo_busqueda' : tipo_busqueda,
+                'busqueda_label' : busqueda_label,
+                'fecha_hasta' : fecha_hasta,
+                'busqueda' : busqueda                    
+            })                    
+            return HttpResponse(t.render(c))     
     else: 
         return HttpResponseRedirect("/login")
     
