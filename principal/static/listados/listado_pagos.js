@@ -9,25 +9,9 @@ function buscar() {
 			}
 		}
 	}
-
-	function desplegar_fecha() {
-		if ($("#tipo_busqueda").val() == 'fecha') {
-			$("#fecha_hasta").show();
-			$('#busqueda').mask('##/##/####');
-			$("#busqueda").datepicker({
-				dateFormat : 'dd/mm/yy'
-			});
-		} else {
-			$("#fecha_hasta").hide();
-			$("#busqueda").datepicker("destroy");
-			$("#busqueda").removeClass("hasDatepicker");
-			$("#busqueda").unmask();
-			$("#fecha_hasta").val("");
-			$("#busqueda").val("");
-		}
-	}
 	
 	function desplegar_campos() {	
+		$("#fecha_hasta").hide();
 		if ($("#tipo_busqueda").val() == 'fecha') {
 			$('#id_busqueda_label').val("");
 			$('#id_busqueda_label').unmask('');

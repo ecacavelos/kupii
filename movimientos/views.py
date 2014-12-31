@@ -569,8 +569,7 @@ def listar_transf(request):
         return HttpResponseRedirect("/login")
 
 
-def listar_busqueda_personas(request):
-    
+def listar_busqueda_personas(request):    
     if request.user.is_authenticated():
         if request.method == 'POST':
             try:
@@ -667,18 +666,14 @@ def listar_busqueda_personas(request):
 def listar_busqueda_ventas(request):    
     if request.user.is_authenticated():
         if request.method == 'GET':
-            t = loader.get_template('movimientos/listado_ventas.html')                
-            tipo_busqueda=request.GET['tipo_busqueda']
-            ultima_busqueda=""
-            busqueda_label=""
-            fecha_hasta=""
-            busqueda=""
+            t = loader.get_template('movimientos/listado_ventas.html')
+            busqueda_label = request.GET['busqueda_label']
+            fecha_hasta = request.GET['fecha_hasta']
+            busqueda = request.GET['busqueda']
+            tipo_busqueda = request.GET['tipo_busqueda']
             if tipo_busqueda=='lote':
                 try:
-                    lote = request.GET['busqueda_label']                    
-                    busqueda_label = request.GET['busqueda_label']
-                    fecha_hasta=""
-                    busqueda=""                    
+                    lote = request.GET['busqueda_label']                                    
                     x=str(lote)
                     fraccion_int = int(x[0:3])
                     manzana_int =int(x[4:7])
@@ -691,9 +686,7 @@ def listar_busqueda_ventas(request):
                     object_list = Venta.objects.filter(lote_id=lote_id.id)                    
                     if object_list:
                         for i in object_list:
-                            i.precio_final_de_venta = str('{:,}'.format(i.precio_final_de_venta)).replace(",", ".")
-                        
-                    ultima_busqueda = "&tipo_busqueda="+tipo_busqueda+"&busqueda_label="+busqueda                     
+                            i.precio_final_de_venta = str('{:,}'.format(i.precio_final_de_venta)).replace(",", ".")                     
                 except Exception, error:
                     print error
                     object_list= []
@@ -701,14 +694,10 @@ def listar_busqueda_ventas(request):
             if tipo_busqueda=='cliente':
                 try:
                     cliente_id = request.GET['busqueda']
-                    busqueda=request.GET['busqueda']
-                    busqueda_label = request.GET['busqueda_label']
-                    fecha_hasta=""
                     object_list = Venta.objects.filter(cliente_id=cliente_id)
                     if object_list:
                         for i in object_list:
-                            i.precio_final_de_venta = str('{:,}'.format(i.precio_final_de_venta)).replace(",", ".")
-                                       
+                            i.precio_final_de_venta = str('{:,}'.format(i.precio_final_de_venta)).replace(",", ".")                                       
                     ultima_busqueda = "&tabla=&cliente="+cliente_id+"&tipo_busqueda="+tipo_busqueda                
                 except Exception, error:
                     print error
@@ -716,16 +705,11 @@ def listar_busqueda_ventas(request):
            
             if tipo_busqueda=='vendedor':
                 try:
-                    vendedor_id = request.GET['busqueda']
-                    busqueda = request.GET['busqueda']
-                    busqueda_label = request.GET['busqueda_label']
-                    fecha_hasta=""
+                    vendedor_id = request.GET['busqueda']                    
                     object_list = Venta.objects.filter(vendedor_id=vendedor_id)
                     if object_list:
                         for i in object_list:
-                            i.precio_final_de_venta = str('{:,}'.format(i.precio_final_de_venta)).replace(",", ".")                   
-                        
-                    ultima_busqueda = "&tabla=&vendedor="+vendedor_id+"&tipo_busqueda="+tipo_busqueda                  
+                            i.precio_final_de_venta = str('{:,}'.format(i.precio_final_de_venta)).replace(",", ".")                                   
                 except Exception, error:
                     print error
                     object_list= []    
@@ -733,18 +717,16 @@ def listar_busqueda_ventas(request):
             if tipo_busqueda=='fecha':
                 try:
                     fecha_venta = request.GET['busqueda_label']
-                    busqueda_label=busqueda
                     fecha_hasta=request.GET['fecha_hasta']
                     fecha_venta_parsed = datetime.strptime(fecha_venta, "%d/%m/%Y").date()
                     fecha_hasta_parsed=datetime.strptime(fecha_hasta,"%d/%m/%Y").date()
                     object_list = Venta.objects.filter(fecha_de_venta__range=(fecha_venta_parsed,fecha_hasta_parsed)).order_by('-fecha_de_venta') 
                     for i in object_list:
                         i.precio_final_de_venta = str('{:,}'.format(i.precio_final_de_venta)).replace(",", ".")                                
-                            
-                    ultima_busqueda = "&tipo_busqueda="+tipo_busqueda+"&busqueda_label="+busqueda+"&fecha_hasta="+fecha_hasta+"&tabla=&venta"
                 except Exception, error:
                     print error
                     object_list= []   
+            ultima_busqueda = "&tipo_busqueda="+tipo_busqueda+"&busqueda_label="+busqueda_label+"&busqueda="+busqueda+"&fecha_hasta="+fecha_hasta
             paginator=Paginator(object_list,15)
             page=request.GET.get('page')
             try:

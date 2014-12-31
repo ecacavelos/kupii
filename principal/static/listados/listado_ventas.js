@@ -1,5 +1,5 @@
 	function buscar() {
-		if ($("#tipo_busqueda").val() == 0) {
+		if ($("#tipo_busqueda").val() == "") {
 			alert("Debe elegir un tipo de busqueda.");
 		} else {
 			if ($("#id_busqueda_label").val() == "") {
@@ -10,7 +10,9 @@
 		}
 	}	
 	
-	function desplegar_campos() {	
+	function desplegar_campos() {
+		$("#fecha_hasta").hide();
+		$("#fecha_hasta").val("");	
 		if ($("#tipo_busqueda").val() == 'fecha') {
 			$('#id_busqueda_label').val("");
 			$('#id_busqueda_label').unmask('');
@@ -27,7 +29,6 @@
 		}
 		if ($("#tipo_busqueda").val() == 'lote') {
 			$('#id_busqueda_label').val("");
-			$("#fecha_hasta").hide();
 			$("#id_busqueda_label").datepicker("destroy");
 			$("#id_busqueda_label").removeClass("hasDatepicker");
 			$('#id_busqueda_label').mask('###/###/####');

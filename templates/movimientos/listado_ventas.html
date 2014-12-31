@@ -23,18 +23,17 @@
 		};
 		// Setear idioma al calendario
 		$.datepicker.setDefaults($.datepicker.regional['es']);
-		var busqueda_label="{{busqueda_label}}";
-		var busqueda="{{busqueda}}";
-		var fecha_hasta="{{busqueda_label}}";
-		var tipo_busqueda="{{tipo_busqueda}}";
-		/*
-		$('#tipo_busqueda').val(tipo_busqueda);
-		$('#id_busqueda_label').val(busqueda_label);
-		$('#fecha_hasta').val(fecha_hasta);
-		$('#id_busqueda').val(busqueda);
-		desplegar_campos();
-		*/
-	});
+		var busqueda_label = "{{busqueda_label}}";
+		var busqueda = "{{busqueda}}";
+		var fecha_hasta = "{{busqueda_label}}";
+		var tipo_busqueda = "{{tipo_busqueda}}";
+		
+		 $('#tipo_busqueda').val(tipo_busqueda);
+		 $('#id_busqueda_label').val(busqueda_label);
+		 $('#fecha_hasta').val(fecha_hasta);
+		 $('#id_busqueda').val(busqueda);
+		 
+	}); 
 </script>
 <script type="text/javascript" src="{{ STATIC_URL }}listados/listado_ventas.js"></script>
 {% endblock %}
@@ -87,41 +86,33 @@
 	<table width="50%" cellpadding="0" cellspacing="0" class="listado-ventas" align="center">
 		<th>Venta Nro</th><th>Lote Nro</th><th>Fracci&oacute;n</th><th>Cliente</th><th>Vendedor</th><th>Fecha de Venta</th><th>Precio Final de Venta</th>
 		{% for lot in object_list %}
-			{% if forloop.counter|divisibleby:2 %}
-			<tr>
-				<td><a href="/lotes/listado/ventas/{{ lot.id }}/">{{lot.id}} <strong>(Ver Detalles)</strong></a></td>
-				<td>{{lot.lote}}</td>
-				<td>{{lot.lote.manzana.fraccion}}</td>
-				<td>{{lot.cliente}}</td>
-				<td>{{lot.vendedor}}</td>
-				<td>{{lot.fecha_de_venta}}</td>
-				<td>{{lot.precio_final_de_venta}}</td>
-			</tr>
-			{% else %}
-			<tr class="bkg_gris">
-				<td><a href="/lotes/listado/ventas/{{ lot.id }}/">{{lot.id}} <strong>(Ver Detalles)</strong></a></td>
-				<td>{{lot.lote}}</td>
-				<td>{{lot.lote.manzana.fraccion}}</td>
-				<td>{{lot.cliente}}</td>
-				<td>{{lot.vendedor}}</td>
-				<td>{{lot.fecha_de_venta}}</td>
-				<td>{{lot.precio_final_de_venta}}</td>
-			</tr>
-			{% endif %}
+		{% if forloop.counter|divisibleby:2 %}
+		<tr>
+			<td><a href="/lotes/listado/ventas/{{ lot.id }}/">{{lot.id}} <strong>(Ver Detalles)</strong></a></td>
+			<td>{{lot.lote}}</td>
+			<td>{{lot.lote.manzana.fraccion}}</td>
+			<td>{{lot.cliente}}</td>
+			<td>{{lot.vendedor}}</td>
+			<td>{{lot.fecha_de_venta}}</td>
+			<td>{{lot.precio_final_de_venta}}</td>
+		</tr>
+		{% else %}
+		<tr class="bkg_gris">
+			<td><a href="/lotes/listado/ventas/{{ lot.id }}/">{{lot.id}} <strong>(Ver Detalles)</strong></a></td>
+			<td>{{lot.lote}}</td>
+			<td>{{lot.lote.manzana.fraccion}}</td>
+			<td>{{lot.cliente}}</td>
+			<td>{{lot.vendedor}}</td>
+			<td>{{lot.fecha_de_venta}}</td>
+			<td>{{lot.precio_final_de_venta}}</td>
+		</tr>
+		{% endif %}
 		{%endfor%}
 		<div class="pagination">
-			<span class="step-links">
-				Mostrando {{ object_list.start_index }}-{{ object_list.end_index }} de {{ object_list.paginator.count }} Resultados
-				{%if object_list.has_previous%} 
-				<a href="?page={{ object_list.first_index}}{{ultimo}}"> Primera </a> 
-				<a href="?page={{ object_list.previous_page_number }}{{ultimo}}"> Anterior</a> 
-				{%endif%}
-				P&aacute;gina |{{object_list.number}}|		
-				{%if object_list.has_next%} 
-				<a href="?page={{ object_list.next_page_number }}{{ultimo}}"> Siguiente </a> 				
-				<a href="?page={{ object_list.end_index}}{{ultimo}}"> Ultima </a> 
-				{%endif%} 
-			</span>
+			<span class="step-links"> Mostrando {{ object_list.start_index }}-{{ object_list.end_index }} de {{ object_list.paginator.count }} Resultados
+				{%if object_list.has_previous%} <a href="?page={{ object_list.first_index}}{{ultimo}}"> Primera </a> <a href="?page={{ object_list.previous_page_number }}{{ultimo}}"> Anterior</a> {%endif%}
+				P&aacute;gina |{{object_list.number}}|
+				{%if object_list.has_next%} <a href="?page={{ object_list.next_page_number }}{{ultimo}}"> Siguiente </a> <a href="?page={{ object_list.end_index}}{{ultimo}}"> Ultima </a> {%endif%} </span>
 		</div>
 	</table>
 </div>
