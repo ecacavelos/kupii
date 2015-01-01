@@ -667,10 +667,11 @@ def listar_busqueda_ventas(request):
     if request.user.is_authenticated():
         if request.method == 'GET':
             t = loader.get_template('movimientos/listado_ventas.html')
+            tipo_busqueda = request.GET['tipo_busqueda']
             busqueda_label = request.GET['busqueda_label']
             fecha_hasta = request.GET['fecha_hasta']
-            busqueda = request.GET['busqueda']
-            tipo_busqueda = request.GET['tipo_busqueda']
+            busqueda = request.GET['busqueda']            
+            ultima_busqueda = "&tipo_busqueda="+tipo_busqueda+"&busqueda_label="+busqueda_label+"&busqueda="+busqueda+"&fecha_hasta="+fecha_hasta
             if tipo_busqueda=='lote':
                 try:
                     lote = request.GET['busqueda_label']                                    
@@ -697,8 +698,7 @@ def listar_busqueda_ventas(request):
                     object_list = Venta.objects.filter(cliente_id=cliente_id)
                     if object_list:
                         for i in object_list:
-                            i.precio_final_de_venta = str('{:,}'.format(i.precio_final_de_venta)).replace(",", ".")                                       
-                    ultima_busqueda = "&tabla=&cliente="+cliente_id+"&tipo_busqueda="+tipo_busqueda                
+                            i.precio_final_de_venta = str('{:,}'.format(i.precio_final_de_venta)).replace(",", ".")                                                     
                 except Exception, error:
                     print error
                     object_list= []
@@ -725,8 +725,7 @@ def listar_busqueda_ventas(request):
                         i.precio_final_de_venta = str('{:,}'.format(i.precio_final_de_venta)).replace(",", ".")                                
                 except Exception, error:
                     print error
-                    object_list= []   
-            ultima_busqueda = "&tipo_busqueda="+tipo_busqueda+"&busqueda_label="+busqueda_label+"&busqueda="+busqueda+"&fecha_hasta="+fecha_hasta
+                    object_list= []              
             paginator=Paginator(object_list,15)
             page=request.GET.get('page')
             try:
@@ -751,12 +750,12 @@ def listar_busqueda_ventas(request):
 def listar_busqueda_pagos(request):    
     if request.user.is_authenticated():
         if request.method=='GET':
-            t = loader.get_template('movimientos/listado_pagos.html')
-            tipo_busqueda=request.GET['tipo_busqueda']       
-            ultima_busqueda=""
-            busqueda_label=""
-            fecha_hasta=""
-            busqueda=""
+            t = loader.get_template('movimientos/listado_pagos.html')            
+            tipo_busqueda = request.GET['tipo_busqueda']
+            busqueda_label = request.GET['busqueda_label']
+            fecha_hasta = request.GET['fecha_hasta']
+            busqueda = request.GET['busqueda']            
+            ultima_busqueda = "&tipo_busqueda="+tipo_busqueda+"&busqueda_label="+busqueda_label+"&busqueda="+busqueda+"&fecha_hasta="+fecha_hasta
             if tipo_busqueda=='lote':
                 try:
                     lote = request.GET['busqueda_label']       
@@ -774,8 +773,7 @@ def listar_busqueda_pagos(request):
                         for i in object_list:
                             i.total_de_cuotas=str('{:,}'.format(i.total_de_cuotas)).replace(",", ".")
                             i.total_de_mora=str('{:,}'.format(i.total_de_mora)).replace(",", ".")
-                            i.total_de_pago=str('{:,}'.format(i.total_de_pago)).replace(",", ".")                        
-                    ultima_busqueda = "&tabla=&busqueda="+busqueda+"&tipo_busqueda="+tipo_busqueda                       
+                            i.total_de_pago=str('{:,}'.format(i.total_de_pago)).replace(",", ".")                                             
                 except Exception, error:
                     print error
                     object_list= []   
@@ -788,10 +786,11 @@ def listar_busqueda_pagos(request):
                             i.total_de_cuotas=str('{:,}'.format(i.total_de_cuotas)).replace(",", ".")
                             i.total_de_mora=str('{:,}'.format(i.total_de_mora)).replace(",", ".")
                             i.total_de_pago=str('{:,}'.format(i.total_de_pago)).replace(",", ".")             
-                    ultima_busqueda = "&tabla=&busqueda="+busqueda+"&tipo_busqueda="+tipo_busqueda                 
                 except Exception, error:
                     print error
-                    object_list= []      
+                    print i.id
+                    pass
+                    #object_list= []      
             if tipo_busqueda=='fecha':
                 try:
                     fecha_pago = request.GET['busqueda_label']
@@ -804,7 +803,6 @@ def listar_busqueda_pagos(request):
                             i.total_de_cuotas=str('{:,}'.format(i.total_de_cuotas)).replace(",", ".")
                             i.total_de_mora=str('{:,}'.format(i.total_de_mora)).replace(",", ".")
                             i.total_de_pago=str('{:,}'.format(i.total_de_pago)).replace(",", ".")              
-                    ultima_busqueda = "&tabla=&busqueda="+busqueda+"&tipo_busqueda="+tipo_busqueda       
                 except Exception, error:
                     print error
                     object_list= [] 
