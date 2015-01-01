@@ -506,17 +506,19 @@ def listar_rec(request):
         return HttpResponseRedirect("/login")
     
 #Funcion para obtener el listado de los lotes reservados.        
-def listar_res(request):
-    
+def listar_res(request):    
     if request.user.is_authenticated():
         t = loader.get_template('movimientos/listado_reservas.html')
         try:
-            object_list = Reserva.objects.all().order_by('id')
-            a = len(object_list)
-            if a>0:
+            object_list = Reserva.objects.all().order_by('id','fecha_de_reserva')
+            if object_list:
                 for i in object_list:
-                    if(i.fecha_de_reserva!=None):
+                    try:
                         i.fecha_de_reserva=i.fecha_de_reserva.strftime("%d/%m/%Y")
+                    except Exception, error:
+                        print error
+                        print i.id
+                        pass
             paginator=Paginator(object_list,15)
             page=request.GET.get('page')
             try:
