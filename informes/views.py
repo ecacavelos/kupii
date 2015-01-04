@@ -678,9 +678,10 @@ def liquidacion_vendedores(request):
                     cuota={}
                     com=0        
                     #Esta es una regla de negocio, los vendedores cobran comisiones segun el numero de cuota, maximo hasta la cuota Nro 9.
+                    #Si el plan de pago tiene hasta 12 cuotas, los vendedores cobran una comision sobre todas las cuotas.
                     cuotas_para_vendedor=((cuota_item.plan_de_pago_vendedores.cantidad_cuotas)*(cuota_item.plan_de_pago_vendedores.intervalos))-cuota_item.plan_de_pago_vendedores.cuota_inicial                  
                     #A los vendedores le corresponde comision por las primeras 4 (maximo 5) cuotas impares.
-                    if(nro_cuota%2!=0 and nro_cuota<=cuotas_para_vendedor):                                                                        
+                    if( (nro_cuota%2!=0 and nro_cuota<=cuotas_para_vendedor) or (cuota_item.plan_de_pago.cantidad_de_cuotas<=12 and nro_cuota<=12) ):                                                                        
                         if k==0:
                             #Guardamos la primera fraccion que cumple con la condicion, para tener algo con que comparar.
                             fraccion_actual=cuota_item.lote.manzana.fraccion.id
