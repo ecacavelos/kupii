@@ -244,7 +244,7 @@ def clientes_atrasados(request):
                 cursor = connection.cursor()
                 cursor.execute(query, [meses_peticion])  
             else:
-                fraccion = request['fraccion']
+                fraccion = request.GET['fraccion']
                 meses_peticion = int(request.GET['meses_atraso'])
                 query += "AND pm.fraccion_id =  %s"
                 cursor = connection.cursor()
