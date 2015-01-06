@@ -796,32 +796,113 @@ def liquidacion_gerentes(request):
                 fecha_fin = request.GET['fecha_fin']
                 fecha_ini_parsed = datetime.strptime(fecha_ini, "%d/%m/%Y").date()
                 fecha_fin_parsed = datetime.strptime(fecha_fin, "%d/%m/%Y").date()
-                lista_pagos = PagoDeCuotas.objects.filter(fecha_de_pago__range=[fecha_ini_parsed, fecha_fin_parsed])
+                lista_pagos = PagoDeCuotas.objects.filter(fecha_de_pago__range=[fecha_ini_parsed, fecha_fin_parsed]).order_by('vendedor')
                 if tipo_liquidacion == 'gerente_ventas':
                     tipo_gerente="Gerente de Ventas"
                 if tipo_liquidacion == 'gerente_admin':
                     tipo_gerente="Gerente Administrativo"
+                
+                #totales por vendedor
+                total_importe=0
+                total_comision=0
+                
                 #totales generales
                 total_general_importe=0
                 total_general_comision=0
                 k=0 #variable de control
+                cuotas=[]
                 #Seteamos los datos de las filas
                 for i, cuota_item in enumerate (lista_pagos):                
                     nro_cuota=get_nro_cuota(cuota_item)
+                    cuota={}
                     com=0        
                     #Esta es una regla de negocio, los vendedores cobran comisiones segun el numero de cuota, maximo hasta la cuota Nro 9.
+                    #Si el plan de pago tiene hasta 12 cuotas, los vendedores cobran una comision sobre todas las cuotas.
                     cuotas_para_vendedor=((cuota_item.plan_de_pago_vendedores.cantidad_cuotas)*(cuota_item.plan_de_pago_vendedores.intervalos))-cuota_item.plan_de_pago_vendedores.cuota_inicial                  
                     #A los vendedores le corresponde comision por las primeras 4 (maximo 5) cuotas impares.
-                    if(nro_cuota%2!=0 and nro_cuota<=cuotas_para_vendedor):                                                                        
-                        com=int(cuota_item.total_de_cuotas*(float(cuota_item.plan_de_pago_vendedores.porcentaje_de_cuotas)/float(100)))
+                    if( (nro_cuota%2!=0 and nro_cuota<=cuotas_para_vendedor) or (cuota_item.plan_de_pago.cantidad_de_cuotas<=12 and nro_cuota<=12) ):                                                                        
+                        if k==0:
+                            #Guardamos el vendedor asociado a la primera cuota que cumple con la condicion, para tener algo con que comparar.
+                            vendedor_actual=cuota_item.vendedor.id
+                        k+=1
+                        #print k
+                        if(cuota_item.vendedor.id==vendedor_actual):                              
+                            #comision de las cuotas
+                            com=int(cuota_item.total_de_cuotas*(float(cuota_item.plan_de_pago_vendedores.porcentaje_de_cuotas)/float(100)))
+                            if(cuota_item.venta.entrega_inicial):
+                                #comision de la entrega inicial, si la hubiere
+                                com_inicial=int(cuota_item.venta.entrega_inicial*(float(cuota_item.plan_de_pago_vendedores.porcentaje_cuota_inicial)/float(100)))
+                                cuota['concepto']="Entrega Inicial"
+                                cuota['cuota_nro']=str(0)+'/'+str(cuota_item.plan_de_pago.cantidad_de_cuotas)
+                                cuota['comision']=str('{:,}'.format(com_inicial)).replace(",", ".")
+                            else:
+                                cuota['concepto']="Pago de Cuota" 
+                                cuota['cuota_nro']=str(nro_cuota)+'/'+str(cuota_item.plan_de_pago.cantidad_de_cuotas)
+                                cuota['comision']=str('{:,}'.format(com)).replace(",", ".")
+                            cuota['fraccion']=str(cuota_item.lote.manzana.fraccion)
+                            cuota['vendedor']=str(cuota_item.vendedor)
+                            cuota['fraccion_id']=cuota_item.lote.manzana.fraccion.id
+                            cuota['lote']=str(cuota_item.lote)
+                            cuota['fecha_pago']=str(cuota_item.fecha_de_pago)
+                            cuota['importe']=str('{:,}'.format(cuota_item.total_de_cuotas)).replace(",", ".")   
+    
+                            #Sumamos los totales por vendedor
+                            total_importe+=cuota_item.total_de_cuotas
+                            total_comision+=com
+                            #Guardamos el ultimo lote que cumple la condicion en dos variables, por si se convierta en el ultimo lote para cerrar la fraccion
+                            #actual, o por si sea el ultimo lote de la lista.
+                            anterior=cuota                            
+                            ultimo=cuota                       
+                        #Hay cambio de lote pero NO es el ultimo elemento todavia
+                        else:                                                                                              
+                            com=int(cuota_item.total_de_cuotas*(float(cuota_item.plan_de_pago_vendedores.porcentaje_de_cuotas)/float(100)))
+                            if(cuota_item.venta.entrega_inicial):
+                                #comision de la entrega inicial, si la hubiere
+                                com_inicial=int(cuota_item.venta.entrega_inicial*(float(cuota_item.plan_de_pago_vendedores.porcentaje_cuota_inicial)/float(100)))
+                                cuota['concepto']="Entrega Inicial"
+                                cuota['cuota_nro']=str(0)+'/'+str(cuota_item.plan_de_pago.cantidad_de_cuotas)
+                                cuota['comision']=str('{:,}'.format(com_inicial)).replace(",", ".")
+                            else:
+                                cuota['concepto']="Pago de Cuota" 
+                                cuota['cuota_nro']=str(nro_cuota)+'/'+str(cuota_item.plan_de_pago.cantidad_de_cuotas)
+                                cuota['comision']=str('{:,}'.format(com)).replace(",", ".")
+                            cuota['fraccion']=str(cuota_item.lote.manzana.fraccion)
+                            cuota['vendedor']=str(cuota_item.vendedor)
+                            cuota['fraccion_id']=cuota_item.lote.manzana.fraccion.id
+                            cuota['lote']=str(cuota_item.lote)
+                            cuota['fecha_pago']=str(cuota_item.fecha_de_pago)
+                            cuota['importe']=str('{:,}'.format(cuota_item.total_de_cuotas)).replace(",", ".")
+                            cuota['total_importe']=str('{:,}'.format(total_importe)).replace(",", ".")
+                            cuota['total_comision']=str('{:,}'.format(total_comision)).replace(",", ".") 
+                            
+                            #Se CERAN  los TOTALES por VENDEDOR                          
+                            total_importe=0
+                            total_comision=0                                        
+                            
+                            #Sumamos los totales por fraccion
+                            total_importe+=cuota_item.total_de_cuotas
+                            total_comision+=com 
+                            vendedor_actual=cuota_item.vendedor.id
+                            ultimo=cuota
                         total_general_importe+=cuota_item.total_de_cuotas
-                        total_general_comision+=com                    
-                
+                        total_general_comision+=com
+                        cuotas.append(cuota)                        
+                    #Si es el ultimo lote, cerramos totales de fraccion
+                    if (len(lista_pagos)-1 == i):
+                        try:
+                            ultimo['total_importe']=str('{:,}'.format(total_importe)).replace(",", ".") 
+                            ultimo['total_comision']=str('{:,}'.format(total_comision)).replace(",", ".")             
+                            ultimo['total_general_importe']=str('{:,}'.format(total_general_importe)).replace(",", ".") 
+                            ultimo['total_general_comision']=str('{:,}'.format(total_general_comision)).replace(",", ".")          
+                        except:
+                            pass
+                                     
                 monto_calculado=int(math.ceil((float(total_general_importe)*float(0.1))/float(2)))   
                 monto_calculado=str('{:,}'.format(monto_calculado)).replace(",", ".")
         
             c = RequestContext(request, {
                 'monto_calculado' : monto_calculado,
+                'cuotas' : cuotas,
                 'fecha_' : fecha,
                 'tipo_liquidacion' : tipo_liquidacion,
                 'tipo_gerente' : tipo_gerente
