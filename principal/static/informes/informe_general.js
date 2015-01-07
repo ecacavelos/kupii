@@ -4,7 +4,7 @@ function retrieve_informe_general() {
 		}
 		
 		if($('#id_tipo_busqueda').val()=='codigo'){
-			window.location.href = "/informes/informe_general_reporte_excel?fraccion_ini=" + $('#fecha_ini').val() + "&fecha_fin=" + $('#fecha_fin').val() + "&fraccion_ini=" + $('#id_fraccion_ini').val() + "&fraccion_fin=" + $('#id_fraccion_fin').val();
+			window.location.href = "/informes/informe_general_reporte_excel?fecha_ini=" + $('#fecha_ini').val() + "&fecha_fin=" + $('#fecha_fin').val() + "&fraccion_ini=" + $('#id_fraccion_ini').val() + "&fraccion_fin=" + $('#id_fraccion_fin').val();
 		}
 		
 	}

@@ -1,5 +1,5 @@
 function retrieve_liquidacion_gerentes() {
-	window.location.href = "/informes/liquidacion_gerentes_reporte_excel?fecha_ini=" + $('#fecha_ini').val() + "&fecha_fin=" + $('#fecha_fin').val() + "&fraccion=" + $('#id_fraccion').val();
+	window.location.href = "/informes/liquidacion_gerentes_reporte_excel?fecha_ini=" + $('#fecha_ini').val() + "&fecha_fin=" + $('#fecha_fin').val() + "&tipo_liquidacion=" + $('#id_tipo_liquidacion').val();
 
 }
 

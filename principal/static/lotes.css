@@ -136,12 +136,7 @@ table.listado-clientes-atrasados tr td {
 }
 
 table.listado-clientes-atrasados tr th {
-	/*font-size:16px;
-	font-weight:400;
-	text-align:center;
-	background-color:#02B06B;
-	color:#FFF*/
-	padding: 10px 10px 10px 10px;
+	padding: 10px 10px 10px 20px;
 	font-size:16px;
 	font-weight:400;
 	text-align:center;

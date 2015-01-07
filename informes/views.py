@@ -218,8 +218,8 @@ def clientes_atrasados(request):
             fraccion =''
             query = (
             '''
-            SELECT pm.nro_manzana manzana, pl.nro_lote lote, pc.nombres || ' ' || apellidos cliente, (pp.cantidad_de_cuotas - pv.pagos_realizados) cuotas_atrasadas,
-            pv.pagos_realizados cuotas_pagadas, pv.precio_de_cuota importe_cuota, (pp.cantidad_de_cuotas - pv.pagos_realizados) * pv.precio_de_cuota total_atrasado,
+            SELECT pm.nro_manzana manzana, pl.nro_lote lote, pl.id lote_id, pc.id, pc.nombres || ' ' || apellidos cliente, (pp.cantidad_de_cuotas - pv.pagos_realizados) cuotas_atrasadas,
+            pv.pagos_realizados cuotas_pagadas, pv.precio_de_cuota importe_cuota,
             (pv.pagos_realizados * pv.precio_de_cuota) total_pagado, pp.cantidad_de_cuotas * pv.precio_de_cuota valor_total_lote,
             (pv.pagos_realizados*100/pp.cantidad_de_cuotas) porc_pagado
             FROM principal_lote pl, principal_cliente pc, principal_venta pv, principal_manzana pm, principal_plandepago pp  
@@ -260,16 +260,13 @@ def clientes_atrasados(request):
                     while i < len(desc):
                         cliente_atrasado[desc[i][0]] = r[i]
                         i = i+1
-                    try:
-                        ultimo_pago = PagoDeCuotas.objects.filter(lote__nro_lote= cliente_atrasado['lote']).order_by('-fecha_de_pago')[:1].get()
+                    try:                        
+                        ultimo_pago = PagoDeCuotas.objects.filter(cliente_id= cliente_atrasado['id']).order_by('-fecha_de_pago')[:1].get()
                     except PagoDeCuotas.DoesNotExist:
                         ultimo_pago = None
                         
                     if ultimo_pago != None:
-                        fecha_ultimo_pago = ultimo_pago.fecha_de_pago
-                    
-                    cliente_atrasado['fecha_ultimo_pago']= fecha_ultimo_pago
-                    
+                        fecha_ultimo_pago = ultimo_pago.fecha_de_pago         
                     
                     f1 = fecha_actual.date()
                     f2 = fecha_ultimo_pago
@@ -287,6 +284,15 @@ def clientes_atrasados(request):
                     else:
                         print ("Venta no agregada")
                         print (" ")
+                        
+                    #Seteamos los campos restantes
+                    total_atrasado = meses_diferencia * cliente_atrasado['importe_cuota']
+                    cliente_atrasado['fecha_ultimo_pago']= fecha_ultimo_pago.strftime("%Y-%m-%d")
+                    cliente_atrasado['lote']=(str(cliente_atrasado['manzana']).zfill(3) + "/" + str(cliente_atrasado['lote']).zfill(4))
+                    cliente_atrasado['total_atrasado'] = str('{:,}'.format(total_atrasado)).replace(",", ".")
+                    cliente_atrasado['importe_cuota'] = str('{:,}'.format(cliente_atrasado['importe_cuota'])).replace(",", ".")
+                    cliente_atrasado['total_pagado'] = str('{:,}'.format(cliente_atrasado['total_pagado'])).replace(",", ".")
+                    cliente_atrasado['valor_total_lote'] = str('{:,}'.format(cliente_atrasado['valor_total_lote'])).replace(",", ".") 
                 if meses_peticion == 0:
                     meses_peticion =''  
                 a = len(clientes_atrasados)
@@ -1359,22 +1365,18 @@ def clientes_atrasados_reporte_excel(request):
     meses_peticion = 0
     fraccion =''
     query = (
-    '''
-    SELECT pm.nro_manzana manzana, pl.nro_lote lote, pc.nombres || ' ' || apellidos cliente, (pp.cantidad_de_cuotas - pv.pagos_realizados) cuotas_atrasadas,
-    pv.pagos_realizados cuotas_pagadas, pv.precio_de_cuota importe_cuota, (pp.cantidad_de_cuotas - pv.pagos_realizados) * pv.precio_de_cuota total_atrasado,
-    (pv.pagos_realizados * pv.precio_de_cuota) total_pagado, pp.cantidad_de_cuotas * pv.precio_de_cuota valor_total_lote,
-    (pv.pagos_realizados*100/pp.cantidad_de_cuotas) porc_pagado
-    FROM principal_lote pl, principal_cliente pc, principal_venta pv, principal_manzana pm, principal_plandepago pp  
-    WHERE pv.plan_de_pago_id = pp.id AND pv.lote_id = pl.id AND pv.cliente_id = pc.id
-    AND (pp.cantidad_de_cuotas - pv.pagos_realizados) > 0 AND pl.manzana_id = pm.id AND pp.tipo_de_plan='credito'
-    '''
+            '''
+            SELECT pm.nro_manzana manzana, pl.nro_lote lote, pl.id lote_id, pc.id, pc.nombres || ' ' || apellidos cliente, (pp.cantidad_de_cuotas - pv.pagos_realizados) cuotas_atrasadas,
+            pv.pagos_realizados cuotas_pagadas, pv.precio_de_cuota importe_cuota,
+            (pv.pagos_realizados * pv.precio_de_cuota) total_pagado, pp.cantidad_de_cuotas * pv.precio_de_cuota valor_total_lote,
+            (pv.pagos_realizados*100/pp.cantidad_de_cuotas) porc_pagado
+            FROM principal_lote pl, principal_cliente pc, principal_venta pv, principal_manzana pm, principal_plandepago pp  
+            WHERE pv.plan_de_pago_id = pp.id AND pv.lote_id = pl.id AND pv.cliente_id = pc.id
+            AND (pp.cantidad_de_cuotas - pv.pagos_realizados) > 0 AND pl.manzana_id = pm.id AND pp.tipo_de_plan='credito'
+            '''
     )      
     if filtros == 0:
-        meses_peticion = 0
-        c = RequestContext(request, {
-            'object_list': [],
-        })
-        return HttpResponse(t.render(c))            
+        meses_peticion = 0               
     elif filtros == 1:
         fraccion = request.GET['fraccion']
         query += "AND  pm.fraccion_id =  %s"
@@ -1386,87 +1388,86 @@ def clientes_atrasados_reporte_excel(request):
         cursor = connection.cursor()
         cursor.execute(query, [meses_peticion])  
     else:
-        fraccion = request['fraccion']
+        fraccion = request.GET['fraccion']
         meses_peticion = int(request.GET['meses_atraso'])
         query += "AND pm.fraccion_id =  %s"
         cursor = connection.cursor()
         cursor.execute(query, [fraccion]) 
-    
-    try:
-        dias = meses_peticion*30
-        results= cursor.fetchall()
-        desc = cursor.description
-        for r in results:
-            i = 0
-            cliente_atrasado = {}
-            while i < len(desc):
-                cliente_atrasado[desc[i][0]] = r[i]
-                i = i+1
-            try:
-                ultimo_pago = PagoDeCuotas.objects.filter(lote__nro_lote= cliente_atrasado['lote']).order_by('-fecha_de_pago')[:1].get()
-            except PagoDeCuotas.DoesNotExist:
-                ultimo_pago = None
-                
-            if ultimo_pago != None:
-                fecha_ultimo_pago = ultimo_pago.fecha_de_pago
             
-            cliente_atrasado['fecha_ultimo_pago']= fecha_ultimo_pago
-            
-            
-            f1 = fecha_actual.date()
-            f2 = fecha_ultimo_pago
-            diferencia = (f1-f2).days
-            meses_diferencia =  int(diferencia /30)
-            #En el caso de que las cuotas que debe son menores a la diferencia de meses de la fecha de ultimo pago y la actual
-            if meses_diferencia > cliente_atrasado['cuotas_atrasadas']:
-                meses_diferencia = cliente_atrasado['cuotas_atrasadas']
-                
-            if meses_diferencia >= meses_peticion:
-                cliente_atrasado['cuotas_atrasadas'] = meses_diferencia                           
-                clientes_atrasados.append(cliente_atrasado)                  
-                print ("Venta agregada")
-                print (" ")
-            else:
-                print ("Venta no agregada")
-                print (" ")
-        if meses_peticion == 0:
-            meses_peticion =''  
-        a = len(clientes_atrasados)
-    except Exception, error:
-        print error    
-        return HttpResponseServerError("No se pudo obtener el Listado de Clientes Atrasados.")
-                  
-    if a > 0:
-        # a=len(object_list)
-        sheet.write(0, 0, "Manzana", style)
+        try:
+            dias = meses_peticion*30
+            results= cursor.fetchall()
+            desc = cursor.description
+            for r in results:
+                i = 0
+                cliente_atrasado = {}
+                while i < len(desc):
+                    cliente_atrasado[desc[i][0]] = r[i]
+                    i = i+1
+                try:                        
+                    ultimo_pago = PagoDeCuotas.objects.filter(cliente_id= cliente_atrasado['id']).order_by('-fecha_de_pago')[:1].get()
+                except PagoDeCuotas.DoesNotExist:
+                    ultimo_pago = None
+                    
+                if ultimo_pago != None:
+                    fecha_ultimo_pago = ultimo_pago.fecha_de_pago         
+                    
+                f1 = fecha_actual.date()
+                f2 = fecha_ultimo_pago
+                diferencia = (f1-f2).days
+                meses_diferencia =  int(diferencia /30)
+                #En el caso de que las cuotas que debe son menores a la diferencia de meses de la fecha de ultimo pago y la actual
+                if meses_diferencia > cliente_atrasado['cuotas_atrasadas']:
+                    meses_diferencia = cliente_atrasado['cuotas_atrasadas']
+                        
+                if meses_diferencia >= meses_peticion:
+                    cliente_atrasado['cuotas_atrasadas'] = meses_diferencia                           
+                    clientes_atrasados.append(cliente_atrasado)                  
+                    print ("Venta agregada")
+                    print (" ")
+                else:
+                    print ("Venta no agregada")
+                    print (" ")
+                        
+                #Seteamos los campos restantes
+                total_atrasado = meses_diferencia * cliente_atrasado['importe_cuota']
+                cliente_atrasado['fecha_ultimo_pago']= datetime.strptime(str(fecha_ultimo_pago), "%Y-%m-%d").date()
+                cliente_atrasado['lote']=(str(cliente_atrasado['manzana']).zfill(3) + "/" + str(cliente_atrasado['lote']).zfill(4))
+                cliente_atrasado['total_atrasado'] = str('{:,}'.format(total_atrasado)).replace(",", ".")
+                cliente_atrasado['importe_cuota'] = str('{:,}'.format(cliente_atrasado['importe_cuota'])).replace(",", ".")
+                cliente_atrasado['total_pagado'] = str('{:,}'.format(cliente_atrasado['total_pagado'])).replace(",", ".")
+                cliente_atrasado['valor_total_lote'] = str('{:,}'.format(cliente_atrasado['valor_total_lote'])).replace(",", ".") 
+            if meses_peticion == 0:
+                meses_peticion =''  
+        
+        except Exception, error:
+            print error    
+            return HttpResponseServerError("No se pudo obtener el Listado de Clientes Atrasados.")              
+    if clientes_atrasados:        
+        sheet.write(0, 0, "Cliente", style)
         sheet.write(0, 1, "Lote", style)
-        sheet.write(0, 2, "Cliente", style)
-        sheet.write(0, 3, "Cuotas Atras.", style)
-        sheet.write(0, 4, "Cuotas Pagadas", style)
-        sheet.write(0, 5, "Importe c/ cuota", style)
-        sheet.write(0, 6, "Total Atrasado", style)
-        sheet.write(0, 7, "Total Pagado", style)
-        sheet.write(0, 8, "Valor Total del Lote", style)
-        sheet.write(0, 9, "% Pagado", style)
-        sheet.write(0, 10, "Fec. Ult. Pago", style)
+        sheet.write(0, 2, "Cuotas Atras.", style)
+        sheet.write(0, 3, "Cuotas Pagadas", style)
+        sheet.write(0, 4, "Importe c/ cuota", style)
+        sheet.write(0, 5, "Total Atrasado", style)
+        sheet.write(0, 6, "Total Pagado", style)
+        sheet.write(0, 7, "Valor Total del Lote", style)
+        sheet.write(0, 8, "% Pagado", style)
+        sheet.write(0, 9, "Fec. Ult. Pago", style)
         i = 0
         c = 1
         for i in range(len(clientes_atrasados)):        
-            sheet.write(c, 0, str(clientes_atrasados[i]['manzana']))
+            sheet.write(c, 0, str(clientes_atrasados[i]['cliente']))
             sheet.write(c, 1, str(clientes_atrasados[i]['lote']))
-            sheet.write(c, 2, str(clientes_atrasados[i]['cliente']))
-            sheet.write(c, 3, str(clientes_atrasados[i]['cuotas_atrasadas']))
-            sheet.write(c, 4, str(clientes_atrasados[i]['cuotas_pagadas']))
-            sheet.write(c, 5, str(clientes_atrasados[i]['importe_cuota']))
-            sheet.write(c, 6, str(clientes_atrasados[i]['total_atrasado']))
-            sheet.write(c, 7, str(clientes_atrasados[i]['total_pagado']))
-            sheet.write(c, 8, str(clientes_atrasados[i]['valor_total_lote']))
-            sheet.write(c, 9, str(clientes_atrasados[i]['porc_pagado']))
-            sheet.write(c, 10,str(clientes_atrasados[i]['fecha_ultimo_pago']))
+            sheet.write(c, 2, str(clientes_atrasados[i]['cuotas_atrasadas']))
+            sheet.write(c, 3, str(clientes_atrasados[i]['cuotas_pagadas']))
+            sheet.write(c, 4, str(clientes_atrasados[i]['importe_cuota']))
+            sheet.write(c, 5, str(clientes_atrasados[i]['total_atrasado']))
+            sheet.write(c, 6, str(clientes_atrasados[i]['total_pagado']))
+            sheet.write(c, 7, str(clientes_atrasados[i]['valor_total_lote']))
+            sheet.write(c, 8, str(clientes_atrasados[i]['porc_pagado']))
+            sheet.write(c, 9,str(clientes_atrasados[i]['fecha_ultimo_pago']))
             c += 1
-        
-    else:
-        lista = clientes_atrasados
     response = HttpResponse(content_type='application/vnd.ms-excel')
     # Crear un nombre intuitivo         
     response['Content-Disposition'] = 'attachment; filename=' + 'clientes_atrasados.xls'
@@ -1989,47 +1990,115 @@ def liquidacion_vendedores_reporte_excel(request):
     wb.save(response)
     return response 
 
-def liquidacion_gerentes_reporte_excel(request): 
-     
+def liquidacion_gerentes_reporte_excel(request):      
+    tipo_liquidacion = request.GET['tipo_liquidacion']
     fecha_ini = request.GET['fecha_ini']
     fecha_fin = request.GET['fecha_fin']
-    fecha_ini_parsed = str(datetime.strptime(fecha_ini, "%d/%m/%Y").date())
-    fecha_fin_parsed = str(datetime.strptime(fecha_fin, "%d/%m/%Y").date())
-    fraccion_id = request.GET['fraccion']
-    
-    
-    query = (
-    '''
-    select pc.* from principal_pagodecuotas pc, principal_lote l, principal_manzana m, principal_fraccion f
-    where pc.fecha_de_pago >= \'''' + fecha_ini_parsed + 
-    '''\' and pc.fecha_de_pago <= \'''' + fecha_fin_parsed + 
-    '''\' and f.id=''' + fraccion_id + 
-    ''' 
-    and (pc.lote_id = l.id and l.manzana_id=m.id and m.fraccion_id=f.id) order by f.id,pc.fecha_de_pago
-    '''
-    )
-        
-        
-    object_list = list(PagoDeCuotas.objects.raw(query))
-    a=len(object_list)
+#     fecha_ini_parsed = datetime.strptime(fecha_ini, "%d/%m/%Y").date()
+#     fecha_fin_parsed = datetime.strptime(fecha_fin, "%d/%m/%Y").date()
+    lista_pagos = PagoDeCuotas.objects.filter(fecha_de_pago__range=[fecha_ini, fecha_fin]).order_by('vendedor')
+    if tipo_liquidacion == 'gerente_ventas':
+        tipo_gerente="Gerente de Ventas"
+    if tipo_liquidacion == 'gerente_admin':
+        tipo_gerente="Gerente Administrativo"
+                
+    #totales por vendedor
+    total_importe=0
+    total_comision=0
+                
+    #totales generales
+    total_general_importe=0
+    total_general_comision=0
+    k=0 #variable de control
     cuotas=[]
     #Seteamos los datos de las filas
-    for i, cuota_item in enumerate (object_list):
+    for i, cuota_item in enumerate (lista_pagos):                
         nro_cuota=get_nro_cuota(cuota_item)
         cuota={}
-        monto_gerente=0
-        if(nro_cuota%2!=0 and nro_cuota<=cuota_item.plan_de_pago_vendedores.cantidad_cuotas):
-            monto_gerente=int(cuota_item.total_de_cuotas*(float(cuota_item.plan_de_pago.porcentaje_cuotas_gerente)/float(100)))
-        cuota['fraccion']=str(cuota_item.lote.manzana.fraccion)
-        cuota['cliente']=str(cuota_item.cliente)
-        cuota['fraccion_id']=cuota_item.lote.manzana.fraccion.id
-        cuota['lote']=str(cuota_item.lote)
-        cuota['cuota_nro']=str(nro_cuota)+'/'+str(cuota_item.plan_de_pago.cantidad_de_cuotas)
-        cuota['fecha_pago']=str(cuota_item.fecha_de_pago)
-        cuota['monto_pagado']=cuota_item.total_de_cuotas
-        cuota['monto_gerente']=monto_gerente
-                        
-        cuotas.append(cuota)
+        com=0        
+        #Esta es una regla de negocio, los vendedores cobran comisiones segun el numero de cuota, maximo hasta la cuota Nro 9.
+        #Si el plan de pago tiene hasta 12 cuotas, los vendedores cobran una comision sobre todas las cuotas.
+        cuotas_para_vendedor=((cuota_item.plan_de_pago_vendedores.cantidad_cuotas)*(cuota_item.plan_de_pago_vendedores.intervalos))-cuota_item.plan_de_pago_vendedores.cuota_inicial                  
+        #A los vendedores le corresponde comision por las primeras 4 (maximo 5) cuotas impares.
+        if( (nro_cuota%2!=0 and nro_cuota<=cuotas_para_vendedor) or (cuota_item.plan_de_pago.cantidad_de_cuotas<=12 and nro_cuota<=12) ):                                                                        
+            if k==0:
+                #Guardamos el vendedor asociado a la primera cuota que cumple con la condicion, para tener algo con que comparar.
+                vendedor_actual=cuota_item.vendedor.id
+            k+=1
+            #print k
+            if(cuota_item.vendedor.id==vendedor_actual):                              
+                #comision de las cuotas
+                com=int(cuota_item.total_de_cuotas*(float(cuota_item.plan_de_pago_vendedores.porcentaje_de_cuotas)/float(100)))
+                if(cuota_item.venta.entrega_inicial):
+                    #comision de la entrega inicial, si la hubiere
+                    com_inicial=int(cuota_item.venta.entrega_inicial*(float(cuota_item.plan_de_pago_vendedores.porcentaje_cuota_inicial)/float(100)))
+                    cuota['concepto']="Entrega Inicial"
+                    cuota['cuota_nro']=str(0)+'/'+str(cuota_item.plan_de_pago.cantidad_de_cuotas)
+                    cuota['comision']=str('{:,}'.format(com_inicial)).replace(",", ".")
+                else:
+                    cuota['concepto']="Pago de Cuota" 
+                    cuota['cuota_nro']=str(nro_cuota)+'/'+str(cuota_item.plan_de_pago.cantidad_de_cuotas)
+                    cuota['comision']=str('{:,}'.format(com)).replace(",", ".")
+                cuota['fraccion']=str(cuota_item.lote.manzana.fraccion)
+                cuota['vendedor']=str(cuota_item.vendedor)
+                cuota['fraccion_id']=cuota_item.lote.manzana.fraccion.id
+                cuota['lote']=str(cuota_item.lote)
+                cuota['fecha_pago']=str(cuota_item.fecha_de_pago)
+                cuota['importe']=str('{:,}'.format(cuota_item.total_de_cuotas)).replace(",", ".")   
+
+                #Sumamos los totales por vendedor
+                total_importe+=cuota_item.total_de_cuotas
+                total_comision+=com
+                #Guardamos el ultimo lote que cumple la condicion en dos variables, por si se convierta en el ultimo lote para cerrar la fraccion
+                #actual, o por si sea el ultimo lote de la lista.
+                anterior=cuota                            
+                ultimo=cuota                       
+            #Hay cambio de lote pero NO es el ultimo elemento todavia
+            else:                                                                                              
+                com=int(cuota_item.total_de_cuotas*(float(cuota_item.plan_de_pago_vendedores.porcentaje_de_cuotas)/float(100)))
+                if(cuota_item.venta.entrega_inicial):
+                    #comision de la entrega inicial, si la hubiere
+                    com_inicial=int(cuota_item.venta.entrega_inicial*(float(cuota_item.plan_de_pago_vendedores.porcentaje_cuota_inicial)/float(100)))
+                    cuota['concepto']="Entrega Inicial"
+                    cuota['cuota_nro']=str(0)+'/'+str(cuota_item.plan_de_pago.cantidad_de_cuotas)
+                    cuota['comision']=str('{:,}'.format(com_inicial)).replace(",", ".")
+                else:
+                    cuota['concepto']="Pago de Cuota" 
+                    cuota['cuota_nro']=str(nro_cuota)+'/'+str(cuota_item.plan_de_pago.cantidad_de_cuotas)
+                    cuota['comision']=str('{:,}'.format(com)).replace(",", ".")
+                cuota['fraccion']=str(cuota_item.lote.manzana.fraccion)
+                cuota['vendedor']=str(cuota_item.vendedor)
+                cuota['fraccion_id']=cuota_item.lote.manzana.fraccion.id
+                cuota['lote']=str(cuota_item.lote)
+                cuota['fecha_pago']=str(cuota_item.fecha_de_pago)
+                cuota['importe']=str('{:,}'.format(cuota_item.total_de_cuotas)).replace(",", ".")
+                cuota['total_importe']=str('{:,}'.format(total_importe)).replace(",", ".")
+                cuota['total_comision']=str('{:,}'.format(total_comision)).replace(",", ".") 
+                
+                #Se CERAN  los TOTALES por VENDEDOR                          
+                total_importe=0
+                total_comision=0                                        
+                
+                #Sumamos los totales por fraccion
+                total_importe+=cuota_item.total_de_cuotas
+                total_comision+=com 
+                vendedor_actual=cuota_item.vendedor.id
+                ultimo=cuota
+            total_general_importe+=cuota_item.total_de_cuotas
+            total_general_comision+=com
+            cuotas.append(cuota)                        
+        #Si es el ultimo lote, cerramos totales de fraccion
+        if (len(lista_pagos)-1 == i):
+            try:
+                ultimo['total_importe']=str('{:,}'.format(total_importe)).replace(",", ".") 
+                ultimo['total_comision']=str('{:,}'.format(total_comision)).replace(",", ".")             
+                ultimo['total_general_importe']=str('{:,}'.format(total_general_importe)).replace(",", ".") 
+            except:
+                pass
+                                     
+    monto_calculado=int(math.ceil((float(total_general_importe)*float(0.1))/float(2)))   
+    monto_calculado=str('{:,}'.format(monto_calculado)).replace(",", ".")
+
             
     wb = xlwt.Workbook(encoding='utf-8')
     sheet = wb.add_sheet('test', cell_overwrite_ok=True)
@@ -2037,79 +2106,36 @@ def liquidacion_gerentes_reporte_excel(request):
                               'font: name Arial, bold True;')   
     style2 = xlwt.easyxf('font: name Arial, bold True;')
     # cabeceras
-    sheet.write(0, 0, "Cliente", style)
-    sheet.write(0, 1, "Nombre Fraccion", style)
-    sheet.write(0, 2, "Fraccion", style)
-    sheet.write(0, 3, "Lote Nro.", style)    
-    sheet.write(0, 4, "Cuota Nro.", style)
-    sheet.write(0, 5, "Fecha de Pago", style)
-    sheet.write(0, 6, "Monto Pagado", style)
-    sheet.write(0, 7, "Monto Gerente", style)
-    
-    # guardamos la primera fraccion para comparar
-    fraccion_actual = cuotas[0]['fraccion_id']
-    
-    total_monto_pagado = 0
-    total_monto_gerente= 0
-    total_general_pagado = 0
-    total_general_gerente = 0
-    
+    sheet.write(0, 0, "Vendedor", style)
+    sheet.write(0, 1, "Importe", style)
+    sheet.write(0, 2, "Comision", style)
+       
     # contador de filas
     c = 0
-    for i in range(len(cuotas)):
+    for cuota in cuotas:
         # se suman los totales por fracion
-        if (cuotas[i]['fraccion_id'] == fraccion_actual):
-            c+=1            
-            total_monto_pagado += cuotas[i]['monto_pagado']
-            total_monto_gerente += cuotas[i]['monto_gerente']
-            
-            sheet.write(c, 0, str(cuotas[i]['cliente']))
-            sheet.write(c, 1, str(cuotas[i]['fraccion']))
-            sheet.write(c, 2, str(cuotas[i]['fraccion_id']))
-            sheet.write(c, 3, str(cuotas[i]['lote']))
-            sheet.write(c, 4, str(cuotas[i]['cuota_nro']))
-            sheet.write(c, 5, str(cuotas[i]['fecha_pago']))
-            sheet.write(c, 6, str('{:,}'.format(cuotas[i]['monto_pagado']).replace(",",".")))
-            sheet.write(c, 7, str('{:,}'.format(cuotas[i]['monto_gerente']).replace(",",".")))
-            
-            
-            # ... y acumulamos para los totales generales
-            total_general_pagado += cuotas[i]['monto_pagado']
-            total_general_gerente += cuotas[i]['monto_gerente'] 
-        else:
-            c+=1 
-            sheet.write(c, 0, "Totales de Fraccion", style2)
-            sheet.write(c, 6, str('{:,}'.format(total_monto_pagado)).replace(",","."))
-            sheet.write(c, 7, str('{:,}'.format(total_monto_gerente)).replace(",","."))            
+        if (cuota['total_importe'] and not cuota['total_general_importe']):
+            c+=1                        
+            sheet.write(c, 0, str(cuotas[i]['vendedor']))
+            sheet.write(c, 1, str(cuotas[i]['importe']))
+            sheet.write(c, 2, str(cuotas[i]['comision']))
             c += 1
-            fraccion_actual = cuotas[i]['fraccion_id']
-            sheet.write(c, 0, str(cuotas[i]['cliente']))
-            sheet.write(c, 1, str(cuotas[i]['fraccion']))
-            sheet.write(c, 2, str(cuotas[i]['fraccion_id']))
-            sheet.write(c, 3, str(cuotas[i]['lote']))
-            sheet.write(c, 4, str(cuotas[i]['cuota_nro']))
-            sheet.write(c, 5, str(cuotas[i]['fecha_pago']))
-            sheet.write(c, 6, str('{:,}'.format(cuotas[i]['monto_pagado']).replace(",",".")))
-            sheet.write(c, 7, str('{:,}'.format(cuotas[i]['monto_gerente']).replace(",",".")))         
-            total_general_pagado += cuotas[i]['monto_pagado']
-            total_general_gerente += cuotas[i]['monto_gerente'] 
+            sheet.write(c, 0, "Totales del Gerente", style2)
+            sheet.write(c, 6,  str('{:,}'.format(total_general_importe, style2).replace(",",".")))
+            sheet.write(c, 7, str('{:,}'.format(total_general_comision, style2).replace(",",".")))
             
-            total_monto_pagado = 0
-            total_monto_gerente= 0
+        if (cuota['total_importe'] ):
+            c+=1 
+            sheet.write(c, 0, str(cuotas[i]['vendedor']))
+            sheet.write(c, 1, str(cuotas[i]['importe']))
+            sheet.write(c, 2, str(cuotas[i]['comision']))
             
-            total_monto_pagado += cuotas[i]['monto_pagado']
-            total_monto_gerente += cuotas[i]['monto_gerente']
-        # si es la ultima fila    
-        if (i == len(cuotas) - 1):   
-            c += 1           
-            sheet.write(c, 0, "Totales de Fraccion", style2)
-            sheet.write(c, 6, str('{:,}'.format(total_monto_pagado)).replace(",","."))
-            sheet.write(c, 7, str('{:,}'.format(total_monto_gerente)).replace(",","."))
-            
-    c += 1
-    sheet.write(c, 0, "Totales del Gerente", style2)
-    sheet.write(c, 6,  str('{:,}'.format(total_general_pagado, style2).replace(",",".")))
-    sheet.write(c, 7, str('{:,}'.format(total_general_gerente, style2).replace(",",".")))
+    c+=2
+    sheet.write(c, 2, "Gerente: ", style2)
+    sheet.write(c, 3, tipo_gerente, style2)
+    c+=1
+    sheet.write(c, 2, "Liquidacion: ", style2)
+    sheet.write(c, 3, monto_calculado, style2)
     response = HttpResponse(content_type='application/vnd.ms-excel')
     # Crear un nombre intuitivo         
     response['Content-Disposition'] = 'attachment; filename=' + 'liquidacion_gerentes.xls'
