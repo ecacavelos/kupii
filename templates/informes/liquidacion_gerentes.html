@@ -24,6 +24,8 @@
 		// Setear idioma al calendario
 		$.datepicker.setDefaults($.datepicker.regional['es']);
 		var fecha = "{{fecha}}";
+		var fecha_ini = "{{fecha_ini}}";
+		var fecha_fin = "{{fecha_fin}}";
 		var tipo_liquidacion = "{{tipo_liquidacion}}";
 		var tipo_gerente = "{{tipo_gerente}}";
 		var monto_calculado = "{{monto_calculado}}";
@@ -32,6 +34,8 @@
 		$('#id_monto').val(monto_calculado);
 		$('#id_tipo_gerente').val(tipo_gerente);
 		$('#id_tipo_liquidacion').val(tipo_liquidacion);
+		$('#fecha_ini').val(fecha_ini);
+		$('#fecha_fin').val(fecha_fin);
 
 		$(function() {
 			$('#fecha').datepicker( {
@@ -42,15 +46,15 @@
 	    		onClose: function(dateText, inst) { 
 	        	var month = $("#ui-datepicker-div .ui-datepicker-month :selected").val();
 	        	var year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
-	        $(this).datepicker('setDate', new Date(year, month, 1));
-	        var fecha= new Date(year, month, 1);
-	        var fecha_ini=new Date(year,month,1);
-	        var fecha_fin = new Date(year,fecha.getMonth()+1,0);
-	        fecha_ini=('0'+fecha_ini.getDate()).slice(-2) + '/' + + ('0' + (fecha_ini.getMonth()+1)).slice(-2) + '/'+fecha_ini.getFullYear();
-	        fecha_fin=('0'+fecha_fin.getDate()).slice(-2) + '/' + + ('0' + (fecha_fin.getMonth()+1)).slice(-2) + '/'+fecha_fin.getFullYear();
-	        $('#fecha_ini').val(fecha_ini);
-	        $('#fecha_fin').val(fecha_fin);
-	    	}
+		        $(this).datepicker('setDate', new Date(year, month, 1));
+		        var fecha= new Date(year, month, 1);	        
+		  		fecha_ini=new Date(year,month,1);
+		       	fecha_fin = new Date(year,fecha.getMonth()+1,0);      
+		       	fecha_ini=('0'+fecha_ini.getDate()).slice(-2) + '/' + ('0' + (fecha_ini.getMonth()+1)).slice(-2) + '/'+fecha_ini.getFullYear();
+		       	fecha_fin=('0'+fecha_fin.getDate()).slice(-2) + '/' + ('0' + (fecha_fin.getMonth()+1)).slice(-2) + '/'+fecha_fin.getFullYear();
+		        $('#fecha_ini').val(fecha_ini);
+		        $('#fecha_fin').val(fecha_fin);
+		    	}
 		});
 		});
 		

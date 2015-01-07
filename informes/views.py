@@ -909,7 +909,9 @@ def liquidacion_gerentes(request):
             c = RequestContext(request, {
                 'monto_calculado' : monto_calculado,
                 'cuotas' : cuotas,
-                'fecha_' : fecha,
+                'fecha' : fecha,
+                'fecha_ini' : fecha_ini,
+                'fecha_fin' : fecha_fin,
                 'tipo_liquidacion' : tipo_liquidacion,
                 'tipo_gerente' : tipo_gerente
             })
@@ -1994,9 +1996,9 @@ def liquidacion_gerentes_reporte_excel(request):
     tipo_liquidacion = request.GET['tipo_liquidacion']
     fecha_ini = request.GET['fecha_ini']
     fecha_fin = request.GET['fecha_fin']
-#     fecha_ini_parsed = datetime.strptime(fecha_ini, "%d/%m/%Y").date()
-#     fecha_fin_parsed = datetime.strptime(fecha_fin, "%d/%m/%Y").date()
-    lista_pagos = PagoDeCuotas.objects.filter(fecha_de_pago__range=[fecha_ini, fecha_fin]).order_by('vendedor')
+    fecha_ini_parsed = datetime.strptime(fecha_ini, "%d/%m/%Y").date()
+    fecha_fin_parsed = datetime.strptime(fecha_fin, "%d/%m/%Y").date()
+    lista_pagos = PagoDeCuotas.objects.filter(fecha_de_pago__range=[fecha_ini_parsed, fecha_fin_parsed]).order_by('vendedor')
     if tipo_liquidacion == 'gerente_ventas':
         tipo_gerente="Gerente de Ventas"
     if tipo_liquidacion == 'gerente_admin':
@@ -2093,6 +2095,7 @@ def liquidacion_gerentes_reporte_excel(request):
                 ultimo['total_importe']=str('{:,}'.format(total_importe)).replace(",", ".") 
                 ultimo['total_comision']=str('{:,}'.format(total_comision)).replace(",", ".")             
                 ultimo['total_general_importe']=str('{:,}'.format(total_general_importe)).replace(",", ".") 
+                ultimo['total_general_comision']=str('{:,}'.format(total_general_comision)).replace(",", ".")          
             except:
                 pass
                                      
@@ -2112,30 +2115,43 @@ def liquidacion_gerentes_reporte_excel(request):
        
     # contador de filas
     c = 0
-    for cuota in cuotas:
-        # se suman los totales por fracion
-        if (cuota['total_importe'] and not cuota['total_general_importe']):
+    for i, cuota in enumerate(cuotas): 
+        if(i==len(cuotas)-1):
+            try:        
+                if (cuota['total_general_importe']):
+                    c+= 1
+                    sheet.write(c, 0, str(cuota['vendedor']))
+                    sheet.write(c, 1, str(cuota['importe']))
+                    sheet.write(c, 2, str(cuota['comision']))       
+                    c += 1
+                    sheet.write(c, 0, "Totales del Vendedor", style2)
+                    sheet.write(c, 1, str(cuota['total_importe']))
+                    sheet.write(c, 2, str(cuota['total_comision']))    
+                    c += 1
+                    sheet.write(c, 0, "Totales Generales", style2)
+                    sheet.write(c, 1, str(cuota['total_general_importe']))
+                    sheet.write(c, 2, str(cuota['total_general_comision']))    
+            except:
+                pass
+        else:           
+            try:
+                if (cuota['total_importe']):
+                    c += 1
+                    sheet.write(c, 0, "Totales del Vendedor", style2)
+                    sheet.write(c, 1, str(cuota['total_importe']))
+                    sheet.write(c, 2, str(cuota['total_comision']))                                 
+            except:
+                pass
             c+=1                        
-            sheet.write(c, 0, str(cuotas[i]['vendedor']))
-            sheet.write(c, 1, str(cuotas[i]['importe']))
-            sheet.write(c, 2, str(cuotas[i]['comision']))
-            c += 1
-            sheet.write(c, 0, "Totales del Gerente", style2)
-            sheet.write(c, 6,  str('{:,}'.format(total_general_importe, style2).replace(",",".")))
-            sheet.write(c, 7, str('{:,}'.format(total_general_comision, style2).replace(",",".")))
-            
-        if (cuota['total_importe'] ):
-            c+=1 
-            sheet.write(c, 0, str(cuotas[i]['vendedor']))
-            sheet.write(c, 1, str(cuotas[i]['importe']))
-            sheet.write(c, 2, str(cuotas[i]['comision']))
-            
+            sheet.write(c, 0, str(cuota['vendedor']))
+            sheet.write(c, 1, str(cuota['importe']))
+            sheet.write(c, 2, str(cuota['comision']))           
     c+=2
-    sheet.write(c, 2, "Gerente: ", style2)
-    sheet.write(c, 3, tipo_gerente, style2)
+    sheet.write(c, 0, "Gerente: ", style2)
+    sheet.write(c, 1, tipo_gerente, style2)
     c+=1
-    sheet.write(c, 2, "Liquidacion: ", style2)
-    sheet.write(c, 3, monto_calculado, style2)
+    sheet.write(c, 0, "Liquidacion: ", style2)
+    sheet.write(c, 1, monto_calculado, style2)
     response = HttpResponse(content_type='application/vnd.ms-excel')
     # Crear un nombre intuitivo         
     response['Content-Disposition'] = 'attachment; filename=' + 'liquidacion_gerentes.xls'
