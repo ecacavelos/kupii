@@ -1396,55 +1396,55 @@ def clientes_atrasados_reporte_excel(request):
         cursor = connection.cursor()
         cursor.execute(query, [fraccion]) 
             
-        try:
-            dias = meses_peticion*30
-            results= cursor.fetchall()
-            desc = cursor.description
-            for r in results:
-                i = 0
-                cliente_atrasado = {}
-                while i < len(desc):
-                    cliente_atrasado[desc[i][0]] = r[i]
-                    i = i+1
-                try:                        
-                    ultimo_pago = PagoDeCuotas.objects.filter(cliente_id= cliente_atrasado['id']).order_by('-fecha_de_pago')[:1].get()
-                except PagoDeCuotas.DoesNotExist:
-                    ultimo_pago = None
+    try:
+        dias = meses_peticion*30
+        results= cursor.fetchall()
+        desc = cursor.description
+        for r in results:
+            i = 0
+            cliente_atrasado = {}
+            while i < len(desc):
+                cliente_atrasado[desc[i][0]] = r[i]
+                i = i+1
+            try:                        
+                ultimo_pago = PagoDeCuotas.objects.filter(cliente_id= cliente_atrasado['id']).order_by('-fecha_de_pago')[:1].get()
+            except PagoDeCuotas.DoesNotExist:
+                ultimo_pago = None
+                
+            if ultimo_pago != None:
+                fecha_ultimo_pago = ultimo_pago.fecha_de_pago         
+                
+            f1 = fecha_actual.date()
+            f2 = fecha_ultimo_pago
+            diferencia = (f1-f2).days
+            meses_diferencia =  int(diferencia /30)
+            #En el caso de que las cuotas que debe son menores a la diferencia de meses de la fecha de ultimo pago y la actual
+            if meses_diferencia > cliente_atrasado['cuotas_atrasadas']:
+                meses_diferencia = cliente_atrasado['cuotas_atrasadas']
                     
-                if ultimo_pago != None:
-                    fecha_ultimo_pago = ultimo_pago.fecha_de_pago         
+            if meses_diferencia >= meses_peticion:
+                cliente_atrasado['cuotas_atrasadas'] = meses_diferencia                           
+                clientes_atrasados.append(cliente_atrasado)                  
+                print ("Venta agregada")
+                print (" ")
+            else:
+                print ("Venta no agregada")
+                print (" ")
                     
-                f1 = fecha_actual.date()
-                f2 = fecha_ultimo_pago
-                diferencia = (f1-f2).days
-                meses_diferencia =  int(diferencia /30)
-                #En el caso de que las cuotas que debe son menores a la diferencia de meses de la fecha de ultimo pago y la actual
-                if meses_diferencia > cliente_atrasado['cuotas_atrasadas']:
-                    meses_diferencia = cliente_atrasado['cuotas_atrasadas']
-                        
-                if meses_diferencia >= meses_peticion:
-                    cliente_atrasado['cuotas_atrasadas'] = meses_diferencia                           
-                    clientes_atrasados.append(cliente_atrasado)                  
-                    print ("Venta agregada")
-                    print (" ")
-                else:
-                    print ("Venta no agregada")
-                    print (" ")
-                        
-                #Seteamos los campos restantes
-                total_atrasado = meses_diferencia * cliente_atrasado['importe_cuota']
-                cliente_atrasado['fecha_ultimo_pago']= datetime.strptime(str(fecha_ultimo_pago), "%Y-%m-%d").date()
-                cliente_atrasado['lote']=(str(cliente_atrasado['manzana']).zfill(3) + "/" + str(cliente_atrasado['lote']).zfill(4))
-                cliente_atrasado['total_atrasado'] = str('{:,}'.format(total_atrasado)).replace(",", ".")
-                cliente_atrasado['importe_cuota'] = str('{:,}'.format(cliente_atrasado['importe_cuota'])).replace(",", ".")
-                cliente_atrasado['total_pagado'] = str('{:,}'.format(cliente_atrasado['total_pagado'])).replace(",", ".")
-                cliente_atrasado['valor_total_lote'] = str('{:,}'.format(cliente_atrasado['valor_total_lote'])).replace(",", ".") 
-            if meses_peticion == 0:
-                meses_peticion =''  
-        
-        except Exception, error:
-            print error    
-            return HttpResponseServerError("No se pudo obtener el Listado de Clientes Atrasados.")              
+            #Seteamos los campos restantes
+            total_atrasado = meses_diferencia * cliente_atrasado['importe_cuota']
+            cliente_atrasado['fecha_ultimo_pago']= datetime.strptime(str(fecha_ultimo_pago), "%Y-%m-%d").date()
+            cliente_atrasado['lote']=(str(cliente_atrasado['manzana']).zfill(3) + "/" + str(cliente_atrasado['lote']).zfill(4))
+            cliente_atrasado['total_atrasado'] = str('{:,}'.format(total_atrasado)).replace(",", ".")
+            cliente_atrasado['importe_cuota'] = str('{:,}'.format(cliente_atrasado['importe_cuota'])).replace(",", ".")
+            cliente_atrasado['total_pagado'] = str('{:,}'.format(cliente_atrasado['total_pagado'])).replace(",", ".")
+            cliente_atrasado['valor_total_lote'] = str('{:,}'.format(cliente_atrasado['valor_total_lote'])).replace(",", ".") 
+        if meses_peticion == 0:
+            meses_peticion =''  
+    
+    except Exception, error:
+        print error    
+        return HttpResponseServerError("No se pudo obtener el Listado de Clientes Atrasados.")              
     if clientes_atrasados:        
         sheet.write(0, 0, "Cliente", style)
         sheet.write(0, 1, "Lote", style)
