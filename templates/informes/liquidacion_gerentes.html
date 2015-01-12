@@ -126,36 +126,40 @@
 </div>
 <div id="listado-item-lote">
 	<table width="50%" cellpadding="0" cellspacing="0" class="listado-pagos" align="center">
-		<th>Vendedor</th><th>Importe</th><th>Comisi&oacute;n</th>
+		<th>Fraccion</th><th>Vendedor</th><th>Cuota Nro.</th><th>Importe</th><th>Comisi&oacute;n</th>
 		{% for hw in cuotas %}
 		{% if hw.total_importe and not hw.total_general_importe %}
 		<tr>
-			<th colspan="1" class="celda_resumen_fraccion">Resumen del Vendedor</th>
+			<th colspan="3" class="celda_resumen_fraccion">Totales de Fraccion</th>
 			<td class="celda_resumen_fraccion">{{hw.total_importe}}</td>
 			<td class="celda_resumen_fraccion">{{hw.total_comision}}</td>
 		</tr>
 		{% endif %}
 		{% if forloop.counter|divisibleby:2 %}
 		<tr>
+			<td>{{hw.fraccion}}</td>
 			<td>{{hw.vendedor}}</td>
+			<td>{{hw.cuota_nro}}</td>
 			<td>{{hw.importe}}</td>
 			<td>{{hw.comision}}</td>
 		</tr>
 		{% else %}
 		<tr class="bkg_gris">
+			<td>{{hw.fraccion}}</td>
 			<td>{{hw.vendedor}}</td>
+			<td>{{hw.cuota_nro}}</td>
 			<td>{{hw.importe}}</td>
 			<td>{{hw.comision}}</td>
 		</tr>
 		{% endif %}
 		{% if hw.total_general_importe %}
 		<tr>
-			<th colspan="1" class="celda_resumen_fraccion">Resumen del Vendedor</th>
+			<th colspan="3" class="celda_resumen_fraccion">Totales de Fraccion</th>
 			<td class="celda_resumen_fraccion">{{hw.total_importe}}</td>
 			<td class="celda_resumen_fraccion">{{hw.total_comision}}</td>
 		</tr>
 		<tr>
-			<th colspan="1" class="celda_resumen_fraccion">Total General</th>
+			<th colspan="3" class="celda_resumen_fraccion">Total General</th>
 			<td class="celda_resumen_fraccion">{{hw.total_general_importe}}</td>
 			<td class="celda_resumen_fraccion">{{hw.total_general_comision}}</td>
 

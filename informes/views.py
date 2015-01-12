@@ -40,13 +40,13 @@ def lotes_libres(request):
                 f1=request.GET['fraccion_ini']
                 f2=request.GET['fraccion_fin']
                 ultimo="&tipo_busqueda="+tipo_busqueda+"&fraccion_ini="+f1+"&frac1="+fraccion_ini+"&fraccion_fin="+f2+"&frac2="+fraccion_fin
-                object_list=[]#lista de lotes
+                object_list = []  # lista de lotes
                 if fraccion_ini and fraccion_fin:
-                    manzanas= Manzana.objects.filter(fraccion_id__range=(fraccion_ini,fraccion_fin))
+                    manzanas = Manzana.objects.filter(fraccion_id__range=(fraccion_ini, fraccion_fin)).order_by('fraccion')
                     for m in manzanas:
                         lotes = Lote.objects.filter(manzana=m.id)
                         for l in lotes:
-                            object_list.append(l)                                         
+                            object_list.append(l)                                  
                 else:       
                     object_list = Lote.objects.filter(estado="1").order_by('manzana', 'nro_lote')
                  
@@ -751,6 +751,7 @@ def liquidacion_vendedores(request):
                             total_importe+=cuota_item.total_de_cuotas
                             total_comision+=com 
                             fraccion_actual=cuota_item.lote.manzana.fraccion.id
+                            anterior=cuota
                             ultimo=cuota
                         total_general_importe+=cuota_item.total_de_cuotas
                         total_general_comision+=com
@@ -800,9 +801,20 @@ def liquidacion_gerentes(request):
                 tipo_liquidacion = request.GET['tipo_liquidacion']
                 fecha_ini = request.GET['fecha_ini']
                 fecha_fin = request.GET['fecha_fin']
-                fecha_ini_parsed = datetime.strptime(fecha_ini, "%d/%m/%Y").date()
-                fecha_fin_parsed = datetime.strptime(fecha_fin, "%d/%m/%Y").date()
-                lista_pagos = PagoDeCuotas.objects.filter(fecha_de_pago__range=[fecha_ini_parsed, fecha_fin_parsed]).order_by('vendedor')
+#                 fecha_ini_parsed = datetime.strptime(fecha_ini, "%d/%m/%Y").date()
+#                 fecha_fin_parsed = datetime.strptime(fecha_fin, "%d/%m/%Y").date()
+                query=(
+                '''
+                select pc.* from principal_pagodecuotas pc, principal_lote l, principal_manzana m, principal_fraccion f
+                where pc.fecha_de_pago >= \''''+ fecha_ini +               
+                '''\' and pc.fecha_de_pago <= \'''' + fecha_fin +
+                '''\'                 
+                and (pc.lote_id = l.id and l.manzana_id=m.id and m.fraccion_id=f.id) order by pc.vendedor_id, f.id, pc.fecha_de_pago
+                '''
+                )                    
+        
+                lista_pagos=list(PagoDeCuotas.objects.raw(query))
+                
                 if tipo_liquidacion == 'gerente_ventas':
                     tipo_gerente="Gerente de Ventas"
                 if tipo_liquidacion == 'gerente_admin':
@@ -830,9 +842,10 @@ def liquidacion_gerentes(request):
                         if k==0:
                             #Guardamos el vendedor asociado a la primera cuota que cumple con la condicion, para tener algo con que comparar.
                             vendedor_actual=cuota_item.vendedor.id
+                            fraccion_actual=cuota_item.lote.manzana.fraccion
                         k+=1
                         #print k
-                        if(cuota_item.vendedor.id==vendedor_actual):                              
+                        if(cuota_item.vendedor.id==vendedor_actual and cuota_item.lote.manzana.fraccion==fraccion_actual):                              
                             #comision de las cuotas
                             com=int(cuota_item.total_de_cuotas*(float(cuota_item.plan_de_pago_vendedores.porcentaje_de_cuotas)/float(100)))
                             if(cuota_item.venta.entrega_inicial):
@@ -889,6 +902,7 @@ def liquidacion_gerentes(request):
                             total_importe+=cuota_item.total_de_cuotas
                             total_comision+=com 
                             vendedor_actual=cuota_item.vendedor.id
+                            fraccion_actual=cuota_item.lote.manzana.fraccion
                             ultimo=cuota
                         total_general_importe+=cuota_item.total_de_cuotas
                         total_general_comision+=com
@@ -1233,7 +1247,7 @@ def lotes_libres_reporte_excel(request):
     sheet.write(0, 3, "Superficie", style)    
     sheet.write(0, 4, "Precio Contado", style)    
     sheet.write(0, 5, "Precio Crediro", style)
-    sheet.write(0, 6, "Precio Costo", style)
+    sheet.write(0, 6, "Precio Cuota", style)
     # totales por fraccion
     total_lotes = 0
     total_superficie = 0
@@ -1996,9 +2010,19 @@ def liquidacion_gerentes_reporte_excel(request):
     tipo_liquidacion = request.GET['tipo_liquidacion']
     fecha_ini = request.GET['fecha_ini']
     fecha_fin = request.GET['fecha_fin']
-    fecha_ini_parsed = datetime.strptime(fecha_ini, "%d/%m/%Y").date()
-    fecha_fin_parsed = datetime.strptime(fecha_fin, "%d/%m/%Y").date()
-    lista_pagos = PagoDeCuotas.objects.filter(fecha_de_pago__range=[fecha_ini_parsed, fecha_fin_parsed]).order_by('vendedor')
+#     fecha_ini_parsed = datetime.strptime(fecha_ini, "%d/%m/%Y").date()
+#     fecha_fin_parsed = datetime.strptime(fecha_fin, "%d/%m/%Y").date()
+    query=(
+    '''
+    select pc.* from principal_pagodecuotas pc, principal_lote l, principal_manzana m, principal_fraccion f
+    where pc.fecha_de_pago >= \''''+ fecha_ini +               
+    '''\' and pc.fecha_de_pago <= \'''' + fecha_fin +
+    '''\'                 
+    and (pc.lote_id = l.id and l.manzana_id=m.id and m.fraccion_id=f.id) order by pc.vendedor_id, f.id, pc.fecha_de_pago
+    '''
+    )                    
+
+    lista_pagos=list(PagoDeCuotas.objects.raw(query))
     if tipo_liquidacion == 'gerente_ventas':
         tipo_gerente="Gerente de Ventas"
     if tipo_liquidacion == 'gerente_admin':
@@ -2026,9 +2050,10 @@ def liquidacion_gerentes_reporte_excel(request):
             if k==0:
                 #Guardamos el vendedor asociado a la primera cuota que cumple con la condicion, para tener algo con que comparar.
                 vendedor_actual=cuota_item.vendedor.id
+                fraccion_actual=cuota_item.lote.manzana.fraccion
             k+=1
             #print k
-            if(cuota_item.vendedor.id==vendedor_actual):                              
+            if(cuota_item.vendedor.id==vendedor_actual and cuota_item.lote.manzana.fraccion==fraccion_actual):                              
                 #comision de las cuotas
                 com=int(cuota_item.total_de_cuotas*(float(cuota_item.plan_de_pago_vendedores.porcentaje_de_cuotas)/float(100)))
                 if(cuota_item.venta.entrega_inicial):
@@ -2085,6 +2110,7 @@ def liquidacion_gerentes_reporte_excel(request):
                 total_importe+=cuota_item.total_de_cuotas
                 total_comision+=com 
                 vendedor_actual=cuota_item.vendedor.id
+                fraccion_actual=cuota_item.lote.manzana.fraccion
                 ultimo=cuota
             total_general_importe+=cuota_item.total_de_cuotas
             total_general_comision+=com
@@ -2109,9 +2135,11 @@ def liquidacion_gerentes_reporte_excel(request):
                               'font: name Arial, bold True;')   
     style2 = xlwt.easyxf('font: name Arial, bold True;')
     # cabeceras
-    sheet.write(0, 0, "Vendedor", style)
-    sheet.write(0, 1, "Importe", style)
-    sheet.write(0, 2, "Comision", style)
+    sheet.write(0, 0, "Fecha", style)
+    sheet.write(0, 1, "Vendedor", style)
+    sheet.write(0, 2, "Cuota Nro.", style)
+    sheet.write(0, 3, "Importe", style)
+    sheet.write(0, 4, "Comision", style)
        
     # contador de filas
     c = 0
@@ -2120,17 +2148,19 @@ def liquidacion_gerentes_reporte_excel(request):
             try:        
                 if (cuota['total_general_importe']):
                     c+= 1
-                    sheet.write(c, 0, str(cuota['vendedor']))
-                    sheet.write(c, 1, str(cuota['importe']))
-                    sheet.write(c, 2, str(cuota['comision']))       
+                    sheet.write(c, 0, str(cuota['fecha_pago']))
+                    sheet.write(c, 1, str(cuota['vendedor']))
+                    sheet.write(c, 2, str(cuota['cuota_nro']))       
+                    sheet.write(c, 3, str(cuota['importe']))
+                    sheet.write(c, 4, str(cuota['comision']))       
                     c += 1
                     sheet.write(c, 0, "Totales del Vendedor", style2)
-                    sheet.write(c, 1, str(cuota['total_importe']))
-                    sheet.write(c, 2, str(cuota['total_comision']))    
+                    sheet.write(c, 3, str(cuota['total_importe']))
+                    sheet.write(c, 4, str(cuota['total_comision']))    
                     c += 1
                     sheet.write(c, 0, "Totales Generales", style2)
-                    sheet.write(c, 1, str(cuota['total_general_importe']))
-                    sheet.write(c, 2, str(cuota['total_general_comision']))    
+                    sheet.write(c, 3, str(cuota['total_general_importe']))
+                    sheet.write(c, 4, str(cuota['total_general_comision']))    
             except:
                 pass
         else:           
@@ -2138,14 +2168,16 @@ def liquidacion_gerentes_reporte_excel(request):
                 if (cuota['total_importe']):
                     c += 1
                     sheet.write(c, 0, "Totales del Vendedor", style2)
-                    sheet.write(c, 1, str(cuota['total_importe']))
-                    sheet.write(c, 2, str(cuota['total_comision']))                                 
+                    sheet.write(c, 3, str(cuota['total_importe']))
+                    sheet.write(c, 4, str(cuota['total_comision']))                                 
             except:
                 pass
             c+=1                        
-            sheet.write(c, 0, str(cuota['vendedor']))
-            sheet.write(c, 1, str(cuota['importe']))
-            sheet.write(c, 2, str(cuota['comision']))           
+            sheet.write(c, 0, str(cuota['fecha_pago']))
+            sheet.write(c, 1, str(cuota['vendedor']))
+            sheet.write(c, 2, str(cuota['cuota_nro']))       
+            sheet.write(c, 3, str(cuota['importe']))
+            sheet.write(c, 4, str(cuota['comision']))           
     c+=2
     sheet.write(c, 0, "Gerente: ", style2)
     sheet.write(c, 1, tipo_gerente, style2)
