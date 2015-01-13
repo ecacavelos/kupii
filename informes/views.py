@@ -801,13 +801,13 @@ def liquidacion_gerentes(request):
                 tipo_liquidacion = request.GET['tipo_liquidacion']
                 fecha_ini = request.GET['fecha_ini']
                 fecha_fin = request.GET['fecha_fin']
-#                 fecha_ini_parsed = datetime.strptime(fecha_ini, "%d/%m/%Y").date()
-#                 fecha_fin_parsed = datetime.strptime(fecha_fin, "%d/%m/%Y").date()
+                fecha_ini_parsed = str(datetime.strptime(fecha_ini, "%d/%m/%Y").date())
+                fecha_fin_parsed = str(datetime.strptime(fecha_fin, "%d/%m/%Y").date())
                 query=(
                 '''
                 select pc.* from principal_pagodecuotas pc, principal_lote l, principal_manzana m, principal_fraccion f
-                where pc.fecha_de_pago >= \''''+ fecha_ini +               
-                '''\' and pc.fecha_de_pago <= \'''' + fecha_fin +
+                where pc.fecha_de_pago >= \''''+ fecha_ini_parsed +               
+                '''\' and pc.fecha_de_pago <= \'''' + fecha_fin_parsed +
                 '''\'                 
                 and (pc.lote_id = l.id and l.manzana_id=m.id and m.fraccion_id=f.id) order by pc.vendedor_id, f.id, pc.fecha_de_pago
                 '''
@@ -2010,18 +2010,19 @@ def liquidacion_gerentes_reporte_excel(request):
     tipo_liquidacion = request.GET['tipo_liquidacion']
     fecha_ini = request.GET['fecha_ini']
     fecha_fin = request.GET['fecha_fin']
-#     fecha_ini_parsed = datetime.strptime(fecha_ini, "%d/%m/%Y").date()
-#     fecha_fin_parsed = datetime.strptime(fecha_fin, "%d/%m/%Y").date()
+    fecha_ini_parsed = str(datetime.strptime(fecha_ini, "%d/%m/%Y").date())
+    fecha_fin_parsed = str(datetime.strptime(fecha_fin, "%d/%m/%Y").date())
     query=(
     '''
     select pc.* from principal_pagodecuotas pc, principal_lote l, principal_manzana m, principal_fraccion f
-    where pc.fecha_de_pago >= \''''+ fecha_ini +               
-    '''\' and pc.fecha_de_pago <= \'''' + fecha_fin +
+    where pc.fecha_de_pago >= \''''+ fecha_ini_parsed +               
+    '''\' and pc.fecha_de_pago <= \'''' + fecha_fin_parsed +
     '''\'                 
     and (pc.lote_id = l.id and l.manzana_id=m.id and m.fraccion_id=f.id) order by pc.vendedor_id, f.id, pc.fecha_de_pago
     '''
     )                    
 
+    print(query)
     lista_pagos=list(PagoDeCuotas.objects.raw(query))
     if tipo_liquidacion == 'gerente_ventas':
         tipo_gerente="Gerente de Ventas"
