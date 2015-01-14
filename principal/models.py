@@ -297,3 +297,22 @@ class RecuperacionDeLotes(models.Model):
     vendedor = models.ForeignKey(Vendedor)
     #plan_de_pago = models.ForeignKey(PlanDePago)
     
+    
+class Timbrado(models.Model):
+    desde = models.DateField()
+    hasta = models.DateField()
+    numero = models.CharField(max_length=30)
+    def as_json(self):
+        return dict(
+            label= self.numero,
+            numero = self.numero,
+            id=self.id)
+
+
+class Factura(models.Model):
+    fecha = models.DateField()
+    numero = models.CharField(max_length=30)
+    cliente = models.ForeignKey(Cliente)
+    timbrado = models.ForeignKey(Timbrado)
+    tipo = models.CharField(max_length=2)
+    detalle = models.TextField()

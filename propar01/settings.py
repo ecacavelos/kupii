@@ -148,6 +148,8 @@ INSTALLED_APPS = (
     'movimientos',
     'propietarios',
     'manzanas',
+    'facturas',    
+    'timbrados',
 )
 
 # A sample logging configuration. The only tangible logging

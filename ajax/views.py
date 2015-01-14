@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.views.decorators.http import require_http_methods
 from django.template import RequestContext, loader
 from django.utils import simplejson as json
-from principal.models import Fraccion, Manzana, Venta, PagoDeCuotas, Propietario, Lote, Cliente, Vendedor, PlanDePago, PlanDePagoVendedor
+from principal.models import Fraccion, Manzana, Venta, PagoDeCuotas, Propietario, Lote, Cliente, Vendedor, PlanDePago, PlanDePagoVendedor,Timbrado
 from principal.common_functions import get_cuotas_detail_by_lote, get_nro_cuota
 from datetime import datetime
 #from principal.reports import reporte_lotes_libres, reporte_general_pagos, reporte_liquidacion_vendedores,reporte_liquidacion_gerentes
@@ -285,6 +285,20 @@ def get_plan_pago_vendedor(request):
                 nombre_plan = request.GET['term']
                 print("term ->" + nombre_plan);
                 object_list = PlanDePagoVendedor.objects.filter(nombre__icontains= nombre_plan)
+                results = [ob.as_json() for ob in object_list]
+                return HttpResponse(json.dumps(results), mimetype='application/json')
+            except:
+                return HttpResponseServerError('No se pudo procesar el pedido')
+        else:
+            return HttpResponseRedirect("/login")
+
+def get_timbrado_by_numero(request):
+    if request.method == 'GET':
+        if request.user.is_authenticated():
+            try:            
+                numero_timbrado = request.GET['term']
+                print("term ->" + numero_timbrado);
+                object_list = Timbrado.objects.filter(numero__icontains= numero_timbrado)
                 results = [ob.as_json() for ob in object_list]
                 return HttpResponse(json.dumps(results), mimetype='application/json')
             except:

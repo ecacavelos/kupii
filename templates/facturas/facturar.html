@@ -1,0 +1,79 @@
+{% extends "lotes/base_lotes.html" %}
+{% block header_scripts %}
+
+<script type="text/javascript">
+</script>
+<script type="text/javascript" src="{{ STATIC_URL }}facturacion/facturar.js"></script>
+{% endblock %}
+{% block content %}
+<div class="gri16 text-izquierda" id="breadcumb">
+	<a href="/">Inicio</a><span class="verde-1">></span>
+	<a href="/facturacion/">Facturación</a>
+	<span class="verde-1">> Facturar </span>
+</div>
+
+<div class="clear"></div>
+
+<h1>Facturar</h1>
+	<div class="cabecera_factura">
+		<form action = "" method="post" id="agregar-factura-form">
+			{% csrf_token %}
+			<div class="item-factura-cabecera">
+				<h2>Cliente</h2>
+				<input id="id_cliente" type="hidden" name="cliente"  maxlength="100" />
+				<input id="detalle" type="hidden" name="detalle" />
+				<input id="id_name_cliente" type="text" name="name_cliente" placeholder="Ingrese el Nombre o CI"  maxlength="100" /> <br><br>				
+				<input id="id_cedula_cliente" type="text" name="cedula_cliente"  readonly="readonly" />
+				<a href="/clientes/agregar/" class="boton-verde" target="_blank">Agregar Nuevo Cliente</a> {{ field.errors }}<br><br>			
+			</div>
+			<div class="item-factura-cabecera">
+				<h2>Fecha</h2>
+				<input id="fecha" name="fecha" type="date" />
+			</div>
+			<div class="item-factura-cabecera">
+				<h2>Tipo</h2>
+				<select name="tipo">
+					 <option value="co">Contado</option>
+	  				 <option value="cr">Crédito</option>
+				</select>
+			</div>
+			<div class="item-factura-cabecera">
+				<h2>Número</h2>
+				<input id="nro-factura" type="text" name="nro-factura" placeholder="Nro. de factura"/>
+			</div>
+			<div class="item-factura-cabecera">
+				<h2>Timbrado</h2>
+				<input id="timbrado" type="text" name="timbrado" placeholder="Timbrado" />
+				<input id="id-timbrado" type="hidden" name="id-timbrado"  />
+			</div>
+	</div>	
+	<div class="detalle_factura">
+		<h2>Detalle</h2>
+	</div>
+	<div class="liquidacion_factura">
+		<h2>Liquidación</h2>
+		<div id="sub-totales">
+			<input id="total-exentas" type="text" readonly="readonly" />
+			<input id="total-iva_10" type="text" readonly="readonly" />
+			<input id="total-iva_5" type="text" readonly="readonly" />			
+		</div>
+		<div id="totales">
+			<label>TOTAL</label>		
+			<input id="total" type="text" readonly="readonly" />
+		</div>
+		<div id="liquidacion-iva-block">
+			<label>IVA 5%</label>
+			<input id="liquidacion-iva_5" type="text" readonly="readonly" />
+			<label>IVA 10%</label>		
+			<input id="liquidacion-iva_10" type="text" readonly="readonly" />
+			<label>LIQUIDACION IVA</label>
+			<input id="liquidacion-iva" type="text" readonly="readonly" />					
+		</div>
+	</div>
+<div class="clear"></div>
+<input id="submit-btn" type="submit" value="Grabar" style=" margin-bottom: 10px; cursor: pointer;" />
+</form>
+<div id="footer">
+	<a href="/facturacion" class="boton-verde">Volver al módulo de Facturación</a>
+</div>
+{% endblock %} 
