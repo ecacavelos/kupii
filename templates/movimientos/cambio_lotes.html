@@ -1,0 +1,91 @@
+{% extends "lotes/base_lotes.html" %}
+
+{% block header_scripts %}
+<!--<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}ajax_config.js"></script>
+-->
+<script type="text/javascript" src="{{ STATIC_URL }}movimientos_cambios.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="gri16 text-izquierda" id="breadcumb">
+	<a href="/">Inicio</a> <span class="verde-1">></span>  
+	<a href="/movimientos/">Movimientos</a> 
+	<span class="verde-1">> Cambio de Lote</span> 
+</div>
+<div class="clear"></div>
+
+<div class="grid_10">
+  <h1>Cambio de Lote</h1>
+</div>
+
+<div class="grid_6">
+  <a href="#" class="historico">Buscar</a>
+</div>
+
+<div class="clear"></div>
+<div class="grid_16" align="center">
+<form id="main_cambios_form" action="" method="post">
+	<table width="94%" border="0" cellpadding="0" cellspacing="0" id="forms" align="center">
+	{% csrf_token %}
+	<div class="fieldWrapperMovimientos">
+		<tr>
+			<td><label for="id_lote">Lote a ser cambiado: </label></td>
+			<td class="noimage"><input id="id_lote" type="text" name="lote"  maxlength="12" onblur="retrieveLoteCambio()" /><br>
+		<ul class="errorlist"><li id="lote_error"></li></ul></td>
+		</tr>
+		<tr>
+			<td><label>Superficie (m2): </label></td>
+			<td class="noimage"><div id="lote_superficie"></div></td>
+		</tr>
+		<tr>
+			<td><label>Detalles del Lote: </label></td>
+			<td class="noimage"><div id="lote_seleccionado_detalles"></div></td>
+		</tr>
+	</div>
+	<div class="fieldWrapperMovimientos">
+		<tr>
+			<td><label for="id_fecha">Fecha de Cambio: </label></td>
+			<td class="noimage"><input id="id_fecha" type="text" name="fecha" maxlength="10" /></td>
+		</tr>
+	</div>
+	<div class="fieldWrapperMovimientos">
+		<tr>
+			<td><label for="id_cliente">Cliente: </label></td>
+			<td class="noimage">
+				<input id="id_cliente" type="hidden" name="cliente" maxlength="100" onblur="retrieveCliente()" />
+				<div id="cliente_seleccionado"></div>
+		<ul class="errorlist"><li id="cliente_error"></li></ul></td>
+		</tr>
+	</div>
+	
+	
+	<div class="fieldWrapperMovimientos">
+		<tr>
+			<td><label for="id_lote2">Nuevo Lote a asignar: </label></td>
+			<td class="noimage"><input id="id_lote2" type="text" name="lote2" disabled="disabled" maxlength="12" onblur="retrieveLote2()" />
+		<ul class="errorlist"><li id="lote2_error"></li></ul></td>
+		</tr>
+		<tr>
+			<td><label>Superficie (m2): </label></td>
+			<td class="noimage"><div id="lote2_superficie"></div></td>
+		</tr>
+		<tr>
+			<td><label>Detalles del Lote: </label></td>
+			<td class="noimage"><div id="lote2_seleccionado_detalles"></div></td>
+		</tr>
+	</div>
+<div class="fieldWrapperMovimientos">
+	</div>
+	</table>
+	<input id="enviar_cambio" style="cursor: pointer;" type="submit" value="Guardar Cambio" />
+	<br><br><br>
+	</form>
+	<div class="clear"></div>
+	</div>
+	
+	<div id="footer">
+		<a href="/movimientos/" class="boton-verde">Volver al m&oacute;dulo de movimientos</a>
+	</div>
+
+{% endblock %}

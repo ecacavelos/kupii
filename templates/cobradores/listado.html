@@ -1,0 +1,15 @@
+{% extends "cobradores/base_cobradores.html" %}
+
+{% block content %}
+{% for hw in object_list %}
+<div id="listado-item-cobrador">
+	<a href="{{hw.id}}">{{hw.id}}</a><br>
+	Nombres: {{hw.nombres}}<br>
+	Apellidos: {{hw.apellidos}}<br>
+</div>
+{% endfor %}
+
+<div id="footer">
+	<a href="/cobradores">Volver al módulo de Cobradores</a>
+</div>
+{% endblock %}

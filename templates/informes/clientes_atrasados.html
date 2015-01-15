@@ -1,0 +1,114 @@
+{% extends "lotes/base_lotes.html" %}
+{% block header_scripts %}
+
+<script type="text/javascript">	
+	$(document).ready(function() {
+		$('#busqueda').mask('###/###/####');
+		var fraccion = "{{fraccion}}";
+		$('#fraccion').val(fraccion);
+		var meses_atraso = "{{meses_atraso}}";
+		$('#meses_atraso').val(meses_atraso);
+				
+		if ($("#fraccion").val() == "" && $("#meses_atraso").val() == "") {//parametros no seteados
+			$('.listado-clientes-atrasados').hide();
+			$('.pagination').hide();
+		}else{
+			$('.listado-clientes-atrasados').show();
+			$('.pagination').show();
+		}
+	});
+
+</script>
+<script type="text/javascript" src="{{ STATIC_URL }}informes/clientes_atrasados.js"></script>
+{% endblock %}
+{% block content %}
+<div class="gri16" id="breadcumb">
+	<a href="/">Inicio</a><span class="verde-1">></span>
+	<a href="/informes/">Informes</a>
+	<span class="verde-1">> Clientes Atrasados</span>
+</div>
+
+<div class="clear"></div>
+<h1>Listado de Clientes Atrasados</h1>
+
+<div class="grid_6">
+	<form name="frm_busqueda" id="frm_busqueda" method="get" action="/informes/clientes_atrasados/">
+		<table id="lista-categoria" frame="box">
+			<tr>
+				<th class="acciones" colspan="3"><strong><a href="#" style="color: white;">Filtrar</a></strong></th>
+			</tr>
+			<tr>
+				<td>Por Nro. Faccion:</td>
+				<td>
+				<input name="fraccion" id="fraccion" type="text" value="" placeholder="Nro. Fraccion"/>
+				</td>
+			</tr>
+			<tr>
+				<td> Meses de Atraso: </td>
+				<td>
+				<input name="meses_atraso" id="meses_atraso" type="text" value="" placeholder="Ej:2"/>
+				</td>
+			</tr>
+			<tr>
+				<td>
+				<input type="button" value="Buscar" onclick="validar();" class="historico" style="cursor: pointer"/>
+				</td>
+				<td>
+				<input name="tabla" type="hidden" value="lote" />
+				<a class="boton-verde" id="id_boton" onclick="retrieve_clientes_atrasados();">Descargar como Excel</a></td>
+			</tr>
+		</table>
+	</form>
+</div>
+<div class="clear"></div>
+<div id="listado-cuadro-busqueda">
+	<br>
+	<br>
+</div>
+<div id="listado-item-lote">
+	<table width="50%" cellpadding="0" cellspacing="0" class="listado-clientes-atrasados" align="center">
+		<th>Cliente</th><th>Cod. Lote</th><th>Cuotas Atrasadas</th>
+		<th>Cuotas Pagadas</th><th>Importe c/ Cuota</th><th>Total Atrasado</th><th>Total Pagado</th>
+		<th>Valor Total Del lote</th><th>%Pagado</th><th>Fec. Ult. Pago</th>		
+		{% for hw in object_list %}
+			{% if forloop.counter|divisibleby:2 %}
+		<tr>
+			<td>{{hw.cliente}}</td>
+			<td>{{hw.lote}}</td>
+			<td>{{hw.cuotas_atrasadas}}</td>
+			<td>{{hw.cuotas_pagadas}}</td>
+			<td>{{hw.importe_cuota}}</td>
+			<td>{{hw.total_atrasado}}</td>
+			<td>{{hw.total_pagado}}</td>
+			<td>{{hw.valor_total_lote}}</td>
+			<td>{{hw.porc_pagado}}</td>
+			<td>{{hw.fecha_ultimo_pago}}</td>
+		</tr>
+			{% else %}
+		<tr class="bkg_gris">
+			<td>{{hw.cliente}}</td>
+			<td>{{hw.lote}}</td>
+			<td>{{hw.cuotas_atrasadas}}</td>
+			<td>{{hw.cuotas_pagadas}}</td>
+			<td>{{hw.importe_cuota}}</td>
+			<td>{{hw.total_atrasado}}</td>
+			<td>{{hw.total_pagado}}</td>
+			<td>{{hw.valor_total_lote}}</td>
+			<td>{{hw.porc_pagado}}</td>
+			<td>{{hw.fecha_ultimo_pago}}</td>
+		</tr>
+		{% endif %}
+		{% endfor %}
+		<div class="pagination">
+			<span class="step-links"> Mostrando {{ object_list.start_index }}-{{ object_list.end_index }} de {{ object_list.paginator.count }} Resultados
+				{%if object_list.has_previous%} <a href="?page={{ object_list.first_index}}{{ultimo}}"> Primera </a> <a href="?page={{ object_list.previous_page_number }}{{ultimo}}"> Anterior</a> {%endif%}
+				P&aacute;gina |{{object_list.number}}|
+				{%if object_list.has_next%} <a href="?page={{ object_list.next_page_number }}{{ultimo}}"> Siguiente </a> <a href="?page={{ object_list.end_index}}{{ultimo}}"> Ultima </a> {%endif%} </span>
+		</div>
+	</table>
+</div>
+
+<div id="footer">
+	<a href="/informes" class="boton-verde">Volver al módulo de Informes</a>
+</div>
+{% endblock %}

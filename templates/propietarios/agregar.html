@@ -1,0 +1,138 @@
+{% extends "lotes/base_lotes.html" %}
+
+{% block header_resources %}
+<!--
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+-->
+{% endblock %}
+
+{% block header_scripts %}
+<!--
+<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+-->
+<script type="text/javascript">
+
+function solo_numeros () {
+		
+	  	$('#id_cedula').val($('#id_cedula').val().replace(/\D/g,''));
+	}
+
+function _enviar(){
+	if (self.opener != null ){
+		self.opener.form_add_fraccion.id_name_propietario.value = $("#id_nombres").val() +' '+ $("#id_apellidos").val() ;
+		self.opener.form_add_fraccion.id_cedula_propietario.value = $("#id_cedula").val();
+		$("#form_add_propietario").submit();
+		//window.close();
+	} else {
+		$("#form_add_propietario").submit();
+	}
+	
+}
+
+
+
+var data = [
+		{"label" : "Aragorn"}
+		];
+$(document).ready(function() {
+	$('.grid_6').hide();
+	$("#id_fecha_nacimiento").datepicker({ dateFormat: 'dd/mm/yy' });
+	$("#id_fecha_ingreso").datepicker({ dateFormat: 'dd/mm/yy' });
+	$('.date').mask('##/##/####');
+	//var date = $('#datepicker').datepicker({ dateFormat: 'dd/mm/yyyy' }).val();
+	$("#id_manzana").attr('readonly', true);
+	var fraccion_id;
+	$("#id_manzana").empty();
+
+	base_url = "/ajax/get_fracciones_by_name/";
+	params = "";
+	 $( "#id_fraccion" ).autocomplete({
+	  source:  base_url,
+      minLength: 1,
+      select: function( event, ui ) {
+      	$("#id_manzana").attr('readonly', false);
+      	fraccion_id = ui.item.id;
+      	var request_manzanas = $.ajax({
+					url : '/ajax/get_manzanas_by_fraccion/',
+					type : "GET",
+					data : {
+						fraccion_id : fraccion_id
+					},
+					dataType : "json"
+				});
+			request_manzanas.done(function (data){
+				$.each(data, function (index,value) {
+					$("#id_manzana").append('<option value="'+ value.id +'">' + 'Manzana ' + value.label + '</option>') ;
+				});
+			});
+      }
+    });
+});
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="gri16 text-izquierda" id="breadcumb">
+	<a href="/">Inicio</a> <span class="verde-1">></span>  
+	<a href="/propietarios/">Propietarios</a> 
+	<span class="verde-1">> Agregar Propietario</span> 
+</div>
+
+<div class="clear"></div>
+
+<div class="grid_10">
+  <h1>Agregar Propietario</h1>
+</div>
+
+<div class="grid_6">
+  <a href="#" class="historico">Buscar</a>
+</div>
+
+<div class="clear"></div>
+
+<div class="grid_16" align="center">
+	
+	  <form action="" method="post" id="form_add_propietario">
+	  	<div id="{{message_id}}">{{ message }}</div>
+	  	<table width="94%" border="0" cellpadding="0" cellspacing="0" id="forms" align="center">
+		{% csrf_token %}
+		{% for field in form %}
+			{{ field.errors }}
+			<tr>
+	    		<td><strong>{{ field.label_tag }}</strong></td>
+	    		{%if field.html_name == 'fecha_nacimiento' %}
+					<td class="noimage">
+						<input type="text" name="fecha_nacimiento" id="id_fecha_nacimiento" class="date">
+						{{ field.errors }}
+					</td>
+				{%else%}
+					{%if field.html_name == 'fecha_ingreso' %}
+					<td class="noimage">
+						<input type="text" name="fecha_ingreso" id="id_fecha_ingreso" class="date">
+						{{ field.errors }}
+					</td>
+					{%else%}
+						{%if field.html_name == 'cedula' %}
+						<td class="noimage">
+							<input type="text" name="cedula" id="id_cedula" onkeyup="solo_numeros();">
+							{{ field.errors }}
+						</td>
+					{%else%}
+						
+						<td class="noimage">{{ field }} {{ field.errors }}</td>
+					{%endif%}	
+					{%endif%}
+				{%endif%}
+			</tr>		
+		{% endfor %}
+		</table>
+	    <input name="" class="boton-verde" type="button" value="Grabar" onclick="_enviar();" style="margin-bottom: 10px; cursor: pointer;" />
+	    	    
+	  </form>
+	<a class="boton-verde" href="/propietarios/">Volver al menú de Propietarios</a>
+	<br><br><br>
+	
+<div class="clear"></div>
+</div>
+{% endblock %}
