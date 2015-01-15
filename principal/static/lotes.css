@@ -207,7 +207,7 @@ table.listado-lotes tr td.last {
     border: thin solid #FFFFFF;
     color: #FFFFFF;
     font-size: 13px;
-    margin-right: 5px;
+    /*margin-right: 5px;*/
     margin-bottom: 5px;
     padding: 5px 10px;
     cursor: pointer;
