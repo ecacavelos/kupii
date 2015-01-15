@@ -305,3 +305,17 @@ def get_timbrado_by_numero(request):
                 return HttpResponseServerError('No se pudo procesar el pedido')
         else:
             return HttpResponseRedirect("/login")
+
+def get_cliente_id_by_name_or_ruc(request):
+    if request.method == 'GET':
+        if request.user.is_authenticated():
+            try:            
+                name_cliente = request.GET['term']
+                print("term ->" + name_cliente);
+                object_list = Cliente.objects.filter(nombres__icontains= name_cliente)
+                results = [ob.as_json() for ob in object_list]
+                return HttpResponse(json.dumps(results), mimetype='application/json')
+            except:
+                return HttpResponseServerError('No se pudo procesar el pedido')
+        else:
+            return HttpResponseRedirect("/login") 
