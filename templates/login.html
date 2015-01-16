@@ -18,7 +18,7 @@
             {% if next %}
                 <input type="hidden" name="next" value="{{ next }}" /></td>
             {% else %}
-                <input type="hidden" name="next" value="/" /></td>
+                <input type="hidden" name="next" value="{% url 'frontend_home' %}" /></td>
             {% endif %}
             
           </form>
