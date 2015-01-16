@@ -3,6 +3,7 @@ from django.http import HttpResponse, HttpResponseServerError, HttpResponseRedir
 from django.template import RequestContext, loader
 from principal.models import Lote, Cliente, Vendedor, PlanDePago, Fraccion, Manzana, Venta, Propietario, PlanDePagoVendedor,PagoDeCuotas 
 from django.utils import simplejson as json
+from django.core.urlresolvers import reverse, resolve
 from datetime import datetime
 from django.contrib import auth
 import common_functions
@@ -21,7 +22,7 @@ def index(request):
                                      })
         return HttpResponse(t.render(c))
     else:
-        return HttpResponseRedirect("/login")
+        return HttpResponseRedirect(reverse('login'))
 
 def retrieve_cedula_cliente(request):
     if request.method == 'GET':

@@ -2,7 +2,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext, loader
 from principal.models import PlanDePago, PlanDePagoVendedor
 from parametros.forms import PlanDePagoForm, SearchForm, PlanDePagoVendedorForm
-
+from django.core.urlresolvers import reverse, resolve
 # Funcion principal del modulo de lotes.
 def parametros(request):
     
@@ -11,7 +11,7 @@ def parametros(request):
         c = RequestContext(request, {})
         return HttpResponse(t.render(c))
     else:
-        return HttpResponseRedirect("/login") 
+        return HttpResponseRedirect(reverse('login')) 
 
 #Funcion del modulo plan de pagos
 def plan_de_pago(request):
@@ -21,7 +21,7 @@ def plan_de_pago(request):
         c = RequestContext(request, {})
         return HttpResponse(t.render(c))
     else:
-        return HttpResponseRedirect("/login")
+        return HttpResponseRedirect(reverse('login'))
 
 #Funcion del modulo plan de pagos vendedores
 def plan_de_pago_vendedores(request):
@@ -31,7 +31,7 @@ def plan_de_pago_vendedores(request):
         c = RequestContext(request, {})
         return HttpResponse(t.render(c))
     else:
-        return HttpResponseRedirect("/login")
+        return HttpResponseRedirect(reverse('login'))
 
 
 #funcion para consultar el listado de todos los planes de pagos
@@ -42,7 +42,7 @@ def consultar_plan_de_pago(request):
         #c = RequestContext(request, {})
         #return HttpResponse(t.render(c))
     else:
-        return HttpResponseRedirect("/login")
+        return HttpResponseRedirect(reverse('login'))
     
     if request.method == 'POST':
         data = request.POST
@@ -83,7 +83,7 @@ def consultar_plan_de_pago_vendedores(request):
         #c = RequestContext(request, {})
         #return HttpResponse(t.render(c))
     else:
-        return HttpResponseRedirect("/login")
+        return HttpResponseRedirect(reverse('login'))
     
     if request.method == 'POST':
         data = request.POST
@@ -125,7 +125,7 @@ def detalle_plan_de_pago(request, plandepago_id):
         #c = RequestContext(request, {})
         #return HttpResponse(t.render(c))
     else:
-        return HttpResponseRedirect("/login")
+        return HttpResponseRedirect(reverse('login'))
     
     object_list = PlanDePago.objects.get(pk=plandepago_id)
     message = ''
@@ -161,7 +161,7 @@ def detalle_plan_de_pago_vendedores(request, plandepago_vendedor_id):
         #c = RequestContext(request, {})
         #return HttpResponse(t.render(c))
     else:
-        return HttpResponseRedirect("/login")
+        return HttpResponseRedirect(reverse('login'))
     
     object_list = PlanDePagoVendedor.objects.get(pk=plandepago_vendedor_id)
     message = ''
@@ -198,7 +198,7 @@ def agregar_plan_de_pago(request):
         #c = RequestContext(request, {})
         #return HttpResponse(t.render(c))
     else:
-        return HttpResponseRedirect("/login")
+        return HttpResponseRedirect(reverse('login'))
     
     if request.method == 'POST':
         form = PlanDePagoForm(request.POST)
@@ -223,7 +223,7 @@ def agregar_plan_de_pago_vendedores(request):
         #c = RequestContext(request, {})
         #return HttpResponse(t.render(c))
     else:
-        return HttpResponseRedirect("/login")
+        return HttpResponseRedirect(reverse('login'))
     
     if request.method == 'POST':
         form = PlanDePagoVendedorForm(request.POST)
@@ -246,4 +246,4 @@ def parametros_generales(request):
         c = RequestContext(request, {})
         return HttpResponse(t.render(c))
     else:
-        return HttpResponseRedirect("/login")
+        return HttpResponseRedirect(reverse('login'))

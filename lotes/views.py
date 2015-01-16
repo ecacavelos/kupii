@@ -4,7 +4,7 @@ from principal.models import Lote, Venta, Manzana, Fraccion, Propietario, Client
 from lotes.forms import LoteForm, FraccionManzana
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
-
+from django.core.urlresolvers import reverse, resolve
 # Funcion principal del modulo de lotes.
 def lotes(request):
     
@@ -13,7 +13,7 @@ def lotes(request):
         c = RequestContext(request, {})
         return HttpResponse(t.render(c))
     else:
-        return HttpResponseRedirect("/login") 
+        return HttpResponseRedirect(reverse('login')) 
 
 # Funcion para consultar el listado de todas las lotes.
 def consultar_lotes(request):
@@ -23,7 +23,7 @@ def consultar_lotes(request):
         #c = RequestContext(request, {})
         #return HttpResponse(t.render(c))
     else:
-        return HttpResponseRedirect("/login") 
+        return HttpResponseRedirect(reverse('login')) 
     
     object_list = Lote.objects.all().order_by( 'id','manzana')
     
@@ -51,7 +51,7 @@ def detalle_lote(request, lote_id):
         #c = RequestContext(request, {})
         #return HttpResponse(t.render(c))
     else:
-        return HttpResponseRedirect("/login")     
+        return HttpResponseRedirect(reverse('login'))     
 
     object_list = Lote.objects.get(pk=lote_id)
     message = ''
@@ -91,7 +91,7 @@ def detalle_ventas_lote(request, venta_id):
         #c = RequestContext(request, {})
         #return HttpResponse(t.render(c))
     else:
-        return HttpResponseRedirect("/login")  
+        return HttpResponseRedirect(reverse('login'))  
     
     try:
         venta = Venta.objects.get(pk=venta_id)
@@ -113,7 +113,7 @@ def agregar_lotes(request):
         #c = RequestContext(request, {})
         #return HttpResponse(t.render(c))
     else:
-        return HttpResponseRedirect("/login") 
+        return HttpResponseRedirect(reverse('login')) 
     
     message = ""    
 
@@ -146,7 +146,7 @@ def listar_busqueda_lotes(request):
         #c = RequestContext(request, {})
         #return HttpResponse(t.render(c))
     else:
-        return HttpResponseRedirect("/login") 
+        return HttpResponseRedirect(reverse('login')) 
     
     
     busqueda = request.POST['busqueda']

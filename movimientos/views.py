@@ -4,7 +4,7 @@ from principal.models import Fraccion, Manzana, Cliente,Propietario, Lote, Vende
 from django.utils import simplejson as json
 from datetime import datetime
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-
+from django.core.urlresolvers import reverse, resolve
  
 # Funcion principal del modulo de lotes.
 def movimientos(request):
@@ -13,7 +13,7 @@ def movimientos(request):
         c = RequestContext(request, {})        
         return HttpResponse(t.render(c))
     else:
-        return HttpResponseRedirect("/login")
+        return HttpResponseRedirect(reverse('login'))
         
 
 def ventas_de_lotes(request):
@@ -91,7 +91,7 @@ def ventas_de_lotes(request):
         # c.update(csrf(request))
         return HttpResponse(t.render(c))
     else: 
-        return HttpResponseRedirect("/login")
+        return HttpResponseRedirect(reverse('login'))
 
 def ventas_de_lotes_calcular_cuotas(request):
     
@@ -121,7 +121,7 @@ def ventas_de_lotes_calcular_cuotas(request):
         except:
             return HttpResponseServerError("No se pudo calcular el monto de pago.")
     else:
-        return HttpResponseRedirect("/login")
+        return HttpResponseRedirect(reverse('login'))
 
 def reservas_de_lotes(request):
     
@@ -159,7 +159,7 @@ def reservas_de_lotes(request):
         })
         return HttpResponse(t.render(c))
     else:
-        return HttpResponseRedirect("/login")
+        return HttpResponseRedirect(reverse('login'))
 
 def pago_de_cuotas(request):
     
@@ -229,7 +229,7 @@ def pago_de_cuotas(request):
         })
         return HttpResponse(t.render(c))
     else:
-        return HttpResponseRedirect("/login")
+        return HttpResponseRedirect(reverse('login'))
 
 def transferencias_de_lotes(request):
     
@@ -278,7 +278,7 @@ def transferencias_de_lotes(request):
         })
         return HttpResponse(t.render(c))
     else:
-        return HttpResponseRedirect("/login")
+        return HttpResponseRedirect(reverse('login'))
 
 def cambio_de_lotes(request):
     
@@ -334,7 +334,7 @@ def cambio_de_lotes(request):
         })
         return HttpResponse(t.render(c))
     else:
-        return HttpResponseRedirect("/login")
+        return HttpResponseRedirect(reverse('login'))
         
 
 def recuperacion_de_lotes(request):
@@ -382,7 +382,7 @@ def recuperacion_de_lotes(request):
         })
         return HttpResponse(t.render(c))
     else:
-        return HttpResponseRedirect("/login")
+        return HttpResponseRedirect(reverse('login'))
 
 
 # Funcion para consultar el listado de todas las ventas.
@@ -414,7 +414,7 @@ def listar_ventas(request):
             print error
             return HttpResponseServerError("No se pudo obtener el Listado de Ventas de Lotes.")
     else:
-        return HttpResponseRedirect("/login")
+        return HttpResponseRedirect(reverse('login'))
             
 #Funcion para consultar el listado de todos los pagos.
 def listar_pagos(request):  
@@ -444,7 +444,7 @@ def listar_pagos(request):
         })
         return HttpResponse(t.render(c))        
     else:
-        return HttpResponseRedirect("/login")
+        return HttpResponseRedirect(reverse('login'))
         
 #Funcion para obtener el listado de cambios de lotes.        
 def listar_cambios(request):
@@ -473,7 +473,7 @@ def listar_cambios(request):
         except:   
             return HttpResponseServerError("No se pudo obtener el Listado de Cambios de Lotes.")
     else:
-        return HttpResponseRedirect("/login")
+        return HttpResponseRedirect(reverse('login'))
             
     
 #Funcion para listar los lotes recuperados.
@@ -503,7 +503,7 @@ def listar_rec(request):
         except:   
             return HttpResponseServerError("No se pudo obtener el Listado de Recuperacion de Lotes.")
     else:
-        return HttpResponseRedirect("/login")
+        return HttpResponseRedirect(reverse('login'))
     
 #Funcion para obtener el listado de los lotes reservados.        
 def listar_res(request):    
@@ -534,7 +534,7 @@ def listar_res(request):
         except:   
             return HttpResponseServerError("No se pudo obtener el Listado de Reservas de Lotes.")
     else:
-        return HttpResponseRedirect("/login")
+        return HttpResponseRedirect(reverse('login'))
     
 #Funcion para obtener el listado de los lotes transferidos.
 def listar_transf(request):
@@ -568,7 +568,7 @@ def listar_transf(request):
         except:   
             return HttpResponseServerError("No se pudo obtener el Listado de Transferencias de Lotes.")
     else:
-        return HttpResponseRedirect("/login")
+        return HttpResponseRedirect(reverse('login'))
 
 
 def listar_busqueda_personas(request):    
@@ -663,7 +663,7 @@ def listar_busqueda_personas(request):
             except:
                 return HttpResponseServerError("Error en la ejecucion.")
     else:   
-        return HttpResponseRedirect("/login")
+        return HttpResponseRedirect(reverse('login'))
     
 def listar_busqueda_ventas(request):    
     if request.user.is_authenticated():
@@ -747,7 +747,7 @@ def listar_busqueda_ventas(request):
             })                             
             return HttpResponse(t.render(c))     
     else:
-        return HttpResponseRedirect("/login")
+        return HttpResponseRedirect(reverse('login'))
 
 def listar_busqueda_pagos(request):    
     if request.user.is_authenticated():
@@ -828,7 +828,7 @@ def listar_busqueda_pagos(request):
             })                    
             return HttpResponse(t.render(c))     
     else: 
-        return HttpResponseRedirect("/login")
+        return HttpResponseRedirect(reverse('login'))
     
     
 def listar_busqueda_reservas(request):
@@ -1070,7 +1070,7 @@ def listar_busqueda_reservas(request):
             except:
                 return HttpResponseServerError("Error en la ejecucion")
     else:
-        return HttpResponseRedirect("/login")
+        return HttpResponseRedirect(reverse('login'))
         
 def listar_busqueda_transferencias(request):
     
@@ -1152,7 +1152,7 @@ def listar_busqueda_transferencias(request):
             except:
                 return HttpResponseServerError("Error en la ejecucion")
     else:
-        return HttpResponseRedirect("/login")
+        return HttpResponseRedirect(reverse('login'))
     
 def listar_busqueda_cambios(request):
     
@@ -1315,7 +1315,7 @@ def listar_busqueda_cambios(request):
             except:
                 return HttpResponseServerError("Error en la ejecucion")
     else:
-        return HttpResponseRedirect("/login")
+        return HttpResponseRedirect(reverse('login'))
         
 def listar_busqueda_recuperacion(request):
     
@@ -1556,7 +1556,7 @@ def listar_busqueda_recuperacion(request):
             except:
                 return HttpResponseServerError("Error en la ejecucion")
     else:
-        return HttpResponseRedirect("/login")   
+        return HttpResponseRedirect(reverse('login'))   
 
 
 

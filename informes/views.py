@@ -6,6 +6,7 @@ from operator import itemgetter
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
 from datetime import datetime, timedelta
+from django.core.urlresolvers import reverse, resolve
 from calendar import monthrange
 from principal.common_functions import get_nro_cuota
 from django.utils import simplejson
@@ -21,7 +22,7 @@ def informes(request):
         c = RequestContext(request, {})
         return HttpResponse(t.render(c))
     else:
-        return HttpResponseRedirect("/login") 
+        return HttpResponseRedirect(reverse('login')) 
 
 def lotes_libres(request): 
     if request.method == 'GET':
@@ -114,7 +115,7 @@ def lotes_libres(request):
                 })
                 return HttpResponse(t.render(c))                
         else:
-            return HttpResponseRedirect("/login") 
+            return HttpResponseRedirect(reverse('login')) 
     
     else:
         c = RequestContext(request, {
@@ -128,7 +129,7 @@ def listar_busqueda_lotes(request):
     if request.user.is_authenticated():
         t = loader.get_template('informes/lotes_libres.html')
     else:
-        return HttpResponseRedirect("/login") 
+        return HttpResponseRedirect(reverse('login')) 
     
     busqueda = request.POST['busqueda']
     if busqueda:
@@ -162,7 +163,7 @@ def listar_clientes_atrasados(request):
     if request.user.is_authenticated():
         t = loader.get_template('informes/detalle_pagos_cliente.html')
     else:
-        return HttpResponseRedirect("/login") 
+        return HttpResponseRedirect(reverse('login')) 
 
     if venta != '' and cliente != '':    
     
@@ -327,7 +328,7 @@ def clientes_atrasados(request):
                 print error    
                 return HttpResponseServerError("No se pudo obtener el Listado de Clientes Atrasados.")
         else:
-            return HttpResponseRedirect("/login")
+            return HttpResponseRedirect(reverse('login'))
         
        
 
@@ -445,7 +446,7 @@ def informe_general(request):
                 })
                 return HttpResponse(t.render(c))                
         else:
-            return HttpResponseRedirect("/login")
+            return HttpResponseRedirect(reverse('login'))
          
 def liquidacion_propietarios(request):
     if request.method == 'GET':
@@ -637,7 +638,7 @@ def liquidacion_propietarios(request):
                 except Exception, error:
                     print error                                 
         else:
-            return HttpResponseRedirect("/login")
+            return HttpResponseRedirect(reverse('login'))
 
 def liquidacion_vendedores(request):
     if request.method == 'GET':
@@ -784,7 +785,7 @@ def liquidacion_vendedores(request):
             })
             return HttpResponse(t.render(c))    
         else:    
-            return HttpResponseRedirect("/login") 
+            return HttpResponseRedirect(reverse('login')) 
         
 def liquidacion_gerentes(request):
     if request.method == 'GET':
@@ -931,7 +932,7 @@ def liquidacion_gerentes(request):
             })
             return HttpResponse(t.render(c))    
         else:    
-            return HttpResponseRedirect("/login") 
+            return HttpResponseRedirect(reverse('login')) 
 
 # def informe_movimientos(request):
 #     if request.method == 'GET':
@@ -1088,7 +1089,7 @@ def liquidacion_gerentes(request):
 #                 })
 #                 return HttpResponse(t.render(c)) 
 #         else:
-#             return HttpResponseRedirect("/login") 
+#             return HttpResponseRedirect(reverse('login')) 
 
 
 
@@ -1226,7 +1227,7 @@ def informe_movimientos(request):
                 })
                 return HttpResponse(t.render(c)) 
         else:
-            return HttpResponseRedirect("/login") 
+            return HttpResponseRedirect(reverse('login')) 
         
         
         

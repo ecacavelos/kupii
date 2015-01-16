@@ -6,6 +6,7 @@ from operator import itemgetter
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
 from datetime import datetime, timedelta
+from django.core.urlresolvers import reverse, resolve
 from calendar import monthrange
 from principal.common_functions import get_nro_cuota
 from django.utils import simplejson
@@ -55,7 +56,7 @@ def facturar(request):
             c = RequestContext(request, {})
             return HttpResponse(t.render(c))
     else:
-        return HttpResponseRedirect("/login") 
+        return HttpResponseRedirect(reverse('login')) 
     
     
 # Funcion para consultar el listado de todas las facturas.
@@ -92,7 +93,7 @@ def consultar_facturas(request):
         })
         return HttpResponse(t.render(c))
     else:
-        return HttpResponseRedirect("/login") 
+        return HttpResponseRedirect(reverse('login')) 
    
 ''' 
 # Funcion para consultar el detalle de una factura.
@@ -102,7 +103,7 @@ def detalle_factura(request, factura_id):
         #c = RequestContext(request, {})
         #return HttpResponse(t.render(c))
     else:
-        return HttpResponseRedirect("/login")
+        return HttpResponseRedirect(reverse('login'))
 
     object_list = Cliente.objects.get(pk=cliente_id)
     message = ''

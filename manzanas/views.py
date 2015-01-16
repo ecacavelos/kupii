@@ -3,6 +3,7 @@ from django.template import RequestContext, loader
 from principal.models import Manzana
 from manzanas.forms import ManzanaForm
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.core.urlresolvers import reverse, resolve
 
 # Funcion principal del modulo de manzanas.
 def manzanas(request):
@@ -12,7 +13,7 @@ def manzanas(request):
         c = RequestContext(request, {})
         return HttpResponse(t.render(c))
     else:
-        return HttpResponseRedirect("/login") 
+        return HttpResponseRedirect(reverse('login')) 
 
 # Funcion para consultar el listado de todas las manzanas.
 def consultar_manzanas(request):
@@ -23,7 +24,7 @@ def consultar_manzanas(request):
         #c = RequestContext(request, {})
         #return HttpResponse(t.render(c))
     else:
-        return HttpResponseRedirect("/login") 
+        return HttpResponseRedirect(reverse('login')) 
     
     object_list = Manzana.objects.all().order_by('id')
     
@@ -50,7 +51,7 @@ def agregar_lotes_por_manzana(request):
         #c = RequestContext(request, {})
         #return HttpResponse(t.render(c))
     else:
-        return HttpResponseRedirect("/login") 
+        return HttpResponseRedirect(reverse('login')) 
     
     if request.method == 'POST':
         form = ManzanaForm(request.POST)
@@ -75,7 +76,7 @@ def detalle_manzana(request, manzana_id):
         #c = RequestContext(request, {})
         #return HttpResponse(t.render(c))
     else:
-        return HttpResponseRedirect("/login")  
+        return HttpResponseRedirect(reverse('login'))  
  
     object_list = Manzana.objects.get(pk=manzana_id)
     message = ''
@@ -111,7 +112,7 @@ def listar_busqueda_manzanas(request):
         #c = RequestContext(request, {})
         #return HttpResponse(t.render(c))
     else:
-        return HttpResponseRedirect("/login") 
+        return HttpResponseRedirect(reverse('login')) 
     
     fraccion,manzana=busqueda.split("/") 
     object_list=Manzana.objects.filter(nro_manzana=int(manzana),fraccion_id=int(fraccion))

@@ -3,7 +3,7 @@ from django.template import RequestContext, loader
 from principal.models import Cliente
 from clientes.forms import ClienteForm, SearchForm
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-
+from django.core.urlresolvers import reverse, resolve
 #from django.views.generic.list_detail import object_list
 
 # Funcion principal del modulo de clientes.
@@ -13,7 +13,7 @@ def index(request):
         c = RequestContext(request, {})
         return HttpResponse(t.render(c))
     else:
-        return HttpResponseRedirect("/login")
+        return HttpResponseRedirect(reverse('login'))
     
 
 # Funcion para consultar el listado de todos los clientes.
@@ -23,7 +23,7 @@ def consultar_clientes(request):
         #c = RequestContext(request, {})
         #return HttpResponse(t.render(c))
     else:
-        return HttpResponseRedirect("/login")
+        return HttpResponseRedirect(reverse('login'))
     
     if request.method == 'POST':
         data = request.POST
@@ -73,7 +73,7 @@ def detalle_cliente(request, cliente_id):
         #c = RequestContext(request, {})
         #return HttpResponse(t.render(c))
     else:
-        return HttpResponseRedirect("/login")
+        return HttpResponseRedirect(reverse('login'))
 
     object_list = Cliente.objects.get(pk=cliente_id)
     message = ''
@@ -108,7 +108,7 @@ def agregar_clientes(request):
         #c = RequestContext(request, {})
         #return HttpResponse(t.render(c))
     else:
-        return HttpResponseRedirect("/login")
+        return HttpResponseRedirect(reverse('login'))
     
     if request.method == 'POST':
         form = ClienteForm(request.POST)

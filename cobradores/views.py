@@ -2,6 +2,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext, loader
 from principal.models import Cobrador
 from cobradores.forms import CobradorForm
+from django.core.urlresolvers import reverse, resolve
 # from django.views.generic.list_detail import object_list
 
 # Funcion principal del modulo de cobradores.

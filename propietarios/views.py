@@ -3,7 +3,7 @@ from django.template import RequestContext, loader
 from principal.models import Propietario
 from propietarios.forms import PropietarioForm, SearchForm
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-
+from django.core.urlresolvers import reverse, resolve
 
 #from django.views.generic.list_detail import object_list
 
@@ -16,7 +16,7 @@ def index(request):
         c = RequestContext(request, {})
         return HttpResponse(t.render(c))
     else:
-        return HttpResponseRedirect("/login")
+        return HttpResponseRedirect(reverse('login'))
 
 # Funcion para consultar el listado de todos los propietarios.
 def consultar_propietarios(request):
@@ -26,7 +26,7 @@ def consultar_propietarios(request):
         #c = RequestContext(request, {})
         #return HttpResponse(t.render(c))
     else:
-        return HttpResponseRedirect("/login")
+        return HttpResponseRedirect(reverse('login'))
  
     if request.method == 'POST':
         data = request.POST
@@ -76,7 +76,7 @@ def detalle_propietario(request, propietario_id):
         #c = RequestContext(request, {})
         #return HttpResponse(t.render(c))
     else:
-        return HttpResponseRedirect("/login")
+        return HttpResponseRedirect(reverse('login'))
  
     object_list = Propietario.objects.get(pk=propietario_id)
     message = ''
@@ -111,7 +111,7 @@ def agregar_propietarios(request):
         #c = RequestContext(request, {})
         #return HttpResponse(t.render(c))
     else:
-        return HttpResponseRedirect("/login")
+        return HttpResponseRedirect(reverse('login'))
 
     if request.method == 'POST':
         form = PropietarioForm(request.POST)

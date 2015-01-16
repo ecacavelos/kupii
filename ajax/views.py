@@ -6,6 +6,7 @@ from django.views.decorators.http import require_http_methods
 from django.template import RequestContext, loader
 from django.utils import simplejson as json
 from principal.models import Fraccion, Manzana, Venta, PagoDeCuotas, Propietario, Lote, Cliente, Vendedor, PlanDePago, PlanDePagoVendedor,Timbrado
+from django.core.urlresolvers import reverse, resolve
 from principal.common_functions import get_cuotas_detail_by_lote, get_nro_cuota
 from datetime import datetime
 #from principal.reports import reporte_lotes_libres, reporte_general_pagos, reporte_liquidacion_vendedores,reporte_liquidacion_gerentes
@@ -23,7 +24,7 @@ def get_propietario_id_by_name(request):
             except:
                 return HttpResponseServerError('No se pudo procesar el pedido')
         else:
-            return HttpResponseRedirect("/login") 
+            return HttpResponseRedirect(reverse('login')) 
 
 @require_http_methods(["GET"])
 def get_vendedor_name_id_by_cedula(request):
@@ -38,7 +39,7 @@ def get_vendedor_name_id_by_cedula(request):
             except:
                 return HttpResponseServerError('No se pudo procesar el pedido')
         else:
-            return HttpResponseRedirect("/login") 
+            return HttpResponseRedirect(reverse('login')) 
         
 @require_http_methods(["GET"])
 def get_propietario_name_id_by_cedula(request):
@@ -53,7 +54,7 @@ def get_propietario_name_id_by_cedula(request):
             except:
                 return HttpResponseServerError('No se pudo procesar el pedido')
         else:
-            return HttpResponseRedirect("/login") 
+            return HttpResponseRedirect(reverse('login')) 
 
 
 @require_http_methods(["GET"])
@@ -69,7 +70,7 @@ def get_cliente_name_id_by_cedula(request):
             except:
                 return HttpResponseServerError('No se pudo procesar el pedido')
         else:
-            return HttpResponseRedirect("/login") 
+            return HttpResponseRedirect(reverse('login')) 
 
 def get_cliente_id_by_name(request):
     if request.method == 'GET':
@@ -83,7 +84,7 @@ def get_cliente_id_by_name(request):
             except:
                 return HttpResponseServerError('No se pudo procesar el pedido')
         else:
-            return HttpResponseRedirect("/login") 
+            return HttpResponseRedirect(reverse('login')) 
 
 def get_vendedor_id_by_name(request):
     if request.method == 'GET':
@@ -97,7 +98,7 @@ def get_vendedor_id_by_name(request):
             except:
                 return HttpResponseServerError('No se pudo procesar el pedido')
         else:
-            return HttpResponseRedirect("/login") 
+            return HttpResponseRedirect(reverse('login')) 
  
 @require_http_methods(["GET"])
 def get_lotes_a_cargar_by_manzana(request):
@@ -143,7 +144,7 @@ def get_lotes_a_cargar_by_manzana(request):
             except:
                 return HttpResponseServerError('No se pudo procesar el pedido')
         else:
-            return HttpResponseRedirect("/login") 
+            return HttpResponseRedirect(reverse('login')) 
  
 
 @require_http_methods(["GET"])
@@ -159,7 +160,7 @@ def get_propietario_name_by_id(request):
             except:
                 return HttpResponseServerError('No se pudo procesar el pedido')
         else:
-            return HttpResponseRedirect("/login") 
+            return HttpResponseRedirect(reverse('login')) 
 
 
 @require_http_methods(["GET"])
@@ -179,7 +180,7 @@ def get_propietario_lastId(request):
             except:
                 return HttpResponseServerError('No se pudo procesar el pedido')
         else:
-            return HttpResponseRedirect("/login")    
+            return HttpResponseRedirect(reverse('login'))    
     
 
 
@@ -194,7 +195,7 @@ def get_fracciones_by_name(request):
             results = [ob.as_json() for ob in object_list]
             return HttpResponse(json.dumps(results), mimetype='application/json')
         else:
-            return HttpResponseRedirect("/login")
+            return HttpResponseRedirect(reverse('login'))
   
 @require_http_methods(["GET"])
 def get_fracciones_by_id(request):
@@ -206,7 +207,7 @@ def get_fracciones_by_id(request):
             results = [ob.as_json() for ob in object_list]
             return HttpResponse(json.dumps(results), mimetype='application/json')
         else:
-            return HttpResponseRedirect("/login") 
+            return HttpResponseRedirect(reverse('login')) 
 
 @require_http_methods(["GET"])
 def get_manzanas_by_fraccion(request):
@@ -218,7 +219,7 @@ def get_manzanas_by_fraccion(request):
             results = [ob.as_json() for ob in object_list]
             return HttpResponse(json.dumps(results), mimetype='application/json')
         else:
-            return HttpResponseRedirect("/login")
+            return HttpResponseRedirect(reverse('login'))
 
 @require_http_methods(["GET"])
 def get_ventas_by_lote(request):
@@ -236,7 +237,7 @@ def get_ventas_by_lote(request):
             print(json_response)
             return HttpResponse(json_response, mimetype='application/json')
         else:
-            return HttpResponseRedirect("/login") 
+            return HttpResponseRedirect(reverse('login')) 
 
 @require_http_methods(["GET"])
 def get_ventas_by_cliente(request):
@@ -259,7 +260,7 @@ def get_pagos_by_venta(request):
             json.dumps(results)
             return HttpResponse(json.dumps(results), mimetype='application/json')
         else:
-            return HttpResponseRedirect("/login") 
+            return HttpResponseRedirect(reverse('login')) 
 
 @require_http_methods(["GET"])
 def get_plan_pago(request):
@@ -275,7 +276,7 @@ def get_plan_pago(request):
                 except:
                     return HttpResponseServerError('No se pudo procesar el pedido')
             else:
-                return HttpResponseRedirect("/login")
+                return HttpResponseRedirect(reverse('login'))
 
 @require_http_methods(["GET"])
 def get_plan_pago_vendedor(request):
@@ -290,7 +291,7 @@ def get_plan_pago_vendedor(request):
             except:
                 return HttpResponseServerError('No se pudo procesar el pedido')
         else:
-            return HttpResponseRedirect("/login")
+            return HttpResponseRedirect(reverse('login'))
 
 def get_timbrado_by_numero(request):
     if request.method == 'GET':
@@ -304,7 +305,7 @@ def get_timbrado_by_numero(request):
             except:
                 return HttpResponseServerError('No se pudo procesar el pedido')
         else:
-            return HttpResponseRedirect("/login")
+            return HttpResponseRedirect(reverse('login'))
 
 def get_cliente_id_by_name_or_ruc(request):
     if request.method == 'GET':
@@ -318,4 +319,4 @@ def get_cliente_id_by_name_or_ruc(request):
             except:
                 return HttpResponseServerError('No se pudo procesar el pedido')
         else:
-            return HttpResponseRedirect("/login") 
+            return HttpResponseRedirect(reverse('login')) 

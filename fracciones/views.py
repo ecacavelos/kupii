@@ -4,6 +4,7 @@ from principal.models import Propietario,Fraccion, Manzana, Lote
 from fracciones.forms import FraccionForm, FraccionFormAdd
 from django.db import reset_queries, close_connection
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.core.urlresolvers import reverse, resolve
 
 # Funcion principal del modulo de fracciones.
 def fracciones(request):
@@ -14,7 +15,7 @@ def fracciones(request):
         c = RequestContext(request, {})
         return HttpResponse(t.render(c))
     else:
-        return HttpResponseRedirect("/login")
+        return HttpResponseRedirect(reverse('login'))
 
 # Funcion para consultar el listado de todas las fracciones.
 def consultar_fracciones(request):
@@ -25,7 +26,7 @@ def consultar_fracciones(request):
         #c = RequestContext(request, {})
         #return HttpResponse(t.render(c))
     else:
-        return HttpResponseRedirect("/login")
+        return HttpResponseRedirect(reverse('login'))
     
     object_list = Fraccion.objects.all().order_by('id')
     
@@ -53,7 +54,7 @@ def detalle_fraccion(request, fraccion_id):
         #c = RequestContext(request, {})
         #return HttpResponse(t.render(c))
     else:
-        return HttpResponseRedirect("/login")    
+        return HttpResponseRedirect(reverse('login'))    
 
     object_list = Fraccion.objects.get(pk=fraccion_id)
     message = ''
@@ -110,7 +111,7 @@ def agregar_fracciones(request):
         #c = RequestContext(request, {})
         #return HttpResponse(t.render(c))
     else:
-        return HttpResponseRedirect("/login")   
+        return HttpResponseRedirect(reverse('login'))   
 
     if request.method == 'POST':
         form = FraccionForm(request.POST)
@@ -150,7 +151,7 @@ def listar_busqueda_fracciones(request):
         #c = RequestContext(request, {})
         #return HttpResponse(t.render(c))
     else:
-        return HttpResponseRedirect("/login") 
+        return HttpResponseRedirect(reverse('login')) 
         
     if tipo_busqueda == "numero":
         

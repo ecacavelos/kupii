@@ -3,6 +3,7 @@ from django.template import RequestContext, loader
 from principal.models import Vendedor
 from vendedores.forms import VendedorForm
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.core.urlresolvers import reverse, resolve
 #from django.views.generic.list_detail import object_list
 
 # Funcion principal del modulo de vendedores.
@@ -13,7 +14,7 @@ def vendedores(request):
         c = RequestContext(request, {})
         return HttpResponse(t.render(c))
     else:
-        return HttpResponseRedirect("/login")
+        return HttpResponseRedirect(reverse('login'))
 
 # Funcion para consultar el listado de todas los vendedores.
 def consultar_vendedores(request):
@@ -23,7 +24,7 @@ def consultar_vendedores(request):
         #c = RequestContext(request, {})
         #return HttpResponse(t.render(c))
     else:
-        return HttpResponseRedirect("/login")
+        return HttpResponseRedirect(reverse('login'))
     
     object_list = Vendedor.objects.all().order_by('id')
     
@@ -51,7 +52,7 @@ def detalle_vendedor(request, vendedor_id):
         #c = RequestContext(request, {})
         #return HttpResponse(t.render(c))
     else:
-        return HttpResponseRedirect("/login")    
+        return HttpResponseRedirect(reverse('login'))    
 
     object_list = Vendedor.objects.get(pk=vendedor_id)
     message = ''
@@ -87,7 +88,7 @@ def agregar_vendedores(request):
         #c = RequestContext(request, {})
         #return HttpResponse(t.render(c))
     else:
-        return HttpResponseRedirect("/login")
+        return HttpResponseRedirect(reverse('login'))
 
     if request.method == 'POST':
         form = VendedorForm(request.POST)
