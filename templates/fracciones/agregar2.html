@@ -21,8 +21,8 @@
 
 {% block content %}
 <div class="gri16 text-izquierda" id="breadcumb">
-	<a href="/">Inicio</a><span class="verde-1">></span>
-	<a href="/fracciones">Fracciones</a>
+	<a href="{% url 'frontend_home' %}">Inicio</a><span class="verde-1">></span>
+	<a href="{% url 'frontend_home' %}fracciones">Fracciones</a>
 	<span class="verde-1">> Agregar Fracci&oacute;n</span>
 </div>
 
@@ -58,7 +58,7 @@
 				{%if field.html_name == 'propietario' %}
 				<td class="noimage">
 					<input type="text" id="id_name_propietario" name="name_propietario" placeholder="Ingrese el Nombre"/>
-					o <a href="/propietarios/agregar/" class="boton-verde" target="_blank">Agregar Nuevo Propietario</a> {{ field.errors }}<br><br>
+					o <a href="{% url 'frontend_home' %}propietarios/agregar/" class="boton-verde" target="_blank">Agregar Nuevo Propietario</a> {{ field.errors }}<br><br>
 					<input type="text" id="id_cedula_propietario" name="cedula_propietario" placeholder="Ingrese el Nro. de C.I." onkeyup="solo_numeros();"/> 
 				</td>
 				{%else%}
@@ -81,7 +81,7 @@
 				{%if field.html_name == 'cantidad_manzanas' %}
 				<td class="noimage">
 				<input type="text" name="cantidad_manzanas" id="id_cantidad_manzanas" onkeyup="activar_boton();">
-				<a href="/manzanas/agregar_lotes_por_manzana/" id="boton_cantidad_lotes" class="boton-verde" target="_blank" onclick="crear_form();">Cantidad Lotes por Manzana</a>{{ field.errors }}</td>
+				<a href="{% url 'frontend_home' %}manzanas/agregar_lotes_por_manzana/" id="boton_cantidad_lotes" class="boton-verde" target="_blank" onclick="crear_form();">Cantidad Lotes por Manzana</a>{{ field.errors }}</td>
 				{%else%}
 				<td class="noimage">{{ field }} {{ field.errors }}</td>
 				{%endif%}
@@ -98,7 +98,7 @@
 		</table>
 		<input name="" type="button" value="Grabar" style="margin-bottom: 10px; cursor: pointer;" onclick="validar_id_propietario();" />
 	</form>
-		<a class="boton-verde" href="/fracciones/">Volver al menú de Fracciones</a>
+		<a class="boton-verde" href="{% url 'frontend_home' %}fracciones/">Volver al menú de Fracciones</a>
 		<br><br><br>
 	<div class="clear"></div>
 </div>

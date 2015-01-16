@@ -23,8 +23,8 @@
 {% endblock %}
 {% block content %}
 <div class="gri16" id="breadcumb">
-	<a href="/">Inicio</a><span class="verde-1">></span>
-	<a href="/informes/">Informes</a>
+	<a href="{% url 'frontend_home' %}">Inicio</a><span class="verde-1">></span>
+	<a href="{% url 'frontend_home' %}informes/">Informes</a>
 	<span class="verde-1">> Clientes Atrasados</span>
 </div>
 
@@ -109,6 +109,6 @@
 </div>
 
 <div id="footer">
-	<a href="/informes" class="boton-verde">Volver al módulo de Informes</a>
+	<a href="{% url 'frontend_home' %}informes" class="boton-verde">Volver al módulo de Informes</a>
 </div>
 {% endblock %}

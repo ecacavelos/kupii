@@ -23,8 +23,8 @@ function buscar(){
 {% endblock %}
 {% block content %}
 <div class="gri16 text-izquierda" id="breadcumb">
-	<a href="/">Inicio</a> <span class="verde-1">></span>  
-	<a href="/manzanas">Manzanas</a> 
+	<a href="{% url 'frontend_home' %}">Inicio</a> <span class="verde-1">></span>  
+	<a href="{% url 'frontend_home' %}manzanas">Manzanas</a> 
 	<span class="verde-1">> Listado de Manzanas</span> 
 </div>
 <div class="clear"></div>
@@ -84,5 +84,5 @@ function buscar(){
 	</table>
 </div>
 
-<div id="footer"><a href="/manzanas" class="boton-verde">Volver al módulo de Manzanas</a></div>
+<div id="footer"><a href="{% url 'frontend_home' %}manzanas" class="boton-verde">Volver al módulo de Manzanas</a></div>
 {% endblock %}

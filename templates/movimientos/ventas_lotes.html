@@ -26,8 +26,8 @@ var data = [
 
 {% block content %}
 <div class="gri16 text-izquierda" id="breadcumb">
-	<a href="/">Inicio</a> <span class="verde-1">></span>  
-	<a href="/movimientos/">Movimientos</a> 
+	<a href="{% url 'frontend_home' %}">Inicio</a> <span class="verde-1">></span>  
+	<a href="{% url 'frontend_home' %}movimientos/">Movimientos</a> 
 	<span class="verde-1">> Vender Lote</span> 
 </div>
 <div class="clear"></div>
@@ -79,7 +79,7 @@ var data = [
 			<td class="noimage"><input id="id_cliente" type="hidden" name="cliente"  maxlength="100" onchange="retrieveCliente()" />
 				<input id="id_name_cliente" type="text" name="name_cliente" placeholder="Ingrese el Nombre"  maxlength="100" /> <br><br>				
 				<input id="id_cedula_cliente" type="text" name="cedula_cliente" placeholder="Ingrese el Nro. de C.I."  maxlength="100" />
-				o <a href="/clientes/agregar/" class="boton-verde" target="_blank">Agregar Nuevo Cliente</a> {{ field.errors }}<br><br>			
+				o <a href="{% url 'frontend_home' %}clientes/agregar/" class="boton-verde" target="_blank">Agregar Nuevo Cliente</a> {{ field.errors }}<br><br>			
 			</td>
 			<td class="noimage"><div id="cliente_seleccionado"></div>
 			<ul class="errorlist"><li id="cliente_error"></li></ul></td>
@@ -91,7 +91,7 @@ var data = [
 			<td class="noimage"><input id="id_vendedor" type="hidden" name="vendedor" maxlength="100" onchange="retrieveVendedor()" />
 				<input id="id_name_vendedor" type="text" name="name_vendedor" placeholder="Ingrese el Nombre" maxlength="100" /> <br><br>
 				<input id="id_cedula_vendedor" type="text" name="cedula_vendedor" placeholder="Ingrese el Nro. de C.I."  maxlength="100" />
-				o <a href="/vendedores/agregar/" class="boton-verde" target="_blank">Agregar Nuevo Vendedor</a> {{ field.errors }}<br><br>	
+				o <a href="{% url 'frontend_home' %}vendedores/agregar/" class="boton-verde" target="_blank">Agregar Nuevo Vendedor</a> {{ field.errors }}<br><br>	
 			</td>
 			<td class="noimage"><div id="vendedor_seleccionado"></div>	
 			<ul class="errorlist"><li id="vendedor_error"></li></ul></td>
@@ -157,7 +157,7 @@ var data = [
 	</div>
 	
 	<div id="footer">
-		<a href="/movimientos/" class="boton-verde">Volver al m&oacute;dulo de movimientos</a>
+		<a href="{% url 'frontend_home' %}movimientos/" class="boton-verde">Volver al m&oacute;dulo de movimientos</a>
 	</div>
 
 {% endblock %}

@@ -39,8 +39,8 @@
 {% endblock %}
 {% block content %}
 <div class="gri16 text-izquierda" id="breadcumb">
-	<a href="/">Inicio</a><span class="verde-1">></span>
-	<a href="/movimientos/">Movimientos</a>
+	<a href="{% url 'frontend_home' %}">Inicio</a><span class="verde-1">></span>
+	<a href="{% url 'frontend_home' %}movimientos/">Movimientos</a>
 	<span class="verde-1">> Listado de Ventas</span>
 </div>
 <div class="clear"></div>
@@ -78,7 +78,7 @@
 
 <div class="clear"></div>
 <div id="listado-cuadro-busqueda">
-	<a href="/movimientos/ventas_lotes/" class="boton-verde">Agregar Venta</a>
+	<a href="{% url 'frontend_home' %}movimientos/ventas_lotes/" class="boton-verde">Agregar Venta</a>
 	<br>
 	<br>
 </div>
@@ -88,7 +88,7 @@
 		{% for lot in object_list %}
 		{% if forloop.counter|divisibleby:2 %}
 		<tr>
-			<td><a href="/lotes/listado/ventas/{{ lot.id }}/">{{lot.id}} <strong>(Ver Detalles)</strong></a></td>
+			<td><a href="{% url 'frontend_home' %}lotes/listado/ventas/{{ lot.id }}/">{{lot.id}} <strong>(Ver Detalles)</strong></a></td>
 			<td>{{lot.lote}}</td>
 			<td>{{lot.lote.manzana.fraccion}}</td>
 			<td>{{lot.cliente}}</td>
@@ -98,7 +98,7 @@
 		</tr>
 		{% else %}
 		<tr class="bkg_gris">
-			<td><a href="/lotes/listado/ventas/{{ lot.id }}/">{{lot.id}} <strong>(Ver Detalles)</strong></a></td>
+			<td><a href="{% url 'frontend_home' %}lotes/listado/ventas/{{ lot.id }}/">{{lot.id}} <strong>(Ver Detalles)</strong></a></td>
 			<td>{{lot.lote}}</td>
 			<td>{{lot.lote.manzana.fraccion}}</td>
 			<td>{{lot.cliente}}</td>
@@ -118,6 +118,6 @@
 </div>
 
 <div id="footer">
-	<a href="/movimientos" class="boton-verde">Volver al módulo de Movimientos</a>
+	<a href="{% url 'frontend_home' %}movimientos" class="boton-verde">Volver al módulo de Movimientos</a>
 </div>
 {% endblock %}

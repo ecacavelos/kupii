@@ -1,5 +1,5 @@
 """
-WSGI config for propar01 project.
+WSGI config for propar project.
 
 This module contains the WSGI application used by Django's development server
 and any production WSGI deployments. It should expose a module-level variable
@@ -14,8 +14,19 @@ framework.
 
 """
 import os
+import sys
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "propar01.settings")
+os.environ['DJANGO_SETTINGS_MODULE'] = 'propar01.settings'
+
+currpath = os.path.dirname(os.path.abspath(__file__))
+newpath = os.path.abspath(os.path.join(currpath, os.pardir))
+#commonpath = os.path.abspath(os.path.join(newpath, os.pardir, 'gesmedwebcommon'))
+
+if newpath not in sys.path:
+    sys.path.append(newpath)
+
+#if commonpath not in sys.path:
+ #   sys.path.append(commonpath)
 
 # This application object is used by any WSGI server configured to use this
 # file. This includes Django's development server, if the WSGI_APPLICATION

@@ -2,9 +2,9 @@
 
 {% block content %}
 <div class="gri16 text-izquierda" id="breadcumb">
-	<a href="/">Inicio</a><span class="verde-1">></span>
-	<a href="/lotes/">Lotes</a><span class="verde-1">></span>
-	<a href="/lotes/listado/">Listado de Lotes</a>
+	<a href="{% url 'frontend_home' %}">Inicio</a><span class="verde-1">></span>
+	<a href="{% url 'frontend_home' %}lotes/">Lotes</a><span class="verde-1">></span>
+	<a href="{% url 'frontend_home' %}lotes/listado/">Listado de Lotes</a>
 	<span class="verde-1">> Detalles de Ventas</span>
 </div>
 
@@ -34,7 +34,7 @@
 
 		<tr>
 			<td>
-				<!--<a href="/lotes/listado/ventas/{{ hw.id }}/">{{venta.id}} <strong>(Ver Detalles)</strong></a>-->
+				<!--<a href="{% url 'frontend_home' %}lotes/listado/ventas/{{ hw.id }}/">{{venta.id}} <strong>(Ver Detalles)</strong></a>-->
 				{{venta.id}}
 			</td>
 			<td>
@@ -67,7 +67,7 @@
 	<br>
 	<br>
 	<div id="footer">
-		<a href="/lotes/listado" class="boton-verde">Volver al Listado de Lotes</a>
-		<a href="/movimientos/listado_ventas" class="boton-verde">Volver al Listado de Ventas</a>
+		<a href="{% url 'frontend_home' %}lotes/listado" class="boton-verde">Volver al Listado de Lotes</a>
+		<a href="{% url 'frontend_home' %}movimientos/listado_ventas" class="boton-verde">Volver al Listado de Ventas</a>
 	</div>
 	{% endblock %}

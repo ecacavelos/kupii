@@ -170,9 +170,9 @@ $(document).ready(function() {
 
 {% block content %}
 <div class="gri16 text-izquierda" id="breadcumb">
-						<a href="/">Inicio</a> <span class="verde-1">></span>  
-						<a href="/parametros/">Parametros</a> <span class="verde-1">></span>  
-						<a href="/parametros/plan_pago_vendedores/listado/">Listado de Plan de pagos de Vendedores</a>  
+						<a href="{% url 'frontend_home' %}">Inicio</a> <span class="verde-1">></span>  
+						<a href="{% url 'frontend_home' %}parametros/">Parametros</a> <span class="verde-1">></span>  
+						<a href="{% url 'frontend_home' %}parametros/plan_pago_vendedores/listado/">Listado de Plan de pagos de Vendedores</a>  
 						<span class="verde-1">> Detalles de Plan de pago de Vendedores</span> 
 					</div>
 
@@ -208,7 +208,7 @@ $(document).ready(function() {
 	</table>
 		<div id="lote-ventas">
 			{% for venta in ventas_relacionadas %}
-				<a href="/lotes/listado/ventas/{{ venta.id }}" target="_blank">{{ venta }}</a>
+				<a href="{% url 'frontend_home' %}lotes/listado/ventas/{{ venta.id }}" target="_blank">{{ venta }}</a>
 			{% endfor %}
 		</div>
 		<input class="lote-form-button" type="submit" name="boton_guardar" value="Guardar Cambios" />
@@ -217,6 +217,6 @@ $(document).ready(function() {
 </div>
 <br>
 <div id="footer">
-	<a href="/parametros/plan_pago_vendedores/listado" class="boton-verde">Volver al Listado de Planes de Pago de Vendedores</a>
+	<a href="{% url 'frontend_home' %}parametros/plan_pago_vendedores/listado" class="boton-verde">Volver al Listado de Planes de Pago de Vendedores</a>
 </div>
 {% endblock %}

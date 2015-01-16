@@ -130,9 +130,9 @@ $(document).ready(function() {
 {% endblock %}
 {% block content %}
 <div class="gri16 text-izquierda" id="breadcumb">
-						<a href="/">Inicio</a> <span class="verde-1">></span>  
-						<a href="/lotes/">Lotes</a> <span class="verde-1">></span>  
-						<a href="/lotes/listado/">Listado de Lotes</a>  
+						<a href="{% url 'frontend_home' %}">Inicio</a> <span class="verde-1">></span>  
+						<a href="{% url 'frontend_home' %}lotes/">Lotes</a> <span class="verde-1">></span>  
+						<a href="{% url 'frontend_home' %}lotes/listado/">Listado de Lotes</a>  
 						<span class="verde-1">> Detalles de Lote</span> 
 					</div>
 
@@ -179,9 +179,9 @@ $(document).ready(function() {
 				<th>Id</th><th>Fecha de Venta</th><th>Vendido a:</th>
 				{% for venta in ventas_relacionadas %}
 				<tr>
-					<td><a href="/lotes/listado/ventas/{{ venta.id }}" target="_blank">{{ venta.id }}</a></td>
-					<td><a href="/lotes/listado/ventas/{{ venta.id }}" target="_blank">{{ venta.fecha_de_venta }}</a></td>
-					<td><a href="/lotes/listado/ventas/{{ venta.id }}" target="_blank">{{ venta.cliente }}</a></td>
+					<td><a href="{% url 'frontend_home' %}lotes/listado/ventas/{{ venta.id }}" target="_blank">{{ venta.id }}</a></td>
+					<td><a href="{% url 'frontend_home' %}lotes/listado/ventas/{{ venta.id }}" target="_blank">{{ venta.fecha_de_venta }}</a></td>
+					<td><a href="{% url 'frontend_home' %}lotes/listado/ventas/{{ venta.id }}" target="_blank">{{ venta.cliente }}</a></td>
 				</tr>
 				{% endfor %}	
 			</table>
@@ -190,6 +190,6 @@ $(document).ready(function() {
 </div>
 <br>
 <div id="footer">
-	<a href="/lotes/listado" class="boton-verde">Volver al Listado de Lotes</a>
+	<a href="{% url 'frontend_home' %}lotes/listado" class="boton-verde">Volver al Listado de Lotes</a>
 </div>
 {% endblock %}

@@ -2,13 +2,13 @@
 
 {% block content %}
 <div class="gri16 text-izquierda" id="breadcumb">
-	<a href="/">Inicio</a> 
-	<a href="/parametros/">> Parametros</a>
+	<a href="{% url 'frontend_home' %}">Inicio</a> 
+	<a href="{% url 'frontend_home' %}parametros/">> Parametros</a>
 	<span class="verde-1">> Planes de pago</span> 
 </div>
 <a href="listado" class="boton-verde">Consultar Planes de pago</a>
 <br><br><br>
 <a href="agregar" class="boton-verde">Agregar Plan de pago</a><br>
 <br><br><br>
-<a href="/parametros/" class="boton-verde">Volver a Parametros</a>
+<a href="{% url 'frontend_home' %}parametros/" class="boton-verde">Volver a Parametros</a>
 {% endblock %}

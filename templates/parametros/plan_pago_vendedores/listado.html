@@ -8,9 +8,9 @@ $(document).ready(function(){
 {%endblock%}
 {% block content %}
 <div class="gri16 text-izquierda" id="breadcumb">
-						<a href="/">Inicio</a> 
-						<a href="/parametros/">> Parametros</a>  
-						<a href="/parametros/plan_pago/">> Planes de pago de Vendedores</a> 
+						<a href="{% url 'frontend_home' %}">Inicio</a> 
+						<a href="{% url 'frontend_home' %}parametros/">> Parametros</a>  
+						<a href="{% url 'frontend_home' %}parametros/plan_pago/">> Planes de pago de Vendedores</a> 
 						<span class="verde-1">> Listado de Planes de pago de Vendedores</span> 
 					</div>
 
@@ -26,7 +26,7 @@ $(document).ready(function(){
 
 					<div class="clear"></div>
 					<div id="listado-cuadro-busqueda">
-						<a href="/parametros/plan_pago_vendedores/agregar" class="boton-verde">Agregar Plan de Pago de Vendedor</a>
+						<a href="{% url 'frontend_home' %}parametros/plan_pago_vendedores/agregar" class="boton-verde">Agregar Plan de Pago de Vendedor</a>
 						<br><br>
 					</div>
 					<div id="listado-item-lote">
@@ -65,5 +65,5 @@ $(document).ready(function(){
 						</table>
 					</div>
 
-<div id="footer"><a href="/parametros/plan_pago_vendedores" class="boton-verde">Volver al módulo de Plan de pago de Vendedores</a></div>
+<div id="footer"><a href="{% url 'frontend_home' %}parametros/plan_pago_vendedores" class="boton-verde">Volver al módulo de Plan de pago de Vendedores</a></div>
 {% endblock %}

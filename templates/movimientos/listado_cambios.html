@@ -36,8 +36,8 @@ function desplegar_fecha(){
 {% endblock %}
 {% block content %}
 <div class="gri16 text-izquierda" id="breadcumb">
-	<a href="/">Inicio</a> <span class="verde-1">></span>  
-	<a href="/movimientos/">Movimientos</a> 
+	<a href="{% url 'frontend_home' %}">Inicio</a> <span class="verde-1">></span>  
+	<a href="{% url 'frontend_home' %}movimientos/">Movimientos</a> 
 	<span class="verde-1">> Listado de Cambios</span> 
 </div>
 <div class="clear"></div>
@@ -69,7 +69,7 @@ function desplegar_fecha(){
 
 					<div class="clear"></div>
 					<div id="listado-cuadro-busqueda">
-						<a href="/movimientos/cambio_lotes" class="boton-verde">Agregar Cambio</a>
+						<a href="{% url 'frontend_home' %}movimientos/cambio_lotes" class="boton-verde">Agregar Cambio</a>
 						<br><br>
 					</div>
 					<div id="listado-item-lote">
@@ -142,5 +142,5 @@ function desplegar_fecha(){
 </table>
  		</div>
 
-<div id="footer"><a href="/movimientos" class="boton-verde">Volver al módulo de Movimientos</a></div>
+<div id="footer"><a href="{% url 'frontend_home' %}movimientos" class="boton-verde">Volver al módulo de Movimientos</a></div>
 {% endblock %}

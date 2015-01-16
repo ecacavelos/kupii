@@ -20,8 +20,8 @@ function buscar(){
 {% endblock %}
 {% block content %}
 <div class="gri16 text-izquierda" id="breadcumb">
-	<a href="/">Inicio</a> <span class="verde-1">></span>  
-	<a href="/propietarios/">Propietarios</a> 
+	<a href="{% url 'frontend_home' %}">Inicio</a> <span class="verde-1">></span>  
+	<a href="{% url 'frontend_home' %}propietarios/">Propietarios</a> 
 	<span class="verde-1">> Listado de Propietarios</span> 
 </div>
 <div class="clear"></div>
@@ -54,7 +54,7 @@ function buscar(){
 </div>
 <div class="clear"></div>
 <div id="listado-cuadro-busqueda">
-	<a href="/propietarios/agregar" class="boton-verde">Agregar Propietario</a>
+	<a href="{% url 'frontend_home' %}propietarios/agregar" class="boton-verde">Agregar Propietario</a>
 	<br><br>
 </div>
 <div id="listado-item-lote">
@@ -96,7 +96,7 @@ function buscar(){
 					</div>
 
 <div id="footer">
-	<a href="/propietarios" class="boton-verde">Volver al módulo de Propietarios</a>
+	<a href="{% url 'frontend_home' %}propietarios" class="boton-verde">Volver al módulo de Propietarios</a>
 	<input name="" class="boton-verde" type="button" value="Cerrar Pestaña" onclick="_cerrar();" style="margin-bottom: 10px; cursor: pointer;" />
 	</div>
 {% endblock %}

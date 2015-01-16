@@ -39,8 +39,8 @@
 {% endblock %}
 {% block content %}
 <div class="gri16 text-izquierda" id="breadcumb">
-	<a href="/">Inicio</a><span class="verde-1">></span>
-	<a href="/movimientos/">Movimientos</a>
+	<a href="{% url 'frontend_home' %}">Inicio</a><span class="verde-1">></span>
+	<a href="{% url 'frontend_home' %}movimientos/">Movimientos</a>
 	<span class="verde-1">> Listado de Pagos</span>
 </div>
 <div class="clear"></div>
@@ -77,7 +77,7 @@
 
 <div class="clear"></div>
 <div id="listado-cuadro-busqueda">
-	<a href="/movimientos/pago_cuotas" class="boton-verde">Agregar Pago de Cuota</a>
+	<a href="{% url 'frontend_home' %}movimientos/pago_cuotas" class="boton-verde">Agregar Pago de Cuota</a>
 	<br>
 	<br>
 </div>
@@ -123,6 +123,6 @@
 </div>
 
 <div id="footer">
-	<a href="/movimientos" class="boton-verde">Volver al módulo de Movimientos</a>
+	<a href="{% url 'frontend_home' %}movimientos" class="boton-verde">Volver al módulo de Movimientos</a>
 </div>
 {% endblock %}

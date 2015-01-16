@@ -2,9 +2,9 @@
 
 {% block content %}
 <div class="gri16 text-izquierda" id="breadcumb">
-						<a href="/">Inicio</a> <span class="verde-1">></span>  
-						<a href="/manzanas/">Manzanas</a> <span class="verde-1">></span>  
-						<a href="/manzanas/listado/">Listado de Manzanas</a>  
+						<a href="{% url 'frontend_home' %}">Inicio</a> <span class="verde-1">></span>  
+						<a href="{% url 'frontend_home' %}manzanas/">Manzanas</a> <span class="verde-1">></span>  
+						<a href="{% url 'frontend_home' %}manzanas/listado/">Listado de Manzanas</a>  
 						<span class="verde-1">> Detalles de Manzana</span> 
 					</div>
 
@@ -46,6 +46,6 @@
 </div>
 <br>
 <div id="footer">
-	<a href="/manzanas/listado" class="boton-verde">Volver al Listado de Manzanas</a>
+	<a href="{% url 'frontend_home' %}manzanas/listado" class="boton-verde">Volver al Listado de Manzanas</a>
 </div>
 {% endblock %}

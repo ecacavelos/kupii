@@ -24,8 +24,8 @@ $(document).ready(function() {
 {% endblock %}
 {% block content %}
 <div class="gri16 text-izquierda" id="breadcumb">
-						<a href="/">Inicio</a> <span class="verde-1">></span>  
-						<a href="/informes/">Informes</a> 
+						<a href="{% url 'frontend_home' %}">Inicio</a> <span class="verde-1">></span>  
+						<a href="{% url 'frontend_home' %}informes/">Informes</a> 
 						<span class="verde-1">> Detalle Pagos </span> 
 					</div>
 
@@ -125,5 +125,5 @@ $(document).ready(function() {
 						</table>
 					</div>
 
-<div id="footer"><a href="/informes/clientes_atrasados/" class="boton-verde">Volver al listado de Clientes Atrasados</a></div>
+<div id="footer"><a href="{% url 'frontend_home' %}informes/clientes_atrasados/" class="boton-verde">Volver al listado de Clientes Atrasados</a></div>
 {% endblock %}

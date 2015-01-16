@@ -18,8 +18,8 @@ function buscar(){
 {% endblock %}
 {% block content %}
 <div class="gri16 text-izquierda" id="breadcumb">
-	<a href="/">Inicio</a> <span class="verde-1">></span>  
-	<a href="/clientes/">Clientes</a> 
+	<a href="{% url 'frontend_home' %}">Inicio</a> <span class="verde-1">></span>  
+	<a href="{% url 'frontend_home' %}clientes/">Clientes</a> 
 	<span class="verde-1">> Listado de Clientes</span> 
 </div>
 <div class="clear"></div>
@@ -53,7 +53,7 @@ function buscar(){
 
 <div class="clear"></div>
 <div id="listado-cuadro-busqueda">
-	<a href="/clientes/agregar" class="boton-verde">Agregar Cliente</a>
+	<a href="{% url 'frontend_home' %}clientes/agregar" class="boton-verde">Agregar Cliente</a>
 	<br><br>
 </div>
 <div id="listado-item-lote">
@@ -62,7 +62,7 @@ function buscar(){
 {% for hw in object_list %}
 		<tr>
 			<td>
-				<a href="/clientes/listado/{{hw.id}}">{{hw.cedula}} <strong>(Ver Detalles)</strong></a>
+				<a href="{% url 'frontend_home' %}clientes/listado/{{hw.id}}">{{hw.cedula}} <strong>(Ver Detalles)</strong></a>
 			</td>
 			<td>
 				{{hw.nombres}} {{hw.apellidos}}
@@ -95,5 +95,5 @@ P&aacute;gina
 						</table>
 					</div>
 <br>
-<div id="footer"><a href="/clientes" class="boton-verde">Volver al módulo de Clientes</a></div>
+<div id="footer"><a href="{% url 'frontend_home' %}clientes" class="boton-verde">Volver al módulo de Clientes</a></div>
 {% endblock %}

@@ -171,8 +171,8 @@ $(document).ready(function() {
 
 {% block content %}
 <div class="gri16 text-izquierda" id="breadcumb">
-	<a href="/">Inicio</a> <span class="verde-1">></span>  
-	<a href="/lotes/">Lotes</a> 
+	<a href="{% url 'frontend_home' %}">Inicio</a> <span class="verde-1">></span>  
+	<a href="{% url 'frontend_home' %}lotes/">Lotes</a> 
 	<span class="verde-1">> Agregar Lote</span> 
 </div>
 
@@ -228,7 +228,7 @@ $(document).ready(function() {
 	    </table>
 	    <input name="" type="button" value="Grabar" onclick="_validar();" style="margin-bottom: 10px; cursor: pointer;" />
 	  </form>
-	  <a class="boton-verde" href="/lotes/">Volver al menú de Lotes</a>
+	  <a class="boton-verde" href="{% url 'frontend_home' %}lotes/">Volver al menú de Lotes</a>
 		<br><br><br>
 	
 	

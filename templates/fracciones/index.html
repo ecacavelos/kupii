@@ -2,12 +2,12 @@
 
 {% block content %}
 <div class="gri16 text-izquierda" id="breadcumb">
-	<a href="/">Inicio</a> 
+	<a href="{% url 'frontend_home' %}">Inicio</a> 
 	<span class="verde-1">> Fracciones</span> 
 </div>
 <a href="listado" class="boton-verde">Consultar Fracciones</a>
 <br><br><br>
 <a href="agregar" class="boton-verde">Agregar Fracción</a><br>
 <br><br><br>
-<a href="/" class="boton-verde">Volver a la Pagina Inicial</a>
+<a href="{% url 'frontend_home' %}" class="boton-verde">Volver a la Pagina Inicial</a>
 {% endblock %}
