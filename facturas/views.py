@@ -11,8 +11,10 @@ from calendar import monthrange
 from principal.common_functions import get_nro_cuota
 from django.utils import simplejson
 from django.db import connection
+from facturas.forms import FacturaForm
 import xlwt
 import math
+import json
 
 # Funcion principal del modulo de facturas.
 def facturar(request):    
@@ -95,7 +97,7 @@ def consultar_facturas(request):
     else:
         return HttpResponseRedirect(reverse('login')) 
    
-''' 
+
 # Funcion para consultar el detalle de una factura.
 def detalle_factura(request, factura_id):    
     if request.user.is_authenticated():
@@ -105,28 +107,29 @@ def detalle_factura(request, factura_id):
     else:
         return HttpResponseRedirect(reverse('login'))
 
-    object_list = Cliente.objects.get(pk=cliente_id)
+    factura = Factura.objects.get(pk=factura_id)
+    detalles=json.loads(factura.detalle)
+    factura.detalle=detalles
     message = ''
-
+        
     if request.method == 'POST':
         data = request.POST
         if data.get('boton_guardar'):
-            form = ClienteForm(data, instance=object_list)
+            form = FacturaForm(data, instance=factura)
             if form.is_valid():
                 message = "Se actualizaron los datos."
                 form.save(commit=False)
-                object_list.save()
+                factura.save()
         elif data.get('boton_borrar'):
-            c = Cliente.objects.get(pk=cliente_id)
+            c = Factura.objects.get(pk=factura_id)
             c.delete()
-            return HttpResponseRedirect('/clientes/listado')
+            return HttpResponseRedirect('/facturacion/listado')
     else:
-        form = ClienteForm(instance=object_list)
+        form = FacturaForm(instance=factura)
 
     c = RequestContext(request, {
-        'cliente': object_list,
+        'factura': factura,
         'form': form,
         'message': message,
     })
     return HttpResponse(t.render(c))
-'''
