@@ -83,7 +83,7 @@
 			iva_5 = $(this).find(".iva_5-item").val();
 			
 			key = 'item' + i;
-			value = {cantidad : cantidad, concepto : concepto, precio_unitario : precio_unitario, iva_10 : iva_10, iva_5 : iva_5 };
+			value = {cantidad : cantidad, concepto : concepto, precio_unitario : precio_unitario, exentas : exentas, iva_10 : iva_10, iva_5 : iva_5 };
 			objeto[key] = value; 			
 			JSON.stringify(objeto);
 

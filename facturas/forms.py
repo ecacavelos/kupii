@@ -9,7 +9,7 @@ class FacturaForm(ModelForm):
     class Meta:
         model = Factura
         #fields = ['fecha', 'headline', 'content', 'reporter']
-#         exclude = ('cliente', 'timbrado'),        
+#         exclude = ('detalle'),        
 #         widgets = {
 #                  'cliente': TextInput,
 #                  'timbrado': TextInput,                

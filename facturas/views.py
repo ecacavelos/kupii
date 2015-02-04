@@ -66,7 +66,13 @@ def consultar_facturas(request):
     if request.user.is_authenticated():
         if request.method == 'GET':
             #Mostrar el formulario basico de factura.  
-            object_list = Factura.objects.all().order_by('id')          
+            object_list = Factura.objects.all().order_by('id','-fecha')
+            monto=0
+#             for factura in object_list:
+#                 lista_detalles=json.loads(factura.detalle)
+#                 for key, value in lista_detalles.iteritems():
+#                     monto+=int(value['cantidad'])*int(value['precio_unitario'])
+#                 factura.monto=monto
             #c = RequestContext(request, {})
             #return HttpResponse(t.render(c))
         else: #POST se envia el formulario.  
@@ -78,7 +84,12 @@ def consultar_facturas(request):
             fecha_ini_parsed = str(datetime.strptime(fecha_ini, "%d/%m/%Y").date())
             fecha_fin_parsed = str(datetime.strptime(fecha_fin, "%d/%m/%Y").date())
             object_list = Factura.objects.filter(fecha__range=(fecha_ini_parsed,fecha_fin_parsed)).order_by('id','fecha')                    
-        
+#             monto=0
+#             for factura in object_list:
+#                 lista_detalles=json.loads(factura.detalle)
+#                 for key, value in lista_detalles.iteritems():
+#                     monto+=int(value['cantidad'])*int(value['precio_unitario'])
+#                 factura.monto=monto
         paginator=Paginator(object_list,15)
         page=request.GET.get('page')
         try:
@@ -108,8 +119,22 @@ def detalle_factura(request, factura_id):
         return HttpResponseRedirect(reverse('login'))
 
     factura = Factura.objects.get(pk=factura_id)
-    detalles=json.loads(factura.detalle)
-    factura.detalle=detalles
+    lista_detalles=json.loads(factura.detalle)
+    #lista_detalles=sorted(lista_detalles.keys())
+    #print type(lista_detalles)
+    #print sorted(lista_detalles.keys())
+    detalles=[]
+    for key, value in lista_detalles.iteritems():
+        detalle={}
+        detalle['item']=key
+        detalle['cantidad']=value['cantidad']
+        detalle['concepto']=value['concepto']
+        detalle['precio_unitario']=value['precio_unitario']
+        detalle['iva_10']=value['iva_10']
+        detalle['iva_5']=value['iva_5']
+#         detalle['exentas']=value['exentas']
+        detalles.append(detalle)
+    
     message = ''
         
     if request.method == 'POST':
@@ -129,6 +154,7 @@ def detalle_factura(request, factura_id):
 
     c = RequestContext(request, {
         'factura': factura,
+        'detalles' : detalles,
         'form': form,
         'message': message,
     })
