@@ -70,12 +70,8 @@ def consultar_facturas(request):
             monto=0
             for factura in object_list:
                 lista_detalles=json.loads(factura.detalle)
-                
                 for key, value in lista_detalles.iteritems():
-                    print value['exentas']
-                    a=int(value['cantidad'])
-                    #print a
-                    #monto+=value['cantidad']*value['precio_unitario']
+                    monto+=int(int(value['cantidad'])*int(value['precio_unitario']))
                 factura.monto=monto
             #c = RequestContext(request, {})
             #return HttpResponse(t.render(c))
@@ -92,7 +88,7 @@ def consultar_facturas(request):
             for factura in object_list:
                 lista_detalles=json.loads(factura.detalle)
                 for key, value in lista_detalles.iteritems():
-                    monto+=int(value['cantidad'])*int(value['precio_unitario'])
+                    monto+=int(int(value['cantidad'])*int(value['precio_unitario']))
                 factura.monto=monto
         paginator=Paginator(object_list,15)
         page=request.GET.get('page')
