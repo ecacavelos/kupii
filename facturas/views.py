@@ -68,11 +68,15 @@ def consultar_facturas(request):
             #Mostrar el formulario basico de factura.  
             object_list = Factura.objects.all().order_by('id','-fecha')
             monto=0
-#             for factura in object_list:
-#                 lista_detalles=json.loads(factura.detalle)
-#                 for key, value in lista_detalles.iteritems():
-#                     monto+=int(value['cantidad'])*int(value['precio_unitario'])
-#                 factura.monto=monto
+            for factura in object_list:
+                lista_detalles=json.loads(factura.detalle)
+                
+                for key, value in lista_detalles.iteritems():
+                    print value['exentas']
+                    a=int(value['cantidad'])
+                    #print a
+                    #monto+=value['cantidad']*value['precio_unitario']
+                factura.monto=monto
             #c = RequestContext(request, {})
             #return HttpResponse(t.render(c))
         else: #POST se envia el formulario.  
@@ -84,12 +88,12 @@ def consultar_facturas(request):
             fecha_ini_parsed = str(datetime.strptime(fecha_ini, "%d/%m/%Y").date())
             fecha_fin_parsed = str(datetime.strptime(fecha_fin, "%d/%m/%Y").date())
             object_list = Factura.objects.filter(fecha__range=(fecha_ini_parsed,fecha_fin_parsed)).order_by('id','fecha')                    
-#             monto=0
-#             for factura in object_list:
-#                 lista_detalles=json.loads(factura.detalle)
-#                 for key, value in lista_detalles.iteritems():
-#                     monto+=int(value['cantidad'])*int(value['precio_unitario'])
-#                 factura.monto=monto
+            monto=0
+            for factura in object_list:
+                lista_detalles=json.loads(factura.detalle)
+                for key, value in lista_detalles.iteritems():
+                    monto+=int(value['cantidad'])*int(value['precio_unitario'])
+                factura.monto=monto
         paginator=Paginator(object_list,15)
         page=request.GET.get('page')
         try:
@@ -132,7 +136,7 @@ def detalle_factura(request, factura_id):
         detalle['precio_unitario']=value['precio_unitario']
         detalle['iva_10']=value['iva_10']
         detalle['iva_5']=value['iva_5']
-#         detalle['exentas']=value['exentas']
+        detalle['exentas']=value['exentas']
         detalles.append(detalle)
     
     message = ''
