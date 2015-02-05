@@ -65,19 +65,16 @@ def facturar(request):
 def consultar_facturas(request):
     if request.user.is_authenticated():
         if request.method == 'GET':
-            #Mostrar el formulario basico de factura.  
+            #Mostrar la lista de todas las facturas.  
             object_list = Factura.objects.all().order_by('id','-fecha')
             monto=0
             for factura in object_list:
                 lista_detalles=json.loads(factura.detalle)
                 for key, value in lista_detalles.iteritems():
-                    monto+=int(int(value['cantidad'])*int(value['precio_unitario']))
-                factura.monto=monto
-            #c = RequestContext(request, {})
-            #return HttpResponse(t.render(c))
-        else: #POST se envia el formulario.  
+                    monto+=int(int(value['cantidad'])*int(value['precio_unitario'])) 
+                factura.monto=str('{:,}'.format(monto)).replace(",", ".") 
+        else: #POST se envia el formulario con los parametros de busqueda.  
             data = request.POST     
-            #object_list = Factura.objects.all().order_by('id')
             # En caso de que se haya solicitado una busqueda, filtramos de acuerdo al parametro correspondiente.
             fecha_ini = data.get('fecha_ini', '')
             fecha_fin = data.get('fecha_fin', '')
@@ -89,7 +86,8 @@ def consultar_facturas(request):
                 lista_detalles=json.loads(factura.detalle)
                 for key, value in lista_detalles.iteritems():
                     monto+=int(int(value['cantidad'])*int(value['precio_unitario']))
-                factura.monto=monto
+                factura.monto=str('{:,}'.format(monto)).replace(",", ".")
+        
         paginator=Paginator(object_list,15)
         page=request.GET.get('page')
         try:
@@ -113,49 +111,48 @@ def consultar_facturas(request):
 def detalle_factura(request, factura_id):    
     if request.user.is_authenticated():
         t = loader.get_template('facturas/detalle.html')
-        #c = RequestContext(request, {})
-        #return HttpResponse(t.render(c))
+        factura = Factura.objects.get(pk=factura_id)
+        lista_detalles=json.loads(factura.detalle)
+        detalles=[]
+        for key, value in lista_detalles.iteritems():
+            detalle={}
+            #detalle['precio_unitario']=str('{:,}'.format(value['precio_unitario']))
+            detalle['item']=key
+            detalle['cantidad']=value['cantidad']
+            detalle['concepto']=value['concepto']
+            detalle['precio_unitario']=value['precio_unitario']
+            detalle['iva_10']=value['iva_10']
+            detalle['iva_5']=value['iva_5']
+            detalle['exentas']=value['exentas']
+            detalles.append(detalle)
+        if factura.tipo=='co':
+            tipo='Contado'
+        else:
+            tipo='Credito'
+        factura.tipo=tipo
+        message = ''
+            
+        if request.method == 'POST':
+            data = request.POST
+            if data.get('boton_guardar'):
+                form = FacturaForm(data, instance=factura)
+                if form.is_valid():
+                    message = "Se actualizaron los datos."
+                    form.save(commit=False)
+                    factura.save()
+            elif data.get('boton_borrar'):
+                c = Factura.objects.get(pk=factura_id)
+                c.delete()
+                return HttpResponseRedirect('/facturacion/listado')
+        else:
+            form = FacturaForm(instance=factura)
+    
+        c = RequestContext(request, {
+            'factura': factura,
+            'detalles' : detalles,
+            'form': form,
+            'message': message,
+        })
+        return HttpResponse(t.render(c))    
     else:
         return HttpResponseRedirect(reverse('login'))
-
-    factura = Factura.objects.get(pk=factura_id)
-    lista_detalles=json.loads(factura.detalle)
-    #lista_detalles=sorted(lista_detalles.keys())
-    #print type(lista_detalles)
-    #print sorted(lista_detalles.keys())
-    detalles=[]
-    for key, value in lista_detalles.iteritems():
-        detalle={}
-        detalle['item']=key
-        detalle['cantidad']=value['cantidad']
-        detalle['concepto']=value['concepto']
-        detalle['precio_unitario']=value['precio_unitario']
-        detalle['iva_10']=value['iva_10']
-        detalle['iva_5']=value['iva_5']
-        detalle['exentas']=value['exentas']
-        detalles.append(detalle)
-    
-    message = ''
-        
-    if request.method == 'POST':
-        data = request.POST
-        if data.get('boton_guardar'):
-            form = FacturaForm(data, instance=factura)
-            if form.is_valid():
-                message = "Se actualizaron los datos."
-                form.save(commit=False)
-                factura.save()
-        elif data.get('boton_borrar'):
-            c = Factura.objects.get(pk=factura_id)
-            c.delete()
-            return HttpResponseRedirect('/facturacion/listado')
-    else:
-        form = FacturaForm(instance=factura)
-
-    c = RequestContext(request, {
-        'factura': factura,
-        'detalles' : detalles,
-        'form': form,
-        'message': message,
-    })
-    return HttpResponse(t.render(c))
