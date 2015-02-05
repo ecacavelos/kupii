@@ -69,7 +69,8 @@ def facturar(request):
             nueva_factura.save()
             
             response = HttpResponse(mimetype='application/pdf')
-            response['Content-Disposition'] = 'attachment; filename=hello.pdf'
+            nombre_factura = "factura-" + nueva_factura.numero + ".pdf"
+            response['Content-Disposition'] = 'attachment; filename=factura.pdf'
             p = canvas.Canvas(response)
             p.setPageSize((19*cm, 14*cm))
             p.setFont("Helvetica",  10)
