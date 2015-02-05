@@ -21,6 +21,7 @@
 			+ '<a href="#" class="add-btn">+</a>'
 		    + '</div>';
 	$(document).ready(function() {
+		$('#lote').mask('###/###/####');
 		$("#id_name_cliente").focus();
 		// 1. Se setea el autocomplete para buscar clientes
 		autocompleteClienteRucONombre('id_name_cliente', 'id_cedula_cliente', 'id_cliente');

@@ -29,6 +29,16 @@ def facturar(request):
             #Obtener el cliente
             cliente_id = request.POST.get('cliente','')
             
+            #Obtener el Lote
+            lote_id = request.POST.get('lote','')
+            
+            x = str(lote_id)
+            fraccion_int = int(x[0:3])
+            manzana_int = int(x[4:7])
+            lote_int = int(x[8:])
+            manzana = Manzana.objects.get(fraccion_id=fraccion_int, nro_manzana=manzana_int)
+            lote_id = Lote.objects.get(manzana=manzana.id, nro_lote=lote_int)
+            
             #Obtener el TIMBRADO
             timbrado_id = request.POST.get('id-timbrado','')
             
@@ -52,6 +62,7 @@ def facturar(request):
             nueva_factura.cliente = Cliente.objects.get(pk=cliente_id)
             nueva_factura.tipo = tipo
             nueva_factura.detalle = detalle
+            nueva_factura.lote = lote_id 
             nueva_factura.save()
             
             t = loader.get_template('facturas/facturar.html')

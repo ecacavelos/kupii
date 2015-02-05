@@ -313,6 +313,9 @@ class Factura(models.Model):
     fecha = models.DateField()
     numero = models.CharField(max_length=30)
     cliente = models.ForeignKey(Cliente)
+    lote = models.ForeignKey(Lote)
     timbrado = models.ForeignKey(Timbrado)
     tipo = models.CharField(max_length=2)
     detalle = models.TextField()
+    
+    
