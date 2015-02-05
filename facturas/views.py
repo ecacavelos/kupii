@@ -12,6 +12,9 @@ from principal.common_functions import get_nro_cuota
 from django.utils import simplejson
 from django.db import connection
 from facturas.forms import FacturaForm
+from reportlab.pdfgen import canvas
+from reportlab.lib.units import cm
+from num2words import num2words
 import xlwt
 import math
 import json
@@ -65,9 +68,81 @@ def facturar(request):
             nueva_factura.lote = lote_id 
             nueva_factura.save()
             
-            t = loader.get_template('facturas/facturar.html')
-            c = RequestContext(request, {})
-            return HttpResponse(t.render(c))
+            response = HttpResponse(mimetype='application/pdf')
+            response['Content-Disposition'] = 'attachment; filename=hello.pdf'
+            p = canvas.Canvas(response)
+            p.setPageSize((19*cm, 14*cm))
+            p.setFont("Helvetica",  10)
+            p.drawString(2*cm, 10.3*cm, str(nueva_factura.fecha.strftime("%Y-%m-%d")))
+            if nueva_factura.tipo == 'co':
+                p.drawString(11*cm, 10.3*cm, "X")
+            else:
+                p.drawString(13.2*cm, 10.3*cm, "X")
+            
+            #p.drawString(15*cm, 4.5*cm, )
+            #Solo se imprime el primer nombre y apellido-- Faltaaa
+            nombre_ape = nueva_factura.cliente.nombres + " " + nueva_factura.cliente.apellidos
+            p.drawString(4*cm, 9.3*cm, str(nombre_ape))
+            if nueva_factura.cliente.ruc == None:
+                nueva_factura.cliente.ruc = ""                
+            p.drawString(2*cm, 8.3*cm, str(nueva_factura.cliente.ruc))
+            #Se obtienen la lista de los detalles
+            lista_detalles=json.loads(nueva_factura.detalle)
+            detalles=[]
+            pos_y = float(7)
+            exentas = 0
+            iva10 =0
+            iva5 = 0
+            total_iva_10 = 0
+            total_iva_5 = 0
+            total_iva = 0           
+            total_gral = 0
+            total_venta = 0
+            for key, value in lista_detalles.iteritems():
+                detalle={}
+                detalle['item']=key
+                detalle['cantidad']=value['cantidad']
+                p.drawString(1.5*cm, float(pos_y - 0.5)*cm, str(detalle['cantidad']))
+                detalle['concepto']=value['concepto']
+                p.drawString(2*cm, float(pos_y - 0.5)*cm, str(detalle['concepto']))
+                detalle['precio_unitario']=value['precio_unitario']
+                p.drawString(8*cm, float(pos_y - 0.5)*cm, str(detalle['precio_unitario']))
+                total_venta +=  int(detalle['cantidad']) * int(detalle['precio_unitario'])
+                detalle['exentas']=value['exentas']
+                p.drawString(10.5*cm, float(pos_y - 0.5)*cm, str(detalle['exentas']))
+                if detalle['exentas'] != '':
+                    exentas += int(detalle['exentas'])
+                detalle['iva_5']=value['iva_5']
+                p.drawString(12*cm, float(pos_y - 0.5)*cm, str(detalle['iva_5']))
+                if detalle['iva_5'] != '':
+                    iva5 += int(detalle['iva_5'])
+                detalle['iva_10']=value['iva_10']
+                p.drawString(14*cm, float(pos_y - 0.5)*cm, str(detalle['iva_10']))
+                if detalle['iva_10'] != '':
+                    iva10 += int(detalle['iva_10'])
+                pos_y -= 0.5
+                detalles.append(detalle)
+            cantidad =  4 - len(detalles)
+            pos_y -= (0.5 * cantidad)
+            p.drawString(10.5*cm, pos_y*cm, str(exentas)) 
+            p.drawString(12*cm, pos_y*cm, str(iva5))   
+            p.drawString(14*cm, pos_y*cm, str(iva10))
+            pos_y -= 0.5
+            p.drawString(14*cm, float(pos_y - 0.5)*cm, str(total_venta))
+            pos_y -= 1
+            p.drawString(14*cm, float(pos_y - 0.5)*cm, str(total_venta))
+            numalet= num2words(int(total_venta), lang='es')
+            p.drawString(6*cm, float(pos_y - 0.5)*cm, str(numalet))
+            total_iva_10 = int(iva10/11)
+            total_iva_5 = int(iva5/21)
+            total_iva = total_iva_10 + total_iva_5
+            pos_y -= 0.5
+            p.drawString(5*cm, float(pos_y - 0.5)*cm, str(total_iva_5))
+            p.drawString(6.2*cm, float(pos_y - 0.5)*cm, str(total_iva_10))
+            p.drawString(11.5*cm, float(pos_y - 0.5)*cm, str(total_iva))
+            p.showPage()
+            p.save()          
+            return response;
     else:
         return HttpResponseRedirect(reverse('login')) 
     
