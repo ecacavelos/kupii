@@ -80,10 +80,12 @@ def facturar(request):
             else:
                 p.drawString(13.2*cm, 10.3*cm, "X")
             
-            #p.drawString(15*cm, 4.5*cm, )
+            p.drawString(15*cm, 10.3*cm, str(manzana.fraccion.nombre))
             #Solo se imprime el primer nombre y apellido-- Faltaaa
             nombre_ape = nueva_factura.cliente.nombres + " " + nueva_factura.cliente.apellidos
             p.drawString(4*cm, 9.3*cm, str(nombre_ape))
+            p.drawString(12*cm, 9.3*cm, str(manzana.nro_manzana))
+            p.drawString(15.5*cm, 9.3*cm, str(lote_id.nro_lote))
             if nueva_factura.cliente.ruc == None:
                 nueva_factura.cliente.ruc = ""                
             p.drawString(2*cm, 8.3*cm, str(nueva_factura.cliente.ruc))
