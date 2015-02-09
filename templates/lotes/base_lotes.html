@@ -26,6 +26,11 @@
 		<script type="text/javascript" src="{{ STATIC_URL }}jquery.mask.min.js"></script>
 		<script type="text/javascript" src="{{ STATIC_URL }}ajax_config.js"></script>
 		<script type="text/javascript" src="{{ STATIC_URL }}common.js"></script>
+		<script type="text/javascript">
+			var base_context = "{% url 'frontend_home' %}";			
+			if (base_context == '/')
+				base_context = "";			
+		</script>
 		{% endblock %}
 		{% block header_scripts %}{% endblock %}
 

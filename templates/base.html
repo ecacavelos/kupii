@@ -5,7 +5,7 @@
 		<meta name="description" content="" />
 		<meta name="keywords" content="" />
 		<meta name="robots" content="noindex" />
-		
+
 		<title>:: PROPAR S.R.L. Inmobiliaria ::</title>
 
 		<link rel="shortcut icon" href="{{ STATIC_URL }}custom/img/favicon.ico" type="image/x-icon"/>
@@ -16,6 +16,11 @@
 		{% block header_resources %}{% endblock %}
 		<script src="{{ STATIC_URL }}custom/js/pngfix.js" type="text/javascript" defer=""></script>
 		<script type="text/javascript" src="{{ STATIC_URL }}jquery-1.10.1.min.js"></script>
+		<script type="text/javascript">
+			var base_context = "{% url 'frontend_home' %}";			
+			if (base_context == '/')
+				base_context = "";			
+		</script>
 		{% block header_scripts %}{% endblock %}
 
 	</head>
@@ -79,11 +84,11 @@
 				<br>
 				<br>
 				<br>
-					<div id="titulo">
-						<b style="color: white">Version 0.1.39 Beta</b>
-					</div>
+				<div id="titulo">
+					<b style="color: white">Version 0.1.39 Beta</b>
 				</div>
-				<div class="clear"></div>
+			</div>
+			<div class="clear"></div>
 		</div>
 		<!--FIN WRAP-->
 	</body>

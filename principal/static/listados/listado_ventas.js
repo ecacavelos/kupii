@@ -40,7 +40,7 @@
 			$("#id_busqueda_label").removeClass("hasDatepicker");
 			var id_vendedor;
 			$("#id_busqueda").empty();
-			base_url = "/ajax/get_vendedor_id_by_name/";
+			base_url = base_context + "/ajax/get_vendedor_id_by_name/";
 			params = "value";
 			$("#id_busqueda_label").autocomplete({
 				source : base_url,
@@ -59,7 +59,7 @@
 			$("#id_busqueda_label").removeClass("hasDatepicker");
 			var id_cliente;
 			$("#id_busqueda").empty();
-			base_url = "/ajax/get_cliente_id_by_name/";
+			base_url = base_context + "/ajax/get_cliente_id_by_name/";
 			params = "value";
 			$("#id_busqueda_label").autocomplete({
 				source : base_url,
