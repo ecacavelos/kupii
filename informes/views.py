@@ -1282,9 +1282,9 @@ def lotes_libres_reporte_excel(request):
         # Se suman los TOTALES GENERALES
         total_general_cuotas += precio_cuota
         total_general_contado += lote_item.precio_contado
-        total_general_credito = 0
-        total_general_superficie = 0
-        total_general_lotes = 0 
+        total_general_credito += lote_item.precio_credito
+        total_general_superficie += lote_item.superficie 
+        total_general_lotes += 1
         
         #Es el ultimo lote, cerrar totales de fraccion
         if (len(object_list)-1 == index):
@@ -1351,7 +1351,7 @@ def lotes_libres_reporte_excel(request):
             
             if lote['total_general_cuotas']:
                 c += 1
-                sheet.write(c, 0, "Totales de Fraccion", style2)  
+                sheet.write(c, 0, "Totales Generales", style2)  
                 sheet.write(c, 2, lote['total_general_lotes'], style2)
                 sheet.write(c, 3, lote['total_general_superficie'], style2)
                 sheet.write(c, 4, lote['total_general_contado'], style2)
