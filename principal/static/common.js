@@ -12,8 +12,7 @@ function autocompleteClienteRucONombre(input_id, cedula_input_id, id_cliente_inp
 	cedula_input_id = '#' + cedula_input_id;
 	id_cliente_input_id = '#' + id_cliente_input_id;
 	var cliente_id;
-	$(input_id).empty();
-	//var base_context = "{% url 'frontend_home' %}";			
+	$(input_id).empty();		
 	base_url = "/ajax/get_cliente_id_by_name_or_ruc/";
 	params = "value";
 	$(input_id).autocomplete({
@@ -40,8 +39,7 @@ function autocompleteTimbradoPorNumero(input_id, id_timbrado_input_id){
 	
 	input_id = '#' + input_id;
 	id_timbrado_input_id = '#' + id_timbrado_input_id;
-	$(input_id).empty();
-	//var base_context = "{% url 'frontend_home' %}";			
+	$(input_id).empty();		
 	base_url = "/ajax/get_timbrado_by_numero/";
 	$(input_id).autocomplete({
 		source : base_url,
