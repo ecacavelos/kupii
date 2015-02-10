@@ -36,7 +36,7 @@ $(document).ready(function() {
 					</div>
 
 					<div class="grid_6">
-  						<form name="frm_busqueda" id="frm_busqueda" method="post" action="/informes/listado_busqueda_pagos/">
+  						<form name="frm_busqueda" id="frm_busqueda" method="post" action="{% url 'frontend_home' %}informes/listado_busqueda_pagos/">
   							{% csrf_token %}
   							<table>
   								<tr>

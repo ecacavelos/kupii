@@ -1,5 +1,5 @@
 function retrieve_liquidacion_vendedores() {
-	window.location.href = "/informes/liquidacion_vendedores_reporte_excel?fecha_ini=" + $('#fecha_ini').val() + "&fecha_fin=" + $('#fecha_fin').val() + "&busqueda=" + $('#id_busqueda').val() + "&tipo_busqueda=" + $('#id_tipo_busqueda').val();
+	window.location.href = base_context + "/informes/liquidacion_vendedores_reporte_excel?fecha_ini=" + $('#fecha_ini').val() + "&fecha_fin=" + $('#fecha_fin').val() + "&busqueda=" + $('#id_busqueda').val() + "&tipo_busqueda=" + $('#id_tipo_busqueda').val();
 }
 
 function validar() {
@@ -30,7 +30,7 @@ function setup_inputs() {
 		
 		var id_vendedor;
 		$("#id_busqueda_label").empty();
-		base_url = "/ajax/get_vendedor_id_by_name/";
+		base_url = base_context + "/ajax/get_vendedor_id_by_name/";
 		params = "value";
 		$("#id_busqueda_label").autocomplete({
 			source : base_url,

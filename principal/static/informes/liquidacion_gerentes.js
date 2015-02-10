@@ -1,5 +1,5 @@
 function retrieve_liquidacion_gerentes() {
-	window.location.href = "/informes/liquidacion_gerentes_reporte_excel?fecha_ini=" + $('#fecha_ini').val() + "&fecha_fin=" + $('#fecha_fin').val() + "&tipo_liquidacion=" + $('#id_tipo_liquidacion').val();
+	window.location.href = base_context + "/informes/liquidacion_gerentes_reporte_excel?fecha_ini=" + $('#fecha_ini').val() + "&fecha_fin=" + $('#fecha_fin').val() + "&tipo_liquidacion=" + $('#id_tipo_liquidacion').val();
 
 }
 
@@ -35,7 +35,7 @@ function setup_inputs() {
 
 	var id_fraccion;
 	$("#id_busqueda_label").empty();
-	base_url = "/ajax/get_fracciones_by_name/";
+	base_url = base_context + "/ajax/get_fracciones_by_name/";
 	params = "value";
 	$("#id_busqueda_label").autocomplete({
 		source : base_url,

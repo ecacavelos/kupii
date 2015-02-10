@@ -8,10 +8,10 @@ function validar() {
 
 function retrieve_lotes_libres() {
 	if($('#id_tipo_busqueda').val()=='nombre'){
-		window.location.href = "/informes/lotes_libres_reporte_excel?fraccion_ini=" + $('#id_frac1').val() + "&fraccion_fin=" + $('#id_frac2').val();
+		window.location.href = base_context + "/informes/lotes_libres_reporte_excel?fraccion_ini=" + $('#id_frac1').val() + "&fraccion_fin=" + $('#id_frac2').val();
 	}
 	if($('#id_tipo_busqueda').val()=='codigo'){
-		window.location.href = "/informes/lotes_libres_reporte_excel?fraccion_ini=" + $('#id_fraccion_ini').val() + "&fraccion_fin=" + $('#id_fraccion_fin').val();
+		window.location.href = base_context + "/informes/lotes_libres_reporte_excel?fraccion_ini=" + $('#id_fraccion_ini').val() + "&fraccion_fin=" + $('#id_fraccion_fin').val();
 	}
 	
 }
@@ -35,7 +35,7 @@ function autocompleteFraccion(){
 		if ($("#id_tipo_busqueda").val() == "nombre") {
 			var id_fraccion;
 			$("#id_busqueda_label").empty();
-			base_url = "/ajax/get_fracciones_by_name/";
+			base_url = base_context + "/ajax/get_fracciones_by_name/";
 			params = "value";
 			$("#id_fraccion_ini").autocomplete({
 				source : base_url,
@@ -47,7 +47,7 @@ function autocompleteFraccion(){
 				}
 			});
 			$("#id_busqueda_label").empty();
-			base_url = "/ajax/get_fracciones_by_name/";
+			base_url = base_context + "/ajax/get_fracciones_by_name/";
 			params = "value";
 			$("#id_fraccion_fin").autocomplete({
 				source : base_url,
@@ -61,7 +61,7 @@ function autocompleteFraccion(){
 		}else if($("#id_tipo_busqueda").val() == "codigo"){
 			var id_fraccion;
 			$("#id_busqueda_label").empty();
-			base_url = "/ajax/get_fracciones_by_id/";
+			base_url = base_context + "/ajax/get_fracciones_by_id/";
 			params = "value";
 			$("#id_fraccion_ini").autocomplete({
 				source : base_url,
@@ -73,7 +73,7 @@ function autocompleteFraccion(){
 				}
 			});
 			$("#id_busqueda_label").empty();
-			base_url = "/ajax/get_fracciones_by_id/";
+			base_url = base_context + "/ajax/get_fracciones_by_id/";
 			params = "value";
 			$("#id_fraccion_fin").autocomplete({
 				source : base_url,

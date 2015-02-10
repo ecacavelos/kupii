@@ -45,7 +45,7 @@
 <h1>Listado de Reservas</h1>
 
 <div class="grid_6">
-	<form name="frm_busqueda" id="frm_busqueda" method="get" action="/movimientos/listado_busqueda_reservas/">
+	<form name="frm_busqueda" id="frm_busqueda" method="get" action="{% url 'frontend_home' %}movimientos/listado_busqueda_reservas/">
 		<table id="lista-categoria" frame="box">
 			<tr>
 				<th class="acciones" colspan="3"><strong><a href="#" style="color: white;">Filtrar</a></strong></th>
