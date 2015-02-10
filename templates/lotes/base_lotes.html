@@ -21,16 +21,16 @@
 
 		{% block java_scripts %}
 		<!--<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>-->
+		<script type="text/javascript">
+			var base_context = "{% url 'frontend_home' %}";			
+			if (base_context == '/')
+				base_context = "";	
+		</script>
 		<script type="text/javascript" src="{{ STATIC_URL }}jquery-1.10.1.min.js"></script>
 		<script type="text/javascript" src="{{ STATIC_URL }}jquery-ui.js"></script>
 		<script type="text/javascript" src="{{ STATIC_URL }}jquery.mask.min.js"></script>
 		<script type="text/javascript" src="{{ STATIC_URL }}ajax_config.js"></script>
-		<script type="text/javascript" src="{{ STATIC_URL }}common.js"></script>
-		<script type="text/javascript">
-			var base_context = "{% url 'frontend_home' %}";			
-			if (base_context == '/')
-				base_context = "";			
-		</script>
+		<script type="text/javascript" src="{{ STATIC_URL }}common.js"></script>		
 		{% endblock %}
 		{% block header_scripts %}{% endblock %}
 

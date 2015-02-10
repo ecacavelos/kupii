@@ -297,7 +297,7 @@ def get_timbrado_by_numero(request):
     if request.method == 'GET':
         if request.user.is_authenticated():
             try:            
-                numero_timbrado = str(request.GET['term'])
+                numero_timbrado = request.GET['term']
                 print("term ->" + numero_timbrado);
                 object_list = Timbrado.objects.filter(numero__icontains= numero_timbrado)
                 results = [ob.as_json() for ob in object_list]

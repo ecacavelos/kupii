@@ -16,11 +16,6 @@
 		{% block header_resources %}{% endblock %}
 		<script src="{{ STATIC_URL }}custom/js/pngfix.js" type="text/javascript" defer=""></script>
 		<script type="text/javascript" src="{{ STATIC_URL }}jquery-1.10.1.min.js"></script>
-		<script type="text/javascript">
-			var base_context = "{% url 'frontend_home' %}";			
-			if (base_context == '/')
-				base_context = "";			
-		</script>
 		{% block header_scripts %}{% endblock %}
 
 	</head>

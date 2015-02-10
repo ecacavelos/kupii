@@ -48,7 +48,7 @@
 <h1>Listado de Ventas</h1>
 
 <div class="grid_6">
-	<form name="frm_busqueda" id="frm_busqueda" method="get" action="/movimientos/listado_busqueda_ventas/">
+	<form name="frm_busqueda" id="frm_busqueda" method="get" action="{% url 'frontend_home' %}movimientos/listado_busqueda_ventas/">
 		<table id="lista-categoria" frame="box">
 			<tr>
 				<th class="acciones" colspan="3"><strong><a href="#" style="color: white;">Filtrar</a></strong></th>

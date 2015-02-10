@@ -6,6 +6,7 @@
 				alert("Debe ingresar un valor para buscar.");
 			} else {
 				$("#frm_busqueda").submit();
+				//$("#frm_busqueda").attr('action',"/base_context").submit();
 			}
 		}
 	}	
