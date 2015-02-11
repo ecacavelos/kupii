@@ -27,7 +27,7 @@ function buscar(){
 <div class="clear"></div>
 <h1>Listado de Vendedores</h1>
 <div class="grid_6">
-	<form name="frm_busqueda" id="frm_busqueda" method="post" action="/movimientos/listado_busqueda_personas/">		
+	<form name="frm_busqueda" id="frm_busqueda" method="post" action="{% url 'frontend_home' %}movimientos/listado_busqueda_personas/">		
 		{% csrf_token %}
 		<table id="lista-categoria" frame="box">
 			<tr>
@@ -58,7 +58,7 @@ function buscar(){
 	<br><br>
 </div>
 <div id="listado-item-lote">
-	<table width="50%" border="1" cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
+	<table width="50%" cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
 		<th>Cedula Nro</th><th>Nombres y apellidos</th><th>Celular</th>
 		{% for hw in object_list %}
 		<tr>
