@@ -11,7 +11,7 @@ $(document).ready(function() {
 		select : function(event, ui) {
 			id_propietario = ui.item.id;
 			$("#busqueda").val(id_propietario);
-			alert(id_propietario);
+			//alert(id_propietario);
 		}
 	});
 	}
@@ -27,7 +27,7 @@ $(document).ready(function() {
 		select : function(event, ui) {
 			id_propietario = ui.item.id;
 			$("#busqueda").val(id_propietario);
-			alert(id_propietario);
+			//alert(id_propietario);
 		}
 	});
 	}

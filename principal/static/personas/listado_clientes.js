@@ -11,7 +11,7 @@ $(document).ready(function() {
 		select : function(event, ui) {
 			id_cliente = ui.item.id;
 			$("#busqueda").val(id_cliente);
-			alert(id_cliente);
+			//alert(id_cliente);
 		}
 	});
 	}
@@ -27,7 +27,7 @@ $(document).ready(function() {
 		select : function(event, ui) {
 			id_cliente = ui.item.id;
 			$("#busqueda").val(id_cliente);
-			alert(id_cliente);
+			//alert(id_cliente);
 		}
 	});
 	}
