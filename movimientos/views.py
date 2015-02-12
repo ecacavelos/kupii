@@ -573,95 +573,85 @@ def listar_transf(request):
 
 def listar_busqueda_personas(request):    
     if request.user.is_authenticated():
-        if request.method == 'POST':
+        if request.method == 'GET':
+            #try:
+            tabla = request.GET['tabla']
+            busqueda = request.GET['busqueda']
+            tipo_busqueda=request.GET['tipo_busqueda']            
+            print 'busqueda->' + busqueda
+            if tabla=='cliente':
+                t = loader.get_template('clientes/listado.html') 
+                object_list = Cliente.objects.filter(pk=busqueda)
+                                               
+            if tabla=='propietario':
+                t = loader.get_template('propietarios/listado.html')
+                object_list = Propietario.objects.filter(pk=busqueda)
+                       
+            if tabla=='vendedor':
+                t = loader.get_template('vendedores/listado.html')
+                object_list = Vendedor.objects.filter(pk=busqueda)
+            
+            ultima_busqueda = "&tabla="+tabla+"&busqueda="+busqueda+"&tipo_busqueda="+tipo_busqueda      
+            paginator=Paginator(object_list,15)
+            page=request.GET.get('page')
             try:
-                tabla = request.POST['tabla']
-                busqueda = request.POST['busqueda']
-                tipo_busqueda=request.POST['tipo_busqueda']
-            
-                if tabla=='cliente':
-                    t = loader.get_template('clientes/listado.html')
-    
-                    if tipo_busqueda=="nombre":
-                        object_list = Cliente.objects.filter(nombres__icontains=busqueda)
-                    if tipo_busqueda=="cedula":
-                        object_list = Cliente.objects.filter(cedula__icontains=busqueda)
-                               
-                if tabla=='propietario':
-                    t = loader.get_template('propietarios/listado.html')
-                    if tipo_busqueda=="nombre":
-                        object_list = Propietario.objects.filter(nombres__icontains=busqueda)
-                    if tipo_busqueda=="cedula":
-                        object_list = Propietario.objects.filter(cedula__icontains=busqueda)
-        
-                if tabla=='vendedor':
-                    t = loader.get_template('vendedores/listado.html')
-                    if tipo_busqueda=="nombre":
-                        object_list = Vendedor.objects.filter(nombres__icontains=busqueda)
-                    if tipo_busqueda=="cedula":
-                        object_list = Vendedor.objects.filter(cedula__icontains=busqueda)
-                
-                ultima_busqueda = "&tabla="+tabla+"&busqueda="+busqueda+"&tipo_busqueda="+tipo_busqueda      
-                paginator=Paginator(object_list,15)
-                page=request.GET.get('page')
-                try:
-                    lista=paginator.page(page)
-                except PageNotAnInteger:
-                    lista=paginator.page(1)
-                except EmptyPage:
-                    lista=paginator.page(paginator.num_pages)
-                c = RequestContext(request, {
-                   'object_list': lista,
-                   'ultima_busqueda': ultima_busqueda,
-                })
-                return HttpResponse(t.render(c))
-            except:
-                return HttpResponseServerError("Error en la ejecucion.")   
-        else:
-            try:
-                t = loader.get_template('clientes/listado.html')
-                tabla = request.GET['tabla']
-                busqueda = request.GET['busqueda']
-                tipo_busqueda=request.GET['tipo_busqueda']
-            
-                if tabla=='cliente':
-                    t = loader.get_template('clientes/listado.html')
-                    if tipo_busqueda=="nombre":
-                        object_list = Cliente.objects.filter(nombres__icontains=busqueda)
-                    if tipo_busqueda=="cedula":
-                        object_list = Cliente.objects.filter(cedula__icontains=busqueda)
-                               
-                if tabla=='propietario':
-                    t = loader.get_template('propietarios/listado.html')
-                    if tipo_busqueda=="nombre":
-                        object_list = Propietario.objects.filter(nombres__icontains=busqueda)
-                    if tipo_busqueda=="cedula":
-                        object_list = Propietario.objects.filter(cedula__icontains=busqueda)
-        
-                if tabla=='vendedor':
-                    t = loader.get_template('vendedores/listado.html')
-                    if tipo_busqueda=="nombre":
-                        object_list = Vendedor.objects.filter(nombres__icontains=busqueda)
-                    if tipo_busqueda=="cedula":
-                        object_list = Vendedor.objects.filter(cedula__icontains=busqueda)
-            
-                ultima_busqueda = "&tabla="+tabla+"&busqueda="+busqueda+"&tipo_busqueda="+tipo_busqueda
-                paginator=Paginator(object_list,15)
-                page=request.GET.get('page')
-                try:
-                    lista=paginator.page(page)
-                except PageNotAnInteger:
-                    lista=paginator.page(1)
-                except EmptyPage:
-                    lista=paginator.page(paginator.num_pages)
-    
-                c = RequestContext(request, {
-                    'object_list': lista,
-                    'ultima_busqueda': ultima_busqueda,
-                })
-                return HttpResponse(t.render(c))
-            except:
-                return HttpResponseServerError("Error en la ejecucion.")
+                lista=paginator.page(page)
+            except PageNotAnInteger:
+                lista=paginator.page(1)
+            except EmptyPage:
+                lista=paginator.page(paginator.num_pages)
+            c = RequestContext(request, {
+               'object_list': lista,
+               'ultima_busqueda': ultima_busqueda,
+            })
+            return HttpResponse(t.render(c))
+            #except:
+            #    return HttpResponseServerError("Error en la ejecucion.")   
+#         else:
+#             try:
+#                 t = loader.get_template('clientes/listado.html')
+#                 tabla = request.GET['tabla']
+#                 busqueda = request.GET['busqueda']
+#                 tipo_busqueda=request.GET['tipo_busqueda']
+#             
+#                 if tabla=='cliente':
+#                     t = loader.get_template('clientes/listado.html')
+#                     if tipo_busqueda=="nombre":
+#                         object_list = Cliente.objects.filter(nombres__icontains=busqueda)
+#                     if tipo_busqueda=="cedula":
+#                         object_list = Cliente.objects.filter(cedula__icontains=busqueda)
+#                                
+#                 if tabla=='propietario':
+#                     t = loader.get_template('propietarios/listado.html')
+#                     if tipo_busqueda=="nombre":
+#                         object_list = Propietario.objects.filter(nombres__icontains=busqueda)
+#                     if tipo_busqueda=="cedula":
+#                         object_list = Propietario.objects.filter(cedula__icontains=busqueda)
+#         
+#                 if tabla=='vendedor':
+#                     t = loader.get_template('vendedores/listado.html')
+#                     if tipo_busqueda=="nombre":
+#                         object_list = Vendedor.objects.filter(nombres__icontains=busqueda)
+#                     if tipo_busqueda=="cedula":
+#                         object_list = Vendedor.objects.filter(cedula__icontains=busqueda)
+#             
+#                 ultima_busqueda = "&tabla="+tabla+"&busqueda="+busqueda+"&tipo_busqueda="+tipo_busqueda
+#                 paginator=Paginator(object_list,15)
+#                 page=request.GET.get('page')
+#                 try:
+#                     lista=paginator.page(page)
+#                 except PageNotAnInteger:
+#                     lista=paginator.page(1)
+#                 except EmptyPage:
+#                     lista=paginator.page(paginator.num_pages)
+#     
+#                 c = RequestContext(request, {
+#                     'object_list': lista,
+#                     'ultima_busqueda': ultima_busqueda,
+#                 })
+#                 return HttpResponse(t.render(c))
+#             except:
+#                 return HttpResponseServerError("Error en la ejecucion.")
     else:   
         return HttpResponseRedirect(reverse('login'))
     
