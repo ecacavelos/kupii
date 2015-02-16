@@ -1,7 +1,7 @@
 from django.http import HttpResponse, HttpResponseServerError,HttpResponseRedirect
 from django.template import RequestContext, loader
 from principal.models import Fraccion, Manzana, Cliente,Propietario, Lote, Vendedor, PlanDePago, PlanDePagoVendedor, Venta, Reserva, PagoDeCuotas, TransferenciaDeLotes, CambioDeLotes, RecuperacionDeLotes
-from django.utils import simplejson as json
+import json
 from datetime import datetime
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.urlresolvers import reverse, resolve

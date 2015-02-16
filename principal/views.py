@@ -2,7 +2,7 @@ from django.db.models import Count, Min, Sum, Avg
 from django.http import HttpResponse, HttpResponseServerError, HttpResponseRedirect
 from django.template import RequestContext, loader
 from principal.models import Lote, Cliente, Vendedor, PlanDePago, Fraccion, Manzana, Venta, Propietario, PlanDePagoVendedor,PagoDeCuotas 
-from django.utils import simplejson as json
+import json
 from django.core.urlresolvers import reverse, resolve
 from datetime import datetime
 from django.contrib import auth

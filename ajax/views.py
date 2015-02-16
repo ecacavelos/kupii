@@ -4,7 +4,7 @@ from django.core.urlresolvers import reverse, resolve
 from django.contrib import messages
 from django.views.decorators.http import require_http_methods
 from django.template import RequestContext, loader
-from django.utils import simplejson as json
+import json
 from principal.models import Fraccion, Manzana, Venta, PagoDeCuotas, Propietario, Lote, Cliente, Vendedor, PlanDePago, PlanDePagoVendedor,Timbrado
 from django.core.urlresolvers import reverse, resolve
 from principal.common_functions import get_cuotas_detail_by_lote, get_nro_cuota
