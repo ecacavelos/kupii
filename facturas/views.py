@@ -9,11 +9,11 @@ from datetime import datetime, timedelta
 from django.core.urlresolvers import reverse, resolve
 from calendar import monthrange
 from principal.common_functions import get_nro_cuota
-from django.utils import json
+import json
 from django.db import connection
 from facturas.forms import FacturaForm
-from reportlab.pdfgen import canvas
-from reportlab.lib.units import cm
+# from reportlab.pdfgen import canvas
+# from reportlab.lib.units import cm
 from num2words import num2words
 import xlwt
 import math

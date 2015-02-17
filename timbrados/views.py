@@ -9,7 +9,7 @@ from django.core.urlresolvers import reverse, resolve
 from datetime import datetime, timedelta
 from calendar import monthrange
 from principal.common_functions import get_nro_cuota
-from django.utils import json
+import json
 from django.db import connection
 import xlwt
 import math
