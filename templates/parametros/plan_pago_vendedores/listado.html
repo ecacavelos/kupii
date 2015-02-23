@@ -1,0 +1,69 @@
+{% extends "lotes/base_lotes.html" %}
+{% block header_scripts %}
+<script type="text/javascript">
+$(document).ready(function(){
+	$( ".grid_6" ).hide();
+});
+</script>
+{%endblock%}
+{% block content %}
+<div class="gri16 text-izquierda" id="breadcumb">
+						<a href="{% url 'frontend_home' %}">Inicio</a> 
+						<a href="{% url 'frontend_home' %}parametros/">> Parametros</a>  
+						<a href="{% url 'frontend_home' %}parametros/plan_pago/">> Planes de pago de Vendedores</a> 
+						<span class="verde-1">> Listado de Planes de pago de Vendedores</span> 
+					</div>
+
+					<div class="clear"></div>
+
+					<div class="grid_10">
+  						<h1>Listado de Planes de Pago de Vendedores</h1>
+					</div>
+
+					<div class="grid_6">
+  						<a href="#" class="historico">Buscar</a>
+					</div>
+
+					<div class="clear"></div>
+					<div id="listado-cuadro-busqueda">
+						<a href="{% url 'frontend_home' %}parametros/plan_pago_vendedores/agregar" class="boton-verde">Agregar Plan de Pago de Vendedor</a>
+						<br><br>
+					</div>
+					<div id="listado-item-lote">
+						<table width="50%" border="1" cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
+							<th>Plan de pago Nro</th><th>Nombre</th><th>Tipo</th><th>Cant. Cuotas</th>
+{% for hw in object_list %}
+		<tr>
+			<td>
+				<a href="{{hw.id}}">{{hw.id}} <strong>(Ver Detalles)</strong></a>
+			</td>
+			<td>
+				{{hw.nombre}}
+			</td>
+			<td>
+				{{hw.tipo}}
+			</td>
+			<td>
+				{{hw.cantidad_cuotas}}
+			</td>
+		</tr>
+
+{% endfor %}
+<div class="pagination">
+    <span class="step-links">
+        {%if object_list.has_previous%}
+        <a href="?page={{ object_list.previous_page_number }}"> Anterior</a>
+		{%endif%}
+    	P&aacute;gina
+    	|{{object_list.number}}|
+    	
+    	{%if object_list.has_next%}
+		<a href="?page={{ object_list.next_page_number }}"> Siguiente</a>
+		{%endif%}
+    </span>
+</div>
+						</table>
+					</div>
+
+<div id="footer"><a href="{% url 'frontend_home' %}parametros/plan_pago_vendedores" class="boton-verde">Volver al módulo de Plan de pago de Vendedores</a></div>
+{% endblock %}
