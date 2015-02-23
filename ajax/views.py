@@ -4,7 +4,7 @@ from django.core.urlresolvers import reverse, resolve
 from django.contrib import messages
 from django.views.decorators.http import require_http_methods
 from django.template import RequestContext, loader
-from django.utils import simplejson as json
+from django.core import serializers
 from principal.models import Fraccion, Manzana, Venta, PagoDeCuotas, Propietario, Lote, Cliente, Vendedor, PlanDePago, PlanDePagoVendedor,Timbrado
 from django.core.urlresolvers import reverse, resolve
 from principal.common_functions import get_cuotas_detail_by_lote, get_nro_cuota
@@ -20,10 +20,9 @@ def get_propietario_id_by_name(request):
                 print("term ->" + name_propietario);
                 object_list = Propietario.objects.filter(nombres__icontains= name_propietario)
                 results = [ob.as_json() for ob in object_list]    
-                return HttpResponse(json.dumps(results), mimetype='application/json')
-            except Exception, error:
-                print error
-                #return HttpResponseServerError('No se pudo procesar el pedido')
+                return HttpResponse(serializers.serialize('json',object_list), mimetype='application/json')
+            except:
+                return HttpResponseServerError('No se pudo procesar el pedido')
         else:
             return HttpResponseRedirect(reverse('login')) 
 
@@ -36,10 +35,9 @@ def get_vendedor_name_id_by_cedula(request):
                 print("term ->" + cedula_vendedor);
                 object_list = Vendedor.objects.filter(cedula__icontains= cedula_vendedor)
                 results = [ob.as_json() for ob in object_list]
-                return HttpResponse(json.dumps(results), mimetype='application/json')
-            except Exception, error:
-                print error
-                #return HttpResponseServerError('No se pudo procesar el pedido')
+                return HttpResponse(serializers.serialize('json',object_list), mimetype='application/json')
+            except:
+                return HttpResponseServerError('No se pudo procesar el pedido')
         else:
             return HttpResponseRedirect(reverse('login')) 
         
@@ -52,10 +50,9 @@ def get_propietario_name_id_by_cedula(request):
                 print("term ->" + cedula_propietario);
                 object_list = Propietario.objects.filter(cedula__icontains= cedula_propietario)
                 results = [ob.as_json() for ob in object_list]
-                return HttpResponse(json.dumps(results), mimetype='application/json')
-            except Exception, error:
-                print error
-                #return HttpResponseServerError('No se pudo procesar el pedido')
+                return HttpResponse(serializers.serialize('json',object_list), mimetype='application/json')
+            except:
+                return HttpResponseServerError('No se pudo procesar el pedido')
         else:
             return HttpResponseRedirect(reverse('login')) 
 
@@ -69,10 +66,9 @@ def get_cliente_name_id_by_cedula(request):
                 print("term ->" + cedula_cliente);
                 object_list = Cliente.objects.filter(cedula__icontains= cedula_cliente)
                 results = [ob.as_json() for ob in object_list]
-                return HttpResponse(json.dumps(results), mimetype='application/json')
-            except Exception, error:
-                print error
-                #return HttpResponseServerError('No se pudo procesar el pedido')
+                return HttpResponse(serializers.serialize('json',object_list), mimetype='application/json')
+            except:
+                return HttpResponseServerError('No se pudo procesar el pedido')
         else:
             return HttpResponseRedirect(reverse('login')) 
 
@@ -84,10 +80,9 @@ def get_cliente_id_by_name(request):
                 print("term ->" + name_cliente);
                 object_list = Cliente.objects.filter(nombres__icontains= name_cliente)
                 results = [ob.as_json() for ob in object_list]
-                return HttpResponse(json.dumps(results), mimetype='application/json')
-            except Exception, error:
-                print error
-                #return HttpResponseServerError('No se pudo procesar el pedido')
+                return HttpResponse(serializers.serialize('json',object_list), mimetype='application/json')
+            except:
+                return HttpResponseServerError('No se pudo procesar el pedido')
         else:
             return HttpResponseRedirect(reverse('login')) 
 
@@ -99,10 +94,9 @@ def get_vendedor_id_by_name(request):
                 print("term ->" + name_vendedor);
                 object_list = Vendedor.objects.filter(nombres__icontains= name_vendedor)
                 results = [ob.as_json() for ob in object_list]
-                return HttpResponse(json.dumps(results), mimetype='application/json')
-            except Exception, error:
-                print error
-                #return HttpResponseServerError('No se pudo procesar el pedido')
+                return HttpResponse(serializers.serialize('json',object_list), mimetype='application/json')
+            except:
+                return HttpResponseServerError('No se pudo procesar el pedido')
         else:
             return HttpResponseRedirect(reverse('login')) 
  
@@ -146,10 +140,9 @@ def get_lotes_a_cargar_by_manzana(request):
                                 record = {"id": i, "label": i}
                                 results.append(record)                 
                             
-                return HttpResponse(json.dumps(results), mimetype='application/json')
-            except Exception, error:
-                print error
-                #return HttpResponseServerError('No se pudo procesar el pedido')
+                return HttpResponse(serializers.serialize('json',object_list), mimetype='application/json')
+            except:
+                return HttpResponseServerError('No se pudo procesar el pedido')
         else:
             return HttpResponseRedirect(reverse('login')) 
  
@@ -163,10 +156,9 @@ def get_propietario_name_by_id(request):
                 print("id ->" + id_propietario);
                 object_list = Propietario.objects.filter(id= id_propietario)
                 results = [ob.as_json() for ob in object_list]
-                return HttpResponse(json.dumps(results), mimetype='application/json')
-            except Exception, error:
-                print error
-                #return HttpResponseServerError('No se pudo procesar el pedido')
+                return HttpResponse(serializers.serialize('json',object_list), mimetype='application/json')
+            except:
+                return HttpResponseServerError('No se pudo procesar el pedido')
         else:
             return HttpResponseRedirect(reverse('login')) 
 
@@ -184,10 +176,9 @@ def get_propietario_lastId(request):
                 id = Propietario.objects.latest('id').id                
                 #object_list = PlanDePago.objects.filter(plan_id=plan_id)
                 results = [{"id": id}]
-                return HttpResponse(json.dumps(results), mimetype='application/json')
-            except Exception, error:
-                print error
-                #return HttpResponseServerError('No se pudo procesar el pedido')
+                return HttpResponse(serializers.serialize('json',object_list), mimetype='application/json')
+            except:
+                return HttpResponseServerError('No se pudo procesar el pedido')
         else:
             return HttpResponseRedirect(reverse('login'))    
     
@@ -197,30 +188,24 @@ def get_propietario_lastId(request):
 @require_http_methods(["GET"])
 def get_fracciones_by_name(request):
     if request.method == 'GET':
-        if request.user.is_authenticated():
-            try:   
-                nombre_fraccion = request.GET['term']
-                print("term ->" + nombre_fraccion);
-                object_list = Fraccion.objects.filter(nombre__icontains=nombre_fraccion)
-                results = [ob.as_json() for ob in object_list]
-                return HttpResponse(json.dumps(results), mimetype='application/json')
-            except Exception, error:
-                print error
+        if request.user.is_authenticated():    
+            nombre_fraccion = request.GET['term']
+            print("term ->" + nombre_fraccion);
+            object_list = Fraccion.objects.filter(nombre__icontains=nombre_fraccion)
+            results = [ob.as_json() for ob in object_list]
+            return HttpResponse(serializers.serialize('json',object_list), mimetype='application/json')
         else:
             return HttpResponseRedirect(reverse('login'))
   
 @require_http_methods(["GET"])
 def get_fracciones_by_id(request):
     if request.method == 'GET':
-        if request.user.is_authenticated():
-            try:    
-                id_fraccion = request.GET['term']
-                print("term ->" + id_fraccion);
-                object_list = Fraccion.objects.filter(id__icontains=id_fraccion).order_by('id')
-                results = [ob.as_json() for ob in object_list]
-                return HttpResponse(json.dumps(results), mimetype='application/json')
-            except Exception, error:
-                print error
+        if request.user.is_authenticated():    
+            id_fraccion = request.GET['term']
+            print("term ->" + id_fraccion);
+            object_list = Fraccion.objects.filter(id__icontains=id_fraccion).order_by('id')
+            results = [ob.as_json() for ob in object_list]
+            return HttpResponse(serializers.serialize('json',object_list), mimetype='application/json')
         else:
             return HttpResponseRedirect(reverse('login')) 
 
@@ -228,14 +213,11 @@ def get_fracciones_by_id(request):
 def get_manzanas_by_fraccion(request):
     if request.method == 'GET':
         if request.user.is_authenticated():
-            try:
-                fraccion_id = request.GET['fraccion_id']
-                print("fraccion_id ->" + fraccion_id);
-                object_list = Manzana.objects.filter(fraccion_id=fraccion_id)
-                results = [ob.as_json() for ob in object_list]
-                return HttpResponse(json.dumps(results), mimetype='application/json')
-            except Exception, error:
-                print error
+            fraccion_id = request.GET['fraccion_id']
+            print("fraccion_id ->" + fraccion_id);
+            object_list = Manzana.objects.filter(fraccion_id=fraccion_id)
+            results = [ob.as_json() for ob in object_list]
+            return HttpResponse(serializers.serialize('json',object_list), mimetype='application/json')
         else:
             return HttpResponseRedirect(reverse('login'))
 
@@ -243,48 +225,40 @@ def get_manzanas_by_fraccion(request):
 def get_ventas_by_lote(request):
     if request.method == 'GET':
         if request.user.is_authenticated():
-            try:
-                lote_id = request.GET['lote_id']
-                print("lote_id ->" + lote_id)
-                object_list = Venta.objects.filter(lote=lote_id).order_by('-id')[:1]
-                venta = [ob.as_json() for ob in object_list]
-                cuotas_details = get_cuotas_detail_by_lote(lote_id)
-                json_response = json.dumps({
-                    'venta': venta,
-                    'cuotas_details': cuotas_details,
-                })
-                print(json_response)
-                return HttpResponse(json_response, mimetype='application/json')
-            except Exception, error:
-                print error
+            lote_id = request.GET['lote_id']
+            print("lote_id ->" + lote_id)
+            object_list = Venta.objects.filter(lote=lote_id).order_by('-id')[:1]
+            venta = [ob.as_json() for ob in object_list]
+            cuotas_details = get_cuotas_detail_by_lote(lote_id)
+            json_response = json.dumps({
+                'venta': venta,
+                'cuotas_details': cuotas_details,
+            })
+            print(json_response)
+            return HttpResponse(json_response, mimetype='application/json')
         else:
             return HttpResponseRedirect(reverse('login')) 
 
 @require_http_methods(["GET"])
 def get_ventas_by_cliente(request):
-    try:
-        cliente_id = request.GET['cliente']
-        print("cliente_id ->" + cliente_id);
-        object_list = Venta.objects.filter(cliente=cliente_id)
-        results = [ob.as_json() for ob in object_list]
-        json.dumps(results)
-        return HttpResponse(json.dumps(results), mimetype='application/json')
-    except Exception, error:
-        print error
+    
+    cliente_id = request.GET['cliente']
+    print("cliente_id ->" + cliente_id);
+    object_list = Venta.objects.filter(cliente=cliente_id)
+    results = [ob.as_json() for ob in object_list]
+    serializers.serialize('json',object_list)
+    return HttpResponse(serializers.serialize('json',object_list), mimetype='application/json')
 
 @require_http_methods(["GET"])
 def get_pagos_by_venta(request):
     if request.method == 'GET':
         if request.user.is_authenticated():
-            try:
-                venta_id = request.GET['venta_id']
-                print("venta_id ->" + venta_id);
-                object_list = PagoDeCuotas.objects.filter(venta=venta_id)
-                results = [ob.as_json() for ob in object_list]
-                json.dumps(results)
-                return HttpResponse(json.dumps(results), mimetype='application/json')
-            except Exception, error:
-                print error
+            venta_id = request.GET['venta_id']
+            print("venta_id ->" + venta_id);
+            object_list = PagoDeCuotas.objects.filter(venta=venta_id)
+            results = [ob.as_json() for ob in object_list]
+            serializers.serialize('json',object_list)
+            return HttpResponse(serializers.serialize('json',object_list), mimetype='application/json')
         else:
             return HttpResponseRedirect(reverse('login')) 
 
@@ -298,10 +272,9 @@ def get_plan_pago(request):
                     print("term ->" + nombre_plan);
                     object_list = PlanDePago.objects.filter(nombre_del_plan__icontains= nombre_plan)
                     results = [ob.as_json() for ob in object_list]
-                    return HttpResponse(json.dumps(results), mimetype='application/json')
-                except Exception, error:
-                    print error
-                    #return HttpResponseServerError('No se pudo procesar el pedido')
+                    return HttpResponse(serializers.serialize('json',object_list), mimetype='application/json')
+                except:
+                    return HttpResponseServerError('No se pudo procesar el pedido')
             else:
                 return HttpResponseRedirect(reverse('login'))
 
@@ -314,10 +287,9 @@ def get_plan_pago_vendedor(request):
                 print("term ->" + nombre_plan);
                 object_list = PlanDePagoVendedor.objects.filter(nombre__icontains= nombre_plan)
                 results = [ob.as_json() for ob in object_list]
-                return HttpResponse(json.dumps(results), mimetype='application/json')
-            except Exception, error:
-                print error
-                #return HttpResponseServerError('No se pudo procesar el pedido')
+                return HttpResponse(serializers.serialize('json',object_list), mimetype='application/json')
+            except:
+                return HttpResponseServerError('No se pudo procesar el pedido')
         else:
             return HttpResponseRedirect(reverse('login'))
 
@@ -329,54 +301,20 @@ def get_timbrado_by_numero(request):
                 print("term ->" + numero_timbrado);
                 object_list = Timbrado.objects.filter(numero__icontains= numero_timbrado)
                 results = [ob.as_json() for ob in object_list]
-                return HttpResponse(json.dumps(results), mimetype='application/json')
+                return HttpResponse(serializers.serialize('json',object_list), mimetype='application/json')
             except Exception, error:
-                print error
-                #return HttpResponseServerError('No se pudo procesar el pedido')
+                print error    
+                return HttpResponseServerError('No se pudo procesar el pedido')
         else:
             return HttpResponseRedirect(reverse('login'))
 
 def get_cliente_id_by_name_or_ruc(request):
     if request.method == 'GET':
         if request.user.is_authenticated():
-            try:            
-                name_cliente = request.GET['term']
-                print("term ->" + name_cliente);
-                object_list = Cliente.objects.filter(nombres__icontains= name_cliente)
-                results = [ob.as_json() for ob in object_list]
-                return HttpResponse(json.dumps(results), mimetype='application/json')
-            except Exception, error:
-                print error
-                #return HttpResponseServerError('No se pudo procesar el pedido')
-        else:
-            return HttpResponseRedirect(reverse('login')) 
-        
-def get_vendedor_id_by_name_or_cedula(request):
-    if request.method == 'GET':
-        if request.user.is_authenticated():
-            try:            
-                name_vendedor = request.GET['term']
-                print("term ->" + name_vendedor);
-                object_list = Vendedor.objects.filter(nombres__icontains= name_vendedor)
-                results = [ob.as_json() for ob in object_list]
-                return HttpResponse(json.dumps(results), mimetype='application/json')
-            except Exception, error:
-                print error
-                #return HttpResponseServerError('No se pudo procesar el pedido')
-        else:
-            return HttpResponseRedirect(reverse('login')) 
-        
-def get_propietario_id_by_name_or_cedula(request):
-    if request.method == 'GET':
-        if request.user.is_authenticated():
-            try:            
-                name_cliente = request.GET['term']
-                print("term ->" + name_cliente);
-                object_list = Cliente.objects.filter(nombres__icontains= name_cliente)
-                results = [ob.as_json() for ob in object_list]
-                return HttpResponse(json.dumps(results), mimetype='application/json')
-            except Exception, error:
-                print error
-                #return HttpResponseServerError('No se pudo procesar el pedido')
+            name_cliente = request.GET['term']
+            print("term ->" + name_cliente);
+            object_list = Cliente.objects.filter(nombres__icontains= name_cliente)
+#                 results = [ob.as_json() for ob in object_list]
+            return HttpResponse(serializers.serialize('json', object_list), content_type="application/json")
         else:
             return HttpResponseRedirect(reverse('login')) 

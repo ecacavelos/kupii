@@ -2,7 +2,7 @@ from django.db.models import Count, Min, Sum, Avg
 from django.http import HttpResponse, HttpResponseServerError, HttpResponseRedirect
 from django.template import RequestContext, loader
 from principal.models import Lote, Cliente, Vendedor, PlanDePago, Fraccion, Manzana, Venta, Propietario, PlanDePagoVendedor,PagoDeCuotas 
-from django.utils import simplejson as json
+from django.core import serializers
 from django.core.urlresolvers import reverse, resolve
 from datetime import datetime
 from django.contrib import auth
@@ -260,7 +260,7 @@ def get_all_planes(request):
             object_list = PlanDePago.objects.filter(nombre_del_plan__icontains=nombre_plan)
             results = [ob.as_json() for ob in object_list]
             
-            return HttpResponse(json.dumps(results), mimetype='application/json')
+            return HttpResponse(serializers.serialize('json',object_list), mimetype='application/json')
         except:
             return HttpResponseServerError('No se pudo procesar el pedido')
             #return (e)
@@ -277,7 +277,7 @@ def get_all_planes_vendedores(request):
 #    object_list = PlanDePago.objects.filter(plan_id=plan_id)
             results = [ob.as_json() for ob in object_list]
             
-            return HttpResponse(json.dumps(results), mimetype='application/json')
+            return HttpResponse(serializers.serialize('json',object_list), mimetype='application/json')
         except:
             return HttpResponseServerError('No se pudo procesar el pedido')
             #return (e)         
@@ -293,7 +293,7 @@ def get_propietario_id_by_name(request):
 #    object_list = PlanDePago.objects.filter(plan_id=plan_id)
             results = [ob.as_json() for ob in object_list]
 
-            return HttpResponse(json.dumps(results), mimetype='application/json')
+            return HttpResponse(serializers.serialize('json',object_list), mimetype='application/json')
         except:
             return HttpResponseServerError('No se pudo procesar el pedido')
             #return (e)     
