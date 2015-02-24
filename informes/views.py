@@ -315,7 +315,7 @@ def clientes_atrasados(request):
                     return HttpResponse(t.render(c))                 
             except Exception, error:
                 print error    
-                return HttpResponseServerError("No se pudo obtener el Listado de Clientes Atrasados.")
+                #return HttpResponseServerError("No se pudo obtener el Listado de Clientes Atrasados.")
         else:
             return HttpResponseRedirect(reverse('login'))
         
@@ -753,7 +753,8 @@ def liquidacion_vendedores(request):
                             ultimo['total_comision']=str('{:,}'.format(total_comision)).replace(",", ".")             
                             ultimo['total_general_importe']=str('{:,}'.format(total_general_importe)).replace(",", ".") 
                             ultimo['total_general_comision']=str('{:,}'.format(total_general_comision)).replace(",", ".")          
-                        except:
+                        except Exception, error:
+                            print error 
                             pass
             ultimo="&busqueda_label="+busqueda_label+"&busqueda="+vendedor_id+"&fecha_ini="+fecha_ini+"&fecha_fin="+fecha_fin         
             paginator = Paginator(cuotas, 25)
@@ -904,7 +905,8 @@ def liquidacion_gerentes(request):
                             ultimo['total_comision']=str('{:,}'.format(total_comision)).replace(",", ".")             
                             ultimo['total_general_importe']=str('{:,}'.format(total_general_importe)).replace(",", ".") 
                             ultimo['total_general_comision']=str('{:,}'.format(total_general_comision)).replace(",", ".")          
-                        except:
+                        except Exception, error:
+                            print error 
                             pass
                                      
                 monto_calculado=int(math.ceil((float(total_general_importe)*float(0.1))/float(2)))   
@@ -1346,7 +1348,8 @@ def lotes_libres_reporte_excel(request):
                 sheet.write(c, 4, lote['total_general_contado'], style2)
                 sheet.write(c, 5, lote['total_general_credito'], style2)
                 sheet.write(c, 6, lote['total_general_cuotas'], style2)            
-        except:
+        except Exception, error:
+            print error 
             pass
     response = HttpResponse(content_type='application/vnd.ms-excel')
     # Crear un nombre intuitivo         
@@ -1446,7 +1449,7 @@ def clientes_atrasados_reporte_excel(request):
     
     except Exception, error:
         print error    
-        return HttpResponseServerError("No se pudo obtener el Listado de Clientes Atrasados.")              
+        #return HttpResponseServerError("No se pudo obtener el Listado de Clientes Atrasados.")              
     if clientes_atrasados:        
         sheet.write(0, 0, "Cliente", style)
         sheet.write(0, 1, "Lote", style)
@@ -1613,7 +1616,8 @@ def informe_general_reporte_excel(request):
                 sheet.write(c, 6, cuota['total_general_cuotas'], style2)
                 sheet.write(c, 7, cuota['total_general_mora'], style2)
                 sheet.write(c, 8, cuota['total_general_pago'], style2)                
-        except:
+        except Exception, error:
+            print error
             pass
        
     
@@ -1809,7 +1813,8 @@ def liquidacion_propietarios_reporte_excel(request):
                 sheet.write(c, 4, pago['total_monto_pagado'],style2)
                 sheet.write(c, 5, pago['total_monto_inmobiliaria'], style2)
                 sheet.write(c, 6, pago['total_monto_propietario'], style2)
-        except:
+        except Exception, error:
+            print error 
             pass
         try:
             if (pago['total_general_pagado']): 
@@ -1818,7 +1823,8 @@ def liquidacion_propietarios_reporte_excel(request):
                 sheet.write(c, 4, pago['total_general_pagado'],style2)
                 sheet.write(c, 5, pago['total_general_inmobiliaria'], style2)
                 sheet.write(c, 6, pago['total_general_propietario'], style2)
-        except:
+        except Exception, error:
+            print error 
             pass
   
     response = HttpResponse(content_type='application/vnd.ms-excel')
@@ -1942,7 +1948,8 @@ def liquidacion_vendedores_reporte_excel(request):
                 ultimo['total_comision']=str('{:,}'.format(total_comision)).replace(",", ".")             
                 ultimo['total_general_importe']=str('{:,}'.format(total_general_importe)).replace(",", ".") 
                 ultimo['total_general_comision']=str('{:,}'.format(total_general_comision)).replace(",", ".")          
-            except:
+            except Exception, error:
+                print error 
                 pass
             
     wb = xlwt.Workbook(encoding='utf-8')
@@ -1986,7 +1993,8 @@ def liquidacion_vendedores_reporte_excel(request):
                 sheet.write(c, 0, "Totales del Vendedor", style2)
                 sheet.write(c, 7, cuota['total_general_importe'])
                 sheet.write(c, 8, cuota['total_general_comision'])
-        except:
+        except Exception, error:
+            print error 
             pass
     response = HttpResponse(content_type='application/vnd.ms-excel')
     # Crear un nombre intuitivo         
@@ -2111,7 +2119,8 @@ def liquidacion_gerentes_reporte_excel(request):
                 ultimo['total_comision']=str('{:,}'.format(total_comision)).replace(",", ".")             
                 ultimo['total_general_importe']=str('{:,}'.format(total_general_importe)).replace(",", ".") 
                 ultimo['total_general_comision']=str('{:,}'.format(total_general_comision)).replace(",", ".")          
-            except:
+            except Exception, error:
+                print error 
                 pass
                                      
     monto_calculado=int(math.ceil((float(total_general_importe)*float(0.1))/float(2)))   
@@ -2150,7 +2159,8 @@ def liquidacion_gerentes_reporte_excel(request):
                     sheet.write(c, 0, "Totales Generales", style2)
                     sheet.write(c, 3, str(cuota['total_general_importe']))
                     sheet.write(c, 4, str(cuota['total_general_comision']))    
-            except:
+            except Exception, error:
+                print error 
                 pass
         else:           
             try:
@@ -2160,6 +2170,8 @@ def liquidacion_gerentes_reporte_excel(request):
                     sheet.write(c, 3, str(cuota['total_importe']))
                     sheet.write(c, 4, str(cuota['total_comision']))                                 
             except:
+                except Exception, error:
+                print error 
                 pass
             c+=1                        
             sheet.write(c, 0, str(cuota['fecha_pago']))

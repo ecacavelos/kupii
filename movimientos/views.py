@@ -5,6 +5,9 @@ import json
 from datetime import datetime
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.urlresolvers import reverse, resolve
+from principal.common_functions import get_nro_cuota, monthdelta, get_cuotas_detail_by_lote
+import math
+from principal.monthdelta import MonthDelta 
  
 # Funcion principal del modulo de lotes.
 def movimientos(request):
@@ -55,7 +58,7 @@ def ventas_de_lotes(request):
             try:        
                 nueva_venta = Venta()
                 nueva_venta.lote = lote_a_vender
-                nueva_venta.fecha_de_venta = fecha_venta_parsed
+                #nueva_venta.fecha_de_venta = fecha_venta_parsed
                 nueva_venta.cliente = Cliente.objects.get(pk=cliente_id)
                 nueva_venta.vendedor = Vendedor.objects.get(pk=vendedor_id)
                 nueva_venta.plan_de_pago = PlanDePago.objects.get(pk=plan_pago_id)
@@ -68,7 +71,8 @@ def ventas_de_lotes(request):
                 nueva_venta.importacion_paralot=False
                 nueva_venta.plan_de_pago_vendedor= PlanDePagoVendedor.objects.get(pk=plan_pago_vendedor_id)
             except Exception, error:
-                print error            
+                print error 
+                pass           
             if nueva_venta.plan_de_pago.tipo_de_plan != 'contado':
                 cant_cuotas = nueva_venta.plan_de_pago.cantidad_de_cuotas
                 sumatoria_cuotas = nueva_venta.entrega_inicial + (cant_cuotas * nueva_venta.precio_de_cuota)
@@ -118,8 +122,9 @@ def ventas_de_lotes_calcular_cuotas(request):
             else:
                 response_data['monto_valido'] = False
             return HttpResponse(json.dumps(response_data), content_type="application/json")
-        except:
-            return HttpResponseServerError("No se pudo calcular el monto de pago.")
+        except Exception, error:
+            print error 
+            #return HttpResponseServerError("No se pudo calcular el monto de pago.")
     else:
         return HttpResponseRedirect(reverse('login'))
 
@@ -161,14 +166,12 @@ def reservas_de_lotes(request):
     else:
         return HttpResponseRedirect(reverse('login'))
 
-def pago_de_cuotas(request):
-    
+def pago_de_cuotas(request):        
     if request.user.is_authenticated():
         t = loader.get_template('movimientos/pago_cuotas.html')
         
         if request.method == 'POST':
-            data = request.POST
-    
+            data = request.POST    
             lote_id = data.get('pago_lote_id', '')
             nro_cuotas_a_pagar = data.get('pago_nro_cuotas_a_pagar')
             venta_id = data.get('pago_venta_id')
@@ -181,20 +184,21 @@ def pago_de_cuotas(request):
             total_de_cuotas = data.get('pago_total_de_cuotas')
             total_de_mora = data.get('pago_total_de_mora')
             total_de_pago = data.get('pago_total_de_pago')
-            
             date_parse_error = False
-    
-            try:
-                fecha_pago_parsed = datetime.strptime(data.get('pago_fecha_de_pago', ''), "%d/%m/%Y")
-            except:
-                date_parse_error = True
-    
-            if date_parse_error == True:
-                try:
-                    fecha_pago_parsed = datetime.strptime(data.get('pago_fecha_de_pago', ''), "%Y-%m-%d")
-                except:
-                    date_parse_error = True
-            
+            fecha_pago=data.get('pago_fecha_de_pago', '')
+            fecha_pago_parsed = datetime.strptime(fecha_pago, "%d/%m/%Y").date()
+#             try:
+#                 fecha_pago_parsed = datetime.strptime(data.get('pago_fecha_de_pago', ''), "%d/%m/%Y")
+#             except:
+#                 date_parse_error = True
+#       
+#             if date_parse_error == True:
+#                 try:
+#                     fecha_pago_parsed = datetime.strptime(data.get('pago_fecha_de_pago', ''), "%Y-%m-%d")
+#                 except:
+#                     date_parse_error = True
+            #print fecha_pago
+            #print fecha_pago_parsed
             cantidad_cuotas = PlanDePago.objects.get(pk=plan_pago_id)
             cuotas_pagadas = Venta.objects.get(pk=venta.id)        
             cuotas_restantes = int(cantidad_cuotas.cantidad_de_cuotas) - int(cuotas_pagadas.pagos_realizados)        
@@ -215,7 +219,7 @@ def pago_de_cuotas(request):
                     nuevo_pago.save()
                 except Exception, error:
                     print error
-                
+                    pass
                 venta.save()
                 c = RequestContext(request, {
     
@@ -229,7 +233,84 @@ def pago_de_cuotas(request):
         })
         return HttpResponse(t.render(c))
     else:
-        return HttpResponseRedirect(reverse('login'))
+        return HttpResponseRedirect("/login")
+
+def calcular_interes(request):
+    #calculando el interes
+    if request.method == 'POST':
+        data = request.POST    
+        lote_id = data.get('lote_id', '')
+        print 'lote_id->' + lote_id
+         
+        #cuotas_a_pagar = int(data.get('nro_cuotas_a_pagar', ''))
+        fecha_pago = data.get('fecha_pago', '')
+        proximo_vencimiento = data.get('proximo_vencimiento', '')
+        fecha_pago_parsed = datetime.strptime(fecha_pago, "%d/%m/%Y").date()
+        proximo_vencimiento_parsed = datetime.strptime(proximo_vencimiento, "%d/%m/%Y").date()
+     
+        resumen_lote=get_cuotas_detail_by_lote(lote_id)
+        cuotas_pagadas=resumen_lote['cant_cuotas_pagadas']
+        
+        detalles=[]
+        #El cliente tiene cuotas atrasadas
+        if fecha_pago_parsed>proximo_vencimiento_parsed:
+            
+#         TODO:
+#         Se calcula la diferencia en dias de la fecha del pago que se esta realizando, con 
+#         respecto a la fecha de vencimiento de dicho pago. El porcentaje de interes que se aplica
+#         sobre las cuotas es constante: 0.00067 (0.002/30) -> 2% interes mensual/30
+#         + interes punitorio (0.00020) + iva (0.00009)
+
+            
+            #Obtenemos la fecha del primer vencimiento de la cuota, de la ultima venta
+            ventas = Venta.objects.filter(lote_id=lote_id)
+            for item_venta in ventas:
+                print 'Obteniendo la ultima venta'
+                try: 
+                    RecuperacionDeLotes.objects.get(venta=item_venta.id)
+                except RecuperacionDeLotes.DoesNotExist:
+                    print 'se encontro la venta no recuperada, la venta actual'
+                    venta = item_venta  
+            
+            
+            #Calculamos en base al primer vencimiento, cuantas cuotas debieron haberse pagado hasta la fecha
+            fecha_primer_vencimiento=venta.fecha_primer_vencimiento
+            cantidad_ideal_cuotas=monthdelta(fecha_primer_vencimiento, fecha_pago_parsed)
+            #Y obtenemos las cuotas atrasadas
+            cuotas_atrasadas=cantidad_ideal_cuotas-cuotas_pagadas+1
+            monto_cuota=venta.precio_de_cuota
+            
+            #Intereses (valores constantes)
+            #Interes moratorio por dia
+            interes=0.00067
+            
+            #Interes
+            interes_punitorio=0.00020
+            
+            #Intereses IVA
+            interes_iva=0.00009
+            
+            total_intereses=interes+interes_punitorio+interes_iva
+            
+            for cuota in range(cuotas_atrasadas+1):
+                detalle={}
+                fecha_vencimiento=proximo_vencimiento_parsed+MonthDelta(cuota)
+                dias_atraso=(fecha_pago_parsed-fecha_vencimiento).days                
+                intereses=math.ceil(total_intereses*dias_atraso*monto_cuota)
+                
+                detalle['interes']=interes
+                detalle['interes_punitorio']=interes_punitorio
+                detalle['interes_iva']=interes_iva
+                detalle['nro_cuota']=cuotas_pagadas+(cuota+1)
+                detalle['dias_atraso']=dias_atraso
+                detalle['intereses']=intereses
+                detalle['vencimiento']=fecha_vencimiento.strftime('%d/%m/%Y')
+                
+               
+                detalles.append(detalle)
+            
+            print detalles
+        return HttpResponse(json.dumps(detalles), mimetype='application/json')
 
 def transferencias_de_lotes(request):
     
@@ -412,7 +493,7 @@ def listar_ventas(request):
             return HttpResponse(t.render(c))       
         except Exception, error:
             print error
-            return HttpResponseServerError("No se pudo obtener el Listado de Ventas de Lotes.")
+            #return HttpResponseServerError("No se pudo obtener el Listado de Ventas de Lotes.")
     else:
         return HttpResponseRedirect(reverse('login'))
             
@@ -470,8 +551,9 @@ def listar_cambios(request):
                 'object_list': lista,
             })
             return HttpResponse(t.render(c))
-        except:   
-            return HttpResponseServerError("No se pudo obtener el Listado de Cambios de Lotes.")
+        except Exception, error:
+            print error 
+            #return HttpResponseServerError("No se pudo obtener el Listado de Cambios de Lotes.")
     else:
         return HttpResponseRedirect(reverse('login'))
             
@@ -500,8 +582,9 @@ def listar_rec(request):
                 'object_list': lista,
             })
             return HttpResponse(t.render(c))
-        except:   
-            return HttpResponseServerError("No se pudo obtener el Listado de Recuperacion de Lotes.")
+        except Exception, error:
+            print error    
+            #return HttpResponseServerError("No se pudo obtener el Listado de Recuperacion de Lotes.")
     else:
         return HttpResponseRedirect(reverse('login'))
     
@@ -531,8 +614,9 @@ def listar_res(request):
                 'object_list': lista,
             })
             return HttpResponse(t.render(c))
-        except:   
-            return HttpResponseServerError("No se pudo obtener el Listado de Reservas de Lotes.")
+        except Exception, error:
+            print error    
+            #return HttpResponseServerError("No se pudo obtener el Listado de Reservas de Lotes.")
     else:
         return HttpResponseRedirect(reverse('login'))
     
@@ -565,8 +649,9 @@ def listar_transf(request):
                 'fraccion': f,
             })
             return HttpResponse(t.render(c))
-        except:   
-            return HttpResponseServerError("No se pudo obtener el Listado de Transferencias de Lotes.")
+        except Exception, error:
+            print error    
+            #return HttpResponseServerError("No se pudo obtener el Listado de Transferencias de Lotes.")
     else:
         return HttpResponseRedirect(reverse('login'))
 
@@ -671,8 +756,9 @@ def listar_busqueda_ventas(request):
                     fraccion_int = int(x[0:3])
                     manzana_int =int(x[4:7])
                     lote_int = int(x[8:])
-                except:
-                    return HttpResponseServerError("Datos erroneos, favor cargar el numero de lote con el formato Fraccion/Manzana/Lote.")       
+                except Exception, error:
+                    print error 
+                    #return HttpResponseServerError("Datos erroneos, favor cargar el numero de lote con el formato Fraccion/Manzana/Lote.")       
                 try:
                     manzana_id=Manzana.objects.get(fraccion_id=fraccion_int,nro_manzana=manzana_int)
                     lote_id=Lote.objects.get(manzana_id=manzana_id,nro_lote=lote_int)
@@ -755,8 +841,9 @@ def listar_busqueda_pagos(request):
                     fraccion_int = int(x[0:3])
                     manzana_int =int(x[4:7])
                     lote_int = int(x[8:])
-                except:
-                    return HttpResponseServerError("Datos erroneos, favor cargar el numero de lote con el formato Fraccion/Manzana/Lote.")       
+                except Exception, error:
+                    print error 
+                    #return HttpResponseServerError("Datos erroneos, favor cargar el numero de lote con el formato Fraccion/Manzana/Lote.")       
                 try:
                     manzana_id=Manzana.objects.get(fraccion_id=fraccion_int,nro_manzana=manzana_int)
                     lote_id=Lote.objects.get(manzana_id=manzana_id,nro_lote=lote_int)
@@ -837,8 +924,9 @@ def listar_busqueda_reservas(request):
                         fraccion_int = int(x[0:3])
                         manzana_int =int(x[4:7])
                         lote_int = int(x[8:])
-                    except:
-                        return HttpResponseServerError("Datos erroneos, favor cargar el numero de lote con el formato Fraccion/Manzana/Lote.")       
+                    except Exception, error:
+                        print error 
+                        #return HttpResponseServerError("Datos erroneos, favor cargar el numero de lote con el formato Fraccion/Manzana/Lote.")       
                                           
                     try:
                         manzana_id=Manzana.objects.get(fraccion_id=fraccion_int,nro_manzana=manzana_int)
@@ -955,8 +1043,9 @@ def listar_busqueda_reservas(request):
                         fraccion_int = int(x[0:3])
                         manzana_int =int(x[4:7])
                         lote_int = int(x[8:])
-                    except:
-                        return HttpResponseServerError("Datos erroneos, favor cargar el numero de lote con el formato Fraccion/Manzana/Lote.")       
+                    except Exception, error:
+                        print error 
+                        #return HttpResponseServerError("Datos erroneos, favor cargar el numero de lote con el formato Fraccion/Manzana/Lote.")       
                                      
                     try:
                         manzana_id=Manzana.objects.get(fraccion_id=fraccion_int,nro_manzana=manzana_int)
@@ -1057,8 +1146,9 @@ def listar_busqueda_reservas(request):
                         })
                     return HttpResponse(t.render(c))  
                           
-            except:
-                return HttpResponseServerError("Error en la ejecucion")
+            except Exception, error:
+                print error 
+                #return HttpResponseServerError("Error en la ejecucion")
     else:
         return HttpResponseRedirect(reverse('login'))
         
@@ -1078,7 +1168,8 @@ def listar_busqueda_transferencias(request):
                         fraccion_int = int(x[0:3])
                         manzana_int =int(x[4:7])
                         lote_int = int(x[8:])
-                    except:
+                    except Exception, error:
+                        print error 
                         return HttpResponseServerError("Datos erroneos, favor cargar el numero de lote con el formato Fraccion/Manzana/Lote.")       
                     try:
                         manzana_id=Manzana.objects.get(fraccion_id=fraccion_int,nro_manzana=manzana_int)
@@ -1139,8 +1230,9 @@ def listar_busqueda_transferencias(request):
                             'object_list': [],
                         })
                     return HttpResponse(t.render(c))  
-            except:
-                return HttpResponseServerError("Error en la ejecucion")
+            except Exception, error:
+                print error 
+                #return HttpResponseServerError("Error en la ejecucion")
     else:
         return HttpResponseRedirect(reverse('login'))
     
@@ -1223,8 +1315,9 @@ def listar_busqueda_cambios(request):
                             'object_list': [],
                         })
                     return HttpResponse(t.render(c))             
-            except:
-                return HttpResponseServerError("Error en la ejecucion")     
+            except Exception, error:
+                print error 
+                #return HttpResponseServerError("Error en la ejecucion")     
         else:
             try:
                 t = loader.get_template('movimientos/listado_cambios.html')
@@ -1302,8 +1395,9 @@ def listar_busqueda_cambios(request):
                             'object_list': [],
                         })
                     return HttpResponse(t.render(c))             
-            except:
-                return HttpResponseServerError("Error en la ejecucion")
+            except Exception, error:
+                print error 
+                #return HttpResponseServerError("Error en la ejecucion")
     else:
         return HttpResponseRedirect(reverse('login'))
         
@@ -1323,8 +1417,9 @@ def listar_busqueda_recuperacion(request):
                         fraccion_int = int(x[0:3])
                         manzana_int =int(x[4:7])
                         lote_int = int(x[8:])
-                    except:
-                        return HttpResponseServerError("Datos erroneos, favor cargar el numero de lote con el formato Fraccion/Manzana/Lote.")       
+                    except Exception, error:
+                        print error 
+                        #return HttpResponseServerError("Datos erroneos, favor cargar el numero de lote con el formato Fraccion/Manzana/Lote.")       
                                   
                     try:
                         manzana_id=Manzana.objects.get(fraccion_id=fraccion_int,nro_manzana=manzana_int)
@@ -1425,8 +1520,9 @@ def listar_busqueda_recuperacion(request):
                             'object_list': [],
                         })
                     return HttpResponse(t.render(c))                    
-            except:
-                return HttpResponseServerError("Error en la ejecucion") 
+            except Exception, error:
+                print error 
+                #return HttpResponseServerError("Error en la ejecucion") 
         else:
             try:
                 t = loader.get_template('movimientos/listado_recuperacion.html')
@@ -1440,8 +1536,9 @@ def listar_busqueda_recuperacion(request):
                         fraccion_int = int(x[0:3])
                         manzana_int =int(x[4:7])
                         lote_int = int(x[8:])
-                    except:
-                        return HttpResponseServerError("Datos erroneos, favor cargar el numero de lote con el formato Fraccion/Manzana/Lote.")       
+                    except Exception, error:
+                        print error 
+                        #return HttpResponseServerError("Datos erroneos, favor cargar el numero de lote con el formato Fraccion/Manzana/Lote.")       
                      
                     try:
                         manzana_id=Manzana.objects.get(fraccion_id=fraccion_int,nro_manzana=manzana_int)
@@ -1543,11 +1640,8 @@ def listar_busqueda_recuperacion(request):
                             'object_list': [],
                         })
                     return HttpResponse(t.render(c))                    
-            except:
-                return HttpResponseServerError("Error en la ejecucion")
+            except Exception, error:
+                print error 
+                #return HttpResponseServerError("Error en la ejecucion")
     else:
-        return HttpResponseRedirect(reverse('login'))   
-
-
-
-    
+        return HttpResponseRedirect(reverse('login')) 
