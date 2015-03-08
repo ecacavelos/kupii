@@ -7,6 +7,7 @@ from django.core.urlresolvers import reverse, resolve
 from datetime import datetime
 from django.contrib import auth
 import common_functions
+import json
 
 def logout(request):
     auth.logout(request)
@@ -31,11 +32,12 @@ def retrieve_cedula_cliente(request):
         try:
             cliente=Cliente.objects.get(cedula=cedula_busqueda)        
             if cliente:
-                return HttpResponseServerError(json.dumps(cliente.as_json()), content_type="application/json")
+                data=serializers.serialize('json',list(cliente)) 
+                return HttpResponseServerError(data,content_type="application/json")                
         except:
-            
-            return HttpResponse(json.dumps("Valido"), content_type="application/json")
-        
+            return HttpResponse(json.dumps("Valido"), content_type="application/json")           
+            return HttpResponse(data,content_type="application/json")
+                        
 def retrieve_lote(request):
     if request.method == 'GET':
         data = request.GET
@@ -78,6 +80,7 @@ def retrieve_fraccion(request):
         response_data = {}
         response_data['fraccion_id']=myfraccion.id
         response_data['nombre']=myfraccion.nombre
+        
         return HttpResponse(json.dumps(response_data), content_type="application/json")
         
 def retrieve_lote_venta(request):
@@ -108,7 +111,8 @@ def retrieve_lote_venta(request):
             response_data['lote_tag'] = str(r[0])
             response_data['precio_contado'] = r[0].precio_contado
             response_data['precio_credito'] = r[0].precio_credito
-            response_data['estado_lote'] = r[0].estado            
+            response_data['estado_lote'] = r[0].estado
+            
             return HttpResponse(json.dumps(response_data), content_type="application/json")
         else:
             return HttpResponseServerError("No se encontraron lotes.")
@@ -143,6 +147,7 @@ def retrieve_lote_cambio(request):
             response_data['lote_tag'] = str(r[0])
             response_data['precio_contado'] = r[0].precio_contado
             response_data['precio_credito'] = r[0].precio_credito
+            
             return HttpResponse(json.dumps(response_data), content_type="application/json")
         else:
             return HttpResponseServerError("No se encontraron lotes.")
@@ -177,7 +182,8 @@ def retrieve_lote_pago_cuotas(request):
             response_data['lote_tag'] = str(r)
             response_data['precio_contado'] = r.precio_contado
             response_data['precio_credito'] = r.precio_credito
-            return HttpResponse(json.dumps(response_data), content_type="application/json")
+            
+            return HttpResponse(json.dumps(response_data), content_type="application/json")      
         else:
             return HttpResponseServerError("No se encontraron lotes.")
 
@@ -212,6 +218,7 @@ def retrieve_lote_recuperacion(request):
             response_data['lote_tag'] = str(r[0])
             response_data['precio_contado'] = r[0].precio_contado
             response_data['precio_credito'] = r[0].precio_credito
+            
             return HttpResponse(json.dumps(response_data), content_type="application/json")
         else:
             return HttpResponseServerError("No se encontraron lotes.")
@@ -220,8 +227,7 @@ def retrieve_lote_recuperacion(request):
 
 def retrieve_cliente(request):
     if request.method == 'GET':
-        data = request.GET
-        
+        data = request.GET        
         try:
             object_list = Cliente.objects.get(pk=data.get('cliente', ''))
             # Creamos la respuesta al request.
@@ -236,7 +242,6 @@ def retrieve_cliente(request):
 def retrieve_vendedor(request):
     if request.method == 'GET':
         data = request.GET
-
         try:
             object_list = Vendedor.objects.get(pk=data.get('vendedor', ''))
             # Creamos la respuesta al request.
@@ -258,9 +263,8 @@ def get_all_planes(request):
 
             #object_list = PlanDePago.objects.filter()
             object_list = PlanDePago.objects.filter(nombre_del_plan__icontains=nombre_plan)
-            results = [ob.as_json() for ob in object_list]
-            
-            return HttpResponse(serializers.serialize('json',object_list), mimetype='application/json')
+            data=serializers.serialize('json',list(object_list)) 
+            return HttpResponseServerError(data,content_type="application/json")           
         except:
             return HttpResponseServerError('No se pudo procesar el pedido')
             #return (e)
@@ -275,9 +279,8 @@ def get_all_planes_vendedores(request):
             nombre_plan = request.GET['term']
             object_list = PlanDePagoVendedor.objects.filter(nombre__icontains=nombre_plan)
 #    object_list = PlanDePago.objects.filter(plan_id=plan_id)
-            results = [ob.as_json() for ob in object_list]
-            
-            return HttpResponse(serializers.serialize('json',object_list), mimetype='application/json')
+            data=serializers.serialize('json',list(object_list)) 
+            return HttpResponseServerError(data,content_type="application/json")   
         except:
             return HttpResponseServerError('No se pudo procesar el pedido')
             #return (e)         
@@ -291,9 +294,8 @@ def get_propietario_id_by_name(request):
             print("id_propietario ->" + id_propietario);
             object_list = Propietario.objects.filter(id_propietario= id_propietario)
 #    object_list = PlanDePago.objects.filter(plan_id=plan_id)
-            results = [ob.as_json() for ob in object_list]
-
-            return HttpResponse(serializers.serialize('json',object_list), mimetype='application/json')
+            data=serializers.serialize('json',list(object_list)) 
+            return HttpResponseServerError(data,content_type="application/json")   
         except:
             return HttpResponseServerError('No se pudo procesar el pedido')
             #return (e)     
@@ -314,7 +316,7 @@ def retrieve_venta(request):
             response_data['plan_de_pago'] = datos_venta.plan_de_pago
             response_data['precio_de_cuota'] = datos_venta.precio_de_cuota
             response_data['fecha_venta'] = datos_venta.fecha_de_venta
-            
+        
             return HttpResponse(json.dumps(response_data), content_type="application/json")
         except:
             return HttpResponseServerError("No se encontro la venta.")
@@ -332,6 +334,7 @@ def retrieve_plan_pago(request):
             response_data['nombre_del_plan'] = str(datos_plan.nombre_del_plan)
             response_data['credito'] = datos_plan.tipo_de_plan
             response_data['cantidad_cuotas'] = datos_plan.cantidad_de_cuotas
+            
             return HttpResponse(json.dumps(response_data), content_type="application/json")
         except:
             return HttpResponseServerError("No se encontraron planes de pago.")
@@ -361,8 +364,7 @@ def get_cuotas_lotes_detalles(request):
         lote_id = request.GET['lote_id']
         print("buscando pagos del lote --> " + lote_id);
         datos = common_functions.get_cuotas_detail_by_lote(lote_id)
-        return HttpResponse(json.dumps(datos), mimetype='application/json')
-
+        return HttpResponse(json.dumps(datos), content_type="application/json")
 
 
 

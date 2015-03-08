@@ -40,8 +40,13 @@ function autocompleteFraccion(){
 			$("#id_fraccion_ini").autocomplete({
 				source : base_url,
 				minLength : 1,
-				select : function(event, ui) {
-					id_fraccion = ui.item.id;
+                create : function(){
+			        $(this).data('ui-autocomplete')._renderItem = function(ul,item){
+				    return $('<li>').append('<a>' +item.fields.nombre+'</a>').appendTo(ul);
+				    };
+		        },
+                select : function(event, ui) {
+					id_fraccion = ui.item.pk;
 					$("#id_frac1").val(id_fraccion);
 					//alert(id_fraccion);
 				}
@@ -52,8 +57,13 @@ function autocompleteFraccion(){
 			$("#id_fraccion_fin").autocomplete({
 				source : base_url,
 				minLength : 1,
+                create : function(){
+			        $(this).data('ui-autocomplete')._renderItem = function(ul,item){
+				    return $('<li>').append('<a>' +item.fields.nombre+'</a>').appendTo(ul);
+				    };
+		        },
 				select : function(event, ui) {
-					id_fraccion = ui.item.id;
+					id_fraccion = ui.item.pk;
 					$("#id_frac2").val(id_fraccion);					
 					//alert(id_fraccion);
 				}
@@ -66,8 +76,13 @@ function autocompleteFraccion(){
 			$("#id_fraccion_ini").autocomplete({
 				source : base_url,
 				minLength : 1,
-				select : function(event, ui) {
-					id_fraccion = ui.item.id;
+               create : function(){
+			        $(this).data('ui-autocomplete')._renderItem = function(ul,item){
+				    return $('<li>').append('<a>' +item.fields.nombre+'</a>').appendTo(ul);
+				    };
+		        },
+                select : function(event, ui) {
+					id_fraccion = ui.item.pk;
 					$("#id_frac1").val(id_fraccion);
 					//alert(id_fraccion);
 				}
@@ -78,9 +93,14 @@ function autocompleteFraccion(){
 			$("#id_fraccion_fin").autocomplete({
 				source : base_url,
 				minLength : 1,
-				select : function(event, ui) {
-					id_fraccion = ui.item.id;
-					$("#id_frac2").val(id_fraccion);					
+				create : function(){
+			        $(this).data('ui-autocomplete')._renderItem = function(ul,item){
+				    return $('<li>').append('<a>' +item.fields.nombre+'</a>').appendTo(ul);
+				    };
+		        },
+                select : function(event, ui) {
+					id_fraccion = ui.item.pk;
+					$("#id_frac2").val(id_fraccion);
 					//alert(id_fraccion);
 				}
 			});

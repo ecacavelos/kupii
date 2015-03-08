@@ -54,14 +54,16 @@
 		$("#fecha_fin").datepicker({
 			dateFormat : 'dd/mm/yy'
 		});
-
+        /*
 		if ($("#lote_id").val() == "") {//parametros no seteados
 			$('#listado-ventas').hide();
 			$("#listado-transferencias").hide();
 			$("#listado-reservas").hide();
 			$("#listado-cambios").hide();
 			$('.pagination').hide();
-		} else {
+		}
+		 else {
+		 */
 			if (mostrar_mvtos == 'True')
 				$('#listado-ventas').show();
 			else
@@ -79,7 +81,7 @@
 			else
 				$('#listado-reservas').hide();	
 			$('.pagination').show();
-		}
+		//}
 
 	});
 

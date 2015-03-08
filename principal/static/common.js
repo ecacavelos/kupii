@@ -18,9 +18,16 @@ function autocompleteClienteRucONombre(input_id, cedula_input_id, id_cliente_inp
 	$(input_id).autocomplete({
 		source : base_url,
 		minLength : 1,
+		create : function(){
+			$(this).data('ui-autocomplete')._renderItem = function(ul,item){
+				return $('<li>').append('<a>' +item.fields.nombres + " "+ item.fields.apellidos+'</a>').appendTo(ul);
+				};
+		},
 		select : function(event, ui) {
-			id_cliente = ui.item.id;
-			cedula_cliente= ui.item.cedula;
+			id_cliente = ui.item.pk;
+			cedula_cliente= ui.item.fields.cedula;
+			//name_cliente=ui.item.fields.nombres+" "+ui.item.fields.apellidos;
+			//$("#id_name_cliente").val(name_cliente);
 			$(id_cliente_input_id).val(id_cliente);
 			$(cedula_input_id).val(cedula_cliente);
 		}
@@ -44,9 +51,14 @@ function autocompleteTimbradoPorNumero(input_id, id_timbrado_input_id){
 	$(input_id).autocomplete({
 		source : base_url,
 		minLength : 1,
+		create : function(){
+			$(this).data('ui-autocomplete')._renderItem = function(ul,item){
+				return $('<li>').append('<a>' +item.fields.numero+'</a>').appendTo(ul);
+				};
+		},
 		select : function(event, ui) {
-			id_timbrado= ui.item.id;
-			numero_timbrado= ui.item.numero;
+			id_timbrado = ui.item.pk;
+			numero_timbrado= ui.item.fields.numero;
 			$(id_timbrado_input_id).val(id_timbrado);
 		}
 	});

@@ -54,14 +54,15 @@
 		$("#fecha_fin").datepicker({
 			dateFormat : 'dd/mm/yy'
 		});
-
-		if ($("#id_fraccion_ini").val() == "" && $("#id_fraccion_fin").val() == "") {//parametros no seteados
+        /*
+		if ($("#id_frac1").val() == "" || $("#id_frac2").val() == "" ) {//parametros no seteados
 			$('.listado-pagos').hide();
 			$('.pagination').hide();
 		} else {
 			$('.listado-pagos').show();
 			$('.pagination').show();
 		}
+		*/
 		setup_inputs();	
 
 	});

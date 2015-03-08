@@ -1464,7 +1464,7 @@ def clientes_atrasados_reporte_excel(request):
         i = 0
         c = 1
         for i in range(len(clientes_atrasados)):        
-            sheet.write(c, 0, str(clientes_atrasados[i]['cliente']))
+            sheet.write(c, 0, clientes_atrasados[i]['cliente'])
             sheet.write(c, 1, str(clientes_atrasados[i]['lote']))
             sheet.write(c, 2, str(clientes_atrasados[i]['cuotas_atrasadas']))
             sheet.write(c, 3, str(clientes_atrasados[i]['cuotas_pagadas']))
@@ -2169,8 +2169,7 @@ def liquidacion_gerentes_reporte_excel(request):
                     sheet.write(c, 0, "Totales del Vendedor", style2)
                     sheet.write(c, 3, str(cuota['total_importe']))
                     sheet.write(c, 4, str(cuota['total_comision']))                                 
-            except:
-                except Exception, error:
+            except Exception, error:
                 print error 
                 pass
             c+=1                        
