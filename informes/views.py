@@ -118,6 +118,7 @@ def lotes_libres(request):
             return HttpResponseRedirect(reverse('login')) 
     
     else:
+        t = loader.get_template('informes/lotes_libres.html')
         c = RequestContext(request, {
             # 'object_list': lista,
             # 'fraccion': f,
@@ -165,8 +166,7 @@ def listar_clientes_atrasados(request):
     else:
         return HttpResponseRedirect(reverse('login')) 
 
-    if venta != '' and cliente != '':    
-    
+    if venta != '' and cliente != '':
         object_list = PagoDeCuotas.objects.filter(venta_id=venta, cliente_id=cliente).order_by('fecha_de_pago')
         a = len(object_list)
         if a > 0:

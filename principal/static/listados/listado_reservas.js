@@ -46,8 +46,15 @@ function desplegar_campos() {
 			$("#id_busqueda_label").autocomplete({
 				source : base_url,
 				minLength : 1,
+                 create : function() {
+								$(this).data('ui-autocomplete')._renderItem = function (ul, item){
+									return $('<li>')
+										.append('<a>'+ item.fields.nombres+" "+item.fields.apellidos+ '</a>')
+										.appendTo(ul);
+									};
+								},
 				select : function(event, ui) {
-					id_cliente = ui.item.id;
+					id_cliente = ui.item.pk;
 					$("#id_busqueda").val(id_cliente);
 					//alert(id_cliente);
 					}

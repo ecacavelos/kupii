@@ -7,8 +7,8 @@ from django.template import RequestContext, loader
 from django.core import serializers
 from principal.models import Fraccion, Manzana, Venta, PagoDeCuotas, Propietario, Lote, Cliente, Vendedor, PlanDePago, PlanDePagoVendedor,Timbrado
 from django.core.urlresolvers import reverse, resolve
-from principal.common_functions import get_cuotas_detail_by_lote, get_nro_cuota
-from datetime import datetime
+from principal.common_functions import get_cuotas_detail_by_lote, custom_json
+from django.core.serializers.json import DjangoJSONEncoder
 import json
 
 
@@ -24,9 +24,9 @@ def get_propietario_id_by_name(request):
             try:            
                 name_propietario = request.GET['term']
                 print("term ->" + name_propietario)
-                object_list = Propietario.objects.filter(nombres__icontains= name_propietario)
-                data=serializers.serialize('json',list(object_list)) 
-                return HttpResponse(data,content_type="application/json")
+                object_list = Propietario.objects.filter(nombres__icontains = name_propietario)
+                labels=["nombres","apellidos"]
+                return HttpResponse(json.dumps(custom_json(object_list,labels), cls=DjangoJSONEncoder), content_type="application/json")
             except Exception, error:
                 print error
                 #return HttpResponseServerError('No se pudo procesar el pedido')
@@ -57,7 +57,7 @@ def get_propietario_name_id_by_cedula(request):
                 cedula_propietario = request.GET['term']
                 print("term ->" + cedula_propietario);
                 object_list = Propietario.objects.filter(cedula__icontains= cedula_propietario)
-                data=serializers.serialize('json',list(object_list)) 
+                data=serializers.serialize('json',list(object_list))
                 return HttpResponse(data,content_type="application/json")
             except Exception, error:
                 print error
@@ -89,7 +89,8 @@ def get_cliente_id_by_name(request):
                 name_cliente = request.GET['term']
                 print("term ->" + name_cliente);
                 object_list = Cliente.objects.filter(nombres__icontains= name_cliente)
-                data=serializers.serialize('json',list(object_list)) 
+                data=serializers.serialize('json',list(object_list))
+                print data
                 return HttpResponse(data,content_type="application/json")
             except Exception, error:
                 print error
@@ -205,7 +206,9 @@ def get_fracciones_by_name(request):
                 nombre_fraccion = request.GET['term']
                 print("term ->" + nombre_fraccion);
                 object_list = Fraccion.objects.filter(nombre__icontains=nombre_fraccion)
-                data=serializers.serialize('json',list(object_list)) 
+                data=serializers.serialize('json',list(object_list))
+                print type(data)
+                print data
                 return HttpResponse(data,content_type="application/json")
             except Exception, error:
                 print error

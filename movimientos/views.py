@@ -8,6 +8,7 @@ from django.core.urlresolvers import reverse, resolve
 from principal.common_functions import get_nro_cuota, monthdelta, get_cuotas_detail_by_lote
 import math
 from principal.monthdelta import MonthDelta 
+from django.core import serializers
  
 # Funcion principal del modulo de lotes.
 def movimientos(request):
@@ -58,7 +59,7 @@ def ventas_de_lotes(request):
             try:        
                 nueva_venta = Venta()
                 nueva_venta.lote = lote_a_vender
-                #nueva_venta.fecha_de_venta = fecha_venta_parsed
+                nueva_venta.fecha_de_venta = fecha_venta_parsed
                 nueva_venta.cliente = Cliente.objects.get(pk=cliente_id)
                 nueva_venta.vendedor = Vendedor.objects.get(pk=vendedor_id)
                 nueva_venta.plan_de_pago = PlanDePago.objects.get(pk=plan_pago_id)
@@ -292,7 +293,7 @@ def calcular_interes(request):
             
             total_intereses=interes+interes_punitorio+interes_iva
             
-            for cuota in range(cuotas_atrasadas+1):
+            for cuota in range(cuotas_atrasadas):
                 detalle={}
                 fecha_vencimiento=proximo_vencimiento_parsed+MonthDelta(cuota)
                 dias_atraso=(fecha_pago_parsed-fecha_vencimiento).days                
@@ -308,9 +309,8 @@ def calcular_interes(request):
                 
                
                 detalles.append(detalle)
-            
-            print detalles
-        return HttpResponse(json.dumps(detalles), mimetype='application/json')
+        print detalles
+        return HttpResponse(json.dumps(detalles),content_type="application/json")
 
 def transferencias_de_lotes(request):
     

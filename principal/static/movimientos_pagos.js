@@ -124,7 +124,7 @@ function validatePago(event) {
 			pago_vendedor_id : $("#id_vendedor").val(),
 			pago_total_de_cuotas : $("#total_cuotas").val(),
 			pago_total_de_mora : $("#total_mora").val(),
-			pago_total_de_pago : $("#total_pago").val(),
+			pago_total_de_pago : $("#total_pago").val()
 		}
 	});
 	request4.done(function(msg) {
@@ -160,6 +160,7 @@ function retrieveLote() {
 		// Actualizamos el formulario con los datos obtenidos del lote.
 		request.done(function(msg) {
 			global_lote_id = msg.lote_id;
+			//alert(msg);
 			var s = "<a class='boton-verde' href=\"/lotes/listado/" + msg.lote_id + "\" target=\"_blank\" \">" + msg.lote_tag + "</a>";
 
 			$("#lote_error").html("");
@@ -243,14 +244,15 @@ function retrieveVenta() {
 			type : "GET",
 			url : "/ajax/get_ventas_by_lote/",
 			data : {
-				lote_id : lote_id,
+				lote_id : lote_id
 			},
 			dataType : "json"
 		});
 		// Actualizamos el formulario con los datos obtenidos del lote.
 		request.done(function(msg) {
 			msgaux = msg;
-			msg = msg.venta;
+			msg = msg['venta'];
+			//alert(msg);
 			venta_id = (msg[0]['venta_id']);
 			$("#id_venta_pagos").val(venta_id);
 			$("#id_cliente").val(msg[0]['cliente_id']);
@@ -293,7 +295,7 @@ function retrieveVenta() {
 }
 
 function calcularInteres() {
-	alert('calculando interes');
+	//alert('calculando interes');
 	var fecha_pago=$('#id_fecha').val();
 	var proximo_vencimiento=global_proximo_vencimiento;
 	var lote_id=global_lote_id;
@@ -305,13 +307,14 @@ function calcularInteres() {
 				lote_id : lote_id,
 				fecha_pago : fecha_pago,
 				proximo_vencimiento : proximo_vencimiento,
-				nro_cuotas_a_pagar : nro_cuotas_a_pagar,
+				nro_cuotas_a_pagar : nro_cuotas_a_pagar
 			},
 			dataType : "json"
 		});
 		// Actualizamos el formulario con los datos obtenidos.
 		request.done(function(msg) {
 			detalle=msg;
+			//alert(detalle);
 			console.log(detalle);
 			var intereses=0;
 			for(i=0;i<msg.length;i++){
@@ -394,7 +397,7 @@ function retrievePlanPagoVendedor() {
 			type : "GET",
 			url : "/datos/4/",
 			data : {
-				plan_pago_vendedor : $("#id_plan_pago_vendedores").val(),
+				plan_pago_vendedor : $("#id_plan_pago_vendedores").val()
 			}
 		});
 		// Actualizamos el formulario con los datos obtenidos del plan de pagos.
@@ -424,7 +427,7 @@ function retrievePlanPago() {
 			type : "GET",
 			url : "/datos/5/",
 			data : {
-				plan_pago : $("#id_plan_pago").val(),
+				plan_pago : $("#id_plan_pago").val()
 			}
 		});
 		// Actualizamos el formulario con los datos obtenidos del plan de pagos.
@@ -442,7 +445,7 @@ function retrievePlanPago() {
 }
 
 function calculateTotalCuotas() {
-	alert('calculando total cuotas');
+	//alert('calculando total cuotas');
 	var monto_cuota = ($('#monto_cuota').val());
 	var nro_cuotas_a_pagar = ($('#nro_cuotas_a_pagar').val());
 	nro_cuotas_a_pagar = parseInt(nro_cuotas_a_pagar);
@@ -455,7 +458,7 @@ function calculateTotalCuotas() {
 }
 
 function calculateTotalPago() {
-	alert('calculando total pago');
+	//alert('calculando total pago');
 	var total_cuotas = $("#total_cuotas").val();
 	var total_mora=global_intereses;
 	var total_pago = parseInt( total_cuotas) + parseInt( total_mora);
