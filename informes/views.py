@@ -360,9 +360,9 @@ def informe_general(request):
                     select pc.* from principal_pagodecuotas pc, principal_lote l, principal_manzana m, principal_fraccion f
                     where pc.fecha_de_pago >= \''''+ str(fecha_ini_parsed) +               
                     '''\' and pc.fecha_de_pago <= \'''' + str(fecha_fin_parsed) +
-                    '''\' and f.id>=''' + fraccion_ini +
+                    '''\' and f.id >= ''' + fraccion_ini +
                     '''
-                    and f.id<=''' + fraccion_fin +
+                    and f.id <= ''' + fraccion_fin +
                     '''
                     and (pc.lote_id = l.id and l.manzana_id=m.id and m.fraccion_id=f.id) order by f.id,pc.fecha_de_pago
                     '''

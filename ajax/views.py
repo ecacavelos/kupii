@@ -10,7 +10,7 @@ from django.core.urlresolvers import reverse, resolve
 from principal.common_functions import get_cuotas_detail_by_lote, custom_json
 from django.core.serializers.json import DjangoJSONEncoder
 import json
-
+import traceback
 
 #Ejemplo nuevo esquema de serializacion:
 # all_objects = list(Restaurant.objects.all()) + list(Place.objects.all())
@@ -205,10 +205,9 @@ def get_fracciones_by_name(request):
                 nombre_fraccion = request.GET['term']
                 print("term ->" + nombre_fraccion);
                 object_list = Fraccion.objects.filter(nombre__icontains=nombre_fraccion)
-                data=serializers.serialize('json',list(object_list))
-                print type(data)
-                print data
-                return HttpResponse(data,content_type="application/json")
+                labels=["nombre", "id"]         
+                json_object_list = custom_json(object_list,labels)       
+                return HttpResponse(json.dumps(json_object_list, cls=DjangoJSONEncoder),content_type="application/json")
             except Exception, error:
                 print error
         else:
@@ -222,10 +221,12 @@ def get_fracciones_by_id(request):
                 id_fraccion = request.GET['term']
                 print("term ->" + id_fraccion);
                 object_list = Fraccion.objects.filter(id__icontains=id_fraccion).order_by('id')
-                data=serializers.serialize('json',list(object_list)) 
-                return HttpResponse(data,content_type="application/json")
+                labels=["nombre","id"]         
+                json_object_list = custom_json(object_list,labels)       
+                return HttpResponse(json.dumps(json_object_list, cls=DjangoJSONEncoder), content_type="application/json")
             except Exception, error:
                 print error
+                print traceback.format_exc()
         else:
             return HttpResponseRedirect(reverse('login')) 
 

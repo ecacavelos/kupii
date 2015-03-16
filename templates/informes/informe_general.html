@@ -3,6 +3,7 @@
 
 <script type="text/javascript">
 	$(document).ready(function() {
+		$("#listado-item-lote").hide();
 		//Cambiar calendario a español
 		$.datepicker.regional['es'] = {
 			closeText : 'Cerrar',
@@ -24,6 +25,7 @@
 		// Setear idioma al calendario
 		$.datepicker.setDefaults($.datepicker.regional['es']);
 
+		var lista_cuotas = "{{lista_cuotas}}";
 		var fraccion_ini = "{{fraccion_ini}}";
 		var fraccion_fin = "{{fraccion_fin}}";
 		var fecha_ini = "{{fecha_ini}}";
@@ -31,7 +33,10 @@
 		var frac1="{{frac1}}";
 		var frac2="{{frac2}}";
 		var tipo_busqueda = "{{tipo_busqueda}}";
-		$('#id_tipo_busqueda').val(tipo_busqueda);
+		if (tipo_busqueda) {
+			$('#id_tipo_busqueda').val(tipo_busqueda);	
+		}
+		
 		if($('#id_tipo_busqueda').val()=='nombre'){
 			$('#id_fraccion_ini').val(frac1);
 			$('#id_fraccion_fin').val(frac2);
@@ -63,6 +68,9 @@
 			$('.pagination').show();
 		}
 		*/
+		if (lista_cuotas){
+			$("#listado-item-lote").show();
+		}
 		setup_inputs();	
 
 	});
@@ -100,8 +108,8 @@
 			<tr>
 				<td>
 				<select id="id_tipo_busqueda" name="tipo_busqueda">
-					<option value="">Elija una opcion</option>
-					<option value="nombre">Nombre de Fraccion</option>
+					<!-- <option value="">Elija una opcion</option> -->
+					<option value="nombre" >Nombre de Fraccion</option>
 					<option value="codigo">Codigo de Fraccion</option>
 				</select></td>
 				<td>
