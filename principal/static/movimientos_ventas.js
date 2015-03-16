@@ -23,14 +23,9 @@ $(document).ready(function() {
 	$("#id_name_cliente").autocomplete({
 		source : base_url,
 		minLength : 1,
-		create : function(){
-			$(this).data('ui-autocomplete')._renderItem = function(ul,item){
-				return $('<li>').append('<a>' +item.fields.nombres+" "+item.fields.apellidos+'</a>').appendTo(ul);
-				};
-		},
 		select : function(event, ui) {
-			id_cliente = ui.item.pk;
-			cedula_cliente= ui.item.fields.cedula;
+			id_cliente = ui.item.id;
+			cedula_cliente= ui.item.cedula;
 			$("#id_cliente").val(id_cliente);
 			$("#id_cedula_cliente").val(cedula_cliente);
 
@@ -45,16 +40,11 @@ $(document).ready(function() {
 	$("#id_cedula_cliente").autocomplete({
 		source : base_url,
 		minLength : 1,
-		create : function(){
-			$(this).data('ui-autocomplete')._renderItem = function(ul,item){
-				return $('<li>').append('<a>' +item.fields.cedula+'</a>').appendTo(ul);
-				};
-		},
 		select : function(event, ui) {
-			id_cliente = ui.item.pk;
-			name_cliente= ui.item.fields.label;
-			cedula_cliente= ui.item.fields.cedula;
-			ui.item.value = ui.item.fields.cedula;
+			id_cliente = ui.item.id;
+			name_cliente= ui.item.label;
+			cedula_cliente= ui.item.cedula;
+			ui.item.value = ui.item.cedula;
 			$("#id_cliente").val(id_cliente);
 			$("#id_name_cliente").val(name_cliente);
 			$("#id_cedula_cliente").val(cedula_cliente);
@@ -71,14 +61,9 @@ $(document).ready(function() {
 	$("#id_name_vendedor").autocomplete({
 		source : base_url,
 		minLength : 1,
-		create : function(){
-			$(this).data('ui-autocomplete')._renderItem = function(ul,item){
-				return $('<li>').append('<a>' +item.fields.nombres+" "+item.fields.apellidos+'</a>').appendTo(ul);
-				};
-		},
 		select : function(event, ui) {
-			id_vendedor = ui.item.pk;
-			cedula_vendedor= ui.item.fields.cedula;
+			id_vendedor = ui.item.id;
+			cedula_vendedor= ui.item.cedula;
 			$("#id_vendedor").val(id_vendedor);
 			$("#id_cedula_vendedor").val(cedula_vendedor);
 
@@ -93,16 +78,11 @@ $(document).ready(function() {
 	$("#id_cedula_vendedor").autocomplete({
 		source : base_url,
 		minLength : 1,
-		create : function(){
-			$(this).data('ui-autocomplete')._renderItem = function(ul,item){
-				return $('<li>').append('<a>' +item.fields.cedula+'</a>').appendTo(ul);
-				};
-		},
 		select : function(event, ui) {
-			id_vendedor = ui.item.pk;
-			name_vendedor= ui.item.fields.label;
-			cedula_vendedor= ui.item.fields.cedula;
-			ui.item.value = ui.item.fields.cedula;
+			id_vendedor = ui.item.id;
+			name_vendedor= ui.item.label;
+			cedula_vendedor= ui.item.cedula;
+			ui.item.value = ui.item.cedula;
 			$("#id_vendedor").val(id_vendedor);
 			$("#id_name_vendedor").val(name_vendedor);
 			$("#id_cedula_vendedor").val(cedula_vendedor);
@@ -119,15 +99,10 @@ $(document).ready(function() {
 	$("#id_plan_p").autocomplete({
 		source : base_url,
 		minLenght : 1,
-		create : function(){
-			$(this).data('ui-autocomplete')._renderItem = function(ul,item){
-				return $('<li>').append('<a>' +item.fields.nombre_del_plan+'</a>').appendTo(ul);
-				};
-		},
 		select : function(event, ui) {
-			id_plan = ui.item.pk;
-			name_plan= ui.item.fields.label;
-			ui.item.value = ui.item.fields.label;
+			id_plan = ui.item.id;
+			name_plan= ui.item.label;
+			ui.item.value = ui.item.label;
 			$("#id_plan_p").val(name_plan);
 			$("#id_plan_pago").val(id_plan);
 			retrievePlanPago();				
@@ -142,15 +117,10 @@ $(document).ready(function() {
 	$("#id_plan_pv").autocomplete({
 		source : base_url,
 		minLenght : 1,
-		create : function(){
-			$(this).data('ui-autocomplete')._renderItem = function(ul,item){
-				return $('<li>').append('<a>' +item.fields.nombre+'</a>').appendTo(ul);
-				};
-		},
 		select : function(event, ui) {
-			id_plan = ui.item.pk;
-			name_plan= ui.item.fields.label;
-			ui.item.value = ui.item.fields.label;
+			id_plan = ui.item.id;
+			name_plan= ui.item.label;
+			ui.item.value = ui.item.label;
 			$("#id_plan_pv").val(name_plan);
 			$("#id_plan_pago_vendedores").val(id_plan);
 		}

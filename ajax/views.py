@@ -41,8 +41,8 @@ def get_vendedor_name_id_by_cedula(request):
                 cedula_vendedor = request.GET['term']
                 print("term ->" + cedula_vendedor);
                 object_list = Vendedor.objects.filter(cedula__icontains= cedula_vendedor)
-                data=serializers.serialize('json',list(object_list)) 
-                return HttpResponse(data,content_type="application/json")
+                labels=["nombres","apellidos"]
+                return HttpResponse(json.dumps(custom_json(object_list,labels), cls=DjangoJSONEncoder), content_type="application/json")
             except Exception, error:
                 print error
                 #return HttpResponseServerError('No se pudo procesar el pedido')
@@ -74,8 +74,8 @@ def get_cliente_name_id_by_cedula(request):
                 cedula_cliente = request.GET['term']
                 print("term ->" + cedula_cliente);
                 object_list = Cliente.objects.filter(cedula__icontains= cedula_cliente)
-                data=serializers.serialize('json',list(object_list)) 
-                return HttpResponse(data,content_type="application/json")
+                labels=["nombres","apellidos"]
+                return HttpResponse(json.dumps(custom_json(object_list,labels), cls=DjangoJSONEncoder), content_type="application/json")
             except Exception, error:
                 print error
                 #return HttpResponseServerError('No se pudo procesar el pedido')
@@ -89,9 +89,8 @@ def get_cliente_id_by_name(request):
                 name_cliente = request.GET['term']
                 print("term ->" + name_cliente);
                 object_list = Cliente.objects.filter(nombres__icontains= name_cliente)
-                data=serializers.serialize('json',list(object_list))
-                print data
-                return HttpResponse(data,content_type="application/json")
+                labels=["nombres","apellidos"]
+                return HttpResponse(json.dumps(custom_json(object_list,labels), cls=DjangoJSONEncoder), content_type="application/json")
             except Exception, error:
                 print error
                 #return HttpResponseServerError('No se pudo procesar el pedido')
@@ -105,8 +104,8 @@ def get_vendedor_id_by_name(request):
                 name_vendedor = request.GET['term']
                 print("term ->" + name_vendedor);
                 object_list = Vendedor.objects.filter(nombres__icontains= name_vendedor)
-                data=serializers.serialize('json',list(object_list)) 
-                return HttpResponse(data,content_type="application/json")
+                labels=["nombres","apellidos"]
+                return HttpResponse(json.dumps(custom_json(object_list,labels), cls=DjangoJSONEncoder), content_type="application/json")
             except Exception, error:
                 print error
                 #return HttpResponseServerError('No se pudo procesar el pedido')
@@ -297,12 +296,12 @@ def get_plan_pago(request):
     if request.method == 'GET':
         if request.method == 'GET':
             if request.user.is_authenticated():
-                try:            
+                try:              
                     nombre_plan = request.GET['term']
                     print("term ->" + nombre_plan);
                     object_list = PlanDePago.objects.filter(nombre_del_plan__icontains= nombre_plan)
-                    data=serializers.serialize('json',list(object_list)) 
-                    return HttpResponse(data,content_type="application/json")
+                    labels=["nombre_del_plan"]
+                    return HttpResponse(json.dumps(custom_json(object_list,labels), cls=DjangoJSONEncoder), content_type="application/json")     
                 except Exception, error:
                     print error
                     #return HttpResponseServerError('No se pudo procesar el pedido')
@@ -313,12 +312,12 @@ def get_plan_pago(request):
 def get_plan_pago_vendedor(request):
     if request.method == 'GET':
         if request.user.is_authenticated():
-            try:            
+            try:                                
                 nombre_plan = request.GET['term']
                 print("term ->" + nombre_plan);
                 object_list = PlanDePagoVendedor.objects.filter(nombre__icontains= nombre_plan)
-                data=serializers.serialize('json',list(object_list)) 
-                return HttpResponse(data,content_type="application/json")
+                labels=["nombre"]
+                return HttpResponse(json.dumps(custom_json(object_list,labels), cls=DjangoJSONEncoder), content_type="application/json")
             except Exception, error:
                 print error
                 #return HttpResponseServerError('No se pudo procesar el pedido')
@@ -329,7 +328,7 @@ def get_timbrado_by_numero(request):
     if request.method == 'GET':
         if request.user.is_authenticated():
             try:            
-                numero_timbrado = request.GET['term']
+                numero_timbrado = str(request.GET['term'])
                 print("term ->" + numero_timbrado);
                 object_list = Timbrado.objects.filter(numero__icontains= numero_timbrado)
                 data=serializers.serialize('json',list(object_list)) 

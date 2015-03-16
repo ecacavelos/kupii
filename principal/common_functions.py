@@ -61,11 +61,16 @@ def custom_json(object_list, labels):
     data = serializers.serialize('python', object_list)
     results = []
     label1=labels[0]
-    label2=labels[1]
+    if len(labels) > 1:
+        label2=labels[1]
+      
     for d in data:
         d['fields']['id'] = d['pk']
         #Como maximo habra 2 labels
-        d['fields']['label'] = d['fields'][label1]+" "+d['fields'][label2]
+        if len(labels) <= 1:
+            d['fields']['label'] = d['fields'][label1]
+        else:
+            d['fields']['label'] = d['fields'][label1]+" "+d['fields'][label2]
         results.append(d['fields'])
     return results
 
