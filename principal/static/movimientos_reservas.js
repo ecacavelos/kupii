@@ -13,11 +13,6 @@ $(document).ready(function() {
 	$("#id_nombre_cliente").autocomplete({
 		source : base_url,
 		minLength : 1,
-		create : function(){
-			$(this).data('ui-autocomplete')._renderItem = function(ul,item){
-				return $('<li>').append('<a>' +item.fields.nombres+" "+item.fields.apellidos+'</a>').appendTo(ul);
-				};
-		},
 		select : function(event, ui) {
 			id_cliente = ui.item.pk;
 			cedula_cliente= ui.item.fields.cedula;
@@ -36,11 +31,6 @@ $(document).ready(function() {
 	$("#id_cedula_cliente").autocomplete({
 		source : base_url,
 		minLength : 1,
-		create : function(){
-			$(this).data('ui-autocomplete')._renderItem = function(ul,item){
-				return $('<li>').append('<a>' +item.fields.cedula+'</a>').appendTo(ul);
-				};
-		},
 		select : function(event, ui) {
 			id_cliente = ui.item.pk;
 			name_cliente= ui.item.fields.label;

@@ -205,7 +205,7 @@ def get_fracciones_by_name(request):
                 nombre_fraccion = request.GET['term']
                 print("term ->" + nombre_fraccion);
                 object_list = Fraccion.objects.filter(nombre__icontains=nombre_fraccion)
-                labels=["nombre", "id"]         
+                labels=["nombre"]         
                 json_object_list = custom_json(object_list,labels)       
                 return HttpResponse(json.dumps(json_object_list, cls=DjangoJSONEncoder),content_type="application/json")
             except Exception, error:
@@ -221,7 +221,7 @@ def get_fracciones_by_id(request):
                 id_fraccion = request.GET['term']
                 print("term ->" + id_fraccion);
                 object_list = Fraccion.objects.filter(id__icontains=id_fraccion).order_by('id')
-                labels=["nombre","id"]         
+                labels=["nombre"]         
                 json_object_list = custom_json(object_list,labels)       
                 return HttpResponse(json.dumps(json_object_list, cls=DjangoJSONEncoder), content_type="application/json")
             except Exception, error:
