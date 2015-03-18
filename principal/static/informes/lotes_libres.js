@@ -12,8 +12,7 @@ function retrieve_lotes_libres() {
 	}
 	if($('#id_tipo_busqueda').val()=='codigo'){
 		window.location.href = base_context + "/informes/lotes_libres_reporte_excel?fraccion_ini=" + $('#id_fraccion_ini').val() + "&fraccion_fin=" + $('#id_fraccion_fin').val();
-	}
-	
+	}	
 }
 
 function setup_inputs() {
@@ -28,7 +27,7 @@ function setup_inputs() {
 	});
 }
 function autocompleteFraccion(){
-	$("#id_fraccion_ini").empty();
+		$("#id_fraccion_ini").empty();
 		$("#id_fraccion_ini").val("");
 		$("#id_fraccion_fin").empty();
 		$("#id_fraccion_fin").val("");
@@ -84,6 +83,5 @@ function autocompleteFraccion(){
 					//alert(id_fraccion);
 				}
 			});
-		}
-		 
+		}		 
 }

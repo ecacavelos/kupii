@@ -3,12 +3,11 @@
 
 <script type="text/javascript">	
 	$(document).ready(function() {
-		$('#busqueda').mask('###/###/####');
 		var fraccion = "{{fraccion}}";
 		$('#fraccion').val(fraccion);
 		var meses_atraso = "{{meses_atraso}}";
 		$('#meses_atraso').val(meses_atraso);
-				
+		
 		if ($("#fraccion").val() == "" && $("#meses_atraso").val() == "") {//parametros no seteados
 			$('.listado-clientes-atrasados').hide();
 			$('.pagination').hide();
@@ -16,6 +15,7 @@
 			$('.listado-clientes-atrasados').show();
 			$('.pagination').show();
 		}
+		setup_inputs();
 	});
 
 </script>
@@ -38,9 +38,15 @@
 				<th class="acciones" colspan="3"><strong><a href="#" style="color: white;">Filtrar</a></strong></th>
 			</tr>
 			<tr>
-				<td>Por Nro. Faccion:</td>
 				<td>
-				<input name="fraccion" id="fraccion" type="text" value="" placeholder="Nro. Fraccion"/>
+				<select id="id_tipo_busqueda" name="tipo_busqueda">
+					<!--<option value="">Elija una opcion</option> -->
+					<option value="nombre">Nombre de Fraccion</option>
+					<option value="codigo">Codigo de Fraccion</option>
+				</select></td>
+				<td>
+				<input name="fraccion_nombre" id="fraccion" type="text" value="" placeholder="Fraccion"/>
+				<input name="fraccion" id="id_fraccion" value="" type="hidden"/>
 				</td>
 			</tr>
 			<tr>
