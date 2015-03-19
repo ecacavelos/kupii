@@ -26,8 +26,8 @@ li{
 table.listado-lotes {
 	border: 5px solid #CCC;
 	margin-bottom:15px;
-	margin-left: 70px;
-	margin-right: 15px;
+	margin-left:auto; 
+    margin-right:auto;
 }
 
 table.listado-ventas {
@@ -184,7 +184,7 @@ table.listado-pagos tr th {
 }
 
 table.listado-lotes tr td {
-	padding:7px;
+	padding:2.9px;
 	font-size:14px;
 	text-align:center;
 	border-bottom:thin solid #CCC

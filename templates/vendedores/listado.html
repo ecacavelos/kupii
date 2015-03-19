@@ -63,7 +63,7 @@
 	<br>
 </div>
 <div id="listado-item-lote">
-	<table width="50%" cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
+	<table border="1" cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
 		<th>Cedula Nro</th><th>Nombres y apellidos</th><th>Celular</th>
 		{% for hw in object_list %}
 		{% if forloop.counter|divisibleby:2 %}
@@ -74,7 +74,6 @@
 		</tr>
 		{% else %}
 		<tr class="bkg_gris">
-		<tr>
 			<td><a href="{% url 'frontend_home' %}vendedores/listado/{{hw.id}}">{{hw.cedula}} <strong>(Ver Detalles)</strong></a></td>
 			<td> {{ hw.nombres }} {{ hw.apellidos }} </td>
 			<td> {{ hw.celular_1 }} </td>

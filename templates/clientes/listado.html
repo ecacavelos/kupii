@@ -65,7 +65,7 @@
 	<br>
 </div>
 <div id="listado-item-lote">
-	<table width="50%" cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
+	<table cellpadding="0" cellspacing="0"  border="1" class="listado-lotes" align="center">
 		<th>Cedula Nro</th><th>Nombre y apellido</th><th>Tel&eacute;fono particular</th><th>Direcci&oacute;n de cobro</th>
 		{% for hw in object_list %}
 		{% if forloop.counter|divisibleby:2 %}
@@ -82,7 +82,6 @@
 			<td> {{hw.nombres}} {{hw.apellidos}} </td>
 			<td> {{hw.telefono_particular}} </td>
 			<td> {{hw.direccion_cobro}} </td>
-
 		</tr>
 		{% endif %}
 		{% endfor %}

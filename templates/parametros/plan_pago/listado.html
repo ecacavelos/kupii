@@ -8,62 +8,54 @@ $(document).ready(function(){
 {%endblock%}
 {% block content %}
 <div class="gri16 text-izquierda" id="breadcumb">
-						<a href="{% url 'frontend_home' %}">Inicio</a> 
-						<a href="{% url 'frontend_home' %}parametros/">> Parametros</a>  
-						<a href="{% url 'frontend_home' %}parametros/plan_pago/">> Planes de pago</a> 
-						<span class="verde-1">> Listado de Planes de pago</span> 
-					</div>
-
-					<div class="clear"></div>
-
-					<div class="grid_10">
-  						<h1>Listado de Planes de Pago</h1>
-					</div>
-
-					<div class="grid_6">
-  						<a href="#" class="historico">Buscar</a>
-					</div>
-
-					<div class="clear"></div>
-					<div id="listado-cuadro-busqueda">
-						<a href="{% url 'frontend_home' %}parametros/plan_pago/agregar" class="boton-verde">Agregar Plan de Pago</a>
-						<br><br>
-					</div>
-					<div id="listado-item-lote">
-						<table width="50%" border="1" cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
-							<th>Plan de pago Nro</th><th>Nombre</th><th>Tipo</th><th>Cant. Cuotas</th>
-{% for hw in object_list %}
-		<tr>
-			<td>
-				<a href="{{hw.id}}">{{hw.id}} <strong>(Ver Detalles)</strong></a>
-			</td>
-			<td>
-				{{hw.nombre_del_plan}}
-			</td>
-			<td>
-				{{hw.tipo_de_plan}}
-			</td>
-			<td>
-				{{hw.cantidad_de_cuotas}}
-			</td>
-		</tr>
-
-{% endfor %}
-<div class="pagination">
-    <span class="step-links">
-        {%if object_list.has_previous%}
-        <a href="?page={{ object_list.previous_page_number }}"> Anterior</a>
-		{%endif%}
-    	P&aacute;gina
-    	|{{object_list.number}}|
-    	
-    	{%if object_list.has_next%}
-		<a href="?page={{ object_list.next_page_number }}"> Siguiente</a>
-		{%endif%}
-    </span>
+	<a href="{% url 'frontend_home' %}">Inicio</a> 
+	<a href="{% url 'frontend_home' %}parametros/">> Parametros</a>  
+	<a href="{% url 'frontend_home' %}parametros/plan_pago/">> Planes de pago</a> 
+	<span class="verde-1">> Listado de Planes de pago</span> 
 </div>
-						</table>
-					</div>
+<div class="clear"></div>
+<div class="grid_10"><h1>Listado de Planes de Pago</h1></div>
+<div class="grid_6"><a href="#" class="historico">Buscar</a></div>
+<div class="clear"></div>
+<div id="listado-cuadro-busqueda">
+	<a href="{% url 'frontend_home' %}parametros/plan_pago/agregar" class="boton-verde">Agregar Plan de Pago</a>
+	<br><br>
+</div>
+<div id="listado-item-lote">
+		<table border="1" cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
+				<th>Plan de pago Nro</th><th>Nombre</th><th>Tipo</th><th>Cant. Cuotas</th>
+				{% for hw in object_list %}
+				{% if forloop.counter|divisibleby:2 %}
+					<tr>
+						<td><a href="{{hw.id}}">{{hw.id}} <strong>(Ver Detalles)</strong></a></td>
+						<td>{{hw.nombre_del_plan}}</td>
+						<td>{{hw.tipo_de_plan}}</td>
+						<td>{{hw.cantidad_de_cuotas}}</td>
+					</tr>
+					{% else %}
+					<tr class="bkg_gris">
+						<td><a href="{{hw.id}}">{{hw.id}} <strong>(Ver Detalles)</strong></a></td>
+						<td>{{hw.nombre_del_plan}}</td>
+						<td>{{hw.tipo_de_plan}}</td>
+						<td>{{hw.cantidad_de_cuotas}}</td>
+					</tr>
+					{% endif %}				
+				{% endfor %}
+		<div class="pagination">
+		    <span class="step-links">
+		        {%if object_list.has_previous%}
+		        <a href="?page={{ object_list.previous_page_number }}"> Anterior</a>
+				{%endif%}
+		    	P&aacute;gina
+		    	|{{object_list.number}}|
+		    	
+		    	{%if object_list.has_next%}
+				<a href="?page={{ object_list.next_page_number }}"> Siguiente</a>
+				{%endif%}
+		    </span>
+		</div>
+	</table>
+</div>
 
 <div id="footer"><a href="{% url 'frontend_home' %}parametros/plan_pago" class="boton-verde">Volver al módulo de Plan de pago</a></div>
 {% endblock %}

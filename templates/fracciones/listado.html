@@ -55,28 +55,27 @@ function buscar(){
 	<br><br>
 </div>
 <div id="listado-item-lote" align="center">
-	<table width="50%" border="1" cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
+	<table border="1" cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
 		<th>Fracci&oacute;n Nro</th><th>Nombre</th><th>Ubicaci&oacute;n</th><th>Distrito</th><th>Propietario</th>
-{% for hw in object_list %}
+		{% for hw in object_list %}
+		{% if forloop.counter|divisibleby:2 %}
 		<tr>
-			<td>
-				<a href="{{hw.id}}">{{hw.id}} <strong>(Ver Detalles)</strong></a>
-			</td>
-			<td>
-				{{hw.nombre}}
-			</td>
-			<td>
-				{{hw.ubicacion}}
-			</td>
-			<td>
-				{{hw.distrito}}
-			</td>
-			<td>
-				{{hw.propietario}}
-			</td>
+			<td><a href="{{hw.id}}">{{hw.id}} <strong>(Ver Detalles)</strong></a></td>
+			<td>{{hw.nombre}}</td>
+			<td>{{hw.ubicacion}}</td>
+			<td>{{hw.distrito}}</td>
+			<td>{{hw.propietario}}</td>
 		</tr>
-
-{% endfor %}
+		{% else %}
+		<tr class="bkg_gris">
+			<td><a href="{{hw.id}}">{{hw.id}} <strong>(Ver Detalles)</strong></a></td>
+			<td>{{hw.nombre}}</td>
+			<td>{{hw.ubicacion}}</td>
+			<td>{{hw.distrito}}</td>
+			<td>{{hw.propietario}}</td>
+		</tr>
+		{% endif %}
+		{% endfor %}
 <div class="pagination">
     <span class="step-links">
     	{%if object_list.has_previous%}
