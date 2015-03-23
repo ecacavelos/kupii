@@ -283,24 +283,24 @@ function retrieveLoteVenta() {
 		request.done(function(msg) {
 			global_lote_id = msg.lote_id;
 			var s = "<a class='boton-verde' href=\"/lotes/listado/" + msg.lote_id + "\" target=\"_blank\" \">" + msg.lote_tag + "</a>";
-
-			$("#lote_error").html("");
-			sup = msg.superficie.replace(".", ",");
-			$("#lote_superficie").html(sup);
-			$("#lote_superficie").html(String(format.call($("#lote_superficie").html().split(' ').join(''), '.', ',')));
-			$("#lote_seleccionado_detalles").html(s);
-			precio_contado = msg.precio_contado;
-			precio_credito = msg.precio_credito;
-			estado_lote = msg.estado_lote;
-			var d = new Date();
-			var month = d.getMonth() + 1;
-			var day = d.getDate();
-
-			$("#id_nombre_cliente").removeAttr("disabled");
-		});
-		// En caso de no poder obtener los datos del lote, indicamos el error.
-		request.fail(function(jqXHR, textStatus) {
-			$("#lote_error").html("El Lote no existe o fue vendido.");
+			if(msg.estado_lote == '1' || msg.estado_lote == '2' || msg.estado_lote =='4'){
+				$("#lote_error").html("");
+				sup = msg.superficie.replace(".", ",");
+				$("#lote_superficie").html(sup);
+				$("#lote_superficie").html(String(format.call($("#lote_superficie").html().split(' ').join(''), '.', ',')));
+				$("#lote_seleccionado_detalles").html(s);
+				precio_contado = msg.precio_contado;
+				precio_credito = msg.precio_credito;
+				estado_lote = msg.estado_lote;
+				var d = new Date();
+				var month = d.getMonth() + 1;
+				var day = d.getDate();
+				$("#id_nombre_cliente").removeAttr("disabled");
+			}else if (msg.estado_lote == '3' || msg.estado_lote == '5' || msg.estado_lote == '6'){
+				$("#lote_error").html("El Lote fue vendido.");
+			}else{
+				$("#lote_error").html("El Lote no existe.");
+			}						
 		});
 	} else {
 		if ($("#id_lote").val().toString().length > 0) {
