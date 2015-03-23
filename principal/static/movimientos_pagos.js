@@ -210,8 +210,8 @@ function retrieveLotePago() {
 		// Actualizamos el formulario con los datos obtenidos del lote.
 		request.done(function(msg) {
 			global_lote_id = msg.lote_id;
-			var s = "<a class='boton-verde' href=\"/lotes/listado/" + msg.lote_id + "\" target=\"_blank\" \">" + msg.lote_tag + "</a>";
-			
+			//var s = "<a class='boton-verde' href=\"/lotes/listado/" + msg.lote_id + "\" target=\"_blank\" \">" + msg.lote_tag + "</a>";
+			var s = "<a class='boton-verde' href=\"/informes/informe_movimientos/?lote_id=" + $("#id_lote").val() + "\&fecha_ini=&fecha_fin="  + "\" target=\"_blank\" \"> Ver Pagos</a>";
 			$("#lote_error").html("");
 			$("#lote_superficie").html(msg.superficie);			
 			$("#lote_seleccionado_detalles").html(s);

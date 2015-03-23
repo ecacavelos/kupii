@@ -91,16 +91,13 @@ def retrieve_lote_venta(request):
         manzana_int = int(data.get('manzana', ''))
         lote_int = int(data.get('lote', ''))
 
-        #object_list = Lote.objects.get(fraccion=fraccion_int, manzana=manzana_int, nro_lote=lote_int)
         myfraccion = Fraccion.objects.get(id=fraccion_int)
         fraccion_manzanas = Manzana.objects.filter(fraccion=myfraccion)
         for manzana in fraccion_manzanas:
             if manzana.nro_manzana == manzana_int:
                 mymanzana = manzana
-        #object_list = Lote.objects.get(manzana_nro_manzana=mymanzana.nro_manzana, nro_lote=lote_int)
-        object_list = Lote.objects.filter(manzana_id=mymanzana.id, nro_lote=lote_int, estado="1") | Lote.objects.filter(manzana_id=mymanzana.id, nro_lote=lote_int, estado="2")
+        object_list = Lote.objects.filter(manzana_id=mymanzana.id, nro_lote=lote_int) | Lote.objects.filter(manzana_id=mymanzana.id, nro_lote=lote_int)
         
-        #object_list = Lote.objects.get(manzana_id=mymanzana.id, nro_lote=lote_int, estado="1")
         r = object_list
         if r:
             #r = r[0]
@@ -115,7 +112,9 @@ def retrieve_lote_venta(request):
             
             return HttpResponse(json.dumps(response_data), content_type="application/json")
         else:
-            return HttpResponseServerError("No se encontraron lotes.")
+            response_data = {}
+            response_data['estado'] = "0"
+            return HttpResponse(json.dumps(response_data), content_type="application/json")
 
     return HttpResponseServerError("No valido.")
 
