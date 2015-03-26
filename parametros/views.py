@@ -3,6 +3,7 @@ from django.template import RequestContext, loader
 from principal.models import PlanDePago, PlanDePagoVendedor
 from parametros.forms import PlanDePagoForm, SearchForm, PlanDePagoVendedorForm
 from django.core.urlresolvers import reverse, resolve
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 # Funcion principal del modulo de lotes.
 def parametros(request):
     
@@ -67,9 +68,16 @@ def consultar_plan_de_pago(request):
         object_list = PlanDePago.objects.all().order_by('id')
         search_form = SearchForm({})
         message = ""
-
+    paginator = Paginator(object_list, 25)
+    page = request.GET.get('page')
+    try:
+        lista = paginator.page(page)
+    except PageNotAnInteger:
+        lista = paginator.page(1)
+    except EmptyPage:
+        lista = paginator.page(paginator.num_pages)  
     c = RequestContext(request, {
-        'object_list': object_list,
+        'object_list': lista,
         'search_form': search_form,
         'message': message,
     })
@@ -108,9 +116,17 @@ def consultar_plan_de_pago_vendedores(request):
         object_list = PlanDePagoVendedor.objects.all().order_by('id')
         search_form = SearchForm({})
         message = ""
-
+        
+    paginator = Paginator(object_list, 25)
+    page = request.GET.get('page')
+    try:
+        lista = paginator.page(page)
+    except PageNotAnInteger:
+        lista = paginator.page(1)
+    except EmptyPage:
+        lista = paginator.page(paginator.num_pages) 
     c = RequestContext(request, {
-        'object_list': object_list,
+        'object_list': lista,
         'search_form': search_form,
         'message': message,
     })
