@@ -1164,18 +1164,35 @@ def informe_movimientos(request):
                         ventas_pagos_list.insert(0,resumen_venta) #El primer elemento de la lista de pagos es el resumen de la venta
                         saldo_anterior=item_venta.precio_final_de_venta
                         monto=item_venta.entrega_inicial
+                        numero_cuota=1
                         saldo=saldo_anterior-monto
                         for pago in venta_pagos_query_set:
                             saldo_anterior=saldo
-                            monto=pago.total_de_cuotas
-                            saldo=saldo_anterior-monto
-                            cuota ={}
-                            cuota['fecha_de_pago'] = pago.fecha_de_pago
-                            cuota['nro_cuota'] = str(get_nro_cuota(pago)) + '/' + str(pago.plan_de_pago.cantidad_de_cuotas)
-                            cuota['saldo_anterior'] = str('{:,}'.format(saldo_anterior)).replace(",",".")
-                            cuota['monto'] = str('{:,}'.format(monto)).replace(",",".")
-                            cuota['saldo'] = str('{:,}'.format(saldo)).replace(",",".")
-                            ventas_pagos_list.append(cuota)
+                            if pago.nro_cuotas_a_pagar > 1:
+                                total_cuotas = int(pago.total_de_cuotas / pago.nro_cuotas_a_pagar)
+                                for x in xrange(1,pago.nro_cuotas_a_pagar + 1):
+                                    monto = total_cuotas
+                                    saldo_anterior=saldo
+                                    saldo = saldo_anterior-monto                                   
+                                    cuota ={}
+                                    cuota['fecha_de_pago'] = pago.fecha_de_pago
+                                    cuota['nro_cuota'] = str(numero_cuota) + '/' + str(pago.plan_de_pago.cantidad_de_cuotas)
+                                    cuota['saldo_anterior'] = str('{:,}'.format(saldo_anterior)).replace(",",".")
+                                    cuota['monto'] = str('{:,}'.format(monto)).replace(",",".")
+                                    cuota['saldo'] = str('{:,}'.format(saldo)).replace(",",".")
+                                    ventas_pagos_list.append(cuota)
+                                    numero_cuota +=1
+                            else:
+                                monto=pago.total_de_cuotas
+                                saldo=saldo_anterior-monto
+                                cuota ={}
+                                cuota['fecha_de_pago'] = pago.fecha_de_pago
+                                cuota['nro_cuota'] = str(numero_cuota) + '/' + str(pago.plan_de_pago.cantidad_de_cuotas)
+                                cuota['saldo_anterior'] = str('{:,}'.format(saldo_anterior)).replace(",",".")
+                                cuota['monto'] = str('{:,}'.format(monto)).replace(",",".")
+                                cuota['saldo'] = str('{:,}'.format(saldo)).replace(",",".")
+                                ventas_pagos_list.append(cuota)
+                                numero_cuota +=1
                         lista_movimientos.append(ventas_pagos_list)
 
                 mostrar_transferencias = False
