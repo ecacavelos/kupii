@@ -40,7 +40,8 @@ $(document).ready(function() {
 	
 	$(function() {
 		$('#id_modal').modal();
-	}); 
+	});
+	
 });
 
 window.onload = function() {
@@ -415,6 +416,7 @@ function retrievePlanPagoVendedor() {
 }
 
 function retrievePlanes(){
+	$("#id_mes_pago").val("0");
 	retrieveFraccion();
 	retrieveLotePago();
 	retrievePlanPagoVendedor(); 
@@ -472,4 +474,23 @@ function calculateTotalPago() {
 	$("#total_pago2").html(String(total_pago));
 	$("#total_pago2").html(String(format.call($("#total_pago2").html().split(' ').join(''),'.',',')));
 	$("#guardar_pago").removeAttr("disabled");
+}
+
+function calculateMesPago() {
+	var request = $.ajax({
+			type : "GET",
+			url : "/ajax/get_mes_pagado_by_id_lote/",
+			data : {
+				lote_id : lote_id,
+				cant_cuotas : $("#nro_cuotas_a_pagar").val()
+			},
+			dataType : "json"
+		});
+		// Actualizamos el formulario con los datos obtenidos del lote.
+		request.done(function(msg) {
+			$("#id_mes_pago").val(msg);
+		});
+		request.done(function(msg) {
+			console.log(msg);
+		});
 }

@@ -116,7 +116,7 @@
 				<tr>
 					<td><label for="nro_cuotas_a_pagar">Cantidad de Cuotas a Pagar: </label></td>
 					<td class="noimage">
-					<input id="nro_cuotas_a_pagar" type"number" name="nro_cuotas_a_pagar" maxlength="4" onkeyup="calcularInteres();"/>
+					<input id="nro_cuotas_a_pagar" type"number" name="nro_cuotas_a_pagar" maxlength="4" onkeyup="calcularInteres();" onblur="calculateMesPago();" />
 					</td>
 				</tr>
 				<tr>
@@ -160,6 +160,11 @@
 					<td class="noimage">
 					<input id="total_pago" type="hidden" name="total_pago" readonly maxlength="100" />
 					<div id="total_pago2"></div></td>
+				</tr>
+				<tr>
+					<td><label for="mes_pago">Se paga hasta la fecha:</label></td>
+					<td class="noimage">
+					<input id="id_mes_pago" type="text" readonly name="mes_de_pago" maxlength="100" />
 				</tr>
 				<tr>
 					<td><label for="fecha_vencimiento">Fecha de &Uacute;ltima Venta: </label></td>

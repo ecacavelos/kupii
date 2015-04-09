@@ -5,12 +5,16 @@ from django.contrib import messages
 from django.views.decorators.http import require_http_methods
 from django.template import RequestContext, loader
 from django.core import serializers
-from principal.models import Fraccion, Manzana, Venta, PagoDeCuotas, Propietario, Lote, Cliente, Vendedor, PlanDePago, PlanDePagoVendedor,Timbrado
+from principal.models import Fraccion, Manzana, Venta, PagoDeCuotas, Propietario, Lote, Cliente, Vendedor, PlanDePago, PlanDePagoVendedor,Timbrado, RecuperacionDeLotes
 from django.core.urlresolvers import reverse, resolve
 from principal.common_functions import get_cuotas_detail_by_lote, custom_json
 from django.core.serializers.json import DjangoJSONEncoder
 import json
 import traceback
+from django.db.models import Count, Min, Sum, Avg
+from principal.monthdelta import MonthDelta
+from calendar import monthrange
+from datetime import datetime, timedelta
 
 #Ejemplo nuevo esquema de serializacion:
 # all_objects = list(Restaurant.objects.all()) + list(Place.objects.all())
@@ -382,5 +386,40 @@ def get_propietario_id_by_name_or_cedula(request):
             except Exception, error:
                 print error
                 #return HttpResponseServerError('No se pudo procesar el pedido')
+        else:
+            return HttpResponseRedirect(reverse('login')) 
+        
+@require_http_methods(["GET"])
+def get_mes_pagado_by_id_lote(request):
+    if request.method == 'GET':
+        if request.user.is_authenticated():
+            try:
+                lote_id = request.GET['lote_id']
+                cuotas_pag = request.GET['cant_cuotas']
+                print("lote_id ->" + lote_id)
+                cant_cuotas_pagadas = PagoDeCuotas.objects.filter(lote=lote_id).aggregate(Sum('nro_cuotas_a_pagar'))
+                ventas = Venta.objects.filter(lote_id=lote_id)
+                cuotas_totales=0
+                for item_venta in ventas:
+                    print 'Obteniendo la ultima venta'
+                    try:
+                        RecuperacionDeLotes.objects.get(venta=item_venta.id)
+                    except RecuperacionDeLotes.DoesNotExist:
+                        print 'se encontro la venta no recuperada, la venta actual'
+                        venta = item_venta
+                plan_de_pago = PlanDePago.objects.get(id=venta.plan_de_pago.id)
+                cuotas_totales = (cant_cuotas_pagadas['nro_cuotas_a_pagar__sum'] -1) + int(cuotas_pag)
+                # calcular la fecha de pago
+                if cuotas_totales != 0:
+                    fecha_pago =(venta.fecha_primer_vencimiento + MonthDelta(cuotas_totales)).strftime('%d/%m/%Y')
+                else:
+                    cuotas_totales = 1
+                    fecha_pago = venta.fecha_primer_vencimiento.strftime('%d/%m/%Y')
+
+                labels=["fecha_de_pago"]
+                #return HttpResponse(json.dumps fecha_pago, cls=DjangoJSONEncoder), content_type="application/json")
+                return HttpResponse(json.dumps(fecha_pago), content_type="application/json")
+            except Exception, error:
+                print error
         else:
             return HttpResponseRedirect(reverse('login')) 
