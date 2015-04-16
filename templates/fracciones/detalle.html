@@ -1,0 +1,168 @@
+{% extends "lotes/base_lotes.html" %}
+
+{% block header_resources %}
+<!--
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+-->
+{% endblock %}
+
+{% block header_scripts %}
+<!--
+<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+-->
+<script type="text/javascript">
+
+	function solo_numeros_comas_puntos () {
+		
+	  	$('#id_superficie_total').val($('#id_superficie_total').val().replace(/[^\d,.]+/g, ''));
+	}
+	
+	//Separador de miles y comas en escritura
+	function format(comma, period) {
+		
+		var comma = comma || ',';
+		var period = period || '.';
+		var split = this.toString().split(',');
+		var numeric = split[0];
+		var decimal = split.length > 1 ? period + split[1] : '';
+		var reg = /(\d+)(\d{3})/;
+		for (var i = 1; i < numeric.length; i++) {
+			numeric = numeric.replace(".", "");
+		}
+		while (reg.test(numeric)) {
+
+			numeric = numeric.replace(reg, '$1' + comma + '$2');
+		}
+		//} else {
+		//	numeric = numeric.substr(0,numeric.length-1);
+		//}
+		
+		return numeric + decimal;
+	}
+		var data = [
+	{"label" : "Aragorn"}
+	];
+	
+	$(document).ready(function() {
+		$('.grid_6').hide();
+		$("#id_fecha_aprobacion").datepicker({ dateFormat: 'dd/mm/yy' });
+		$("#id_fecha_aprobacion").addClass("date");
+		$('.date').mask('##/##/####');
+		$('#id_cantidad_manzanas').prop('disabled', true);
+		$('#id_cantidad_lotes').prop('disabled', true);
+		$('#id_superficie_total').val($('#id_superficie_total').val().replace(".",","));
+		$('#id_superficie_total').val(format.call($('#id_superficie_total').val().split(' ').join(''),'.',','));
+		$('#id_superficie_total').on('keyup', function(){
+	 		$('#id_superficie_total').val(format.call($('#id_superficie_total').val().split(' ').join(''),'.',','));solo_numeros_comas_puntos();
+	 	});
+		
+	var propietario_id = $('#id_propietario').val();	
+	var request_name_by_id = $.ajax({
+				url : '/ajax/get_propietario_name_by_id/',
+				type : "GET",
+				data : {
+						propietario_id : propietario_id
+					},
+				dataType : "json",
+				success: function (data){
+					$.each(data, function (index,value) {
+					$("#id_name_propietario").val(value.label);
+					});
+				}
+			});
+		
+
+	
+	//$("#id_name_propietario").empty();
+
+	base_url = "/ajax/get_propietario_id_by_name/";
+	params = "value";
+	$( "#id_name_propietario" ).autocomplete({
+	source:  base_url,
+	minLength: 1,
+	select: function( event, ui ) {
+	id_propietario = ui.item.id;
+	$("#id_propietario").val(id_propietario) ;
+	}
+	});
+	});
+
+	function _enviar(){
+		$("#id_cantidad_manzanas").prop('disabled', false);
+		$("#id_cantidad_lotes").prop('disabled', false);
+		var dateTypeVar = $('#id_fecha_aprobacion').datepicker('getDate');
+		$("#id_fecha_aprobacion").val($.datepicker.formatDate('yy-mm-dd', dateTypeVar));
+		var res = $("#id_superficie_total").val();
+		//var res ="";
+		for ( i = 0; i < res.length; i++) {
+			res = res.replace(".", "");
+		}
+		res = res.replace(",", ".");
+		//console.log("\n"+str);
+		//console.log("\n"+res);
+		$("#id_superficie_total").val(res);
+		//$("#form_mod_fraccion").submit();
+	
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="gri16 text-izquierda" id="breadcumb">
+						<a href="{% url 'frontend_home' %}">Inicio</a> <span class="verde-1">></span>  
+						<a href="{% url 'frontend_home' %}fracciones/">Fracciones</a> <span class="verde-1">></span>  
+						<a href="{% url 'frontend_home' %}fracciones/listado/">Listado de Fracciones</a>  
+						<span class="verde-1">> Detalles de Fracci&oacute;n</span> 
+					</div>
+
+					<div class="clear"></div>
+
+					<div class="grid_10">
+  						<h1>Detalles de Fracciones</h1>
+					</div>
+
+					<div class="grid_6">
+  						<a href="#" class="historico">Buscar</a>
+					</div>
+
+					<div class="clear"></div>
+<div id="detalle-lote">
+	<div id="detalle-lote-header">
+		<h3 class="detalle-lote-header">Fracci&oacute;n Nro {{ fraccion.id }} </h3>
+	</div>
+			
+		<div id="{{message_id}}">{{ message }}</div>
+	
+	<table width="50%" border="1" cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
+	<form action="/fracciones/listado/{{ fraccion.id }}/" method="post" id="form_mod_fraccion" onsubmit="_enviar();">
+		{% csrf_token %}
+		{% for hidden in form.hidden_fields %}
+			{{ hidden }}
+		{% endfor %}
+		{% for field in form %}
+		<tr>
+		{%if field.html_name == 'propietario' %}
+		<div class="fieldWrapper{% if field.field.required %} required{% endif %}">
+			<td>{{ field.label_tag }}</td><td><input type="text" id="id_name_propietario" name="name_propietario" />{{ field.errors }}</td>
+		</div>
+		{%else%}	
+		<div class="fieldWrapper{% if field.field.required %} required{% endif %}">
+			
+			<td>{{ field.label_tag }}</td><td>{{ field }} {{ field.errors }}</td>
+		</div>
+		{%endif%}
+		</tr>
+				
+		{% endfor %}
+	</table>
+
+		<input class="lote-form-button" type="submit" name="boton_guardar" value="Guardar Cambios" />
+		<input class="lote-form-button" type="submit" name="boton_borrar" value="Borrar este Registro" />
+	</form>
+</div>
+<br>
+<div id="footer">
+	<a href="{% url 'frontend_home' %}fracciones/listado" class="boton-verde">Volver al Listado de Fracciones</a>
+</div>
+{% endblock %}

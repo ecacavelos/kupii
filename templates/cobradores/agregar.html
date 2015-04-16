@@ -1,0 +1,20 @@
+{% extends "cobradores/base_cobradores.html" %}
+
+{% block content %}
+<div id="detalle-cobrador">
+	<form action="" method="post">
+		{% csrf_token %}
+		{% for field in form %}
+		<div class="fieldWrapper{% if field.field.required %} required{% endif %}">
+			{{ field.errors }}
+			{{ field.label_tag }} {{ field }}
+		</div>
+		{% endfor %}
+		<input class="cobrador-form-button" type="submit" value="Agregar este Vendedor" />
+	</form>
+</div>
+<br>
+<div id="footer">
+	<a href="{% url 'frontend_home' %}cobradores">Volver al módulo de Cobradores</a>
+</div>
+{% endblock %}

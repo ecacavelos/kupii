@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="grid_10" align="center">
+	<!--<p>{{nombre}}</p>-->
+	<table width="90%" border="0" cellpadding="0" cellspacing="0" id="lista-categoria" align="center"> 
+	  <tr>
+	    <th colspan="3" class="categorias"><strong>Menú de Lotes</strong></th>
+	  </tr>
+	  <tr>
+	    <td><strong><a href="{% url 'frontend_home' %}fracciones">Fracciones</a></strong></td>
+	    <td width="25px" title="Agregar Fracción"><a class="add" href="{% url 'frontend_home' %}fracciones/agregar/">&nbsp;</a></td>
+	    <td width="25px" title="Ver Fracciones"><a class="edit" href="{% url 'frontend_home' %}fracciones/listado/">&nbsp;</a></td>
+	  </tr>
+	  <tr>
+	    <td><strong><a href="{% url 'frontend_home' %}manzanas">Manzanas</a></strong></td>
+	    <td width="25px" title="Ver Manzanas"><a class="edit" href="{% url 'frontend_home' %}manzanas/listado/">&nbsp;</a></td>
+	  </tr>
+	  <tr>
+	    <td><strong><a href="{% url 'frontend_home' %}lotes/">Lotes</a></strong></td>
+	    <td width="25px" title="Agregar Lote"><a class="add" href="{% url 'frontend_home' %}lotes/agregar/">&nbsp;</a></td>
+	    <td width="25px" title="Ver lotes"><a class="edit" href="{% url 'frontend_home' %}lotes/listado/">&nbsp;</a></td>
+	  </tr>
+	</table>
+	
+	<table width="90%" border="0" cellpadding="0" cellspacing="0" id="lista-categoria" align="center"> 
+	  <tr>
+	    <th colspan="3" class="categorias"><strong>Configuraciones - Parámetros</strong></th>
+	  </tr>
+	  <tr>
+	    <td><strong><a href="parametros/plan_pago">Planes de Pago Propietarios</a></strong></td>
+	    <td width="25px" title="Agregar Plan de Pago"><a class="add" href="{% url 'frontend_home' %}parametros/plan_pago/agregar/">&nbsp;</a></td>
+	    <td width="25px" title="Ver Planes de Pago"><a class="edit" href="{% url 'frontend_home' %}parametros/plan_pago/listado/">&nbsp;</a></td>
+	  </tr>
+	  <tr>
+	    <td><strong><a href="parametros/plan_pago_vendedores">Planes de Pago Vendedores</a></strong></td>
+	    <td width="25px" title="Agregar Plan de Pago"><a class="add" href="{% url 'frontend_home' %}parametros/plan_pago_vendedores/agregar/">&nbsp;</a></td>
+	    <td width="25px" title="Ver Planes de Pago"><a class="edit" href="{% url 'frontend_home' %}parametros/plan_pago_vendedores/listado/">&nbsp;</a></td>
+	  </tr>
+	  <tr>
+	    <td><strong><a href="parametros/generales">Parametros Generales</a></strong></td>
+	    <td width="25px" title="Agregar Plan de Pago"><a class="add" href="#">&nbsp;</a></td>
+	  </tr>
+	</table>
+	
+	<table width="90%" border="0" cellpadding="0" cellspacing="0" id="lista-categoria" align="center"> 
+	  <tr>
+	    <th colspan="3" class="categorias"><strong>Personas</strong></th>
+	  </tr>
+	  <tr>
+	    <td><strong><a href="{% url 'frontend_home' %}clientes/">Clientes</a></strong></td>
+	    <td width="25px" title="Agregar Cliente"><a class="add" href="{% url 'frontend_home' %}clientes/agregar/">&nbsp;</a></td>
+	    <td width="25px" title="Ver Clientes"><a class="edit" href="{% url 'frontend_home' %}clientes/listado/">&nbsp;</a></td>
+	  </tr>
+	  <tr>
+	    <td><strong><a href="{% url 'frontend_home' %}propietarios/">Propietarios</a></strong></td>
+	    <td width="25px" title="Agregar Propietario"><a class="add" href="{% url 'frontend_home' %}propietarios/agregar/">&nbsp;</a></td>
+	    <td width="25px" title="Ver Propietarios"><a class="edit" href="{% url 'frontend_home' %}propietarios/listado/">&nbsp;</a></td>
+	  </tr>
+	  <tr>
+	    <td><strong><a href="{% url 'frontend_home' %}vendedores/">Vendedores</a></strong></td>
+	    <td width="25px" title="Agregar Vendedor"><a class="add" href="{% url 'frontend_home' %}vendedores/agregar/">&nbsp;</a></td>
+	    <td width="25px" title="Ver Vendedores"><a class="edit" href="{% url 'frontend_home' %}vendedores/listado/">&nbsp;</a></td>
+	  </tr>
+	</table>
+	<table width="90%" border="0" cellpadding="0" cellspacing="0" id="lista-categoria" align="center"> 
+	  <tr>
+	    <th colspan="3" class="categorias"><strong>Facturación</strong></th>
+	  </tr>
+	  <tr>
+	    <td><strong><a href="{% url 'frontend_home' %}facturacion/facturar">Facturar</a></strong></td>
+	    <!-- <td width="25px" title="Agregar Cliente"><a class="add" href="{% url 'frontend_home' %}clientes/agregar/">&nbsp;</a></td>-->
+	    <td width="25px" title="Ver Facturas"><a class="edit" href="{% url 'frontend_home' %}facturacion/listado/">&nbsp;</a></td> 
+	  </tr>
+	</table>
+</div>
+
+ <div class="grid_6">
+	<table width="90%" border="0" cellpadding="0" cellspacing="0" id="lista-categoria" align="center">
+		<tr>
+			<th class="acciones"><strong><a href="{% url 'frontend_home' %}movimientos/" style="color: white;">Acciones</a></strong></th>
+		</tr>
+		<tr>
+			<td class="last" title="Vender Lote"><a href="{% url 'frontend_home' %}movimientos/ventas_lotes/">Vender Lote</a></td>
+		</tr>
+		<tr>
+			<td class="last" title="Pago de Cuotas"><a href="{% url 'frontend_home' %}movimientos/pago_cuotas/">Pago de Cuotas</a></td>
+		</tr>		
+		<tr>
+			<td class="last" title="Reservar Lote"><a href="{% url 'frontend_home' %}movimientos/reservas_lotes/">Reservar Lote</a></td>
+		</tr>
+		<tr>
+			<td class="last" title="Transferencia de Lote"><a href="{% url 'frontend_home' %}movimientos/transferencias_lotes/">Transferencia de Lote</a></td>
+		</tr>
+		<tr>
+			<td class="last" title="Cambio de Lote"><a href="{% url 'frontend_home' %}movimientos/cambio_lotes/">Cambio de Lote</a></td>
+		</tr>
+		<tr>
+			<td class="last" title="Recuperacion de Lote"><a href="{% url 'frontend_home' %}movimientos/recuperacion_lotes/">Recuperacion de Lote</a></td>
+		</tr>
+	</table>
+</div>
+<div class="grid_6">
+	<table width="90%" border="0" cellpadding="0" cellspacing="0" id="lista-categoria" align="center">
+		<tr>
+			<th class="acciones"><a href="{% url 'frontend_home' %}informes/" style="color: white;">Informes</a></strong></th>
+		</tr>
+		<tr>
+			<td class="last" title="Lotes Libres">
+				<a href="{% url 'frontend_home' %}informes/lotes_libres/">Lotes Libres</a>
+			</td>
+		</tr>
+		<tr>
+			<td class="last" title="Clientes Atrasados">
+				<a href="{% url 'frontend_home' %}informes/clientes_atrasados/">Clientes Atrasados</a>
+			</td>
+		</tr>
+		<tr>
+			<td class="last" title="Informe General">
+				<a href="{% url 'frontend_home' %}informes/informe_general/">Informe General</a>
+			</td>
+		</tr>
+		<tr>
+			<td class="last" title="Movimientos de Lotes">
+				<a href="{% url 'frontend_home' %}informes/informe_movimientos/">Movimientos de Lotes</a>
+			</td>
+		</tr>
+		<tr>
+			<td class="last" title="Liquidacion de Propietarios">
+				<a href="{% url 'frontend_home' %}informes/liquidacion_propietarios/">Liquidacion de Propietarios</a>
+			</td>
+		</tr>
+		<tr>
+			<td class="last" title="Liquidacion de Vendedores">
+				<a href="{% url 'frontend_home' %}informes/liquidacion_vendedores/">Liquidacion de Vendedores</a>
+			</td>
+		</tr>
+		<tr>
+			<td class="last" title="Liquidacion de Gerentes">
+				<a href="{% url 'frontend_home' %}informes/liquidacion_gerentes/">Liquidacion de Gerentes</a>
+			</td>
+		</tr>
+	</table>
+</div>
+{% endblock %}
