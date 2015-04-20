@@ -186,7 +186,8 @@ class PlanDePago(models.Model):
         verbose_name_plural = "planes de pago"
         
 class Lote(models.Model):
-    nro_lote = models.IntegerField()
+    codigo_paralot = models.CharField(max_length=20,blank=True, null=True)
+    nro_lote = models.IntegerField()    
     manzana = models.ForeignKey(Manzana)
     precio_contado = models.IntegerField()
     precio_credito = models.IntegerField()
@@ -223,7 +224,7 @@ class Venta(models.Model):
     importacion_paralot=models.BooleanField(blank=False, null=False)
     plan_de_pago_vendedor=models.ForeignKey(PlanDePagoVendedor)
     def __unicode__(self):
-        return (str(self.lote) + " a " + self.cliente.nombres + " " + self.cliente.apellidos)
+        return u'%s a %s - %s' % (str(self.lote), self.cliente.nombres, self.cliente.apellidos)    
     def as_json(self):
         return dict(
             venta_id = self.id,
@@ -274,6 +275,8 @@ class PagoDeCuotas(models.Model):
             total_de_cuotas = self.total_de_cuotas,
             
         )
+    def __unicode__(self):
+        return u'%s - %s' % (str(self.lote), self.fecha_de_pago)
 
 class TransferenciaDeLotes(models.Model):
     lote = models.ForeignKey(Lote)
