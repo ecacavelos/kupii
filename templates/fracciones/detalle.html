@@ -67,7 +67,7 @@
 				dataType : "json",
 				success: function (data){
 					$.each(data, function (index,value) {
-					$("#id_name_propietario").val(value.label);
+					$("#id_name_propietario").val(value.fields.nombres + ' ' + value.fields.apellidos );
 					});
 				}
 			});
