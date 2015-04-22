@@ -1,0 +1,163 @@
+{% extends "lotes/base_lotes.html" %}
+
+{% block header_resources %}
+<!--
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+-->
+{% endblock %}
+
+{% block header_scripts %}
+<!--
+<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}ajax_config.js"></script>
+-->
+<script type="text/javascript" src="{{ STATIC_URL }}movimientos.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}movimientos_ventas.js"></script>
+
+<script type="text/javascript">
+/* Cambio para label de commit*/
+var data = [
+		{"label" : "Aragorn"}
+		];
+		
+
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="gri16 text-izquierda" id="breadcumb">
+	<a href="{% url 'frontend_home' %}">Inicio</a> <span class="verde-1">></span>  
+	<a href="{% url 'frontend_home' %}movimientos/">Movimientos</a> 
+	<span class="verde-1">> Vender Lote</span> 
+</div>
+<div class="clear"></div>
+
+<div class="grid_10">
+  <h1>Vender Lote</h1>
+</div>
+
+<div class="grid_6">
+  <a href="#" class="historico">Buscar</a>
+</div>
+
+<div class="clear"></div>
+<div class="grid_16" align="center">
+<form id="main_venta_form" action="" method="post">
+	<table width="94%" border="0" cellpadding="0" cellspacing="0" id="forms" align="center">
+	{% csrf_token %}
+	<div class="fieldWrapperMovimientos">
+		<tr>
+			<td><label for="id_lote">Lote: </label></td>
+			<td class="noimage"><input id="id_lote" type="text" name="lote" maxlength="12" onblur="retrieveLoteVenta()" />
+			<ul class="errorlist"><li id="lote_error"></li></ul></td>
+		</tr>
+		<tr>
+			<td><label>Superficie (m2): </label></td>
+			<td class="noimage"><div id="lote_superficie"></div></td>
+		</tr>	
+		<tr>
+			<td><label>Detalles del Lote: </label></td>
+			<td class="noimage"><div id="lote_seleccionado_detalles"></div></td>
+		</tr>
+		<tr>
+			<td><label for="lote_seleccionado_fraccion">Fraccion: </label></td>
+			<td class="noimage" id="lote_seleccionado_fraccion"></td>
+		</tr>	
+	</div>
+	<div class="fieldWrapperMovimientos">
+		<tr>
+			<td><label for="id_fecha">Fecha de Venta: </label></td>
+			<td class="noimage">
+				<input id="id_fecha" type="text" name="fecha" maxlength="10" />
+				<!--<div id="id_fecha2"></div>-->
+			</td>
+		</tr>
+	</div>
+	<div class="fieldWrapperMovimientos">
+		<tr>
+			<td><label>Cliente: </label></td>
+			<td class="noimage"><input id="id_cliente" type="hidden" name="cliente"  maxlength="100" onchange="retrieveCliente()" />
+				<input id="id_name_cliente" type="text" name="name_cliente" placeholder="Ingrese el Nombre"  maxlength="100" /> <br><br>				
+				<input id="id_cedula_cliente" type="text" name="cedula_cliente" placeholder="Ingrese el Nro. de C.I."  maxlength="100" />
+				o <a href="{% url 'frontend_home' %}clientes/agregar/" class="boton-verde" target="_blank">Agregar Nuevo Cliente</a> {{ field.errors }}<br><br>			
+			</td>
+			<td class="noimage"><div id="cliente_seleccionado"></div>
+			<ul class="errorlist"><li id="cliente_error"></li></ul></td>
+		</tr>
+	</div>
+	<div class="fieldWrapperMovimientos">
+		<tr>
+			<td><label>Vendedor: </label></td>
+			<td class="noimage"><input id="id_vendedor" type="hidden" name="vendedor" maxlength="100" onchange="retrieveVendedor()" />
+				<input id="id_name_vendedor" type="text" name="name_vendedor" placeholder="Ingrese el Nombre" maxlength="100" /> <br><br>
+				<input id="id_cedula_vendedor" type="text" name="cedula_vendedor" placeholder="Ingrese el Nro. de C.I."  maxlength="100" />
+				o <a href="{% url 'frontend_home' %}vendedores/agregar/" class="boton-verde" target="_blank">Agregar Nuevo Vendedor</a> {{ field.errors }}<br><br>	
+			</td>
+			<td class="noimage"><div id="vendedor_seleccionado"></div>	
+			<ul class="errorlist"><li id="vendedor_error"></li></ul></td>
+		</tr>	
+	</div>
+	<div class="fieldWrapperMovimientos">
+		<tr>
+			<td><label>Plan de Pago: </label></td>
+			<td class="noimage"><input id="id_plan_pago" name="plan_pago" type="hidden" maxlength="100" onchange="retrievePlanPago()"/>
+				<input id="id_plan_p" type="text" name="plan_p" maxlength="100" /><br><br>
+			</td>
+			
+		</tr>
+	</div>
+	<div class="fieldWrapperMovimientos">
+		<tr>
+			<td><label>Plan de Pago Vendedor: </label></td>
+			<td class="noimage"><input id="id_plan_pago_vendedores" name="plan_pago_vendedores" type="hidden" maxlength="100" onchange="retrievePlanPagoVendedor()"/>
+				<input id="id_plan_pv" type="text" name="plan_pv" maxlength="100" /><br><br>
+			</td>
+			
+		</tr>
+	</div>
+	<div class="fieldWrapperMovimientos">
+		<tr>
+			<td><label for="id_precio_venta">Precio de Venta: </label></td>
+			<td class="noimage"><input id="id_precio_venta" type="text" name="precio_venta"  maxlength="100" onblur="calculatePrecioFinalVentaLote()" onkeyup="$(this).val(format.call($(this).val().split(' ').join(''),'.',','));solo_numeros_puntos_precio_venta();"/><br><br>
+			<label id="tipo_pago_contado_label" class="shortLabel" for="tipo_pago_contado">Contado</label>
+			<input id="tipo_pago_contado" type="radio" name="tipo_pago"  />
+			<label id="tipo_pago_credito_label" class="shortLabel" for="tipo_pago_credito">Credito</label>
+			<input id="tipo_pago_credito" type="radio" name="tipo_pago"  /></td>
+		</tr>
+		<tr>
+			<td><label for="cantidad_cuotas_venta">Cantidad de cuotas: </label></td>
+			<td class="noimage"><div id="cantidad_cuotas_venta"></div></td>
+		</tr>
+		<tr>
+			<td><label for="id_entrega_inicial">Entrega Inicial: </label></td>
+			<td class="noimage"><input id="id_entrega_inicial" type="text" name="entrega_inicial"  maxlength="100" onblur="calculateMontoCuotas();calculatePrecioFinalVentaLote();$('#id_monto_cuota').attr('readonly', true);" onkeyup="$(this).val(format.call($(this).val().split(' ').join(''),'.',','));solo_numeros_puntos_entrega_inicial();" /></td>
+		</tr>
+		<tr>
+			<td><label for="id_monto_cuota">Monto de cada Cuota: </label></td>
+			<td class="noimage"><input id="id_monto_cuota" type="text" name="monto_cuota"  maxlength="100" onblur="calculatePrecioFinalVentaLote()" onkeyup="$(this).val(format.call($(this).val().split(' ').join(''),'.',','));solo_numeros_puntos_monto_cuota();" /></td>
+		</tr>
+		<tr>
+			<td><label>Monto Total: </label></td>
+			<td class="noimage"><div id="precio_final_venta"></div>
+			<ul class="errorlist"><li id="monto_total_error"></li></ul></td>
+			
+		</tr>
+		<tr>
+			<td><label for="id_fecha_vencimiento">Fecha del 1er Vencimiento: </label></td>
+			<td class="noimage"><input id="id_fecha_vencimiento" type="text" name="fecha_vencimiento" maxlength="10" /></td>
+		</tr>	
+	</div>
+	<div class="fieldWrapperMovimientos">
+	</div>
+	</table>
+	<input id="enviar_venta" style="cursor: pointer;" type="submit" value="Guardar Venta" />
+	<br><br><br>
+	</form>
+	<div class="clear"></div>
+	</div>
+	
+	<div id="footer">
+		<a href="{% url 'frontend_home' %}movimientos/" class="boton-verde">Volver al m&oacute;dulo de movimientos</a>
+	</div>
+
+{% endblock %}
