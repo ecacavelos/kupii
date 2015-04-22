@@ -20,7 +20,7 @@ BEGIN
 		IF FOUND THEN
 			v_contador_deletes := v_contador_deletes + 1;
 			RAISE NOTICE 'pago de cuota a eliminar : %. v_contador_deletes: %',  v_id_pagodecuota, v_contador_deletes;
-			--delete from principal_pagodecuotas where id = v_id_pagodecuota;
+			delete from principal_pagodecuotas where id = v_id_pagodecuota;
 		ELSE
 			RAISE NOTICE 'No se encontro registro de pago de cuota para venta: %. No se borra nada',  r_venta.id;
 		END IF;
