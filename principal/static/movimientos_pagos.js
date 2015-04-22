@@ -43,7 +43,7 @@ $(document).ready(function() {
 	$(function() {
 		$('#id_modal').modal();
 	});
-	
+
 });
 
 window.onload = function() {
@@ -58,6 +58,7 @@ var venta_id = 0;
 var global_proximo_vencimiento;
 var global_intereses;
 var detalle = "";
+var detalles_modificados =new Array();
 
 //Separador de miles y comas en escritura
 	function format(comma, period) {
@@ -305,35 +306,44 @@ function retrieveVenta() {
 
 function calcularInteres() {
 	//alert('calculando interes');
-	var fecha_pago=$('#id_fecha').val();
-	var proximo_vencimiento=global_proximo_vencimiento;
-	var lote_id=global_lote_id;
-	var nro_cuotas_a_pagar = $('#nro_cuotas_a_pagar').val();
-	 	var request = $.ajax({
-			type : "POST",
-			url : "/movimientos/calcular_interes/",
-			data : {
-				lote_id : lote_id,
-				fecha_pago : fecha_pago,
-				proximo_vencimiento : proximo_vencimiento,
-				nro_cuotas_a_pagar : nro_cuotas_a_pagar
-			},
-			dataType : "json"
-		});
-		// Actualizamos el formulario con los datos obtenidos.
-		request.done(function(msg) {
-			detalle=msg;
-			//alert(detalle);
-			console.log(detalle);
-			var intereses=0;
-			for(i=0;i<msg.length;i++){
-				intereses+=msg[i]['intereses'];
-			}
-			global_intereses=intereses;
-			calculateTotalCuotas();
-			calculateTotalPago();		
-			//alert(global_intereses);
-		});
+	if(detalle != ""){
+		var intereses=0;
+		for(i=0;i<detalle.length;i++){
+			intereses+=detalle[i]['intereses'];
+		}
+		global_intereses=intereses;
+		calculateTotalCuotas();
+		calculateTotalPago();
+	}else{
+		var fecha_pago=$('#id_fecha').val();
+		var proximo_vencimiento=global_proximo_vencimiento;
+		var lote_id=global_lote_id;
+		var nro_cuotas_a_pagar = $('#nro_cuotas_a_pagar').val();
+		 	var request = $.ajax({
+				type : "POST",
+				url : "/movimientos/calcular_interes/",
+				data : {
+					lote_id : lote_id,
+					fecha_pago : fecha_pago,
+					proximo_vencimiento : proximo_vencimiento,
+					nro_cuotas_a_pagar : nro_cuotas_a_pagar
+				},
+				dataType : "json"
+			});
+			// Actualizamos el formulario con los datos obtenidos.
+			request.done(function(msg) {
+				detalle=msg;
+				//alert(detalle);
+				console.log(detalle);
+				var intereses=0;
+				for(i=0;i<msg.length;i++){
+					intereses+=msg[i]['intereses'];
+				}
+				global_intereses=intereses;
+				calculateTotalCuotas();
+				calculateTotalPago();		
+			});
+	}
 }
 
 
@@ -344,12 +354,31 @@ function dibujarDetalle() {
 	$('#contenido_modal').append('<div cellpadding="0" cellspacing="0" class="listado-ventas" align="center">');
 	$('#contenido_modal').append("<th>Cuota Nro.</th><th>Vencimiento</th><th>Dias Atraso</th><th>Interes</th>");
 	for(i=0;i<detalle.length;i++){		
-		$('#contenido_modal').append("<tr><td>"+detalle[i]['nro_cuota']+"</td><td>"+detalle[i]['vencimiento']+"</td><td>"+detalle[i]['dias_atraso']+"</td><td>"+f(detalle[i]['intereses'])+"</td></tr>");
+		$('#contenido_modal').append('<tr><td>'+detalle[i]['nro_cuota']+'</td><td>'+
+		detalle[i]['vencimiento']+'</td><td>'+detalle[i]['dias_atraso']+
+		'</td><td><input style="width: 70px;" class="interes" id="interes_' + i + '" type="number" value=' + f(detalle[i]['intereses']).replace(/\./g, '')+'></td></tr>');
 	}
-	$('#contenido_modal').append('</div>');	
+	$('#contenido_modal').append('<button class="button_verde" id="modificar_mora" data-toggle="modal" data-target=".bs-example-modal-sm" value="Modificar">Modificar</button>');
+	$('#contenido_modal').append('</div>');
+	$('#modificar_mora').click(function() {
+		this.style.backgroundColor = '#66A385';
+		modificarMontos();
+		return false;
+	});
 }
 
 
+function modificarMontos(){
+	var intereses =0;
+	global_intereses =0;
+	for(i=0;i<detalle.length;i++){
+		detalle[i]['intereses']= parseInt($('#interes_' + i).val());
+		intereses+=detalle[i]['intereses'];
+	}
+	global_intereses=intereses;
+	calculateTotalCuotas();
+	calculateTotalPago();
+}
 function retrieveCliente() {
 	if ($("#id_cliente").val().toString().length > 0) {
 		// Hacemos un request POST AJAX para obtener los datos del cliente ingresado.
@@ -504,7 +533,6 @@ function calculateMesPago() {
 
 function addRow(msg){	
 	 var table = document.getElementById("id_cuota_pagar");
-	 var nro_fila = 1;
 	 for(i =0; i < msg.cuotas_a_pagar.length; i++){
 	 	$("#id_cuota_pagar").append('<tr><td>' + msg.cuotas_a_pagar[i].nro_cuota+ '</td><td>' + msg.cuotas_a_pagar[i].fecha+'</td></tr>');
 	 }	

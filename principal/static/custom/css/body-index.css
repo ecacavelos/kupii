@@ -200,10 +200,10 @@ table#forms {
 
 table#forms tr td {
 	padding:10px;
-	font-size:14px;
+	font-size:12px;
 	text-align:left;
 	border-bottom:thin solid #CCC;
-	background:url(../img/icon-td-form.png) no-repeat;
+	/*background:url(../img/icon-td-form.png) no-repeat;*/
 	background-position:bottom left
 }
 
@@ -638,4 +638,13 @@ a[disabled] {
 	margin: 12px; 
 	border: 2px solid #CCC;
 	display: inline-block;	
+}
+
+.button_verde{
+	padding:5px 10px;
+	margin-right:5px;
+	font-size:13px;
+	color:#FFF;
+	border:thin #FFF solid;
+	background-color:#006633;
 }

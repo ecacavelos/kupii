@@ -548,10 +548,20 @@ table.listado-cuotas-estado tr th {
 	color:#FFF
 }
 
-table.listado-cuotas-estado tr td {
+table.listado-cuotas-estado td {
 	padding:6px 6px 6px 6px;
 	font-size:12px;
 	font-weight:400;
 	text-align:center;
 	border-bottom:thin solid #CCC
 }
+
+.interes{
+		font-size:13px;
+		padding:4px;
+		font-weight:400;
+		background-color:#fff;
+		-webkit-box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+        box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
+		border:thin #CCC solid;
+	}
