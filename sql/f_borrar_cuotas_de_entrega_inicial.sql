@@ -30,5 +30,3 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION f_insertar_pagodecuotas()
-  OWNER TO postgres;
