@@ -195,21 +195,20 @@ table#forms {
 	border:2px solid #006633;
 	border-left:none;
 	border-right:none;
-	margin-bottom:15px
-}
+	margin-bottom:15px}
 
 table#forms tr td {
-	padding:10px;
-	font-size:12px;
+	padding: 3px 0px;
+	font-size: 10px;
 	text-align:left;
 	border-bottom:thin solid #CCC;
 	/*background:url(../img/icon-td-form.png) no-repeat;*/
-	background-position:bottom left
+	background-position:bottom left;
 }
 
 table#forms tr td.noimage {
-	background-image:none
-}
+	padding: 10px 3px 0px 0px;
+	background-image:none}
 
 table#forms td.last {
 	border-top:2px solid #006633;
@@ -429,9 +428,12 @@ input[type=text]{
 		padding:5px 10px;
 		color:#000;
 		*/
-		font-size:13px;
-		padding:4px;
-		font-weight:400;
+		
+        font-size: 10px;
+		
+        padding: 2px;
+		
+        font-weight:400;
 		background-color:#fff;
 		-webkit-box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
         box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3);
