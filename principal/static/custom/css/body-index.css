@@ -650,3 +650,6 @@ a[disabled] {
 	border:thin #FFF solid;
 	background-color:#006633;
 }
+div.ui-datepicker{
+ font-size:8px;
+}
