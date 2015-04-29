@@ -44,7 +44,7 @@ def get_nro_cuota(pago):
     lote_id = pago.lote_id
     # fecha_fin=pago.fecha_de_pago
  
-    cant_cuotas = PagoDeCuotas.objects.filter(lote_id=lote_id, pk__lte=pago_id).aggregate(Sum('nro_cuotas_a_pagar')).values()[0]    
+    cant_cuotas = PagoDeCuotas.objects.filter(lote_id=lote_id, pk__lt=pago_id).aggregate(Sum('nro_cuotas_a_pagar')).values()[0]    
     if cant_cuotas == None:
         cant_cuotas =0
     return cant_cuotas
