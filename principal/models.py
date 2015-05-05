@@ -27,7 +27,7 @@ class Cliente(models.Model):
     nombre_conyuge = models.CharField('nombre del conyuge', max_length=255, blank=True)
     deuda_contraida = models.BigIntegerField(blank=True, null=True)
     def __unicode__(self):
-        return u'%s %s' % (self.nombres, self.apellidos)
+        return unicode(u'%s %s' % (self.nombres, self.apellidos))
     def as_json(self):
         return dict(
             label= self.nombres + ' ' + self.apellidos,
@@ -320,5 +320,8 @@ class Factura(models.Model):
     timbrado = models.ForeignKey(Timbrado)
     tipo = models.CharField(max_length=2)
     detalle = models.TextField()
+    
+class Transaccion(models.Model):
+    estado = models.CharField(max_length=30)
     
     

@@ -21,5 +21,6 @@ urlpatterns = patterns('',
     url(r'^facturacion/', include('facturas.urls')),
     url(r'^lotes/', include('lotes.urls')),    
     url(r'^ajax/', include('ajax.urls')),        
-    url(r'^datos/', include('principal.urls')),    
+    url(r'^datos/', include('principal.urls')),
+    url(r'^api/', include('api.urls')),    
 )

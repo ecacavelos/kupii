@@ -7,7 +7,7 @@ from django.template import RequestContext, loader
 from django.core import serializers
 from principal.models import Fraccion, Manzana, Venta, PagoDeCuotas, Propietario, Lote, Cliente, Vendedor, PlanDePago, PlanDePagoVendedor,Timbrado, RecuperacionDeLotes
 from django.core.urlresolvers import reverse, resolve
-from principal.common_functions import get_cuotas_detail_by_lote, custom_json
+from principal.common_functions import *
 from django.core.serializers.json import DjangoJSONEncoder
 import json
 import traceback
@@ -92,6 +92,7 @@ def get_cliente_id_by_name(request):
             try:            
                 name_cliente = request.GET['term']
                 print("term ->" + name_cliente);
+                print Cliente.objects.filter(nombres__icontains= name_cliente).query
                 object_list = Cliente.objects.filter(nombres__icontains= name_cliente)
                 labels=["nombres","apellidos"]
                 return HttpResponse(json.dumps(custom_json(object_list,labels), cls=DjangoJSONEncoder), content_type="application/json")
@@ -393,38 +394,12 @@ def get_propietario_id_by_name_or_cedula(request):
 def get_mes_pagado_by_id_lote(request):
     if request.method == 'GET':
         if request.user.is_authenticated():
-            try:
+            try:                
                 lote_id = request.GET['lote_id']
                 cuotas_pag = request.GET['cant_cuotas']
-                print("lote_id ->" + lote_id)
-                cant_cuotas_pagadas = PagoDeCuotas.objects.filter(lote=lote_id).aggregate(Sum('nro_cuotas_a_pagar'))
-                ventas = Venta.objects.filter(lote_id=lote_id)
-                cuotas_totales=0
-                for item_venta in ventas:
-                    print 'Obteniendo la ultima venta'
-                    try:
-                        RecuperacionDeLotes.objects.get(venta=item_venta.id)
-                    except RecuperacionDeLotes.DoesNotExist:
-                        print 'se encontro la venta no recuperada, la venta actual'
-                        venta = item_venta
-                plan_de_pago = PlanDePago.objects.get(id=venta.plan_de_pago.id)
-                cuotas_totales = (cant_cuotas_pagadas['nro_cuotas_a_pagar__sum'])
-                ultima_fecha_pago = ""
-                if cuotas_totales != 0:
-                    ultima_fecha_pago = (venta.fecha_primer_vencimiento + MonthDelta(cuotas_totales))
-                else:
-                    ultima_fecha_pago = venta.fecha_primer_vencimiento
-                cuota_a_pagar= {}
-                cuotas_a_pagar= []
-                for i in range(0, int(cuotas_pag)):
-                    nro_cuota = cuotas_totales + 1
-                    cuota_a_pagar['nro_cuota'] = str(nro_cuota) + "/" + str(plan_de_pago.cantidad_de_cuotas)
-                    cuota_a_pagar['fecha'] = (ultima_fecha_pago + MonthDelta(i)).strftime('%d/%m/%Y')
-                    cuotas_totales +=1
-                    cuotas_a_pagar.append(cuota_a_pagar)
-                    cuota_a_pagar= {}
+                cuotas_detalles = get_cuota_information_by_lote(lote_id,cuotas_pag)
                 data = json.dumps({
-                    'cuotas_a_pagar': cuotas_a_pagar})
+                    'cuotas_a_pagar': cuotas_detalles})
                 return HttpResponse(data,content_type="application/json")
             except Exception, error:
                 print error

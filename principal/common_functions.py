@@ -87,3 +87,35 @@ def monthdelta(d1, d2):
         else:
             break
     return delta
+
+def get_cuota_information_by_lote(lote_id,cuotas_pag):
+
+                print("lote_id ->" + lote_id)
+                cant_cuotas_pagadas = PagoDeCuotas.objects.filter(lote=lote_id).aggregate(Sum('nro_cuotas_a_pagar'))
+                ventas = Venta.objects.filter(lote_id=lote_id)
+                cuotas_totales=0
+                for item_venta in ventas:
+                    print 'Obteniendo la ultima venta'
+                    try:
+                        RecuperacionDeLotes.objects.get(venta=item_venta.id)
+                    except RecuperacionDeLotes.DoesNotExist:
+                        print 'se encontro la venta no recuperada, la venta actual'
+                        venta = item_venta
+                plan_de_pago = PlanDePago.objects.get(id=venta.plan_de_pago.id)
+                cuotas_totales = (cant_cuotas_pagadas['nro_cuotas_a_pagar__sum'])
+                ultima_fecha_pago = ""
+                if cuotas_totales != 0:
+                    ultima_fecha_pago = (venta.fecha_primer_vencimiento + MonthDelta(cuotas_totales))
+                else:
+                    ultima_fecha_pago = venta.fecha_primer_vencimiento
+                cuota_a_pagar= {}
+                cuotas_a_pagar= []
+                for i in range(0, int(cuotas_pag)):
+                    nro_cuota = cuotas_totales + 1
+                    cuota_a_pagar['nro_cuota'] = str(nro_cuota) + "/" + str(plan_de_pago.cantidad_de_cuotas)
+                    cuota_a_pagar['fecha'] = (ultima_fecha_pago + MonthDelta(i)).strftime('%d/%m/%Y')
+                    cuotas_totales +=1
+                    cuotas_a_pagar.append(cuota_a_pagar)
+                    cuota_a_pagar= {}
+                    
+                return cuotas_a_pagar
