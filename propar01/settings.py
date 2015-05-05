@@ -29,7 +29,7 @@ DATABASES = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',     # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'propar_db_nueva_v3',                                     # Or path to database file if using sqlite3.
+        'NAME': 'propar_importacion_v1',                                     # Or path to database file if using sqlite3.
         'USER': 'postgres',                                     # Not used with sqlite3.
         'PASSWORD': 'elpaipatinero',                                   # Not used with sqlite3.
         'HOST': '192.168.50.51',                                             # Set to empty string for localhost. Not used with sqlite3.# Set to empty string for localhost. Not used with sqlite3.
@@ -157,6 +157,7 @@ INSTALLED_APPS = (
     'manzanas',
     'facturas',    
     'timbrados',
+    'api',
 )
 
 # A sample logging configuration. The only tangible logging
