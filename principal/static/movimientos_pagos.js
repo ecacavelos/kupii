@@ -234,7 +234,12 @@ function retrieveLotePago() {
 		});
 		// En caso de no poder obtener los datos del lote, indicamos el error.
 		request.fail(function(jqXHR, textStatus) {
-			$("#lote_error").html("Lote inválido.");
+			if (jqXHR.responseText.indexOf("Multiple") > -1){
+				$("#lote_error").html("existe mas de un lote con el codigo introducido");
+			}
+			else{
+				$("#lote_error").html("Error al obtener el lote");
+			}
 		});
 	} else {
 		if ($("#id_lote").val().toString().length > 0) {
