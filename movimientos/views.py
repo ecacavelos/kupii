@@ -9,7 +9,6 @@ from principal.common_functions import get_nro_cuota, monthdelta, get_cuotas_det
 import math
 from principal.monthdelta import MonthDelta 
 from django.core import serializers
-from dateutil.parser import parse
  
 # Funcion principal del modulo de lotes.
 def movimientos(request):
