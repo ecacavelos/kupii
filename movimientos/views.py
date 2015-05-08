@@ -9,6 +9,7 @@ from principal.common_functions import get_nro_cuota, monthdelta, get_cuotas_det
 import math
 from principal.monthdelta import MonthDelta 
 from django.core import serializers
+from dateutil.parser import parse
  
 # Funcion principal del modulo de lotes.
 def movimientos(request):
@@ -1644,4 +1645,69 @@ def listar_busqueda_recuperacion(request):
                 print error 
                 #return HttpResponseServerError("Error en la ejecucion")
     else:
-        return HttpResponseRedirect(reverse('login')) 
+        return HttpResponseRedirect(reverse('login'))
+    
+
+def modificar_pago_de_cuotas(request, id):        
+    if request.user.is_authenticated():
+        if request.method == 'GET':
+            pago = PagoDeCuotas.objects.get(pk=id)
+            fecha = pago.fecha_de_pago.strftime('%d/%m/%Y')
+            t = loader.get_template('movimientos/modificar_pagocuota.html')
+            c = RequestContext(request, {
+                'pagocuota': pago,
+                'fecha_pago': fecha
+            })
+        
+        if request.method == 'POST':
+            pago = PagoDeCuotas.objects.get(pk=id)
+            data = request.POST    
+            lote_id = data.get('pago_lote_id', '')
+            nro_cuotas_a_pagar = data.get('nro_cuotas_a_pagar')
+            venta = pago.venta
+            venta.pagos_realizados = int(nro_cuotas_a_pagar) + int(venta.pagos_realizados)
+            monto_cuota = data.get('monto_cuota')
+            total_de_cuotas = int(monto_cuota) * int(nro_cuotas_a_pagar)
+            total_de_mora = data.get('total_mora')
+            total_de_pago = data.get('monto_total')
+            date_parse_error = False
+            fecha_pago=data.get('fecha', '')
+            fecha_pago_parsed = datetime.strptime(fecha_pago, "%d/%m/%Y").date()
+
+            try:
+                pago.total_de_cuotas = total_de_cuotas
+                pago.total_de_mora = total_de_mora
+                pago.total_de_pago = total_de_pago
+                pago.nro_cuotas_a_pagar = nro_cuotas_a_pagar
+                pago.fecha_de_pago = fecha_pago_parsed
+                pago.save()
+            except Exception, error:
+                print error
+                pass
+            venta.save()
+            t = loader.get_template('movimientos/modificar_pagocuota.html')
+            fecha = pago.fecha_de_pago.strftime('%d/%m/%Y')
+            c = RequestContext(request, {
+                'pagocuota': pago,
+                'fecha_pago': fecha
+            })
+            return HttpResponse(t.render(c))                        
+        return HttpResponse(t.render(c))
+    else:
+        return HttpResponseRedirect("/login")
+    '''
+    def eliminar_pago_de_cuotas(request, id):        
+        if request.user.is_authenticated():
+            if request.method == 'GET':
+                lote = pago.lote.codigo_paralot
+                pago = PagoDeCuotas.objects.get(pk=id)
+                pago.delete()
+                t = loader.get_template('informes/informe_movimientos.html')
+                c = RequestContext(request, {
+                    'lote_id': lote,
+                    'fecha_ini':"",
+                    'fecha_fin':""
+                })
+                return HttpResponse(t.render(c))
+        else:
+            return HttpResponseRedirect("/login")'''

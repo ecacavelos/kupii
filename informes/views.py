@@ -1221,6 +1221,7 @@ def informe_movimientos(request):
                                     saldo = saldo_anterior-monto                                   
                                     cuota ={}
                                     cuota['fecha_de_pago'] = pago.fecha_de_pago
+                                    cuota['id'] = pago.id
                                     cuota['nro_cuota'] = str(numero_cuota) + '/' + str(pago.plan_de_pago.cantidad_de_cuotas)
                                     cuota['saldo_anterior'] = str('{:,}'.format(saldo_anterior)).replace(",",".")
                                     cuota['monto'] = str('{:,}'.format(monto)).replace(",",".")
@@ -1232,6 +1233,7 @@ def informe_movimientos(request):
                                 saldo=saldo_anterior-monto
                                 cuota ={}
                                 cuota['fecha_de_pago'] = pago.fecha_de_pago
+                                cuota['id'] = pago.id
                                 cuota['nro_cuota'] = str(numero_cuota) + '/' + str(pago.plan_de_pago.cantidad_de_cuotas)
                                 cuota['saldo_anterior'] = str('{:,}'.format(saldo_anterior)).replace(",",".")
                                 cuota['monto'] = str('{:,}'.format(monto)).replace(",",".")

@@ -154,7 +154,7 @@
 <div id="listado-ventas">
 	<h2>Historial de cuotas en VENTAS</h2>
 	<table  cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
-		<th>Fecha</th><th>Cliente</th><th>Cuota Nº</th><th>Tipo Cuota</th><th>Saldo Anterior</th><th>Monto</th><th>Saldo</th>
+		<th>Fecha</th><th>Cliente</th><th>Cuota Nº</th><th>Tipo Cuota</th><th>Saldo Anterior</th><th>Monto</th><th>Saldo</th><th></th>
 		{% for venta in lista_ventas %}
 			{% for pago in venta %}			
 			
@@ -163,7 +163,7 @@
 					{% if pago.recuperacion %}
 						<td class="celda_resumen_venta recuperada">{{pago.fecha_de_venta}}</td>
 						<td class="celda_resumen_venta recuperada">{{pago.cliente}}</td>
-						<td colspan="5" class="celda_resumen_venta recuperada">::::::VENTA RECUPERADA:::::</td>											
+						<td colspan="6" class="celda_resumen_venta recuperada">::::::VENTA RECUPERADA:::::</td>											
 						<!-- <td class="celda_resumen_venta recuperada">Cuotas Plan: {{pago.cantidad_de_cuotas}}</td>
 						<td class="celda_resumen_venta recuperada">Entrega Inicial: {{pago.entrega_incial}}</td>
 						<td class="celda_resumen_venta recuperada">Precio Final: {{pago.precio_final}}</td> -->
@@ -171,7 +171,7 @@
 					{% else %}
 						<td class="celda_resumen_venta">{{pago.fecha_de_venta}}</td>
 						<td class="celda_resumen_venta">{{pago.cliente}}</td>
-						<td colspan="5" class="celda_resumen_venta">::::::VENTA ACTUAL::::::</td>											
+						<td colspan="6" class="celda_resumen_venta">::::::VENTA ACTUAL::::::</td>											
 						<!-- <td class="celda_resumen_venta">Cuotas Plan: {{pago.cantidad_de_cuotas}}</td>
 						<td class="celda_resumen_venta">Entrega Inicial: {{pago.entrega_incial}}</td>
 						<td class="celda_resumen_venta">Precio Final: {{pago.precio_final}}</td> -->
@@ -187,6 +187,8 @@
 					<td>{{pago.saldo_anterior}}</td>
 					<td>{{pago.monto}}</td>
 					<td>{{pago.saldo}}</td>
+					<td><a href="/movimientos/modificar_pagocuota/{{pago.id}}"><img src="/static/custom/img/black_edit.png" /></a></td>
+					<!--<td><a href="/movimientos/eliminar_pagocuota/{{pago.id}}">Holis</a></td>-->
 				</tr>
 				{% else %}
 				<tr class="bkg_gris">
@@ -197,6 +199,8 @@
 					<td>{{pago.saldo_anterior}}</td>
 					<td>{{pago.monto}}</td>
 					<td>{{pago.saldo}}</td>
+					<td><a href="/movimientos/modificar_pagocuota/{{pago.id}}"><img src="/static/custom/img/black_edit.png" /></a></td>
+					<!--<td><a href="/movimientos/eliminar_pagocuota/{{pago.id}}">Holis</a></td>-->
 				</tr>
 				{% endif %}
 			{% endif %}
