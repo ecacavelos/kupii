@@ -71,9 +71,9 @@ def custom_json(object_list, labels):
         d['fields']['id'] = d['pk']
         #Como maximo habra 2 labels
         if len(labels) <= 1:
-            d['fields']['label'] = str(d['fields'][label1])
+            d['fields']['label'] = u'%s' % (d['fields'][label1])
         else:
-            d['fields']['label'] = str(d['fields'][label1])+" "+ str(d['fields'][label2])
+            d['fields']['label'] = u'%s %s' % (d['fields'][label1],d['fields'][label2])
         results.append(d['fields'])
     return results
 
