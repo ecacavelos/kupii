@@ -1645,7 +1645,6 @@ def listar_busqueda_recuperacion(request):
                 #return HttpResponseServerError("Error en la ejecucion")
     else:
         return HttpResponseRedirect(reverse('login'))
-    
 
 def modificar_pago_de_cuotas(request, id):        
     if request.user.is_authenticated():
@@ -1690,10 +1689,10 @@ def modificar_pago_de_cuotas(request, id):
                 'pagocuota': pago,
                 'fecha_pago': fecha
             })
-            return HttpResponse(t.render(c))                        
-        return HttpResponse(t.render(c))
+            return HttpResponse(t.render(c))
     else:
-        return HttpResponseRedirect("/login")
+        return HttpResponseRedirect("/login")   
+        
     '''
     def eliminar_pago_de_cuotas(request, id):        
         if request.user.is_authenticated():
@@ -1710,3 +1709,59 @@ def modificar_pago_de_cuotas(request, id):
                 return HttpResponse(t.render(c))
         else:
             return HttpResponseRedirect("/login")'''
+
+def modificar_venta(request, id):        
+    if request.user.is_authenticated():
+        if request.method == 'GET':
+            venta = Venta.objects.get(pk=id)
+            fecha_venta = venta.fecha_de_venta.strftime('%d/%m/%Y')
+            fecha_primer_venc = venta.fecha_primer_vencimiento.strftime('%d/%m/%Y')
+            t = loader.get_template('movimientos/modificar_venta.html')
+            c = RequestContext(request, {
+                'venta': venta,
+                'fecha_venta': fecha_venta,
+                'fecha_primer_venc': fecha_primer_venc
+            })
+        
+        if request.method == 'POST':
+            venta = Venta.objects.get(pk=id)
+            data = request.POST 
+            fecha_de_venta = data.get('fecha_de_venta', '')
+            fecha_de_venta_parsed = datetime.strptime(fecha_de_venta, "%d/%m/%Y").date()
+            
+            fecha_primer_venc = data.get('fecha_primer_venc', '')
+            fecha_primer_venc_parsed = datetime.strptime(fecha_primer_venc, "%d/%m/%Y").date()
+            
+            pagos_realizados = data.get('pagos_realizados', '')
+            entrega_inicial = data.get('entrega_inicial', '')
+            #entrega_inicial_sin_puntos = entrega_inicial.strip('.')
+            precio_de_cuota = data.get('precio_de_cuota', '')
+            #precio_de_cuota_sin_puntos = precio_de_cuota.strip('.') precio_de_cuota.translate(None, string.punctuation)
+            precio_final_venta = data.get('precio_final_venta', '')
+            #precio_final_venta_sin_puntos = precio_final_venta.strip('.')
+            
+            try:
+                venta.fecha_de_venta = fecha_de_venta_parsed
+                venta.fecha_primer_vencimiento = fecha_primer_venc_parsed
+                venta.entrega_inicial = int(entrega_inicial)
+                venta.precio_de_cuota = int(precio_de_cuota)
+                venta.precio_final_de_venta = int(precio_final_venta)
+                venta.pagos_realizados = int(pagos_realizados)
+                venta.save()
+            except Exception, error:
+                print error
+                pass
+            venta.save()
+            t = loader.get_template('movimientos/modificar_venta.html')
+            fecha_venta = venta.fecha_de_venta.strftime('%d/%m/%Y')
+            fecha_primer_venc = venta.fecha_primer_vencimiento.strftime('%d/%m/%Y')
+            c = RequestContext(request, {
+                'venta': venta,
+                'fecha_venta': fecha_venta,
+                'fecha_primer_venc': fecha_primer_venc
+            })
+            return HttpResponse(t.render(c))                        
+        return HttpResponse(t.render(c))
+    else:
+        return HttpResponseRedirect("/login")   
+        
