@@ -18,4 +18,5 @@ urlpatterns = patterns('informes.views',
     url(r'^liquidacion_vendedores_reporte_excel/$', 'liquidacion_vendedores_reporte_excel'),
     url(r'^liquidacion_gerentes_reporte_excel/$', 'liquidacion_gerentes_reporte_excel'),
     url(r'^informe_movimientos_reporte_excel/$', 'informe_movimientos_reporte_excel'),
+    url(r'^informe_ventas/$', 'informe_ventas'),
 )

@@ -2451,7 +2451,46 @@ def informe_movimientos_reporte_excel(request):
     response['Content-Disposition'] = 'attachment; filename=' + 'informe_movimientos.xls'
     wb.save(response)
     return response     
-    
+
+def informe_ventas(request):    
+    if request.method == 'GET':
+        if request.user.is_authenticated():
+            if (filtros_establecidos(request.GET,'informe_ventas') == False):
+                t = loader.get_template('informes/informe_ventas.html')
+                c = RequestContext(request, {
+                    'object_list': [],
+                })
+                return HttpResponse(t.render(c))
+            else: #Parametros seteados
+                t = loader.get_template('informes/informe_ventas.html')
+                lote_id=request.GET['lote_id']
+                #ultimo="&tipo_busqueda="+tipo_busqueda+"&fraccion_ini="+f1+"&frac1="+fraccion_ini+"&fraccion_fin="+f2+"&frac2="+fraccion_fin+"&fecha_ini="+fecha_ini+"&fecha_fin="+fecha_fin
+                x = str(lote_id)
+                fraccion_int = int(x[0:3])
+                manzana_int = int(x[4:7])
+                lote_int = int(x[8:])
+                manzana = Manzana.objects.get(fraccion_id=fraccion_int, nro_manzana=manzana_int)
+                lote = Lote.objects.get(manzana=manzana.id, nro_lote=lote_int)
+                object_list=list(Venta.objects.filter(lote_id=lote.id))               
+                               
+                paginator = Paginator(object_list, 25)
+                page = request.GET.get('page')
+                try:
+                    lista = paginator.page(page)
+                except PageNotAnInteger:
+                    lista = paginator.page(1)
+                except EmptyPage:
+                    lista = paginator.page(paginator.num_pages) 
+                   
+                c = RequestContext(request, {
+                    'lista_ventas': lista,
+                    'lote_id' : lote_id
+                })
+                return HttpResponse(t.render(c))                
+        else:
+            return HttpResponseRedirect(reverse('login'))
+        
+            
 def filtros_establecidos(request, tipo_informe):
     
     if tipo_informe == 'liquidacion_propietarios':        
@@ -2519,7 +2558,13 @@ def filtros_establecidos(request, tipo_informe):
             fecha=request['fecha']
             return True
         except:
-            print('Parametros no seteados')      
+            print('Parametros no seteados')
+    elif tipo_informe == "informe_ventas":
+        try:
+            lote=request['lote_id']
+            return True
+        except:
+            print('Parametros no seteados')     
     return False
 
 
