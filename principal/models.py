@@ -67,7 +67,7 @@ class Fraccion(models.Model):
     fecha_aprobacion = models.DateField('fecha de aprobacion', blank=True, null=True)
     superficie_total = models.DecimalField(max_digits=8, decimal_places=2, blank=True, null=True)
     def __unicode__(self):
-        return (self.nombre)
+        return u'%s' % (self.nombre)
     class Meta:
         verbose_name_plural = "fracciones"
     def as_json(self):
@@ -268,7 +268,7 @@ class PagoDeCuotas(models.Model):
         return dict(
             lote=str(self.lote),
             fecha_de_pago=str(self.fecha_de_pago),
-            cliente=str(self.cliente),
+            cliente=u'%s' % (self.cliente),
             plan_de_pago=self.plan_de_pago_id,
             plan_de_pago_vendedores=self.plan_de_pago_vendedores_id, 
             nro_cuotas_a_pagar = self.nro_cuotas_a_pagar,
@@ -276,7 +276,7 @@ class PagoDeCuotas(models.Model):
             
         )
     def __unicode__(self):
-        return u'%s - %s' % (str(self.lote), self.fecha_de_pago)
+        return u'%s - %s' % (self.lote, self.fecha_de_pago)
 
 class TransferenciaDeLotes(models.Model):
     lote = models.ForeignKey(Lote)

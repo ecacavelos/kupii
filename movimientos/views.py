@@ -1689,7 +1689,7 @@ def modificar_pago_de_cuotas(request, id):
                 'pagocuota': pago,
                 'fecha_pago': fecha
             })
-            return HttpResponse(t.render(c))
+        return HttpResponse(t.render(c))
     else:
         return HttpResponseRedirect("/login")   
         
