@@ -32,7 +32,7 @@
 <div class="clear"></div>
 <h1>Listado de Clientes</h1>
 <div class="grid_6">
-	<form name="frm_busqueda" id="frm_busqueda" method="get" action="{% url 'frontend_home' %}movimientos/listado_busqueda_personas/">
+	<form name="frm_busqueda" id="frm_busqueda" method="get" >
 		{% csrf_token %}
 		<table id="lista-categoria" frame="box">
 			<tr>

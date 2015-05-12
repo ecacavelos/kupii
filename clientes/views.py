@@ -4,6 +4,7 @@ from principal.models import Cliente
 from clientes.forms import ClienteForm, SearchForm
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.urlresolvers import reverse, resolve
+from principal.common_functions import *
 #from django.views.generic.list_detail import object_list
 
 # Funcion principal del modulo de clientes.
@@ -18,14 +19,40 @@ def index(request):
 
 # Funcion para consultar el listado de todos los clientes.
 def consultar_clientes(request):
-    if request.user.is_authenticated():
-        t = loader.get_template('clientes/listado.html')
-        #c = RequestContext(request, {})
-        #return HttpResponse(t.render(c))
-    else:
-        return HttpResponseRedirect(reverse('login'))
     
-    if request.method == 'POST':
+    if request.method == 'GET':
+        if request.user.is_authenticated():
+            t = loader.get_template('clientes/listado.html')
+            if (filtros_establecidos(request.GET,'listado_clientes') == False):
+                print('Parametros no seteados')
+                object_list = Cliente.objects.all().order_by('id')
+            else: #Parametros seteados
+                print('Parametros de filtrado seteados')
+                tipo_busqueda=request.GET['tipo_busqueda']
+                busqueda_label=request.GET['busqueda_label']
+                if tipo_busqueda == 'nombre':
+                    object_list = Cliente.objects.filter(nombres__icontains=busqueda_label)
+                else:
+                    object_list = Cliente.objects.filter(cedula__icontains=busqueda_label)
+            search_form = SearchForm({})
+            message = ""            
+            paginator=Paginator(object_list,15)
+            page=request.GET.get('page')
+            try:
+                lista=paginator.page(page)
+            except PageNotAnInteger:
+                lista=paginator.page(1)
+            except EmptyPage:
+                lista=paginator.page(paginator.num_pages)
+            c = RequestContext(request, {
+                'object_list': lista,
+                'search_form': search_form,
+                'message': message,
+            })
+            return HttpResponse(t.render(c))
+        else:
+            return HttpResponseRedirect(reverse('login'))    
+    else: #POST
         data = request.POST
         search_form = SearchForm(data)        
         object_list = Cliente.objects.all().order_by('id')
@@ -44,26 +71,6 @@ def consultar_clientes(request):
                     object_list = Cliente.objects.filter(id=int(data.get('buscar', '')))
             else:
                 message = "No se ingresaron datos para la busqueda."
-    else:
-        object_list = Cliente.objects.all().order_by('id')
-        search_form = SearchForm({})
-        message = ""
-        
-    paginator=Paginator(object_list,15)
-    page=request.GET.get('page')
-    try:
-        lista=paginator.page(page)
-    except PageNotAnInteger:
-        lista=paginator.page(1)
-    except EmptyPage:
-        lista=paginator.page(paginator.num_pages)
-
-    c = RequestContext(request, {
-        'object_list': lista,
-        'search_form': search_form,
-        'message': message,
-    })
-    return HttpResponse(t.render(c))
 
 # Funcion para consultar el detalle de un cliente.
 def detalle_cliente(request, cliente_id):

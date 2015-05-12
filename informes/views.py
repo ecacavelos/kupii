@@ -13,6 +13,7 @@ import json
 from django.db import connection
 import xlwt
 import math
+from principal.common_functions import *
 
 # Funcion principal del modulo de lotes.
 def informes(request):
@@ -2491,81 +2492,6 @@ def informe_ventas(request):
             return HttpResponseRedirect(reverse('login'))
         
             
-def filtros_establecidos(request, tipo_informe):
-    
-    if tipo_informe == 'liquidacion_propietarios':        
-        try:
-            fecha_ini=request['fecha_ini']
-            fecha_fin=request['fecha_fin']
-            tipo_busqueda=request['tipo_busqueda']
-            return True
-        except:
-            print('Parametros no seteados')
-            return False
-    elif tipo_informe == 'clientes_atrasados':
-            #Puede filtrar solo por meses de atraso o solo por fraccion o sin ningun filtro
-            try:
-                if request['fraccion'] == '' and request['meses_atraso'] == '':               
-                    return 0
-                elif request['fraccion'] != '' and request['meses_atraso'] == '':
-                    fraccion = request['fraccion']
-                    return 1
-                elif request['fraccion'] == ''and request['meses_atraso'] != '':
-                    meses_atraso = request['meses_atraso']
-                    return 2
-                else:
-                    fraccion = request['fraccion']
-                    meses_atraso = request['meses_atraso']
-                    return 3
-            except:
-                print('Parametros no seteados')
-                return 0
-    elif tipo_informe == 'lotes_libres':
-        try:
-            fraccion_ini=request['fraccion_ini']
-            fraccion_fin=request['fraccion_fin']
-            return True
-        except:
-            print('Parametros no seteados')
-            
-    elif tipo_informe == 'informe_movimientos':
-        try:
-            lote_id=request['lote_id']
-            fecha_ini=request['fecha_ini']
-            fecha_fin=request['fecha_fin']
-            return True
-        except:
-            print('Parametros no seteados')
-    elif tipo_informe == "informe_general":
-        try:
-            fraccion_ini=request['fraccion_ini']
-            fraccion_fin=request['fraccion_fin']
-            fecha_ini=request['fecha_ini']
-            fecha_fin=request['fecha_fin']
-            return True
-        except:
-            print('Parametros no seteados')
-    elif tipo_informe == "liquidacion_vendedores":
-        try:
-            fecha_ini=request['fecha_ini']
-            fecha_fin=request['fecha_fin']
-            busqueda=request['busqueda']
-            return True
-        except:
-            print('Parametros no seteados')      
-    elif tipo_informe == "liquidacion_gerentes":
-        try:
-            fecha=request['fecha']
-            return True
-        except:
-            print('Parametros no seteados')
-    elif tipo_informe == "informe_ventas":
-        try:
-            lote=request['lote_id']
-            return True
-        except:
-            print('Parametros no seteados')     
-    return False
 
 
 def calculo_montos_liquidacion_propietarios(pago ,nro_cuota):
