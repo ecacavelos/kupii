@@ -58,7 +58,7 @@ class Fraccion(models.Model):
     id=models.IntegerField(primary_key=True)
     nombre = models.CharField(max_length=255)
     ubicacion = models.CharField(max_length=255,blank=True,null=True)
-    propietario = models.ForeignKey(Propietario)
+    propietario = models.ForeignKey(Propietario,on_delete=models.PROTECT)
     cantidad_manzanas = models.IntegerField()
     cantidad_lotes = models.IntegerField()
     distrito = models.CharField(max_length=255,blank=True,null=True)
@@ -77,7 +77,7 @@ class Fraccion(models.Model):
 
 class Manzana(models.Model):
     nro_manzana = models.IntegerField()
-    fraccion = models.ForeignKey(Fraccion)   
+    fraccion = models.ForeignKey(Fraccion,on_delete=models.PROTECT)   
     cantidad_lotes = models.IntegerField(null=True)
     def __unicode__(self):
         #return (self.nro_manzana)
@@ -188,7 +188,7 @@ class PlanDePago(models.Model):
 class Lote(models.Model):
     codigo_paralot = models.CharField(max_length=20,blank=True, null=True)
     nro_lote = models.IntegerField()    
-    manzana = models.ForeignKey(Manzana)
+    manzana = models.ForeignKey(Manzana,on_delete=models.PROTECT)
     precio_contado = models.IntegerField()
     precio_credito = models.IntegerField()
     precio_costo = models.IntegerField()
@@ -211,18 +211,18 @@ class Lote(models.Model):
             id=self.nro_lote)
 
 class Venta(models.Model):
-    lote = models.ForeignKey(Lote)
+    lote = models.ForeignKey(Lote,on_delete=models.PROTECT)
     fecha_de_venta = models.DateField()
-    cliente = models.ForeignKey(Cliente)
-    vendedor = models.ForeignKey(Vendedor)
-    plan_de_pago = models.ForeignKey(PlanDePago)
+    cliente = models.ForeignKey(Cliente,on_delete=models.PROTECT)
+    vendedor = models.ForeignKey(Vendedor,on_delete=models.PROTECT)
+    plan_de_pago = models.ForeignKey(PlanDePago, on_delete=models.PROTECT)
     entrega_inicial = models.BigIntegerField(blank=True, null=True)
     precio_de_cuota = models.BigIntegerField(blank=True, null=True)
     precio_final_de_venta = models.BigIntegerField()
     fecha_primer_vencimiento = models.DateField(blank=True, null=True)
     pagos_realizados = models.IntegerField(blank=True, null=True)
     importacion_paralot=models.BooleanField(blank=False, null=False)
-    plan_de_pago_vendedor=models.ForeignKey(PlanDePagoVendedor)
+    plan_de_pago_vendedor=models.ForeignKey(PlanDePagoVendedor,on_delete=models.PROTECT)
     def __unicode__(self):
         return u'%s a %s - %s' % (str(self.lote), self.cliente.nombres, self.cliente.apellidos)    
     def as_json(self):
@@ -246,21 +246,21 @@ class Venta(models.Model):
         )
     
 class Reserva(models.Model):
-    lote = models.ForeignKey(Lote)
+    lote = models.ForeignKey(Lote,on_delete=models.PROTECT)
     fecha_de_reserva = models.DateField()
-    cliente = models.ForeignKey(Cliente)
+    cliente = models.ForeignKey(Cliente,on_delete=models.PROTECT)
     def __unicode__(self):
         return (str(self.lote) + " a " + self.cliente.nombres + " " + self.cliente.apellidos)
 
 class PagoDeCuotas(models.Model):
-    venta = models.ForeignKey(Venta)
-    lote = models.ForeignKey(Lote)
+    venta = models.ForeignKey(Venta,on_delete=models.PROTECT)
+    lote = models.ForeignKey(Lote,on_delete=models.PROTECT)
     fecha_de_pago = models.DateField()
     nro_cuotas_a_pagar = models.IntegerField()
-    cliente = models.ForeignKey(Cliente)
-    plan_de_pago = models.ForeignKey(PlanDePago)
-    plan_de_pago_vendedores = models.ForeignKey(PlanDePagoVendedor)
-    vendedor = models.ForeignKey(Vendedor)
+    cliente = models.ForeignKey(Cliente,on_delete=models.PROTECT)
+    plan_de_pago = models.ForeignKey(PlanDePago, on_delete=models.PROTECT)
+    plan_de_pago_vendedores = models.ForeignKey(PlanDePagoVendedor,on_delete=models.PROTECT)
+    vendedor = models.ForeignKey(Vendedor,on_delete=models.PROTECT)
     total_de_cuotas = models.IntegerField()
     total_de_mora = models.IntegerField()
     total_de_pago = models.IntegerField()
@@ -279,26 +279,26 @@ class PagoDeCuotas(models.Model):
         return u'%s - %s' % (self.lote, self.fecha_de_pago)
 
 class TransferenciaDeLotes(models.Model):
-    lote = models.ForeignKey(Lote)
+    lote = models.ForeignKey(Lote,on_delete=models.PROTECT)
     fecha_de_transferencia = models.DateField()
-    cliente = models.ForeignKey(Cliente)
+    cliente = models.ForeignKey(Cliente,on_delete=models.PROTECT)
     cliente_original = models.ForeignKey(Cliente,related_name='clienteoriginal')
-    vendedor = models.ForeignKey(Vendedor)
-    plan_de_pago = models.ForeignKey(PlanDePago)
+    vendedor = models.ForeignKey(Vendedor,on_delete=models.PROTECT)
+    plan_de_pago = models.ForeignKey(PlanDePago, on_delete=models.PROTECT)
 
 class CambioDeLotes(models.Model):
-    cliente = models.ForeignKey(Cliente)
+    cliente = models.ForeignKey(Cliente,on_delete=models.PROTECT)
     fecha_de_cambio = models.DateField()
     lote_a_cambiar = models.ForeignKey(Lote,related_name='loteacambiar')
-    lote_nuevo = models.ForeignKey(Lote)
+    lote_nuevo = models.ForeignKey(Lote,on_delete=models.PROTECT)
 
 class RecuperacionDeLotes(models.Model):
-    lote = models.ForeignKey(Lote)
-    venta= models.ForeignKey(Venta)
+    lote = models.ForeignKey(Lote,on_delete=models.PROTECT)
+    venta= models.ForeignKey(Venta,on_delete=models.PROTECT)
     fecha_de_recuperacion = models.DateField()
-    cliente = models.ForeignKey(Cliente)
-    vendedor = models.ForeignKey(Vendedor)
-    #plan_de_pago = models.ForeignKey(PlanDePago)
+    cliente = models.ForeignKey(Cliente,on_delete=models.PROTECT)
+    vendedor = models.ForeignKey(Vendedor,on_delete=models.PROTECT)
+    #plan_de_pago = models.ForeignKey(PlanDePago, on_delete=models.PROTECT)
     
     
 class Timbrado(models.Model):
@@ -315,9 +315,9 @@ class Timbrado(models.Model):
 class Factura(models.Model):
     fecha = models.DateField()
     numero = models.CharField(max_length=30)
-    cliente = models.ForeignKey(Cliente)
-    lote = models.ForeignKey(Lote)
-    timbrado = models.ForeignKey(Timbrado)
+    cliente = models.ForeignKey(Cliente,on_delete=models.PROTECT)
+    lote = models.ForeignKey(Lote,on_delete=models.PROTECT)
+    timbrado = models.ForeignKey(Timbrado,on_delete=models.PROTECT)
     tipo = models.CharField(max_length=2)
     detalle = models.TextField()
     
