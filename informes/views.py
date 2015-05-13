@@ -46,7 +46,7 @@ def lotes_libres(request):
                 if fraccion_ini and fraccion_fin:
                     manzanas = Manzana.objects.filter(fraccion_id__range=(fraccion_ini, fraccion_fin)).order_by('fraccion')
                     for m in manzanas:
-                        lotes = Lote.objects.filter(manzana=m.id)
+                        lotes = Lote.objects.filter(manzana=m.id, estado="1")
                         for l in lotes:
                             object_list.append(l)                                  
                 else:       
@@ -1295,7 +1295,7 @@ def lotes_libres_reporte_excel(request):
     if fraccion_ini and fraccion_fin:
         manzanas = Manzana.objects.filter(fraccion_id__range=(fraccion_ini, fraccion_fin)).order_by('fraccion')
         for m in manzanas:
-            lotes = Lote.objects.filter(manzana=m.id)
+            lotes = Lote.objects.filter(manzana=m.id, estado="1")
             for l in lotes:
                 object_list.append(l)                                  
     else:       
