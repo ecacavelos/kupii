@@ -39,13 +39,14 @@
 				</tr>
 			</div>
 			<div class="fieldWrapperMovimientos">
-				<input id="id_cliente" type="hidden" name="cliente"  maxlength="100"/>
 				<tr>
 					<td><label>Cliente: </label></td>
-					<td class="noimage"><div id="cliente_seleccionado"></div>
-					<ul class="errorlist">
-						<li id="cliente_error"></li>
-					</ul>{{venta.cliente.apellidos}}  {{venta.cliente.nombres}} </td>
+					<td class="noimage">
+						<input id="id_cliente" type="hidden" name="cliente" maxlength="100" value="{{venta.cliente.id}}"/>
+						<input id="detalle" type="hidden" name="detalle" />
+						<input id="id_name_cliente" type="text" name="name_cliente" value="{{venta.cliente.apellidos}}  {{venta.cliente.nombres}}"  maxlength="10" />
+						<input id="id_cedula_cliente" type="hidden" name="cedula_cliente"  readonly="readonly" />
+					</td>
 				</tr>
 			</div>
 			<div class="fieldWrapperMovimientos">
@@ -59,11 +60,17 @@
 			<div class="fieldWrapperMovimientos">
 				<tr>
 					<td><label for="vendedor">Vendedor: </label></td>
-					<td class="noimage">{{venta.vendedor.nombres}} {{venta.vendedor.apellidos}}</td>
+					<td class="noimage">
+						<input id="id_vendedor" type="hidden" name="vendedor"  maxlength="100" value="{{venta.vendedor.id}}"/>
+						<input id="id_name_vendedor" type="text" name="name_vendedor" value="{{venta.vendedor.nombres}} {{venta.vendedor.apellidos}}"  maxlength="10"/>
+					</td>
 				</tr>
 				<tr>
 					<td><label for="plan">Plan de Pago: </label></td>
-					<td class="noimage">{{venta.plan_de_pago.nombre_del_plan}}</td>
+					<td class="noimage">
+						<input id="id_plan_de_pago" type="hidden" name="plan_de_pago"  maxlength="100" value="{{venta.plan_de_pago.id}}"/>
+						<input id="id_name_ppago" type="text" name="name_ppago" value="{{venta.plan_de_pago.nombre_del_plan}}"  maxlength="10"/>
+					</td>
 				</tr>
 				<tr>
 					<td><label for="pagos_realizados">Pagos_realizados: </label></td>
