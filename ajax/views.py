@@ -367,8 +367,8 @@ def get_vendedor_id_by_name_or_cedula(request):
                 name_vendedor = request.GET['term']
                 print("term ->" + name_vendedor);
                 object_list = Vendedor.objects.filter(nombres__icontains= name_vendedor)
-                data=serializers.serialize('json',list(object_list)) 
-                return HttpResponse(data,content_type="application/json")
+                labels=["nombres","apellidos"]
+                return HttpResponse(json.dumps(custom_json(object_list,labels), cls=DjangoJSONEncoder), content_type="application/json")
             except Exception, error:
                 print error
                 #return HttpResponseServerError('No se pudo procesar el pedido')

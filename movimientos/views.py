@@ -1725,21 +1725,24 @@ def modificar_venta(request, id):
         
         if request.method == 'POST':
             venta = Venta.objects.get(pk=id)
-            data = request.POST 
+            data = request.POST            
             fecha_de_venta = data.get('fecha_de_venta', '')
-            fecha_de_venta_parsed = datetime.strptime(fecha_de_venta, "%d/%m/%Y").date()
-            
+            fecha_de_venta_parsed = datetime.strptime(fecha_de_venta, "%d/%m/%Y").date()            
             fecha_primer_venc = data.get('fecha_primer_venc', '')
             fecha_primer_venc_parsed = datetime.strptime(fecha_primer_venc, "%d/%m/%Y").date()
-            
+            id_cliente = data.get('cliente', '')
+            cliente = Cliente.objects.get(pk=int(id_cliente))
+            id_plandepago = data.get('plan_de_pago', '')
+            plandepago = PlanDePago.objects.get(pk=int(id_plandepago))
+            id_vendedor = data.get('vendedor', '')
+            vendedor = Vendedor.objects.get(pk=int(id_vendedor))
             pagos_realizados = data.get('pagos_realizados', '')
             entrega_inicial = data.get('entrega_inicial', '')
             #entrega_inicial_sin_puntos = entrega_inicial.strip('.')
             precio_de_cuota = data.get('precio_de_cuota', '')
             #precio_de_cuota_sin_puntos = precio_de_cuota.strip('.') precio_de_cuota.translate(None, string.punctuation)
             precio_final_venta = data.get('precio_final_venta', '')
-            #precio_final_venta_sin_puntos = precio_final_venta.strip('.')
-            
+            #precio_final_venta_sin_puntos = precio_final_venta.strip('.').
             try:
                 venta.fecha_de_venta = fecha_de_venta_parsed
                 venta.fecha_primer_vencimiento = fecha_primer_venc_parsed
@@ -1747,11 +1750,18 @@ def modificar_venta(request, id):
                 venta.precio_de_cuota = int(precio_de_cuota)
                 venta.precio_final_de_venta = int(precio_final_venta)
                 venta.pagos_realizados = int(pagos_realizados)
+                venta.plan_de_pago = plandepago
+                venta.cliente = cliente
+                venta.vendedor = vendedor
                 venta.save()
+                object_list = PagoDeCuotas.objects.filter(venta_id=venta).order_by('fecha_de_pago')
+                for pago in object_list:
+                    pago.plan_de_pago = venta.plan_de_pago
+                    pago.vendedor = venta.vendedor
+                    pago.cliente = venta.cliente
+                    pago.save()
             except Exception, error:
                 print error
-                pass
-            venta.save()
             t = loader.get_template('movimientos/modificar_venta.html')
             fecha_venta = venta.fecha_de_venta.strftime('%d/%m/%Y')
             fecha_primer_venc = venta.fecha_primer_vencimiento.strftime('%d/%m/%Y')

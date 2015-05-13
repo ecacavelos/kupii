@@ -10,6 +10,12 @@ $(document).ready(function() {
 	});
 	$('#id_fecha_venc').mask('##/##/####');
 	$('.grid_6').hide();
+	// 1. Se setea el autocomplete para buscar clientes
+		autocompleteClienteRucONombre('id_name_cliente', 'id_cedula_cliente', 'id_cliente');
+	// 2. Se setea el autocomplete para buscar vendedor
+		autocompleteVendedorNombre('id_name_vendedor', 'id_vendedor');
+	// 3. Se setea el autocomplete para buscar plan de pago
+		autocompletePlandePago('id_name_ppago', 'id_plan_de_pago');
 	//Cambiar calendario a español
 	$.datepicker.regional['es'] = {
 		closeText : 'Cerrar',
@@ -77,4 +83,112 @@ function validateVentaMod(event) {
 	});
 	
 	return false;
+}
+
+/*
+ * AUTOCOMPLETE para CLIENTES
+ * Busca por RUC o NOMBRE
+ * parametros: 
+ * 1. id del input 
+ * 2. id del input donde se coloca el valor de la cedula
+ * 3. id del input donde se coloca el id del cliente
+ * */
+function autocompleteClienteRucONombre(input_id, cedula_input_id, id_cliente_input_id){
+	
+	input_id = '#' + input_id;
+	cedula_input_id = '#' + cedula_input_id;
+	id_cliente_input_id = '#' + id_cliente_input_id;
+	var cliente_id;
+	$(input_id).empty();		
+	base_url = base_context + "/ajax/get_cliente_id_by_name_or_ruc/";
+	params = "value";
+	$(input_id).autocomplete({
+		source : base_url,
+		minLength : 1,
+		create : function(){
+			$(this).data('ui-autocomplete')._renderItem = function(ul,item){
+				return $('<li>').append('<a>' +item.fields.nombres + " "+ item.fields.apellidos+'</a>').appendTo(ul);
+				};
+		},
+		select : function(event, ui) {
+			alert("Al modificar el cliente esto modificara a todos los pagos relacionados a la venta");
+			cliente_id = ui.item.pk;
+			cedula_cliente= ui.item.fields.cedula;
+			$(input_id).val(ui.item.fields.nombres+" "+ui.item.fields.apellidos);
+			//name_cliente=ui.item.fields.nombres+" "+ui.item.fields.apellidos;
+			//$("#id_name_cliente").val(name_cliente);
+			$(id_cliente_input_id).val(cliente_id);
+			$(cedula_input_id).val(cedula_cliente);
+			$(this).trigger('change'); 
+    		return false; 
+		}
+	});
+}
+
+/*
+ * AUTOCOMPLETE para Vendedor
+ * Busca por el nombre del vendedor
+ * parametros: 
+ * 1. id del input 
+ * 2. id del input donde se coloca el nombre del vendedor
+ * */
+function autocompleteVendedorNombre(input_id,  id_vendedor_input_id){
+	
+	input_id = '#' + input_id;
+	id_vendedor_input_id = '#' + id_vendedor_input_id;
+	var vendedor_id;
+	$(input_id).empty();		
+	base_url = base_context + "/ajax/get_vendedor_id_by_name/";
+	params = "value";
+	$(input_id).autocomplete({
+		source : base_url,
+		minLength : 1,
+		create : function(){
+			$(this).data('ui-autocomplete')._renderItem = function(ul,item){
+				return $('<li>').append('<a>' +item.nombres + " "+ item.apellidos+'</a>').appendTo(ul);
+				};
+		},
+		select : function(event, ui) {
+			alert("Al modificar el vendedor esto modificara a todos los pagos relacionados a la venta");
+			vendedor_id = ui.item.id;
+			$(input_id).val(ui.item.nombres+" "+ui.item.apellidos);
+			$(id_vendedor_input_id).val(vendedor_id);
+			$(this).trigger('change'); 
+    		return false; 
+		}
+	});
+}
+
+/*
+ * AUTOCOMPLETE para Plan de Pago
+ * Busca por el nombre del plan de pago
+ * parametros: 
+ * 1. id del input 
+ * 2. id del input donde se coloca el nombre del plan de pago
+ * */
+function autocompletePlandePago(input_id,  id_plandepago_input_id){
+	
+	input_id = '#' + input_id;
+	id_plandepago_input_id = '#' + id_plandepago_input_id;
+	var planpago_id;
+	$(input_id).empty();		
+	base_url = base_context + "/ajax/get_plan_pago/";
+	params = "value";
+	$(input_id).autocomplete({
+		source : base_url,
+		minLength : 1,
+		create : function(){
+			$(this).data('ui-autocomplete')._renderItem = function(ul,item){
+				return $('<li>').append('<a>'+ item.nombre_del_plan +'</a>').appendTo(ul);
+				};
+		},
+		select : function(event, ui) {
+			alert("Al modificar el plan de pago esto modificara a todos los pagos relacionados a la venta");
+			planpago_id = ui.item.id;
+			$(input_id).val(ui.item.nombre_del_plan);
+			$(id_plandepago_input_id).val(planpago_id);
+			$(this).trigger('change'); 
+    		return false; 
+		}
+	});
 }
