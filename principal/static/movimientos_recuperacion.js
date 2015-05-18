@@ -2,6 +2,10 @@ $(document).ready(function() {
 	$("#id_lote").keydown(validateLotePre);
 	$("#id_lote").keyup(validateLotePost);
 	$("#main_recuperacion_form").submit(validateRecuperacion);
+	$('#monto_cuota_venta').mask('000.000.000.000.000.000.000', {
+		byPassKeys : [ null ],
+		reverse : true,
+	});
 });
 
 window.onload = function() {
@@ -110,6 +114,7 @@ function retrieveLote() {
 			$("#lote_superficie").html(sup);
 			$("#lote_superficie").html(String(format.call($("#lote_superficie").html().split(' ').join(''),'.',',')));
 			$("#lote_seleccionado_detalles").html(s);
+			
 			lote_id = msg.lote_id;
 			var d = new Date();
 			var month = d.getMonth() + 1;
@@ -139,6 +144,8 @@ function retrieveVenta() {
 		});
 		// Actualizamos el formulario con los datos obtenidos del lote.
 		request.done(function(msg) {
+			$("#cant_cuotas_venta").html(msg.venta[0]['pagos_realizados']);
+			$("#monto_cuota_venta").html(msg.venta[0]['precio_de_cuota']);
 			$("#id_cliente").val(msg.venta[0]['cliente_id']);
 			$("#cliente_seleccionado").val(msg.venta[0]['cliente']);
 			$("#id_vendedor").val(msg.venta[0]['vendedor_id']);
@@ -148,6 +155,10 @@ function retrieveVenta() {
 			venta_id = (msg.venta[0]['venta_id']);
 			PrecioVenta = (msg.venta[0]['precio_de_venta']);
 			EntregaInicial = (msg.venta[0]['entrega_inicial']);
+			$('#monto_cuota_venta').mask('000.000.000.000.000.000.000', {
+				byPassKeys : [ null ],
+				reverse : true,
+			});
 			retrievePagos();
 		});
 		request.fail(function(jqXHR, textStatus) {
