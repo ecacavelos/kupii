@@ -44,13 +44,14 @@ def lotes_libres(request):
                 ultimo="&tipo_busqueda="+tipo_busqueda+"&fraccion_ini="+f1+"&frac1="+fraccion_ini+"&fraccion_fin="+f2+"&frac2="+fraccion_fin
                 object_list = []  # lista de lotes
                 if fraccion_ini and fraccion_fin:
-                    manzanas = Manzana.objects.filter(fraccion_id__range=(fraccion_ini, fraccion_fin)).order_by('fraccion')
+                    
+                    manzanas = Manzana.objects.filter(fraccion_id__range=(fraccion_ini, fraccion_fin)).order_by('fraccion_id', 'nro_manzana')
                     for m in manzanas:
-                        lotes = Lote.objects.filter(manzana=m.id, estado="1")
+                        lotes = Lote.objects.filter(manzana=m.id, estado="1").order_by('nro_lote')
                         for l in lotes:
                             object_list.append(l)                                  
                 else:       
-                    object_list = Lote.objects.filter(estado="1").order_by('manzana', 'nro_lote')
+                    object_list = Lote.objects.filter(estado="1").order_by('nro_lote')
                  
                 lotes=[]
                 total_importe_cuotas = 0
@@ -1293,13 +1294,13 @@ def lotes_libres_reporte_excel(request):
     fraccion_fin=request.GET['fraccion_fin']
     object_list = []  
     if fraccion_ini and fraccion_fin:
-        manzanas = Manzana.objects.filter(fraccion_id__range=(fraccion_ini, fraccion_fin)).order_by('fraccion')
+        manzanas = Manzana.objects.filter(fraccion_id__range=(fraccion_ini, fraccion_fin)).order_by('fraccion_id', 'nro_manzana')
         for m in manzanas:
-            lotes = Lote.objects.filter(manzana=m.id, estado="1")
+            lotes = Lote.objects.filter(manzana=m.id, estado="1").order_by('nro_lote')
             for l in lotes:
                 object_list.append(l)                                  
     else:       
-        object_list = Lote.objects.filter(estado="1").order_by('manzana', 'nro_lote')
+        object_list = Lote.objects.filter(estado="1").order_by('nro_lote')
      
       
     #Totales por FRACCION
