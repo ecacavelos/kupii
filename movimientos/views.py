@@ -5,8 +5,7 @@ import json
 from datetime import datetime
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.urlresolvers import reverse, resolve
-from principal.common_functions import get_nro_cuota, monthdelta, get_cuotas_detail_by_lote
-import math
+from principal.common_functions import *
 from principal.monthdelta import MonthDelta 
 from django.core import serializers
  
@@ -237,80 +236,23 @@ def pago_de_cuotas(request):
         return HttpResponseRedirect("/login")
 
 def calcular_interes(request):
-    #calculando el interes
-    if request.method == 'POST':
-        data = request.POST    
-        lote_id = data.get('lote_id', '')
-        print 'lote_id->' + lote_id
-         
-        #cuotas_a_pagar = int(data.get('nro_cuotas_a_pagar', ''))
-        fecha_pago = data.get('fecha_pago', '')
-        proximo_vencimiento = data.get('proximo_vencimiento', '')
-        fecha_pago_parsed = datetime.strptime(fecha_pago, "%d/%m/%Y").date()
-        proximo_vencimiento_parsed = datetime.strptime(proximo_vencimiento, "%d/%m/%Y").date()
-     
-        resumen_lote=get_cuotas_detail_by_lote(lote_id)
-        cuotas_pagadas=resumen_lote['cant_cuotas_pagadas']
-        
-        detalles=[]
-        #El cliente tiene cuotas atrasadas
-        if fecha_pago_parsed>proximo_vencimiento_parsed:
+    
+    if request.user.is_authenticated():
+        #calculando el interes
+        if request.method == 'POST':
+            data = request.POST    
+            lote_id = data.get('lote_id', '')
+            print 'lote_id->' + lote_id
+            fecha_pago = data.get('fecha_pago', '')
+            fecha_pago_parsed = datetime.strptime(fecha_pago, "%d/%m/%Y").date()
+            proximo_vencimiento = data.get('proximo_vencimiento', '')
+            proximo_vencimiento_parsed = datetime.strptime(proximo_vencimiento, "%d/%m/%Y").date()
             
-#         TODO:
-#         Se calcula la diferencia en dias de la fecha del pago que se esta realizando, con 
-#         respecto a la fecha de vencimiento de dicho pago. El porcentaje de interes que se aplica
-#         sobre las cuotas es constante: 0.00067 (0.002/30) -> 2% interes mensual/30
-#         + interes punitorio (0.00020) + iva (0.00009)
+            detalles = obtener_detalle_interes_lote(lote_id,fecha_pago_parsed,proximo_vencimiento_parsed)
 
-            
-            #Obtenemos la fecha del primer vencimiento de la cuota, de la ultima venta
-            ventas = Venta.objects.filter(lote_id=lote_id)
-            for item_venta in ventas:
-                print 'Obteniendo la ultima venta'
-                try: 
-                    RecuperacionDeLotes.objects.get(venta=item_venta.id)
-                except RecuperacionDeLotes.DoesNotExist:
-                    print 'se encontro la venta no recuperada, la venta actual'
-                    venta = item_venta  
-            
-            
-            #Calculamos en base al primer vencimiento, cuantas cuotas debieron haberse pagado hasta la fecha
-            fecha_primer_vencimiento=venta.fecha_primer_vencimiento
-            cantidad_ideal_cuotas=monthdelta(fecha_primer_vencimiento, fecha_pago_parsed)
-            #Y obtenemos las cuotas atrasadas
-            cuotas_atrasadas=cantidad_ideal_cuotas-cuotas_pagadas+1
-            monto_cuota=venta.precio_de_cuota
-            
-            #Intereses (valores constantes)
-            #Interes moratorio por dia
-            interes=0.00067
-            
-            #Interes
-            interes_punitorio=0.00020
-            
-            #Intereses IVA
-            interes_iva=0.00009
-            
-            total_intereses=interes+interes_punitorio+interes_iva
-            
-            for cuota in range(cuotas_atrasadas):
-                detalle={}
-                fecha_vencimiento=proximo_vencimiento_parsed+MonthDelta(cuota)
-                dias_atraso=(fecha_pago_parsed-fecha_vencimiento).days                
-                intereses=math.ceil(total_intereses*dias_atraso*monto_cuota)
-                
-                detalle['interes']=interes
-                detalle['interes_punitorio']=interes_punitorio
-                detalle['interes_iva']=interes_iva
-                detalle['nro_cuota']=cuotas_pagadas+(cuota+1)
-                detalle['dias_atraso']=dias_atraso
-                detalle['intereses']=intereses
-                detalle['vencimiento']=fecha_vencimiento.strftime('%d/%m/%Y')
-                
-               
-                detalles.append(detalle)
-        print detalles
-        return HttpResponse(json.dumps(detalles),content_type="application/json")
+            return HttpResponse(json.dumps(detalles),content_type="application/json")
+    else:
+        return HttpResponseRedirect("/login")
 
 def transferencias_de_lotes(request):
     

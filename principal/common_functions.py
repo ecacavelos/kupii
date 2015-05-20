@@ -6,6 +6,7 @@ from calendar import monthrange
 from datetime import datetime, timedelta
 from django.core import serializers
 import json
+import math
 
 
 def get_cuotas_detail_by_lote(lote_id):
@@ -61,21 +62,25 @@ def pagos_db_to_custom_pagos(lista_pagos_db):
 #Funcion que recibe una lista de objetos y una lista de labels,
 #serializa la lista de objetos y retorna una lista de diccionarios
 def custom_json(object_list, labels):
-    data = serializers.serialize('python', object_list)
-    results = []
-    label1=labels[0]
-    if len(labels) > 1:
-        label2=labels[1]
-      
-    for d in data:
-        d['fields']['id'] = d['pk']
-        #Como maximo habra 2 labels
-        if len(labels) <= 1:
-            d['fields']['label'] = u'%s' % (d['fields'][label1])
-        else:
-            d['fields']['label'] = u'%s %s' % (d['fields'][label1],d['fields'][label2])
-        results.append(d['fields'])
-    return results
+    try:
+        data = serializers.serialize('python', object_list)
+        results = []
+        label1=labels[0]
+        if len(labels) > 1:
+            label2=labels[1]
+          
+        for d in data:
+            d['fields']['id'] = d['pk']
+            #Como maximo habra 2 labels
+            if len(labels) <= 1:
+                d['fields']['label'] = u'%s' % (d['fields'][label1])
+            else:
+                d['fields']['label'] = u'%s %s' % (d['fields'][label1],d['fields'][label2])
+            results.append(d['fields'])
+        return results
+    except Exception, error:  
+        print error
+        return False
 
 def monthdelta(d1, d2):
     delta = 0
@@ -101,7 +106,6 @@ def get_cuota_information_by_lote(lote_id,cuotas_pag):
                     except RecuperacionDeLotes.DoesNotExist:
                         print 'se encontro la venta no recuperada, la venta actual'
                         venta = item_venta
-                plan_de_pago = PlanDePago.objects.get(id=venta.plan_de_pago.id)
                 cuotas_totales = (cant_cuotas_pagadas['nro_cuotas_a_pagar__sum'])
                 ultima_fecha_pago = ""
                 if cuotas_totales != 0:
@@ -112,7 +116,7 @@ def get_cuota_information_by_lote(lote_id,cuotas_pag):
                 cuotas_a_pagar= []
                 for i in range(0, int(cuotas_pag)):
                     nro_cuota = cuotas_totales + 1
-                    cuota_a_pagar['nro_cuota'] = str(nro_cuota) + "/" + str(plan_de_pago.cantidad_de_cuotas)
+                    cuota_a_pagar['nro_cuota'] = str(nro_cuota) + "/" + str(venta.plan_de_pago.cantidad_de_cuotas)
                     cuota_a_pagar['fecha'] = (ultima_fecha_pago + MonthDelta(i)).strftime('%d/%m/%Y')
                     cuotas_totales +=1
                     cuotas_a_pagar.append(cuota_a_pagar)
@@ -203,3 +207,114 @@ def filtros_establecidos(request, tipo_informe):
             print('Parametros no seteados')     
     return False
 
+
+
+def obtener_detalle_interes_lote(lote_id,fecha_pago_parsed,proximo_vencimiento_parsed):
+    
+            resumen_lote=get_cuotas_detail_by_lote(str(lote_id))
+            cuotas_pagadas=resumen_lote['cant_cuotas_pagadas']
+            
+            detalles=[]
+            #El cliente tiene cuotas atrasadas
+            if fecha_pago_parsed>proximo_vencimiento_parsed:
+                
+    #         TODO:
+    #         Se calcula la diferencia en dias de la fecha del pago que se esta realizando, con 
+    #         respecto a la fecha de vencimiento de dicho pago. El porcentaje de interes que se aplica
+    #         sobre las cuotas es constante: 0.00067 (0.002/30) -> 2% interes mensual/30
+    #         + interes punitorio (0.00020) + iva (0.00009)
+    
+                
+                #Obtenemos la fecha del primer vencimiento de la cuota, de la ultima venta
+                ventas = Venta.objects.filter(lote_id=lote_id)
+                for item_venta in ventas:
+                    print 'Obteniendo la ultima venta'
+                    try: 
+                        RecuperacionDeLotes.objects.get(venta=item_venta.id)
+                    except RecuperacionDeLotes.DoesNotExist:
+                        print 'se encontro la venta no recuperada, la venta actual'
+                        venta = item_venta  
+                
+                
+                #Calculamos en base al primer vencimiento, cuantas cuotas debieron haberse pagado hasta la fecha
+                fecha_primer_vencimiento=venta.fecha_primer_vencimiento
+                cantidad_ideal_cuotas=monthdelta(fecha_primer_vencimiento, fecha_pago_parsed)
+                #Y obtenemos las cuotas atrasadas
+                cuotas_atrasadas=cantidad_ideal_cuotas-cuotas_pagadas+1
+                monto_cuota=venta.precio_de_cuota
+                
+                #Intereses (valores constantes)
+                #Interes moratorio por dia
+                interes=0.00067
+                
+                #Interes
+                interes_punitorio=0.00020
+                
+                #Intereses IVA
+                interes_iva=0.00009
+                
+                total_intereses=interes+interes_punitorio+interes_iva
+                
+                for cuota in range(cuotas_atrasadas):
+                    detalle={}
+                    fecha_vencimiento=proximo_vencimiento_parsed+MonthDelta(cuota)
+                    dias_atraso=(fecha_pago_parsed-fecha_vencimiento).days                
+                    intereses=math.ceil(total_intereses*dias_atraso*monto_cuota)
+                    
+                    detalle['interes']=interes
+                    detalle['interes_punitorio']=interes_punitorio
+                    detalle['interes_iva']=interes_iva
+                    detalle['nro_cuota']=cuotas_pagadas+(cuota+1)
+                    detalle['dias_atraso']=dias_atraso
+                    detalle['intereses']=intereses
+                    detalle['vencimiento']=fecha_vencimiento.strftime('%d/%m/%Y')
+                    
+                   
+                    detalles.append(detalle)
+            print detalles
+            return detalles
+        
+        
+def obtener_cuotas_a_pagar(venta,fecha_pago,resumen_cuotas_a_pagar):
+    
+    lista_cuotas = []
+
+    if (datetime.strptime(resumen_cuotas_a_pagar['proximo_vencimiento'], "%d/%m/%Y").date() < fecha_pago):
+        print 'Hay al menos 1 cuota en mora'
+        intereses = obtener_detalle_interes_lote(venta.lote.id,fecha_pago,datetime.strptime(resumen_cuotas_a_pagar['proximo_vencimiento'], "%d/%m/%Y").date())
+        interes_total = 0 
+        for interes_item in intereses:
+            interes_total+=interes_item['intereses']
+        if len(intereses)<=5: # Hasta 5 cuotas
+            for interes_item in intereses:
+                cuota = {
+                    'numero_cuota': interes_item['nro_cuota'],
+                    'monto_cuota':venta.precio_de_cuota + interes_total, 
+                    'vencimiento': interes_item['vencimiento'],
+                    'fecha_pago' : fecha_pago.strftime("%d/%m/%Y")
+                    }
+            
+                lista_cuotas.append(cuota)
+            # Ademas de las cuotas con mora se agrega la cuota actual que es posible pagar
+            vencimiento_cuota_acutal = datetime.strptime(resumen_cuotas_a_pagar['proximo_vencimiento'], "%d/%m/%Y").date() + MonthDelta(len(intereses))
+            cuota = {'numero_cuota': resumen_cuotas_a_pagar['cant_cuotas_pagadas'] + len(intereses) + 1 ,
+                 'monto_cuota':venta.precio_de_cuota , 
+                 'vencimiento': vencimiento_cuota_acutal.strftime("%d/%m/%Y"),
+                 'fecha_pago' : fecha_pago.strftime("%d/%m/%Y")}
+            lista_cuotas.append(cuota)
+        else:    
+            
+            error_item = {}
+            error_item['codigo'] = '33'
+            error_item['mensaje'] = 'Compra con mas de 6 meses de atraso'
+            error = {'error': error_item}            
+            return error
+    else:
+        print 'Cliente esta al dia, solo debe abonar una cuota'
+        cuota = {'numero_cuota': resumen_cuotas_a_pagar['cant_cuotas_pagadas'] + 1 ,
+                 'monto_cuota':venta.precio_de_cuota , 
+                 'vencimiento': resumen_cuotas_a_pagar['proximo_vencimiento'],
+                 'fecha_pago' : fecha_pago.strftime("%d/%m/%Y")}
+        lista_cuotas.append(cuota)
+        
+    return lista_cuotas

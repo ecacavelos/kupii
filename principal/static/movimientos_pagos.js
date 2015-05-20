@@ -40,6 +40,14 @@ $(document).ready(function() {
 			dateFormat : 'dd/mm/yy'
 		});
 	
+	
+	$( "#nro_cuotas_a_pagar" ).change(function() {
+  		refresh();
+	});
+	$( "#id_fecha" ).change(function() {
+  		refresh();
+	});
+	
 	$(function() {
 		$('#id_modal').modal();
 	});
@@ -78,6 +86,14 @@ var detalles_modificados =new Array();
 		}
 		return numeric + decimal;
 	}
+
+
+function refresh(){
+	
+	calculateMesPago();
+	calcularInteres();
+}
+
 
 //Separador de miles que recibe un numero como parametro 
 function f(n) {
@@ -292,10 +308,9 @@ function retrieveVenta() {
 			$("#proximo_vencimiento").empty();
 			$("#proximo_vencimiento").append(msgaux.cuotas_details.proximo_vencimiento);
 			global_proximo_vencimiento=msgaux.cuotas_details.proximo_vencimiento;
-			
-			calculateMesPago();
-			calculateTotalCuotas();
-			calcularInteres();
+						
+			refresh();
+			calculateTotalCuotas();			
 			calculateTotalPago();
 
 			retrieveCliente();
@@ -311,15 +326,15 @@ function retrieveVenta() {
 
 function calcularInteres() {
 	//alert('calculando interes');
-	if(detalle != ""){
-		var intereses=0;
-		for(i=0;i<detalle.length;i++){
-			intereses+=detalle[i]['intereses'];
-		}
-		global_intereses=intereses;
-		calculateTotalCuotas();
-		calculateTotalPago();
-	}else{
+	// if(detalle != ""){
+		// var intereses=0;
+		// for(i=0;i<detalle.length;i++){
+			// intereses+=detalle[i]['intereses'];
+		// }
+		// global_intereses=intereses;
+		// calculateTotalCuotas();
+		// calculateTotalPago();
+	// }else{
 		var fecha_pago=$('#id_fecha').val();
 		var proximo_vencimiento=global_proximo_vencimiento;
 		var lote_id=global_lote_id;
@@ -348,7 +363,7 @@ function calcularInteres() {
 				calculateTotalCuotas();
 				calculateTotalPago();		
 			});
-	}
+	// }
 }
 
 

@@ -104,7 +104,7 @@ class Vendedor(models.Model):
     fecha_ingreso = models.DateField('fecha de ingreso')
     sucursal = models.CharField(max_length=255)
     def __unicode__(self):
-        return u'%s %s' % (self.nombres, self.apellidos)
+        return unicode(u'%s %s' % (self.nombres, self.apellidos))
     class Meta:
         verbose_name_plural = "vendedores"
     
@@ -323,5 +323,6 @@ class Factura(models.Model):
     
 class Transaccion(models.Model):
     estado = models.CharField(max_length=30)
+    cliente = models.ForeignKey(Cliente,on_delete=models.PROTECT)
     
     
