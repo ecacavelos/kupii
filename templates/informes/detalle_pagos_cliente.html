@@ -1,0 +1,129 @@
+{% extends "lotes/base_lotes.html" %}
+{% block header_scripts %}
+
+<script type="text/javascript">
+function buscar(){
+	if($("#tipo_busqueda").val()==0){
+		alert("Debe elegir un tipo de busqueda.");
+	}
+	else{
+		if($("#busqueda").val()==""){
+			alert("Debe ingresar un nro de lote para buscar.");
+		}else{
+			$("#frm_busqueda").submit();
+		}
+	}
+}
+
+$(document).ready(function() {
+	$('#busqueda').mask('###/###/####');
+	
+});	
+	
+</script>
+{% endblock %}
+{% block content %}
+<div class="gri16 text-izquierda" id="breadcumb">
+						<a href="{% url 'frontend_home' %}">Inicio</a> <span class="verde-1">></span>  
+						<a href="{% url 'frontend_home' %}informes/">Informes</a> 
+						<span class="verde-1">> Detalle Pagos </span> 
+					</div>
+
+					<div class="clear"></div>
+
+					<div class="grid_10">
+  						<h1>Listado de Pagos del Cliente Atrasado</h1>
+					</div>
+
+					<div class="grid_6">
+  						<form name="frm_busqueda" id="frm_busqueda" method="post" action="{% url 'frontend_home' %}informes/listado_busqueda_pagos/">
+  							{% csrf_token %}
+  							<table>
+  								<tr>
+  									<tr>
+  										<td>
+  											Nro de Lote:
+  										</td>
+  										<td id="campo_busqueda">
+  											
+  										</td>
+  									</tr>
+  									<td>
+  										<input id="busqueda" type="" name="busqueda" placeholder="Ej: 001/001/0001"/>
+  									</td>
+  									<td>
+  										<input type="button" value="Buscar" onclick="buscar();" class="historico" style="cursor: pointer"/>
+  									</td>
+  								</tr>
+  								
+  								<input name="tabla" type="hidden" value="lote"/>
+  								 
+  							</table>		
+							
+						</form>
+					</div>
+
+					<div class="clear"></div>
+					<div id="listado-cuadro-busqueda">
+						
+						<br><br>
+					</div>
+					<div id="listado-item-lote">
+						<table width="50%" border="1" cellpadding="0" cellspacing="0" class="listado-pagos-atrasados" align="center">
+							<th>Id Pago</th><th>Venta</th><th>Lote Nro</th><th>Cliente</th><th>Cuotas a Pagar</th><th>Plan de Pago</th><th>Fecha de Pago</th><th>Total de Cuotas</th><th>Total de Mora</th><th>Total de Pago</th>
+
+
+{% for hw in object_list %}
+		<tr>
+			<td>
+			    {{hw.id}}
+			</td>
+			<td>
+			    {{hw.venta}}
+			</td>	
+			<td>
+				{{hw.lote}}
+			</td>
+			<td>
+			    {{hw.cliente}}
+			</td>
+			<td>
+			    {{hw.nro_cuotas_a_pagar}}
+			</td>
+			<td>
+			    {{hw.plan_de_pago}}
+			</td>
+			<td>
+			    {{hw.fecha_de_pago}}
+			</td>			
+			<td>
+				{{hw.total_de_cuotas}}
+			</td>
+			<td>
+				{{hw.total_de_mora}}
+			</td>
+			<td>
+				{{hw.total_de_pago}}
+			</td>
+			
+		</tr>
+{% endfor %}
+<div class="pagination">
+    <span class="step-links">
+        {%if object_list.has_previous%}
+        <a href="?page={{ object_list.previous_page_number }}"> Anterior</a>
+		{%endif%}
+    	P&aacute;gina
+    	|{{object_list.number}}|
+    	
+    	{%if object_list.has_next%}
+		<a href="?page={{ object_list.next_page_number }}"> Siguiente</a>
+		{%endif%}
+        
+    </span>
+</div>
+						</table>
+					</div>
+
+<div id="footer"><a href="{% url 'frontend_home' %}informes/clientes_atrasados/" class="boton-verde">Volver al listado de Clientes Atrasados</a></div>
+{% endblock %}
