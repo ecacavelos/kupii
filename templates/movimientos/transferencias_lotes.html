@@ -1,0 +1,148 @@
+{% extends "lotes/base_lotes.html" %}
+
+{% block header_scripts %}
+<!--
+<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}ajax_config.js"></script>
+-->
+<script type="text/javascript" src="{{ STATIC_URL }}listados/listado_transferencias.js"></script>
+<script type="text/javascript" >
+$(document).ready(function() {
+	$('.grid_6').hide();
+	$('#id_fecha').mask('##/##/####');
+	$("#id_fecha").datepicker({ dateFormat: 'dd/mm/yy' });
+base_url = "/ajax/get_cliente_id_by_name/";
+		params = "value";
+		$("#id_nombre_cliente").autocomplete({
+			source : base_url,
+			minLength : 1,
+			select : function(event, ui) {
+				id_cliente = ui.item.id;
+				cedula_cliente = ui.item.cedula;
+				$("#id_cliente").val(id_cliente);
+				$("#id_cedula_cliente").val(cedula_cliente);
+								
+			}
+		});
+		
+		//cliente por cedula
+		base_url = "/ajax/get_cliente_name_id_by_cedula/";
+		params = "value";
+		$("#id_cedula_cliente").autocomplete({
+			source : base_url,
+			minLength : 1,
+			select : function(event, ui) {
+				id_cliente = ui.item.id;
+				name_cliente= ui.item.label;
+				cedula_cliente = ui.item.cedula;
+				ui.item.value = ui.item.cedula;
+				$("#id_cliente").val(id_cliente);
+				$("#id_cedula_cliente").val(cedula_cliente);
+				$("#id_nombre_cliente").val(name_cliente);
+			}
+		});
+});
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="gri16 text-izquierda" id="breadcumb">
+	<a href="{% url 'frontend_home' %}">Inicio</a> <span class="verde-1">></span>  
+	<a href="{% url 'frontend_home' %}movimientos/">Movimientos</a> 
+	<span class="verde-1">> Transferir Lote</span> 
+</div>
+<div class="clear"></div>
+
+<div class="grid_10">
+  <h1>Transferencia de Lote</h1>
+</div>
+
+<div class="grid_6">
+  <a href="#" class="historico">Buscar</a>
+</div>
+
+<div class="clear"></div>
+<div class="grid_16" align="center">
+<form id="main_transferencia_form" action="" method="post">
+	<table width="94%" border="0" cellpadding="0" cellspacing="0" id="forms" align="center">
+	{% csrf_token %}
+	<div class="fieldWrapperMovimientos">
+		<tr>
+			<td><label for="id_lote">Lote: </label></td>
+			<td class="noimage"><input id="id_lote" type="text" name="lote" maxlength="12" onblur="retrieveLote()" />
+		<ul class="errorlist"><li id="lote_error"></li></ul></td>
+		</tr>
+		<tr>
+			<td><label>Superficie (m2): </label></td>
+			<td class="noimage"><div id="lote_superficie"></div></td>
+		</tr>
+		<tr>
+			<td><label>Detalles del Lote: </label></td>
+			<td class="noimage"><div id="lote_seleccionado_detalles"></div></td>
+		</tr>
+	</div>
+	<div class="fieldWrapperMovimientos">
+		<tr>
+			<td><label for="id_fecha">Fecha de Transferencia: </label></td>
+			<td class="noimage"><input id="id_fecha" type="text" name="fecha" maxlength="10" /></td>
+		</tr>
+	</div>
+	<div class="fieldWrapperMovimientos">
+		<tr>
+			<td><label for="id_cliente_original">Cliente Original: </label></td>
+			<td class="noimage">
+				<input id="id_cliente_original" type="hidden" name="cliente_original" disabled="disabled" maxlength="100" />
+				
+			<div id="cliente_original_seleccionado"></div>
+		<ul class="errorlist"><li id="cliente_error"></li></ul></td>
+		</tr>
+	</div>
+	<div class="fieldWrapperMovimientos">
+		<tr>
+			<td><label for="id_cliente">Cedula Cliente a Transferir: </label></td>
+			<td class="noimage">
+				<input id="id_cliente" type="hidden" name="cliente_a_transferir" disabled="disabled" maxlength="100" onblur="retrieveCliente()" />
+				<input id="id_cedula_cliente" type="text" name="cedula_cliente_a_transferir" maxlength="100"/>
+			</td>
+		</tr>	
+		<tr>
+			<td><label>Nombre Cliente a Transferir: </label></td>
+			<td class="noimage">
+				<input id="id_nombre_cliente" type="text" name="nombre_cliente" maxlength="100"/>
+				<div id="cliente_seleccionado"></div>
+		<ul class="errorlist"><li id="cliente_error"></li></ul>
+		</td>
+		</tr>
+	</div>
+	<div class="fieldWrapperMovimientos">	
+		<tr>
+			<td><label for="id_vendedor">Vendedor: </label></td>
+			<td class="noimage">
+				<input id="id_vendedor" type="hidden" name="vendedor" disabled="disabled" maxlength="100" onblur="retrieveVendedor()" />
+				<div id="vendedor_seleccionado"></div><br>
+		<ul class="errorlist"><li id="vendedor_error"></li></ul></td>
+		</tr>
+	</div>
+	<div class="fieldWrapperMovimientos">
+		<tr>
+			<td><label for="id_plan_pago">Plan de Pago: </label></td>
+			<td class="noimage"><input id="id_plan_pago" type="hidden" name="plan_pago" disabled="disabled" maxlength="100" onblur="retrievePlanPago()" />
+			<div id="plan_pago_seleccionado"></div><br>
+		<ul class="errorlist"><li id="plan_pago_error"></li></ul>
+		</td>
+		</tr>
+	</div>
+<div class="fieldWrapperMovimientos">
+	</div>
+	</table>
+	<input id="enviar_transferencia" style="cursor: pointer;" type="submit" value="Guardar Transferencia" />
+	<br><br><br>
+	</form>
+	<div class="clear"></div>
+	</div>
+	
+	<div id="footer">
+		<a href="{% url 'frontend_home' %}movimientos/" class="boton-verde">Volver al m&oacute;dulo de movimientos</a>
+	</div>
+
+{% endblock %}

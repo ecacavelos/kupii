@@ -1,0 +1,39 @@
+{% extends "lotes/base_lotes.html" %}
+
+{% block content %}
+<div class="gri16 text-izquierda" id="breadcumb">
+	<a href="{% url 'frontend_home' %}">Inicio</a> 
+	<span class="verde-1">> Movimientos</span> 
+</div>
+<table class="listado-movimientos">
+	<th>Acciones</th><th>Listados</th>
+<tr>
+	<td><a href="ventas_lotes" class="boton-verde">Venta de Lote</a></td>
+	<td><a href="listado_ventas" class="boton-verde">Listado de Ventas</a></td>
+</tr>
+<tr>
+	<td><a href="pago_cuotas" class="boton-verde">Pago de cuotas</a></td>
+	<td><a href="listado_pagos" class="boton-verde">Listado de Pagos</a></td>
+</tr>
+<tr>
+	<td><a href="reservas_lotes" class="boton-verde">Reserva de Lote</a></td>
+	<td><a href="listado_reservas" class="boton-verde">Listado de Reservas</a></td>
+</tr>
+<tr>
+	<td><a href="transferencias_lotes" class="boton-verde">Transferencia de Lote</a></td>
+	<td><a href="listado_transferencias" class="boton-verde">Listado de Transferencias</a></td>
+</tr>
+<tr>
+	<td><a href="cambio_lotes" class="boton-verde">Cambio de Lote</a></td>
+	<td><a href="listado_cambios" class="boton-verde">Listado de Cambios</a></td>
+</tr>
+<tr>
+	<td><a href="recuperacion_lotes" class="boton-verde">Recuperación de Lote</a></td>
+	<td><a href="listado_recuperacion" class="boton-verde">Listado de Recuperación</a></td>
+</tr>
+
+</table>
+
+
+<a href="{% url 'frontend_home' %}" class="boton-verde">Volver a la Pagina Inicial</a>
+{% endblock %}
