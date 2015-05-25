@@ -251,9 +251,15 @@ class Reserva(models.Model):
     cliente = models.ForeignKey(Cliente,on_delete=models.PROTECT)
     def __unicode__(self):
         return (str(self.lote) + " a " + self.cliente.nombres + " " + self.cliente.apellidos)
+    
+class Transaccion(models.Model):
+    estado = models.CharField(max_length=30)
+    cliente = models.ForeignKey(Cliente,on_delete=models.PROTECT)
+    created = models.DateTimeField(auto_now_add=True) 
 
 class PagoDeCuotas(models.Model):
     venta = models.ForeignKey(Venta,on_delete=models.PROTECT)
+    transaccion = models.ForeignKey(Transaccion,on_delete=models.PROTECT)
     lote = models.ForeignKey(Lote,on_delete=models.PROTECT)
     fecha_de_pago = models.DateField()
     nro_cuotas_a_pagar = models.IntegerField()
@@ -321,8 +327,5 @@ class Factura(models.Model):
     tipo = models.CharField(max_length=2)
     detalle = models.TextField()
     
-class Transaccion(models.Model):
-    estado = models.CharField(max_length=30)
-    cliente = models.ForeignKey(Cliente,on_delete=models.PROTECT)
     
     
