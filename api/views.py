@@ -146,7 +146,7 @@ def pago(request):
                         # the password verified for the user
                         if user.is_active:                        
                             #2. Se obtiene la transaccion
-                            transaccion = Transaccion.objects.get(Q(estado__contains='Consultado'),Q(id=transaccion_id))
+                            transaccion = Transaccion.objects.get(Q(id=transaccion_id))
 #                             transaccion_tmstmp = transaccion.created.replace(tzinfo=None)
                             if not transaccion: 
                                 error_msg = 'Transaccion no encontrada' 
