@@ -1,0 +1,36 @@
+@charset "utf-8";
+/* CSS Document */
+
+.fieldWrapperMovimientos {
+	padding: 8px 12px;
+	border: 1px solid rgb(238,238,238);
+}
+
+.shortLabel {
+	width: auto !important;
+	margin-left: 8px;
+	/*vertical-align: top !important;*/
+}
+
+.fieldWrapperMovimientos label {
+	width: 16em;	
+	vertical-align: baseline;
+}
+
+.fieldWrapperMovimientos div {
+	display: inline-block;
+}
+
+#cantidad_cuotas_venta, #precio_final_venta {
+	color: blue;
+}
+
+div#precio_final_venta.error {
+	color: red;
+}
+
+#enviar_venta {
+	border: 1px solid rgb(204, 204, 204);
+	margin: 8px 12px;
+	width: 16em;
+}

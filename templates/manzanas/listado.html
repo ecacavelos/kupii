@@ -1,0 +1,90 @@
+{% extends "lotes/base_lotes.html" %}
+{% block header_scripts %}
+
+<script type="text/javascript">
+$(document).ready(function() {
+	$("#busqueda").mask("###/###");
+});
+function buscar(){
+	if($("#tipo_busqueda").val()==0){
+		alert("Debe elegir un tipo de busqueda.");
+	}
+	else{
+		if($("#busqueda").val()==""){
+			alert("Debe ingresar un nro de manzana para buscar.");
+		}else{
+			$("#frm_busqueda").submit();
+		}
+	}
+}
+
+	
+</script>
+{% endblock %}
+{% block content %}
+<div class="gri16 text-izquierda" id="breadcumb">
+	<a href="{% url 'frontend_home' %}">Inicio</a> <span class="verde-1">></span>  
+	<a href="{% url 'frontend_home' %}manzanas">Manzanas</a> 
+	<span class="verde-1">> Listado de Manzanas</span> 
+</div>
+<div class="clear"></div>
+<h1>Listado de Manzanas</h1>
+
+<div class="grid_6">
+	<form name="frm_busqueda" id="frm_busqueda" method="post" action="/manzanas/listado_busqueda_manzanas/">
+		{% csrf_token %}
+		<table id="lista-categoria" frame="box">
+			<tr>
+				<th class="acciones"  colspan="3"><strong><a href="#" style="color: white;">Filtrar</a></strong></th>
+			</tr>
+			<tr>
+				<td>Nro. Manzana</td>
+				<td><input id="busqueda" type="text" name="busqueda" placeholder="Ej: 001/001"></td>
+				<td><input type="button" value="Buscar" onclick="buscar();" class="historico" style="cursor: pointer"/></td>
+			</tr>
+		</table>
+	</form>
+</div>
+<div class="clear"></div>
+<div id="listado-cuadro-busqueda">
+	
+</div>
+<div id="listado-item-lote" align="center">
+	<table border="1" cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
+		<th>Nro Manzana</th>
+		<th>Nro Fracci&oacute;n</th>
+		<th>Cantidad de Lotes</th>
+		{% for hw in object_list %}
+		{% if forloop.counter|divisibleby:2 %}
+			<tr>
+				<td>{{hw.nro_manzana}}</td>
+				<td>{{hw.fraccion_id}}</td>
+				<td>{{hw.cantidad_lotes}}</td>
+			</tr>
+		{% else %}
+			<tr class="bkg_gris">
+				<td>{{hw.nro_manzana}}</td>
+					<td>{{hw.fraccion_id}}</td>
+					<td>{{hw.cantidad_lotes}}</td>
+			</tr>
+		{% endif %}		
+		{% endfor %}
+		<div class="pagination">
+			<span class="step-links">
+				Mostrando {{ object_list.start_index }}-{{ object_list.end_index }} de {{ object_list.paginator.count }} Resultados
+				{%if object_list.has_previous%} 
+				<a href="?page={{ object_list.first_index}}{{ultimo}}"> Primera </a> 
+				<a href="?page={{ object_list.previous_page_number }}{{ultimo}}"> Anterior</a> 
+				{%endif%}
+				P&aacute;gina |{{object_list.number}}|		
+				{%if object_list.has_next%} 
+				<a href="?page={{ object_list.next_page_number }}{{ultimo}}"> Siguiente </a> 				
+				<a href="?page={{ object_list.end_index}}{{ultimo}}"> Ultima </a> 
+				{%endif%} 
+			</span>
+</div>	
+	</table>
+</div>
+
+<div id="footer"><a href="{% url 'frontend_home' %}manzanas" class="boton-verde">Volver al módulo de Manzanas</a></div>
+{% endblock %}
