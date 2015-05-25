@@ -96,26 +96,26 @@ def consulta(request, cedula):
                     else:
                         error_msg = 'Cuenta deshabilitada'     
                         print error_msg
-                        error['codigo'] = codigo_base_error_consulta + '22'
+                        error['codigo'] =  '22'
                         error['mensaje'] = error_msg
                         return HttpResponse(json.dumps(error),status=401, content_type="application/json")                        
                 else:
                     # the authentication system was unable to verify the username and password
                     error_msg = 'Usuario o password incorrecto'
                     print error_msg
-                    error['codigo'] = codigo_base_error_consulta + '21'
+                    error['codigo'] =  '21'
                     error['mensaje'] = error_msg                                        
                     return HttpResponse(json.dumps(error), status=401, content_type="application/json")                    
             except MultiValueDictKeyError:
                 error_msg = 'Sintaxis del request incorrecta'
                 print error_msg
-                error['codigo'] = codigo_base_error_consulta + '11'
+                error['codigo'] =  '11'
                 error['mensaje'] = error_msg                                                        
                 return HttpResponseBadRequest(json.dumps(error), content_type="application/json")
             except Exception, error:
                 error_msg = 'Error en el servidor'
                 print error_msg
-                error['codigo'] = codigo_base_error_consulta + '00'
+                error['codigo'] =  '00'
                 error['mensaje'] = error_msg                                                        
                 return HttpResponseServerError(json.dumps(error), content_type="application/json")                
 
@@ -136,7 +136,7 @@ def pago(request):
                 print 'JSON recibido: ' + detalle_pago_json
                 if not detalle_pago_json:
                     print('Error en los parametros del request')
-                    error['codigo'] = codigo_base_error_pago + '12'
+                    error['codigo'] =  '12'
                     error['mensaje'] = 'Request sin datos en el cuerpo'                    
                     return HttpResponseBadRequest(json.dumps(error), content_type="application/json")
                 else:                
@@ -149,22 +149,23 @@ def pago(request):
                             transaccion = Transaccion.objects.get(Q(estado__contains='Consultado'),Q(id=transaccion_id))
 #                             transaccion_tmstmp = transaccion.created.replace(tzinfo=None)
                             if not transaccion: 
-                                print 'Transaccion no encontrada'
-                                error['codigo'] = codigo_base_error_pago + '41'
-                                error['mensaje'] = 'Transaccion no encontrado'
+                                error_msg = 'Transaccion no encontrada' 
+                                print error_msg
+                                error['codigo'] = codigo_base_error_pago + '31'
+                                error['mensaje'] = error_msg
                                 return HttpResponse(json.dumps(error),status=404, content_type="application/json")                        
                             else:
                                 if transaccion.estado != 'Consultado':
                                     error_msg = 'Transaccion con estado invalido' 
                                     print error_msg
-                                    error['codigo'] = codigo_base_error_pago + '47'
+                                    error['codigo'] = codigo_base_error_pago + '32'
                                     error['mensaje'] = error_msg
                                     return HttpResponse(json.dumps(error),status=404, content_type="application/json")
                                 else: # Estado valido                                                                        
                                     if (datetime.now(pytz.utc) - transaccion.created).seconds/60 > 30: #TIMEOUT
                                             error_msg = 'Timeout'
                                             print error_msg
-                                            error['codigo'] = codigo_base_error_pago + '45'
+                                            error['codigo'] = codigo_base_error_pago + '33'
                                             error['mensaje'] = error_msg
                                             if transaccion.estado != 'Pagado':
                                                 transaccion.estado = 'Expirado'
@@ -178,15 +179,16 @@ def pago(request):
                                         hoy = date.today()
                                         cuotas_a_pagar_detalle = obtener_cuotas_a_pagar(venta,hoy,detalle_cuotas)                                
                                         if not cuotas_a_pagar_detalle:
-                                            print 'Cuota a pagar no encontrada'
-                                            error['codigo'] = codigo_base_error_pago + '42'
-                                            error['mensaje'] = 'Cuota a pagar no encontrada'
+                                            error_msg = 'Cuota a pagar no encontrada' 
+                                            print error_msg
+                                            error['codigo'] = codigo_base_error_pago + '34'
+                                            error['mensaje'] = error_msg                                            
                                             return HttpResponse(json.dumps(error),status=404, content_type="application/json")
                                         else:    
                                             if str(cuotas_a_pagar_detalle[0]['numero_cuota']) != detalle_pago['cuota_a_pagar']:
                                                 error_msg = 'Numero de cuota a pagar incorrecta, se espera: ' + str(cuotas_a_pagar_detalle[0]['numero_cuota']) 
                                                 print error_msg
-                                                error['codigo'] = codigo_base_error_pago + '43'
+                                                error['codigo'] = codigo_base_error_pago + '35'
                                                 error['mensaje'] = error_msg
                                                 return HttpResponse(json.dumps(error),status=404, content_type="application/json")
                                             elif float(detalle_pago['monto_total']) != cuotas_a_pagar_detalle[0]['monto_cuota']:
@@ -217,20 +219,23 @@ def pago(request):
                                                 respuesta['codigo'] = '200'                                 
                                                 return HttpResponse(json.dumps(respuesta), content_type="application/json")
                         else:
-                            error['codigo'] = codigo_base_error_pago + '22'
-                            error['mensaje'] = 'Cuenta deshabilitada'
-                            print("The password is valid, but the account has been disabled!")
+                            error_msg = 'Cuenta deshabilitada' 
+                            print error_msg
+                            error['codigo'] =  '22'
+                            error['mensaje'] = error_msg                            
                             return HttpResponse(json.dumps(error),status=401, content_type="application/json")                        
                     else:
                         # the authentication system was unable to verify the username and password
-                        print("The username and password were incorrect.")
-                        error['codigo'] = codigo_base_error_pago + '21'
-                        error['mensaje'] = 'usuario o password incorrecto'                    
+                        error_msg = 'Usuario o password incorrecto'  
+                        print error_msg
+                        error['codigo'] = '21'
+                        error['mensaje'] = error_msg
                         return HttpResponse(json.dumps(error), status=401, content_type="application/json")                    
             except MultiValueDictKeyError:
-                print('Error en los parametros del request')
-                error['codigo'] = codigo_base_error_pago + '11'
-                error['mensaje'] = 'Sintaxis del request incorrecta'                    
+                error_msg = 'Sintaxis del request incorrecta'
+                print error_msg
+                error['codigo'] =  '11'
+                error['mensaje'] = error_msg
                 return HttpResponseBadRequest(json.dumps(error), content_type="application/json")
             except Exception, error2:
                 print error2
@@ -246,7 +251,7 @@ def pago(request):
                     error['codigo'] = codigo_base_error_pago + '48'
                     error['mensaje'] = error_msg
                     return HttpResponse(json.dumps(error),status=404, content_type="application/json")
-                error['codigo'] = codigo_base_error_pago + '00'
+                error['codigo'] = '00'
                 error['mensaje'] = 'Error en el servidor'                    
                 return HttpResponseServerError(json.dumps(error), content_type="application/json")                
  
