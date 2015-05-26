@@ -1660,7 +1660,10 @@ def modificar_venta(request, id):
         if request.method == 'GET':
             venta = Venta.objects.get(pk=id)
             fecha_venta = venta.fecha_de_venta.strftime('%d/%m/%Y')
-            fecha_primer_venc = venta.fecha_primer_vencimiento.strftime('%d/%m/%Y')
+            if venta.fecha_primer_vencimiento == "":
+                fecha_primer_venc = venta.fecha_primer_vencimiento.strftime('%d/%m/%Y')
+            else:
+                fecha_primer_venc = ""
             t = loader.get_template('movimientos/modificar_venta.html')
             c = RequestContext(request, {
                 'venta': venta,
