@@ -8,6 +8,8 @@ from datetime import datetime
 from django.contrib import auth
 import common_functions
 import json
+from principal import permisos
+from principal.common_functions import verificar_permisos
 
 def logout(request):
     auth.logout(request)
@@ -18,8 +20,9 @@ def logout(request):
 def index(request):
     if request.user.is_authenticated():
         t = loader.get_template('index2.html')
+        perm_ok= verificar_permisos(request.user.id, permisos.ADD_LOG)
         c = RequestContext(request, {
-                                     #'nombre': 'profe'
+            'permiso_ok': perm_ok
                                      })
         return HttpResponse(t.render(c))
     else:

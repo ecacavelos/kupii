@@ -5,6 +5,8 @@ from principal.monthdelta import MonthDelta
 from calendar import monthrange
 from datetime import datetime, timedelta
 from django.core import serializers
+from django.contrib.auth.models import User, Permission
+from django.db.models import Q
 import json
 import math
 
@@ -322,3 +324,43 @@ def obtener_cuotas_a_pagar(venta,fecha_pago,resumen_cuotas_a_pagar):
         lista_cuotas.append(cuota)
         
     return lista_cuotas
+
+def verificar_permisos(user_id, permiso):
+    """
+    Metodo que comprueba que un usuario determinado tenga permisos sobre esa vista
+    @return: True, False
+    @rtype: Boolean
+    """
+    
+    print("Id_user->" + str(user_id))
+    print("Permiso->" + str(permiso))
+    print("has_project_permission")
+    ok = False
+    user = None
+    perm = Permission.objects.get(codename=permiso)  
+    user = User.objects.filter(id=user_id)
+    users_perm = User.objects.filter(Q(groups__permissions=perm) & Q(groups__user=user))
+    if len(users_perm) != 0:
+        print("El usuario si posee ese permiso")
+        ok = True
+    
+    return ok
+
+def verificar_grupo(user_id):
+    """
+    Metodo que comprueba que un usuario determinado tenga permisos sobre esa vista
+    @return: True, False
+    @rtype: Boolean
+    """
+    
+    print("Id_user->" + str(user_id))
+    ok = False
+    user = None
+    perm = Permission.objects.get(codename=permiso)  
+    user = User.objects.filter(id=user_id)
+    users_perm = User.objects.filter(Q(groups__permissions=perm) & Q(groups__user=user))
+    if len(users_perm) != 0:
+        print("El usuario si posee ese permiso")
+        ok = True
+    
+    return ok

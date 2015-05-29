@@ -5,6 +5,7 @@ from clientes.forms import ClienteForm, SearchForm
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.urlresolvers import reverse, resolve
 from principal.common_functions import *
+from principal import permisos
 #from django.views.generic.list_detail import object_list
 
 # Funcion principal del modulo de clientes.
@@ -111,9 +112,11 @@ def detalle_cliente(request, cliente_id):
 def agregar_clientes(request):
     
     if request.user.is_authenticated():
-        t = loader.get_template('clientes/agregar.html')
-        #c = RequestContext(request, {})
-        #return HttpResponse(t.render(c))
+        if verificar_permisos(request.user.id, permisos.ADD_CLIENTE):
+            t = loader.get_template('clientes/agregar.html')
+            #c = RequestContext(request, {})
+            #return HttpResponse(t.render(c))
+            
     else:
         return HttpResponseRedirect(reverse('login'))
     
