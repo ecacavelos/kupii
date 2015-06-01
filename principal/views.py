@@ -20,9 +20,9 @@ def logout(request):
 def index(request):
     if request.user.is_authenticated():
         t = loader.get_template('index2.html')
-        perm_ok= verificar_permisos(request.user.id, permisos.ADD_LOG)
+        grupo= request.user.groups.get().id
         c = RequestContext(request, {
-            'permiso_ok': perm_ok
+            'grupo': grupo
                                      })
         return HttpResponse(t.render(c))
     else:
