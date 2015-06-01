@@ -40,9 +40,9 @@ class MonthDelta:
         try:
             return 'MonthDelta({0})'.format(self.__months)
         except AttributeError:
-            return 'MonthDelta(' + str(self.__months) + ')'
+            return 'MonthDelta(' + unicode(self.__months) + ')'
     def __str__(self):
-        return str(self.__months) + ' month' + ((abs(self.__months) != 1
+        return unicode(self.__months) + ' month' + ((abs(self.__months) != 1
                                                  and 's') or '')
     def __hash__(self):
         return hash(self.__months)

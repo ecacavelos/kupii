@@ -33,6 +33,10 @@ class Cliente(models.Model):
             label= self.nombres + ' ' + self.apellidos,
             cedula= self.cedula,
             id=self.id)
+    class Meta:
+        permissions = (
+            ('permission_code', 'Friendly permission description'),
+        )
     
 
 class Propietario(models.Model):
@@ -81,7 +85,7 @@ class Manzana(models.Model):
     cantidad_lotes = models.IntegerField(null=True)
     def __unicode__(self):
         #return (self.nro_manzana)
-        return('Manzana ' + str(self.nro_manzana))
+        return('Manzana ' + unicode(self.nro_manzana))
     class Meta:
         verbose_name_plural = "manzanas"
     def as_json(self):
@@ -203,7 +207,7 @@ class Lote(models.Model):
     )
     estado = models.CharField(max_length=1, choices=ESTADO_CHOICES)
     def __unicode__(self):
-        return (str(self.manzana).zfill(3) + "/" + str(self.nro_lote).zfill(4))
+        return (unicode(self.manzana).zfill(3) + "/" + unicode(self.nro_lote).zfill(4))
     
     def as_json(self):
         return dict(
@@ -224,14 +228,14 @@ class Venta(models.Model):
     importacion_paralot=models.BooleanField(blank=False, null=False)
     plan_de_pago_vendedor=models.ForeignKey(PlanDePagoVendedor,on_delete=models.PROTECT)
     def __unicode__(self):
-        return u'%s a %s - %s' % (str(self.lote), self.cliente.nombres, self.cliente.apellidos)    
+        return u'%s a %s - %s' % (unicode(self.lote), self.cliente.nombres, self.cliente.apellidos)    
     def as_json(self):
         return dict(
             venta_id = self.id,
             cliente_id = self.cliente.id,
-            cliente = (str(self.cliente.nombres) + ' ' + (self.cliente.apellidos)),
+            cliente = (unicode(self.cliente.nombres) + ' ' + (self.cliente.apellidos)),
             vendedor_id = self.vendedor.id,
-            vendedor = (str(self.vendedor.nombres) + ' ' + (self.vendedor.apellidos)),
+            vendedor = (unicode(self.vendedor.nombres) + ' ' + (self.vendedor.apellidos)),
             plan_de_pago_id = self.plan_de_pago.id,
             plan_de_pago = self.plan_de_pago.nombre_del_plan,
             cantidad_cuotas = self.plan_de_pago.cantidad_de_cuotas,
@@ -239,8 +243,8 @@ class Venta(models.Model):
             entrega_inicial = self.entrega_inicial,
             precio_de_venta = self.precio_final_de_venta,
             pagos_realizados = self.pagos_realizados,
-            fecha_de_venta = str(self.fecha_de_venta),
-            importacion_paralot=str(self.importacion_paralot),
+            fecha_de_venta = unicode(self.fecha_de_venta),
+            importacion_paralot=unicode(self.importacion_paralot),
             plan_de_pago_vendedor_id = self.plan_de_pago_vendedor.id,
             plan_de_pago_vendedor = self.plan_de_pago_vendedor.nombre,            
         )
@@ -250,7 +254,7 @@ class Reserva(models.Model):
     fecha_de_reserva = models.DateField()
     cliente = models.ForeignKey(Cliente,on_delete=models.PROTECT)
     def __unicode__(self):
-        return (str(self.lote) + " a " + self.cliente.nombres + " " + self.cliente.apellidos)
+        return (unicode(self.lote) + " a " + self.cliente.nombres + " " + self.cliente.apellidos)
     
 class Transaccion(models.Model):
     estado = models.CharField(max_length=30)
@@ -272,8 +276,8 @@ class PagoDeCuotas(models.Model):
     total_de_pago = models.IntegerField()
     def as_json(self):
         return dict(
-            lote=str(self.lote),
-            fecha_de_pago=str(self.fecha_de_pago),
+            lote=unicode(self.lote),
+            fecha_de_pago=unicode(self.fecha_de_pago),
             cliente=u'%s' % (self.cliente),
             plan_de_pago=self.plan_de_pago_id,
             plan_de_pago_vendedores=self.plan_de_pago_vendedores_id, 

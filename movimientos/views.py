@@ -422,7 +422,7 @@ def listar_ventas(request):
             if a > 0:
                 for i in object_list:
                     #i.fecha_de_venta = i.fecha_de_venta.strftime("%Y-%m-%d")
-                    i.precio_final_de_venta = str('{:,}'.format(i.precio_final_de_venta)).replace(",", ".")
+                    i.precio_final_de_venta = unicode('{:,}'.format(i.precio_final_de_venta)).replace(",", ".")
             paginator = Paginator(object_list, 15)
             page = request.GET.get('page')
             try:
@@ -451,9 +451,9 @@ def listar_pagos(request):
             for i in object_list:
                 try:
                     i.fecha_de_pago=i.fecha_de_pago.strftime("%d/%m/%Y")
-                    i.total_de_cuotas=str('{:,}'.format(i.total_de_cuotas)).replace(",", ".")
-                    i.total_de_mora=str('{:,}'.format(i.total_de_mora)).replace(",", ".")
-                    i.total_de_pago=str('{:,}'.format(i.total_de_pago)).replace(",", ".")
+                    i.total_de_cuotas=unicode('{:,}'.format(i.total_de_cuotas)).replace(",", ".")
+                    i.total_de_mora=unicode('{:,}'.format(i.total_de_mora)).replace(",", ".")
+                    i.total_de_pago=unicode('{:,}'.format(i.total_de_pago)).replace(",", ".")
                 except Exception, error:
                     print i.id
                     pass
@@ -697,7 +697,7 @@ def listar_busqueda_ventas(request):
             if tipo_busqueda=='lote':
                 try:
                     lote = request.GET['busqueda_label']                                    
-                    x=str(lote)
+                    x=unicode(lote)
                     fraccion_int = int(x[0:3])
                     manzana_int =int(x[4:7])
                     lote_int = int(x[8:])
@@ -710,7 +710,7 @@ def listar_busqueda_ventas(request):
                     object_list = Venta.objects.filter(lote_id=lote_id.id)                    
                     if object_list:
                         for i in object_list:
-                            i.precio_final_de_venta = str('{:,}'.format(i.precio_final_de_venta)).replace(",", ".")                     
+                            i.precio_final_de_venta = unicode('{:,}'.format(i.precio_final_de_venta)).replace(",", ".")                     
                 except Exception, error:
                     print error
                     object_list= []
@@ -721,7 +721,7 @@ def listar_busqueda_ventas(request):
                     object_list = Venta.objects.filter(cliente_id=cliente_id)
                     if object_list:
                         for i in object_list:
-                            i.precio_final_de_venta = str('{:,}'.format(i.precio_final_de_venta)).replace(",", ".")                                                     
+                            i.precio_final_de_venta = unicode('{:,}'.format(i.precio_final_de_venta)).replace(",", ".")                                                     
                 except Exception, error:
                     print error
                     object_list= []
@@ -732,7 +732,7 @@ def listar_busqueda_ventas(request):
                     object_list = Venta.objects.filter(vendedor_id=vendedor_id)
                     if object_list:
                         for i in object_list:
-                            i.precio_final_de_venta = str('{:,}'.format(i.precio_final_de_venta)).replace(",", ".")                                   
+                            i.precio_final_de_venta = unicode('{:,}'.format(i.precio_final_de_venta)).replace(",", ".")                                   
                 except Exception, error:
                     print error
                     object_list= []    
@@ -745,7 +745,7 @@ def listar_busqueda_ventas(request):
                     fecha_hasta_parsed=datetime.strptime(fecha_hasta,"%d/%m/%Y").date()
                     object_list = Venta.objects.filter(fecha_de_venta__range=(fecha_venta_parsed,fecha_hasta_parsed)).order_by('-fecha_de_venta') 
                     for i in object_list:
-                        i.precio_final_de_venta = str('{:,}'.format(i.precio_final_de_venta)).replace(",", ".")                                
+                        i.precio_final_de_venta = unicode('{:,}'.format(i.precio_final_de_venta)).replace(",", ".")                                
                 except Exception, error:
                     print error
                     object_list= []              
@@ -782,7 +782,7 @@ def listar_busqueda_pagos(request):
             if tipo_busqueda=='lote':
                 try:
                     lote = request.GET['busqueda_label']       
-                    x=str(lote)
+                    x=unicode(lote)
                     fraccion_int = int(x[0:3])
                     manzana_int =int(x[4:7])
                     lote_int = int(x[8:])
@@ -795,9 +795,9 @@ def listar_busqueda_pagos(request):
                     object_list = PagoDeCuotas.objects.filter(lote_id=lote_id.id)
                     if object_list:
                         for i in object_list:
-                            i.total_de_cuotas=str('{:,}'.format(i.total_de_cuotas)).replace(",", ".")
-                            i.total_de_mora=str('{:,}'.format(i.total_de_mora)).replace(",", ".")
-                            i.total_de_pago=str('{:,}'.format(i.total_de_pago)).replace(",", ".")                                             
+                            i.total_de_cuotas=unicode('{:,}'.format(i.total_de_cuotas)).replace(",", ".")
+                            i.total_de_mora=unicode('{:,}'.format(i.total_de_mora)).replace(",", ".")
+                            i.total_de_pago=unicode('{:,}'.format(i.total_de_pago)).replace(",", ".")                                             
                 except Exception, error:
                     print error
                     object_list= []   
@@ -807,9 +807,9 @@ def listar_busqueda_pagos(request):
                     object_list = PagoDeCuotas.objects.filter(cliente_id=cliente_id)    
                     if object_list:
                         for i in object_list:
-                            i.total_de_cuotas=str('{:,}'.format(i.total_de_cuotas)).replace(",", ".")
-                            i.total_de_mora=str('{:,}'.format(i.total_de_mora)).replace(",", ".")
-                            i.total_de_pago=str('{:,}'.format(i.total_de_pago)).replace(",", ".")             
+                            i.total_de_cuotas=unicode('{:,}'.format(i.total_de_cuotas)).replace(",", ".")
+                            i.total_de_mora=unicode('{:,}'.format(i.total_de_mora)).replace(",", ".")
+                            i.total_de_pago=unicode('{:,}'.format(i.total_de_pago)).replace(",", ".")             
                 except Exception, error:
                     print error
                     print i.id
@@ -824,9 +824,9 @@ def listar_busqueda_pagos(request):
                     object_list = PagoDeCuotas.objects.filter(fecha_de_pago__range=(fecha_pago_parsed,fecha_hasta_parsed)).order_by('-fecha_de_pago') 
                     if object_list:    
                         for i in object_list:
-                            i.total_de_cuotas=str('{:,}'.format(i.total_de_cuotas)).replace(",", ".")
-                            i.total_de_mora=str('{:,}'.format(i.total_de_mora)).replace(",", ".")
-                            i.total_de_pago=str('{:,}'.format(i.total_de_pago)).replace(",", ".")              
+                            i.total_de_cuotas=unicode('{:,}'.format(i.total_de_cuotas)).replace(",", ".")
+                            i.total_de_mora=unicode('{:,}'.format(i.total_de_mora)).replace(",", ".")
+                            i.total_de_pago=unicode('{:,}'.format(i.total_de_pago)).replace(",", ".")              
                 except Exception, error:
                     print error
                     object_list= [] 
@@ -865,7 +865,7 @@ def listar_busqueda_reservas(request):
                 
                 if tipo_busqueda=='lote':
                     try:
-                        x=str(busqueda)
+                        x=unicode(busqueda)
                         fraccion_int = int(x[0:3])
                         manzana_int =int(x[4:7])
                         lote_int = int(x[8:])
@@ -984,7 +984,7 @@ def listar_busqueda_reservas(request):
                 
                 if tipo_busqueda=='lote':
                     try:
-                        x=str(busqueda)
+                        x=unicode(busqueda)
                         fraccion_int = int(x[0:3])
                         manzana_int =int(x[4:7])
                         lote_int = int(x[8:])
@@ -1109,7 +1109,7 @@ def listar_busqueda_transferencias(request):
             
                 if tipo_busqueda=='lote':
                     try:
-                        x=str(busqueda)
+                        x=unicode(busqueda)
                         fraccion_int = int(x[0:3])
                         manzana_int =int(x[4:7])
                         lote_int = int(x[8:])
@@ -1358,7 +1358,7 @@ def listar_busqueda_recuperacion(request):
                 
                 if tipo_busqueda=='lote':
                     try:
-                        x=str(busqueda)
+                        x=unicode(busqueda)
                         fraccion_int = int(x[0:3])
                         manzana_int =int(x[4:7])
                         lote_int = int(x[8:])
@@ -1477,7 +1477,7 @@ def listar_busqueda_recuperacion(request):
                 
                 if tipo_busqueda=='lote':
                     try:
-                        x=str(busqueda)
+                        x=unicode(busqueda)
                         fraccion_int = int(x[0:3])
                         manzana_int =int(x[4:7])
                         lote_int = int(x[8:])

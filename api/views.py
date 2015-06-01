@@ -79,8 +79,8 @@ def consulta(request, cedula):
                                         item = {}
                                         lote = Lote.objects.filter(id = venta.lote_id)
                                         lote_serialized = serializers.serialize('python', lote)                                        
-                                        detalle_cuotas = get_cuotas_detail_by_lote(str(lote_serialized[0]['pk']))
-                                        cuota_detalle = get_cuota_information_by_lote(str(lote_serialized[0]['pk']),1)
+                                        detalle_cuotas = get_cuotas_detail_by_lote(unicode(lote_serialized[0]['pk']))
+                                        cuota_detalle = get_cuota_information_by_lote(unicode(lote_serialized[0]['pk']),1)
                                         item['codigo_lote'] = lote_serialized[0]['fields']['codigo_paralot']
                                         item['cuotas_pagadas'] = detalle_cuotas['cant_cuotas_pagadas']
                                         item['total_cuotas'] = detalle_cuotas['cantidad_total_cuotas']                                        
@@ -175,7 +175,7 @@ def pago(request):
                                         detalle_pago = json.loads(detalle_pago_json)                                        
                                         lote = Lote.objects.get(codigo_paralot = detalle_pago['codigo_lote'])
                                         venta = Venta.objects.get(Q(lote=lote),Q(cliente=transaccion.cliente))                                
-                                        detalle_cuotas = get_cuotas_detail_by_lote(str(lote.id))
+                                        detalle_cuotas = get_cuotas_detail_by_lote(unicode(lote.id))
                                         hoy = date.today()
                                         cuotas_a_pagar_detalle = obtener_cuotas_a_pagar(venta,hoy,detalle_cuotas)                                
                                         if not cuotas_a_pagar_detalle:
@@ -185,14 +185,14 @@ def pago(request):
                                             error['mensaje'] = error_msg                                            
                                             return HttpResponse(json.dumps(error),status=404, content_type="application/json")
                                         else:    
-                                            if str(cuotas_a_pagar_detalle[0]['numero_cuota']) != detalle_pago['cuota_a_pagar']:
-                                                error_msg = 'Numero de cuota a pagar incorrecta, se espera: ' + str(cuotas_a_pagar_detalle[0]['numero_cuota']) 
+                                            if unicode(cuotas_a_pagar_detalle[0]['numero_cuota']) != detalle_pago['cuota_a_pagar']:
+                                                error_msg = 'Numero de cuota a pagar incorrecta, se espera: ' + unicode(cuotas_a_pagar_detalle[0]['numero_cuota']) 
                                                 print error_msg
                                                 error['codigo'] = codigo_base_error_pago + '35'
                                                 error['mensaje'] = error_msg
                                                 return HttpResponse(json.dumps(error),status=404, content_type="application/json")
                                             elif float(detalle_pago['monto_total']) != cuotas_a_pagar_detalle[0]['monto_cuota']:
-                                                error_msg = 'Monto de la cuota incorrecto, se espera: ' + str(cuotas_a_pagar_detalle[0]['monto_cuota'])
+                                                error_msg = 'Monto de la cuota incorrecto, se espera: ' + unicode(cuotas_a_pagar_detalle[0]['monto_cuota'])
                                                 print error_msg
                                                 error['codigo'] = codigo_base_error_pago + '44'
                                                 error['mensaje'] = error_msg

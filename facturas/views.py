@@ -35,7 +35,7 @@ def facturar(request):
             #Obtener el Lote
             lote_id = request.POST.get('lote','')
             
-            x = str(lote_id)
+            x = unicode(lote_id)
             fraccion_int = int(x[0:3])
             manzana_int = int(x[4:7])
             lote_int = int(x[8:])
@@ -74,21 +74,21 @@ def facturar(request):
             p = canvas.Canvas(response)
             p.setPageSize((19*cm, 14*cm))
             p.setFont("Helvetica",  10)
-            p.drawString(2*cm, 10.3*cm, str(nueva_factura.fecha.strftime("%Y-%m-%d")))
+            p.drawString(2*cm, 10.3*cm, unicode(nueva_factura.fecha.strftime("%Y-%m-%d")))
             if nueva_factura.tipo == 'co':
                 p.drawString(11*cm, 10.3*cm, "X")
             else:
                 p.drawString(13.2*cm, 10.3*cm, "X")
             
-            p.drawString(15*cm, 10.3*cm, str(manzana.fraccion.nombre))
+            p.drawString(15*cm, 10.3*cm, unicode(manzana.fraccion.nombre))
             #Solo se imprime el primer nombre y apellido-- Faltaaa
             nombre_ape = nueva_factura.cliente.nombres + " " + nueva_factura.cliente.apellidos
-            p.drawString(4*cm, 9.3*cm, str(nombre_ape))
-            p.drawString(12*cm, 9.3*cm, str(manzana.nro_manzana))
-            p.drawString(15.5*cm, 9.3*cm, str(lote_id.nro_lote))
+            p.drawString(4*cm, 9.3*cm, unicode(nombre_ape))
+            p.drawString(12*cm, 9.3*cm, unicode(manzana.nro_manzana))
+            p.drawString(15.5*cm, 9.3*cm, unicode(lote_id.nro_lote))
             if nueva_factura.cliente.ruc == None:
                 nueva_factura.cliente.ruc = ""                
-            p.drawString(2*cm, 8.3*cm, str(nueva_factura.cliente.ruc))
+            p.drawString(2*cm, 8.3*cm, unicode(nueva_factura.cliente.ruc))
             #Se obtienen la lista de los detalles
             lista_detalles=json.loads(nueva_factura.detalle)
             detalles=[]
@@ -105,44 +105,44 @@ def facturar(request):
                 detalle={}
                 detalle['item']=key
                 detalle['cantidad']=value['cantidad']
-                p.drawString(1.5*cm, float(pos_y - 0.5)*cm, str(detalle['cantidad']))
+                p.drawString(1.5*cm, float(pos_y - 0.5)*cm, unicode(detalle['cantidad']))
                 detalle['concepto']=value['concepto']
-                p.drawString(2*cm, float(pos_y - 0.5)*cm, str(detalle['concepto']))
+                p.drawString(2*cm, float(pos_y - 0.5)*cm, unicode(detalle['concepto']))
                 detalle['precio_unitario']=value['precio_unitario']
-                p.drawString(8*cm, float(pos_y - 0.5)*cm, str(detalle['precio_unitario']))
+                p.drawString(8*cm, float(pos_y - 0.5)*cm, unicode(detalle['precio_unitario']))
                 total_venta +=  int(detalle['cantidad']) * int(detalle['precio_unitario'])
                 detalle['exentas']=value['exentas']
-                p.drawString(10.5*cm, float(pos_y - 0.5)*cm, str(detalle['exentas']))
+                p.drawString(10.5*cm, float(pos_y - 0.5)*cm, unicode(detalle['exentas']))
                 if detalle['exentas'] != '':
                     exentas += int(detalle['exentas'])
                 detalle['iva_5']=value['iva_5']
-                p.drawString(12*cm, float(pos_y - 0.5)*cm, str(detalle['iva_5']))
+                p.drawString(12*cm, float(pos_y - 0.5)*cm, unicode(detalle['iva_5']))
                 if detalle['iva_5'] != '':
                     iva5 += int(detalle['iva_5'])
                 detalle['iva_10']=value['iva_10']
-                p.drawString(14*cm, float(pos_y - 0.5)*cm, str(detalle['iva_10']))
+                p.drawString(14*cm, float(pos_y - 0.5)*cm, unicode(detalle['iva_10']))
                 if detalle['iva_10'] != '':
                     iva10 += int(detalle['iva_10'])
                 pos_y -= 0.5
                 detalles.append(detalle)
             cantidad =  4 - len(detalles)
             pos_y -= (0.5 * cantidad)
-            p.drawString(10.5*cm, pos_y*cm, str(exentas)) 
-            p.drawString(12*cm, pos_y*cm, str(iva5))   
-            p.drawString(14*cm, pos_y*cm, str(iva10))
+            p.drawString(10.5*cm, pos_y*cm, unicode(exentas)) 
+            p.drawString(12*cm, pos_y*cm, unicode(iva5))   
+            p.drawString(14*cm, pos_y*cm, unicode(iva10))
             pos_y -= 0.5
-            p.drawString(14*cm, float(pos_y - 0.5)*cm, str(total_venta))
+            p.drawString(14*cm, float(pos_y - 0.5)*cm, unicode(total_venta))
             pos_y -= 1
-            p.drawString(14*cm, float(pos_y - 0.5)*cm, str(total_venta))
+            p.drawString(14*cm, float(pos_y - 0.5)*cm, unicode(total_venta))
             numalet= num2words(int(total_venta), lang='es')
-            p.drawString(6*cm, float(pos_y - 0.5)*cm, str(numalet))
+            p.drawString(6*cm, float(pos_y - 0.5)*cm, unicode(numalet))
             total_iva_10 = int(iva10/11)
             total_iva_5 = int(iva5/21)
             total_iva = total_iva_10 + total_iva_5
             pos_y -= 0.5
-            p.drawString(5*cm, float(pos_y - 0.5)*cm, str(total_iva_5))
-            p.drawString(6.2*cm, float(pos_y - 0.5)*cm, str(total_iva_10))
-            p.drawString(11.5*cm, float(pos_y - 0.5)*cm, str(total_iva))
+            p.drawString(5*cm, float(pos_y - 0.5)*cm, unicode(total_iva_5))
+            p.drawString(6.2*cm, float(pos_y - 0.5)*cm, unicode(total_iva_10))
+            p.drawString(11.5*cm, float(pos_y - 0.5)*cm, unicode(total_iva))
             p.showPage()
             p.save()          
             return response;
@@ -161,21 +161,21 @@ def consultar_facturas(request):
                 lista_detalles=json.loads(factura.detalle)
                 for key, value in lista_detalles.iteritems():
                     monto+=int(int(value['cantidad'])*int(value['precio_unitario'])) 
-                factura.monto=str('{:,}'.format(monto)).replace(",", ".") 
+                factura.monto=unicode('{:,}'.format(monto)).replace(",", ".") 
         else: #POST se envia el formulario con los parametros de busqueda.  
             data = request.POST     
             # En caso de que se haya solicitado una busqueda, filtramos de acuerdo al parametro correspondiente.
             fecha_ini = data.get('fecha_ini', '')
             fecha_fin = data.get('fecha_fin', '')
-            fecha_ini_parsed = str(datetime.strptime(fecha_ini, "%d/%m/%Y").date())
-            fecha_fin_parsed = str(datetime.strptime(fecha_fin, "%d/%m/%Y").date())
+            fecha_ini_parsed = unicode(datetime.strptime(fecha_ini, "%d/%m/%Y").date())
+            fecha_fin_parsed = unicode(datetime.strptime(fecha_fin, "%d/%m/%Y").date())
             object_list = Factura.objects.filter(fecha__range=(fecha_ini_parsed,fecha_fin_parsed)).order_by('id','fecha')                    
             monto=0
             for factura in object_list:
                 lista_detalles=json.loads(factura.detalle)
                 for key, value in lista_detalles.iteritems():
                     monto+=int(int(value['cantidad'])*int(value['precio_unitario']))
-                factura.monto=str('{:,}'.format(monto)).replace(",", ".")
+                factura.monto=unicode('{:,}'.format(monto)).replace(",", ".")
         
         paginator=Paginator(object_list,15)
         page=request.GET.get('page')
@@ -205,7 +205,7 @@ def detalle_factura(request, factura_id):
         detalles=[]
         for key, value in lista_detalles.iteritems():
             detalle={}
-            #detalle['precio_unitario']=str('{:,}'.format(value['precio_unitario']))
+            #detalle['precio_unitario']=unicode('{:,}'.format(value['precio_unitario']))
             detalle['item']=key
             detalle['cantidad']=value['cantidad']
             detalle['concepto']=value['concepto']

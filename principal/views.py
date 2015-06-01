@@ -63,9 +63,9 @@ def retrieve_lote(request):
             #r = r[0]
             # Creamos una cadena JSON para enviar la respuesta al request AJAX POST.
             response_data = {}
-            response_data['superficie'] = str(r.superficie)
+            response_data['superficie'] = u'%s' %(r.superficie)
             response_data['lote_id'] = r.id
-            response_data['lote_tag'] = str(r)
+            response_data['lote_tag'] = u'%s' %(r)
             response_data['precio_contado'] = r.precio_contado
             response_data['precio_credito'] = r.precio_credito
             
@@ -106,9 +106,9 @@ def retrieve_lote_venta(request):
             #r = r[0]
             # Creamos una cadena JSON para enviar la respuesta al request AJAX POST.
             response_data = {}
-            response_data['superficie'] = str(r[0].superficie)
+            response_data['superficie'] = u'%s' %(r[0].superficie)
             response_data['lote_id'] = r[0].id
-            response_data['lote_tag'] = str(r[0])
+            response_data['lote_tag'] = u'%s' %(r[0])
             response_data['precio_contado'] = r[0].precio_contado
             response_data['precio_credito'] = r[0].precio_credito
             response_data['estado_lote'] = r[0].estado
@@ -144,9 +144,9 @@ def retrieve_lote_cambio(request):
             #r = r[0]
             # Creamos una cadena JSON para enviar la respuesta al request AJAX POST.
             response_data = {}
-            response_data['superficie'] = str(r[0].superficie)
+            response_data['superficie'] = u'%s' %(r[0].superficie)
             response_data['lote_id'] = r[0].id
-            response_data['lote_tag'] = str(r[0])
+            response_data['lote_tag'] = u'%s' %(r[0])
             response_data['precio_contado'] = r[0].precio_contado
             response_data['precio_credito'] = r[0].precio_credito
             
@@ -179,9 +179,9 @@ def retrieve_lote_pago_cuotas(request):
             #r = r[0]
             # Creamos una cadena JSON para enviar la respuesta al request AJAX POST.
             response_data = {}
-            response_data['superficie'] = str(r.superficie)
+            response_data['superficie'] = u'%s' %(r.superficie)
             response_data['lote_id'] = r.id
-            response_data['lote_tag'] = str(r)
+            response_data['lote_tag'] = u'%s' %(r)
             response_data['precio_contado'] = r.precio_contado
             response_data['precio_credito'] = r.precio_credito
             
@@ -215,9 +215,9 @@ def retrieve_lote_recuperacion(request):
             #r = r[0]
             # Creamos una cadena JSON para enviar la respuesta al request AJAX POST.
             response_data = {}
-            response_data['superficie'] = str(r[0].superficie)
+            response_data['superficie'] = u'%s' %(r[0].superficie)
             response_data['lote_id'] = r[0].id
-            response_data['lote_tag'] = str(r[0])
+            response_data['lote_tag'] = u'%s' %(r[0])
             response_data['precio_contado'] = r[0].precio_contado
             response_data['precio_credito'] = r[0].precio_credito
             
@@ -333,12 +333,13 @@ def retrieve_plan_pago(request):
             datos_plan = PlanDePago.objects.get(pk=data.get('plan_pago', ''))
             # Creamos la respuesta al request.
             response_data = {}
-            response_data['nombre_del_plan'] = str(datos_plan.nombre_del_plan)
+            response_data['nombre_del_plan'] = u'%s' %(datos_plan.nombre_del_plan)            
             response_data['credito'] = datos_plan.tipo_de_plan
             response_data['cantidad_cuotas'] = datos_plan.cantidad_de_cuotas
             
             return HttpResponse(json.dumps(response_data), content_type="application/json")
-        except:
+        except Exception, error:
+            print error
             return HttpResponseServerError("No se encontraron planes de pago.")
 
 def retrieve_plan_pago_vendedores(request):
@@ -350,7 +351,7 @@ def retrieve_plan_pago_vendedores(request):
             # Creamos la respuesta al request.
             response_data = {}
             # TODO: setear todo lo que necesites para tu vista.            
-            response_data['nombre_del_plan'] = str(datos_plan.nombre)
+            response_data['nombre_del_plan'] = u'%s' %(datos_plan.nombre)
             response_data['credito'] = datos_plan.tipo
             response_data['cantidad_cuotas'] = datos_plan.cantidad_cuotas
             

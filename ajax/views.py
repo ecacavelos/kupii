@@ -131,7 +131,7 @@ def get_lotes_a_cargar_by_manzana(request):
                 total_lotes = object_list[0].cantidad_lotes
                 object_list2= Lote.objects.filter(manzana_id = id_manzana)
                 cantidad_encontrada = len(object_list2)
-                print("cantidad_encontrada ->" + str(cantidad_encontrada));
+                print("cantidad_encontrada ->" + unicode(cantidad_encontrada));
                 diferencia = total_lotes - cantidad_encontrada
                 results =[]
                 if (diferencia == 0):
@@ -334,7 +334,7 @@ def get_timbrado_by_numero(request):
     if request.method == 'GET':
         if request.user.is_authenticated():
             try:            
-                numero_timbrado = str(request.GET['term'])
+                numero_timbrado = unicode(request.GET['term'])
                 print("term ->" + numero_timbrado);
                 object_list = Timbrado.objects.filter(numero__icontains= numero_timbrado)
                 data=serializers.serialize('json',list(object_list)) 

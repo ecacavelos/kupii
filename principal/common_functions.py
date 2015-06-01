@@ -122,7 +122,7 @@ def get_cuota_information_by_lote(lote_id,cuotas_pag):
                 cuotas_a_pagar= []
                 for i in range(0, int(cuotas_pag)):
                     nro_cuota = cuotas_totales + 1
-                    cuota_a_pagar['nro_cuota'] = str(nro_cuota) + "/" + str(venta.plan_de_pago.cantidad_de_cuotas)
+                    cuota_a_pagar['nro_cuota'] = unicode(nro_cuota) + "/" + unicode(venta.plan_de_pago.cantidad_de_cuotas)
                     cuota_a_pagar['fecha'] = (ultima_fecha_pago + MonthDelta(i)).strftime('%d/%m/%Y')
                     cuotas_totales +=1
                     cuotas_a_pagar.append(cuota_a_pagar)
@@ -217,7 +217,7 @@ def filtros_establecidos(request, tipo_informe):
 
 def obtener_detalle_interes_lote(lote_id,fecha_pago_parsed,proximo_vencimiento_parsed):
     
-            resumen_lote=get_cuotas_detail_by_lote(str(lote_id))
+            resumen_lote=get_cuotas_detail_by_lote(unicode(lote_id))
             cuotas_pagadas=resumen_lote['cant_cuotas_pagadas']
             
             detalles=[]
@@ -332,13 +332,14 @@ def verificar_permisos(user_id, permiso):
     @rtype: Boolean
     """
     
-    print("Id_user->" + str(user_id))
-    print("Permiso->" + str(permiso))
+    print("Id_user->" + unicode(user_id))
+    print("Permiso->" + unicode(permiso))
     print("has_project_permission")
     ok = False
     user = None
     perm = Permission.objects.get(codename=permiso)  
-    user = User.objects.filter(id=user_id)
+    user = User.objects.get(id=user_id)
+    user.has_perm('add_pagodecuotas')
     users_perm = User.objects.filter(Q(groups__permissions=perm) & Q(groups__user=user))
     if len(users_perm) != 0:
         print("El usuario si posee ese permiso")
@@ -353,7 +354,7 @@ def verificar_grupo(user_id):
     @rtype: Boolean
     """
     
-    print("Id_user->" + str(user_id))
+    print("Id_user->" + unicode(user_id))
     ok = False
     user = None
     perm = Permission.objects.get(codename=permiso)  

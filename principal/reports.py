@@ -47,15 +47,15 @@ def reporte_general_pagos(object_list):
             total_mora += cuotas[i]['total_de_mora']
             total_pagos += cuotas[i]['total_de_pago']
             
-            sheet.write(c,0,str(cuotas[i]['fraccion']))
-            sheet.write(c,1,str(cuotas[i]['lote']))
-            sheet.write(c,2,str(cuotas[i]['cliente']))
-            sheet.write(c,3,str(cuotas[i]['cuota_nro']))
-            sheet.write(c,4,str(cuotas[i]['plan_de_pago']))
-            sheet.write(c,5,str(cuotas[i]['fecha_pago']))
-            sheet.write(c,6,str(cuotas[i]['total_de_cuotas']))
-            sheet.write(c,7,str(cuotas[i]['total_de_mora']))
-            sheet.write(c,8,str(cuotas[i]['total_de_pago']))
+            sheet.write(c,0,unicode(cuotas[i]['fraccion']))
+            sheet.write(c,1,unicode(cuotas[i]['lote']))
+            sheet.write(c,2,unicode(cuotas[i]['cliente']))
+            sheet.write(c,3,unicode(cuotas[i]['cuota_nro']))
+            sheet.write(c,4,unicode(cuotas[i]['plan_de_pago']))
+            sheet.write(c,5,unicode(cuotas[i]['fecha_pago']))
+            sheet.write(c,6,unicode(cuotas[i]['total_de_cuotas']))
+            sheet.write(c,7,unicode(cuotas[i]['total_de_mora']))
+            sheet.write(c,8,unicode(cuotas[i]['total_de_pago']))
             c+=1
             #... y acumulamos para los totales generales
             total_general_cuotas += cuotas[i]['total_de_cuotas']
@@ -71,15 +71,15 @@ def reporte_general_pagos(object_list):
             sheet.write(c,8,total_pagos)
             c+=1
             
-            sheet.write(c,0,str(cuotas[i]['fraccion']))
-            sheet.write(c,1,str(cuotas[i]['lote']))
-            sheet.write(c,2,str(cuotas[i]['cliente']))
-            sheet.write(c,3,str(cuotas[i]['cuota_nro']))
-            sheet.write(c,4,str(cuotas[i]['plan_de_pago']))
-            sheet.write(c,5,str(cuotas[i]['fecha_pago']))
-            sheet.write(c,6,str(cuotas[i]['total_de_cuotas']))
-            sheet.write(c,7,str(cuotas[i]['total_de_mora']))
-            sheet.write(c,8,str(cuotas[i]['total_de_pago']))
+            sheet.write(c,0,unicode(cuotas[i]['fraccion']))
+            sheet.write(c,1,unicode(cuotas[i]['lote']))
+            sheet.write(c,2,unicode(cuotas[i]['cliente']))
+            sheet.write(c,3,unicode(cuotas[i]['cuota_nro']))
+            sheet.write(c,4,unicode(cuotas[i]['plan_de_pago']))
+            sheet.write(c,5,unicode(cuotas[i]['fecha_pago']))
+            sheet.write(c,6,unicode(cuotas[i]['total_de_cuotas']))
+            sheet.write(c,7,unicode(cuotas[i]['total_de_mora']))
+            sheet.write(c,8,unicode(cuotas[i]['total_de_pago']))
             
             fraccion_actual = cuotas[i]['fraccion_id']
             total_cuotas = 0;
@@ -131,13 +131,13 @@ def reporte_liquidacion_propietarios(object_list,totales):
     total_monto_inm=0
     total_monto_propietario=0
     for i in range(len(object_list)):              
-        sheet.write(c,0,str(object_list[i][0]))
-        sheet.write(c,1,str(object_list[i][1]))
-        sheet.write(c,2,str(object_list[i][2]))
-        sheet.write(c,3,str(object_list[i][3]))
-        sheet.write(c,4,str(object_list[i][4]))
-        sheet.write(c,5,str(object_list[i][5]))
-        sheet.write(c,6,str(object_list[i][6]))
+        sheet.write(c,0,unicode(object_list[i][0]))
+        sheet.write(c,1,unicode(object_list[i][1]))
+        sheet.write(c,2,unicode(object_list[i][2]))
+        sheet.write(c,3,unicode(object_list[i][3]))
+        sheet.write(c,4,unicode(object_list[i][4]))
+        sheet.write(c,5,unicode(object_list[i][5]))
+        sheet.write(c,6,unicode(object_list[i][6]))
         
         c+=1
     if (i == len(object_list)-1):             
@@ -187,14 +187,14 @@ def reporte_liquidacion_vendedores(object_list):
             total_importe += cuotas[i]['importe']
             total_comision += cuotas[i]['comision']
             
-            sheet.write(c,0,str(cuotas[i]['cliente']))
-            sheet.write(c,1,str(cuotas[i]['lote']))
-            sheet.write(c,2,str(cuotas[i]['cuota_nro']))
-            sheet.write(c,3,str(cuotas[i]['fecha_pago']))
-            sheet.write(c,4,str(cuotas[i]['importe']))
-            sheet.write(c,5,str(cuotas[i]['comision']))
-            sheet.write(c,6,str(cuotas[i]['fraccion']))
-            #print str(cuotas[i]['importe'])
+            sheet.write(c,0,unicode(cuotas[i]['cliente']))
+            sheet.write(c,1,unicode(cuotas[i]['lote']))
+            sheet.write(c,2,unicode(cuotas[i]['cuota_nro']))
+            sheet.write(c,3,unicode(cuotas[i]['fecha_pago']))
+            sheet.write(c,4,unicode(cuotas[i]['importe']))
+            sheet.write(c,5,unicode(cuotas[i]['comision']))
+            sheet.write(c,6,unicode(cuotas[i]['fraccion']))
+            #print unicode(cuotas[i]['importe'])
             
             
             #... y acumulamos para los totales generales
@@ -210,13 +210,13 @@ def reporte_liquidacion_vendedores(object_list):
             sheet.write(c,5,total_comision)
             
             c+=1
-            sheet.write(c,0,str(cuotas[i]['cliente']))
-            sheet.write(c,1,str(cuotas[i]['lote']))
-            sheet.write(c,2,str(cuotas[i]['cuota_nro']))
-            sheet.write(c,3,str(cuotas[i]['fecha_pago']))
-            sheet.write(c,4,str(cuotas[i]['importe']))
-            sheet.write(c,5,str(cuotas[i]['comision']))
-            sheet.write(c,6,str(cuotas[i]['fraccion']))
+            sheet.write(c,0,unicode(cuotas[i]['cliente']))
+            sheet.write(c,1,unicode(cuotas[i]['lote']))
+            sheet.write(c,2,unicode(cuotas[i]['cuota_nro']))
+            sheet.write(c,3,unicode(cuotas[i]['fecha_pago']))
+            sheet.write(c,4,unicode(cuotas[i]['importe']))
+            sheet.write(c,5,unicode(cuotas[i]['comision']))
+            sheet.write(c,6,unicode(cuotas[i]['fraccion']))
             
             total_general_importe += cuotas[i]['importe']
             total_general_comision += cuotas[i]['comision'] 
@@ -283,12 +283,12 @@ def reporte_liquidacion_gerentes(object_list):
             total_monto_gerente += cuotas[i]['monto_gerente']
                     
             
-            sheet.write(c,0,str(cuotas[i]['fecha_pago']))
-            sheet.write(c,1,str(cuotas[i]['lote']))
-            sheet.write(c,2,str(cuotas[i]['cliente']))
-            sheet.write(c,3,str(cuotas[i]['monto_pagado']))
-            sheet.write(c,4,str(cuotas[i]['monto_gerente']))
-            sheet.write(c,6,str(cuotas[i]['fraccion']))
+            sheet.write(c,0,unicode(cuotas[i]['fecha_pago']))
+            sheet.write(c,1,unicode(cuotas[i]['lote']))
+            sheet.write(c,2,unicode(cuotas[i]['cliente']))
+            sheet.write(c,3,unicode(cuotas[i]['monto_pagado']))
+            sheet.write(c,4,unicode(cuotas[i]['monto_gerente']))
+            sheet.write(c,6,unicode(cuotas[i]['fraccion']))
             
             
             #... y acumulamos para los totales generales
@@ -305,12 +305,12 @@ def reporte_liquidacion_gerentes(object_list):
             
             c+=1
 #             
-            sheet.write(c,0,str(cuotas[i]['fecha_pago']))
-            sheet.write(c,1,str(cuotas[i]['lote']))
-            sheet.write(c,2,str(cuotas[i]['cliente']))
-            sheet.write(c,3,str(cuotas[i]['monto_pagado']))
-            sheet.write(c,4,str(cuotas[i]['monto_gerente']))
-            sheet.write(c,6,str(cuotas[i]['fraccion']))
+            sheet.write(c,0,unicode(cuotas[i]['fecha_pago']))
+            sheet.write(c,1,unicode(cuotas[i]['lote']))
+            sheet.write(c,2,unicode(cuotas[i]['cliente']))
+            sheet.write(c,3,unicode(cuotas[i]['monto_pagado']))
+            sheet.write(c,4,unicode(cuotas[i]['monto_gerente']))
+            sheet.write(c,6,unicode(cuotas[i]['fraccion']))
             
             total_general_pagado += cuotas[i]['monto_pagado']
             total_general_gerente += cuotas[i]['monto_gerente'] 

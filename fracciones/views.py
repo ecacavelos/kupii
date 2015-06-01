@@ -82,7 +82,7 @@ def detalle_fraccion(request, fraccion_id):
                 #m = Manzana.objects.get(nro_manzana=i, fraccion=fraccion_id)
                 m = Manzana.objects.filter(nro_manzana=i, fraccion=fraccion_id)
                 m_list= list(m)
-                #m = Manzana.objects.raw('SELECT id FROM principal_lote WHERE (nro_manzana = '+str(i)+' AND fraccion_id = '+str(f.id)+')')
+                #m = Manzana.objects.raw('SELECT id FROM principal_lote WHERE (nro_manzana = '+unicode(i)+' AND fraccion_id = '+unicode(f.id)+')')
                 manzana_id = m[0].id
                 
                 for j in range(1, cantidad_lotes + 1):

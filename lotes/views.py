@@ -96,7 +96,7 @@ def detalle_ventas_lote(request, venta_id):
     try:
         venta = Venta.objects.get(pk=venta_id)
         venta.fecha_de_venta=venta.fecha_de_venta.strftime("%d/%m/%Y")
-        venta.precio_final_de_venta=str('{:,}'.format(venta.precio_final_de_venta)).replace(",", ".")
+        venta.precio_final_de_venta=unicode('{:,}'.format(venta.precio_final_de_venta)).replace(",", ".")
         c = RequestContext(request, {
             'venta': venta,
             })
@@ -153,7 +153,7 @@ def listar_busqueda_lotes(request):
     tipo_busqueda=request.POST['tipo_busqueda']
     #se busca un lote
     if busqueda:        
-        x=str(busqueda)
+        x=unicode(busqueda)
         fraccion_int = int(x[0:3])
         manzana_int =int(x[4:7])
         lote_int = int(x[8:])
