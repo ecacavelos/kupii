@@ -5,26 +5,40 @@ from fracciones.forms import FraccionForm, FraccionFormAdd
 from django.db import reset_queries, close_connection
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.urlresolvers import reverse, resolve
+from principal.common_functions import *
+from principal import permisos
 
 # Funcion principal del modulo de fracciones.
 def fracciones(request):
-    
-    
     if request.user.is_authenticated():
-        t = loader.get_template('fracciones/index.html')
-        c = RequestContext(request, {})
-        return HttpResponse(t.render(c))
+        if verificar_permisos(request.user.id, permisos.VER_OPCIONES_FRACCION):
+            t = loader.get_template('fracciones/index.html')
+            c = RequestContext(request, {})
+            return HttpResponse(t.render(c))
+        else:
+            t = loader.get_template('index2.html')
+            grupo= request.user.groups.get().id
+            c = RequestContext(request, {
+                'grupo': grupo  
+                })
+            return HttpResponse(t.render(c))
     else:
         return HttpResponseRedirect(reverse('login'))
 
 # Funcion para consultar el listado de todas las fracciones.
 def consultar_fracciones(request):
-    
-    
     if request.user.is_authenticated():
-        t = loader.get_template('fracciones/listado.html')
-        #c = RequestContext(request, {})
-        #return HttpResponse(t.render(c))
+        if verificar_permisos(request.user.id, permisos.VER_LISTADO_FRACCIONES):
+            t = loader.get_template('fracciones/listado.html')
+            #c = RequestContext(request, {})
+            #return HttpResponse(t.render(c))
+        else:
+            t = loader.get_template('index2.html')
+            grupo= request.user.groups.get().id
+            c = RequestContext(request, {
+                'grupo': grupo  
+                })
+            return HttpResponse(t.render(c))
     else:
         return HttpResponseRedirect(reverse('login'))
     
@@ -46,13 +60,19 @@ def consultar_fracciones(request):
 # Funcion para el detalle de una fraccion: edita o borra una fraccion.
 def detalle_fraccion(request, fraccion_id):
     close_connection()
-    reset_queries()
-    
-    
+    reset_queries()   
     if request.user.is_authenticated():
-        t = loader.get_template('fracciones/detalle.html')
-        #c = RequestContext(request, {})
-        #return HttpResponse(t.render(c))
+        if verificar_permisos(request.user.id, permisos.VER_LISTADO_FRACCIONES):
+            t = loader.get_template('fracciones/detalle.html')
+            #c = RequestContext(request, {})
+            #return HttpResponse(t.render(c))
+        else:
+            t = loader.get_template('index2.html')
+            grupo= request.user.groups.get().id
+            c = RequestContext(request, {
+                'grupo': grupo  
+                })
+            return HttpResponse(t.render(c))
     else:
         return HttpResponseRedirect(reverse('login'))    
 
@@ -107,9 +127,16 @@ def agregar_fracciones(request):
     
     
     if request.user.is_authenticated():
-        t = loader.get_template('fracciones/agregar2.html')
-        #c = RequestContext(request, {})
-        #return HttpResponse(t.render(c))
+        if verificar_permisos(request.user.id, permisos.ADD_FRACCION):
+            t = loader.get_template('fracciones/agregar2.html')
+            #c = RequestContext(request, {})
+            #return HttpResponse(t.render(c))
+        else:
+            t = loader.get_template('index2.html')
+            grupo= request.user.groups.get().id
+            c = RequestContext(request, {
+                'grupo': grupo                                     })
+            return HttpResponse(t.render(c))
     else:
         return HttpResponseRedirect(reverse('login'))   
 
@@ -147,9 +174,17 @@ def listar_busqueda_fracciones(request):
     
     
     if request.user.is_authenticated():
-        t = loader.get_template('fracciones/listado.html')
-        #c = RequestContext(request, {})
-        #return HttpResponse(t.render(c))
+        if verificar_permisos(request.user.id, permisos.VER_LISTADO_FRACCIONES):
+            t = loader.get_template('fracciones/listado.html')
+            #c = RequestContext(request, {})
+            #return HttpResponse(t.render(c))
+        else:
+            t = loader.get_template('index2.html')
+            grupo= request.user.groups.get().id
+            c = RequestContext(request, {
+                'grupo': grupo
+            })
+            return HttpResponse(t.render(c))
     else:
         return HttpResponseRedirect(reverse('login')) 
         

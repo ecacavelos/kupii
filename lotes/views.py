@@ -6,6 +6,8 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
 from django.core.urlresolvers import reverse, resolve
 # Funcion principal del modulo de lotes.
+from principal.common_functions import verificar_permisos
+from principal import permisos
 def lotes(request):
     
     if request.user.is_authenticated():
@@ -109,9 +111,16 @@ def agregar_lotes(request):
     
     
     if request.user.is_authenticated():
-        t = loader.get_template('lotes/agregar2.html')
-        #c = RequestContext(request, {})
-        #return HttpResponse(t.render(c))
+        if verificar_permisos(request.user.id, permisos.ADD_LOTE):
+            t = loader.get_template('lotes/agregar2.html')
+            #c = RequestContext(request, {})
+            #return HttpResponse(t.render(c))
+        else:
+            t = loader.get_template('index2.html')
+            grupo= request.user.groups.get().id
+            c = RequestContext(request, {
+                'grupo': grupo                                     })
+            return HttpResponse(t.render(c))
     else:
         return HttpResponseRedirect(reverse('login')) 
     

@@ -334,14 +334,12 @@ def verificar_permisos(user_id, permiso):
     
     print("Id_user->" + unicode(user_id))
     print("Permiso->" + unicode(permiso))
-    print("has_project_permission")
     ok = False
     user = None
-    perm = Permission.objects.get(codename=permiso)  
+    permi = 'principal.' + permiso
     user = User.objects.get(id=user_id)
-    user.has_perm('add_pagodecuotas')
-    users_perm = User.objects.filter(Q(groups__permissions=perm) & Q(groups__user=user))
-    if len(users_perm) != 0:
+    perm = user.has_perm(permi)
+    if perm == True:
         print("El usuario si posee ese permiso")
         ok = True
     

@@ -35,8 +35,9 @@ class Cliente(models.Model):
             id=self.id)
     class Meta:
         permissions = (
-            ('permission_code', 'Friendly permission description'),
-        )
+            ('ver_listado_clientes', 'Ver listado de clientes'),
+            ('ver_opciones_cliente', 'Ver opciones de clientes'),
+        )    
     
 
 class Propietario(models.Model):
@@ -57,6 +58,11 @@ class Propietario(models.Model):
             label= self.nombres + ' ' + self.apellidos,
             cedula= self.cedula,
             id=self.id)
+    class Meta:
+        permissions = (
+            ('ver_listado_propietarios', 'Ver listado de propietarios'),
+            ('ver_opciones_propietario', 'Ver opciones de propietarios'),
+        )
 
 class Fraccion(models.Model):
     id=models.IntegerField(primary_key=True)
@@ -74,10 +80,15 @@ class Fraccion(models.Model):
         return u'%s' % (self.nombre)
     class Meta:
         verbose_name_plural = "fracciones"
+        permissions = (
+            ('ver_listado_fracciones', 'Ver listado de fracciones'),
+            ('ver_opciones_fraccion', 'Ver opciones de fracciones'),
+        )
     def as_json(self):
         return dict(
             label=self.nombre,
             id=self.id)
+        
 
 class Manzana(models.Model):
     nro_manzana = models.IntegerField()
@@ -88,12 +99,17 @@ class Manzana(models.Model):
         return('Manzana ' + unicode(self.nro_manzana))
     class Meta:
         verbose_name_plural = "manzanas"
+        permissions = (
+            ('ver_listado_manzanas', 'Ver listado de manzanas'),
+            ('ver_opciones_manzana', 'Ver opciones de manzanas'),
+        )
     def as_json(self):
         return dict(
             cantidad=self.cantidad_lotes,        
             fraccion=self.fraccion_id,        
             label=self.nro_manzana, 
             id=self.id)
+        
         
 class Vendedor(models.Model):
     nombres = models.CharField(max_length=255)
@@ -111,7 +127,10 @@ class Vendedor(models.Model):
         return unicode(u'%s %s' % (self.nombres, self.apellidos))
     class Meta:
         verbose_name_plural = "vendedores"
-    
+        permissions = (
+            ('ver_listado_vendedores', 'Ver listado de vendedores'),
+            ('ver_opciones_vendedor', 'Ver opciones de vendedores'),
+        )
     def as_json(self):
         return dict(
             label= self.nombres + ' ' + self.apellidos,
@@ -135,6 +154,10 @@ class PlanDePagoVendedor(models.Model):
         return (self.nombre)
     class Meta:
         verbose_name_plural = "plandepagovendedores"
+        permissions = (
+            ('ver_listado_plandepagovendedores', 'Ver listado de plan de pago vendedores'),
+            ('ver_opciones_plandepagovendedor', 'Ver opciones de plan de pago vendedores'),
+        )
     
     def as_json(self):
         return dict(
@@ -156,6 +179,10 @@ class Cobrador(models.Model):
         return (self.nombres + ' ' + self.apellidos)
     class Meta:
         verbose_name_plural = "cobradores"
+        permissions = (
+            ('ver_listado_cobradores', 'Ver listado de cobradores'),
+            ('ver_opciones_cobrador', 'Ver opciones de cobradores'),
+        )
 
 
 class PlanDePago(models.Model):
@@ -188,6 +215,10 @@ class PlanDePago(models.Model):
     
     class Meta:
         verbose_name_plural = "planes de pago"
+        permissions = (
+            ('ver_listado_plandepago', 'Ver listado de planes de pago'),
+            ('ver_opciones_plandepago', 'Ver opciones de planes de pago'),
+        )
         
 class Lote(models.Model):
     codigo_paralot = models.CharField(max_length=20,blank=True, null=True)
@@ -213,6 +244,14 @@ class Lote(models.Model):
         return dict(
             label=self.nro_lote,
             id=self.nro_lote)
+    class Meta:
+        permissions = (
+            ('ver_listado_lotes', 'Ver listado de lotes'),
+            ('ver_opciones_lote', 'Ver opciones de lotes'),
+            ('cambio_lote', 'Cambio lotes'),
+            ('transferencia_lote', 'Transferir lotes'),
+            ('recuperar_lote', 'Recuperar lotes'),
+        )
 
 class Venta(models.Model):
     lote = models.ForeignKey(Lote,on_delete=models.PROTECT)
@@ -248,6 +287,10 @@ class Venta(models.Model):
             plan_de_pago_vendedor_id = self.plan_de_pago_vendedor.id,
             plan_de_pago_vendedor = self.plan_de_pago_vendedor.nombre,            
         )
+        class Meta:
+            permissions = (
+                ('ver_listado_ventas', 'Ver listado de ventas'),
+            )
     
 class Reserva(models.Model):
     lote = models.ForeignKey(Lote,on_delete=models.PROTECT)
@@ -331,5 +374,9 @@ class Factura(models.Model):
     tipo = models.CharField(max_length=2)
     detalle = models.TextField()
     
-    
-    
+class PermisosAdicionales(models.Model): 
+    class Meta:
+        permissions = (
+            ('ver_listado_opciones', 'Ver listado de opciones de las acciones'),
+            ('ver_informes', 'Ver informes'),
+        )

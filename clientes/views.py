@@ -11,9 +11,17 @@ from principal import permisos
 # Funcion principal del modulo de clientes.
 def index(request):
     if request.user.is_authenticated():
-        t = loader.get_template('clientes/index.html')
-        c = RequestContext(request, {})
-        return HttpResponse(t.render(c))
+        if verificar_permisos(request.user.id, permisos.VER_OPCIONES_CLIENTE):
+            t = loader.get_template('clientes/index.html')
+            c = RequestContext(request, {})
+            return HttpResponse(t.render(c))
+        else:
+            t = loader.get_template('index2.html')
+            grupo= request.user.groups.get().id
+            c = RequestContext(request, {
+                'grupo': grupo  
+            })
+            return HttpResponse(t.render(c))
     else:
         return HttpResponseRedirect(reverse('login'))
     
@@ -23,34 +31,42 @@ def consultar_clientes(request):
     
     if request.method == 'GET':
         if request.user.is_authenticated():
-            t = loader.get_template('clientes/listado.html')
-            if (filtros_establecidos(request.GET,'listado_clientes') == False):
-                print('Parametros no seteados')
-                object_list = Cliente.objects.all().order_by('id')
-            else: #Parametros seteados
-                print('Parametros de filtrado seteados')
-                tipo_busqueda=request.GET['tipo_busqueda']
-                busqueda_label=request.GET['busqueda_label']
-                if tipo_busqueda == 'nombre':
-                    object_list = Cliente.objects.filter(nombres__icontains=busqueda_label)
-                else:
-                    object_list = Cliente.objects.filter(cedula__icontains=busqueda_label)
-            search_form = SearchForm({})
-            message = ""            
-            paginator=Paginator(object_list,15)
-            page=request.GET.get('page')
-            try:
-                lista=paginator.page(page)
-            except PageNotAnInteger:
-                lista=paginator.page(1)
-            except EmptyPage:
-                lista=paginator.page(paginator.num_pages)
-            c = RequestContext(request, {
-                'object_list': lista,
-                'search_form': search_form,
-                'message': message,
-            })
-            return HttpResponse(t.render(c))
+            if verificar_permisos(request.user.id, permisos.VER_LISTADO_CLIENTES):
+                t = loader.get_template('clientes/listado.html')
+                if (filtros_establecidos(request.GET,'listado_clientes') == False):
+                    print('Parametros no seteados')
+                    object_list = Cliente.objects.all().order_by('id')
+                else: #Parametros seteados
+                    print('Parametros de filtrado seteados')
+                    tipo_busqueda=request.GET['tipo_busqueda']
+                    busqueda_label=request.GET['busqueda_label']
+                    if tipo_busqueda == 'nombre':
+                        object_list = Cliente.objects.filter(nombres__icontains=busqueda_label)
+                    else:
+                        object_list = Cliente.objects.filter(cedula__icontains=busqueda_label)
+                search_form = SearchForm({})
+                message = ""            
+                paginator=Paginator(object_list,15)
+                page=request.GET.get('page')
+                try:
+                    lista=paginator.page(page)
+                except PageNotAnInteger:
+                    lista=paginator.page(1)
+                except EmptyPage:
+                    lista=paginator.page(paginator.num_pages)
+                c = RequestContext(request, {
+                    'object_list': lista,
+                    'search_form': search_form,
+                    'message': message,
+                })
+                return HttpResponse(t.render(c))
+            else:
+                t = loader.get_template('index2.html')
+                grupo= request.user.groups.get().id
+                c = RequestContext(request, {
+                    'grupo': grupo  
+                    })
+                return HttpResponse(t.render(c))
         else:
             return HttpResponseRedirect(reverse('login'))    
     else: #POST
@@ -77,9 +93,17 @@ def consultar_clientes(request):
 def detalle_cliente(request, cliente_id):
     
     if request.user.is_authenticated():
-        t = loader.get_template('clientes/detalle.html')
-        #c = RequestContext(request, {})
-        #return HttpResponse(t.render(c))
+        if verificar_permisos(request.user.id, permisos.VER_LISTADO_CLIENTES):
+            t = loader.get_template('clientes/detalle.html')
+            #c = RequestContext(request, {})
+            #return HttpResponse(t.render(c))
+        else:
+            t = loader.get_template('index2.html')
+            grupo= request.user.groups.get().id
+            c = RequestContext(request, {
+                'grupo': grupo  
+            })
+            return HttpResponse(t.render(c))
     else:
         return HttpResponseRedirect(reverse('login'))
 
@@ -116,7 +140,13 @@ def agregar_clientes(request):
             t = loader.get_template('clientes/agregar.html')
             #c = RequestContext(request, {})
             #return HttpResponse(t.render(c))
-            
+        else:
+            t = loader.get_template('index2.html')
+            grupo= request.user.groups.get().id
+            c = RequestContext(request, {
+                'grupo': grupo                                     })
+            return HttpResponse(t.render(c))
+             
     else:
         return HttpResponseRedirect(reverse('login'))
     
