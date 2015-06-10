@@ -46,7 +46,9 @@ def ventas_de_lotes(request):
                 plan_pago_vendedor_id=data.get('venta_plan_pago_vendedor_id','')
                 cedula_cli =  data.get('venta_cedula_cli', '')
                 estado_lote=data.get('estado_lote','')
-                
+                monto_c_refuerzo = data.get('monto_refuerzo')
+                if monto_c_refuerzo == '':
+                    monto_c_refuerzo = 0
                 if estado_lote == "2":
                     objeto_reserva=Reserva.objects.filter(cliente_id=cliente_id,lote_id=lote_id)
                     a=len(objeto_reserva)
@@ -84,6 +86,7 @@ def ventas_de_lotes(request):
                     nueva_venta.pagos_realizados = 0    
                     nueva_venta.importacion_paralot=False
                     nueva_venta.plan_de_pago_vendedor= PlanDePagoVendedor.objects.get(pk=plan_pago_vendedor_id)
+                    nueva_venta.monto_cuota_refuerzo = long(monto_c_refuerzo)
                 except Exception, error:
                     print error 
                     pass           

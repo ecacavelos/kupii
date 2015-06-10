@@ -130,16 +130,21 @@ var data = [
 		</tr>
 		<tr>
 			<td><label for="id_entrega_inicial">Entrega Inicial: </label></td>
-			<td class="noimage"><input id="id_entrega_inicial" type="text" name="entrega_inicial"  maxlength="100" onblur="calculateMontoCuotas();calculatePrecioFinalVentaLote();$('#id_monto_cuota').attr('readonly', true);" onkeyup="$(this).val(format.call($(this).val().split(' ').join(''),'.',','));solo_numeros_puntos_entrega_inicial();" /></td>
+			<td class="noimage"><input id="id_entrega_inicial" type="text" name="entrega_inicial"  maxlength="10" onblur="calculateMontoCuotas();calculatePrecioFinalVentaLote();$('#id_monto_cuota').attr('readonly', true);" onkeyup="$(this).val(format.call($(this).val().split(' ').join(''),'.',','));solo_numeros_puntos_entrega_inicial();" /></td>
 		</tr>
 		<tr>
 			<td><label for="id_monto_cuota">Monto de cada Cuota: </label></td>
-			<td class="noimage"><input id="id_monto_cuota" type="text" name="monto_cuota"  maxlength="100" onblur="calculatePrecioFinalVentaLote()" onkeyup="$(this).val(format.call($(this).val().split(' ').join(''),'.',','));solo_numeros_puntos_monto_cuota();" /></td>
+			<td class="noimage"><input id="id_monto_cuota" type="text" name="monto_cuota"  maxlength="10" onblur="calculatePrecioFinalVentaLote()" onkeyup="$(this).val(format.call($(this).val().split(' ').join(''),'.',','));solo_numeros_puntos_monto_cuota();" /></td>
 		</tr>
 		<tr>
 			<td><label>Monto Total: </label></td>
 			<td class="noimage"><div id="precio_final_venta"></div>
 			<ul class="errorlist"><li id="monto_total_error"></li></ul></td>
+			
+		</tr>
+		<tr>
+			<td><label>Monto Cuota Refuerzo: </label></td>
+			<td class="noimage"><input id="id_monto_cuota_refuerzo" type="text" name="monto_refuerzo"  maxlength="10" onkeyup="$(this).val(format.call($(this).val().split(' ').join(''),'.',','));solo_numeros_puntos_monto_refuerzo();" /></td>
 			
 		</tr>
 		<tr>

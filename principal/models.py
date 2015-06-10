@@ -205,6 +205,8 @@ class PlanDePago(models.Model):
     intervalos_cuotas_gerente = models.IntegerField()
     porcentaje_cuotas_gerente = models.IntegerField()
     monto_fijo_cuotas_gerente = models.IntegerField()
+    cuotas_de_refuerzo = models.IntegerField()
+    intervalo_cuota_refuerzo = models.IntegerField(blank=True, null=True)
     def __unicode__(self):
         return (self.nombre_del_plan)
     
@@ -266,6 +268,7 @@ class Venta(models.Model):
     pagos_realizados = models.IntegerField(blank=True, null=True)
     importacion_paralot=models.BooleanField(blank=False, null=False)
     plan_de_pago_vendedor=models.ForeignKey(PlanDePagoVendedor,on_delete=models.PROTECT)
+    monto_cuota_refuerzo = models.BigIntegerField(blank=True, null=True)
     def __unicode__(self):
         return u'%s a %s - %s' % (unicode(self.lote), self.cliente.nombres, self.cliente.apellidos)    
     def as_json(self):

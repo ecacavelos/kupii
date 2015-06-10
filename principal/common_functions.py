@@ -47,7 +47,7 @@ def get_nro_cuota(pago):
     lote_id = pago.lote_id
     # fecha_fin=pago.fecha_de_pago
  
-    cant_cuotas = PagoDeCuotas.objects.filter(lote_id=lote_id, pk__lt=pago_id).aggregate(Sum('nro_cuotas_a_pagar')).values()[0]    
+    cant_cuotas = PagoDeCuotas.objects.filter(lote_id=lote_id, pk__lt=pago_id).aggregate(Sum('nro_cuotas_a_pagar')).values()[0]
     if cant_cuotas == None:
         cant_cuotas =0
     return cant_cuotas
@@ -345,21 +345,81 @@ def verificar_permisos(user_id, permiso):
     
     return ok
 
-def verificar_grupo(user_id):
-    """
-    Metodo que comprueba que un usuario determinado tenga permisos sobre esa vista
-    @return: True, False
-    @rtype: Boolean
-    """
-    
-    print("Id_user->" + unicode(user_id))
-    ok = False
-    user = None
-    perm = Permission.objects.get(codename=permiso)  
-    user = User.objects.filter(id=user_id)
-    users_perm = User.objects.filter(Q(groups__permissions=perm) & Q(groups__user=user))
-    if len(users_perm) != 0:
-        print("El usuario si posee ese permiso")
-        ok = True
-    
-    return ok
+def get_pago_cuotas(venta, fecha_ini,fecha_fin):
+    if fecha_ini == None and fecha_fin == None:
+        #Se traen todos los pagos
+        pagos = PagoDeCuotas.objects.filter(venta_id=venta.id).order_by('fecha_de_pago')
+        cantidad_pagos_anteriores=0
+    else:
+        #Primero se cuenta cuantos son los pagos anteriores y despues se filtra
+        cantidad_pagos_anteriores = PagoDeCuotas.objects.filter(venta_id=venta.id, fecha_de_pago__lt=fecha_ini).aggregate(Sum('nro_cuotas_a_pagar')).values()[0]
+        pagos = PagoDeCuotas.objects.filter(venta_id=venta.id, fecha_de_pago__range=(fecha_ini, fecha_fin))
+        if cantidad_pagos_anteriores == None:
+            cantidad_pagos_anteriores = 0
+            
+    cuotas_ref_pagadas =0;
+    numero_cuota=cantidad_pagos_anteriores +1
+    ventas_pagos_list = []
+    esRefuerzo = False
+    if venta.plan_de_pago.cuotas_de_refuerzo != 0:
+        for pago in pagos:
+            if (numero_cuota % venta.plan_de_pago.intervalo_cuota_refuerzo) == 0 and cuotas_ref_pagadas < venta.plan_de_pago.cuotas_de_refuerzo:
+                    monto_cuota = venta.monto_cuota_refuerzo
+                    cuotas_ref_pagadas +=1
+                    esRefuerzo =True
+            else:
+                monto_cuota = venta.precio_de_cuota
+                esRefuerzo = False
+            if pago.nro_cuotas_a_pagar > 1:
+                for x in xrange(1,pago.nro_cuotas_a_pagar + 1):
+                    if (numero_cuota % venta.plan_de_pago.intervalo_cuota_refuerzo) == 0 and cuotas_ref_pagadas < venta.plan_de_pago.cuotas_de_refuerzo:
+                        monto_cuota = venta.monto_cuota_refuerzo
+                        cuotas_ref_pagadas +=1
+                        esRefuerzo =True
+                    else:
+                        monto_cuota = venta.precio_de_cuota
+                        esRefuerzo = False                                  
+                    cuota ={}
+                    cuota['fecha_de_pago'] = pago.fecha_de_pago
+                    cuota['id'] = pago.id
+                    cuota['nro_cuota_y_total'] = unicode(numero_cuota) + '/' + unicode(pago.plan_de_pago.cantidad_de_cuotas)
+                    cuota['nro_cuota'] = unicode(numero_cuota)
+                    cuota['monto'] = unicode(monto_cuota)
+                    cuota['refuerzo'] = esRefuerzo                    
+                    ventas_pagos_list.append(cuota)
+                    numero_cuota +=1
+            else:
+                cuota ={}
+                cuota['fecha_de_pago'] = pago.fecha_de_pago
+                cuota['id'] = pago.id
+                cuota['nro_cuota_y_total'] = unicode(numero_cuota) + '/' + unicode(pago.plan_de_pago.cantidad_de_cuotas)
+                cuota['nro_cuota'] = unicode(numero_cuota)
+                cuota['monto'] = unicode(monto_cuota)
+                cuota['refuerzo'] = esRefuerzo
+                ventas_pagos_list.append(cuota)
+                numero_cuota +=1
+    else:
+        monto_cuota = venta.precio_de_cuota
+        for pago in pagos:
+            if pago.nro_cuotas_a_pagar > 1:
+                for x in xrange(1,pago.nro_cuotas_a_pagar + 1):                                  
+                    cuota ={}
+                    cuota['fecha_de_pago'] = pago.fecha_de_pago
+                    cuota['id'] = pago.id
+                    cuota['nro_cuota_y_total'] = unicode(numero_cuota) + '/' + unicode(pago.plan_de_pago.cantidad_de_cuotas)
+                    cuota['nro_cuota'] = unicode(numero_cuota)
+                    cuota['monto'] = unicode(monto_cuota)
+                    cuota['refuerzo'] = esRefuerzo                    
+                    ventas_pagos_list.append(cuota)
+                    numero_cuota +=1
+            else:
+                cuota ={}
+                cuota['fecha_de_pago'] = pago.fecha_de_pago
+                cuota['id'] = pago.id
+                cuota['nro_cuota_y_total'] = unicode(numero_cuota) + '/' + unicode(pago.plan_de_pago.cantidad_de_cuotas)
+                cuota['nro_cuota'] = unicode(numero_cuota)
+                cuota['monto'] = unicode(monto_cuota)
+                cuota['refuerzo'] = esRefuerzo
+                ventas_pagos_list.append(cuota)
+                numero_cuota +=1
+    return ventas_pagos_list

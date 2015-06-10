@@ -137,7 +137,10 @@ $(document).ready(function() {
 	function solo_numeros_puntos_monto_cuota() {
 		$('#id_monto_cuota ').val($('#id_monto_cuota ').val().replace(/[^\d.]+/g, ''));
 	}
-
+	
+	function solo_numeros_puntos_monto_refuerzo() {
+		$('#id_monto_cuota_refuerzo ').val($('#id_monto_cuota_refuerzo ').val().replace(/[^\d.]+/g, ''));
+	}
 	function format(comma, period) {
 
 		var comma = comma || ',';
@@ -175,6 +178,7 @@ function validateVenta(event) {
 		var res_venta = $("#id_precio_venta").val();
 		var res_cuota = $("#id_monto_cuota").val();
 		var res_entrega = $("#id_entrega_inicial").val();
+		var res_refuerzo = $("#id_monto_cuota_refuerzo").val();
 		//var res ="";
 		for ( i = 0; i < res_venta.length; i++) {
 			res_venta = res_venta.replace(".", "");
@@ -184,6 +188,9 @@ function validateVenta(event) {
 		}
 		for ( i = 0; i < res_entrega.length; i++) {
 			res_entrega = res_entrega.replace(".", "");
+		}
+		for ( i = 0; i < res_refuerzo.length; i++) {
+			res_refuerzo = res_refuerzo.replace(".", "");
 		}
 		var cedula ="";
 		if ($("#id_cliente").val() == ""){
@@ -211,7 +218,8 @@ function validateVenta(event) {
 				venta_fecha_primer_vencimiento : $("#id_fecha_vencimiento").val(),
 				venta_pagos_realizados : 0,
 				estado_lote : estado_lote,
-				venta_cedula_cli: cedula
+				venta_cedula_cli: cedula,
+				monto_refuerzo: res_refuerzo
 			}
 
 		});

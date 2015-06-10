@@ -25,6 +25,8 @@ class PlanDePagoForm(ModelForm):
                  'intervalos_cuotas_gerente': TextInput,
                  'porcentaje_cuotas_gerente': TextInput,
                  'monto_fijo_cuotas_gerente': TextInput,
+                 'cuotas_de_refuerzo': TextInput,
+                 'intervalo_cuota_refuerzo': TextInput
          }
         
 class SearchForm(Form):
