@@ -141,7 +141,7 @@ def get_cuota_information_by_lote(lote_id,cuotas_pag):
             nro_cuota = cuotas_totales + 1
             cuota_a_pagar['nro_cuota'] = unicode(nro_cuota) + "/" + unicode(venta.plan_de_pago.cantidad_de_cuotas)
             cuota_a_pagar['fecha'] = (ultima_fecha_pago + MonthDelta(i)).strftime('%d/%m/%Y')
-            cuota_a_pagar['monto_cuota'] = venta.monto_cuota_refuerzo
+            cuota_a_pagar['monto_cuota'] = venta.precio_de_cuota
             cuotas_totales +=1
             cuotas_a_pagar.append(cuota_a_pagar)
             cuota_a_pagar= {}
