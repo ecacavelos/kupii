@@ -1830,7 +1830,7 @@ def modificar_pago_de_cuotas(request, id):
 
 def modificar_venta(request, id):        
     if request.user.is_authenticated():
-        if verificar_permisos(request.user.id, permisos.VER_INFORMES):
+        if verificar_permisos(request.user.id, permisos.CHANGE_VENTA):
             if request.method == 'GET':
                 venta = Venta.objects.get(pk=id)
                 fecha_venta = venta.fecha_de_venta.strftime('%d/%m/%Y')
@@ -1902,5 +1902,30 @@ def modificar_venta(request, id):
             return HttpResponse(t.render(c))                        
         return HttpResponse(t.render(c))
     else:
-        return HttpResponseRedirect("/login")   
+        return HttpResponseRedirect("/login")
+    
+def eliminar_venta(request):        
+    if request.user.is_authenticated():
+        if verificar_permisos(request.user.id, permisos.DELETE_VENTA):           
+            if request.method == 'POST':
+                data = request.POST
+                pagos = None
+                id= int(data.get('venta_id'))
+                venta = Venta.objects.get(pk=id)            
+                pagos = PagoDeCuotas.objects.filter(venta_id=venta.id)
+                if len(pagos) == 0:
+                    try:
+                        venta.delete()
+                        ok=True
+                    except Exception, error:
+                        print error
+                    
+                else:
+                    ok=False
+                data = json.dumps({
+                    'ok': ok})
+                return HttpResponse(data,content_type="application/json")
+    else:
+        return HttpResponseRedirect("/login")
+    
         

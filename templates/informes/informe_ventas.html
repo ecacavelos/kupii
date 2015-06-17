@@ -52,7 +52,25 @@
 		});
 
 		$('.pagination').show();
-
+		$( ".eliminar" ).click(function() {
+			var id_venta = this.value;
+			var request = $.ajax({
+				type : "POST",
+				url : "/movimientos/eliminar_venta/",
+				data : {
+					venta_id : id_venta,
+				},
+				dataType : "json"
+			});
+			// Actualizamos el formulario con los datos obtenidos.
+			request.done(function(msg) {
+				if(msg.ok == false){
+					alert(" NO se puede eliminar porque la venta tiene asociadas cuotas.");
+				}else{
+					window.location.reload();
+				}
+			});
+		});
 	});
 
 	function validar() {
@@ -104,7 +122,7 @@
 </div>
 <div id="listado-ventas">
 	<table  cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
-		<th>Fecha</th><th>Cliente</th><th>Lote</th><th>Vendedor</th><th>Plan de Pago</th><th>Entrega Inicial</th><th>Precio Cuota</th><th>Precio final de venta</th><th>Pagos Realizados</th><th></th>
+		<th>Fecha</th><th>Cliente</th><th>Lote</th><th>Vendedor</th><th>Plan de Pago</th><th>Entrega Inicial</th><th>Precio Cuota</th><th>Precio final de venta</th><th>Pagos Realizados</th><th></th><th></th>
 		{% for venta in lista_ventas %}
 				{% if forloop.counter|divisibleby:2 %}				
 				<tr>
@@ -118,7 +136,7 @@
 					<td>{{venta.precio_final_de_venta}}</td>
 					<td>{{venta.pagos_realizados}}</td>
 					<td><a href="/movimientos/modificar_venta/{{venta.id}}"><img src="/static/custom/img/black_edit.png" /></a></td>
-					<!--<td><a href="/movimientos/eliminar_pagocuota/{{pago.id}}">Holis</a></td>-->
+					<td><button class="eliminar" value="{{venta.id}}"><img src="/static/custom/img/black_delete.png" /></button></td>
 				</tr>
 				{% else %}
 				<tr class="bkg_gris">
@@ -132,7 +150,7 @@
 					<td>{{venta.precio_final_de_venta}}</td>
 					<td>{{venta.pagos_realizados}}</td>
 					<td><a href="/movimientos/modificar_venta/{{venta.id}}"><img src="/static/custom/img/black_edit.png" /></a></td>
-					<!--<td><a href="/movimientos/eliminar_pagocuota/{{pago.id}}">Holis</a></td>-->
+					<td><button class="eliminar" value="{{venta.id}}"><img src="/static/custom/img/black_delete.png" /></button></td>
 				</tr>
 				{% endif %}
 		{%endfor%}
