@@ -278,17 +278,33 @@ def obtener_detalle_interes_lote(lote_id,fecha_pago_parsed,proximo_vencimiento_p
                 interes_iva=0.00009
                 
                 total_intereses=interes+interes_punitorio+interes_iva
-                
+                #Verificar si tiene cuotas de refuerzo 
+                if venta.plan_de_pago.cuotas_de_refuerzo != 0:
+                    pagos = get_pago_cuotas(venta, None, None)
+                    cantidad_pagos_ref = cant_cuotas_pagadas_ref(pagos)
+                    es_ref= True
+                else:
+                    cantidad_pagos_ref = 0
+                    es_ref= False
                 for cuota in range(cuotas_atrasadas):
                     detalle={}
                     fecha_vencimiento=proximo_vencimiento_parsed+MonthDelta(cuota)
-                    dias_atraso=(fecha_pago_parsed-fecha_vencimiento).days                
+                    dias_atraso=(fecha_pago_parsed-fecha_vencimiento).days
+                    nro_cuota = cuotas_pagadas+(cuota+1)
+                    if es_ref == True:
+                        if (nro_cuota % venta.plan_de_pago.intervalo_cuota_refuerzo) == 0 and cantidad_pagos_ref < venta.plan_de_pago.cuotas_de_refuerzo:
+                            monto_cuota = venta.monto_cuota_refuerzo
+                            cantidad_pagos_ref += 1
+                        else:
+                            monto_cuota=venta.precio_de_cuota
+                    else:
+                        monto_cuota=venta.precio_de_cuota             
                     intereses=math.ceil(total_intereses*dias_atraso*monto_cuota)
                     
                     detalle['interes']=interes
                     detalle['interes_punitorio']=interes_punitorio
                     detalle['interes_iva']=interes_iva
-                    detalle['nro_cuota']=cuotas_pagadas+(cuota+1)
+                    detalle['nro_cuota']=nro_cuota
                     detalle['dias_atraso']=dias_atraso
                     detalle['intereses']=intereses
                     detalle['vencimiento']=fecha_vencimiento.strftime('%d/%m/%Y')
@@ -445,6 +461,6 @@ def get_pago_cuotas(venta, fecha_ini,fecha_fin):
 def cant_cuotas_pagadas_ref(pagos):
     cuotas_ref_pagadas=0
     for pago in pagos:
-        if cuota['refuerzo'] ==True:
+        if pago['refuerzo'] ==True:
             cuotas_ref_pagadas +=1
     return cuotas_ref_pagadas
