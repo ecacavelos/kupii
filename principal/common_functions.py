@@ -115,11 +115,11 @@ def get_cuota_information_by_lote(lote_id,cuotas_pag):
     cuota_a_pagar= {}
     cuotas_a_pagar= []
     ultima_fecha_pago = ""
+    cuotas_totales = (cant_cuotas_pag)
     if cuotas_totales != 0:
         ultima_fecha_pago = (venta.fecha_primer_vencimiento + MonthDelta(cuotas_totales))
     else:
         ultima_fecha_pago = venta.fecha_primer_vencimiento
-    cuotas_totales = (cant_cuotas_pag)
     #Verificar si el plan tiene cuotas de refuerzo 
     if venta.plan_de_pago.cuotas_de_refuerzo != 0:
         pagos = get_pago_cuotas(venta, None,None)
