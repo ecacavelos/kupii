@@ -152,6 +152,7 @@ function retrieveVenta() {
 			$("#vendedor_seleccionado").val(msg.venta[0]['vendedor']);
 			$("#plan_pago").val(msg.venta[0]['plan_de_pago']);
 			$("#id_plan_pago").val(msg.venta[0]['plan_de_pago_id']);
+            $("#id_fecha_venta").html(msg.venta[0]['fecha_de_venta']);
 			venta_id = (msg.venta[0]['venta_id']);
 			PrecioVenta = (msg.venta[0]['precio_de_venta']);
 			EntregaInicial = (msg.venta[0]['entrega_inicial']);
