@@ -1,4 +1,5 @@
 $(document).ready(function() {
+	//var deshabilitar = true;
 	$("#fecha_hasta").hide();
 	$("#id_lote").keydown(validateLotePre);
 	$("#id_lote").keyup(validateLotePost);
@@ -171,9 +172,7 @@ var entrega_inicial = 0;
 var monto_cuota = 0;
 var estado_lote = "";
 
-function validateVenta(event) {
-
-	event.preventDefault();
+function validateVenta() {
 	if (monto_final_validado == true) {
 		var res_venta = $("#id_precio_venta").val();
 		var res_cuota = $("#id_monto_cuota").val();
@@ -195,10 +194,13 @@ function validateVenta(event) {
 		var cedula ="";
 		if ($("#id_cliente").val() == ""){
 			cedula = $('#id_cedula_cliente').val();
+			$('#enviar_venta').removeAttr('disabled');
+			return false;
 		}
 		
 		if ($("#id_fecha_vencimiento").val() == ""){
 			alert("Ingrese una fecha de vencimiento");
+			$('#enviar_venta').removeAttr('disabled');
 			return false;
 		}
 		var request2 = $.ajax({
@@ -231,6 +233,8 @@ function validateVenta(event) {
 		});
 	} else {
 		alert("Por favor introduzca el monto.");
+		$('#enviar_venta').removeAttr('disabled');
+		return false;
 	}
 
 };

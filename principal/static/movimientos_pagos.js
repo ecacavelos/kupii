@@ -127,9 +127,8 @@ function validateLotePost(event) {
 	}
 }
 
-function validatePago(event) {
+function validatePago() {
 
-	event.preventDefault();
 	var request4 = $.ajax({
 		type : "POST",
 		url : "/movimientos/pago_cuotas/",
@@ -153,9 +152,13 @@ function validatePago(event) {
 	});
 	request4.fail(function(jqXHR, textStatus) {
 		if (jqXHR.responseText == "La cantidad de cuotas a pagar, es mayor a la cantidad de cuotas restantes."){
-			alert(jqXHR.responseText);	
+			alert(jqXHR.responseText);
+			$('#enviar_pago').removeAttr('disabled');
+			return false;	
 		} else {
 			alert("Se encontró un error en el pago, favor verifique los datos");
+			$('#enviar_pago').removeAttr('disabled');
+			return false;	
 		}
 		
 	});
