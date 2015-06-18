@@ -1,7 +1,7 @@
 from django.db import models
 
 class Cliente(models.Model):    
-    cedula = models.CharField(unique=True,max_length=8, blank=False, null=False)
+    cedula = models.CharField(unique=True,max_length=10, blank=False, null=False)
     nombres = models.CharField(max_length=255)
     apellidos = models.CharField(max_length=255)
     fecha_nacimiento = models.DateField('fecha de nacimiento')
@@ -45,7 +45,7 @@ class Propietario(models.Model):
     apellidos = models.CharField(max_length=255, blank=True)
     fecha_nacimiento = models.DateField('fecha de nacimiento',blank=True,null=True)
     fecha_ingreso = models.DateField('fecha de ingreso',blank=True,null=True)
-    cedula = models.CharField(max_length=10, blank=True, null=True)
+    cedula = models.CharField(unique=True,max_length=10, blank=False, null=False)
     ruc = models.CharField(max_length=255, blank=True,null=True)
     direccion_particular = models.CharField(max_length=255, blank=True)
     telefono_particular = models.CharField(max_length=255, blank=True)
@@ -115,7 +115,7 @@ class Vendedor(models.Model):
     nombres = models.CharField(max_length=255)
     apellidos = models.CharField(max_length=255)
     # fecha_nacimiento = models.DateField('fecha de nacimiento')    
-    cedula = models.CharField(unique=True,max_length=8, blank=False, null=False)
+    cedula = models.CharField(unique=True,max_length=10, blank=False, null=False)
     # ruc = models.CharField(max_length=255)
     direccion = models.CharField('direccion del vendedor', max_length=255)
     telefono = models.CharField(max_length=255)
@@ -168,7 +168,7 @@ class Cobrador(models.Model):
     nombres = models.CharField(max_length=255)
     apellidos = models.CharField(max_length=255)
     # fecha_nacimiento = models.DateField('fecha de nacimiento')    
-    cedula = models.CharField(unique=True,max_length=8, blank=False, null=False)
+    cedula = models.CharField(unique=True,max_length=10, blank=False, null=False)
     # ruc = models.CharField(max_length=255)
     direccion = models.CharField('direccion del cobrador', max_length=255)
     telefono_particular = models.CharField(max_length=255)
