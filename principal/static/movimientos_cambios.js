@@ -5,7 +5,6 @@ $(document).ready(function() {
 	$("#id_lote2").keydown(validateLotePre);
 	$("#id_lote2").keyup(validateLotePost);
 
-	$("#main_cambios_form").submit(validateCambio);
 	$('#id_fecha').mask('##/##/####');
 	$("#id_fecha").datepicker({ dateFormat: 'dd/mm/yy' });
 });
@@ -70,9 +69,8 @@ function validateLotePost(event) {
 	}
 }
 
-function validateCambio(event) {
+function validateCambio() {
 
-	event.preventDefault();
 	var request6 = $.ajax({
 		type : "POST",
 		url : "/movimientos/cambio_lotes/",
@@ -90,6 +88,8 @@ function validateCambio(event) {
 	});
 	request6.fail(function(jqXHR, textStatus) {
 		alert("Se encontró un error en el cambio, favor verifique los datos");
+		$('#enviar_cambio').removeAttr('disabled');
+		return false;
 	});
 	return false;
 }

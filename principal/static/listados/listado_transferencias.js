@@ -1,7 +1,6 @@
 $(document).ready(function() {
 	$("#id_lote").keydown(validateLotePre);
 	$("#id_lote").keyup(validateLotePost);
-	$("#main_transferencia_form").submit(validateTransferencia);
 });
 
 window.onload = function() {
@@ -57,9 +56,8 @@ function validateLotePost(event) {
 	}
 }
 
-function validateTransferencia(event) {
+function validateTransferencia() {
 
-	event.preventDefault();
 	var request5 = $.ajax({
 		type : "POST",
 		url : "/movimientos/transferencias_lotes/",
@@ -78,6 +76,8 @@ function validateTransferencia(event) {
 	});
 	request5.fail(function(jqXHR, textStatus) {
 		alert("Se encontró un error en la transferencia, favor verifique los datos");
+		$('#enviar_transferencia').removeAttr('disabled');
+		return false;
 	});
 	return false;
 }

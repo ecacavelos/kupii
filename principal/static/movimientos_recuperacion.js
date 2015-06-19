@@ -1,7 +1,7 @@
 $(document).ready(function() {
 	$("#id_lote").keydown(validateLotePre);
 	$("#id_lote").keyup(validateLotePost);
-	$("#main_recuperacion_form").submit(validateRecuperacion);
+	//$("#main_recuperacion_form").submit(validateRecuperacion);
 	$('#monto_cuota_venta').mask('000.000.000.000.000.000.000', {
 		byPassKeys : [ null ],
 		reverse : true,
@@ -45,9 +45,8 @@ function validateLotePost(event) {
 	}
 }
 
-function validateRecuperacion(event) {
+function validateRecuperacion() {
 
-	event.preventDefault();
 	var request7 = $.ajax({
 		type : "POST",
 		url : "/movimientos/recuperacion_lotes/",

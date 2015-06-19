@@ -2,7 +2,7 @@ $(document).ready(function() {
 	$("#id_lote").keydown(validateLotePre);
 	$("#id_lote").keyup(validateLotePost);
 
-	$("#main_reserva_form").submit(validateReserva);
+	//$("#main_reserva_form").submit(validateReserva);
 
 
 //autocomplete para cliente
@@ -49,9 +49,8 @@ window.onload = function() {
 // Funciones individuales
 var global_lote_id = 0;
 
-function validateReserva(event) {
+function validateReserva() {
 
-	event.preventDefault();
 	var request3 = $.ajax({
 		type : "POST",
 		url : "/movimientos/reservas_lotes/",
@@ -67,6 +66,8 @@ function validateReserva(event) {
 	});
 	request3.fail(function(jqXHR, textStatus) {
 		alert("Se encontró un error en la reserva, favor verifique los datos");
+		$('#enviar_reserva').removeAttr('disabled');
+		return false;
 	});
 	return false;
 };
