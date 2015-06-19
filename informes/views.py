@@ -1218,15 +1218,15 @@ def informe_movimientos(request):
                                 resumen_venta['precio_final'] = unicode('{:,}'.format(item_venta.precio_final_de_venta)).replace(",",".")
                                 resumen_venta['entrega_inicial'] = unicode('{:,}'.format(item_venta.entrega_inicial)).replace(",",".") 
                                 RecuperacionDeLotes.objects.get(venta=item_venta.id)
-                                try: 
-                                    venta_pagos_query_set = PagoDeCuotas.objects.filter(venta_id=item_venta).order_by('fecha_de_pago')
+                                try:
+                                    venta_pagos_query_set = get_pago_cuotas(item_venta,None,None)
                                     resumen_venta['recuperacion'] = True
                                 except PagoDeCuotas.DoesNotExist:
                                     venta_pagos_query_set = []
                             except RecuperacionDeLotes.DoesNotExist:
                                 print 'se encontro la venta no recuperada, la venta actual'                            
-                                try: 
-                                    venta_pagos_query_set = PagoDeCuotas.objects.filter(venta_id=item_venta).order_by('fecha_de_pago')
+                                try:
+                                    venta_pagos_query_set = get_pago_cuotas(item_venta,None,None)
                                     resumen_venta['recuperacion'] = False
                                 except PagoDeCuotas.DoesNotExist:
                                     venta_pagos_query_set = [] 
@@ -1235,39 +1235,20 @@ def informe_movimientos(request):
                             ventas_pagos_list.insert(0,resumen_venta) #El primer elemento de la lista de pagos es el resumen de la venta
                             saldo_anterior=item_venta.precio_final_de_venta
                             monto=item_venta.entrega_inicial
-                            numero_cuota=1
                             saldo=saldo_anterior-monto
                             for pago in venta_pagos_query_set:
-                                saldo_anterior=saldo
-                                if pago.nro_cuotas_a_pagar > 1:
-                                    total_cuotas = int(pago.total_de_cuotas / pago.nro_cuotas_a_pagar)
-                                    for x in xrange(1,pago.nro_cuotas_a_pagar + 1):
-                                        monto = total_cuotas
-                                        saldo_anterior=saldo
-                                        saldo = saldo_anterior-monto                                   
-                                        cuota ={}
-                                        cuota['fecha_de_pago'] = pago.fecha_de_pago
-                                        cuota['id'] = pago.id
-                                        cuota['nro_cuota'] = unicode(numero_cuota) + '/' + unicode(pago.plan_de_pago.cantidad_de_cuotas)
-                                        cuota['saldo_anterior'] = unicode('{:,}'.format(saldo_anterior)).replace(",",".")
-                                        cuota['monto'] = unicode('{:,}'.format(monto)).replace(",",".")
-                                        cuota['saldo'] = unicode('{:,}'.format(saldo)).replace(",",".")
-                                        ventas_pagos_list.append(cuota)
-                                        numero_cuota +=1
-                                else:
-                                    monto=pago.total_de_cuotas
-                                    saldo=saldo_anterior-monto
-                                    cuota ={}
-                                    cuota['fecha_de_pago'] = pago.fecha_de_pago
-                                    cuota['id'] = pago.id
-                                    cuota['nro_cuota'] = unicode(numero_cuota) + '/' + unicode(pago.plan_de_pago.cantidad_de_cuotas)
-                                    cuota['saldo_anterior'] = unicode('{:,}'.format(saldo_anterior)).replace(",",".")
-                                    cuota['monto'] = unicode('{:,}'.format(monto)).replace(",",".")
-                                    cuota['saldo'] = unicode('{:,}'.format(saldo)).replace(",",".")
-                                    ventas_pagos_list.append(cuota)
-                                    numero_cuota +=1
-                            lista_movimientos.append(ventas_pagos_list)
-    
+                                saldo_anterior=saldo                             
+                                monto= long(pago['monto'])
+                                saldo=saldo_anterior-monto
+                                cuota ={}
+                                cuota['fecha_de_pago'] = pago['fecha_de_pago']
+                                cuota['id'] = pago['id']
+                                cuota['nro_cuota'] = pago['nro_cuota_y_total']
+                                cuota['saldo_anterior'] = saldo_anterior
+                                cuota['monto'] = pago['monto']
+                                cuota['saldo'] = saldo
+                                ventas_pagos_list.append(cuota)
+                            lista_movimientos.append(ventas_pagos_list)    
                     mostrar_transferencias = False
                     mostrar_mvtos = False
                     mostrar_reservas = False
