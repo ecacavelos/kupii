@@ -2277,121 +2277,75 @@ def informe_movimientos_reporte_excel(request):
     lote = Lote.objects.get(manzana=manzana.id, nro_lote=lote_int)
     print 'lote->'+unicode(lote.id)
     if fecha_ini != '' and fecha_fin != "":    
-            fecha_ini_parsed = datetime.strptime(fecha_ini, "%d/%m/%Y").date()
-            fecha_fin_parsed = datetime.strptime(fecha_fin, "%d/%m/%Y").date()                
-            try:
-                lista_pagos = PagoDeCuotas.objects.filter(lote_id=lote.id, fecha_de_pago__range=(fecha_ini_parsed, fecha_fin_parsed))
-            except Exception, error:
-                print error
-                lista_pagos = []
-                pass 
-            try:
-                lista_ventas = Venta.objects.get(lote_id=lote.id, fecha_de_venta__range=(fecha_ini_parsed, fecha_fin_parsed))
-            except Exception, error:
-                print error
-                lista_ventas = []
-                pass 
-            try:
-                lista_reservas = Reserva.objects.get(lote_id=lote.id, fecha_de_reserva__range=(fecha_ini_parsed, fecha_fin_parsed))
-            except Exception, error:
-                print error
-                lista_reservas = []
-                pass 
-            try:
-                lista_cambios = CambioDeLotes.objects.get(lote_id=lote.id, fecha_de_cambio__range=(fecha_ini_parsed, fecha_fin_parsed))
-            except Exception, error:
-                print error
-                lista_cambios = []
-                pass 
-            try:
-                lista_recuperaciones = RecuperacionDeLotes.objects.get(lote_id=lote.id, fecha_de_recuperacion__range=(fecha_ini_parsed, fecha_fin_parsed))
-            except Exception, error:
-                print error
-                lista_recuperaciones = []
-                pass
-            try: 
-                lista_transferencias = TransferenciaDeLotes.objects.get(lote_id=lote.id, fecha_de_transferencia__range=(fecha_ini_parsed, fecha_fin_parsed))
-            except Exception, error:
-                print error
-                lista_transferencias = []
-                pass 
+        fecha_ini_parsed = datetime.strptime(fecha_ini, "%d/%m/%Y").date()
+        fecha_fin_parsed = datetime.strptime(fecha_fin, "%d/%m/%Y").date()
+        try:
+            lista_ventas = Venta.objects.filter(lote_id=lote.id, fecha_de_venta__range=(fecha_ini_parsed, fecha_fin_parsed)).order_by('-fecha_de_venta')
+            lista_reservas = Reserva.objects.filter(lote_id=lote.id, fecha_de_reserva__range=(fecha_ini_parsed, fecha_fin_parsed))
+            lista_cambios = CambioDeLotes.objects.filter(Q(lote_nuevo_id=lote.id) |Q(lote_a_cambiar=lote.id), fecha_de_cambio__range=(fecha_ini_parsed, fecha_fin_parsed))
+            lista_transferencias = TransferenciaDeLotes.objects.filter(lote_id=lote.id, fecha_de_transferencia__range=(fecha_ini_parsed, fecha_fin_parsed))
+        except Exception, error:
+            print error
+            lista_ventas = []
+            lista_reservas = []
+            lista_cambios = []
+            lista_transferencias = []
+            pass
     else:
-            try:
-                lista_pagos = PagoDeCuotas.objects.filter(lote_id=lote.id).order_by('fecha_de_pago')
-            except Exception, error:
-                print error
-                lista_pagos = []
-                pass
-            try:
-                lista_ventas = Venta.objects.get(lote_id=lote.id)
-            except Exception, error:
-                print error
-                lista_ventas =[] 
-                pass
-            try:
-                lista_reservas = Reserva.objects.get(lote_id=lote.id)
-            except Exception, error:
-                print error
-                lista_reservas = []
-                pass    
-            try:    
-                lista_cambios = CambioDeLotes.objects.get(lote_nuevo_id=lote.id)
-            except Exception, error:
-                print error
-                lista_cambios = []
-                pass
-            try:    
-                lista_recuperaciones = RecuperacionDeLotes.objects.get(lote_id=lote.id)
-            except Exception, error:
-                print error
-                lista_recuperaciones = []
-                pass
-            try:    
-                lista_transferencias = TransferenciaDeLotes.objects.get(lote_id=lote.id)
-            except Exception, error:
-                print error
-                lista_transferencias = []
-                pass
-    venta = []
-    venta.append(lista_ventas.fecha_de_venta)
-    venta.append(lista_ventas.cliente)
-    venta.append(unicode(0) + '/' + unicode(lista_ventas.plan_de_pago.cantidad_de_cuotas))
-    venta.append("Entrega inicial")
-    venta.append(unicode('{:,}'.format(lista_ventas.precio_final_de_venta)).replace(",","."))
-    venta.append(unicode('{:,}'.format(lista_ventas.entrega_inicial)).replace(",","."))
-    venta.append(unicode('{:,}'.format(lista_ventas.precio_final_de_venta-lista_ventas.entrega_inicial)).replace(",","."))
-    lista_movimientos.append(venta)
-    if lista_pagos:  
-        saldo_anterior=lista_ventas.precio_final_de_venta
-        monto=lista_ventas.entrega_inicial
-        numero_cuota=1
-        saldo=saldo_anterior-monto
-        for pago in lista_pagos:
-            saldo_anterior=saldo
-            monto=pago.total_de_cuotas
+        try:
+            lista_ventas = Venta.objects.filter(lote_id=lote.id).order_by('-fecha_de_venta')
+            lista_cambios = CambioDeLotes.objects.filter(Q(lote_nuevo_id=lote.id) |Q(lote_a_cambiar=lote.id))
+            lista_reservas = Reserva.objects.filter(lote_id=lote.id)                        
+            lista_transferencias = TransferenciaDeLotes.objects.filter(lote_id=lote.id)
+        except Exception, error:
+            print error
+            lista_ventas =[] 
+            lista_reservas = []
+            lista_cambios = []
+            lista_transferencias = []
+            pass
+    if lista_ventas:
+        print('Hay ventas asociadas a este lote')
+        lista_movimientos = []
+        # En este punto tenemos ventas asociadas a este lote
+        for item_venta in lista_ventas:
+            try: 
+                venta = []
+                venta.append(item_venta.fecha_de_venta)
+                venta.append(item_venta.cliente)
+                venta.append(unicode(0) + '/' + unicode(item_venta.plan_de_pago.cantidad_de_cuotas))
+                venta.append("Entrega inicial")
+                venta.append(unicode('{:,}'.format(item_venta.precio_final_de_venta)).replace(",","."))
+                venta.append(unicode('{:,}'.format(item_venta.entrega_inicial)).replace(",","."))
+                venta.append(unicode('{:,}'.format(item_venta.precio_final_de_venta-item_venta.entrega_inicial)).replace(",","."))
+                lista_movimientos.append(venta)
+                RecuperacionDeLotes.objects.get(venta=item_venta.id)
+                try:
+                    venta_pagos_query_set = get_pago_cuotas(item_venta,None,None)
+                except PagoDeCuotas.DoesNotExist:
+                    venta_pagos_query_set = []
+            except RecuperacionDeLotes.DoesNotExist:
+                print 'se encontro la venta no recuperada, la venta actual'                            
+                try:
+                    venta_pagos_query_set = get_pago_cuotas(item_venta,None,None)
+                except PagoDeCuotas.DoesNotExist:
+                    venta_pagos_query_set = [] 
+            saldo_anterior=item_venta.precio_final_de_venta
+            monto=item_venta.entrega_inicial
             saldo=saldo_anterior-monto
-            cuota =[]
-            cuota.append(pago.fecha_de_pago)
-            cuota.append(pago.cliente)
-            cuota.append(unicode(numero_cuota) + '/' + unicode(pago.plan_de_pago.cantidad_de_cuotas))
-            cuota.append("Pago de Cuota")
-            cuota.append(unicode('{:,}'.format(saldo_anterior)).replace(",","."))
-            cuota.append(unicode('{:,}'.format(monto)).replace(",","."))
-            cuota.append(unicode('{:,}'.format(saldo)).replace(",","."))
-            lista_movimientos.append(cuota)
-            numero_cuota +=1
-    if lista_recuperaciones:
-        for pago in lista_pagos:
-            cuota =[]
-            cuota.append(pago.fecha_de_pago)
-            cuota.append(pago.cliente)
-            cuota.append(unicode(numero_cuota) + '/' + unicode(pago.plan_de_pago.cantidad_de_cuotas))
-            cuota.append("Cuota Recuperada")
-            cuota.append(" ")
-            cuota.append(unicode('{:,}'.format(pago.total_de_cuotas)).replace(",","."))
-            cuota.append(" ")
-            lista_movimientos.append(cuota)
-            numero_cuota +=1
+            for pago in venta_pagos_query_set:
+                saldo_anterior=saldo                             
+                monto= long(pago['monto'])
+                saldo=saldo_anterior-monto
+                cuota =[]
+                cuota.append(pago['fecha_de_pago'])
+                cuota.append(item_venta.cliente)
+                cuota.append(pago['nro_cuota_y_total'])
+                cuota.append("Pago de Cuota")
+                cuota.append(unicode('{:,}'.format(saldo_anterior)).replace(",","."))
+                cuota.append(unicode('{:,}'.format(monto)).replace(",","."))
+                cuota.append(unicode('{:,}'.format(saldo)).replace(",","."))
+                lista_movimientos.append(cuota)
             
     wb = xlwt.Workbook(encoding='utf-8')
     sheet = wb.add_sheet('test', cell_overwrite_ok=True)
@@ -2420,7 +2374,7 @@ def informe_movimientos_reporte_excel(request):
     # Crear un nombre intuitivo         
     response['Content-Disposition'] = 'attachment; filename=' + 'informe_movimientos.xls'
     wb.save(response)
-    return response     
+    return response       
 
 def informe_ventas(request):    
     if request.method == 'GET':
