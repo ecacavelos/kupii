@@ -1,0 +1,115 @@
+{% extends "lotes/base_lotes.html" %}
+
+{% block header_scripts %}
+
+<script type="text/javascript" src="{{ STATIC_URL }}modificar_venta.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="gri16 text-izquierda" id="breadcumb">
+	<a href="{% url 'frontend_home' %}">Inicio</a><span class="verde-1">></span>
+	<a href="{% url 'frontend_home' %}movimientos/">Movimientos</a>
+	<span class="verde-1">> Modificar Venta</span>
+</div>
+<div class="clear"></div>
+
+<div class="grid_10">
+	<h1>Modificar Venta</h1>
+</div>
+
+<div class="grid_6">
+	<a href="#" class="historico">Buscar</a>
+</div>
+
+<div class="clear"></div>
+<div class="grid_16" align="center">
+	<form id="main_pago_form" action="" method="post">
+		<table width="94%" border="0" cellpadding="0" cellspacing="0" id="forms" align="center">
+			{% csrf_token %}
+			<div class="fieldWrapperMovimientos">
+				<tr>
+					<td><label for="id_lote">Lote: </label></td>
+					<td class="noimage">{{venta.lote.codigo_paralot}}</td>
+				</tr>
+			</div>
+			<div class="fieldWrapperMovimientos">
+				<tr>
+					<td><label for="lote_seleccionado_fraccion">Fecha de Venta: </label></td>
+					<td class="noimage"><input id="id_fecha_venta" type="text" name="fecha_de_venta" maxlength="10" value="{{fecha_venta}}"/></td>
+				</tr>
+			</div>
+			<div class="fieldWrapperMovimientos">
+				<tr>
+					<td><label>Cliente: </label></td>
+					<td class="noimage">
+						<input id="id_cliente" type="hidden" name="cliente" maxlength="100" value="{{venta.cliente.id}}"/>
+						<input id="detalle" type="hidden" name="detalle" />
+						<input id="id_name_cliente" type="text" name="name_cliente" value="{{venta.cliente.apellidos}}  {{venta.cliente.nombres}}"  maxlength="10" />
+						<input id="id_cedula_cliente" type="hidden" name="cedula_cliente"  readonly="readonly" />
+					</td>
+				</tr>
+			</div>
+			<div class="fieldWrapperMovimientos">
+				<tr>
+					<td><label for="id_fecha">Fecha de Primer Vencimiento: </label></td>
+					<td class="noimage">
+					<input id="id_fecha_venc" type="text" name="fecha_primer_venc" maxlength="10" value="{{fecha_primer_venc}}"/>
+					</td>
+				</tr>
+			</div>
+			<div class="fieldWrapperMovimientos">
+				<tr>
+					<td><label for="vendedor">Vendedor: </label></td>
+					<td class="noimage">
+						<input id="id_vendedor" type="hidden" name="vendedor"  maxlength="100" value="{{venta.vendedor.id}}"/>
+						<input id="id_name_vendedor" type="text" name="name_vendedor" value="{{venta.vendedor.nombres}} {{venta.vendedor.apellidos}}"  maxlength="10"/>
+					</td>
+				</tr>
+				<tr>
+					<td><label for="plan">Plan de Pago: </label></td>
+					<td class="noimage">
+						<input id="id_plan_de_pago" type="hidden" name="plan_de_pago"  maxlength="100" value="{{venta.plan_de_pago.id}}"/>
+						<input id="id_name_ppago" type="text" name="name_ppago" value="{{venta.plan_de_pago.nombre_del_plan}}"  maxlength="10"/>
+					</td>
+				</tr>
+				<tr>
+					<td><label for="pagos_realizados">Pagos_realizados: </label></td>
+					<td class="noimage">
+						<input id="pagos_realizados" type="text" name="pagos_realizados" maxlength="10" value="{{venta.pagos_realizados}}"/>
+					</td>
+				</tr>
+			</div>
+			<div class="fieldWrapperMovimientos">
+				<tr>
+					<td><label for="entrega_inicial">Entrega Inicial: </label></td>
+					<td class="noimage">
+					<input id="entrega_inicial_id" type="text" name="entrega_inicial" maxlength="10" value="{{venta.entrega_inicial}}"/>
+					</td>
+				</tr>			
+				<tr>
+					<td><label for="precio_de_cuota">Precio de Cuota: </label></td>
+					<td class="noimage">
+					<input id="id_precio_de_cuota" type="text" name="precio_de_cuota" maxlength="10" value="{{venta.precio_de_cuota}}"/>
+					</td>
+				</tr>
+				<tr>
+					<td><label for="precio_final_venta">Precio final de venta: </label></td>
+					<td class="noimage">
+					<input id="id_precio_f_venta" type="text" name="precio_final_venta" maxlength="10" value="{{venta.precio_final_de_venta}}"/>
+					</td>
+				</tr>
+			</div>
+		</table>
+		<input id="modificar_venta" style="cursor: pointer;" type="submit" value="Modificar Venta" />
+		<br>
+		<br>
+		<br>
+	</form>
+	<div class="clear"></div>
+</div>
+
+<div id="footer">
+	<a href="{% url 'frontend_home' %}movimientos/" class="boton-verde">Volver al m&oacute;dulo de movimientos</a>
+</div>
+
+{% endblock %}
