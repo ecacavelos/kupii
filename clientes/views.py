@@ -95,6 +95,7 @@ def detalle_cliente(request, cliente_id):
     if request.user.is_authenticated():
         if verificar_permisos(request.user.id, permisos.VER_LISTADO_CLIENTES):
             t = loader.get_template('clientes/detalle.html')
+            grupo= request.user.groups.get().id
             #c = RequestContext(request, {})
             #return HttpResponse(t.render(c))
         else:
@@ -129,6 +130,7 @@ def detalle_cliente(request, cliente_id):
         'cliente': object_list,
         'form': form,
         'message': message,
+        'grupo': grupo
     })
     return HttpResponse(t.render(c))
 

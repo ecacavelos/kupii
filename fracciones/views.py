@@ -62,8 +62,12 @@ def detalle_fraccion(request, fraccion_id):
     close_connection()
     reset_queries()   
     if request.user.is_authenticated():
-        if verificar_permisos(request.user.id, permisos.VER_LISTADO_FRACCIONES):
+        if verificar_permisos(request.user.id, permisos.VER_LISTADO_FRACCIONES):            
             t = loader.get_template('fracciones/detalle.html')
+            grupo= request.user.groups.get().id
+            c = RequestContext(request, {
+                'grupo': grupo  
+            })
             #c = RequestContext(request, {})
             #return HttpResponse(t.render(c))
         else:

@@ -11,9 +11,17 @@ from principal import permisos
 def lotes(request):
     
     if request.user.is_authenticated():
-        t = loader.get_template('lotes/index.html')
-        c = RequestContext(request, {})
-        return HttpResponse(t.render(c))
+        if verificar_permisos(request.user.id, permisos.VER_LISTADO_OPCIONES):
+            t = loader.get_template('lotes/index.html')
+            c = RequestContext(request, {})
+            return HttpResponse(t.render(c))
+        else:
+            t = loader.get_template('index2.html')
+            grupo= request.user.groups.get().id
+            c = RequestContext(request, {
+                 'grupo': grupo
+            })
+            return HttpResponse(t.render(c))
     else:
         return HttpResponseRedirect(reverse('login')) 
 
@@ -21,9 +29,17 @@ def lotes(request):
 def consultar_lotes(request):
     
     if request.user.is_authenticated():
-        t = loader.get_template('lotes/listado.html')
-        #c = RequestContext(request, {})
-        #return HttpResponse(t.render(c))
+        if verificar_permisos(request.user.id, permisos.VER_LISTADO_LOTES):
+            t = loader.get_template('lotes/listado.html')
+            #c = RequestContext(request, {})
+            #return HttpResponse(t.render(c))
+        else:
+            t = loader.get_template('index2.html')
+            grupo= request.user.groups.get().id
+            c = RequestContext(request, {
+                 'grupo': grupo
+            })
+            return HttpResponse(t.render(c))
     else:
         return HttpResponseRedirect(reverse('login')) 
     
@@ -45,13 +61,21 @@ def consultar_lotes(request):
     return HttpResponse(t.render(c))
 
 # Funcion para el detalle de una fraccion: edita o borra una fraccion.
-def detalle_lote(request, lote_id):
-    
-    
+def detalle_lote(request, lote_id):    
     if request.user.is_authenticated():
-        t = loader.get_template('lotes/detalle.html')
-        #c = RequestContext(request, {})
-        #return HttpResponse(t.render(c))
+        if verificar_permisos(request.user.id, permisos.VER_LISTADO_LOTES):
+            t = loader.get_template('lotes/detalle.html')
+            grupo= request.user.groups.get().id
+    
+            #c = RequestContext(request, {})
+            #return HttpResponse(t.render(c))
+        else:
+            t = loader.get_template('index2.html')
+            grupo= request.user.groups.get().id
+            c = RequestContext(request, {
+                 'grupo': grupo
+            })
+            return HttpResponse(t.render(c))
     else:
         return HttpResponseRedirect(reverse('login'))     
 
@@ -83,15 +107,24 @@ def detalle_lote(request, lote_id):
         'form': form,
         'message_id': message_id,
         'message': message,
+        'grupo': grupo
     })
     return HttpResponse(t.render(c))
 
 # Funcion que detalla las ventas relacionadas a un lote determinado.
 def detalle_ventas_lote(request, venta_id):
     if request.user.is_authenticated():
-        t = loader.get_template('lotes/detalle_ventas.html')
-        #c = RequestContext(request, {})
-        #return HttpResponse(t.render(c))
+        if verificar_permisos(request.user.id, permisos.VER_LISTADO_LOTES):  
+            t = loader.get_template('lotes/detalle_ventas.html')
+            #c = RequestContext(request, {})
+            #return HttpResponse(t.render(c))
+        else:
+            t = loader.get_template('index2.html')
+            grupo= request.user.groups.get().id
+            c = RequestContext(request, {
+                 'grupo': grupo
+            })
+            return HttpResponse(t.render(c))
     else:
         return HttpResponseRedirect(reverse('login'))  
     
@@ -108,8 +141,6 @@ def detalle_ventas_lote(request, venta_id):
 
 # Funcion para agregar un nuevo lote.
 def agregar_lotes(request):
-    
-    
     if request.user.is_authenticated():
         if verificar_permisos(request.user.id, permisos.ADD_LOTE):
             t = loader.get_template('lotes/agregar2.html')
@@ -148,12 +179,19 @@ def agregar_lotes(request):
     })
     return HttpResponse(t.render(c))
 
-def listar_busqueda_lotes(request):
-       
+def listar_busqueda_lotes(request):       
     if request.user.is_authenticated():
-        t = loader.get_template('lotes/listado.html')
-        #c = RequestContext(request, {})
-        #return HttpResponse(t.render(c))
+        if verificar_permisos(request.user.id, permisos.VER_LISTADO_LOTES): 
+            t = loader.get_template('lotes/listado.html')
+            #c = RequestContext(request, {})
+            #return HttpResponse(t.render(c))
+        else:
+            t = loader.get_template('index2.html')
+            grupo= request.user.groups.get().id
+            c = RequestContext(request, {
+                 'grupo': grupo
+            })
+            return HttpResponse(t.render(c))
     else:
         return HttpResponseRedirect(reverse('login')) 
     

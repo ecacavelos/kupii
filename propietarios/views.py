@@ -4,7 +4,8 @@ from principal.models import Propietario
 from propietarios.forms import PropietarioForm, SearchForm
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.urlresolvers import reverse, resolve
-
+from principal.common_functions import verificar_permisos
+from principal import permisos
 #from django.views.generic.list_detail import object_list
 
 
@@ -12,9 +13,17 @@ from django.core.urlresolvers import reverse, resolve
 def index(request):
     
     if request.user.is_authenticated():
-        t = loader.get_template('propietarios/index.html')
-        c = RequestContext(request, {})
-        return HttpResponse(t.render(c))
+        if verificar_permisos(request.user.id, permisos.VER_OPCIONES_PROPIETARIO):
+            t = loader.get_template('propietarios/index.html')
+            c = RequestContext(request, {})
+            return HttpResponse(t.render(c))
+        else:
+            t = loader.get_template('index2.html')
+            grupo= request.user.groups.get().id
+            c = RequestContext(request, {
+                'grupo': grupo  
+            })
+            return HttpResponse(t.render(c))
     else:
         return HttpResponseRedirect(reverse('login'))
 
@@ -22,9 +31,17 @@ def index(request):
 def consultar_propietarios(request):
     
     if request.user.is_authenticated():
-        t = loader.get_template('propietarios/listado.html')
-        #c = RequestContext(request, {})
-        #return HttpResponse(t.render(c))
+        if verificar_permisos(request.user.id, permisos.VER_LISTADO_PROPIETARIOS):
+            t = loader.get_template('propietarios/listado.html')
+            #c = RequestContext(request, {})
+            #return HttpResponse(t.render(c))
+        else:
+            t = loader.get_template('index2.html')
+            grupo= request.user.groups.get().id
+            c = RequestContext(request, {
+                'grupo': grupo  
+            })
+            return HttpResponse(t.render(c))
     else:
         return HttpResponseRedirect(reverse('login'))
  
@@ -72,9 +89,18 @@ def consultar_propietarios(request):
 def detalle_propietario(request, propietario_id):
     
     if request.user.is_authenticated():
-        t = loader.get_template('propietarios/detalle.html')
-        #c = RequestContext(request, {})
-        #return HttpResponse(t.render(c))
+        if verificar_permisos(request.user.id, permisos.VER_LISTADO_CLIENTES):
+            t = loader.get_template('propietarios/detalle.html')
+            grupo= request.user.groups.get().id
+            #c = RequestContext(request, {})
+            #return HttpResponse(t.render(c))
+        else:
+            t = loader.get_template('index2.html')
+            grupo= request.user.groups.get().id
+            c = RequestContext(request, {
+                'grupo': grupo  
+            })
+            return HttpResponse(t.render(c))
     else:
         return HttpResponseRedirect(reverse('login'))
  
@@ -100,6 +126,7 @@ def detalle_propietario(request, propietario_id):
         'propietario': object_list,
         'form': form,
         'message': message,
+        'grupo': grupo
     })
     return HttpResponse(t.render(c))
 
@@ -107,9 +134,16 @@ def detalle_propietario(request, propietario_id):
 def agregar_propietarios(request):
     
     if request.user.is_authenticated():
-        t = loader.get_template('propietarios/agregar.html')
-        #c = RequestContext(request, {})
-        #return HttpResponse(t.render(c))
+        if verificar_permisos(request.user.id, permisos.ADD_PROPIETARIO):
+            t = loader.get_template('propietarios/agregar.html')
+            #c = RequestContext(request, {})
+            #return HttpResponse(t.render(c))
+        else:
+            t = loader.get_template('index2.html')
+            grupo= request.user.groups.get().id
+            c = RequestContext(request, {
+                'grupo': grupo                                     })
+            return HttpResponse(t.render(c))
     else:
         return HttpResponseRedirect(reverse('login'))
 

@@ -4,15 +4,25 @@ from principal.models import Vendedor
 from vendedores.forms import VendedorForm
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.urlresolvers import reverse, resolve
+from principal.common_functions import verificar_permisos
+from principal import permisos
 #from django.views.generic.list_detail import object_list
 
 # Funcion principal del modulo de vendedores.
 def vendedores(request):
     
     if request.user.is_authenticated():
-        t = loader.get_template('vendedores/index.html')
-        c = RequestContext(request, {})
-        return HttpResponse(t.render(c))
+        if verificar_permisos(request.user.id, permisos.VER_OPCIONES_VENDEDOR):
+            t = loader.get_template('vendedores/index.html')
+            c = RequestContext(request, {})
+            return HttpResponse(t.render(c))
+        else:
+            t = loader.get_template('index2.html')
+            grupo= request.user.groups.get().id
+            c = RequestContext(request, {
+                'grupo': grupo  
+            })
+            return HttpResponse(t.render(c))
     else:
         return HttpResponseRedirect(reverse('login'))
 
@@ -20,9 +30,17 @@ def vendedores(request):
 def consultar_vendedores(request):
     
     if request.user.is_authenticated():
-        t = loader.get_template('vendedores/listado.html')
-        #c = RequestContext(request, {})
-        #return HttpResponse(t.render(c))
+        if verificar_permisos(request.user.id, permisos.VER_LISTADO_VENDEDORES):
+            t = loader.get_template('vendedores/listado.html')
+            #c = RequestContext(request, {})
+            #return HttpResponse(t.render(c))
+        else:
+            t = loader.get_template('index2.html')
+            grupo= request.user.groups.get().id
+            c = RequestContext(request, {
+                'grupo': grupo  
+                })
+            return HttpResponse(t.render(c))
     else:
         return HttpResponseRedirect(reverse('login'))
     
@@ -48,9 +66,18 @@ def detalle_vendedor(request, vendedor_id):
     
     
     if request.user.is_authenticated():
-        t = loader.get_template('vendedores/detalle.html')
-        #c = RequestContext(request, {})
-        #return HttpResponse(t.render(c))
+        if verificar_permisos(request.user.id, permisos.VER_LISTADO_VENDEDORES):
+            t = loader.get_template('vendedores/detalle.html')
+            grupo= request.user.groups.get().id
+            #c = RequestContext(request, {})
+            #return HttpResponse(t.render(c))
+        else:
+            t = loader.get_template('index2.html')
+            grupo= request.user.groups.get().id
+            c = RequestContext(request, {
+                'grupo': grupo  
+            })
+            return HttpResponse(t.render(c))
     else:
         return HttpResponseRedirect(reverse('login'))    
 
@@ -76,6 +103,7 @@ def detalle_vendedor(request, vendedor_id):
         'vendedor': object_list,
         'form': form,
         'message': message,
+        'grupo': grupo
     })
     return HttpResponse(t.render(c))
 
@@ -84,9 +112,16 @@ def agregar_vendedores(request):
     
     
     if request.user.is_authenticated():
-        t = loader.get_template('vendedores/agregar.html')
-        #c = RequestContext(request, {})
-        #return HttpResponse(t.render(c))
+        if verificar_permisos(request.user.id, permisos.ADD_VENDEDOR):
+            t = loader.get_template('vendedores/agregar.html')
+            #c = RequestContext(request, {})
+            #return HttpResponse(t.render(c))
+        else:
+            t = loader.get_template('index2.html')
+            grupo= request.user.groups.get().id
+            c = RequestContext(request, {
+                'grupo': grupo                                     })
+            return HttpResponse(t.render(c))
     else:
         return HttpResponseRedirect(reverse('login'))
 

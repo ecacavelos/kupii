@@ -4,33 +4,56 @@ from principal.models import PlanDePago, PlanDePagoVendedor
 from parametros.forms import PlanDePagoForm, SearchForm, PlanDePagoVendedorForm
 from django.core.urlresolvers import reverse, resolve
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from principal.common_functions import verificar_permisos
+from principal import permisos
 # Funcion principal del modulo de lotes.
-def parametros(request):
-    
+def parametros(request):    
     if request.user.is_authenticated():
-        t = loader.get_template('parametros/index.html')
-        c = RequestContext(request, {})
-        return HttpResponse(t.render(c))
+        if verificar_permisos(request.user.id, permisos.VER_LISTADO_OPCIONES):
+            t = loader.get_template('parametros/index.html')
+            c = RequestContext(request, {})
+            return HttpResponse(t.render(c))
+        else:
+            t = loader.get_template('index2.html')
+            grupo= request.user.groups.get().id
+            c = RequestContext(request, {
+                 'grupo': grupo
+            })
+            return HttpResponse(t.render(c))
     else:
         return HttpResponseRedirect(reverse('login')) 
 
 #Funcion del modulo plan de pagos
-def plan_de_pago(request):
-    
+def plan_de_pago(request):    
     if request.user.is_authenticated():
-        t = loader.get_template('parametros/plan_pago/index.html')
-        c = RequestContext(request, {})
-        return HttpResponse(t.render(c))
+        if verificar_permisos(request.user.id, permisos.VER_OPCIONES_PLANDEPAGO):
+            t = loader.get_template('parametros/plan_pago/index.html')
+            c = RequestContext(request, {})
+            return HttpResponse(t.render(c))
+        else:
+            t = loader.get_template('index2.html')
+            grupo= request.user.groups.get().id
+            c = RequestContext(request, {
+                 'grupo': grupo
+            })
+            return HttpResponse(t.render(c))
     else:
         return HttpResponseRedirect(reverse('login'))
 
 #Funcion del modulo plan de pagos vendedores
 def plan_de_pago_vendedores(request):
-    
     if request.user.is_authenticated():
-        t = loader.get_template('parametros/plan_pago_vendedores/index.html')
-        c = RequestContext(request, {})
-        return HttpResponse(t.render(c))
+        if verificar_permisos(request.user.id, permisos.VER_OPCIONES_PLANDEPAGOVENDEDOR):
+            t = loader.get_template('parametros/plan_pago_vendedores/index.html')
+            c = RequestContext(request, {})
+            return HttpResponse(t.render(c))
+        else:
+            t = loader.get_template('index2.html')
+            grupo= request.user.groups.get().id
+            c = RequestContext(request, {
+                 'grupo': grupo
+            })
+            return HttpResponse(t.render(c))
     else:
         return HttpResponseRedirect(reverse('login'))
 
@@ -39,9 +62,17 @@ def plan_de_pago_vendedores(request):
 def consultar_plan_de_pago(request):
     
     if request.user.is_authenticated():
-        t = loader.get_template('parametros/plan_pago/listado.html')
-        #c = RequestContext(request, {})
-        #return HttpResponse(t.render(c))
+        if verificar_permisos(request.user.id, permisos.VER_LISTADO_PLANDEPAGO):
+            t = loader.get_template('parametros/plan_pago/listado.html')
+            #c = RequestContext(request, {})
+            #return HttpResponse(t.render(c))
+        else:
+            t = loader.get_template('index2.html')
+            grupo= request.user.groups.get().id
+            c = RequestContext(request, {
+                 'grupo': grupo
+            })
+            return HttpResponse(t.render(c))
     else:
         return HttpResponseRedirect(reverse('login'))
     
@@ -84,12 +115,19 @@ def consultar_plan_de_pago(request):
     return HttpResponse(t.render(c))
 
 #funcion para consultar el listado de todos los planes de pagos de vendedores
-def consultar_plan_de_pago_vendedores(request):
-    
+def consultar_plan_de_pago_vendedores(request):    
     if request.user.is_authenticated():
-        t = loader.get_template('parametros/plan_pago_vendedores/listado.html')
-        #c = RequestContext(request, {})
-        #return HttpResponse(t.render(c))
+        if verificar_permisos(request.user.id, permisos.VER_LISTADO_PLANDEPAGOVENDEDORES):
+            t = loader.get_template('parametros/plan_pago_vendedores/listado.html')
+            #c = RequestContext(request, {})
+            #return HttpResponse(t.render(c))
+        else:
+            t = loader.get_template('index2.html')
+            grupo= request.user.groups.get().id
+            c = RequestContext(request, {
+                 'grupo': grupo
+            })
+            return HttpResponse(t.render(c))
     else:
         return HttpResponseRedirect(reverse('login'))
     
@@ -133,13 +171,20 @@ def consultar_plan_de_pago_vendedores(request):
     return HttpResponse(t.render(c))
 
 # Funcion para consultar el detalle de un cliente.
-def detalle_plan_de_pago(request, plandepago_id):
-    
-    
+def detalle_plan_de_pago(request, plandepago_id):    
     if request.user.is_authenticated():
-        t = loader.get_template('parametros/plan_pago/detalle.html')
-        #c = RequestContext(request, {})
-        #return HttpResponse(t.render(c))
+        if verificar_permisos(request.user.id, permisos.VER_LISTADO_PLANDEPAGO):
+            t = loader.get_template('parametros/plan_pago/detalle.html')
+            grupo= request.user.groups.get().id
+            #c = RequestContext(request, {})
+            #return HttpResponse(t.render(c))
+        else:
+            t = loader.get_template('index2.html')
+            grupo= request.user.groups.get().id
+            c = RequestContext(request, {
+                 'grupo': grupo
+            })
+            return HttpResponse(t.render(c))
     else:
         return HttpResponseRedirect(reverse('login'))
     
@@ -165,17 +210,25 @@ def detalle_plan_de_pago(request, plandepago_id):
         'plandepago': object_list,
         'form': form,
         'message': message,
+        'grupo': grupo
     })
     return HttpResponse(t.render(c))
 
 # Funcion para consultar el detalle de un cliente.
-def detalle_plan_de_pago_vendedores(request, plandepago_vendedor_id):
-    
-    
+def detalle_plan_de_pago_vendedores(request, plandepago_vendedor_id):    
     if request.user.is_authenticated():
-        t = loader.get_template('parametros/plan_pago_vendedores/detalle.html')
-        #c = RequestContext(request, {})
-        #return HttpResponse(t.render(c))
+        if verificar_permisos(request.user.id, permisos.VER_LISTADO_PLANDEPAGOVENDEDORES):
+            t = loader.get_template('parametros/plan_pago_vendedores/detalle.html')
+            grupo= request.user.groups.get().id
+            #c = RequestContext(request, {})
+            #return HttpResponse(t.render(c))
+        else:
+            t = loader.get_template('index2.html')
+            grupo= request.user.groups.get().id
+            c = RequestContext(request, {
+                 'grupo': grupo
+            })
+            return HttpResponse(t.render(c))
     else:
         return HttpResponseRedirect(reverse('login'))
     
@@ -201,18 +254,26 @@ def detalle_plan_de_pago_vendedores(request, plandepago_vendedor_id):
         'plandepago': object_list,
         'form': form,
         'message': message,
+        'grupo': grupo
     })
     return HttpResponse(t.render(c))
 
 
 #funcion para agregar planes de pago
 def agregar_plan_de_pago(request):
-    
-    
+   
     if request.user.is_authenticated():
-        t = loader.get_template('parametros/plan_pago/agregar.html')
-        #c = RequestContext(request, {})
-        #return HttpResponse(t.render(c))
+        if verificar_permisos(request.user.id, permisos.ADD_PLANDEPAGO): 
+            t = loader.get_template('parametros/plan_pago/agregar.html')
+            #c = RequestContext(request, {})
+            #return HttpResponse(t.render(c))
+        else:
+            t = loader.get_template('index2.html')
+            grupo= request.user.groups.get().id
+            c = RequestContext(request, {
+                 'grupo': grupo
+            })
+            return HttpResponse(t.render(c))
     else:
         return HttpResponseRedirect(reverse('login'))
     
@@ -232,12 +293,19 @@ def agregar_plan_de_pago(request):
 
 #funcion para agregar planes de pago de vendedores
 def agregar_plan_de_pago_vendedores(request):
-    
-    
+  
     if request.user.is_authenticated():
-        t = loader.get_template('parametros/plan_pago_vendedores/agregar.html')
-        #c = RequestContext(request, {})
-        #return HttpResponse(t.render(c))
+        if verificar_permisos(request.user.id, permisos.ADD_PLANDEPAGOVENDEDOR): 
+            t = loader.get_template('parametros/plan_pago_vendedores/agregar.html')
+            #c = RequestContext(request, {})
+            #return HttpResponse(t.render(c))
+        else:
+            t = loader.get_template('index2.html')
+            grupo= request.user.groups.get().id
+            c = RequestContext(request, {
+                 'grupo': grupo
+            })
+            return HttpResponse(t.render(c))
     else:
         return HttpResponseRedirect(reverse('login'))
     

@@ -1764,7 +1764,7 @@ def listar_busqueda_recuperacion(request):
 
 def modificar_pago_de_cuotas(request, id):        
     if request.user.is_authenticated():
-        if verificar_permisos(request.user.id, permisos.VER_INFORMES):
+        if verificar_permisos(request.user.id, permisos.CHANGE_PAGODECUOTAS):
             if request.method == 'GET':
                 pago = PagoDeCuotas.objects.get(pk=id)
                 fecha = pago.fecha_de_pago.strftime('%d/%m/%Y')
