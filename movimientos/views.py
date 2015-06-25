@@ -2,6 +2,7 @@ from django.http import HttpResponse, HttpResponseServerError,HttpResponseRedire
 from django.template import RequestContext, loader
 from principal.models import Fraccion, Manzana, Cliente,Propietario, Lote, Vendedor, PlanDePago, PlanDePagoVendedor, Venta, Reserva, PagoDeCuotas, TransferenciaDeLotes, CambioDeLotes, RecuperacionDeLotes
 import json
+import datetime
 from datetime import datetime
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.urlresolvers import reverse, resolve
@@ -276,7 +277,6 @@ def pago_de_cuotas(request):
         return HttpResponseRedirect("/login")
 
 def calcular_interes(request):
-    
     if request.user.is_authenticated():
         #calculando el interes
         if request.method == 'POST':
@@ -284,9 +284,15 @@ def calcular_interes(request):
             lote_id = data.get('lote_id', '')
             print 'lote_id->' + lote_id
             fecha_pago = data.get('fecha_pago', '')
-            fecha_pago_parsed = datetime.strptime(fecha_pago, "%d/%m/%Y").date()
             proximo_vencimiento = data.get('proximo_vencimiento', '')
-            proximo_vencimiento_parsed = datetime.strptime(proximo_vencimiento, "%d/%m/%Y").date()
+            fecha_pago_parsed = datetime.datetime.strptime(data.get('fecha_pago'), "%d/%m/%Y").date()
+
+            #fecha_pago_parsed = datetime.strptime(fecha_pago, "%d/%m/%Y").date()
+            #proximo_vencimiento = data.get('proximo_vencimiento', '')
+            #proximo_vencimiento_parsed = datetime.strptime(proximo_vencimiento, "%d/%m/%Y").date()
+
+            proximo_vencimiento_parsed = datetime.datetime.strptime(data.get('proximo_vencimiento'), "%d/%m/%Y").date()
+
             
             detalles = obtener_detalle_interes_lote(lote_id,fecha_pago_parsed,proximo_vencimiento_parsed)
 

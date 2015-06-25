@@ -9,6 +9,7 @@ from django.contrib.auth.models import User, Permission
 from django.db.models import Q
 import json
 import math
+import datetime
 
 
 def get_cuotas_detail_by_lote(lote_id):
@@ -464,3 +465,11 @@ def cant_cuotas_pagadas_ref(pagos):
         if pago['refuerzo'] ==True:
             cuotas_ref_pagadas +=1
     return cuotas_ref_pagadas
+
+def calcular_dias_habiles(fecha_ini, fecha_fin):
+    start = datetime.date(2010,1,1)
+    end = datetime.date(2010,3,31)
+
+    daydiff = end.weekday() - start.weekday()
+
+    days = ((end-start).days - daydiff) / 7 * 5 + min(daydiff,5) - (max(end.weekday() - 4, 0) % 5)
