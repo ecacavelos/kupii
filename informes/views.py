@@ -545,15 +545,14 @@ def liquidacion_propietarios(request):
                                                 #se encontro la venta no recuperada, la venta actual
                                                 venta = item_venta
                                         pagos =[]
-                                        if ventas != None: 
-                                            pagos = get_pago_cuotas(venta, fecha_ini_parsed,fecha_fin_parsed)
-                                            
-                                        lista_cuotas_inm =[]
-                                        lista_cuotas_inm.append(venta.plan_de_pago.inicio_cuotas_inmobiliaria)
-                                        numero_cuota = venta.plan_de_pago.inicio_cuotas_inmobiliaria
-                                        for i in range(venta.plan_de_pago.cantidad_cuotas_inmobiliaria -1):
-                                            numero_cuota +=  venta.plan_de_pago.intervalos_cuotas_inmobiliaria
-                                            lista_cuotas_inm.append(numero_cuota)
+                                        if venta != None: 
+                                            pagos = get_pago_cuotas(venta, fecha_ini_parsed,fecha_fin_parsed)                                            
+                                            lista_cuotas_inm =[]
+                                            lista_cuotas_inm.append(venta.plan_de_pago.inicio_cuotas_inmobiliaria)
+                                            numero_cuota = venta.plan_de_pago.inicio_cuotas_inmobiliaria
+                                            for i in range(venta.plan_de_pago.cantidad_cuotas_inmobiliaria -1):
+                                                numero_cuota +=  venta.plan_de_pago.intervalos_cuotas_inmobiliaria
+                                                lista_cuotas_inm.append(numero_cuota)
                                         if pagos:
                                             for pago in pagos:
                                                 montos = calculo_montos_liquidacion_propietarios(pago,venta,lista_cuotas_inm)
@@ -609,6 +608,7 @@ def liquidacion_propietarios(request):
                                         lotes = Lote.objects.filter(manzana_id=m.id)
                                         for l in lotes:
                                             ventas = Venta.objects.filter(lote_id=l.id)
+                                            venta= None
                                             for item_venta in ventas:
                                                 print 'Obteniendo la ultima venta'
                                                 try:
@@ -616,13 +616,15 @@ def liquidacion_propietarios(request):
                                                 except RecuperacionDeLotes.DoesNotExist:
                                                     print 'se encontro la venta no recuperada, la venta actual'
                                                     venta = item_venta
-                                            pagos = get_pago_cuotas(venta, fecha_ini_parsed,fecha_fin_parsed)
-                                            lista_cuotas_inm =[]
-                                            lista_cuotas_inm.append(venta.plan_de_pago.inicio_cuotas_inmobiliaria)
-                                            numero_cuota = venta.plan_de_pago.inicio_cuotas_inmobiliaria
-                                            for i in range(venta.plan_de_pago.cantidad_cuotas_inmobiliaria -1):
-                                                numero_cuota +=  venta.plan_de_pago.intervalos_cuotas_inmobiliaria
-                                                lista_cuotas_inm.append(numero_cuota)
+                                            pagos =[]
+                                            if venta != None: 
+                                                pagos = get_pago_cuotas(venta, fecha_ini_parsed,fecha_fin_parsed)                                            
+                                                lista_cuotas_inm =[]
+                                                lista_cuotas_inm.append(venta.plan_de_pago.inicio_cuotas_inmobiliaria)
+                                                numero_cuota = venta.plan_de_pago.inicio_cuotas_inmobiliaria
+                                                for i in range(venta.plan_de_pago.cantidad_cuotas_inmobiliaria -1):
+                                                    numero_cuota +=  venta.plan_de_pago.intervalos_cuotas_inmobiliaria
+                                                    lista_cuotas_inm.append(numero_cuota)
                                             if pagos:
                                                 for pago in pagos:
                                                     montos = calculo_montos_liquidacion_propietarios(pago,venta, lista_cuotas_inm)
@@ -1753,6 +1755,7 @@ def liquidacion_propietarios_reporte_excel(request):
                 lotes_list = Lote.objects.filter(manzana_id=m.id).order_by('id')
                 for l in lotes_list:
                     ventas = Venta.objects.filter(lote_id=l.id)
+                    venta= None
                     #Obteniendo la ultima venta
                     for item_venta in ventas:                                           
                         try:
@@ -1760,10 +1763,18 @@ def liquidacion_propietarios_reporte_excel(request):
                         except RecuperacionDeLotes.DoesNotExist:
                             #se encontro la venta no recuperada, la venta actual
                             venta = item_venta
-                    pagos = get_pago_cuotas(venta, fecha_ini_parsed,fecha_fin_parsed)
+                    pagos =[]
+                    if venta != None: 
+                        pagos = get_pago_cuotas(venta, fecha_ini_parsed,fecha_fin_parsed)                                            
+                        lista_cuotas_inm =[]
+                        lista_cuotas_inm.append(venta.plan_de_pago.inicio_cuotas_inmobiliaria)
+                        numero_cuota = venta.plan_de_pago.inicio_cuotas_inmobiliaria
+                        for i in range(venta.plan_de_pago.cantidad_cuotas_inmobiliaria -1):
+                            numero_cuota +=  venta.plan_de_pago.intervalos_cuotas_inmobiliaria
+                            lista_cuotas_inm.append(numero_cuota)
                     if pagos:
                         for pago in pagos:
-                            montos = calculo_montos_liquidacion_propietarios(pago,venta)
+                            montos = calculo_montos_liquidacion_propietarios(pago,venta,lista_cuotas_inm)
                             monto_inmobiliaria = montos['monto_inmobiliaria']
                             monto_propietario = montos['monto_propietario']
                             # Se setean los datos de cada fila
@@ -1816,15 +1827,24 @@ def liquidacion_propietarios_reporte_excel(request):
                     lotes = Lote.objects.filter(manzana_id=m.id)
                     for l in lotes:
                         ventas = Venta.objects.filter(lote_id=l.id)
+                        venta= None
                         for item_venta in ventas:
                             try:
                                 RecuperacionDeLotes.objects.get(venta=item_venta.id)
                             except RecuperacionDeLotes.DoesNotExist:
                                 venta = item_venta
-                        pagos = get_pago_cuotas(venta, fecha_ini_parsed,fecha_fin_parsed)
+                        pagos =[]
+                        if venta != None: 
+                            pagos = get_pago_cuotas(venta, fecha_ini_parsed,fecha_fin_parsed)                                            
+                            lista_cuotas_inm =[]
+                            lista_cuotas_inm.append(venta.plan_de_pago.inicio_cuotas_inmobiliaria)
+                            numero_cuota = venta.plan_de_pago.inicio_cuotas_inmobiliaria
+                            for i in range(venta.plan_de_pago.cantidad_cuotas_inmobiliaria -1):
+                                numero_cuota +=  venta.plan_de_pago.intervalos_cuotas_inmobiliaria
+                                lista_cuotas_inm.append(numero_cuota)
                         if pagos:
                             for pago in pagos:
-                                montos = calculo_montos_liquidacion_propietarios(pago,venta)
+                                montos = calculo_montos_liquidacion_propietarios(pago,venta,lista_cuotas_inm)
                                 monto_inmobiliaria = montos['monto_inmobiliaria']
                                 monto_propietario = montos['monto_propietario']
                                 # Se setean los datos de cada fila
