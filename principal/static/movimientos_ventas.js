@@ -230,6 +230,8 @@ function validateVenta() {
 		});
 		request2.fail(function(jqXHR, textStatus) {
 			alert("Error en la solicitud.");
+			$('#enviar_venta').removeAttr('disabled');
+			return false;
 		});
 	} else {
 		alert("Por favor introduzca el monto.");
