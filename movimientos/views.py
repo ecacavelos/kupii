@@ -58,15 +58,15 @@ def ventas_de_lotes(request):
                 date_parse_error = False
         
                 try:
-                    fecha_venta_parsed = datetime.strptime(data.get('venta_fecha_de_venta', ''), "%d/%m/%Y")
-                    fecha_vencim_parsed = datetime.strptime(data.get('venta_fecha_primer_vencimiento', ''), "%d/%m/%Y")
+                    fecha_venta_parsed = datetime.datetime.strptime(data.get('venta_fecha_de_venta', ''), "%d/%m/%Y")
+                    fecha_vencim_parsed = datetime.datetime.strptime(data.get('venta_fecha_primer_vencimiento', ''), "%d/%m/%Y")
                 except:
                     date_parse_error = True
         
                 if date_parse_error == True:
                     try:
-                        fecha_venta_parsed = datetime.strptime(data.get('venta_fecha_de_venta', ''), "%Y-%m-%d")
-                        fecha_vencim_parsed = datetime.strptime(data.get('venta_fecha_primer_vencimiento', ''), "%Y-%m-%d")
+                        fecha_venta_parsed = datetime.datetime.strptime(data.get('venta_fecha_de_venta', ''), "%Y-%m-%d")
+                        fecha_vencim_parsed = datetime.datetime.strptime(data.get('venta_fecha_primer_vencimiento', ''), "%Y-%m-%d")
                     except:
                         date_parse_error = True
                 try:        
@@ -101,9 +101,14 @@ def ventas_de_lotes(request):
                     nueva_venta.save()
                     lote_a_vender.estado = "3"
                     lote_a_vender.save()
+                    venta_cli = Venta.objects.get(pk=nueva_venta.id)
                 else:
                     return HttpResponseServerError("La sumatoria de las cuotas es menor al precio final de venta.")
-                return HttpResponse(sumatoria_cuotas)
+                c = RequestContext(request, {
+                    'ventas': venta_cli,
+                    'sumatoria_cuotas': sumatoria_cuotas
+                })
+                return HttpResponse(t.render(c))
         
             else:
                 object_list = Lote.objects.none()
@@ -220,7 +225,7 @@ def pago_de_cuotas(request):
                 total_de_pago = data.get('pago_total_de_pago')
                 date_parse_error = False
                 fecha_pago=data.get('pago_fecha_de_pago', '')
-                fecha_pago_parsed = datetime.strptime(fecha_pago, "%d/%m/%Y").date()
+                fecha_pago_parsed = datetime.datetime.strptime(fecha_pago, "%d/%m/%Y").date()
     #             try:
     #                 fecha_pago_parsed = datetime.strptime(data.get('pago_fecha_de_pago', ''), "%d/%m/%Y")
     #             except:
