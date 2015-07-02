@@ -331,3 +331,67 @@ def parametros_generales(request):
         return HttpResponse(t.render(c))
     else:
         return HttpResponseRedirect(reverse('login'))
+    
+def listar_busqueda_ppagos(request):       
+    if request.user.is_authenticated():
+        if verificar_permisos(request.user.id, permisos.VER_LISTADO_PLANDEPAGO): 
+            t = loader.get_template('parametros/plan_pago/listado.html')
+            #c = RequestContext(request, {})
+            #return HttpResponse(t.render(c))
+        else:
+            t = loader.get_template('index2.html')
+            grupo= request.user.groups.get().id
+            c = RequestContext(request, {
+                 'grupo': grupo
+            })
+            return HttpResponse(t.render(c))
+    else:
+        return HttpResponseRedirect(reverse('login')) 
+    
+    id_ppago = request.POST['plan_pago']
+    if id_ppago:
+        object_list=PlanDePago.objects.filter(pk=id_ppago)
+    paginator=Paginator(object_list,15)
+    page=request.GET.get('page')
+    try:
+        lista=paginator.page(page)
+    except PageNotAnInteger:
+        lista=paginator.page(1)
+    except EmptyPage:
+        lista=paginator.page(paginator.num_pages)
+        
+    c = RequestContext(request, {
+        'object_list': lista,
+    })
+    return HttpResponse(t.render(c))
+
+def listar_busqueda_ppagos_vendedores(request):       
+    if request.user.is_authenticated():
+        if verificar_permisos(request.user.id, permisos.VER_LISTADO_PLANDEPAGOVENDEDORES): 
+            t = loader.get_template('parametros/plan_pago_vendedores/listado.html')
+        else:
+            t = loader.get_template('index2.html')
+            grupo= request.user.groups.get().id
+            c = RequestContext(request, {
+                 'grupo': grupo
+            })
+            return HttpResponse(t.render(c))
+    else:
+        return HttpResponseRedirect(reverse('login')) 
+    
+    id_ppago_vendedor = request.POST['plan_pago_vendedores']
+    if id_ppago_vendedor:
+        object_list=PlanDePagoVendedor.objects.filter(pk=id_ppago_vendedor)
+    paginator=Paginator(object_list,15)
+    page=request.GET.get('page')
+    try:
+        lista=paginator.page(page)
+    except PageNotAnInteger:
+        lista=paginator.page(1)
+    except EmptyPage:
+        lista=paginator.page(paginator.num_pages)
+        
+    c = RequestContext(request, {
+        'object_list': lista,
+    })
+    return HttpResponse(t.render(c))

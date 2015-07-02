@@ -1,9 +1,32 @@
 {% extends "lotes/base_lotes.html" %}
 {% block header_scripts %}
 <script type="text/javascript">
-$(document).ready(function(){
-	$( ".grid_6" ).hide();
-});
+	function buscar() {
+		if ($("#id_plan_pago").val() == "") {
+			alert("Debe ingresar el nombre del plan para buscar.");
+		} else {
+			$("#frm_busqueda").submit();
+		}
+	}
+	$(document).ready(function() {
+		//autocomplete para planes de pago
+		var id_plan_pago;
+		$("#id_plan_pago").empty();
+		base_url="/ajax/get_plan_pago/";
+		params="value";
+		$("#id_plan_p").autocomplete({
+			source : base_url,
+			minLenght : 1,
+			select : function(event, ui) {
+				id_plan = ui.item.id;
+				name_plan= ui.item.label;
+				ui.item.value = ui.item.label;
+				$("#id_plan_p").val(name_plan);
+				$("#id_plan_pago").val(id_plan);			
+			}
+		});
+	});
+
 </script>
 {%endblock%}
 {% block content %}
@@ -14,8 +37,27 @@ $(document).ready(function(){
 	<span class="verde-1">> Listado de Planes de pago</span> 
 </div>
 <div class="clear"></div>
-<div class="grid_10"><h1>Listado de Planes de Pago</h1></div>
-<div class="grid_6"><a href="#" class="historico">Buscar</a></div>
+<h1>Listado de Planes de Pago</h1>
+<div class="grid_6">
+	<form name="frm_busqueda" id="frm_busqueda" method="post" action="/parametros/plan_pago/listado_busqueda_ppagos/">
+		{% csrf_token %}
+		<table id="lista-categoria" frame="box">
+			<tr>
+				<th class="acciones"  colspan="3"><strong><a href="#" style="color: white;">Filtrar</a></strong></th>
+			</tr>
+			<tr>
+				<td>Plan de Pago:</td>
+				<td><input id="id_plan_pago" name="plan_pago" type="hidden" maxlength="100"/>
+					<input id="id_plan_p" type="text" name="plan_p" maxlength="100" /><br><br>
+				</td>
+			</tr>
+			<tr>
+				<td></td>
+				<td><input type="button" value="Buscar" onclick="buscar();" class="historico" style="cursor: pointer"/></td>
+			</tr>
+		</table>
+	</form>
+</div>
 <div class="clear"></div>
 <div id="listado-cuadro-busqueda">
 	<a href="{% url 'frontend_home' %}parametros/plan_pago/agregar" class="boton-verde">Agregar Plan de Pago</a>

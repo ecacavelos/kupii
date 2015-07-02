@@ -1,9 +1,31 @@
 {% extends "lotes/base_lotes.html" %}
 {% block header_scripts %}
 <script type="text/javascript">
-$(document).ready(function(){
-	$( ".grid_6" ).hide();
-});
+	function buscar() {
+		if ($("#id_plan_pv").val() == "") {
+			alert("Debe ingresar el nombre del plan para buscar.");
+		} else {
+			$("#frm_busqueda").submit();
+		}
+	}
+	$(document).ready(function() {
+		//autocomplete para planes de pago de vendedores
+		var id_plan_pago_vendedores;
+		$("#id_plan_pago_vendedores").empty();
+		base_url="/ajax/get_plan_pago_vendedor/";
+		params="value";
+		$("#id_plan_pv").autocomplete({
+			source : base_url,
+			minLenght : 1,
+			select : function(event, ui) {
+				id_plan = ui.item.id;
+				name_plan= ui.item.label;
+				ui.item.value = ui.item.label;
+				$("#id_plan_pv").val(name_plan);
+				$("#id_plan_pago_vendedores").val(id_plan);
+			}
+		});
+	});
 </script>
 {%endblock%}
 {% block content %}
@@ -14,13 +36,26 @@ $(document).ready(function(){
 	<span class="verde-1">> Listado de Planes de pago de Vendedores</span> 
 </div>
 <div class="clear"></div>
-
-<div class="grid_10">
-	<h1>Listado de Planes de Pago de Vendedores</h1>
-</div>
-
+<h1>Listado de Planes de Pago de Vendedores</h1>
 <div class="grid_6">
-	<a href="#" class="historico">Buscar</a>
+	<form name="frm_busqueda" id="frm_busqueda" method="post" action="/parametros/plan_pago/listado_busqueda_ppagos_vendedores/">
+		{% csrf_token %}
+		<table id="lista-categoria" frame="box">
+			<tr>
+				<th class="acciones"  colspan="3"><strong><a href="#" style="color: white;">Filtrar</a></strong></th>
+			</tr>
+			<tr>
+				<td>Plan de Pago Vendedor:</td>
+				<td><input id="id_plan_pago_vendedores" name="plan_pago_vendedores" type="hidden" maxlength="100"/>
+				<input id="id_plan_pv" type="text" name="plan_pv" maxlength="100" /><br><br>
+				</td>
+			</tr>
+			<tr>
+				<td></td>
+				<td><input type="button" value="Buscar" onclick="buscar();" class="historico" style="cursor: pointer"/></td>
+			</tr>
+		</table>
+	</form>
 </div>
 
 <div class="clear"></div>
