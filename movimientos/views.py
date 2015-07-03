@@ -105,11 +105,13 @@ def ventas_de_lotes(request):
                 else:
                     return HttpResponseServerError("La sumatoria de las cuotas es menor al precio final de venta.")
                 c = RequestContext(request, {
-                    'ventas': venta_cli,
-                    'sumatoria_cuotas': sumatoria_cuotas
+                     'sumatoria_cuotas': sumatoria_cuotas,
+                     'ventas': venta_cli
                 })
                 return HttpResponse(t.render(c))
-        
+#                 data = json.dumps({
+#                     'ventas': venta_cli})
+#                 return HttpResponse(data,content_type="application/json")
             else:
                 object_list = Lote.objects.none()
             c = RequestContext(request, {
@@ -1860,9 +1862,9 @@ def modificar_venta(request, id):
                 venta = Venta.objects.get(pk=id)
                 data = request.POST            
                 fecha_de_venta = data.get('fecha_de_venta', '')
-                fecha_de_venta_parsed = datetime.strptime(fecha_de_venta, "%d/%m/%Y").date()            
+                fecha_de_venta_parsed = datetime.datetime.strptime(fecha_de_venta, "%d/%m/%Y").date()            
                 fecha_primer_venc = data.get('fecha_primer_venc', '')
-                fecha_primer_venc_parsed = datetime.strptime(fecha_primer_venc, "%d/%m/%Y").date()
+                fecha_primer_venc_parsed = datetime.datetime.strptime(fecha_primer_venc, "%d/%m/%Y").date()
                 id_cliente = data.get('cliente', '')
                 cliente = Cliente.objects.get(pk=int(id_cliente))
                 id_plandepago = data.get('plan_de_pago', '')
