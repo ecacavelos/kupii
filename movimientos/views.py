@@ -174,13 +174,13 @@ def reservas_de_lotes(request):
                 cliente_id = data.get('reserva_cliente_id', '')
                 date_parse_error = False
                 try:
-                    fecha_reserva_parsed = datetime.strptime(data.get('reserva_fecha_de_reserva', ''), "%d/%m/%Y")
+                    fecha_reserva_parsed = datetime.datetime.strptime(data.get('reserva_fecha_de_reserva', ''), "%d/%m/%Y")
                 except:
                     date_parse_error = True
         
                 if date_parse_error == True:
                     try:
-                        fecha_reserva_parsed = datetime.strptime(data.get('reserva_fecha_de_reserva', ''), "%Y-%m-%d")
+                        fecha_reserva_parsed = datetime.datetime.strptime(data.get('reserva_fecha_de_reserva', ''), "%Y-%m-%d")
                     except:
                         date_parse_error = True
                 
@@ -328,13 +328,13 @@ def transferencias_de_lotes(request):
                 date_parse_error = False
         
                 try:
-                    fecha_transferencia_parsed = datetime.strptime(data.get('transferencia_fecha_de_transferencia', ''), "%d/%m/%Y")
+                    fecha_transferencia_parsed = datetime.datetime.strptime(data.get('transferencia_fecha_de_transferencia', ''), "%d/%m/%Y")
                 except:
                     date_parse_error = True
         
                 if date_parse_error == True:
                     try:
-                        fecha_transferencia_parsed = datetime.strptime(data.get('transferencia_fecha_de_transferencia', ''), "%Y-%m-%d")
+                        fecha_transferencia_parsed = datetime.datetime.strptime(data.get('transferencia_fecha_de_transferencia', ''), "%Y-%m-%d")
                     except:
                         date_parse_error = True
         
@@ -386,13 +386,13 @@ def cambio_de_lotes(request):
                 date_parse_error = False
         
                 try:
-                    fecha_cambio_parsed = datetime.strptime(data.get('cambio_fecha_de_cambio', ''), "%d/%m/%Y")
+                    fecha_cambio_parsed = datetime.datetime.strptime(data.get('cambio_fecha_de_cambio', ''), "%d/%m/%Y")
                 except:
                     date_parse_error = True
         
                 if date_parse_error == True:
                     try:
-                        fecha_cambio_parsed = datetime.strptime(data.get('cambio_fecha_de_cambio', ''), "%Y-%m-%d")
+                        fecha_cambio_parsed = datetime.datetime.strptime(data.get('cambio_fecha_de_cambio', ''), "%Y-%m-%d")
                     except:
                         date_parse_error = True
         
@@ -449,13 +449,13 @@ def recuperacion_de_lotes(request):
                 date_parse_error = False
         
                 try:
-                    fecha_recuperacion_parsed = datetime.strptime(data.get('recuperacion_fecha_de_recuperacion', ''), "%d/%m/%Y")
+                    fecha_recuperacion_parsed = datetime.datetime.strptime(data.get('recuperacion_fecha_de_recuperacion', ''), "%d/%m/%Y")
                 except:
                     date_parse_error = True
         
                 if date_parse_error == True:
                     try:
-                        fecha_recuperacion_parsed = datetime.strptime(data.get('recuperacion_fecha_de_recuperacion', ''), "%Y-%m-%d")
+                        fecha_recuperacion_parsed = datetime.datetime.strptime(data.get('recuperacion_fecha_de_recuperacion', ''), "%Y-%m-%d")
                     except:
                         date_parse_error = True
         
