@@ -24,6 +24,12 @@ $(document).ready(function() {
 		showMonthAfterYear : false,
 		yearSuffix : ''
 	};
+	$('#id_fecha').blur(function() {
+		$('#enviar_pago').attr("disabled",false);
+		if($('#id_fecha').val() != ""){
+			isValidDate($('#id_fecha').val());
+		}
+});
 });
 
 function validatePago(event) {
@@ -31,7 +37,7 @@ function validatePago(event) {
 	event.preventDefault();
 	var request4 = $.ajax({
 		type : "POST",
-		url : "/movimientos/pago_cuotas/",
+		url : "/movimientos/modificar_pago_de_cuotas/",
 		data : {
 			ingresar_pago : true,
 			pago_venta_id : venta_id,
@@ -61,3 +67,36 @@ function validatePago(event) {
 	
 	return false;
 }
+
+function isValidDate(dateString)
+{
+    // First check for the pattern
+    if(!/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(dateString))
+        alert("Formato de fecha incorrecto");
+        $('#enviar_pago').attr("disabled",true);
+    	$('#id_fecha').val("");
+        return false;
+
+    // Parse the date parts to integers
+    var parts = dateString.split("/");
+    var day = parseInt(parts[1], 10);
+    var month = parseInt(parts[0], 10);
+    var year = parseInt(parts[2], 10);
+
+    // Check the ranges of month and year
+    if(year < 1000 || year > 3000 || month == 0 || month > 12){
+    	alert("Formato de fecha incorrecto");
+        $('#enviar_pago').attr("disabled",true);
+        $('#id_fecha').val("");
+        return false;
+    }
+
+    var monthLength = [ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ];
+
+    // Adjust for leap years
+    if(year % 400 == 0 || (year % 100 != 0 && year % 4 == 0))
+        monthLength[1] = 29;
+
+    // Check the range of the day
+    return day > 0 && day <= monthLength[month - 1];
+};

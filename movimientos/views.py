@@ -1794,7 +1794,7 @@ def modificar_pago_de_cuotas(request, id):
                 total_de_pago = data.get('monto_total')
                 date_parse_error = False
                 fecha_pago=data.get('fecha', '')
-                fecha_pago_parsed = datetime.strptime(fecha_pago, "%d/%m/%Y").date()
+                fecha_pago_parsed = datetime.datetime.strptime(fecha_pago, "%d/%m/%Y").date()
     
                 try:
                     pago.total_de_cuotas = total_de_cuotas
