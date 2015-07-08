@@ -210,7 +210,7 @@ def pago_de_cuotas(request):
     if request.user.is_authenticated():
         if verificar_permisos(request.user.id, permisos.ADD_PAGODECUOTAS):
             t = loader.get_template('movimientos/pago_cuotas.html')
-            
+            grupo= request.user.groups.get().id
             if request.method == 'POST':
                 data = request.POST    
                 lote_id = data.get('pago_lote_id', '')
@@ -270,7 +270,7 @@ def pago_de_cuotas(request):
                     return HttpResponseServerError("La cantidad de cuotas a pagar, es mayor a la cantidad de cuotas restantes.")  
         
             c = RequestContext(request, {
-        
+               'grupo': grupo   
             })
             return HttpResponse(t.render(c))
         else:
@@ -1774,7 +1774,9 @@ def modificar_pago_de_cuotas(request, id):
         if verificar_permisos(request.user.id, permisos.CHANGE_PAGODECUOTAS):
             if request.method == 'GET':
                 pago = PagoDeCuotas.objects.get(pk=id)
-                fecha = pago.fecha_de_pago.strftime('%d/%m/%Y')
+                fecha= pago.fecha_de_pago
+                if fecha != "" and fecha != None:
+                    fecha = pago.fecha_de_pago.strftime('%d/%m/%Y')
                 t = loader.get_template('movimientos/modificar_pagocuota.html')
                 c = RequestContext(request, {
                     'pagocuota': pago,
@@ -1846,8 +1848,11 @@ def modificar_venta(request, id):
         if verificar_permisos(request.user.id, permisos.CHANGE_VENTA):
             if request.method == 'GET':
                 venta = Venta.objects.get(pk=id)
-                fecha_venta = venta.fecha_de_venta.strftime('%d/%m/%Y')
-                if venta.fecha_primer_vencimiento != "":
+                if venta.fecha_venta != "" and venta.fecha_venta != None:
+                    fecha_venta = venta.fecha_de_venta.strftime('%d/%m/%Y')
+                else:
+                    fecha_venta= ""
+                if venta.fecha_primer_vencimiento != "" and venta.fecha_primer_vencimiento != None:
                     fecha_primer_venc = venta.fecha_primer_vencimiento.strftime('%d/%m/%Y')
                 else:
                     fecha_primer_venc = ""
