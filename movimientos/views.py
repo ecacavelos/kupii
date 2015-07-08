@@ -1848,7 +1848,7 @@ def modificar_venta(request, id):
         if verificar_permisos(request.user.id, permisos.CHANGE_VENTA):
             if request.method == 'GET':
                 venta = Venta.objects.get(pk=id)
-                if venta.fecha_venta != "" and venta.fecha_venta != None:
+                if venta.fecha_de_venta != "" and venta.fecha_de_venta != None:
                     fecha_venta = venta.fecha_de_venta.strftime('%d/%m/%Y')
                 else:
                     fecha_venta= ""
