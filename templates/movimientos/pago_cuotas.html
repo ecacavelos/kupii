@@ -87,7 +87,11 @@
 				<tr>
 					<td><label for="id_fecha">Fecha de Pago: </label></td>
 					<td class="noimage">
-					<input id="id_fecha" type="text" name="fecha" maxlength="10" />
+						{%if grupo == 2%}
+							<input class="fecha_pago" id="id_fecha_read"  type="text" name="fecha" maxlength="10" readonly=""/>
+						{%else%}
+							<input class="fecha_pago" id="id_fecha" type="text" name="fecha" maxlength="10"/>
+						{%endif%}
 					</td>
 				</tr>
 			</div>
@@ -95,7 +99,7 @@
 				<tr>
 					<td><label for="nro_cuotas_a_pagar">Cantidad de Cuotas a Pagar: </label></td>
 					<td class="noimage">
-					<input id="nro_cuotas_a_pagar" type"number" name="nro_cuotas_a_pagar" maxlength="4"  />
+					<input id="nro_cuotas_a_pagar" type="number" name="nro_cuotas_a_pagar" maxlength="4"  />
 					</td>
 				</tr>
 			</div>

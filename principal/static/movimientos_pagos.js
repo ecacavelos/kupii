@@ -5,6 +5,7 @@ $(document).ready(function() {
 	$("#id_lote").keyup(validateLotePost);
 	$("#main_pago_form").submit(validatePago);
 	$("#nro_cuotas_a_pagar").val("1");
+	$("#id_fecha_read").val(getCurrentDate());
 	
 	$("#id_fecha").val(getCurrentDate());
 		$('.grid_6').hide();
@@ -136,7 +137,7 @@ function validatePago() {
 			ingresar_pago : true,
 			pago_venta_id : venta_id,
 			pago_lote_id : global_lote_id,
-			pago_fecha_de_pago : $("#id_fecha").val(),
+			pago_fecha_de_pago : $(".fecha_pago").val(),
 			pago_nro_cuotas_a_pagar : $("#nro_cuotas_a_pagar").val(),
 			pago_cliente_id : $("#id_cliente").val(),
 			pago_plan_de_pago_id : $("#id_plan_pago").val(),
@@ -329,7 +330,7 @@ function retrieveVenta() {
 }
 
 function calcularInteres() {
-	var fecha_pago=$('#id_fecha').val();
+	var fecha_pago=$('.fecha_pago').val();
 	var proximo_vencimiento=global_proximo_vencimiento;
 	var lote_id=global_lote_id;
 	var nro_cuotas_a_pagar = $('#nro_cuotas_a_pagar').val();
@@ -349,7 +350,8 @@ function calcularInteres() {
 			detalle=msg;
 			console.log(detalle);
 			var intereses=0;
-			for(i=0;i<msg.length;i++){
+			var nro_cuotas_a_pagar=$('#nro_cuotas_a_pagar').val();
+			for(i=0;i<nro_cuotas_a_pagar;i++){
 				intereses+=msg[i]['intereses'];
 			}
 			global_intereses=intereses;
@@ -365,7 +367,8 @@ function dibujarDetalle() {
 	$('#contenido_modal').append('<div id="listado-item-lote">');
 	$('#contenido_modal').append('<div cellpadding="0" cellspacing="0" class="listado-ventas" align="center">');
 	$('#contenido_modal').append("<th>Cuota Nro.</th><th>Vencimiento</th><th>Dias Atraso</th><th>Interes</th>");
-	for(i=0;i<detalle.length;i++){		
+	var nro_cuotas_a_pagar=$('#nro_cuotas_a_pagar').val();
+	for(i=0;i<nro_cuotas_a_pagar;i++){		
 		$('#contenido_modal').append('<tr><td>'+detalle[i]['nro_cuota']+'</td><td>'+
 		detalle[i]['vencimiento']+'</td><td>'+detalle[i]['dias_atraso']+
 		'</td><td><input style="width: 70px;" class="interes" id="interes_' + i + '" type="number" value=' + f(detalle[i]['intereses']).replace(/\./g, '')+'></td></tr>');

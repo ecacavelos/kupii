@@ -246,7 +246,7 @@ def obtener_detalle_interes_lote(lote_id,fecha_pago_parsed,proximo_vencimiento_p
     #         TODO:
     #         Se calcula la diferencia en dias de la fecha del pago que se esta realizando, con 
     #         respecto a la fecha de vencimiento de dicho pago. El porcentaje de interes que se aplica
-    #         sobre las cuotas es constante: 0.00067 (0.002/30) -> 2% interes mensual/30
+    #         sobre las cuotas es constante: 0.001 (0.03/30) -> 3% interes mensual/30
     #         + interes punitorio (0.00020) + iva (0.00009)
     
                 
@@ -270,7 +270,7 @@ def obtener_detalle_interes_lote(lote_id,fecha_pago_parsed,proximo_vencimiento_p
                 
                 #Intereses (valores constantes)
                 #Interes moratorio por dia
-                interes=0.00067
+                interes=0.001
                 
                 #Interes
                 interes_punitorio=0.00020
@@ -320,9 +320,9 @@ def obtener_cuotas_a_pagar(venta,fecha_pago,resumen_cuotas_a_pagar):
     
     lista_cuotas = []
 
-    if (datetime.strptime(resumen_cuotas_a_pagar['proximo_vencimiento'], "%d/%m/%Y").date() < fecha_pago):
+    if (datetime.datetime.strptime(resumen_cuotas_a_pagar['proximo_vencimiento'], "%d/%m/%Y").date() < fecha_pago):
         print 'Hay al menos 1 cuota en mora'
-        intereses = obtener_detalle_interes_lote(venta.lote.id,fecha_pago,datetime.strptime(resumen_cuotas_a_pagar['proximo_vencimiento'], "%d/%m/%Y").date())
+        intereses = obtener_detalle_interes_lote(venta.lote.id,fecha_pago,datetime.datetime.strptime(resumen_cuotas_a_pagar['proximo_vencimiento'], "%d/%m/%Y").date())
         interes_total = 0 
         for interes_item in intereses:
             interes_total+=interes_item['intereses']
@@ -337,7 +337,7 @@ def obtener_cuotas_a_pagar(venta,fecha_pago,resumen_cuotas_a_pagar):
             
                 lista_cuotas.append(cuota)
             # Ademas de las cuotas con mora se agrega la cuota actual que es posible pagar
-            vencimiento_cuota_acutal = datetime.strptime(resumen_cuotas_a_pagar['proximo_vencimiento'], "%d/%m/%Y").date() + MonthDelta(len(intereses))
+            vencimiento_cuota_acutal = datetime.datetime.strptime(resumen_cuotas_a_pagar['proximo_vencimiento'], "%d/%m/%Y").date() + MonthDelta(len(intereses))
             cuota = {'numero_cuota': resumen_cuotas_a_pagar['cant_cuotas_pagadas'] + len(intereses) + 1 ,
                  'monto_cuota':venta.precio_de_cuota , 
                  'vencimiento': vencimiento_cuota_acutal.strftime("%d/%m/%Y"),
