@@ -72,15 +72,17 @@ function isValidDate(dateString)
 {
     // First check for the pattern
     if(!/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(dateString))
+    {
         alert("Formato de fecha incorrecto");
         $('#enviar_pago').attr("disabled",true);
     	$('#id_fecha').val("");
         return false;
+    }
 
     // Parse the date parts to integers
     var parts = dateString.split("/");
-    var day = parseInt(parts[1], 10);
-    var month = parseInt(parts[0], 10);
+	var day = parseInt(parts[0], 10);	
+    var month = parseInt(parts[1], 10);
     var year = parseInt(parts[2], 10);
 
     // Check the ranges of month and year
@@ -98,5 +100,14 @@ function isValidDate(dateString)
         monthLength[1] = 29;
 
     // Check the range of the day
-    return day > 0 && day <= monthLength[month - 1];
+    if(!(day > 0 && day <= monthLength[month - 1]))
+    {
+    	alert("Formato de fecha incorrecto");
+        $('#enviar_pago').attr("disabled",true);
+        $('#id_fecha').val("");
+        return false;
+    }else
+    {
+    	return day > 0 && day <= monthLength[month - 1];
+    }
 };

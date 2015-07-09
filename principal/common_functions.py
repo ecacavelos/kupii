@@ -246,7 +246,7 @@ def obtener_detalle_interes_lote(lote_id,fecha_pago_parsed,proximo_vencimiento_p
     #         Se calcula la diferencia en dias de la fecha del pago que se esta realizando, con 
     #         respecto a la fecha de vencimiento de dicho pago. El porcentaje de interes que se aplica
     #         sobre las cuotas es constante: 0.001 (0.03/30) -> 3% interes mensual/30
-    #         + interes punitorio (0.00020) + iva (0.00009)
+    #         + interes punitorio (0.00030) + iva = (interes mensual + interes punitorio)* (10%)=(0.00013)
     
                 
                 #Obtenemos la fecha del primer vencimiento de la cuota, de la ultima venta
@@ -272,10 +272,10 @@ def obtener_detalle_interes_lote(lote_id,fecha_pago_parsed,proximo_vencimiento_p
                 interes=0.001
                 
                 #Interes
-                interes_punitorio=0.00020
+                interes_punitorio=0.00030
                 
                 #Intereses IVA
-                interes_iva=0.00009
+                interes_iva=0.00013
                 
                 total_intereses=interes+interes_punitorio+interes_iva
                 #Verificar si tiene cuotas de refuerzo 
