@@ -11,7 +11,6 @@ import json
 import math
 import datetime
 
-
 def get_cuotas_detail_by_lote(lote_id):
     print("buscando pagos del lote --> " + lote_id);
     # El query es: select sum(nro_cuotas_a_pagar) from principal_pagodecuotas where lote_id = 16108;
@@ -301,13 +300,13 @@ def obtener_detalle_interes_lote(lote_id,fecha_pago_parsed,proximo_vencimiento_p
                     else:
                         monto_cuota=venta.precio_de_cuota             
                     intereses=math.ceil(total_intereses*dias_atraso*monto_cuota)
-                    
+                    redondeado=roundup(intereses)
                     detalle['interes']=interes
                     detalle['interes_punitorio']=interes_punitorio
                     detalle['interes_iva']=interes_iva
                     detalle['nro_cuota']=nro_cuota
                     detalle['dias_atraso']=dias_atraso
-                    detalle['intereses']=intereses
+                    detalle['intereses']=redondeado
                     detalle['vencimiento']=fecha_vencimiento.strftime('%d/%m/%Y')
                     
                    
@@ -473,3 +472,7 @@ def calcular_dias_habiles(fecha_ini, fecha_fin):
     daydiff = end.weekday() - start.weekday()
 
     days = ((end-start).days - daydiff) / 7 * 5 + min(daydiff,5) - (max(end.weekday() - 4, 0) % 5)
+    
+    
+def roundup(interes):
+    return int(math.ceil(interes / 1000.0)) * 1000
