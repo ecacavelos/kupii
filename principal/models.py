@@ -382,4 +382,5 @@ class PermisosAdicionales(models.Model):
         permissions = (
             ('ver_listado_opciones', 'Ver listado de opciones de las acciones'),
             ('ver_informes', 'Ver informes'),
+            ('ver_ficha_lote', 'Ver Ficha Lote')
         )

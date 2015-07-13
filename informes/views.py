@@ -1175,7 +1175,7 @@ def liquidacion_gerentes(request):
 def informe_movimientos(request):
     if request.method == 'GET':
         if request.user.is_authenticated():
-            if verificar_permisos(request.user.id, permisos.VER_INFORMES):
+            if verificar_permisos(request.user.id, permisos.VER_FICHA_LOTE):
                 if (filtros_establecidos(request.GET,'informe_movimientos') == False):
                     t = loader.get_template('informes/informe_movimientos.html')
                     c = RequestContext(request, {

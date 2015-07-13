@@ -350,9 +350,12 @@ function calcularInteres() {
 			detalle=msg;
 			console.log(detalle);
 			var intereses=0;
-			var nro_cuotas_a_pagar=$('#nro_cuotas_a_pagar').val();
-			for(i=0;i<nro_cuotas_a_pagar;i++){
-				intereses+=msg[i]['intereses'];
+			if(msg.length > 0)
+			{
+				var nro_cuotas_a_pagar=$('#nro_cuotas_a_pagar').val();
+				for(i=0;i<nro_cuotas_a_pagar;i++){
+					intereses+=msg[i]['intereses'];
+				}
 			}
 			global_intereses=intereses;
 			//calculateTotalCuotas();
@@ -368,10 +371,13 @@ function dibujarDetalle() {
 	$('#contenido_modal').append('<div cellpadding="0" cellspacing="0" class="listado-ventas" align="center">');
 	$('#contenido_modal').append("<th>Cuota Nro.</th><th>Vencimiento</th><th>Dias Atraso</th><th>Interes</th>");
 	var nro_cuotas_a_pagar=$('#nro_cuotas_a_pagar').val();
-	for(i=0;i<nro_cuotas_a_pagar;i++){		
-		$('#contenido_modal').append('<tr><td>'+detalle[i]['nro_cuota']+'</td><td>'+
-		detalle[i]['vencimiento']+'</td><td>'+detalle[i]['dias_atraso']+
-		'</td><td><input style="width: 70px;" class="interes" id="interes_' + i + '" type="number" value=' + f(detalle[i]['intereses']).replace(/\./g, '')+'></td></tr>');
+	if(detalle.length > 0)
+	{
+		for(i=0;i<nro_cuotas_a_pagar;i++){		
+			$('#contenido_modal').append('<tr><td>'+detalle[i]['nro_cuota']+'</td><td>'+
+			detalle[i]['vencimiento']+'</td><td>'+detalle[i]['dias_atraso']+
+			'</td><td><input style="width: 70px;" class="interes" id="interes_' + i + '" type="number" value=' + f(detalle[i]['intereses']).replace(/\./g, '')+'></td></tr>');
+		}
 	}
 	$('#contenido_modal').append('<button class="button_verde" id="modificar_mora" data-toggle="modal" data-target=".bs-example-modal-sm" value="Modificar">Modificar</button>');
 	$('#contenido_modal').append('</div>');
