@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta name="description" content="" />
+		<meta name="keywords" content="" />
+		<meta name="robots" content="noindex" />
+
+		<title>:: PROPAR S.R.L. Inmobiliaria ::</title>
+
+		<link rel="shortcut icon" href="{{ STATIC_URL }}custom/img/favicon.ico" type="image/x-icon"/>
+		<link rel="icon" href="{{ STATIC_URL }}custom/img/favicon.ico" type="image/x-icon"/>
+		<link href="{{ STATIC_URL }}custom/css/grid.css" rel="stylesheet" type="text/css" />
+		<link href="{{ STATIC_URL }}custom/css/body-index.css" rel="stylesheet" type="text/css" />
+		<link href="{{ STATIC_URL }}custom/css/fonts.css" rel="stylesheet" type="text/css" />
+		{% block header_resources %}{% endblock %}
+		<script src="{{ STATIC_URL }}custom/js/pngfix.js" type="text/javascript" defer=""></script>
+		<script type="text/javascript" src="{{ STATIC_URL }}jquery-1.10.1.min.js"></script>
+		{% block header_scripts %}{% endblock %}
+
+	</head>
+	<body>
+		<!--WRAP-->
+		<div id="wrap">
+			<!--HEADER-->
+			<div id="header">
+				<div class="container_16" style="background: url({{ STATIC_URL }}custom/img/header-back.png) repeat-x #FFF; background-position:0px 53px">
+					<div class="grid_5" style="margin-top:13px">
+						<a href="{% url 'frontend_home' %}" target="_self"> <img src="{{ STATIC_URL }}custom/img/propar-logo.png" width="235" height="84" border="0" /> </a>
+					</div>
+					<div class="grid_11">
+						<div id="menu">
+							{% if user.is_authenticated %}
+							<ul id="boton">
+								<li>
+									<a href="{% url 'frontend_home' %}logout" class="salir">Salir</a>
+								</li>
+								<li>
+									<a href="#" class="usuario">{{ user.username }}</a>
+								</li>
+							</ul>
+							{% else %}
+							<ul id="boton">
+								<li>
+									<a href="{% url 'frontend_home' %}login" class="usuario">Iniciar sesi&oacute;n</a>
+								</li>
+							</ul>
+							{% endif %}
+						</div>
+						<div id="titulo">
+							<h1>SISTEMA DE ADMINISTRACI&Oacute;N </h1>
+						</div>
+					</div>
+					<div class="clear"></div>
+				</div>
+			</div>
+			<!--END Header-->
+			<div class="clear"></div>
+			<!--CONTAINER 16-->
+			<div class="container_16" id="caja-contenido">
+				<!--Container CONTENIDO-->
+				{% if messages %}
+				<div id="messages-container">
+					<a class="message-close-button">&nbsp;</a>
+					{% for message in messages %}
+					<div id="global-message" {% if message.tags %}class="{{ message.tags }}"{% endif %}>
+						{{ message }}
+					</div>
+					{% endfor %}
+				</div>
+				{% endif %}
+				{% block content %}{% endblock %}
+				<!--FIN Container CONTENIDO-->
+			</div>
+			<!--FIN CONTAINER 16-->
+			<div class="clear"></div>
+			<div id="header">
+				<br>
+				<br>
+				<br>
+				<br>
+				<div id="titulo">
+					<b style="color: white">Version 0.1.95 Beta</b>
+				</div>
+			</div>
+			<div class="clear"></div>
+		</div>
+		<!--FIN WRAP-->
+	</body>
+</html>
