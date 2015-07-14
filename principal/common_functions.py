@@ -121,14 +121,13 @@ def get_cuota_information_by_lote(lote_id,cuotas_pag):
     else:
         ultima_fecha_pago = venta.fecha_primer_vencimiento
 
-    if cant_cuotas_pag == venta.plan_de_pago.cantidad_de_cuotas:
-        cuota_a_pagar['pago_cancelado'] = True
-        cuotas_a_pagar.append(cuota_a_pagar)
-        return cuotas_a_pagar
-
-    if venta.plan_de_pago.tipo_de_plan == 'contado':
-        cuota_a_pagar['contado'] = True
-        cuotas_a_pagar.append(cuota_a_pagar)
+    if cant_cuotas_pag == venta.plan_de_pago.cantidad_de_cuotas or venta.plan_de_pago.tipo_de_plan == 'contado':
+        if venta.plan_de_pago.tipo_de_plan == 'contado':
+            cuota_a_pagar['contado'] = True
+            cuotas_a_pagar.append(cuota_a_pagar)
+        else:
+            cuota_a_pagar['pago_cancelado'] = True
+            cuotas_a_pagar.append(cuota_a_pagar)
         return cuotas_a_pagar
 
     #Verificar si el plan tiene cuotas de refuerzo 
