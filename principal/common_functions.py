@@ -120,6 +120,17 @@ def get_cuota_information_by_lote(lote_id,cuotas_pag):
         ultima_fecha_pago = (venta.fecha_primer_vencimiento + MonthDelta(cuotas_totales))
     else:
         ultima_fecha_pago = venta.fecha_primer_vencimiento
+
+    if cant_cuotas_pag == venta.plan_de_pago.cantidad_de_cuotas:
+        cuota_a_pagar['pago_cancelado'] = True
+        cuotas_a_pagar.append(cuota_a_pagar)
+        return cuotas_a_pagar
+
+    if venta.plan_de_pago.tipo_de_plan == 'contado':
+        cuota_a_pagar['contado'] = True
+        cuotas_a_pagar.append(cuota_a_pagar)
+        return cuotas_a_pagar
+
     #Verificar si el plan tiene cuotas de refuerzo 
     if venta.plan_de_pago.cuotas_de_refuerzo != 0:
         pagos = get_pago_cuotas(venta, None,None)
@@ -311,6 +322,17 @@ def obtener_detalle_interes_lote(lote_id,fecha_pago_parsed,proximo_vencimiento_p
                     
                    
                     detalles.append(detalle)
+                fecha_ultimo_vencimiento = datetime.datetime.strptime(detalles[-1]['vencimiento'], "%d/%m/%Y").date()
+                fecha_dias_gracia = fecha_ultimo_vencimiento + datetime.timedelta(days=5)
+                dias_habiles = calcular_dias_habiles(fecha_ultimo_vencimiento,fecha_dias_gracia)
+
+                if dias_habiles<5:
+                    fecha_ultimo_vencimiento = fecha_dias_gracia+datetime.timedelta(days=5-dias_habiles)
+                detalles[-1]['vencimiento_gracia']=fecha_ultimo_vencimiento.strftime('%d/%m/%Y')
+
+                if fecha_pago_parsed>fecha_ultimo_vencimiento:
+                    detalles[-1]['intereses']=0
+
             print detalles
             return detalles
         
@@ -466,12 +488,17 @@ def cant_cuotas_pagadas_ref(pagos):
     return cuotas_ref_pagadas
 
 def calcular_dias_habiles(fecha_ini, fecha_fin):
-    start = datetime.date(2010,1,1)
-    end = datetime.date(2010,3,31)
+    start = fecha_ini
+    end = fecha_fin
 
     daydiff = end.weekday() - start.weekday()
 
+
+    #Verificamos cuantos dias habiles hay entre la fecha del ultimo vencimiento
+    #y esa misma fecha + 5 dias de gracia
     days = ((end-start).days - daydiff) / 7 * 5 + min(daydiff,5) - (max(end.weekday() - 4, 0) % 5)
+
+    return days
     
     
 def roundup(interes):
