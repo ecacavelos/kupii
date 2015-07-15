@@ -171,7 +171,7 @@ function retrievePlanPago() {
 			type : "GET",
 			url : "/datos/5/",
 			data : {
-				plan_pago : $("#id_plan_pago").val(),
+				plan_pago : $("#id_plan_pago").val()
 			}
 		});
 		// Actualizamos el formulario con los datos obtenidos del plan de pagos.
@@ -228,7 +228,7 @@ function retrievePlanPagoVendedor() {
 			type : "GET",
 			url : "/datos/4/",
 			data : {
-				plan_pago : $("#id_plan_pago_vendedores").val(),
+				plan_pago : $("#id_plan_pago_vendedores").val()
 			}
 		});
 		// Actualizamos el formulario con los datos obtenidos del plan de pagos.

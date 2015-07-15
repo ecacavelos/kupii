@@ -321,17 +321,17 @@ def obtener_detalle_interes_lote(lote_id,fecha_pago_parsed,proximo_vencimiento_p
                     
                    
                     detalles.append(detalle)
-                fecha_ultimo_vencimiento = datetime.datetime.strptime(detalles[-1]['vencimiento'], "%d/%m/%Y").date()
-                fecha_dias_gracia = fecha_ultimo_vencimiento + datetime.timedelta(days=5)
-                dias_habiles = calcular_dias_habiles(fecha_ultimo_vencimiento,fecha_dias_gracia)
+                # fecha_ultimo_vencimiento = datetime.datetime.strptime(detalles[-1]['vencimiento'], "%d/%m/%Y").date()
+                # fecha_dias_gracia = fecha_ultimo_vencimiento + datetime.timedelta(days=5)
+                # dias_habiles = calcular_dias_habiles(fecha_ultimo_vencimiento,fecha_dias_gracia)
+                #
+                # if dias_habiles<5:
+                #     fecha_ultimo_vencimiento = fecha_dias_gracia+datetime.timedelta(days=5-dias_habiles)
+                # detalles[-1]['vencimiento_gracia']=fecha_ultimo_vencimiento.strftime('%d/%m/%Y')
 
-                if dias_habiles<5:
-                    fecha_ultimo_vencimiento = fecha_dias_gracia+datetime.timedelta(days=5-dias_habiles)
-                detalles[-1]['vencimiento_gracia']=fecha_ultimo_vencimiento.strftime('%d/%m/%Y')
-
-                if fecha_pago_parsed>fecha_ultimo_vencimiento:
-                    detalles[-1]['intereses']=0
-
+                # if fecha_pago_parsed>fecha_ultimo_vencimiento:
+                #     detalles[-1]['intereses']=0
+            #
             print detalles
             return detalles
         
@@ -486,18 +486,18 @@ def cant_cuotas_pagadas_ref(pagos):
             cuotas_ref_pagadas +=1
     return cuotas_ref_pagadas
 
-def calcular_dias_habiles(fecha_ini, fecha_fin):
-    start = fecha_ini
-    end = fecha_fin
-
-    daydiff = end.weekday() - start.weekday()
-
-
-    #Verificamos cuantos dias habiles hay entre la fecha del ultimo vencimiento
-    #y esa misma fecha + 5 dias de gracia
-    days = ((end-start).days - daydiff) / 7 * 5 + min(daydiff,5) - (max(end.weekday() - 4, 0) % 5)
-
-    return days
+# def calcular_dias_habiles(fecha_ini, fecha_fin):
+#     start = fecha_ini
+#     end = fecha_fin
+#
+#     daydiff = end.weekday() - start.weekday()
+#
+#
+#     #Verificamos cuantos dias habiles hay entre la fecha del ultimo vencimiento
+#     #y esa misma fecha + 5 dias de gracia
+#     days = ((end-start).days - daydiff) / 7 * 5 + min(daydiff,5) - (max(end.weekday() - 4, 0) % 5)
+#
+#     return days
     
     
 def roundup(interes):
