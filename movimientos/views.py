@@ -299,10 +299,6 @@ def calcular_interes(request):
             proximo_vencimiento = data.get('proximo_vencimiento', '')
             fecha_pago_parsed = datetime.datetime.strptime(data.get('fecha_pago'), "%d/%m/%Y").date()
 
-            #fecha_pago_parsed = datetime.strptime(fecha_pago, "%d/%m/%Y").date()
-            #proximo_vencimiento = data.get('proximo_vencimiento', '')
-            #proximo_vencimiento_parsed = datetime.strptime(proximo_vencimiento, "%d/%m/%Y").date()
-
             proximo_vencimiento_parsed = datetime.datetime.strptime(data.get('proximo_vencimiento'), "%d/%m/%Y").date()
 
             

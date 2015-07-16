@@ -354,11 +354,15 @@ function calcularInteres() {
 			{
 				var nro_cuotas_a_pagar=$('#nro_cuotas_a_pagar').val();
 				for(i=0;i<nro_cuotas_a_pagar;i++){
-					intereses+=msg[i]['intereses'];
+                    if ($('#id_fecha').val()>detalle[i]['vencimiento_gracia']){
+                        console.log("Sumando intereses");
+                        //alert("sumando intereses");
+                        intereses+=msg[i]['intereses'];
+                    }
 				}
 			}
 			global_intereses=intereses;
-			//calculateTotalCuotas();
+            //alert(global_intereses);
 			calculateTotalPago();		
 		});
 }
@@ -369,26 +373,22 @@ function dibujarDetalle() {
     $('#contenido_modal').empty();
     $('#contenido_modal').append('<div id="listado-item-lote">');
     $('#contenido_modal').append('<div cellpadding="0" cellspacing="0" class="listado-ventas" align="center">');
-    $('#contenido_modal').append("<th>Cuota Nro.</th><th>Vencimiento</th><th>Dias Atraso</th><th>Interes</th>");
-
-    for (i = 0; i < detalle.length; i++) {
-        $('#contenido_modal').append('<tr><td>' + detalle[i]['nro_cuota'] + '</td><td>' +
-        detalle[i]['vencimiento'] + '</td><td>' + detalle[i]['dias_atraso'] +
-        '</td><td><input style="width: 70px;" class="interes" id="interes_' + i + '" type="number" value=' + f(detalle[i]['intereses']).replace(/\./g, '') + '></td></tr>');
-        //if (detalle[i]['vencimiento_gracia']){
-        //    $('#contenido_modal').append('<br>Fecha ultimo vencimiento con 5 dias de gracia: '+ detalle[i]['vencimiento_gracia']+'</br>');
-        //}
+    $('#contenido_modal').append("<th>Cuota Nro.</th><th>Vencimiento</th><th>Dias Atraso</th><th>Interes</th>")
 
 
-        //var nro_cuotas_a_pagar = $('#nro_cuotas_a_pagar').val();
-        //if (detalle.length > 0) {
-        //    for (i = 0; i < nro_cuotas_a_pagar; i++) {
-        //        $('#contenido_modal').append('<tr><td>' + detalle[i]['nro_cuota'] + '</td><td>' +
-        //        detalle[i]['vencimiento'] + '</td><td>' + detalle[i]['dias_atraso'] +
-        //        '</td><td><input style="width: 70px;" class="interes" id="interes_' + i + '" type="number" value=' + f(detalle[i]['intereses']).replace(/\./g, '') + '></td></tr>');
-        //    }
-        //}
-}
+    var nro_cuotas_a_pagar = $('#nro_cuotas_a_pagar').val();
+    console.log(detalle);
+    if (detalle.length > 0) {
+        for (i = 0; i < nro_cuotas_a_pagar; i++) {
+            $('#contenido_modal').append('<tr><td>' + detalle[i]['nro_cuota'] + '</td><td>' +
+            detalle[i]['vencimiento'] + '</td><td>' + detalle[i]['dias_atraso'] +
+            '</td><td><input style="width: 70px;" class="interes" id="interes_' + i + '" type="number" value=' + f(detalle[i]['intereses']).replace(/\./g, '') + '></td></tr>');
+            if (i==nro_cuotas_a_pagar-1) {
+                $('#contenido_modal').append('<br>Fecha ultimo vencimiento con 5 dias de gracia: ' + detalle[i]['vencimiento_gracia'] + '</br>');
+            }
+        }
+    }
+
 	$('#contenido_modal').append('<button class="button_verde" id="modificar_mora" data-toggle="modal" data-target=".bs-example-modal-sm" value="Modificar">Modificar</button>');
 	$('#contenido_modal').append('</div>');
 	$('#modificar_mora').click(function() {
