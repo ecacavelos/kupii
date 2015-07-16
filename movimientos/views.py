@@ -138,14 +138,19 @@ def ventas_de_lotes_calcular_cuotas(request):
         try:
             datos_plan = PlanDePago.objects.get(pk=data.get('plan_pago_establecido', ''))
             entrega_inicial = data.get('entrega_inicial', '')
-            monto_cuota = data.get('monto_cuota', '')
+            monto_cuota = data.get('monto_cuota', '')           
+            monto_refuerzo = data.get('monto_refuerzo', '')
     
             precio_venta_actual = int(data.get('precio_de_venta', ''))
     
             response_data = {}
     
             if datos_plan.tipo_de_plan == "credito":
-                response_data['monto_total'] = int(entrega_inicial) + (datos_plan.cantidad_de_cuotas * int(monto_cuota))
+                if datos_plan.cuotas_de_refuerzo == 0:
+                    response_data['monto_total'] = int(entrega_inicial) + (datos_plan.cantidad_de_cuotas * int(monto_cuota))
+                else:
+                    cantidad_cuotas_sin_ref = datos_plan.cantidad_de_cuotas - datos_plan.cuotas_de_refuerzo
+                    response_data['monto_total'] = int(entrega_inicial) + (cantidad_cuotas_sin_ref * int(monto_cuota)) + (datos_plan.cuotas_de_refuerzo * int(monto_refuerzo))
             else:
                 response_data['monto_total'] = int(precio_venta_actual)
     

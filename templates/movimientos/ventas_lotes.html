@@ -68,7 +68,7 @@ var data = [
 		<tr>
 			<td><label for="id_fecha">Fecha de Venta: </label></td>
 			<td class="noimage">
-				<input id="id_fecha" type="text" name="fecha" maxlength="10" />
+				<input id="id_fecha" type="text" name="fecha" maxlength="12" />
 				<!--<div id="id_fecha2"></div>-->
 			</td>
 		</tr>
@@ -102,6 +102,7 @@ var data = [
 			<td><label>Plan de Pago: </label></td>
 			<td class="noimage"><input id="id_plan_pago" name="plan_pago" type="hidden" maxlength="100" onchange="retrievePlanPago()"/>
 				<input id="id_plan_p" type="text" name="plan_p" maxlength="100" /><br><br>
+				<input id="id_cant_cuotas_ref" type="hidden" name="cuotas_ref"/>
 			</td>
 			
 		</tr>
@@ -133,6 +134,11 @@ var data = [
 			<td class="noimage"><input id="id_entrega_inicial" type="text" name="entrega_inicial"  maxlength="10" onblur="calculateMontoCuotas();calculatePrecioFinalVentaLote();$('#id_monto_cuota').attr('readonly', true);" onkeyup="$(this).val(format.call($(this).val().split(' ').join(''),'.',','));solo_numeros_puntos_entrega_inicial();" /></td>
 		</tr>
 		<tr>
+			<td><label>Monto Cuota Refuerzo: </label></td>
+			<td class="noimage"><input id="id_monto_cuota_refuerzo" type="text" name="monto_refuerzo"  maxlength="10" onblur="calculateMontoCuotas();calculatePrecioFinalVentaLote();$('#id_monto_cuota').attr('readonly', true);" onkeyup="$(this).val(format.call($(this).val().split(' ').join(''),'.',','));solo_numeros_puntos_monto_refuerzo();" /></td>
+			
+		</tr>
+		<tr>
 			<td><label for="id_monto_cuota">Monto de cada Cuota: </label></td>
 			<td class="noimage"><input id="id_monto_cuota" type="text" name="monto_cuota"  maxlength="10" onblur="calculatePrecioFinalVentaLote()" onkeyup="$(this).val(format.call($(this).val().split(' ').join(''),'.',','));solo_numeros_puntos_monto_cuota();" /></td>
 		</tr>
@@ -140,11 +146,6 @@ var data = [
 			<td><label>Monto Total: </label></td>
 			<td class="noimage"><div id="precio_final_venta"></div>
 			<ul class="errorlist"><li id="monto_total_error"></li></ul></td>
-			
-		</tr>
-		<tr>
-			<td><label>Monto Cuota Refuerzo: </label></td>
-			<td class="noimage"><input id="id_monto_cuota_refuerzo" type="text" name="monto_refuerzo"  maxlength="10" onkeyup="$(this).val(format.call($(this).val().split(' ').join(''),'.',','));solo_numeros_puntos_monto_refuerzo();" /></td>
 			
 		</tr>
 		<tr>

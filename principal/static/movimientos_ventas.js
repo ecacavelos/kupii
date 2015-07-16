@@ -3,6 +3,7 @@ $(document).ready(function() {
 	$("#fecha_hasta").hide();
 	$("#id_lote").keydown(validateLotePre);
 	$("#id_lote").keyup(validateLotePost);
+	$("#id_monto_cuota_refuerzo").val("0");
 	$("#main_venta_form").submit(validateVenta);
 
 	$('.grid_6').hide();
@@ -106,6 +107,7 @@ $(document).ready(function() {
 			ui.item.value = ui.item.label;
 			$("#id_plan_p").val(name_plan);
 			$("#id_plan_pago").val(id_plan);
+			$("#id_cant_cuotas_ref").val(ui.item.cuotas_de_refuerzo);
 			retrievePlanPago();				
 		}
 	});
@@ -224,10 +226,12 @@ function validateVenta() {
 				monto_refuerzo: res_refuerzo
 			}
 
-		});
-		request2.done(function(msg) {
+		}).done(function (data) {
 			top.location.href = "/movimientos/listado_ventas/";
 		});
+		/*request2.done(function(msg) {
+			top.location.href = "/movimientos/listado_ventas/";
+		});*/
 		request2.fail(function(jqXHR, textStatus) {
 			alert("Error en la solicitud.");
 			$('#enviar_venta').removeAttr('disabled');
@@ -247,6 +251,8 @@ function calculatePrecioFinalVentaLote() {
 	var res_venta = $("#id_precio_venta").val();
 	var res_cuota = $("#id_monto_cuota").val();
 	var res_entrega = $("#id_entrega_inicial").val();
+	var res_refuerzo = $("#id_monto_cuota_refuerzo").val();
+	
 	for ( i = 0; i < res_venta.length; i++) {
 		res_venta = res_venta.replace(".", "");
 	}
@@ -255,6 +261,9 @@ function calculatePrecioFinalVentaLote() {
 	}
 	for ( i = 0; i < res_entrega.length; i++) {
 		res_entrega = res_entrega.replace(".", "");
+	}
+	for ( i = 0; i < res_refuerzo.length; i++) {
+		res_refuerzo = res_refuerzo.replace(".", "");
 	}
 	var request = $.ajax({
 		type : "GET",
@@ -265,7 +274,8 @@ function calculatePrecioFinalVentaLote() {
 			plan_pago_establecido : $("#id_plan_pago").val(),
 			precio_de_venta : res_venta,
 			entrega_inicial : res_entrega,
-			monto_cuota : res_cuota
+			monto_cuota : res_cuota,
+			monto_refuerzo : res_refuerzo
 		}
 	});
 	request.complete(function(msg) {
@@ -336,7 +346,8 @@ function calculateMontoCuotas() {
 	var res_entrega = $("#id_entrega_inicial").val();
 	var res_cuota = $("#id_monto_cuota").val();
 	var precio_venta = $("#id_precio_venta").val();
-
+	var res_refuerzo = $("#id_monto_cuota_refuerzo").val();
+	var cantidad_cuotas_ref = $("#id_cant_cuotas_ref").val();
 	for ( i = 0; i < precio_venta.length; i++) {
 		precio_venta = precio_venta.replace(".", "");
 	}
@@ -346,13 +357,18 @@ function calculateMontoCuotas() {
 	for ( i = 0; i < res_cuota.length; i++) {
 		res_cuota = res_cuota.replace(".", "");
 	}
+	for ( i = 0; i < res_refuerzo.length; i++) {
+		res_refuerzo = res_refuerzo.replace(".", "");
+	}
 	var entrega_inicial = res_entrega;
 	entrega_inicial = parseInt(entrega_inicial);
 	precio_venta = parseInt(precio_venta);
+	var monto_ref = parseInt(res_refuerzo) * parseInt(cantidad_cuotas_ref);
+	var cuotas_restantes = cantidad_cuotas - cantidad_cuotas_ref
 	console.log("precio_credito: " + precio_credito);
 	console.log("entrega_inicial: " + entrega_inicial);
 	console.log("cantidad_credito: " + cantidad_cuotas);
-	var monto_cuota = Math.ceil((precio_venta - entrega_inicial) / cantidad_cuotas);
+	var monto_cuota = Math.ceil((precio_venta - (entrega_inicial + monto_ref)) / cuotas_restantes);
 	if (precio_venta < entrega_inicial) {
 		alert("La entrega inicial debe ser menor al precio de venta.");
 		$("#id_monto_cuota").val("");
