@@ -38,7 +38,7 @@ def ventas_de_lotes(request):
         
             if request.method == 'POST':
                 data = request.POST
-                lote_id = data.get('venta_lote_id', '')
+                lote_id = data.get('venta_lote_id', '') 
                 lote_a_vender = Lote.objects.get(pk=lote_id)
         
                 cliente_id = data.get('venta_cliente_id', '')
@@ -92,8 +92,12 @@ def ventas_de_lotes(request):
                     print error 
                     pass           
                 if nueva_venta.plan_de_pago.tipo_de_plan != 'contado':
-                    cant_cuotas = nueva_venta.plan_de_pago.cantidad_de_cuotas
-                    sumatoria_cuotas = nueva_venta.entrega_inicial + (cant_cuotas * nueva_venta.precio_de_cuota)
+                    if nueva_venta.plan_de_pago.cuotas_de_refuerzo == 0:
+                        cant_cuotas = nueva_venta.plan_de_pago.cantidad_de_cuotas
+                        sumatoria_cuotas = nueva_venta.entrega_inicial + (cant_cuotas * nueva_venta.precio_de_cuota)
+                    else:
+                        cant_cuotas = nueva_venta.plan_de_pago.cantidad_de_cuotas - nueva_venta.plan_de_pago.cuotas_de_refuerzo
+                        sumatoria_cuotas = nueva_venta.entrega_inicial + (cant_cuotas * nueva_venta.precio_de_cuota) + (nueva_venta.plan_de_pago.cuotas_de_refuerzo * nueva_venta.monto_cuota_refuerzo)
                 else:
                     sumatoria_cuotas = nueva_venta.precio_final_de_venta
                     
