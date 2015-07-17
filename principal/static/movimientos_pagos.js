@@ -350,14 +350,16 @@ function calcularInteres() {
 			detalle=msg;
 			console.log(detalle);
 			var intereses=0;
-			if(msg.length > 0)
+			if(detalle.length > 0)
 			{
 				var nro_cuotas_a_pagar=$('#nro_cuotas_a_pagar').val();
+                var fecha_pago = $('#id_fecha').val();
 				for(i=0;i<nro_cuotas_a_pagar;i++){
-                    if ($('#id_fecha').val()>detalle[i]['vencimiento_gracia']){
+                    var fecha_vencimiento_pago = (detalle[i]['vencimiento_gracia']);
+                    if(fecha_pago>fecha_vencimiento_pago){
                         console.log("Sumando intereses");
                         //alert("sumando intereses");
-                        intereses+=msg[i]['intereses'];
+                        intereses+=detalle[i]['intereses'];
                     }
 				}
 			}
