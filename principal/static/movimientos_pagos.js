@@ -353,12 +353,15 @@ function calcularInteres() {
 			if(detalle.length > 0)
 			{
 				var nro_cuotas_a_pagar=$('#nro_cuotas_a_pagar').val();
-                var fecha_pago = $('#id_fecha').val();
+                var f1 = $("#id_fecha").val().split("/");
+                var fecha_pago = new Date(f1[2], f1[1] - 1, f1[0]);
+                //alert(fecha_pago);
 				for(i=0;i<nro_cuotas_a_pagar;i++){
-                    var fecha_vencimiento_pago = (detalle[i]['vencimiento_gracia']);
+                    var f2 = (detalle[i]['vencimiento_gracia']).split("/");
+                    var fecha_vencimiento_pago = new Date(f2[2], f2[1] - 1, f2[0]);
+                    //alert(fecha_vencimiento_pago);
                     if(fecha_pago>fecha_vencimiento_pago){
                         console.log("Sumando intereses");
-                        //alert("sumando intereses");
                         intereses+=detalle[i]['intereses'];
                     }
 				}
