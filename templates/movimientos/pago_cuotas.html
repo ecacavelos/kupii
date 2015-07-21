@@ -7,7 +7,9 @@
 -->
 <script type="text/javascript" src="{{ STATIC_URL }}movimientos.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}movimientos_pagos.js"></script>
-
+<script>
+	var grupo = "{{grupo}}";
+</script>
 {% endblock %}
 
 {% block content %}
@@ -25,7 +27,6 @@
 <div class="grid_6">
 	<a href="#" class="historico">Buscar</a>
 </div>
-
 <div class="clear"></div>
 <div class="grid_16" align="center">
 	<form id="main_pago_form" action="" method="post">
@@ -87,11 +88,7 @@
 				<tr>
 					<td><label for="id_fecha">Fecha de Pago: </label></td>
 					<td class="noimage">
-						{%if grupo == 2%}
-							<input class="fecha_pago" id="id_fecha_read"  type="text" name="fecha" maxlength="10" readonly=""/>
-						{%else%}
-							<input class="fecha_pago" id="id_fecha" type="text" name="fecha" maxlength="10"/>
-						{%endif%}
+						<input class="fecha_pago" type="text" name="fecha" maxlength="10"/>
 					</td>
 				</tr>
 			</div>
@@ -187,7 +184,6 @@
 	</form>
 	<div class="clear"></div>
 </div>
-
 <div id="footer">
 	<a href="{% url 'frontend_home' %}movimientos/" class="boton-verde">Volver al m&oacute;dulo de movimientos</a>
 </div>

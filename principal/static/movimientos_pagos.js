@@ -5,16 +5,14 @@ $(document).ready(function() {
 	$("#id_lote").keyup(validateLotePost);
 	$("#main_pago_form").submit(validatePago);
 	$("#nro_cuotas_a_pagar").val("1");
-	$("#id_fecha_read").val(getCurrentDate());
-	
-	$("#id_fecha").val(getCurrentDate());
-		$('.grid_6').hide();
-		//Cambiar calendario a español
-		$.datepicker.regional['es'] = {
+	$(".fecha_pago").val(getCurrentDate());
+	$('.grid_6').hide();
+	$('.fecha_pago').mask('##/##/####');
+	if(grupo != "2"){
+		$(".fecha_pago").datepicker({
 			closeText : 'Cerrar',
 			prevText : '<Ant',
 			nextText : 'Sig>',
-			currentText : 'Hoy',
 			monthNames : ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
 			monthNamesShort : ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
 			dayNames : ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
@@ -26,27 +24,23 @@ $(document).ready(function() {
 			isRTL : false,
 			showMonthAfterYear : false,
 			yearSuffix : ''
-		};
-		// Setear idioma al calendario
-		$.datepicker.setDefaults($.datepicker.regional['es']);
-		$('#id_fecha').mask('##/##/####');
-		$("#id_fecha").datepicker({
-			dateFormat : 'dd/mm/yy'
 		});
-		
-		$("#id_fecha_venta2").datepicker({
-			dateFormat : 'dd/mm/yy'
-		});
-		$('#id_fecha_venta2').mask('##/##/####');
-		$("#id_fecha_venta2").datepicker({
-			dateFormat : 'dd/mm/yy'
-		});
+	}else{
+		$(".fecha_pago").prop('readonly', true);
+	}
+	$("#id_fecha_venta2").datepicker({
+		dateFormat : 'dd/mm/yy'
+	});
+	$('#id_fecha_venta2').mask('##/##/####');
+	$("#id_fecha_venta2").datepicker({
+		dateFormat : 'dd/mm/yy'
+	});
 	
 	
 	$( "#nro_cuotas_a_pagar" ).change(function() {
   		refresh();
 	});
-	$( "#id_fecha" ).change(function() {
+	$( ".fecha_pago" ).change(function() {
   		refresh();
 	});
 	
@@ -353,7 +347,7 @@ function calcularInteres() {
 			if(detalle.length > 0)
 			{
 				var nro_cuotas_a_pagar=$('#nro_cuotas_a_pagar').val();
-                var f1 = $("#id_fecha").val().split("/");
+                var f1 = $(".fecha_pago").val().split("/");
                 var fecha_pago = new Date(f1[2], f1[1] - 1, f1[0]);
                 //alert(fecha_pago);
 				for(i=0;i<nro_cuotas_a_pagar;i++){
