@@ -224,8 +224,21 @@ def pago_de_cuotas(request):
                 data = request.POST    
                 lote_id = data.get('pago_lote_id', '')
                 nro_cuotas_a_pagar = data.get('pago_nro_cuotas_a_pagar')
-                venta_id = data.get('pago_venta_id')
-                venta = Venta.objects.get(pk=venta_id)
+
+                #############################################################
+                #Codigo agregado: contemplar el caso de los lotes recuperados
+                ventas = Venta.objects.filter(lote_id=lote_id)
+                for item_venta in ventas:
+                    print 'Obteniendo la ultima venta'
+                    try:
+                        RecuperacionDeLotes.objects.get(venta=item_venta.id)
+                    except RecuperacionDeLotes.DoesNotExist:
+                        print 'se encontro la venta no recuperada, la venta actual'
+                        venta = item_venta
+                #############################################################
+
+                #venta_id = data.get('pago_venta_id')
+                #venta = Venta.objects.get(pk=venta_id)
                 venta.pagos_realizados = int(nro_cuotas_a_pagar) + int(venta.pagos_realizados)
                 cliente_id = data.get('pago_cliente_id')
                 vendedor_id = data.get('pago_vendedor_id')
@@ -255,7 +268,7 @@ def pago_de_cuotas(request):
                 if cuotas_restantes >= int(nro_cuotas_a_pagar):
                     try:
                         nuevo_pago = PagoDeCuotas()
-                        nuevo_pago.venta = Venta.objects.get(pk=venta_id)
+                        nuevo_pago.venta = Venta.objects.get(pk=venta.id)
                         nuevo_pago.lote = Lote.objects.get(pk=lote_id)
                         nuevo_pago.fecha_de_pago = fecha_pago_parsed
                         nuevo_pago.nro_cuotas_a_pagar = nro_cuotas_a_pagar
@@ -435,7 +448,6 @@ def cambio_de_lotes(request):
         
 
 def recuperacion_de_lotes(request):
-    
     if request.user.is_authenticated():
         if verificar_permisos(request.user.id, permisos.ADD_RECUPERACIONDELOTES):
             t = loader.get_template('movimientos/recuperacion_lotes.html')
