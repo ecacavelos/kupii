@@ -401,9 +401,13 @@ function dibujarDetalle() {
 function modificarMontos(){
 	var intereses =0;
 	global_intereses =0;
-	for(i=0;i<detalle.length;i++){
-		detalle[i]['intereses']= parseInt($('#interes_' + i).val());
-		intereses+=detalle[i]['intereses'];
+	if(detalle.length > 0)
+	{
+		var nro_cuotas_a_pagar=$('#nro_cuotas_a_pagar').val();
+		for(i=0;i<nro_cuotas_a_pagar;i++){
+			detalle[i]['intereses']= parseInt($('#interes_' + i).val());
+			intereses+=detalle[i]['intereses'];
+		}
 	}
 	global_intereses=intereses;
 	//calculateTotalCuotas();
