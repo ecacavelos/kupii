@@ -18,7 +18,7 @@ from num2words import num2words
 import xlwt
 import math
 import json
-
+from principal.common_functions import *
 # Funcion principal del modulo de facturas.
 def facturar(request):    
     if request.user.is_authenticated():
@@ -49,7 +49,7 @@ def facturar(request):
             numero = request.POST.get('nro-factura','')
             
             #Obtener fecha
-            fecha = datetime.strptime(request.POST.get('fecha', ''), "%Y-%m-%d")
+            fecha = datetime.datetime.strptime(request.POST.get('fecha', ''), "%Y-%m-%d")
             
             #Obtener Tipo (Contado - Crédito)
             tipo = request.POST.get('tipo','')
@@ -57,6 +57,11 @@ def facturar(request):
             #Obtener el detalle
             detalle = request.POST.get('detalle','')
             
+            #obtener numero de cuotas
+            numero_cuota_desde = request.POST.get('nro_cuota_desde','').split("/") 
+            numero_cuota_hasta= request.POST.get('nro_cuota_hasta','').split("/")
+            num_desde = int(numero_cuota_desde[0])
+            num_hasta = int(numero_cuota_hasta[0])
             #Crear un objeto Factura y guardar            
             nueva_factura = Factura()
             nueva_factura.fecha = fecha
@@ -67,7 +72,13 @@ def facturar(request):
             nueva_factura.detalle = detalle
             nueva_factura.lote = lote_id 
             nueva_factura.save()
-            
+            venta = Venta.objects.get(cliente_id= nueva_factura.cliente.id, lote_id= lote_id.id)
+            object_list= get_pago_cuotas(venta, None, None)
+            for x in xrange(0,len(object_list)):
+                if num_desde <= int(object_list[x]['nro_cuota']) <= num_hasta:
+                    pago = PagoDeCuotas.objects.get(pk=object_list[x]['id'])
+                    pago.factura = nueva_factura
+                    pago.save() 
             response = HttpResponse(mimetype='application/pdf')
             nombre_factura = "factura-" + nueva_factura.numero + ".pdf"
             response['Content-Disposition'] = 'attachment; filename=factura.pdf'

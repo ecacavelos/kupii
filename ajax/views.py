@@ -15,6 +15,7 @@ from django.db.models import Count, Min, Sum, Avg
 from principal.monthdelta import MonthDelta
 from calendar import monthrange
 from datetime import datetime, timedelta
+from _pydev_xmlrpclib import Error
 
 #Ejemplo nuevo esquema de serializacion:
 # all_objects = list(Restaurant.objects.all()) + list(Place.objects.all())
@@ -405,4 +406,22 @@ def get_mes_pagado_by_id_lote(request):
             except Exception, error:
                 print error
         else:
-            return HttpResponseRedirect(reverse('login')) 
+            return HttpResponseRedirect(reverse('login'))
+        
+def get_pago_cuotas_by_lote_cliente(request):
+    if request.method == 'GET':
+        if request.user.is_authenticated():
+            try:  
+                codigo= request.GET.get('lote_id')
+                cedula_cli= request.GET.get('cliente_id')
+                nombre= request.GET.get('nombre')
+                lote =  Lote.objects.get(codigo_paralot= codigo)
+                cliente = Cliente.objects.get(cedula=cedula_cli)
+                venta = Venta.objects.get(lote_id= lote.id, cliente_id=cliente.id)
+                object_list=get_pago_cuotas(venta, None, None)
+                labels=["nro_cuota_y_total","nro_cuota"]
+                return HttpResponse(json.dumps(object_list, cls=DjangoJSONEncoder), content_type="application/json")
+            except Exception, error:
+                print error
+        else:
+            return HttpResponseRedirect(reverse('login'))

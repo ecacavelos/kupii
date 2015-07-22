@@ -305,7 +305,27 @@ class Reserva(models.Model):
 class Transaccion(models.Model):
     estado = models.CharField(max_length=30)
     cliente = models.ForeignKey(Cliente,on_delete=models.PROTECT)
-    created = models.DateTimeField(auto_now_add=True) 
+    created = models.DateTimeField(auto_now_add=True)
+   
+class Timbrado(models.Model):
+    desde = models.DateField()
+    hasta = models.DateField()
+    numero = models.CharField(max_length=30)
+    def as_json(self):
+        return dict(
+            label= self.numero,
+            numero = self.numero,
+            id=self.id)
+
+ 
+class Factura(models.Model):
+    fecha = models.DateField()
+    numero = models.CharField(max_length=30)
+    cliente = models.ForeignKey(Cliente,on_delete=models.PROTECT)
+    lote = models.ForeignKey(Lote,on_delete=models.PROTECT)
+    timbrado = models.ForeignKey(Timbrado,on_delete=models.PROTECT)
+    tipo = models.CharField(max_length=2)
+    detalle = models.TextField()
 
 class PagoDeCuotas(models.Model):
     venta = models.ForeignKey(Venta,on_delete=models.PROTECT)
@@ -320,6 +340,7 @@ class PagoDeCuotas(models.Model):
     total_de_cuotas = models.IntegerField()
     total_de_mora = models.IntegerField()
     total_de_pago = models.IntegerField()
+    factura = models.ForeignKey(Factura,on_delete=models.PROTECT)
     def as_json(self):
         return dict(
             lote=unicode(self.lote),
@@ -355,27 +376,6 @@ class RecuperacionDeLotes(models.Model):
     cliente = models.ForeignKey(Cliente,on_delete=models.PROTECT)
     vendedor = models.ForeignKey(Vendedor,on_delete=models.PROTECT)
     #plan_de_pago = models.ForeignKey(PlanDePago, on_delete=models.PROTECT)
-    
-    
-class Timbrado(models.Model):
-    desde = models.DateField()
-    hasta = models.DateField()
-    numero = models.CharField(max_length=30)
-    def as_json(self):
-        return dict(
-            label= self.numero,
-            numero = self.numero,
-            id=self.id)
-
-
-class Factura(models.Model):
-    fecha = models.DateField()
-    numero = models.CharField(max_length=30)
-    cliente = models.ForeignKey(Cliente,on_delete=models.PROTECT)
-    lote = models.ForeignKey(Lote,on_delete=models.PROTECT)
-    timbrado = models.ForeignKey(Timbrado,on_delete=models.PROTECT)
-    tipo = models.CharField(max_length=2)
-    detalle = models.TextField()
     
 class PermisosAdicionales(models.Model): 
     class Meta:

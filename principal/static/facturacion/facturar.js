@@ -53,6 +53,53 @@
         	validarDetalle();
     	});
     	
+    	$('#id_nro_cuota').autocomplete({
+			source: function(request, response) {
+				$.getJSON("/ajax/get_pago_cuotas_by_lote_cliente/", 
+				{
+					lote_id: $("#lote").val(),
+					cliente_id: $("#id_cedula_cliente").val(),
+					nombre: request.term
+				}, 
+					response);
+			},
+			minLength: 1,
+			create : function(){
+				$(this).data('ui-autocomplete')._renderItem = function(ul,item){
+					return $('<li>').append('<a>' +item.nro_cuota_y_total +'</a>').appendTo(ul);
+					};
+			},
+			select : function(event, ui) {
+				nro_cuota= ui.item.nro_cuota_y_total;
+				$("#id_nro_cuota").val(nro_cuota);
+				$(this).trigger('change'); 
+	    		return false;
+			}
+		});
+		
+		$('#id_nro_cuota_hasta').autocomplete({
+			source: function(request, response) {
+				$.getJSON("/ajax/get_pago_cuotas_by_lote_cliente/", 
+				{
+					lote_id: $("#lote").val(),
+					cliente_id: $("#id_cedula_cliente").val(),
+					nombre: request.term
+				}, 
+					response);
+			},
+			minLength: 1,
+			create : function(){
+				$(this).data('ui-autocomplete')._renderItem = function(ul,item){
+					return $('<li>').append('<a>' +item.nro_cuota_y_total +'</a>').appendTo(ul);
+					};
+			},
+			select : function(event, ui) {
+				nro_cuota= ui.item.nro_cuota_y_total;
+				$("#id_nro_cuota_hasta").val(nro_cuota);
+				$(this).trigger('change'); 
+	    		return false;
+			}
+		});
     	// Control del SUBMIT del FORM
     	$("#agregar-factura-form").submit(function(){
 			
