@@ -344,6 +344,7 @@ function calcularInteres() {
 			detalle=msg;
 			console.log(detalle);
 			var intereses=0;
+            var gestion_cobranza=0;
 			if(detalle.length > 0)
 			{
 				var nro_cuotas_a_pagar=$('#nro_cuotas_a_pagar').val();
@@ -359,8 +360,14 @@ function calcularInteres() {
                         intereses+=detalle[i]['intereses'];
                     }
 				}
+
+                if(detalle[detalle.length-1]['gestion_cobranza']){
+                    gestion_cobranza=detalle[detalle.length-1]['gestion_cobranza'];
+                }
 			}
-			global_intereses=intereses;
+
+
+			global_intereses=intereses+gestion_cobranza;
             //alert(global_intereses);
 			calculateTotalPago();		
 		});
@@ -385,9 +392,9 @@ function dibujarDetalle() {
             if (i==nro_cuotas_a_pagar-1) {
                 $('#contenido_modal').append('<br>Fecha ultimo vencimiento con 5 dias de gracia: ' + detalle[i]['vencimiento_gracia'] + '</br>');
             }
-            //if(detalle[i]['gestion_cobranza']){
-            //    $('#contenido_modal').append('<br>Gestion de cobranza: ' + detalle[i]['gestion_cobranza'] + '</br>');
-            //}
+        }
+        if(detalle[detalle.length-1]['gestion_cobranza']){
+            $('#contenido_modal').append('</tr><td>Gestion de Cobranza: </td><td><input style="width: 100px;" class="interes" id="id_gestion_cobranza" type="number" value=' + f(detalle[detalle.length-1]['gestion_cobranza']).replace(/\./g, '') + '></td></tr>');
         }
     }
 
@@ -411,6 +418,8 @@ function modificarMontos(){
 			detalle[i]['intereses']= parseInt($('#interes_' + i).val());
 			intereses+=detalle[i]['intereses'];
 		}
+        //var gestion_cobranza = $("#id_gestion_cobranza").val();
+        //intereses+=parseInt(gestion_cobranza);
 	}
 	global_intereses=intereses;
 	//calculateTotalCuotas();
@@ -532,7 +541,11 @@ function calculateTotalCuotas(total_cuotas) {
 function calculateTotalPago() {
 	//alert('calculando total pago');
 	var total_cuotas = $("#total_cuotas").val();
-	var total_mora=global_intereses;
+    var gestion_cobranza = $("#id_gestion_cobranza").val();
+    if(gestion_cobranza==null){
+        gestion_cobranza=0;
+    }
+	var total_mora=global_intereses+parseInt(gestion_cobranza);
 	var total_pago = parseInt( total_cuotas) + parseInt( total_mora);
 	total_cuotas = parseInt(total_cuotas);
 	$("#total_mora").val(total_mora);
