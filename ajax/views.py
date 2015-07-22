@@ -257,9 +257,10 @@ def get_ventas_by_lote(request):
             try:
                 lote_id = request.GET['lote_id']
                 print("lote_id ->" + lote_id)
-                venta = Venta.objects.filter(lote=lote_id).order_by('-id')[:1]
-                object_list = [ob.as_json() for ob in venta] 
+                #venta = Venta.objects.filter(lote=lote_id).order_by('-id')[:1]
+                venta = [get_ultima_venta(lote_id)]
                 print venta
+                object_list = [ob.as_json() for ob in venta]
                 cuotas_details = get_cuotas_detail_by_lote(lote_id)
                 response = {
                     'venta': object_list,

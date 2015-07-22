@@ -385,6 +385,9 @@ function dibujarDetalle() {
             if (i==nro_cuotas_a_pagar-1) {
                 $('#contenido_modal').append('<br>Fecha ultimo vencimiento con 5 dias de gracia: ' + detalle[i]['vencimiento_gracia'] + '</br>');
             }
+            //if(detalle[i]['gestion_cobranza']){
+            //    $('#contenido_modal').append('<br>Gestion de cobranza: ' + detalle[i]['gestion_cobranza'] + '</br>');
+            //}
         }
     }
 

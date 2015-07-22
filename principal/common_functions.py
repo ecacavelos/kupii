@@ -14,16 +14,16 @@ import datetime
 def get_cuotas_detail_by_lote(lote_id):
     print("buscando pagos del lote --> " + lote_id);
     # El query es: select sum(nro_cuotas_a_pagar) from principal_pagodecuotas where lote_id = 16108;
-    cant_cuotas_pagadas = PagoDeCuotas.objects.filter(lote=lote_id).aggregate(Sum('nro_cuotas_a_pagar'))
-    ventas = Venta.objects.filter(lote_id=lote_id)
-    for item_venta in ventas:
-        print 'Obteniendo la ultima venta'
-        try:
-            RecuperacionDeLotes.objects.get(venta=item_venta.id)
-        except RecuperacionDeLotes.DoesNotExist:
-            print 'se encontro la venta no recuperada, la venta actual'
-            venta = item_venta
-
+    venta = get_ultima_venta(lote_id)
+    # ventas = Venta.objects.filter(lote_id=lote_id)
+    # for item_venta in ventas:
+    #     print 'Obteniendo la ultima venta'
+    #     try:
+    #         RecuperacionDeLotes.objects.get(venta=item_venta.id)
+    #     except RecuperacionDeLotes.DoesNotExist:
+    #         print 'se encontro la venta no recuperada, la venta actual'
+    #         venta = item_venta
+    cant_cuotas_pagadas = PagoDeCuotas.objects.filter(venta=venta).aggregate(Sum('nro_cuotas_a_pagar'))
     plan_de_pago = PlanDePago.objects.get(id=venta.plan_de_pago.id)
     # calcular la fecha de vencimiento.    
     if cant_cuotas_pagadas['nro_cuotas_a_pagar__sum']:
@@ -102,20 +102,21 @@ def monthdelta(d1, d2):
 def get_cuota_information_by_lote(lote_id,cuotas_pag):
     cant_cuotas_pag =0
     print("lote_id ->" + lote_id)
-    cant_cuotas_pagadas = PagoDeCuotas.objects.filter(lote=lote_id).aggregate(Sum('nro_cuotas_a_pagar'))
-    ventas = Venta.objects.filter(lote_id=lote_id)
+    # for item_venta in ventas:
+    #     print 'Obteniendo la ultima venta'
+    #     try:
+    #         RecuperacionDeLotes.objects.get(venta=item_venta.id)
+    #     except RecuperacionDeLotes.DoesNotExist:
+    #         print 'se encontro la venta no recuperada, la venta actual'
+    #         venta = item_venta
+    venta = get_ultima_venta(lote_id)
+    cant_cuotas_pagadas = PagoDeCuotas.objects.filter(venta=venta).aggregate(Sum('nro_cuotas_a_pagar'))
+    #ventas = Venta.objects.filter(lote_id=lote_id)
     if cant_cuotas_pagadas['nro_cuotas_a_pagar__sum'] == None:
         cant_cuotas_pag = 0
     else:
         cant_cuotas_pag = cant_cuotas_pagadas['nro_cuotas_a_pagar__sum']
     cuotas_totales=0
-    for item_venta in ventas:
-        print 'Obteniendo la ultima venta'
-        try:
-            RecuperacionDeLotes.objects.get(venta=item_venta.id)
-        except RecuperacionDeLotes.DoesNotExist:
-            print 'se encontro la venta no recuperada, la venta actual'
-            venta = item_venta
     cuota_a_pagar= {}
     cuotas_a_pagar= []
     ultima_fecha_pago = ""
@@ -253,6 +254,7 @@ def obtener_detalle_interes_lote(lote_id,fecha_pago_parsed,proximo_vencimiento_p
             cuotas_pagadas=resumen_lote['cant_cuotas_pagadas']
             
             detalles=[]
+            sumatoria_intereses = 0
             #El cliente tiene cuotas atrasadas
             if fecha_pago_parsed>proximo_vencimiento_parsed:
                 
@@ -261,19 +263,9 @@ def obtener_detalle_interes_lote(lote_id,fecha_pago_parsed,proximo_vencimiento_p
     #         respecto a la fecha de vencimiento de dicho pago. El porcentaje de interes que se aplica
     #         sobre las cuotas es constante: 0.001 (0.03/30) -> 3% interes mensual/30
     #         + interes punitorio (0.00030) + iva = (interes mensual + interes punitorio)* (10%)=(0.00013)
-    
-                
-                #Obtenemos la fecha del primer vencimiento de la cuota, de la ultima venta
-                ventas = Venta.objects.filter(lote_id=lote_id)
-                for item_venta in ventas:
-                    print 'Obteniendo la ultima venta'
-                    try: 
-                        RecuperacionDeLotes.objects.get(venta=item_venta.id)
-                    except RecuperacionDeLotes.DoesNotExist:
-                        print 'se encontro la venta no recuperada, la venta actual'
-                        venta = item_venta  
-                
-                
+
+                venta = get_ultima_venta(lote_id)
+
                 #Calculamos en base al primer vencimiento, cuantas cuotas debieron haberse pagado hasta la fecha
                 fecha_primer_vencimiento=venta.fecha_primer_vencimiento
                 cantidad_ideal_cuotas=monthdelta(fecha_primer_vencimiento, fecha_pago_parsed)
@@ -286,13 +278,14 @@ def obtener_detalle_interes_lote(lote_id,fecha_pago_parsed,proximo_vencimiento_p
                 interes=0.001
                 
                 #Interes
-                interes_punitorio=0.00030
+                #interes_punitorio=0.00030
                 
                 #Intereses IVA
                 interes_iva=0.00013
                 
-                total_intereses=interes+interes_punitorio+interes_iva
-                #Verificar si tiene cuotas de refuerzo 
+                #total_intereses=interes+interes_punitorio+interes_iva
+                total_intereses=interes+interes_iva
+                #Verificar si tiene cuotas de refuerzo
                 if venta.plan_de_pago.cuotas_de_refuerzo != 0:
                     pagos = get_pago_cuotas(venta, None, None)
                     cantidad_pagos_ref = cant_cuotas_pagadas_ref(pagos)
@@ -316,13 +309,15 @@ def obtener_detalle_interes_lote(lote_id,fecha_pago_parsed,proximo_vencimiento_p
                     intereses=math.ceil(total_intereses*dias_atraso*monto_cuota)
                     redondeado=roundup(intereses)
                     detalle['interes']=interes
-                    detalle['interes_punitorio']=interes_punitorio
+                    #detalle['interes_punitorio']=interes_punitorio
                     detalle['interes_iva']=interes_iva
                     detalle['nro_cuota']=nro_cuota
                     detalle['dias_atraso']=dias_atraso
                     detalle['intereses']=redondeado
                     detalle['vencimiento']=fecha_vencimiento.strftime('%d/%m/%Y')
-                    
+
+                    sumatoria_intereses += redondeado
+
                     fecha_ultimo_vencimiento = datetime.datetime.strptime(detalle['vencimiento'], "%d/%m/%Y").date()
                     fecha_dias_gracia = fecha_ultimo_vencimiento + datetime.timedelta(days=5)
                     dias_habiles = calcular_dias_habiles(fecha_ultimo_vencimiento,fecha_dias_gracia)
@@ -331,14 +326,11 @@ def obtener_detalle_interes_lote(lote_id,fecha_pago_parsed,proximo_vencimiento_p
                         fecha_ultimo_vencimiento = fecha_dias_gracia+datetime.timedelta(days=5-dias_habiles)
                     detalle['vencimiento_gracia']=fecha_ultimo_vencimiento.strftime('%d/%m/%Y')
 
-                    # if fecha_pago_parsed<=fecha_ultimo_vencimiento:
-                    #     detalle['intereses']=0
-
-
                     detalles.append(detalle)
 
-
-
+                # if cuotas_atrasadas>6:
+                #     gestion_cobranza = math.ceil(float(0.1)*float(cuotas_atrasadas*monto_cuota))+sumatoria_intereses
+                #     detalles[-1]['gestion_cobranza']=gestion_cobranza
 
             print detalles
             return detalles
@@ -510,3 +502,17 @@ def calcular_dias_habiles(fecha_ini, fecha_fin):
     
 def roundup(interes):
     return int(math.ceil(interes / 1000.0)) * 1000
+
+
+#Funcion que encuentra todas las ventas de un lote y retorna la ultima
+def get_ultima_venta(lote_id):
+    ventas = Venta.objects.filter(lote_id=lote_id)
+    for item_venta in ventas:
+        print 'Obteniendo la ultima venta'
+        try:
+            RecuperacionDeLotes.objects.get(venta=item_venta.id)
+        except RecuperacionDeLotes.DoesNotExist:
+            print 'se encontro la venta no recuperada, la venta actual'
+            venta = item_venta
+
+    return venta
