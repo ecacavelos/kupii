@@ -15,7 +15,7 @@ from django.db.models import Count, Min, Sum, Avg
 from principal.monthdelta import MonthDelta
 from calendar import monthrange
 from datetime import datetime, timedelta
-from _pydev_xmlrpclib import Error
+
 
 #Ejemplo nuevo esquema de serializacion:
 # all_objects = list(Restaurant.objects.all()) + list(Place.objects.all())
