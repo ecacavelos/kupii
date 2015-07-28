@@ -26,6 +26,8 @@ function setup_inputs() {
 		autocompleteFraccion();		
 	});
 }
+
+
 function autocompleteFraccion(){
 		$("#id_fraccion_ini").empty();
 		$("#id_fraccion_ini").val("");

@@ -54,7 +54,6 @@ def lotes_libres(request):
                     ultimo="&tipo_busqueda="+tipo_busqueda+"&fraccion_ini="+f1+"&frac1="+fraccion_ini+"&fraccion_fin="+f2+"&frac2="+fraccion_fin
                     object_list = []  # lista de lotes
                     if fraccion_ini and fraccion_fin:
-                        
                         manzanas = Manzana.objects.filter(fraccion_id__range=(fraccion_ini, fraccion_fin)).order_by('fraccion_id', 'nro_manzana')
                         for m in manzanas:
                             lotes = Lote.objects.filter(manzana=m.id, estado="1").order_by('nro_lote')
@@ -107,8 +106,19 @@ def lotes_libres(request):
                             total_superficie_fraccion = 0
                             total_lotes = 0
                         lotes.append(lote)
-                    
-                    paginator = Paginator(lotes, 25)
+
+                    #cantidad de registros a mostrar, determinada por el usuario
+                    try:
+                        cant_reg = request.GET['cant_reg']
+                        if cant_reg=='todos':
+                            paginator = Paginator(lotes, len(lotes))
+                        else:
+                            p=range(int(cant_reg))
+                            paginator = Paginator(lotes, len(p))
+                    except:
+                        cant_reg=25
+                        paginator = Paginator(lotes, 25)
+
                     page = request.GET.get('page')
                     try:
                         lista = paginator.page(page)
@@ -122,6 +132,7 @@ def lotes_libres(request):
                         'fraccion_fin': fraccion_fin,
                         'ultimo': ultimo,
                         'lista_lotes': lista,
+                        'cant_reg':cant_reg,
                         'frac1' : f1,
                         'frac2' : f2
                     })
@@ -236,7 +247,7 @@ def clientes_atrasados(request):
         if request.user.is_authenticated():
             if verificar_permisos(request.user.id, permisos.VER_INFORMES):
                 t = loader.get_template('informes/clientes_atrasados.html')
-                fecha_actual= datetime.now()            
+                fecha_actual= datetime.datetime.now()
                 filtros = filtros_establecidos(request.GET,'clientes_atrasados')
                 cliente_atrasado= {}
                 clientes_atrasados= []

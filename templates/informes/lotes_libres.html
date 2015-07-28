@@ -4,11 +4,14 @@
 <script type="text/javascript">
 	$(document).ready(function() {
 		var tipo_busqueda = "{{tipo_busqueda}}";
-		$('#id_tipo_busqueda').val(tipo_busqueda);
+		var cant_reg = "{{cant_reg}}";
+        $('#id_tipo_busqueda').val(tipo_busqueda);
+        $('#id_cant_reg').val(cant_reg);
 		var fraccion_ini="{{fraccion_ini}}";
 		var fraccion_fin="{{fraccion_fin}}";
 		var frac1="{{frac1}}";
 		var frac2="{{frac2}}";
+
 		
 		if($('#id_tipo_busqueda').val()=='nombre'){
 			$('#id_fraccion_ini').val(frac1);
@@ -21,7 +24,39 @@
 			$('#id_fraccion_fin').val(fraccion_fin);
 		}	
 	
-	
+        $('#id_cant_reg').change(function(){
+            var page = $("#id_nro_pagina").val();
+            var cant_reg = $("#id_cant_reg").val();
+            var fraccion_ini;
+            var fraccion_fin;
+            var frac1;
+            var frac2;
+            var tipo_busqueda = $("#id_tipo_busqueda").val();
+            if($('#id_tipo_busqueda').val()=='nombre'){
+                fraccion_ini = $('#id_fraccion_ini').val();
+			    fraccion_fin = $('#id_fraccion_fin').val();
+                frac1 = $('#id_frac1').val();
+                frac2 = $('#id_frac2').val();
+            }
+            if($('#id_tipo_busqueda').val()=='codigo'){
+                frac1 = $('#id_fraccion_ini').val();
+                frac2 = $('#id_fraccion_fin').val();
+            }
+
+            window.location.replace("/informes/lotes_libres/?page="+page+"&tipo_busqueda="+tipo_busqueda+"&fraccion_ini="+fraccion_ini+"&frac1="+frac1+"&fraccion_fin="+fraccion_fin+"&frac2="+frac2+"&cant_reg="+cant_reg);
+            fraccion_ini = $('#id_fraccion_ini').val();
+        });
+
+        $('#boton_pagina').click(function() {
+            var page = $("#id_nro_pagina").val();
+            var tipo_busqueda = $("#id_tipo_busqueda").val();
+            var fraccion_ini = $("#id_fraccion_ini").val();
+            var fraccion_fin = $("#id_fraccion_fin").val();
+            var frac1 = $("#id_frac1").val();
+            var frac2 = $("#id_frac2").val();
+            var cant_reg = $("#cant_reg").val();
+            window.location.replace("/informes/lotes_libres/?page="+page+"&tipo_busqueda="+tipo_busqueda+"&fraccion_ini="+fraccion_ini+"&frac1="+frac1+"&fraccion_fin="+fraccion_fin+"&frac2="+frac2+"&cant_reg="+cant_reg);
+        });
 		/*	
 		if($('#id_frac1').val()!="" && $('#id_frac2').val()!=""){ // parametros seteados
 			$('.listado-lotes').show();
@@ -122,12 +157,18 @@
 			{% endfor %}
 		<div class="pagination">
 			<span class="step-links">
-				Mostrando {{ lista_lotes.start_index }}-{{ lista_lotes.end_index }} de {{ lista_lotes.paginator.count }} Resultados
+{#				Mostrando {{ lista_lotes.start_index }}-{{ lista_lotes.end_index }} de {{ lista_lotes.paginator.count }} Resultados#}
+                Cantidad de Registros <select name="cant_reg" id="id_cant_reg" style="width:70px">
+                    <option value="25">25</option>
+					<option value="50">50</option>
+                    <option value="todos">Todos</option>
+                </select>
 				{%if lista_lotes.has_previous%} 
 				<a href="?page={{ lista_lotes.first_index}}{{ultimo}}"> Primera </a> 
 				<a href="?page={{ lista_lotes.previous_page_number }}{{ultimo}}"> Anterior</a> 
 				{%endif%}
-				P&aacute;gina |{{lista_lotes.number}}|		
+				P&aacute;gina <input name="nro_pagina" id="id_nro_pagina" size="1" type="text" value="{{lista_lotes.number}}"/>
+                <input id="boton_pagina" type="button" value="Ir" class="historico" style="cursor: pointer"/>
 				{%if lista_lotes.has_next%} 
 				<a href="?page={{ lista_lotes.next_page_number }}{{ultimo}}"> Siguiente </a> 				
 				<a href="?page={{ lista_lotes.end_index}}{{ultimo}}"> Ultima </a> 
