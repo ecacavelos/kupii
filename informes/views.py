@@ -125,7 +125,8 @@ def lotes_libres(request):
                     except PageNotAnInteger:
                         lista = paginator.page(1)
                     except EmptyPage:
-                        lista = paginator.page(paginator.num_pages)                
+                        lista = paginator.page(paginator.num_pages)
+
                     c = RequestContext(request, {
                         'tipo_busqueda' : tipo_busqueda,
                         'fraccion_ini': fraccion_ini,
@@ -335,7 +336,19 @@ def clientes_atrasados(request):
                     a = len(clientes_atrasados)
                     if a > 0:                    
                         ultimo="&fraccion="+unicode(fraccion)+"&meses_atraso="+unicode(meses_peticion)
-                        paginator = Paginator(clientes_atrasados, 25)
+
+                        #cantidad de registros a mostrar, determinada por el usuario
+                        try:
+                            cant_reg = request.GET['cant_reg']
+                            if cant_reg=='todos':
+                                paginator = Paginator(clientes_atrasados, len(clientes_atrasados))
+                            else:
+                                p=range(int(cant_reg))
+                                paginator = Paginator(clientes_atrasados, len(p))
+                        except:
+                            cant_reg=25
+                            paginator = Paginator(clientes_atrasados, 25)
+
                         page = request.GET.get('page')
                         try:
                             lista = paginator.page(page)
@@ -348,6 +361,7 @@ def clientes_atrasados(request):
                             'meses_atraso': meses_peticion,
                             'ultimo': ultimo,
                             'object_list': lista,
+                            'cant_reg':cant_reg,
                             'clientes_atrasados' : clientes_atrasados                        
                         })                     
                         return HttpResponse(t.render(c))

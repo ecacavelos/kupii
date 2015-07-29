@@ -57,15 +57,15 @@
             var cant_reg = $("#cant_reg").val();
             window.location.replace("/informes/lotes_libres/?page="+page+"&tipo_busqueda="+tipo_busqueda+"&fraccion_ini="+fraccion_ini+"&frac1="+frac1+"&fraccion_fin="+fraccion_fin+"&frac2="+frac2+"&cant_reg="+cant_reg);
         });
-		/*	
-		if($('#id_frac1').val()!="" && $('#id_frac2').val()!=""){ // parametros seteados
+
+		if(($('#id_frac1').val()!="" || $('#id_frac2').val()!="") || ($('#id_fraccion_ini').val()!="" || $('#id_fraccion_fin').val()!="")){ // parametros seteados
 			$('.listado-lotes').show();
 			$('.pagination').show();
-		}		
+		}
 		else{
 			$('.listado-lotes').hide();
 			$('.pagination').hide();
-		}*/
+		}
 		
 		setup_inputs();		
 	});
@@ -113,13 +113,34 @@
 				<input id="boton_buscar" type="button" value="Buscar"  onclick="validar();" class="historico" style="cursor: pointer"/>
 				</td>
 				<td>
-				<a class="boton-verde" id="id_boton" onclick="retrieve_lotes_libres();">Descargar como Excel</a>
+				<a class="boton-verde" id="id_boton" onclick="retrieve_lotes_libres();">Descargar Excel</a>
 				</td>
 			</tr>
 		</table>
 	</form>
 </div>
 <div class="clear"></div>
+<div class="pagination">
+    <span class="step-links">
+{#				Mostrando {{ lista_lotes.start_index }}-{{ lista_lotes.end_index }} de {{ lista_lotes.paginator.count }} Resultados#}
+        Cantidad de Registros <select name="cant_reg" id="id_cant_reg" style="width:70px">
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="todos">Todos</option>
+        </select>
+        {%if lista_lotes.has_previous%}
+        <a href="?page={{ lista_lotes.first_index}}{{ultimo}}"> Primera </a>
+        <a href="?page={{ lista_lotes.previous_page_number }}{{ultimo}}"> Anterior</a>
+        {%endif%}
+        P&aacute;gina <input name="nro_pagina" id="id_nro_pagina" size="1" type="text" value="{{lista_lotes.number}}"/>
+        de {{ lista_lotes.paginator.num_pages }}
+        <input id="boton_pagina" type="button" value="Ir" class="historico" style="cursor: pointer"/>
+        {%if lista_lotes.has_next%}
+        <a href="?page={{ lista_lotes.next_page_number }}{{ultimo}}"> Siguiente </a>
+        <a href="?page={{ lista_lotes.end_index}}{{ultimo}}"> Ultima </a>
+        {%endif%}
+    </span>
+</div>
 <div id="listado-item-lote">
 	<table   cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
 		<th>Nombre Fracci&oacute;n</th><th>Fracci&oacute;n</th><th>Lote Nro</th><th>Superficie</th><th>Precio Contado</th><th>Precio Credito</th><th>Precio Cuota</th>
@@ -155,28 +176,29 @@
 					</tr>
 				{% endif %}
 			{% endfor %}
-		<div class="pagination">
-			<span class="step-links">
-{#				Mostrando {{ lista_lotes.start_index }}-{{ lista_lotes.end_index }} de {{ lista_lotes.paginator.count }} Resultados#}
-                Cantidad de Registros <select name="cant_reg" id="id_cant_reg" style="width:70px">
-                    <option value="25">25</option>
-					<option value="50">50</option>
-                    <option value="todos">Todos</option>
-                </select>
-				{%if lista_lotes.has_previous%} 
-				<a href="?page={{ lista_lotes.first_index}}{{ultimo}}"> Primera </a> 
-				<a href="?page={{ lista_lotes.previous_page_number }}{{ultimo}}"> Anterior</a> 
-				{%endif%}
-				P&aacute;gina <input name="nro_pagina" id="id_nro_pagina" size="1" type="text" value="{{lista_lotes.number}}"/>
-                <input id="boton_pagina" type="button" value="Ir" class="historico" style="cursor: pointer"/>
-				{%if lista_lotes.has_next%} 
-				<a href="?page={{ lista_lotes.next_page_number }}{{ultimo}}"> Siguiente </a> 				
-				<a href="?page={{ lista_lotes.end_index}}{{ultimo}}"> Ultima </a> 
-				{%endif%} 
-			</span>
-		</div>
 	</table>
 </div>
+    <div class="pagination">
+        <span class="step-links">
+{#				Mostrando {{ lista_lotes.start_index }}-{{ lista_lotes.end_index }} de {{ lista_lotes.paginator.count }} Resultados#}
+            Cantidad de Registros <select name="cant_reg" id="id_cant_reg" style="width:70px">
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="todos">Todos</option>
+            </select>
+            {%if lista_lotes.has_previous%}
+            <a href="?page={{ lista_lotes.first_index}}{{ultimo}}"> Primera </a>
+            <a href="?page={{ lista_lotes.previous_page_number }}{{ultimo}}"> Anterior</a>
+            {%endif%}
+            P&aacute;gina <input name="nro_pagina" id="id_nro_pagina" size="1" type="text" value="{{lista_lotes.number}}"/>
+            de {{ lista_lotes.paginator.num_pages }}
+            <input id="boton_pagina" type="button" value="Ir" class="historico" style="cursor: pointer"/>
+            {%if lista_lotes.has_next%}
+            <a href="?page={{ lista_lotes.next_page_number }}{{ultimo}}"> Siguiente </a>
+            <a href="?page={{ lista_lotes.end_index}}{{ultimo}}"> Ultima </a>
+            {%endif%}
+        </span>
+    </div>
 <div id="footer">
 	<a href="{% url 'frontend_home' %}informes" class="boton-verde">Volver al módulo de Informes</a>
 </div>

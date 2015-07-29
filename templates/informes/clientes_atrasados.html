@@ -3,6 +3,8 @@
 
 <script type="text/javascript">	
 	$(document).ready(function() {
+        var cant_reg = "{{cant_reg}}";
+        $('#id_cant_reg').val(cant_reg);
 		var fraccion = "{{fraccion}}";
 		$('#fraccion').val(fraccion);
 		var meses_atraso = "{{meses_atraso}}";
@@ -15,6 +17,27 @@
 			$('.listado-clientes-atrasados').show();
 			$('.pagination').show();
 		}
+
+         $('#id_cant_reg').change(function(){
+            var cant_reg = $("#id_cant_reg").val();
+            var fraccion_nombre = $("#fraccion").val();
+            var fraccion = $("#id_fraccion").val();
+            var meses_atraso = $("#meses_atraso").val();
+            var tipo_busqueda = $("#id_tipo_busqueda").val();
+            window.location.replace("/informes/clientes_atrasados/?tipo_busqueda="+tipo_busqueda+"&fraccion_nombre="+fraccion_nombre+"&fraccion="+fraccion+"194&meses_atraso="+meses_atraso+"&cant_reg="+cant_reg+"&tabla=lote");
+         });
+
+        $('#boton_pagina').click(function() {
+            var page = $("#id_nro_pagina").val();
+            var cant_reg = $("#id_cant_reg").val();
+            var fraccion_nombre = $("#fraccion").val();
+            var fraccion = $("#id_fraccion").val();
+            var meses_atraso = $("#meses_atraso").val();
+            var tipo_busqueda = $("#id_tipo_busqueda").val();
+            window.location.replace("/informes/clientes_atrasados/?page="+page+"&tipo_busqueda="+tipo_busqueda+"&fraccion_nombre="+fraccion_nombre+"&fraccion="+fraccion+"194&meses_atraso="+meses_atraso+"&cant_reg="+cant_reg+"&tabla=lote");
+        });
+
+
 		setup_inputs();
 	});
 
@@ -61,16 +84,40 @@
 				</td>
 				<td>
 				<input name="tabla" type="hidden" value="lote" />
-				<a class="boton-verde" id="id_boton" onclick="retrieve_clientes_atrasados();">Descargar como Excel</a></td>
+				<a class="boton-verde" id="id_boton" onclick="retrieve_clientes_atrasados();">Descargar Excel</a></td>
 			</tr>
 		</table>
 	</form>
 </div>
 <div class="clear"></div>
-<div id="listado-cuadro-busqueda">
-	<br>
-	<br>
+<div class="pagination">
+    <span class="step-links">
+{#                Mostrando {{ object_list.start_index }}-{{ object_list.end_index }} de {{ object_list.paginator.count }} Resultados#}
+        Cantidad de Registros <select name="cant_reg" id="id_cant_reg" style="width:70px">
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="todos">Todos</option>
+        </select>
+        {%if object_list.has_previous%}
+            <a href="?page={{ object_list.first_index}}{{ultimo}}"> Primera </a>
+            <a href="?page={{ object_list.previous_page_number }}{{ultimo}}"> Anterior</a>
+        {%endif%}
+        P&aacute;gina <input name="nro_pagina" id="id_nro_pagina" size="1" type="text" value="{{object_list.number}}"/>
+        de {{ object_list.paginator.num_pages }}
+        <input id="boton_pagina" type="button" value="Ir" class="historico" style="cursor: pointer"/>
+        {%if object_list.has_next%}
+            <a href="?page={{ object_list.next_page_number }}{{ultimo}}"> Siguiente </a>
+            <a href="?page={{ object_list.end_index}}{{ultimo}}"> Ultima </a>
+        {%endif%}
+    </span>
 </div>
+{##}
+{##}
+{#<div id="listado-cuadro-busqueda">#}
+{#	<br>#}
+{#	<br>#}
+{#</div>#}
+
 <div id="listado-item-lote">
 	<table border="1.5"cellpadding="0" cellspacing="0" class="listado-clientes-atrasados" align="center">
 		<th>Cliente</th><th>Cod. Lote</th><th>Cuotas Atras.</th>
@@ -105,13 +152,28 @@
 		</tr>
 		{% endif %}
 		{% endfor %}
-		<div class="pagination">
-			<span class="step-links"> Mostrando {{ object_list.start_index }}-{{ object_list.end_index }} de {{ object_list.paginator.count }} Resultados
-				{%if object_list.has_previous%} <a href="?page={{ object_list.first_index}}{{ultimo}}"> Primera </a> <a href="?page={{ object_list.previous_page_number }}{{ultimo}}"> Anterior</a> {%endif%}
-				P&aacute;gina |{{object_list.number}}|
-				{%if object_list.has_next%} <a href="?page={{ object_list.next_page_number }}{{ultimo}}"> Siguiente </a> <a href="?page={{ object_list.end_index}}{{ultimo}}"> Ultima </a> {%endif%} </span>
-		</div>
 	</table>
+</div>
+<div class="pagination">
+    <span class="step-links">
+{#                Mostrando {{ object_list.start_index }}-{{ object_list.end_index }} de {{ object_list.paginator.count }} Resultados#}
+        Cantidad de Registros <select name="cant_reg" id="id_cant_reg" style="width:70px">
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="todos">Todos</option>
+        </select>
+        {%if object_list.has_previous%}
+            <a href="?page={{ object_list.first_index}}{{ultimo}}"> Primera </a>
+            <a href="?page={{ object_list.previous_page_number }}{{ultimo}}"> Anterior</a>
+        {%endif%}
+        P&aacute;gina <input name="nro_pagina" id="id_nro_pagina" size="1" type="text" value="{{object_list.number}}"/>
+        de {{ object_list.paginator.num_pages }}
+        <input id="boton_pagina" type="button" value="Ir" class="historico" style="cursor: pointer"/>
+        {%if object_list.has_next%}
+            <a href="?page={{ object_list.next_page_number }}{{ultimo}}"> Siguiente </a>
+            <a href="?page={{ object_list.end_index}}{{ultimo}}"> Ultima </a>
+        {%endif%}
+    </span>
 </div>
 
 <div id="footer">
