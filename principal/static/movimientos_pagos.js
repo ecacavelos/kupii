@@ -8,6 +8,7 @@ $(document).ready(function() {
 	$(".fecha_pago").val(getCurrentDate());
 	$('.grid_6').hide();
 	$('.fecha_pago').mask('##/##/####');
+	var detalle_interes = "";
 	if(grupo != "2"){
 		$(".fecha_pago").datepicker({
 			closeText : 'Cerrar',
@@ -139,7 +140,8 @@ function validatePago() {
 			pago_vendedor_id : $("#id_vendedor").val(),
 			pago_total_de_cuotas : $("#total_cuotas").val(),
 			pago_total_de_mora : $("#total_mora").val(),
-			pago_total_de_pago : $("#total_pago").val()
+			pago_total_de_pago : $("#total_pago").val(),
+			detalle : $("#detalle").val() 
 		}
 	});
 	request4.done(function(msg) {
@@ -366,7 +368,8 @@ function calcularInteres() {
                 }
 			}
 
-
+			detalle_interes = generarDetalleJSON();			
+			$("#detalle").val(detalle_interes);	
 			global_intereses=intereses+gestion_cobranza;
             //alert(global_intereses);
 			calculateTotalPago();		
@@ -400,6 +403,8 @@ function dibujarDetalle() {
 
 	$('#contenido_modal').append('<button class="button_verde" id="modificar_mora" data-toggle="modal" data-target=".bs-example-modal-sm" value="Modificar">Modificar</button>');
 	$('#contenido_modal').append('</div>');
+	detalle_interes = generarDetalleJSON();			
+	$("#detalle").val(detalle_interes);	
 	$('#modificar_mora').click(function() {
 		this.style.backgroundColor = '#66A385';
 		modificarMontos();
@@ -420,7 +425,12 @@ function modificarMontos(){
 		}
         //var gestion_cobranza = $("#id_gestion_cobranza").val();
         //intereses+=parseInt(gestion_cobranza);
+        if(detalle[detalle.length-1]['gestion_cobranza']){
+        	detalle[detalle.length-1]['gestion_cobranza'] = parseInt($('#id_gestion_cobranza').val());
+		}
 	}
+	detalle_interes = generarDetalleJSON();			
+	$("#detalle").val(detalle_interes);
 	global_intereses=intereses;
 	//calculateTotalCuotas();
 	calculateTotalPago();
@@ -616,4 +626,34 @@ function getCurrentDate(){
 	
 	today = dd+ '/'+mm+'/'+yyyy;
 	return today;
+}
+
+function generarDetalleJSON(){
+		detalle_json = '';
+		objeto = {};
+		var nro_cuotas_a_pagar = $('#nro_cuotas_a_pagar').val();
+		size=detalle.length
+		if (detalle.length > 0) {
+			for (i = 0; i < nro_cuotas_a_pagar; i++) {
+				nro_cuota=detalle[i]['nro_cuota'];
+				intereses=detalle[i]['intereses'];
+				key= 'item' + i
+				value = {nro_cuota : nro_cuota, intereses : intereses};
+				objeto[key] = value; 			
+				JSON.stringify(objeto);
+			}
+			if(detalle[detalle.length-1]['gestion_cobranza']){
+				key= 'item' + i
+				value = {gestion_cobranza :detalle[detalle.length-1]['gestion_cobranza']};
+				objeto[key] = value;
+				JSON.stringify(objeto);
+			}else{
+				key= 'item' + i
+				value = {gestion_cobranza :'0'};
+				objeto[key] = value;
+				JSON.stringify(objeto);
+			}
+			detalle_json = JSON.stringify(objeto);
+			return detalle_json;
+		}
 }

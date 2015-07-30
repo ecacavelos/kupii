@@ -250,6 +250,9 @@ def pago_de_cuotas(request):
                 date_parse_error = False
                 fecha_pago=data.get('pago_fecha_de_pago', '')
                 fecha_pago_parsed = datetime.datetime.strptime(fecha_pago, "%d/%m/%Y").date()
+                detalle = data.get('detalle', '')
+                if detalle == '':
+                    detalle =None
     #             try:
     #                 fecha_pago_parsed = datetime.strptime(data.get('pago_fecha_de_pago', ''), "%d/%m/%Y")
     #             except:
@@ -279,6 +282,7 @@ def pago_de_cuotas(request):
                         nuevo_pago.total_de_cuotas = total_de_cuotas
                         nuevo_pago.total_de_mora = total_de_mora
                         nuevo_pago.total_de_pago = total_de_pago
+                        nuevo_pago.detalle = detalle
                         nuevo_pago.save()
                     except Exception, error:
                         print error
