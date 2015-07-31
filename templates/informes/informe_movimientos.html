@@ -37,16 +37,19 @@
 
 		var fecha_ini = "{{fecha_ini}}";
 		var fecha_fin = "{{fecha_fin}}";
-		var lote_id = "{{lote_id}}";
+		var lote_ini = "{{lote_ini}}";
+        var lote_fin = "{{lote_fin}}";
 		mostrar_mvtos = "{{mostrar_mvtos}}";
 		mostrar_transferencias = "{{mostrar_transferencias}}";
 		mostrar_reservas = "{{mostrar_reservas}}";
 		mostrar_cambios = "{{mostrar_cambios}}";
-		$('#lote_id').val(lote_id);
+		$('#lote_ini').val(lote_ini);
+        $('#lote_fin').val(lote_fin);
 		$('#fecha_ini').val(fecha_ini);
 		$('#fecha_fin').val(fecha_fin);
-		$('#lote_id').mask('###/###/####');
-		$('#fecha_ini').mask('##/##/####');
+		$('#lote_ini').mask('###/###/####');
+		$('#lote_fin').mask('###/###/####');
+        $('#fecha_ini').mask('##/##/####');
 		$("#fecha_ini").datepicker({
 			dateFormat : 'dd/mm/yy'
 		});
@@ -118,12 +121,16 @@
 	<form name="frm_busqueda" id="frm_busqueda" method="get" action="{% url 'frontend_home' %}informes/informe_movimientos/">
 		<table id="lista-categoria" frame="box">
 			<tr>
-				<th class="acciones" colspan="3"><strong><a href="#" style="color: white;">Filtrar</a></strong></th>
+				<th class="acciones" colspan="3"><strong><a href="#" style="color: white">Filtrar</a></strong></th>
 			</tr>
-			<tr>
-				<td> Lote: </td>
+			<th></th><th>Lote Inicio:</th><th>Lote Fin:</th>
+            <tr>
+                <td>Rango de Lotes:</td>
 				<td>
-				<input name="lote_id" id="lote_id" type="text" value=""/>
+				    <input name="lote_ini" id="lote_ini" type="text" value=""/>
+				</td>
+                <td>
+				    <input name="lote_fin" id="lote_fin" type="text" value=""/>
 				</td>
 			</tr>
 			<th></th><th>Desde:</th><th>Hasta:</th>
@@ -140,7 +147,7 @@
 				<td>
 				<input type="button" value="Buscar" onclick="validar();" class="historico" style="cursor: pointer"/>
 				</td>
-				<td><a class="boton-verde" id="id_boton" onclick="retrieve_informe_movimientos();">Descargar como Excel</a></td>
+				<td><a class="boton-verde" id="id_boton" onclick="retrieve_informe_movimientos();">Descargar Excel</a></td>
 			</tr>
 		</table>
 	</form>
@@ -154,25 +161,28 @@
 <div id="listado-ventas">
 	<h2>Historial de cuotas en VENTAS</h2>
 	<table  cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
-		<th>Fecha</th><th>Cliente</th><th>Cuota Nº</th><th>Tipo Cuota</th><th>Saldo Anterior</th><th>Monto</th><th>Saldo</th><th></th>
+		<th>Fecha</th><th>Fraccion</th><th>Manzana</th><th>Cliente</th><th>Cuota Nº</th><th>Tipo Cuota</th><th>Saldo Anterior</th><th>Monto</th><th>Saldo</th><th></th>
 		{% for venta in lista_ventas %}
-			{% for pago in venta %}			
-			
+			{% for pago in venta %}
 			{% if forloop.counter == 1 %}
 				<tr>
 					{% if pago.recuperacion %}
 						<td class="celda_resumen_venta recuperada">{{pago.fecha_de_venta}}</td>
+                        <td class="celda_resumen_venta recuperada">{{pago.lote.manzana.fraccion.id}}</td>
+                        <td class="celda_resumen_venta recuperada">{{ pago.lote }}</td>
 						<td class="celda_resumen_venta recuperada">{{pago.cliente}}</td>
 						<td colspan="3" class="celda_resumen_venta recuperada">::::::VENTA RECUPERADA:::::</td>
-						<td colspan="3" class="celda_resumen_venta recuperada">Entrega Inicial: {{pago.entrega_incial}}</td>											
+						<td colspan="3" class="celda_resumen_venta recuperada">Entrega Inicial: {{pago.entrega_incial}}</td>
 						<!-- <td class="celda_resumen_venta recuperada">Cuotas Plan: {{pago.cantidad_de_cuotas}}</td>
 						<td class="celda_resumen_venta recuperada">Precio Final: {{pago.precio_final}}</td> -->
 						
 					{% else %}
 						<td class="celda_resumen_venta">{{pago.fecha_de_venta}}</td>
+                        <td class="celda_resumen_venta">{{pago.lote.manzana.fraccion.id}}</td>
+                        <td class="celda_resumen_venta">{{ pago.lote}}</td>
 						<td class="celda_resumen_venta">{{pago.cliente}}</td>
 						<td colspan="3" class="celda_resumen_venta">::::::VENTA ACTUAL::::::</td>
-						<td colspan="3"class="celda_resumen_venta">Entrega Inicial: {{pago.entrega_inicial}}</td>											
+						<td colspan="3"class="celda_resumen_venta">Entrega Inicial: {{pago.entrega_inicial}}</td>
 						<!-- <td class="celda_resumen_venta">Cuotas Plan: {{pago.cantidad_de_cuotas}}</td>
 						<td class="celda_resumen_venta">Precio Final: {{pago.precio_final}}</td> -->
 					{% endif %}
@@ -183,7 +193,7 @@
 					<td>{{pago.fecha_de_pago}}</td>
 					<td></td>
 					<td>{{pago.nro_cuota}}</td>
-					<td></td>
+					<td colspan="3"></td>
 					<td>{{pago.saldo_anterior}}</td>
 					<td>{{pago.monto}}</td>
 					<td>{{pago.saldo}}</td>
@@ -195,7 +205,7 @@
 					<td>{{pago.fecha_de_pago}}</td>
 					<td></td>
 					<td>{{pago.nro_cuota}}</td>
-					<td></td>
+					<td colspan="3"></td>
 					<td>{{pago.saldo_anterior}}</td>
 					<td>{{pago.monto}}</td>
 					<td>{{pago.saldo}}</td>
