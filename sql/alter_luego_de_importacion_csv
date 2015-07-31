@@ -1,0 +1,4 @@
+ALTER TABLE movimientos_intermedio ALTER COLUMN fec_mov TYPE DATE using to_date(fec_mov, 'DD-MM-YYYY');
+ALTER TABLE movimientos_intermedio ALTER COLUMN mon_pag type integer  USING (mon_pag::integer);
+ALTER TABLE movimientos_intermedio ALTER COLUMN mor_cuo type integer  USING (mor_cuo::integer);
+update  movimientos_intermedio set mor_cuo = 0  where mor_cuo is null;

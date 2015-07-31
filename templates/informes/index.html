@@ -1,0 +1,29 @@
+{% extends "lotes/base_lotes.html" %}
+
+{% block content %}
+<a href="lotes_libres" class="boton-verde">Informe de Lotes Libres</a><br>
+<br>
+
+
+<a href="clientes_atrasados" class="boton-verde">Clientes Atrasados</a><br>
+<br>
+
+
+<a href="informe_movimientos" class="boton-verde">Informe de Movimientos</a><br>
+<br>
+
+
+<a href="informe_general" class="boton-verde">Informe General de Pagos</a><br>
+<br>
+
+<a href="liquidacion_vendedores" class="boton-verde">Liquidacion de Vendedores</a><br>
+<br>
+
+<a href="liquidacion_propietarios" class="boton-verde">Liquidacion de Propietarios</a><br>
+<br>
+
+<a href="liquidacion_gerentes" class="boton-verde">Liquidacion de Gerentes</a><br>
+<br> 
+
+<a href="{% url 'frontend_home' %}" class="boton-verde">Volver a la Pagina Inicial</a>
+{% endblock %}

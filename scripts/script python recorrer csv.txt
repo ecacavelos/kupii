@@ -1,0 +1,10 @@
+import csv
+archivo='C:/propar_exportaciones/fracciones_paralot.csv'
+reader=csv.reader(open(archivo,'r',encoding="utf8"))
+for index,row in enumerate(reader):
+#una vez en el row, se pueden manejar los registros por el indice
+print ('Fraccion: '+str(index+1))
+print ('------------------------')
+print ('ID: '+row[0]+'FRACCION: '+row[1]+'PROPIETARIO: '+row[2]+' '+row[3]+'MANZANA: '+row[4]+'LOTE: '+row[5]+'UBICACION: '+row[6])
+print ('\n')
+
