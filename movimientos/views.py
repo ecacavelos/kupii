@@ -1942,16 +1942,15 @@ def eliminar_venta(request):
                 pagos = None
                 id= int(data.get('venta_id'))
                 venta = Venta.objects.get(pk=id)            
-                pagos = PagoDeCuotas.objects.filter(venta_id=venta.id)
-                if len(pagos) == 0:
-                    try:
-                        venta.delete()
-                        ok=True
-                    except Exception, error:
-                        print error
-                    
-                else:
-                    ok=False
+                pagos = PagoDeCuotas.objects.filter(venta_id=venta.id)              
+                try:
+                    if len(pagos) != 0:
+                        pagos.delete()                        
+                    venta.delete()
+                    ok=True
+                except Exception, error:
+                    print error
+                    ok = False
                 data = json.dumps({
                     'ok': ok})
                 return HttpResponse(data,content_type="application/json")

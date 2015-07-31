@@ -341,6 +341,7 @@ class PagoDeCuotas(models.Model):
     total_de_mora = models.IntegerField()
     total_de_pago = models.IntegerField()
     factura = models.ForeignKey(Factura,on_delete=models.PROTECT)
+    detalle = models.TextField()
     def as_json(self):
         return dict(
             lote=unicode(self.lote),
@@ -384,3 +385,12 @@ class PermisosAdicionales(models.Model):
             ('ver_informes', 'Ver informes'),
             ('ver_ficha_lote', 'Ver Ficha Lote')
         )
+ 
+'''      
+class ConceptosFactura(models.Model):
+    descripcion = models.CharField(max_length=255)
+    exentas = models.BooleanField(blank=False, null=False)
+    iva5 = models.BooleanField(blank=False, null=False) 
+    iva10 = models.BooleanField(blank=False, null=False)
+    precio_unitario = models.IntegerField()
+'''

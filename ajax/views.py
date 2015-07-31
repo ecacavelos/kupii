@@ -16,7 +16,6 @@ from principal.monthdelta import MonthDelta
 from calendar import monthrange
 from datetime import datetime, timedelta
 
-
 #Ejemplo nuevo esquema de serializacion:
 # all_objects = list(Restaurant.objects.all()) + list(Place.objects.all())
 # data = serializers.serialize('xml', all_objects)
@@ -425,3 +424,31 @@ def get_pago_cuotas_by_lote_cliente(request):
                 print error
         else:
             return HttpResponseRedirect(reverse('login'))
+        
+def get_detalles_factura(request):
+    if request.method == 'GET':
+        if request.user.is_authenticated():
+            try:
+                codigo= request.GET.get('lote_id')
+                cedula_cli= request.GET.get('cliente_id')
+                nro_cuota_desde = request.GET.get('nro_cuota_desde').split("/")
+                nro_cuota_hasta = request.GET.get('nro_cuota_hasta').split("/")
+                num_desde = int(nro_cuota_desde[0])
+                num_hasta = int(nro_cuota_hasta[0])
+                lote =  Lote.objects.get(codigo_paralot= codigo)
+                cliente = Cliente.objects.get(cedula=cedula_cli)
+                venta = Venta.objects.get(lote_id= lote.id, cliente_id=cliente.id)
+                object_list=get_pago_cuotas(venta, None, None)
+                detalles=[]
+                detalle={}
+                cantidad = num_hasta - (num_desde -1)
+                detalle['cantidad'] = cantidad
+                detalle['precio_unitario']= venta.precio_de_cuota
+                detalle['exentas'] = int(round((cantidad * venta.precio_de_cuota) * 0.7))
+                detalle['iva5']= int(round((cantidad * venta.precio_de_cuota) * 0.3))
+                detalles.append(detalle)
+                return HttpResponse(json.dumps(detalles, cls=DjangoJSONEncoder), content_type="application/json")
+            except Exception, error:
+                print error
+        else:
+            return HttpResponse(json.dumps(object_list, cls=DjangoJSONEncoder), content_type="application/json")
