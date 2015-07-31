@@ -4,7 +4,7 @@ $(document).ready(function() {
 	//$("#main_recuperacion_form").submit(validateRecuperacion);
 	$('#monto_cuota_venta').mask('000.000.000.000.000.000.000', {
 		byPassKeys : [ null ],
-		reverse : true,
+		reverse : true
 	});
 });
 
@@ -45,6 +45,12 @@ function validateLotePost(event) {
 	}
 }
 
+function convertDate(inputFormat) {
+  function pad(s) { return (s < 10) ? '0' + s : s; }
+  var d = new Date(inputFormat);
+  return [pad(d.getDate()), pad(d.getMonth()+1), d.getFullYear()].join('/');
+}
+
 function validateRecuperacion() {
 
 	var request7 = $.ajax({
@@ -57,7 +63,7 @@ function validateRecuperacion() {
 			recuperacion_fecha_de_recuperacion : $("#id_fecha").val(),
 			recuperacion_cliente_id : $("#id_cliente").val(),
 			recuperacion_plan_de_pago_id : $("#id_plan_pago").val(),
-			recuperacion_vendedor_id : $("#id_vendedor").val(),
+			recuperacion_vendedor_id : $("#id_vendedor").val()
 		}
 	});
 	request7.done(function(msg) {
@@ -137,7 +143,7 @@ function retrieveVenta() {
 			type : "GET",
 			url : "/ajax/get_ventas_by_lote/",
 			data : {
-				lote_id : lote_id,
+				lote_id : lote_id
 			},
 			dataType : "json"
 		});
@@ -151,13 +157,14 @@ function retrieveVenta() {
 			$("#vendedor_seleccionado").val(msg.venta[0]['vendedor']);
 			$("#plan_pago").val(msg.venta[0]['plan_de_pago']);
 			$("#id_plan_pago").val(msg.venta[0]['plan_de_pago_id']);
-            $("#id_fecha_venta").html(msg.venta[0]['fecha_de_venta']);
+            var f1 = (msg.venta[0]['fecha_de_venta'].split("-"));
+            $("#id_fecha_venta").html(convertDate(f1));
 			venta_id = (msg.venta[0]['venta_id']);
 			PrecioVenta = (msg.venta[0]['precio_de_venta']);
 			EntregaInicial = (msg.venta[0]['entrega_inicial']);
 			$('#monto_cuota_venta').mask('000.000.000.000.000.000.000', {
 				byPassKeys : [ null ],
-				reverse : true,
+				reverse : true
 			});
 			retrievePagos();
 		});
@@ -227,7 +234,7 @@ function retrievePlanPago() {
 			type : "GET",
 			url : "/datos/5/",
 			data : {
-				plan_pago : $("#id_plan_pago").val(),
+				plan_pago : $("#id_plan_pago").val()
 			}
 		});
 		// Actualizamos el formulario con los datos obtenidos del plan de pagos.
@@ -251,7 +258,7 @@ function retrievePagos() {
 			type : "GET",
 			url : "/ajax/get_pagos_by_venta/",
 			data : {
-				venta_id : venta_id,
+				venta_id : venta_id
 			},
 			dataType : "json"
 		});
