@@ -227,18 +227,9 @@ def pago_de_cuotas(request):
 
                 #############################################################
                 #Codigo agregado: contemplar el caso de los lotes recuperados
-                ventas = Venta.objects.filter(lote_id=lote_id)
-                for item_venta in ventas:
-                    print 'Obteniendo la ultima venta'
-                    try:
-                        RecuperacionDeLotes.objects.get(venta=item_venta.id)
-                    except RecuperacionDeLotes.DoesNotExist:
-                        print 'se encontro la venta no recuperada, la venta actual'
-                        venta = item_venta
+                venta = get_ultima_venta(lote_id)
                 #############################################################
 
-                #venta_id = data.get('pago_venta_id')
-                #venta = Venta.objects.get(pk=venta_id)
                 venta.pagos_realizados = int(nro_cuotas_a_pagar) + int(venta.pagos_realizados)
                 cliente_id = data.get('pago_cliente_id')
                 vendedor_id = data.get('pago_vendedor_id')

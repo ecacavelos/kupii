@@ -202,7 +202,8 @@ def filtros_establecidos(request, tipo_informe):
             
     elif tipo_informe == 'informe_movimientos':
         try:
-            lote_id=request['lote_id']
+            lote_ini=request['lote_ini']
+            lote_fin=request['lote_fin']
             fecha_ini=request['fecha_ini']
             fecha_fin=request['fecha_fin']
             return True
