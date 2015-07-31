@@ -18,14 +18,14 @@
 			$('.pagination').show();
 		}
 
-         $('#id_cant_reg').change(function(){
-            var cant_reg = $("#id_cant_reg").val();
-            var fraccion_nombre = $("#fraccion").val();
-            var fraccion = $("#id_fraccion").val();
-            var meses_atraso = $("#meses_atraso").val();
-            var tipo_busqueda = $("#id_tipo_busqueda").val();
-            window.location.replace("/informes/clientes_atrasados/?tipo_busqueda="+tipo_busqueda+"&fraccion_nombre="+fraccion_nombre+"&fraccion="+fraccion+"194&meses_atraso="+meses_atraso+"&cant_reg="+cant_reg+"&tabla=lote");
-         });
+        $('#id_cant_reg').change(function(){
+        var cant_reg = $("#id_cant_reg").val();
+        var fraccion_nombre = $("#fraccion").val();
+        var fraccion = $("#id_fraccion").val();
+        var meses_atraso = $("#meses_atraso").val();
+        var tipo_busqueda = $("#id_tipo_busqueda").val();
+        window.location.replace("/informes/clientes_atrasados/?tipo_busqueda="+tipo_busqueda+"&fraccion_nombre="+fraccion_nombre+"&fraccion="+fraccion+"194&meses_atraso="+meses_atraso+"&cant_reg="+cant_reg+"&tabla=lote");
+        });
 
         $('#boton_pagina').click(function() {
             var page = $("#id_nro_pagina").val();
