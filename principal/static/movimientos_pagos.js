@@ -123,6 +123,12 @@ function validateLotePost(event) {
 	}
 }
 
+function convertDate(inputFormat) {
+  function pad(s) { return (s < 10) ? '0' + s : s; }
+  var d = new Date(inputFormat);
+  return [pad(d.getDate()), pad(d.getMonth()+1), d.getFullYear()].join('/');
+}
+
 function validatePago() {
 
 	var request4 = $.ajax({
@@ -232,7 +238,7 @@ function retrieveLotePago() {
 		request.done(function(msg) {
 			global_lote_id = msg.lote_id;
 			//var s = "<a class='boton-verde' href=\"/lotes/listado/" + msg.lote_id + "\" target=\"_blank\" \">" + msg.lote_tag + "</a>";
-			var s = "<a class='boton-verde' href=\"/informes/informe_movimientos/?lote_id=" + $("#id_lote").val() + "\&fecha_ini=&fecha_fin="  + "\" target=\"_blank\" \"> Ver Pagos</a>";
+			var s = "<a class='boton-verde' href=\"/informes/informe_movimientos/?lote_ini=" + $("#id_lote").val() +"\&lote_fin="+ $("#id_lote").val() +"\&fecha_ini=&fecha_fin="  + "\" target=\"_blank\" \"> Ver Pagos</a>";
 			$("#lote_error").html("");
 			$("#lote_superficie").html(msg.superficie);			
 			$("#lote_seleccionado_detalles").html(s);
