@@ -3,7 +3,7 @@
 	var total_iva_5 = 0;
 	var detalle_valido = true;
 	item_detalle_factura = '<div class="item-detalle">'
-			+ '<input type="text" class= "cantidad-item item" placeholder="Cantidad" size="2">'
+			+ '<input type="text" class= "cantidad-item item" placeholder="Cantidad" size="2" value="">'
 			+ '<input type="text" class="concepto-factura item" placeholder="Concepto">'
 			+ '<input type="text" class= "precio_unitario-item item" placeholder="Precio unitario">'
 			+ '<input type="text" class= "exentas-item item" placeholder="Exentas">'
@@ -12,7 +12,7 @@
 			+ '<a href="#" class="add-btn">+</a>'
 		    + '</div>';
 		item_inicial_detalle_factura = '<div class="item-detalle">'
-			+ '<input type="text" class= "cantidad-item item" placeholder="Cantidad" size="2">'
+			+ '<input type="text" class= "cantidad-item item" placeholder="Cantidad" size="2" value="">'
 			+ '<input type="text" class="concepto-factura item" placeholder="Concepto">'
 			+ '<input type="text" class= "precio_unitario-item item" placeholder="Precio unitario">'
 			+ '<input type="text" class= "exentas-item item" placeholder="Exentas">'
@@ -91,7 +91,7 @@
 			create : function(){
 				$(this).data('ui-autocomplete')._renderItem = function(ul,item){
 					return $('<li>').append('<a>' +item.nro_cuota_y_total +'</a>').appendTo(ul);
-					};
+				}; 
 			},
 			select : function(event, ui) {
 				nro_cuota= ui.item.nro_cuota_y_total;
@@ -100,6 +100,35 @@
 	    		return false;
 			}
 		});
+		$('#id_nro_cuota_hasta').blur(function(){
+			if($("#id_nro_cuota_hasta").val() != '' && $('#id_nro_cuota').val() != ''){
+				var request = $.ajax({
+					type : "GET",
+					url : "/ajax/get_detalles_factura/",
+					data : {
+						lote_id: $("#lote").val(),
+						cliente_id: $("#id_cedula_cliente").val(),
+						nro_cuota_desde: $("#id_nro_cuota").val(),
+						nro_cuota_hasta: $("#id_nro_cuota_hasta").val()
+					},
+					dataType : "json"
+				});
+				// Actualizamos el detalle de la factura
+				request.done(function(msg) {
+					index = $('.item-detalle').length;
+					var inputs= $('.item-detalle')[index -1].children
+					inputs[0].value=msg[0].cantidad;
+					inputs[1].value="Cuota Nro: "  + $("#id_nro_cuota").val() + " a " + $("#id_nro_cuota_hasta").val();
+					inputs[2].value=msg[0].precio_unitario;
+					inputs[3].value=msg[0].exentas;
+					inputs[4].value=msg[0].iva5;
+					inputs[5].value="0";
+					validarDetalle();
+				});
+			}
+		});
+		//traer datos para los detalles de la factura
+		
     	// Control del SUBMIT del FORM
     	$("#agregar-factura-form").submit(function(){
 			

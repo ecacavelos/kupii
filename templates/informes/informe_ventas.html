@@ -65,7 +65,7 @@
 			// Actualizamos el formulario con los datos obtenidos.
 			request.done(function(msg) {
 				if(msg.ok == false){
-					alert(" NO se puede eliminar porque la venta tiene asociadas cuotas.");
+					alert("Ha ocurrido un error.");
 				}else{
 					window.location.reload();
 				}
