@@ -2324,18 +2324,49 @@ def informe_ventas(request):
                     })
                     return HttpResponse(t.render(c))
                 else: #Parametros seteados
+                    lista_movimientos = []
                     t = loader.get_template('informes/informe_ventas.html')
                     lote_id=request.GET['lote_id']
-                    #ultimo="&tipo_busqueda="+tipo_busqueda+"&fraccion_ini="+f1+"&frac1="+fraccion_ini+"&fraccion_fin="+f2+"&frac2="+fraccion_fin+"&fecha_ini="+fecha_ini+"&fecha_fin="+fecha_fin
                     x = unicode(lote_id)
                     fraccion_int = int(x[0:3])
                     manzana_int = int(x[4:7])
                     lote_int = int(x[8:])
                     manzana = Manzana.objects.get(fraccion_id=fraccion_int, nro_manzana=manzana_int)
                     lote = Lote.objects.get(manzana=manzana.id, nro_lote=lote_int)
-                    object_list=list(Venta.objects.filter(lote_id=lote.id))               
+                    lista_ventas = Venta.objects.filter(lote_id=lote.id).order_by('-fecha_de_venta')
+                    try:
+                        for item_venta in lista_ventas:
+                            try:
+                                resumen_venta = {}
+                                resumen_venta['id'] = item_venta.id
+                                resumen_venta['fecha_de_venta'] = item_venta.fecha_de_venta
+                                resumen_venta['lote']=item_venta.lote
+                                resumen_venta['cliente'] = item_venta.cliente
+                                resumen_venta['cantidad_de_cuotas'] = item_venta.plan_de_pago.cantidad_de_cuotas
+                                resumen_venta['precio_final'] = unicode('{:,}'.format(item_venta.precio_final_de_venta)).replace(",",".")
+                                resumen_venta['precio_de_cuota'] = unicode('{:,}'.format(item_venta.precio_de_cuota)).replace(",",".")
+                                resumen_venta['entrega_inicial'] = unicode('{:,}'.format(item_venta.entrega_inicial)).replace(",",".")
+                                resumen_venta['vendedor'] = item_venta.vendedor
+                                resumen_venta['plan_de_pago'] = item_venta.plan_de_pago
+                                resumen_venta['pagos_realizados'] = item_venta.pagos_realizados
+                                #venta_pagos_query_set = get_pago_cuotas(item_venta,None,None)
+                                venta_pagos_query_set = PagoDeCuotas.objects.filter(venta_id=item_venta.id)
+                            except Exception, error:
+                                print error
+                            ventas_pagos_list = []
+                            ventas_pagos_list.insert(0,resumen_venta) #El primer elemento de la lista de pagos es el resumen de la venta
+                            for pago in venta_pagos_query_set:
+                                cuota ={}
+                                cuota['fecha_de_pago'] = pago.fecha_de_pago
+                                cuota['id'] = pago.id
+                                cuota['cantidad_cuotas'] = pago.nro_cuotas_a_pagar
+                                cuota['monto'] = pago.total_de_pago
+                                ventas_pagos_list.append(cuota)
+                            lista_movimientos.append(ventas_pagos_list)
+                    except Exception, error:
+                        print error             
                                    
-                    paginator = Paginator(object_list, 25)
+                    paginator = Paginator(lista_movimientos, 25)
                     page = request.GET.get('page')
                     try:
                         lista = paginator.page(page)

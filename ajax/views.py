@@ -452,3 +452,18 @@ def get_detalles_factura(request):
                 print error
         else:
             return HttpResponse(json.dumps(object_list, cls=DjangoJSONEncoder), content_type="application/json")
+
+def get_pagos_by_ventas(request):
+    if request.method == 'GET':
+        if request.user.is_authenticated():
+            try:
+                data = request.GET
+                id= int(data.get('venta_id'))
+                pagos = PagoDeCuotas.objects.filter(venta_id=id)
+                data=serializers.serialize('json',list(pagos))
+                return HttpResponse(data,content_type="application/json")
+                #return HttpResponse(json.dumps(pagos, cls=DjangoJSONEncoder), content_type="application/json")
+            except Exception, error:
+                print error
+        else:
+            return HttpResponseRedirect(reverse('login'))

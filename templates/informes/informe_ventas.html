@@ -3,6 +3,8 @@
 
 <script type="text/javascript">
 	$(document).ready(function() {
+		item_detalle = '<table border="1" cellpadding="0" cellspacing="0"  id="id_cuota_pagar" class="listado-cuotas">'
+			+ '<tr><th>Nro Cuota</th><th>Fechas</th><th>Monto Cuota</th></tr>';	
 		//Cambiar calendario a español
 		$.datepicker.regional['es'] = {
 			closeText : 'Cerrar',
@@ -65,12 +67,34 @@
 			// Actualizamos el formulario con los datos obtenidos.
 			request.done(function(msg) {
 				if(msg.ok == false){
+					alert("Favor eliminar los pagos asociados a dicha venta");
+				}else{
+					window.location.reload();
+				}
+			});
+		});
+		
+		$( ".eliminar_pago" ).click(function() {
+			var id_pago = this.value;
+			var request = $.ajax({
+				type : "POST",
+				url : "/movimientos/eliminar_pagodecuotas/",
+				data : {
+					id_pago : id_pago,
+				},
+				dataType : "json"
+			});
+			// Actualizamos el formulario con los datos obtenidos.
+			request.done(function(msg) {
+				if(msg.ok == false){
 					alert("Ha ocurrido un error.");
 				}else{
 					window.location.reload();
 				}
 			});
 		});
+		
+		
 	});
 
 	function validar() {
@@ -124,35 +148,33 @@
 	<table  cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
 		<th>Fecha</th><th>Cliente</th><th>Lote</th><th>Vendedor</th><th>Plan de Pago</th><th>Entrega Inicial</th><th>Precio Cuota</th><th>Precio final de venta</th><th>Pagos Realizados</th><th></th><th></th>
 		{% for venta in lista_ventas %}
-				{% if forloop.counter|divisibleby:2 %}				
+			{% for pago in venta %}
+			{% if forloop.counter == 1 %}
 				<tr>
-					<td>{{venta.fecha_de_venta}}</td>
-					<td>{{venta.cliente.nombres}} {{venta.cliente.apellidos}}</td>
-					<td>{{venta.lote.codigo_paralot}}</td>
-					<td>{{venta.vendedor.nombres}} {{venta.vendedor.apellidos}}</td>
-					<td>{{venta.nombre_del_plan}}</td>
-					<td>{{venta.entrega_inicial}}</td>
-					<td>{{venta.precio_de_cuota}}</td>
-					<td>{{venta.precio_final_de_venta}}</td>
-					<td>{{venta.pagos_realizados}}</td>
-					<td><a href="/movimientos/modificar_venta/{{venta.id}}"><img src="/static/custom/img/black_edit.png" /></a></td>
-					<td><button class="eliminar" value="{{venta.id}}"><img src="/static/custom/img/black_delete.png" /></button></td>
+					<td class="recuperada celda_resumen_venta">{{pago.fecha_de_venta}}</td>
+					<td class="recuperada celda_resumen_venta">{{pago.cliente}}</td>
+                    <td class="recuperada celda_resumen_venta">{{ pago.lote}}</td>
+                    <td class="recuperada celda_resumen_venta">{{pago.vendedor}}</td>
+                    <td class="recuperada celda_resumen_venta">{{pago.plan_de_pago}}</td>
+					<td class="recuperada celda_resumen_venta">{{pago.entrega_inicial}}</td>
+					<td class="recuperada celda_resumen_venta">{{pago.precio_de_cuota}}</td>
+					<td class="recuperada celda_resumen_venta">{{pago.precio_final}}</td>
+					<td class="recuperada celda_resumen_venta">{{pago.pagos_realizados}}</td>
+					<td class="recuperada celda_resumen_venta"><a href="/movimientos/modificar_venta/{{pago.id}}"><img src="/static/custom/img/black_edit.png" /></a></td>
+					<td class="recuperada celda_resumen_venta"><button class="eliminar" value="{{pago.id}}"><img src="/static/custom/img/black_delete.png" /></button></td>
 				</tr>
-				{% else %}
+			{% else %}		
 				<tr class="bkg_gris">
-					<td>{{venta.fecha_de_venta}}</td>
-					<td>{{venta.cliente.nombres}} {{venta.cliente.apellidos}}</td>
-					<td>{{venta.lote.codigo_paralot}}</td>
-					<td>{{venta.vendedor.nombres}} {{venta.vendedor.apellidos}}</td>
-					<td>{{venta.nombre_del_plan}}</td>
-					<td>{{venta.entrega_inicial}}</td>
-					<td>{{venta.precio_de_cuota}}</td>
-					<td>{{venta.precio_final_de_venta}}</td>
-					<td>{{venta.pagos_realizados}}</td>
-					<td><a href="/movimientos/modificar_venta/{{venta.id}}"><img src="/static/custom/img/black_edit.png" /></a></td>
-					<td><button class="eliminar" value="{{venta.id}}"><img src="/static/custom/img/black_delete.png" /></button></td>
+					<td>{{pago.fecha_de_pago}}</td>
+					<td></td>
+					<td colspan="3">{{pago.cantidad_cuotas}} Cuota(s) pagada(s)</td>
+					<td></td>
+					<td colspan="2">Total pagado: {{pago.monto}}</td>
+					<td colspan="2"></td>
+					<td><button class="eliminar_pago" value="{{pago.id}}"><img src="/static/custom/img/black_delete.png" /></button></td>
 				</tr>
-				{% endif %}
+			{% endif %}
+			{%endfor%}
 		{%endfor%}
 		<div class="pagination">
 			<span class="step-links"> Mostrando {{ lista_movimientos.start_index }}-{{ lista_movimientos.end_index }} de {{ lista_movimientos.paginator.count }} Resultados

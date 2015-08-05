@@ -1942,11 +1942,30 @@ def eliminar_venta(request):
                 pagos = None
                 id= int(data.get('venta_id'))
                 venta = Venta.objects.get(pk=id)            
-                pagos = PagoDeCuotas.objects.filter(venta_id=venta.id)              
+                pagos = PagoDeCuotas.objects.filter(venta_id=venta.id)
+                if len(pagos) == 0:              
+                    try:                      
+                        venta.delete()
+                        ok=True
+                    except Exception, error:
+                        print error
+                        ok = False
+                else:
+                    ok = False
+                data = json.dumps({
+                    'ok': ok})
+                return HttpResponse(data,content_type="application/json")
+    else:
+        return HttpResponseRedirect("/login")
+
+def eliminar_pagodecuotas(request):        
+    if request.user.is_authenticated():
+        if verificar_permisos(request.user.id, permisos.DELETE_PAGODECUOTAS):           
+            if request.method == 'POST':
+                data = request.POST         
+                pago = PagoDeCuotas.objects.get(id=int(data.get('id_pago')))              
                 try:
-                    if len(pagos) != 0:
-                        pagos.delete()                        
-                    venta.delete()
+                    pago.delete()                        
                     ok=True
                 except Exception, error:
                     print error
@@ -1956,5 +1975,4 @@ def eliminar_venta(request):
                 return HttpResponse(data,content_type="application/json")
     else:
         return HttpResponseRedirect("/login")
-    
         
