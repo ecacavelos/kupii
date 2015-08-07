@@ -15,6 +15,7 @@ from django.db.models import Count, Min, Sum, Avg
 from principal.monthdelta import MonthDelta
 from calendar import monthrange
 from datetime import datetime, timedelta
+import ast
 
 #Ejemplo nuevo esquema de serializacion:
 # all_objects = list(Restaurant.objects.all()) + list(Place.objects.all())
@@ -439,14 +440,63 @@ def get_detalles_factura(request):
                 cliente = Cliente.objects.get(cedula=cedula_cli)
                 venta = Venta.objects.get(lote_id= lote.id, cliente_id=cliente.id)
                 object_list=get_pago_cuotas(venta, None, None)
+                gestion_cobranza = []
+                interes_moratorio = 0   
+                suma_gestion = 0                     
                 detalles=[]
                 detalle={}
+                ok =False
                 cantidad = num_hasta - (num_desde -1)
                 detalle['cantidad'] = cantidad
                 detalle['precio_unitario']= venta.precio_de_cuota
                 detalle['exentas'] = int(round((cantidad * venta.precio_de_cuota) * 0.7))
                 detalle['iva5']= int(round((cantidad * venta.precio_de_cuota) * 0.3))
                 detalles.append(detalle)
+                '''
+                    Se trae los pagos que se van a facturar y se iteran para traer el interes de cada cuota.
+                    Tambien se acumula la gestion de cobranza que hay en las cuotas
+                '''
+                for x in xrange(num_desde -1 ,num_hasta):
+                    pago = PagoDeCuotas.objects.get(id= object_list[x]['id'])
+                    if pago.detalle != None:
+                        detalle = ast.literal_eval(pago.detalle)
+                        for y in xrange(0, len(detalle)-1):
+                            if detalle['item' + str(y)]['nro_cuota'] == (x+1):
+                                interes_moratorio += int(detalle['item' + str(y)]['intereses'])
+                                break
+                    if len(gestion_cobranza) == 0:
+                        gestion_cobranza.append(pago)
+                    else:
+                        for x in xrange(0,len(gestion_cobranza) -1):
+                            if gestion_cobranza[x].id == pago.id:
+                                ok = True
+                                break
+                            else:
+                                ok = False
+                        if ok == False:
+                            gestion_cobranza.append(pago)
+                if interes_moratorio != 0:
+                    detalle={}
+                    detalle['cantidad'] = 1
+                    detalle['precio_unitario']= interes_moratorio
+                    detalle['exentas'] = 0
+                    detalle['iva5']= 0
+                    detalle['iva10'] = interes_moratorio
+                    detalles.append(detalle)
+                
+                for x in xrange(0 ,len(gestion_cobranza)):
+                    if gestion_cobranza[x].detalle != None:
+                        detalle= ast.literal_eval(gestion_cobranza[x].detalle)
+                        if detalle['item' + str(len(detalle) -1)]['gestion_cobranza'] != "0":
+                            suma_gestion += detalle['item' + str(len(detalle) -1)]['gestion_cobranza']
+                if suma_gestion != 0:
+                    detalle={}
+                    detalle['cantidad'] = 1
+                    detalle['precio_unitario']= suma_gestion
+                    detalle['exentas'] = 0
+                    detalle['iva5']= 0
+                    detalle['iva10'] = suma_gestion
+                    detalles.append(detalle)
                 return HttpResponse(json.dumps(detalles, cls=DjangoJSONEncoder), content_type="application/json")
             except Exception, error:
                 print error

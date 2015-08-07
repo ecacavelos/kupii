@@ -124,6 +124,35 @@
 					inputs[4].value=msg[0].iva5;
 					inputs[5].value="0";
 					validarDetalle();
+					if (msg.length > 1){
+						$('.detalle_factura').append(item_detalle_factura); 
+			        	$(this).attr('class', 'rm-btn');
+			        	$(this).html('-');
+			        	index = $('.item-detalle').length;
+			        	var inputs= $('.item-detalle')[index -1].children
+						inputs[0].value=msg[1].cantidad;
+						inputs[1].value="Interes Moratorio";
+						inputs[2].value=msg[1].precio_unitario;
+						inputs[3].value=msg[1].exentas;
+						inputs[4].value=msg[1].iva5;
+						inputs[5].value=msg[1].iva10;
+						validarDetalle();
+						if (msg.length == 3){
+							$('.detalle_factura').append(item_detalle_factura); 
+				        	$(this).attr('class', 'rm-btn');
+				        	$(this).html('-');
+				        	index = $('.item-detalle').length;
+				        	var inputs= $('.item-detalle')[index -1].children
+							inputs[0].value=msg[2].cantidad;
+							inputs[1].value="Gestion Cobranzas";
+							inputs[2].value=msg[2].precio_unitario;
+							inputs[3].value=msg[2].exentas;
+							inputs[4].value=msg[2].iva5;
+							inputs[5].value=msg[2].iva10;
+							validarDetalle();
+						}
+					}
+					
 				});
 			}
 		});
