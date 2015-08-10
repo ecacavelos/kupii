@@ -12,8 +12,8 @@ from principal.common_functions import get_nro_cuota
 import json
 from django.db import connection
 from facturas.forms import FacturaForm
-# from reportlab.pdfgen import canvas
-# from reportlab.lib.units import cm
+from reportlab.pdfgen import canvas
+from reportlab.lib.units import cm
 from num2words import num2words
 import xlwt
 import math
@@ -79,7 +79,7 @@ def facturar(request):
                     pago = PagoDeCuotas.objects.get(pk=object_list[x]['id'])
                     pago.factura = nueva_factura
                     pago.save() 
-            response = HttpResponse(mimetype='application/pdf')
+            response = HttpResponse(content_type='application/pdf')
             nombre_factura = "factura-" + nueva_factura.numero + ".pdf"
             response['Content-Disposition'] = 'attachment; filename=factura.pdf'
             p = canvas.Canvas(response)

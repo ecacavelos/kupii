@@ -456,6 +456,7 @@ def get_detalles_factura(request):
                     Se trae los pagos que se van a facturar y se iteran para traer el interes de cada cuota.
                     Tambien se acumula la gestion de cobranza que hay en las cuotas
                 '''
+                cantidad = 0
                 for x in xrange(num_desde -1 ,num_hasta):
                     pago = PagoDeCuotas.objects.get(id= object_list[x]['id'])
                     if pago.detalle != None:
@@ -463,6 +464,7 @@ def get_detalles_factura(request):
                         for y in xrange(0, len(detalle)-1):
                             if detalle['item' + str(y)]['nro_cuota'] == (x+1):
                                 interes_moratorio += int(detalle['item' + str(y)]['intereses'])
+                                cantidad +=1
                                 break
                     if len(gestion_cobranza) == 0:
                         gestion_cobranza.append(pago)

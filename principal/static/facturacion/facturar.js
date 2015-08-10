@@ -72,7 +72,14 @@
 			select : function(event, ui) {
 				nro_cuota= ui.item.nro_cuota_y_total;
 				$("#id_nro_cuota").val(nro_cuota);
-				$(this).trigger('change'); 
+				$(this).trigger('change');
+				index = $('.item-detalle').length -1;
+				if(index >1 ){
+					for(x=0;x<index;x++){
+						$('.item-detalle')[x].remove();
+					}
+					limpiarLiquidacion();
+				} 
 	    		return false;
 			}
 		});
@@ -96,11 +103,25 @@
 			select : function(event, ui) {
 				nro_cuota= ui.item.nro_cuota_y_total;
 				$("#id_nro_cuota_hasta").val(nro_cuota);
-				$(this).trigger('change'); 
+				$(this).trigger('change');
+				index = $('.item-detalle').length -1;
+				if(index >1 ){
+					for(x=0;x<index;x++){
+						$('.item-detalle')[x].remove();
+					}
+					limpiarLiquidacion();
+				}  
 	    		return false;
 			}
 		});
 		$('#id_nro_cuota_hasta').blur(function(){
+			index = $('.item-detalle').length -1;
+				if(index >1 ){
+					for(x=0;x<index;x++){
+						$('.item-detalle')[x].remove();
+					}
+					limpiarLiquidacion();
+			}
 			if($("#id_nro_cuota_hasta").val() != '' && $('#id_nro_cuota').val() != ''){
 				var request = $.ajax({
 					type : "GET",
@@ -125,9 +146,7 @@
 					inputs[5].value="0";
 					validarDetalle();
 					if (msg.length > 1){
-						$('.detalle_factura').append(item_detalle_factura); 
-			        	$(this).attr('class', 'rm-btn');
-			        	$(this).html('-');
+						$('.item-detalle')[index -1].children[6].click();
 			        	index = $('.item-detalle').length;
 			        	var inputs= $('.item-detalle')[index -1].children
 						inputs[0].value=msg[1].cantidad;
@@ -138,9 +157,7 @@
 						inputs[5].value=msg[1].iva10;
 						validarDetalle();
 						if (msg.length == 3){
-							$('.detalle_factura').append(item_detalle_factura); 
-				        	$(this).attr('class', 'rm-btn');
-				        	$(this).html('-');
+							$('.item-detalle')[index -1].children[6].click();
 				        	index = $('.item-detalle').length;
 				        	var inputs= $('.item-detalle')[index -1].children
 							inputs[0].value=msg[2].cantidad;
