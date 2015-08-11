@@ -75,10 +75,10 @@
 				$(this).trigger('change');
 				index = $('.item-detalle').length -1;
 				if(index >1 ){
-					for(x=0;x<index;x++){
-						$('.item-detalle')[x].remove();
-					}
+					$('.item-detalle').remove();
+					$('.detalle_factura').append(item_inicial_detalle_factura);
 					limpiarLiquidacion();
+					$('#id_nro_cuota_hasta').blur();
 				} 
 	    		return false;
 			}
@@ -106,10 +106,12 @@
 				$(this).trigger('change');
 				index = $('.item-detalle').length -1;
 				if(index >1 ){
-					for(x=0;x<index;x++){
-						$('.item-detalle')[x].remove();
-					}
+					$('.item-detalle').remove();
+					$('.detalle_factura').append(item_inicial_detalle_factura);
 					limpiarLiquidacion();
+					$('#id_nro_cuota_hasta').blur();
+				}else{
+					$('#id_nro_cuota_hasta').blur();
 				}  
 	    		return false;
 			}
@@ -117,11 +119,10 @@
 		$('#id_nro_cuota_hasta').blur(function(){
 			index = $('.item-detalle').length -1;
 				if(index >1 ){
-					for(x=0;x<index;x++){
-						$('.item-detalle')[x].remove();
-					}
+					$('.item-detalle').remove();
+					$('.detalle_factura').append(item_inicial_detalle_factura);
 					limpiarLiquidacion();
-			}
+				}
 			if($("#id_nro_cuota_hasta").val() != '' && $('#id_nro_cuota').val() != ''){
 				var request = $.ajax({
 					type : "GET",

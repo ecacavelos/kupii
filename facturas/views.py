@@ -146,7 +146,7 @@ def facturar(request):
             pos_y -= 1
             p.drawString(14*cm, float(pos_y - 0.5)*cm, unicode(total_venta))
             numalet= num2words(int(total_venta), lang='es')
-            p.drawString(6*cm, float(pos_y - 0.5)*cm, unicode(numalet))
+            p.drawString(4*cm, float(pos_y - 0.5)*cm, unicode(numalet))
             total_iva_10 = int(iva10/11)
             total_iva_5 = int(iva5/21)
             total_iva = total_iva_10 + total_iva_5

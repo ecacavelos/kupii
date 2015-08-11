@@ -60,8 +60,10 @@ function autocompleteTimbradoPorNumero(input_id, id_timbrado_input_id){
 				};
 		},
 		select : function(event, ui) {
+			event.preventDefault();
 			id_timbrado = ui.item.pk;
 			numero_timbrado= ui.item.fields.numero;
+			$(timbrado).val(numero_timbrado);
 			$(id_timbrado_input_id).val(id_timbrado);
 		}
 	});
