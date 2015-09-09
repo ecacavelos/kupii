@@ -353,7 +353,11 @@ def get_cliente_id_by_name_or_ruc(request):
             try:            
                 name_cliente = request.GET['term']
                 print("term ->" + name_cliente);
-                object_list = Cliente.objects.filter(nombres__icontains= name_cliente)
+                term = name_cliente.split()
+                if len(term) > 1:
+                    object_list = Cliente.objects.filter(nombres__icontains= term[0], apellidos__icontains= term[1])
+                else:
+                    object_list = Cliente.objects.filter(nombres__icontains= term[0])
                 data=serializers.serialize('json',list(object_list)) 
                 return HttpResponse(data,content_type="application/json")
             except Exception, error:

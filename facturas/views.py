@@ -49,7 +49,8 @@ def facturar(request):
             numero = request.POST.get('nro-factura','')
             
             #Obtener fecha
-            fecha = datetime.datetime.strptime(request.POST.get('fecha', ''), "%Y-%m-%d")
+            #fecha = datetime.datetime.strptime(request.POST.get('fecha', ''), "%Y-%m-%d")
+            fecha = datetime.datetime.strptime(request.POST.get('fecha', ''), "%d/%m/%Y")
             
             #Obtener Tipo (Contado - Crédito)
             tipo = request.POST.get('tipo','')
