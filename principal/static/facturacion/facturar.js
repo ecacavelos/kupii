@@ -26,9 +26,12 @@
 		
 		//Configuraciones del datepicker
 		$("#fecha").datepicker();
-		$("#fecha").datepicker({ dateFormat: 'dd-mm-yy' });
-		$("#fecha").datepicker('setDate', new Date());
-		$('#fecha').mask('##/##/####');
+		//$("#fecha").datepicker('setDate', new Date());
+		//$("#fecha").datepicker({ dateFormat: 'dd/mm/yy' });
+		$('#fecha').datepicker({ dateFormat: 'dd-mm-yy'}).datepicker("setDate", new Date());
+		
+		
+		//$('#fecha').mask('##/##/####');
 		$(function($){
 		    $.datepicker.regional['es'] = {
 		        closeText: 'Cerrar',
@@ -311,7 +314,7 @@
 		$('#total').val( total.toString());
 		iva_10 = (Math.round(total_iva_10/11));
 		$('#liquidacion-iva_10').val(iva_10.toString());
-		iva_5 = (Math.round(total_iva_5/11));
+		iva_5 = (Math.round(total_iva_5/21));
 		$('#liquidacion-iva_5').val(iva_5.toString());
 		$('#liquidacion-iva').val((iva_5 + iva_10).toString());		
 	}

@@ -139,7 +139,8 @@ $(document).ready(function() {
 				$("#id_manzana").append('<option value="0">Elegir Manzana</option>') ;
 			request_manzanas.done(function (data){
 				$.each(data, function (index,value) {
-					$("#id_manzana").append('<option value="'+ value.id +'">' + 'Manzana ' + value.label + '</option>') ;
+					//$("#id_manzana").append('<option value="'+ value.id +'">' + 'Manzana ' + value.label + '</option>') ;
+					$("#id_manzana").append('<option value="'+ value.pk +'">' + 'Manzana ' + value.fields.nro_manzana + '</option>') ;
 				});
 			});
       }
