@@ -1,3 +1,4 @@
+	var pdf = "";
 	var total_exentas = 0;
 	var total_iva_10 = 0;
 	var total_iva_5 = 0;
@@ -24,11 +25,12 @@
 		$('#lote').mask('###/###/####');
 		$("#id_name_cliente").focus();
 		
+		
 		//Configuraciones del datepicker
 		$("#fecha").datepicker();
 		//$("#fecha").datepicker('setDate', new Date());
 		//$("#fecha").datepicker({ dateFormat: 'dd/mm/yy' });
-		$('#fecha').datepicker({ dateFormat: 'dd-mm-yy'}).datepicker("setDate", new Date());
+		$('#fecha').val(getCurrentDate());
 		
 		
 		//$('#fecha').mask('##/##/####');
@@ -57,8 +59,30 @@
 		autocompleteClienteRucONombre('id_name_cliente', 'id_cedula_cliente', 'id_cliente');
 		autocompleteTimbradoPorNumero('timbrado', 'id-timbrado');
 		
+				
+		$("#id_cedula_cliente").autocomplete({
+			source : "/ajax/get_cliente_name_id_by_cedula/",
+			minLength : 1,
+			create : function(){
+				$(this).data('ui-autocomplete')._renderItem = function(ul,item){
+					return $('<li>').append('<a>' +item.fields.cedula+' '+item.fields.nombres+' '+item.fields.apellidos+'</a>').appendTo(ul);
+					};
+			},
+			select : function(event, ui) {
+				cliente_id = ui.item.pk;
+				$("#id_name_cliente").val (ui.item.fields.nombres+" "+ui.item.fields.apellidos);
+				$("#id_cedula_cliente").val(ui.item.fields.cedula);
+				//name_cliente=ui.item.fields.nombres+" "+ui.item.fields.apellidos;
+				//$("#id_name_cliente").val(name_cliente);
+				$("#id_cliente").val(cliente_id);
+				//$(this).trigger('change'); 
+	    		return false; 
+			}
+		});
+		
 		// 2. Se agrega el primer item (al menos debe existir 1).
 		$('.detalle_factura').append(item_inicial_detalle_factura);
+		
 		
 		// 3. Para agregar un item.		
 		// $('.add-btn').click(function(){
@@ -220,6 +244,72 @@
 				return false;
 			}
     	});
+    	
+    	$("#submit-btn").click(function(){
+			
+			//1. TODO: Hacer chequeo de que todos los valores esten correctos. 
+			if (formOk()){
+				//2. Obtener el JSON del detalle
+				detalle = generarDetalleJSON();			
+				$("#detalle").val(detalle);
+				
+				var request = $.ajax({
+					type : "POST",
+					url : "/ajax/facturar/",
+					async: false,
+					data : {
+						csrfmiddlewaretoken : $('input[name=csrfmiddlewaretoken]').val(),
+						cliente: $("#id_cliente").val(),
+						lote: $("#lote").val(),
+						id_timbrado: $("#id-timbrado").val(),
+						nro_factura : $("#nro_factura").val(),
+						fecha: $("#fecha").val(),
+						tipo : $("#tipo").val(),
+						detalle: $("#detalle").val(),
+						nro_cuota_desde : $("#id_nro_cuota").val(),
+						nro_cuota_hasta : $("#id_nro_cuota_hasta").val(),
+						
+					},
+					dataType : "aplication/pdf"
+				});
+				// devuelve el pdf
+				request.done(function(msg) {
+					pdf = msg;
+				// Must start with "data:application/pdf;base64,XXXXXXXXXX"
+				   //qz.appendPDF("data:application/pdf;base64,"+pdf);
+					
+				   qz.append("Hola Mundo");
+				   // Tell the applet to print.
+				   function qzDoneAppending() {
+				      // Very important for PDFs, use "printPS()" instead of "print()"
+				      //qz.printPS();
+				      // Print normal
+				      qz.print();
+				   }
+				 				   
+				});
+				useDefaultPrinter();
+				//pdf = window.btoa(utf8_encode(request.responseText));
+				pdf = request.responseText;
+				//pdf = utf8_encode(pdf);
+				//pdf = utf8_decode(pdf);
+				//pdf = window.btoa(pdf);
+				qz.appendPDF("data:application/pdf;base64,"+pdf);
+				//qz.appendPDF(pdf);
+				qz.printPS();
+				//qz.append("A37,503,0,1,2,3,N,QZ-Hola Mundo!!!\n");
+  				//qz.print();
+				//pdf = "HOLA MUNDO";
+														
+				return true;		    						
+			}
+			else{
+				return false;
+			}
+    	});
+    	
+    	detalles();
+    	
 	});
 	
 	function generarDetalleJSON(){
@@ -327,3 +417,148 @@
 		$('#liquidacion-iva_5').val('');
 		$('#liquidacion-iva').val('');		
 	}
+	
+	function utf8_encode(argString) {
+  //  discuss at: http://phpjs.org/functions/utf8_encode/
+  // original by: Webtoolkit.info (http://www.webtoolkit.info/)
+  // improved by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
+  // improved by: sowberry
+  // improved by: Jack
+  // improved by: Yves Sucaet
+  // improved by: kirilloid
+  // bugfixed by: Onno Marsman
+  // bugfixed by: Onno Marsman
+  // bugfixed by: Ulrich
+  // bugfixed by: Rafal Kukawski
+  // bugfixed by: kirilloid
+  //   example 1: utf8_encode('Kevin van Zonneveld');
+  //   returns 1: 'Kevin van Zonneveld'
+
+  if (argString === null || typeof argString === 'undefined') {
+    return '';
+  }
+
+  var string = (argString + ''); // .replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+  var utftext = '',
+    start, end, stringl = 0;
+
+  start = end = 0;
+  stringl = string.length;
+  for (var n = 0; n < stringl; n++) {
+    var c1 = string.charCodeAt(n);
+    var enc = null;
+
+    if (c1 < 128) {
+      end++;
+    } else if (c1 > 127 && c1 < 2048) {
+      enc = String.fromCharCode(
+        (c1 >> 6) | 192, (c1 & 63) | 128
+      );
+    } else if ((c1 & 0xF800) != 0xD800) {
+      enc = String.fromCharCode(
+        (c1 >> 12) | 224, ((c1 >> 6) & 63) | 128, (c1 & 63) | 128
+      );
+    } else { // surrogate pairs
+      if ((c1 & 0xFC00) != 0xD800) {
+        throw new RangeError('Unmatched trail surrogate at ' + n);
+      }
+      var c2 = string.charCodeAt(++n);
+      if ((c2 & 0xFC00) != 0xDC00) {
+        throw new RangeError('Unmatched lead surrogate at ' + (n - 1));
+      }
+      c1 = ((c1 & 0x3FF) << 10) + (c2 & 0x3FF) + 0x10000;
+      enc = String.fromCharCode(
+        (c1 >> 18) | 240, ((c1 >> 12) & 63) | 128, ((c1 >> 6) & 63) | 128, (c1 & 63) | 128
+      );
+    }
+    if (enc !== null) {
+      if (end > start) {
+        utftext += string.slice(start, end);
+      }
+      utftext += enc;
+      start = end = n + 1;
+    }
+  }
+
+  if (end > start) {
+    utftext += string.slice(start, stringl);
+  }
+
+  return utftext;
+}
+
+function utf8_decode(str_data) {
+  //  discuss at: http://phpjs.org/functions/utf8_decode/
+  // original by: Webtoolkit.info (http://www.webtoolkit.info/)
+  //    input by: Aman Gupta
+  //    input by: Brett Zamir (http://brett-zamir.me)
+  // improved by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
+  // improved by: Norman "zEh" Fuchs
+  // bugfixed by: hitwork
+  // bugfixed by: Onno Marsman
+  // bugfixed by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
+  // bugfixed by: kirilloid
+  //   example 1: utf8_decode('Kevin van Zonneveld');
+  //   returns 1: 'Kevin van Zonneveld'
+
+  var tmp_arr = [],
+    i = 0,
+    ac = 0,
+    c1 = 0,
+    c2 = 0,
+    c3 = 0,
+    c4 = 0;
+
+  str_data += '';
+
+  while (i < str_data.length) {
+    c1 = str_data.charCodeAt(i);
+    if (c1 <= 191) {
+      tmp_arr[ac++] = String.fromCharCode(c1);
+      i++;
+    } else if (c1 <= 223) {
+      c2 = str_data.charCodeAt(i + 1);
+      tmp_arr[ac++] = String.fromCharCode(((c1 & 31) << 6) | (c2 & 63));
+      i += 2;
+    } else if (c1 <= 239) {
+      // http://en.wikipedia.org/wiki/UTF-8#Codepage_layout
+      c2 = str_data.charCodeAt(i + 1);
+      c3 = str_data.charCodeAt(i + 2);
+      tmp_arr[ac++] = String.fromCharCode(((c1 & 15) << 12) | ((c2 & 63) << 6) | (c3 & 63));
+      i += 3;
+    } else {
+      c2 = str_data.charCodeAt(i + 1);
+      c3 = str_data.charCodeAt(i + 2);
+      c4 = str_data.charCodeAt(i + 3);
+      c1 = ((c1 & 7) << 18) | ((c2 & 63) << 12) | ((c3 & 63) << 6) | (c4 & 63);
+      c1 -= 0x10000;
+      tmp_arr[ac++] = String.fromCharCode(0xD800 | ((c1 >> 10) & 0x3FF));
+      tmp_arr[ac++] = String.fromCharCode(0xDC00 | (c1 & 0x3FF));
+      i += 4;
+    }
+  }
+
+  return tmp_arr.join('');
+}
+
+function detalles(){
+	$('#id_nro_cuota_hasta').trigger("blur");
+}
+
+function getCurrentDate(){
+	var today = new Date();
+	var dd = today.getDate();
+	var mm = today.getMonth()+1; //January is 0!
+	var yyyy = today.getFullYear();
+	
+	if(dd<10) {
+	    dd='0'+dd;
+	} 
+	
+	if(mm<10) {
+	    mm='0'+mm;
+	} 
+	
+	today = dd+ '/'+mm+'/'+yyyy;
+	return today;
+}

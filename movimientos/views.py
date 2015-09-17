@@ -1,6 +1,7 @@
 from django.http import HttpResponse, HttpResponseServerError,HttpResponseRedirect
 from django.template import RequestContext, loader
 from principal.models import Fraccion, Manzana, Cliente,Propietario, Lote, Vendedor, PlanDePago, PlanDePagoVendedor, Venta, Reserva, PagoDeCuotas, TransferenciaDeLotes, CambioDeLotes, RecuperacionDeLotes
+from django.core.serializers.json import DjangoJSONEncoder
 import json
 import datetime
 from datetime import datetime
@@ -279,17 +280,27 @@ def pago_de_cuotas(request):
                         print error
                         pass
                     venta.save()
-                    c = RequestContext(request, {
-        
-                    })
-                    return HttpResponse(t.render(c))        
+                    
+                    #Vuelve al template
+                    #c = RequestContext(request, {})
+                    #return HttpResponse(t.render(c))
+                    
+                    #Redirecciona a facturacion (al final hace esto en movimientos_pagos.js
+                    #return HttpResponseRedirect("/facturacion/facturar")
+                
+                    #retorna el objeto como json
+                    object_list = PagoDeCuotas.objects.filter(id = nuevo_pago.id)
+                    labels=["id"]
+                    return HttpResponse(json.dumps(custom_json(object_list,labels), cls=DjangoJSONEncoder), content_type="application/json")
+                            
                 else:
                     return HttpResponseServerError("La cantidad de cuotas a pagar, es mayor a la cantidad de cuotas restantes.")  
         
-            c = RequestContext(request, {
-               'grupo': grupo   
-            })
-            return HttpResponse(t.render(c))
+            elif request.method == 'GET':
+                c = RequestContext(request, {
+                   'grupo': grupo   
+                })
+                return HttpResponse(t.render(c))
         else:
             t = loader.get_template('index2.html')
             grupo= request.user.groups.get().id

@@ -151,7 +151,8 @@ function validatePago() {
 		}
 	});
 	request4.done(function(msg) {
-		top.location.href = "/movimientos/pago_cuotas";
+		//top.location.href = "/movimientos/pago_cuotas";
+		top.location.href = "/facturacion/facturar_pagos/"+msg[0].id;
 	});
 	request4.fail(function(jqXHR, textStatus) {
 		if (jqXHR.responseText == "La cantidad de cuotas a pagar, es mayor a la cantidad de cuotas restantes."){

@@ -1108,10 +1108,10 @@ function setear_impresora(){
 			{% csrf_token %}
 			<div class="item-factura-cabecera">
 				<h2>Cliente</h2>
-				<input id="id_cliente" type="hidden" name="cliente"  maxlength="100" />
+				<input id="id_cliente" type="hidden" name="cliente"  maxlength="100" value="{{cliente.id}}" />
 				<input id="detalle" type="hidden" name="detalle" />
-				<input id="id_name_cliente" type="text" name="name_cliente" placeholder="Ingrese el Nombre"  maxlength="100" /> <br><br>				
-				<input id="id_cedula_cliente" type="text" name="cedula_cliente" placeholder="Ingrese la cedula"/>
+				<input id="id_name_cliente" type="text" name="name_cliente" placeholder="Ingrese el Nombre"  maxlength="100" value="{{cliente}}" /> <br><br>				
+				<input id="id_cedula_cliente" type="text" name="cedula_cliente" value="{{cliente.cedula}}" />
 				<a href="{% url 'frontend_home' %}clientes/agregar/" class="boton-verde" target="_blank">Agregar Nuevo Cliente</a> {{ field.errors }}<br><br>			
 			</div>
 			<div class="item-factura-cabecera">
@@ -1127,7 +1127,7 @@ function setear_impresora(){
 			</div>
 			<div class="item-factura-cabecera">
 				<h2>Lote</h2>
-				<input id="lote" name="lote" type="text" />
+				<input id="lote" name="lote" type="text" value="{{lote}}" />
 			</div>
 			<div class="item-factura-cabecera">
 				<h2>Número</h2>
@@ -1140,12 +1140,12 @@ function setear_impresora(){
 			</div>
 			<div class="item-factura-cabecera">
 				<h5>Nro de Cuota Desde:</h5>
-				<input id="id_nro_cuota" class = "cuotas" type="text" name="nro_cuota_desde" placeholder="Nro Cuota Desde" />
+				<input id="id_nro_cuota" class = "cuotas" type="text" name="nro_cuota_desde" placeholder="Nro Cuota Desde" value="{{cuota_desde}}" />
 				<input id="id-nro_cuotap" class = "cuotas" type="hidden" name="id-nro_cuotapago"  />
 			</div>
 			<div class="item-factura-cabecera">
 				<h5>Nro de Cuota Hasta:</h5>
-				<input id="id_nro_cuota_hasta" type="text" name="nro_cuota_hasta" placeholder="Nro Cuota Hasta" />
+				<input id="id_nro_cuota_hasta" type="text" name="nro_cuota_hasta" placeholder="Nro Cuota Hasta" value="{{cuota_hasta}}" />
 			</div>
 	</div>	
 	<div class="detalle_factura">
@@ -1186,8 +1186,8 @@ function setear_impresora(){
 	</div>
 <div class="clear"></div>
 <input id="submit-btn" type="button" value="Grabar e imprimir" style=" margin-bottom: 10px; cursor: pointer;" />
-<input type="button" value="Imprimir Factura" onclick="print()">
-<label>Copias: </label><input id="copies" type="text" value="1" size="8" style="text-align: center;">
+<!--<input type="button" value="Imprimir Factura" onclick="print()">-->
+<!--<label>Copias: </label><input id="copies" type="text" value="1" size="8" style="text-align: center;">-->
 <!--<input id="boton-default-printer" type="button" value="Use Default Printer" onclick="useDefaultPrinter()" >-->
 </form>
 <div id="footer">
