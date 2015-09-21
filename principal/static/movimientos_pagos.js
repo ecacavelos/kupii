@@ -151,17 +151,24 @@ function validatePago() {
 		}
 	});
 	request4.done(function(msg) {
-		//top.location.href = "/movimientos/pago_cuotas";
-		top.location.href = "/facturacion/facturar_pagos/"+msg[0].id;
+		if ( $("#facturar").val() == 'NO' ){
+			top.location.href = "/movimientos/pago_cuotas";	
+		} else if ( $("#facturar").val() == 'SI' ){
+			top.location.href = "/facturacion/facturar_pagos/"+msg[0].id;	
+		}
+		
+		
 	});
 	request4.fail(function(jqXHR, textStatus) {
 		if (jqXHR.responseText == "La cantidad de cuotas a pagar, es mayor a la cantidad de cuotas restantes."){
 			alert(jqXHR.responseText);
 			$('#enviar_pago').removeAttr('disabled');
+			$('#enviar_pago_factura').removeAttr('disabled');
 			return false;	
 		} else {
 			alert("Se encontró un error en el pago, favor verifique los datos");
 			$('#enviar_pago').removeAttr('disabled');
+			$('#enviar_pago_factura').removeAttr('disabled');
 			return false;	
 		}
 		

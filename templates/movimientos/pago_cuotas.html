@@ -178,7 +178,9 @@
 			</div>
 
 		</table>
-		<input id="enviar_pago" style="cursor: pointer;" type="button" value="Guardar Pago y Facturar" onclick="this.disabled=true;validatePago()"/>
+		<input id="enviar_pago" name="boton_pagar" style="cursor: pointer;" type="button" value="Guardar Pago" onclick="this.disabled=true; $('#facturar').val('NO');validatePago()"/>
+		<input id="enviar_pago_factura" name="boton_pagar" style="cursor: pointer;" type="button" value="Guardar Pago y Facturar" onclick="this.disabled=true; $('#facturar').val('SI');validatePago()"/>
+		<input type="hidden" id="facturar" value="" name="facurar">
 		<br>
 		<br>
 		<br>
