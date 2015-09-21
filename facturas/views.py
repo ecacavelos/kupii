@@ -14,6 +14,7 @@ from django.db import connection
 from facturas.forms import FacturaForm
 from reportlab.pdfgen import canvas
 from reportlab.lib.units import cm
+from reportlab.lib.units import mm
 from num2words import num2words
 import xlwt
 import math
@@ -95,27 +96,38 @@ def facturar_pagos(request, pago_id):
             nombre_factura = "factura-" + nueva_factura.numero + ".pdf"
             response['Content-Disposition'] = 'attachment; filename=factura'+str(nueva_factura.id)+'.pdf'
             p = canvas.Canvas(response)
-            p.setPageSize((21*cm, 29.4*cm))
-            p.setFont("Helvetica",  10)
-            p.drawString(2*cm, 10.3*cm, unicode(nueva_factura.fecha.strftime("%Y-%m-%d")))
-            if nueva_factura.tipo == 'co':
-                p.drawString(11*cm, 10.3*cm, "X")
-            else:
-                p.drawString(13.2*cm, 10.3*cm, "X")
+            p.setPageSize((210*mm, 297*mm))
+            p.setFont("Helvetica",  7)
             
-            p.drawString(15*cm, 10.3*cm, unicode(manzana.fraccion.nombre))
+            # INICIO PRIMERA IMPRESION
+            y_1ra_imp = float(14.8)
+            p.drawString(4.4*cm, float(y_1ra_imp+11)*cm, unicode(request.POST.get('fecha', '')))
+            if nueva_factura.tipo == 'co':
+                p.drawString(12.4*cm, float(y_1ra_imp+11)*cm, "X")
+            else:
+                p.drawString(14.1*cm, float(y_1ra_imp+11)*cm, "X")
+            
+            p.drawString(16.6*cm, float(y_1ra_imp+11)*cm, unicode(manzana.fraccion.nombre))
             #Solo se imprime el primer nombre y apellido-- Faltaaa
             nombre_ape = nueva_factura.cliente.nombres + " " + nueva_factura.cliente.apellidos
-            p.drawString(4*cm, 9.3*cm, unicode(nombre_ape))
-            p.drawString(12*cm, 9.3*cm, unicode(manzana.nro_manzana))
-            p.drawString(15.5*cm, 9.3*cm, unicode(lote_id.nro_lote))
+            p.drawString(5.3*cm, float(y_1ra_imp+10.3)*cm, unicode(nombre_ape))
+            p.drawString(16.4*cm, float(y_1ra_imp+10.4)*cm, unicode(manzana.nro_manzana))
+            p.drawString(18.7*cm, float(y_1ra_imp+10.4)*cm, unicode(lote_id.nro_lote))
+            
+            
             if nueva_factura.cliente.ruc == None:
                 nueva_factura.cliente.ruc = ""                
-            p.drawString(2*cm, 8.3*cm, unicode(nueva_factura.cliente.ruc))
+            p.drawString(2.3*cm, float(y_1ra_imp+9.7)*cm, unicode(nueva_factura.cliente.ruc))
+            p.drawString(16.7*cm, float(y_1ra_imp+9.7)*cm, unicode(nueva_factura.cliente.telefono_laboral))
+            
+            p.drawString(3*cm, float(y_1ra_imp+9.1)*cm, unicode(nueva_factura.cliente.direccion_cobro))
+            p.drawString(13.1*cm, float(y_1ra_imp+9.1)*cm, unicode(lote_id.superficie)+ "  mts2")
+            p.drawString(17.6*cm, float(y_1ra_imp+9.1)*cm, unicode(lote_id.cuenta_corriente_catastral))
+            
             #Se obtienen la lista de los detalles
             lista_detalles=json.loads(nueva_factura.detalle)
             detalles=[]
-            pos_y = float(7)
+            pos_y = float(y_1ra_imp+7.5)
             exentas = 0
             iva10 =0
             iva5 = 0
@@ -128,46 +140,126 @@ def facturar_pagos(request, pago_id):
                 detalle={}
                 detalle['item']=key
                 detalle['cantidad']=value['cantidad']
-                p.drawString(1.5*cm, float(pos_y - 0.5)*cm, unicode(detalle['cantidad']))
+                p.drawString(1.7*cm, float(pos_y - 0.5)*cm, unicode(detalle['cantidad']))
                 detalle['concepto']=value['concepto']
-                p.drawString(2*cm, float(pos_y - 0.5)*cm, unicode(detalle['concepto']))
+                p.drawString(5*cm, float(pos_y - 0.5)*cm, unicode(detalle['concepto']))
                 detalle['precio_unitario']=value['precio_unitario']
-                p.drawString(8*cm, float(pos_y - 0.5)*cm, unicode(detalle['precio_unitario']))
+                p.drawString(11.2*cm, float(pos_y - 0.5)*cm, unicode(detalle['precio_unitario']))
                 total_venta +=  int(detalle['cantidad']) * int(detalle['precio_unitario'])
                 detalle['exentas']=value['exentas']
-                p.drawString(10.5*cm, float(pos_y - 0.5)*cm, unicode(detalle['exentas']))
+                p.drawString(13.5*cm, float(pos_y - 0.5)*cm, unicode(detalle['exentas']))
                 if detalle['exentas'] != '':
                     exentas += int(detalle['exentas'])
                 detalle['iva_5']=value['iva_5']
-                p.drawString(12*cm, float(pos_y - 0.5)*cm, unicode(detalle['iva_5']))
+                p.drawString(15.8*cm, float(pos_y - 0.5)*cm, unicode(detalle['iva_5']))
                 if detalle['iva_5'] != '':
                     iva5 += int(detalle['iva_5'])
                 detalle['iva_10']=value['iva_10']
-                p.drawString(14*cm, float(pos_y - 0.5)*cm, unicode(detalle['iva_10']))
+                p.drawString(18.6*cm, float(pos_y - 0.5)*cm, unicode(detalle['iva_10']))
                 if detalle['iva_10'] != '':
                     iva10 += int(detalle['iva_10'])
                 pos_y -= 0.5
                 detalles.append(detalle)
             cantidad =  4 - len(detalles)
             pos_y -= (0.5 * cantidad)
-            p.drawString(10.5*cm, pos_y*cm, unicode(exentas)) 
-            p.drawString(12*cm, pos_y*cm, unicode(iva5))   
-            p.drawString(14*cm, pos_y*cm, unicode(iva10))
+            p.drawString(13.5*cm, float(y_1ra_imp+3.8)*cm, unicode(exentas)) 
+            p.drawString(15.7*cm, float(y_1ra_imp+3.8)*cm, unicode(iva5))   
+            p.drawString(18*cm, float(y_1ra_imp+3.8)*cm, unicode(iva10))
             pos_y -= 0.5
-            p.drawString(14*cm, float(pos_y - 0.5)*cm, unicode(total_venta))
+            p.drawString(18*cm, float(y_1ra_imp+3.2)*cm, unicode(total_venta))
             pos_y -= 1
-            p.drawString(14*cm, float(pos_y - 0.5)*cm, unicode(total_venta))
             numalet= num2words(int(total_venta), lang='es')
-            p.drawString(4*cm, float(pos_y - 0.5)*cm, unicode(numalet))
+            p.drawString(6.5*cm, float(pos_y - 2.2)*cm, unicode(numalet))
+            p.drawString(18*cm, float(pos_y - 2.2)*cm, unicode(total_venta))
             total_iva_10 = int(iva10/11)
             total_iva_5 = int(iva5/21)
             total_iva = total_iva_10 + total_iva_5
             pos_y -= 0.5
-            p.drawString(5*cm, float(pos_y - 0.5)*cm, unicode(total_iva_5))
-            p.drawString(6.2*cm, float(pos_y - 0.5)*cm, unicode(total_iva_10))
-            p.drawString(11.5*cm, float(pos_y - 0.5)*cm, unicode(total_iva))
+            p.drawString(5.2*cm, float(pos_y - 2.2)*cm, unicode(total_iva_5))
+            p.drawString(8.5*cm, float(pos_y - 2.2)*cm, unicode(total_iva_10))
+            p.drawString(13*cm, float(pos_y - 2.2)*cm, unicode(total_iva))
+            # FIN PRIMERA IMPRESION
+            
+            # INICIO SEGUNDA IMPRESION
+            p.drawString(4.4*cm, 11*cm, unicode(request.POST.get('fecha', '')))
+            if nueva_factura.tipo == 'co':
+                p.drawString(12.4*cm, 11*cm, "X")
+            else:
+                p.drawString(14.1*cm, 11*cm, "X")
+            
+            p.drawString(16.6*cm, 11*cm, unicode(manzana.fraccion.nombre))
+            #Solo se imprime el primer nombre y apellido-- Faltaaa
+            nombre_ape = nueva_factura.cliente.nombres + " " + nueva_factura.cliente.apellidos
+            p.drawString(5.3*cm, 10.3*cm, unicode(nombre_ape))
+            p.drawString(16.4*cm, 10.4*cm, unicode(manzana.nro_manzana))
+            p.drawString(18.7*cm, 10.4*cm, unicode(lote_id.nro_lote))
+            if nueva_factura.cliente.ruc == None:
+                nueva_factura.cliente.ruc = ""                
+            p.drawString(2.3*cm, 9.7*cm, unicode(nueva_factura.cliente.ruc))
+            p.drawString(16.7*cm, 9.7*cm, unicode(nueva_factura.cliente.telefono_laboral))
+            
+            p.drawString(3*cm, 9.1*cm, unicode(nueva_factura.cliente.direccion_cobro))
+            p.drawString(13.1*cm, 9.1*cm, unicode(lote_id.superficie)+ "  mts2")
+            p.drawString(17.6*cm, 9.1*cm, unicode(lote_id.cuenta_corriente_catastral))
+            
+            #Se obtienen la lista de los detalles
+            lista_detalles=json.loads(nueva_factura.detalle)
+            detalles=[]
+            pos_y = float(7.5)
+            exentas = 0
+            iva10 =0
+            iva5 = 0
+            total_iva_10 = 0
+            total_iva_5 = 0
+            total_iva = 0           
+            total_gral = 0
+            total_venta = 0
+            for key, value in lista_detalles.iteritems():
+                detalle={}
+                detalle['item']=key
+                detalle['cantidad']=value['cantidad']
+                p.drawString(1.7*cm, float(pos_y - 0.5)*cm, unicode(detalle['cantidad']))
+                detalle['concepto']=value['concepto']
+                p.drawString(5*cm, float(pos_y - 0.5)*cm, unicode(detalle['concepto']))
+                detalle['precio_unitario']=value['precio_unitario']
+                p.drawString(11.2*cm, float(pos_y - 0.5)*cm, unicode(detalle['precio_unitario']))
+                total_venta +=  int(detalle['cantidad']) * int(detalle['precio_unitario'])
+                detalle['exentas']=value['exentas']
+                p.drawString(13.5*cm, float(pos_y - 0.5)*cm, unicode(detalle['exentas']))
+                if detalle['exentas'] != '':
+                    exentas += int(detalle['exentas'])
+                detalle['iva_5']=value['iva_5']
+                p.drawString(15.8*cm, float(pos_y - 0.5)*cm, unicode(detalle['iva_5']))
+                if detalle['iva_5'] != '':
+                    iva5 += int(detalle['iva_5'])
+                detalle['iva_10']=value['iva_10']
+                p.drawString(18.6*cm, float(pos_y - 0.5)*cm, unicode(detalle['iva_10']))
+                if detalle['iva_10'] != '':
+                    iva10 += int(detalle['iva_10'])
+                pos_y -= 0.5
+                detalles.append(detalle)
+            cantidad =  4 - len(detalles)
+            pos_y -= (0.5 * cantidad)
+            p.drawString(13.5*cm, 3.8*cm, unicode(exentas)) 
+            p.drawString(15.7*cm, 3.8*cm, unicode(iva5))   
+            p.drawString(18*cm, 3.8*cm, unicode(iva10))
+            pos_y -= 0.5
+            p.drawString(18*cm, 3.2*cm, unicode(total_venta))
+            pos_y -= 1
+            numalet= num2words(int(total_venta), lang='es')
+            p.drawString(6.5*cm, float(pos_y - 2.2)*cm, unicode(numalet))
+            p.drawString(18*cm, float(pos_y - 2.2)*cm, unicode(total_venta))
+            total_iva_10 = int(iva10/11)
+            total_iva_5 = int(iva5/21)
+            total_iva = total_iva_10 + total_iva_5
+            pos_y -= 0.5
+            p.drawString(5.2*cm, float(pos_y - 2.2)*cm, unicode(total_iva_5))
+            p.drawString(8.5*cm, float(pos_y - 2.2)*cm, unicode(total_iva_10))
+            p.drawString(13*cm, float(pos_y - 2.2)*cm, unicode(total_iva))
+            # FIN SEGUNDA IMPRESION
+            
             p.showPage()
-            p.save()          
+            p.save()             
             return response;
     else:
         return HttpResponseRedirect(reverse('login')) 
@@ -237,27 +329,38 @@ def facturar(request):
             nombre_factura = "factura-" + nueva_factura.numero + ".pdf"
             response['Content-Disposition'] = 'attachment; filename=factura'+str(nueva_factura.id)+'.pdf'
             p = canvas.Canvas(response)
-            p.setPageSize((21*cm, 29.4*cm))
-            p.setFont("Helvetica",  10)
-            p.drawString(2*cm, 10.3*cm, unicode(nueva_factura.fecha.strftime("%Y-%m-%d")))
-            if nueva_factura.tipo == 'co':
-                p.drawString(11*cm, 10.3*cm, "X")
-            else:
-                p.drawString(13.2*cm, 10.3*cm, "X")
+            p.setPageSize((210*mm, 297*mm))
+            p.setFont("Helvetica",  7)
             
-            p.drawString(15*cm, 10.3*cm, unicode(manzana.fraccion.nombre))
+            # INICIO PRIMERA IMPRESION
+            y_1ra_imp = float(14.8)
+            p.drawString(4.4*cm, float(y_1ra_imp+11)*cm, unicode(request.POST.get('fecha', '')))
+            if nueva_factura.tipo == 'co':
+                p.drawString(12.4*cm, float(y_1ra_imp+11)*cm, "X")
+            else:
+                p.drawString(14.1*cm, float(y_1ra_imp+11)*cm, "X")
+            
+            p.drawString(16.6*cm, float(y_1ra_imp+11)*cm, unicode(manzana.fraccion.nombre))
             #Solo se imprime el primer nombre y apellido-- Faltaaa
             nombre_ape = nueva_factura.cliente.nombres + " " + nueva_factura.cliente.apellidos
-            p.drawString(4*cm, 9.3*cm, unicode(nombre_ape))
-            p.drawString(12*cm, 9.3*cm, unicode(manzana.nro_manzana))
-            p.drawString(15.5*cm, 9.3*cm, unicode(lote_id.nro_lote))
+            p.drawString(5.3*cm, float(y_1ra_imp+10.3)*cm, unicode(nombre_ape))
+            p.drawString(16.4*cm, float(y_1ra_imp+10.4)*cm, unicode(manzana.nro_manzana))
+            p.drawString(18.7*cm, float(y_1ra_imp+10.4)*cm, unicode(lote_id.nro_lote))
+            
+            
             if nueva_factura.cliente.ruc == None:
                 nueva_factura.cliente.ruc = ""                
-            p.drawString(2*cm, 8.3*cm, unicode(nueva_factura.cliente.ruc))
+            p.drawString(2.3*cm, float(y_1ra_imp+9.7)*cm, unicode(nueva_factura.cliente.ruc))
+            p.drawString(16.7*cm, float(y_1ra_imp+9.7)*cm, unicode(nueva_factura.cliente.telefono_laboral))
+            
+            p.drawString(3*cm, float(y_1ra_imp+9.1)*cm, unicode(nueva_factura.cliente.direccion_cobro))
+            p.drawString(13.1*cm, float(y_1ra_imp+9.1)*cm, unicode(lote_id.superficie)+ "  mts2")
+            p.drawString(17.6*cm, float(y_1ra_imp+9.1)*cm, unicode(lote_id.cuenta_corriente_catastral))
+            
             #Se obtienen la lista de los detalles
             lista_detalles=json.loads(nueva_factura.detalle)
             detalles=[]
-            pos_y = float(7)
+            pos_y = float(y_1ra_imp+7.5)
             exentas = 0
             iva10 =0
             iva5 = 0
@@ -270,44 +373,124 @@ def facturar(request):
                 detalle={}
                 detalle['item']=key
                 detalle['cantidad']=value['cantidad']
-                p.drawString(1.5*cm, float(pos_y - 0.5)*cm, unicode(detalle['cantidad']))
+                p.drawString(1.7*cm, float(pos_y - 0.5)*cm, unicode(detalle['cantidad']))
                 detalle['concepto']=value['concepto']
-                p.drawString(2*cm, float(pos_y - 0.5)*cm, unicode(detalle['concepto']))
+                p.drawString(5*cm, float(pos_y - 0.5)*cm, unicode(detalle['concepto']))
                 detalle['precio_unitario']=value['precio_unitario']
-                p.drawString(8*cm, float(pos_y - 0.5)*cm, unicode(detalle['precio_unitario']))
+                p.drawString(11.2*cm, float(pos_y - 0.5)*cm, unicode(detalle['precio_unitario']))
                 total_venta +=  int(detalle['cantidad']) * int(detalle['precio_unitario'])
                 detalle['exentas']=value['exentas']
-                p.drawString(10.5*cm, float(pos_y - 0.5)*cm, unicode(detalle['exentas']))
+                p.drawString(13.5*cm, float(pos_y - 0.5)*cm, unicode(detalle['exentas']))
                 if detalle['exentas'] != '':
                     exentas += int(detalle['exentas'])
                 detalle['iva_5']=value['iva_5']
-                p.drawString(12*cm, float(pos_y - 0.5)*cm, unicode(detalle['iva_5']))
+                p.drawString(15.8*cm, float(pos_y - 0.5)*cm, unicode(detalle['iva_5']))
                 if detalle['iva_5'] != '':
                     iva5 += int(detalle['iva_5'])
                 detalle['iva_10']=value['iva_10']
-                p.drawString(14*cm, float(pos_y - 0.5)*cm, unicode(detalle['iva_10']))
+                p.drawString(18.6*cm, float(pos_y - 0.5)*cm, unicode(detalle['iva_10']))
                 if detalle['iva_10'] != '':
                     iva10 += int(detalle['iva_10'])
                 pos_y -= 0.5
                 detalles.append(detalle)
             cantidad =  4 - len(detalles)
             pos_y -= (0.5 * cantidad)
-            p.drawString(10.5*cm, pos_y*cm, unicode(exentas)) 
-            p.drawString(12*cm, pos_y*cm, unicode(iva5))   
-            p.drawString(14*cm, pos_y*cm, unicode(iva10))
+            p.drawString(13.5*cm, float(y_1ra_imp+3.8)*cm, unicode(exentas)) 
+            p.drawString(15.7*cm, float(y_1ra_imp+3.8)*cm, unicode(iva5))   
+            p.drawString(18*cm, float(y_1ra_imp+3.8)*cm, unicode(iva10))
             pos_y -= 0.5
-            p.drawString(14*cm, float(pos_y - 0.5)*cm, unicode(total_venta))
+            p.drawString(18*cm, float(y_1ra_imp+3.2)*cm, unicode(total_venta))
             pos_y -= 1
-            p.drawString(14*cm, float(pos_y - 0.5)*cm, unicode(total_venta))
             numalet= num2words(int(total_venta), lang='es')
-            p.drawString(4*cm, float(pos_y - 0.5)*cm, unicode(numalet))
+            p.drawString(6.5*cm, float(pos_y - 2.2)*cm, unicode(numalet))
+            p.drawString(18*cm, float(pos_y - 2.2)*cm, unicode(total_venta))
             total_iva_10 = int(iva10/11)
             total_iva_5 = int(iva5/21)
             total_iva = total_iva_10 + total_iva_5
             pos_y -= 0.5
-            p.drawString(5*cm, float(pos_y - 0.5)*cm, unicode(total_iva_5))
-            p.drawString(6.2*cm, float(pos_y - 0.5)*cm, unicode(total_iva_10))
-            p.drawString(11.5*cm, float(pos_y - 0.5)*cm, unicode(total_iva))
+            p.drawString(5.2*cm, float(pos_y - 2.2)*cm, unicode(total_iva_5))
+            p.drawString(8.5*cm, float(pos_y - 2.2)*cm, unicode(total_iva_10))
+            p.drawString(13*cm, float(pos_y - 2.2)*cm, unicode(total_iva))
+            # FIN PRIMERA IMPRESION
+            
+            # INICIO SEGUNDA IMPRESION
+            p.drawString(4.4*cm, 11*cm, unicode(request.POST.get('fecha', '')))
+            if nueva_factura.tipo == 'co':
+                p.drawString(12.4*cm, 11*cm, "X")
+            else:
+                p.drawString(14.1*cm, 11*cm, "X")
+            
+            p.drawString(16.6*cm, 11*cm, unicode(manzana.fraccion.nombre))
+            #Solo se imprime el primer nombre y apellido-- Faltaaa
+            nombre_ape = nueva_factura.cliente.nombres + " " + nueva_factura.cliente.apellidos
+            p.drawString(5.3*cm, 10.3*cm, unicode(nombre_ape))
+            p.drawString(16.4*cm, 10.4*cm, unicode(manzana.nro_manzana))
+            p.drawString(18.7*cm, 10.4*cm, unicode(lote_id.nro_lote))
+            if nueva_factura.cliente.ruc == None:
+                nueva_factura.cliente.ruc = ""                
+            p.drawString(2.3*cm, 9.7*cm, unicode(nueva_factura.cliente.ruc))
+            p.drawString(16.7*cm, 9.7*cm, unicode(nueva_factura.cliente.telefono_laboral))
+            
+            p.drawString(3*cm, 9.1*cm, unicode(nueva_factura.cliente.direccion_cobro))
+            p.drawString(13.1*cm, 9.1*cm, unicode(lote_id.superficie)+ "  mts2")
+            p.drawString(17.6*cm, 9.1*cm, unicode(lote_id.cuenta_corriente_catastral))
+            
+            #Se obtienen la lista de los detalles
+            lista_detalles=json.loads(nueva_factura.detalle)
+            detalles=[]
+            pos_y = float(7.5)
+            exentas = 0
+            iva10 =0
+            iva5 = 0
+            total_iva_10 = 0
+            total_iva_5 = 0
+            total_iva = 0           
+            total_gral = 0
+            total_venta = 0
+            for key, value in lista_detalles.iteritems():
+                detalle={}
+                detalle['item']=key
+                detalle['cantidad']=value['cantidad']
+                p.drawString(1.7*cm, float(pos_y - 0.5)*cm, unicode(detalle['cantidad']))
+                detalle['concepto']=value['concepto']
+                p.drawString(5*cm, float(pos_y - 0.5)*cm, unicode(detalle['concepto']))
+                detalle['precio_unitario']=value['precio_unitario']
+                p.drawString(11.2*cm, float(pos_y - 0.5)*cm, unicode(detalle['precio_unitario']))
+                total_venta +=  int(detalle['cantidad']) * int(detalle['precio_unitario'])
+                detalle['exentas']=value['exentas']
+                p.drawString(13.5*cm, float(pos_y - 0.5)*cm, unicode(detalle['exentas']))
+                if detalle['exentas'] != '':
+                    exentas += int(detalle['exentas'])
+                detalle['iva_5']=value['iva_5']
+                p.drawString(15.8*cm, float(pos_y - 0.5)*cm, unicode(detalle['iva_5']))
+                if detalle['iva_5'] != '':
+                    iva5 += int(detalle['iva_5'])
+                detalle['iva_10']=value['iva_10']
+                p.drawString(18.6*cm, float(pos_y - 0.5)*cm, unicode(detalle['iva_10']))
+                if detalle['iva_10'] != '':
+                    iva10 += int(detalle['iva_10'])
+                pos_y -= 0.5
+                detalles.append(detalle)
+            cantidad =  4 - len(detalles)
+            pos_y -= (0.5 * cantidad)
+            p.drawString(13.5*cm, 3.8*cm, unicode(exentas)) 
+            p.drawString(15.7*cm, 3.8*cm, unicode(iva5))   
+            p.drawString(18*cm, 3.8*cm, unicode(iva10))
+            pos_y -= 0.5
+            p.drawString(18*cm, 3.2*cm, unicode(total_venta))
+            pos_y -= 1
+            numalet= num2words(int(total_venta), lang='es')
+            p.drawString(6.5*cm, float(pos_y - 2.2)*cm, unicode(numalet))
+            p.drawString(18*cm, float(pos_y - 2.2)*cm, unicode(total_venta))
+            total_iva_10 = int(iva10/11)
+            total_iva_5 = int(iva5/21)
+            total_iva = total_iva_10 + total_iva_5
+            pos_y -= 0.5
+            p.drawString(5.2*cm, float(pos_y - 2.2)*cm, unicode(total_iva_5))
+            p.drawString(8.5*cm, float(pos_y - 2.2)*cm, unicode(total_iva_10))
+            p.drawString(13*cm, float(pos_y - 2.2)*cm, unicode(total_iva))
+            # FIN SEGUNDA IMPRESION
+            
             p.showPage()
             p.save()          
             return response;
