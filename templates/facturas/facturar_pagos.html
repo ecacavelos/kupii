@@ -1131,12 +1131,12 @@ function setear_impresora(){
 			</div>
 			<div class="item-factura-cabecera">
 				<h2>Número</h2>
-				<input id="nro-factura" type="text" name="nro_factura" placeholder="Nro. de factura"/>
+				<input id="nro-factura" type="text" name="nro_factura" placeholder="Nro. de factura" value="{{ultima_factura}}"/>
 			</div>
 			<div class="item-factura-cabecera">
 				<h2>Timbrado</h2>
-				<input id="timbrado" type="text" name="timbrado" placeholder="Timbrado" />
-				<input id="id-timbrado" type="hidden" name="id_timbrado"  />
+				<input id="timbrado" type="text" name="timbrado" placeholder="Timbrado" value="{{ultimo_timbrado_numero}}" />
+				<input id="id-timbrado" type="hidden" name="id_timbrado" value="{{ultimo_timbrado_id}}"  />
 			</div>
 			<div class="item-factura-cabecera">
 				<h5>Nro de Cuota Desde:</h5>
@@ -1185,8 +1185,8 @@ function setear_impresora(){
 		</div>
 	</div>
 <div class="clear"></div>
-<input id="submit-btn" type="button" value="Grabar e imprimir" style=" margin-bottom: 10px; cursor: pointer;" />
-<!--<input id="submit-btn" type="submit" value="Grabar y mostrar pdf" style=" margin-bottom: 10px; cursor: pointer;" />-->
+<input id="ajax-print" type="button" value="Grabar e imprimir" style=" margin-bottom: 10px; cursor: pointer;" />
+<input id="submit-btn" type="submit" value="Grabar y mostrar pdf" style=" margin-bottom: 10px; cursor: pointer;" />
 <!--<input type="button" value="Imprimir Factura" onclick="print()">-->
 <!--<label>Copias: </label><input id="copies" type="text" value="1" size="8" style="text-align: center;">-->
 <!--<input id="boton-default-printer" type="button" value="Use Default Printer" onclick="useDefaultPrinter()" >-->

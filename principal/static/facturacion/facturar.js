@@ -245,7 +245,7 @@
 			}
     	});
     	
-    	$("#submit-btn").click(function(){
+    	$("#ajax-print").click(function(){
 			
 			//1. TODO: Hacer chequeo de que todos los valores esten correctos. 
 			if (formOk()){
@@ -262,7 +262,7 @@
 						cliente: $("#id_cliente").val(),
 						lote: $("#lote").val(),
 						id_timbrado: $("#id-timbrado").val(),
-						nro_factura : $("#nro_factura").val(),
+						nro_factura : $("#nro-factura").val(),
 						fecha: $("#fecha").val(),
 						tipo : $("#tipo").val(),
 						detalle: $("#detalle").val(),
@@ -294,6 +294,8 @@
 				//pdf = utf8_encode(pdf);
 				//pdf = utf8_decode(pdf);
 				//pdf = window.btoa(pdf);
+				qz.setPaperSize("210mm", "297mm");
+				//qz.setAutoSize(true);               // Preserve proportions 
 				qz.appendPDF("data:application/pdf;base64,"+pdf);
 				//qz.appendPDF(pdf);
 				qz.printPS();
