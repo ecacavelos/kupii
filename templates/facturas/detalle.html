@@ -61,13 +61,17 @@
 			{% for field in form %}
 			<tr>
 				<div class="fieldWrapper{% if field.field.required %} required{% endif %}">
-					<td>{{ field.label_tag }}</td>
-					{% if field.html_name == 'cliente'  or field.html_name == 'timbrado' or field.html_name == 'detalle' %}
+					{% if field.html_name == 'rango_factura' %}
+						<td><label for="timbrado" >Timbrado</label></td>
+					{% else %}
+						<td>{{ field.label_tag }}</td>
+					{% endif %}
+					{% if field.html_name == 'cliente'  or field.html_name == 'rango_factura' or field.html_name == 'detalle' %}
 					{%if field.html_name == 'cliente' %}
 					<td colspan="5" class="noimage">{{ factura.cliente }}{{ field.errors }}</td>
 					{% endif %}
-					{%if field.html_name == 'timbrado' %}
-					<td colspan="5" class="noimage">{{ factura.timbrado.numero }}{{ field.errors }}</td>
+					{%if field.html_name == 'rango_factura' %}
+					<td colspan="5" class="noimage">{{ numero_timbrado }}{{ field.errors }}</td>
 					{% endif %}
 					{%if field.html_name == 'detalle' %}
 					<td colspan="5" class="noimage"></td>

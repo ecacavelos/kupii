@@ -290,10 +290,12 @@ def facturar(request):
             
             ultimo_timbrado = Timbrado.objects.latest('id')
             trfu = TimbradoRangoFacturaUsuario.objects.get(usuario_id=request.user, timbrado_id = ultimo_timbrado.id)
-            ultimaFactura = Factura.objects.filter(rango_factura_id= trfu.rango_factura.id).latest('id')
-            
-            ultimo_numero = ultimaFactura.numero.split("-")
-            ultima_factura = unicode(trfu.rango_factura.nro_sucursal)+'-'+unicode(trfu.rango_factura.nro_boca)+'-'+unicode(int(ultimo_numero[2])+1).zfill(7)
+            try: 
+                ultimaFactura = Factura.objects.filter(rango_factura_id= trfu.rango_factura.id).latest('id')
+                ultimo_numero = ultimaFactura.numero.split("-")
+                ultima_factura = unicode(trfu.rango_factura.nro_sucursal)+'-'+unicode(trfu.rango_factura.nro_boca)+'-'+unicode(int(ultimo_numero[2])+1).zfill(7)
+            except:
+                ultima_factura = unicode(trfu.rango_factura.nro_sucursal)+'-'+unicode(trfu.rango_factura.nro_boca)+'-0000001'
             
             c = RequestContext(request, {
                 'ultima_factura': ultima_factura,
@@ -579,6 +581,8 @@ def detalle_factura(request, factura_id):
     if request.user.is_authenticated():
         t = loader.get_template('facturas/detalle.html')
         factura = Factura.objects.get(pk=factura_id)
+        trfu = TimbradoRangoFacturaUsuario.objects.get(rango_factura_id= factura.rango_factura.id)
+        numero_timbrado = trfu.timbrado.numero 
         lista_detalles=json.loads(factura.detalle)
         detalles=[]
         for key, value in lista_detalles.iteritems():
@@ -619,6 +623,7 @@ def detalle_factura(request, factura_id):
             'detalles' : detalles,
             'form': form,
             'message': message,
+            'numero_timbrado': numero_timbrado
         })
         return HttpResponse(t.render(c))    
     else:
