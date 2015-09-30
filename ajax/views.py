@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.views.decorators.http import require_http_methods
 from django.template import RequestContext, loader
 from django.core import serializers
-from principal.models import Fraccion, Manzana, Venta, PagoDeCuotas, Propietario, Lote, Cliente, Vendedor, PlanDePago, PlanDePagoVendedor,Timbrado, RecuperacionDeLotes, Factura
+from principal.models import Fraccion, Manzana, Venta, PagoDeCuotas, Propietario, Lote, Cliente, Vendedor, PlanDePago, PlanDePagoVendedor,Timbrado, RecuperacionDeLotes, Factura, TimbradoRangoFacturaUsuario, RangoFactura
 from django.core.urlresolvers import reverse, resolve
 from principal.common_functions import *
 from django.core.serializers.json import DjangoJSONEncoder
@@ -573,7 +573,8 @@ def facturar(request):
             #Crear un objeto Factura y guardar            
             nueva_factura = Factura()
             nueva_factura.fecha = fecha
-            nueva_factura.timbrado = Timbrado.objects.get(id=timbrado_id)
+            trfu = TimbradoRangoFacturaUsuario.objects.get(usuario_id = request.user, timbrado_id = timbrado_id )
+            nueva_factura.rango_factura = trfu.rango_factura
             nueva_factura.numero = numero
             nueva_factura.cliente = Cliente.objects.get(pk=cliente_id)
             nueva_factura.tipo = tipo
