@@ -30,10 +30,15 @@ def facturar_pagos(request, pago_id):
             
             ultimo_timbrado = Timbrado.objects.latest('id')
             trfu = TimbradoRangoFacturaUsuario.objects.get(usuario_id=request.user, timbrado_id = ultimo_timbrado.id)
-            ultimaFactura = Factura.objects.filter(rango_factura_id= trfu.rango_factura.id).latest('id')
+            try: 
+                ultimaFactura = Factura.objects.filter(rango_factura_id= trfu.rango_factura.id).latest('id')
+                ultimo_numero = ultimaFactura.numero.split("-")
+                ultima_factura = unicode(trfu.rango_factura.nro_sucursal)+'-'+unicode(trfu.rango_factura.nro_boca)+'-'+unicode(int(ultimo_numero[2])+1).zfill(7)
+            except:
+                ultima_factura = unicode(trfu.rango_factura.nro_sucursal)+'-'+unicode(trfu.rango_factura.nro_boca)+'-0000001'
             
-            ultimo_numero = ultimaFactura.numero.split("-")
-            ultima_factura = unicode(trfu.rango_factura.nro_sucursal)+'-'+unicode(trfu.rango_factura.nro_boca)+'-'+unicode(int(ultimo_numero[2])+1).zfill(7)
+            
+            
             cuota_desde_num = pago.venta.pagos_realizados - pago.nro_cuotas_a_pagar+1
             cuota_desde = unicode(cuota_desde_num)+"/"+unicode( pago.plan_de_pago.cantidad_de_cuotas)
             cuota_hasta = unicode(cuota_desde_num  + pago.nro_cuotas_a_pagar-1)+"/"+unicode( pago.plan_de_pago.cantidad_de_cuotas)
