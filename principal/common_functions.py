@@ -397,7 +397,9 @@ def verificar_permisos(user_id, permiso):
     if perm == True:
         print("El usuario si posee ese permiso")
         ok = True
-    
+    else:
+        print("El usuario no posee ese permiso")
+        ok = False
     return ok
 
 def get_pago_cuotas(venta, fecha_ini,fecha_fin):

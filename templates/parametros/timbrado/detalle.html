@@ -1,0 +1,226 @@
+{% extends "lotes/base_lotes.html" %}
+
+{% block header_resources %}
+<!--
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+-->
+{% endblock %}
+
+{% block header_scripts %}
+<!--
+<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+-->
+<script type="text/javascript">
+
+var data = [
+		{"label" : "Aragorn"}
+		];
+
+function solo_numeros_cantidad_de_cuotas () {
+		
+	  	$('#id_cantidad_de_cuotas').val($('#id_cantidad_de_cuotas').val().replace(/\D/g,''));
+}
+	
+function solo_numeros_porcentaje_inicial_inmobiliaria () {
+		
+	  	$('#id_porcentaje_inicial_inmobiliaria').val($('#id_porcentaje_inicial_inmobiliaria').val().replace(/\D/g,''));
+}
+
+function solo_numeros_cantidad_cuotas_inmobiliaria () {
+		
+	  	$('#id_cantidad_cuotas_inmobiliaria').val($('#id_cantidad_cuotas_inmobiliaria').val().replace(/\D/g,''));
+}	
+
+function solo_numeros_inicio_cuotas_inmobiliaria () {
+		
+	  	$('#id_inicio_cuotas_inmobiliaria').val($('#id_inicio_cuotas_inmobiliaria').val().replace(/\D/g,''));
+}
+
+function solo_numeros_intervalos_cuotas_inmobiliaria () {
+		
+	  	$('#id_intervalos_cuotas_inmobiliaria').val($('#id_intervalos_cuotas_inmobiliaria').val().replace(/\D/g,''));
+}
+
+function solo_numeros_porcentaje_cuotas_inmobiliaria () {
+		
+	  	$('#id_porcentaje_cuotas_inmobiliaria').val($('#id_porcentaje_cuotas_inmobiliaria').val().replace(/\D/g,''));
+}
+
+function solo_numeros_porcentaje_cuotas_administracion () {
+		
+	  	$('#id_porcentaje_cuotas_administracion').val($('#id_porcentaje_cuotas_administracion').val().replace(/\D/g,''));
+}
+
+function solo_numeros_porcentaje_inicial_gerente () {
+		
+	  	$('#id_porcentaje_inicial_gerente').val($('#id_porcentaje_inicial_gerente').val().replace(/\D/g,''));
+}
+
+function solo_numeros_cantidad_cuotas_gerente () {
+		
+	  	$('#id_cantidad_cuotas_gerente').val($('#id_cantidad_cuotas_gerente').val().replace(/\D/g,''));
+}
+
+function solo_numeros_inicio_cuotas_gerente () {
+		
+	  	$('#id_inicio_cuotas_gerente').val($('#id_inicio_cuotas_gerente').val().replace(/\D/g,''));
+}
+
+function solo_numeros_intervalos_cuotas_gerente () {
+		
+	  	$('#id_intervalos_cuotas_gerente').val($('#id_intervalos_cuotas_gerente').val().replace(/\D/g,''));
+}
+
+function solo_numeros_porcentaje_cuotas_gerente () {
+		
+	  	$('#id_porcentaje_cuotas_gerente').val($('#id_porcentaje_cuotas_gerente').val().replace(/\D/g,''));
+}
+
+/////////////////////////
+function solo_numeros_monto_fijo_cuotas_gerente () {
+		
+	  	$('#id_monto_fijo_cuotas_gerente').val($('#id_monto_fijo_cuotas_gerente').val().replace(/[^\d,.]+/g, ''));
+}
+
+	//Separador de miles y comas en escritura
+	function format(comma, period) {
+		
+		var comma = comma || ',';
+		var period = period || '.';
+		var split = this.toString().split(',');
+		var numeric = split[0];
+		var decimal = split.length > 1 ? period + split[1] : '';
+		var reg = /(\d+)(\d{3})/;
+		for (var i = 1; i < numeric.length; i++) {
+			numeric = numeric.replace(".", "");
+		}
+		while (reg.test(numeric)) {
+
+			numeric = numeric.replace(reg, '$1' + comma + '$2');
+		}
+		//} else {
+		//	numeric = numeric.substr(0,numeric.length-1);
+		//}
+		
+		return numeric + decimal;
+	}
+
+function _validar(){
+	var res = $("#id_monto_fijo_cuotas_gerente").val();
+	for ( i = 0; i < res.length; i++) {
+		res = res.replace(".", "");
+	}
+	res = res.replace(",", ".");
+	//console.log("\n"+str);
+	//console.log("\n"+res);
+	$("#id_monto_fijo_cuotas_gerente").val(res);
+}
+
+$(document).ready(function() {
+	
+	$('#id_monto_fijo_cuotas_gerente').val($('#id_monto_fijo_cuotas_gerente').val().replace(".",","));
+	$('#id_monto_fijo_cuotas_gerente').val(format.call($('#id_monto_fijo_cuotas_gerente').val().split(' ').join(''),'.',','));
+	
+	$( "#id_cantidad_de_cuotas" ).keyup(function() {
+  		solo_numeros_cantidad_de_cuotas();
+	});
+	$( "#id_porcentaje_inicial_inmobiliaria" ).keyup(function() {
+  		solo_numeros_porcentaje_inicial_inmobiliaria();
+	});
+	$( "#id_cantidad_cuotas_inmobiliaria" ).keyup(function() {
+  		solo_numeros_cantidad_cuotas_inmobiliaria();
+	});
+	$( "#id_inicio_cuotas_inmobiliaria" ).keyup(function() {
+  		solo_numeros_inicio_cuotas_inmobiliaria();
+	});
+	$( "#id_intervalos_cuotas_inmobiliaria" ).keyup(function() {
+  		solo_numeros_intervalos_cuotas_inmobiliaria();
+	});
+	$( "#id_porcentaje_cuotas_inmobiliaria" ).keyup(function() {
+  		solo_numeros_porcentaje_cuotas_inmobiliaria();
+	});
+	$( "#id_porcentaje_cuotas_administracion" ).keyup(function() {
+  		solo_numeros_porcentaje_cuotas_administracion();
+	});
+	$( "#id_porcentaje_inicial_gerente" ).keyup(function() {
+  		solo_numeros_porcentaje_inicial_gerente();
+	});
+	$( "#id_cantidad_cuotas_gerente" ).keyup(function() {
+  		solo_numeros_cantidad_cuotas_gerente();
+	});
+	$( "#id_inicio_cuotas_gerente" ).keyup(function() {
+  		solo_numeros_inicio_cuotas_gerente();
+	});
+	$( "#id_intervalos_cuotas_gerente" ).keyup(function() {
+  		solo_numeros_intervalos_cuotas_gerente();
+  	});
+	$( "#id_porcentaje_cuotas_gerente" ).keyup(function() {
+  		solo_numeros_porcentaje_cuotas_gerente();
+  		
+	});//////////
+	$( "#id_monto_fijo_cuotas_gerente" ).keyup(function() {
+  		$("#id_monto_fijo_cuotas_gerente").val(format.call($("#id_monto_fijo_cuotas_gerente").val().split(' ').join(''),'.',','));solo_numeros_monto_fijo_cuotas_gerente();
+	});
+	
+	
+});
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="gri16 text-izquierda" id="breadcumb">
+						<a href="{% url 'frontend_home' %}">Inicio</a> <span class="verde-1">></span>  
+						<a href="{% url 'frontend_home' %}parametros/">Parametros</a> <span class="verde-1">></span>  
+						<a href="{% url 'frontend_home' %}parametros/timbrado/listado/">Listado de timbrados</a>  
+						<span class="verde-1">> Detalles de Timbrado</span> 
+					</div>
+
+					<div class="clear"></div>
+
+					<div class="grid_10">
+  						<h1>Detalles de Timbrado</h1>
+					</div>
+
+					<div class="grid_6">
+  						<a href="#" class="historico">Buscar</a>
+					</div>
+
+					<div class="clear"></div>
+<div id="detalle-lote">
+	<div id="detalle-lote-header">
+		<h3 class="detalle-lote-header">Timbrado {{ timbrado.id }} </h3>
+	</div>
+			
+		<div id="{{message_id}}">{{ message }}</div>
+	
+	<table width="50%" border="1" cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
+	<form action="/parametros/timbrado/listado/{{ timbrado.id }}/" method="post" onsubmit="_validar();">
+		{% csrf_token %}
+		{% for field in form %}
+		<tr>
+		<div class="fieldWrapper{% if field.field.required %} required{% endif %}">
+			
+			<td>{{ field.label_tag }}</td><td>{{ field }}{{ field.errors }}</td>
+		</div>
+		</tr>		
+		{% endfor %}
+	</table>
+		<div id="lote-ventas">
+			{% for venta in ventas_relacionadas %}
+				<a href="{% url 'frontend_home' %}lotes/listado/ventas/{{ venta.id }}" target="_blank">{{ venta }}</a>
+			{% endfor %}
+		</div>
+		{%if grupo == 1%}
+			<input class="lote-form-button" type="submit" name="boton_guardar" value="Guardar Cambios" />
+			<input class="lote-form-button" type="submit" name="boton_borrar" value="Borrar este Registro" />
+		{%endif%}
+	</form>
+</div>
+<br>
+<div id="footer">
+	<a href="rango_factura/" class="boton-verde">Rangos de Facturas del timbrado</a><br>
+	<br>
+	<a href="{% url 'frontend_home' %}parametros/timbrado/listado" class="boton-verde">Volver al Listado de Timbrados</a>
+</div>
+{% endblock %}

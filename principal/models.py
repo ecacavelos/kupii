@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 class Cliente(models.Model):    
     cedula = models.CharField(unique=True,max_length=10, blank=False, null=False)
@@ -316,14 +317,57 @@ class Timbrado(models.Model):
             label= self.numero,
             numero = self.numero,
             id=self.id)
+    class Meta:
+        permissions = (
+            ('ver_listado_timbrado', 'Ver listado de Timbrados'),
+            ('ver_opciones_timbrado', 'Ver opciones de Timbrados'),
+        )    
 
+class RangoFactura(models.Model):
+    nro_sucursal = models.CharField(max_length=30)
+    nro_boca = models.CharField(max_length=30)
+    nro_desde = models.CharField(max_length=30)
+    nro_hasta = models.CharField(max_length=30)
+    
+    def as_json(self):
+        return dict(
+            label= unicode(self.nro_sucursal+"-"+self.nro_boca),
+            nro_sucursal = self.nro_sucursal,
+            nro_boca = self.nro_boca,
+            nro_desde = self.nro_desde,
+            nro_hasta = self.nro_hasta,
+            id=self.id)
+    class Meta:
+        permissions = (
+            ('ver_listado_rango_factura', 'Ver listado de Rangos de Facturas'),
+            ('ver_opciones_rango_factura', 'Ver opciones de Rangos de Facturas'),
+        )
+        
+class TimbradoRangoFacturaUsuario(models.Model):
+    timbrado =  models.ForeignKey(Timbrado,on_delete=models.PROTECT)
+    rango_factura =  models.ForeignKey(RangoFactura,on_delete=models.PROTECT)
+    usuario =  models.ForeignKey(User,on_delete=models.PROTECT)
+    
+    def as_json(self):
+        return dict(
+            label= unicode(self.nro_sucursal+"-"+self.nro_boca),
+            nro_sucursal = self.nro_sucursal,
+            nro_boca = self.nro_boca,
+            nro_desde = self.nro_desde,
+            nro_hasta = self.nro_hasta,
+            id=self.id)
+    class Meta:
+        permissions = (
+            ('ver_listado_rango_factura', 'Ver listado de Rangos de Facturas'),
+            ('ver_opciones_rango_factura', 'Ver opciones de Rangos de Facturas'),
+        )
  
 class Factura(models.Model):
     fecha = models.DateField()
     numero = models.CharField(max_length=30)
     cliente = models.ForeignKey(Cliente,on_delete=models.PROTECT)
     lote = models.ForeignKey(Lote,on_delete=models.PROTECT)
-    timbrado = models.ForeignKey(Timbrado,on_delete=models.PROTECT)
+    rango_factura = models.ForeignKey(RangoFactura,on_delete=models.PROTECT)
     tipo = models.CharField(max_length=2)
     detalle = models.TextField()
 

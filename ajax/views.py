@@ -599,7 +599,7 @@ def facturar(request):
             y_1ra_imp = float(14.8)
             p.drawString(4.4*cm, float(y_1ra_imp+11)*cm, unicode(request.POST.get('fecha', '')))
             if nueva_factura.tipo == 'co':
-                p.drawString(12.55*cm, float(y_1ra_imp+11)*cm, "X")
+                p.drawString(12.5*cm, float(y_1ra_imp+11)*cm, "X")
             else:
                 p.drawString(14.1*cm, float(y_1ra_imp+11)*cm, "X")
             
@@ -679,7 +679,7 @@ def facturar(request):
             # INICIO SEGUNDA IMPRESION
             p.drawString(4.4*cm, 12.1*cm, unicode(request.POST.get('fecha', '')))
             if nueva_factura.tipo == 'co':
-                p.drawString(12.55*cm, 12.1*cm, "X")
+                p.drawString(12.5*cm, 12.1*cm, "X")
             else:
                 p.drawString(14.1*cm, 12.1*cm, "X")
             

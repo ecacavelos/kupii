@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError
 from django.template import RequestContext, loader
-from principal.models import Propietario, Fraccion, Lote, Manzana, PagoDeCuotas, Venta, Reserva, CambioDeLotes, RecuperacionDeLotes, TransferenciaDeLotes,Factura, Cliente,Timbrado
+from principal.models import Propietario, Fraccion, Lote, Manzana, PagoDeCuotas, Venta, Reserva, CambioDeLotes, RecuperacionDeLotes, TransferenciaDeLotes,Factura, Cliente,Timbrado, TimbradoRangoFacturaUsuario, RangoFactura
 from operator import itemgetter
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
@@ -27,7 +27,13 @@ def facturar_pagos(request, pago_id):
             
             t = loader.get_template('facturas/facturar_pagos.html')
             pago = PagoDeCuotas.objects.get(pk=pago_id)
-            ultimaFactura = Factura.objects.latest('id')
+            
+            ultimo_timbrado = Timbrado.objects.latest('id')
+            trfu = TimbradoRangoFacturaUsuario.objects.get(usuario_id=request.user, timbrado_id = ultimo_timbrado.id)
+            ultimaFactura = Factura.objects.filter(rango_factura_id= trfu.rango_factura.id).latest('id')
+            
+            ultimo_numero = ultimaFactura.numero.split("-")
+            ultima_factura = unicode(trfu.rango_factura.nro_sucursal)+'-'+unicode(trfu.rango_factura.nro_boca)+'-'+unicode(int(ultimo_numero[2])+1).zfill(7)
             cuota_desde_num = pago.venta.pagos_realizados - pago.nro_cuotas_a_pagar+1
             cuota_desde = unicode(cuota_desde_num)+"/"+unicode( pago.plan_de_pago.cantidad_de_cuotas)
             cuota_hasta = unicode(cuota_desde_num  + pago.nro_cuotas_a_pagar-1)+"/"+unicode( pago.plan_de_pago.cantidad_de_cuotas)
@@ -36,9 +42,9 @@ def facturar_pagos(request, pago_id):
                 'lote': pago.lote.codigo_paralot,
                 'cuota_desde': cuota_desde,
                 'cuota_hasta': cuota_hasta,
-                'ultima_factura': int(ultimaFactura.numero)+1,
-                'ultimo_timbrado_numero': ultimaFactura.timbrado.numero,
-                'ultimo_timbrado_id': ultimaFactura.timbrado.id,
+                'ultima_factura': ultima_factura,
+                'ultimo_timbrado_numero': trfu.timbrado.numero,
+                'ultimo_timbrado_id': ultimo_timbrado.id,
 
             })
             return HttpResponse(t.render(c))
@@ -82,7 +88,9 @@ def facturar_pagos(request, pago_id):
             #Crear un objeto Factura y guardar            
             nueva_factura = Factura()
             nueva_factura.fecha = fecha
-            nueva_factura.timbrado = Timbrado.objects.get(pk=timbrado_id)
+            #nueva_factura.timbrado = Timbrado.objects.get(pk=timbrado_id)
+            trfu = TimbradoRangoFacturaUsuario.objects.get(timbrado_id = timbrado_id, usuario_id = request.user)
+            nueva_factura.rango_factura = trfu.rango_factura
             nueva_factura.numero = numero
             nueva_factura.cliente = Cliente.objects.get(pk=cliente_id)
             nueva_factura.tipo = tipo
@@ -274,7 +282,19 @@ def facturar(request):
         if request.method == 'GET':
             #Mostrar el formulario basico de factura.            
             t = loader.get_template('facturas/facturar.html')
-            c = RequestContext(request, {})
+            
+            ultimo_timbrado = Timbrado.objects.latest('id')
+            trfu = TimbradoRangoFacturaUsuario.objects.get(usuario_id=request.user, timbrado_id = ultimo_timbrado.id)
+            ultimaFactura = Factura.objects.filter(rango_factura_id= trfu.rango_factura.id).latest('id')
+            
+            ultimo_numero = ultimaFactura.numero.split("-")
+            ultima_factura = unicode(trfu.rango_factura.nro_sucursal)+'-'+unicode(trfu.rango_factura.nro_boca)+'-'+unicode(int(ultimo_numero[2])+1).zfill(7)
+            
+            c = RequestContext(request, {
+                'ultima_factura': ultima_factura,
+                'ultimo_timbrado_numero': trfu.timbrado.numero,
+                'ultimo_timbrado_id': ultimo_timbrado.id,
+                                         })
             return HttpResponse(t.render(c))
         else: #POST se envia el formulario.  
             print 'POST'          
@@ -315,7 +335,8 @@ def facturar(request):
             #Crear un objeto Factura y guardar            
             nueva_factura = Factura()
             nueva_factura.fecha = fecha
-            nueva_factura.timbrado = Timbrado.objects.get(pk=timbrado_id)
+            trfu = TimbradoRangoFacturaUsuario.objects.get(usuario_id = request.user, timbrado_id = timbrado_id )
+            nueva_factura.rango_factura = trfu.rango_factura
             nueva_factura.numero = numero
             nueva_factura.cliente = Cliente.objects.get(pk=cliente_id)
             nueva_factura.tipo = tipo
