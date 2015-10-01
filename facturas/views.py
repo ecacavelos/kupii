@@ -160,43 +160,43 @@ def facturar_pagos(request, pago_id):
                 p.drawString(1.7*cm, float(pos_y - 0.5)*cm, unicode(detalle['cantidad']))
                 detalle['concepto']=value['concepto']
                 p.drawString(5*cm, float(pos_y - 0.5)*cm, unicode(detalle['concepto']))
-                detalle['precio_unitario']=value['precio_unitario']
-                p.drawString(11.2*cm, float(pos_y - 0.5)*cm, unicode(detalle['precio_unitario']))
+                detalle['precio_unitario']=int(value['precio_unitario'])
+                p.drawString(11.2*cm, float(pos_y - 0.5)*cm, unicode('{:,}'.format(detalle['precio_unitario']).replace(",", ".")))
                 total_venta +=  int(detalle['cantidad']) * int(detalle['precio_unitario'])
-                detalle['exentas']=value['exentas']
-                p.drawString(13.5*cm, float(pos_y - 0.5)*cm, unicode(detalle['exentas']))
+                detalle['exentas']=int(value['exentas'])
+                p.drawString(13.5*cm, float(pos_y - 0.5)*cm, unicode('{:,}'.format(detalle['exentas']).replace(",", ".")))
                 if detalle['exentas'] != '':
                     exentas += int(detalle['exentas'])
-                detalle['iva_5']=value['iva_5']
-                p.drawString(15.8*cm, float(pos_y - 0.5)*cm, unicode(detalle['iva_5']))
+                detalle['iva_5']=int(value['iva_5'])
+                p.drawString(15.8*cm, float(pos_y - 0.5)*cm, unicode('{:,}'.format(detalle['iva_5']).replace(",", ".")))
                 if detalle['iva_5'] != '':
                     iva5 += int(detalle['iva_5'])
-                detalle['iva_10']=value['iva_10']
-                p.drawString(18.6*cm, float(pos_y - 0.5)*cm, unicode(detalle['iva_10']))
+                detalle['iva_10']=int(value['iva_10'])
+                p.drawString(18.6*cm, float(pos_y - 0.5)*cm, unicode('{:,}'.format(detalle['iva_10']).replace(",", ".")))
                 if detalle['iva_10'] != '':
                     iva10 += int(detalle['iva_10'])
                 pos_y -= 0.5
                 detalles.append(detalle)
             cantidad =  4 - len(detalles)
             pos_y -= (0.5 * cantidad)
-            p.drawString(13.5*cm, float(y_1ra_imp+3.8)*cm, unicode(exentas)) 
-            p.drawString(15.7*cm, float(y_1ra_imp+3.8)*cm, unicode(iva5))   
-            p.drawString(18*cm, float(y_1ra_imp+3.8)*cm, unicode(iva10))
+            p.drawString(13.5*cm, float(y_1ra_imp+3.8)*cm, unicode('{:,}'.format(exentas).replace(",", "."))) 
+            p.drawString(15.7*cm, float(y_1ra_imp+3.8)*cm, unicode('{:,}'.format(iva5).replace(",", ".")))   
+            p.drawString(18*cm, float(y_1ra_imp+3.8)*cm, unicode('{:,}'.format(iva10).replace(",", ".")))
             pos_y -= 0.5
-            p.drawString(18*cm, float(y_1ra_imp+3.2)*cm, unicode(total_venta))
+            p.drawString(18*cm, float(y_1ra_imp+3.2)*cm, unicode('{:,}'.format(total_venta).replace(",", ".")))
             pos_y -= 1
             numalet= num2words(int(total_venta), lang='es')
             p.drawString(6.5*cm, float(pos_y - 1.5)*cm, unicode(numalet))
-            p.drawString(18*cm, float(pos_y - 1.5)*cm, unicode(total_venta))
+            p.drawString(18*cm, float(pos_y - 1.5)*cm, unicode('{:,}'.format(total_venta).replace(",", ".")))
             total_iva_10 = int(iva10/11)
             total_iva_5 = int(iva5/21)
             total_iva = total_iva_10 + total_iva_5
             pos_y -= 0.5
-            p.drawString(5.2*cm, float(pos_y - 1.6)*cm, unicode(total_iva_5))
-            p.drawString(8.5*cm, float(pos_y - 1.6)*cm, unicode(total_iva_10))
-            p.drawString(13*cm, float(pos_y - 1.6)*cm, unicode(total_iva))
+            p.drawString(5.2*cm, float(pos_y - 1.6)*cm, unicode('{:,}'.format(total_iva_5).replace(",", ".")))
+            p.drawString(8.5*cm, float(pos_y - 1.6)*cm, unicode('{:,}'.format(total_iva_10).replace(",", ".")))
+            p.drawString(13*cm, float(pos_y - 1.6)*cm, unicode('{:,}'.format(total_iva).replace(",", ".")))
             # FIN PRIMERA IMPRESION
-            
+            ######################################################################################################################################
             # INICIO SEGUNDA IMPRESION
             p.drawString(4.4*cm, 12.1*cm, unicode(request.POST.get('fecha', '')))
             if nueva_factura.tipo == 'co':
@@ -238,41 +238,41 @@ def facturar_pagos(request, pago_id):
                 p.drawString(1.7*cm, float(pos_y - 0.5)*cm, unicode(detalle['cantidad']))
                 detalle['concepto']=value['concepto']
                 p.drawString(5*cm, float(pos_y - 0.5)*cm, unicode(detalle['concepto']))
-                detalle['precio_unitario']=value['precio_unitario']
-                p.drawString(11.2*cm, float(pos_y - 0.5)*cm, unicode(detalle['precio_unitario']))
+                detalle['precio_unitario']=int(value['precio_unitario'])
+                p.drawString(11.2*cm, float(pos_y - 0.5)*cm, unicode('{:,}'.format(detalle['precio_unitario']).replace(",", ".")))
                 total_venta +=  int(detalle['cantidad']) * int(detalle['precio_unitario'])
-                detalle['exentas']=value['exentas']
-                p.drawString(13.5*cm, float(pos_y - 0.5)*cm, unicode(detalle['exentas']))
+                detalle['exentas']=int(value['exentas'])
+                p.drawString(13.5*cm, float(pos_y - 0.5)*cm, unicode('{:,}'.format(detalle['exentas']).replace(",", ".")))
                 if detalle['exentas'] != '':
                     exentas += int(detalle['exentas'])
-                detalle['iva_5']=value['iva_5']
-                p.drawString(15.8*cm, float(pos_y - 0.5)*cm, unicode(detalle['iva_5']))
+                detalle['iva_5']=int(value['iva_5'])
+                p.drawString(15.8*cm, float(pos_y - 0.5)*cm, unicode('{:,}'.format(detalle['iva_5']).replace(",", ".")))
                 if detalle['iva_5'] != '':
                     iva5 += int(detalle['iva_5'])
-                detalle['iva_10']=value['iva_10']
-                p.drawString(18.6*cm, float(pos_y - 0.5)*cm, unicode(detalle['iva_10']))
+                detalle['iva_10']=int(value['iva_10'])
+                p.drawString(18.6*cm, float(pos_y - 0.5)*cm, unicode('{:,}'.format(detalle['iva_10']).replace(",", ".")))
                 if detalle['iva_10'] != '':
                     iva10 += int(detalle['iva_10'])
                 pos_y -= 0.5
                 detalles.append(detalle)
             cantidad =  4 - len(detalles)
             pos_y -= (0.5 * cantidad)
-            p.drawString(13.5*cm, 4.8*cm, unicode(exentas)) 
-            p.drawString(15.7*cm, 4.8*cm, unicode(iva5))   
-            p.drawString(18*cm, 4.8*cm, unicode(iva10))
+            p.drawString(13.5*cm, 4.8*cm, unicode('{:,}'.format(exentas).replace(",", "."))) 
+            p.drawString(15.7*cm, 4.8*cm, unicode('{:,}'.format(iva5).replace(",", ".")))   
+            p.drawString(18*cm, 4.8*cm, unicode('{:,}'.format(iva10).replace(",", ".")))
             pos_y -= 0.5
-            p.drawString(18*cm, 4.2*cm, unicode(total_venta))
+            p.drawString(18*cm, 4.2*cm, unicode('{:,}'.format(total_venta).replace(",", ".")))
             pos_y -= 1
             numalet= num2words(int(total_venta), lang='es')
             p.drawString(6.5*cm, float(pos_y - 1.5)*cm, unicode(numalet))
-            p.drawString(18*cm, float(pos_y - 1.5)*cm, unicode(total_venta))
+            p.drawString(18*cm, float(pos_y - 1.5)*cm, unicode('{:,}'.format(total_venta).replace(",", "."))) 
             total_iva_10 = int(iva10/11)
             total_iva_5 = int(iva5/21)
             total_iva = total_iva_10 + total_iva_5
             pos_y -= 0.5
-            p.drawString(5.2*cm, float(pos_y - 1.6)*cm, unicode(total_iva_5))
-            p.drawString(8.5*cm, float(pos_y - 1.6)*cm, unicode(total_iva_10))
-            p.drawString(13*cm, float(pos_y - 1.6)*cm, unicode(total_iva))
+            p.drawString(5.2*cm, float(pos_y - 1.6)*cm, unicode('{:,}'.format(total_iva_5).replace(",", ".")))
+            p.drawString(8.5*cm, float(pos_y - 1.6)*cm, unicode('{:,}'.format(total_iva_10).replace(",", ".")))
+            p.drawString(13*cm, float(pos_y - 1.6)*cm, unicode('{:,}'.format(total_iva).replace(",", ".")))
             # FIN SEGUNDA IMPRESION
             
             p.showPage()
@@ -408,43 +408,43 @@ def facturar(request):
                 p.drawString(1.7*cm, float(pos_y - 0.5)*cm, unicode(detalle['cantidad']))
                 detalle['concepto']=value['concepto']
                 p.drawString(5*cm, float(pos_y - 0.5)*cm, unicode(detalle['concepto']))
-                detalle['precio_unitario']=value['precio_unitario']
-                p.drawString(11.2*cm, float(pos_y - 0.5)*cm, unicode(detalle['precio_unitario']))
+                detalle['precio_unitario']=int(value['precio_unitario'])
+                p.drawString(11.2*cm, float(pos_y - 0.5)*cm, unicode('{:,}'.format(detalle['precio_unitario']).replace(",", ".")))
                 total_venta +=  int(detalle['cantidad']) * int(detalle['precio_unitario'])
-                detalle['exentas']=value['exentas']
-                p.drawString(13.5*cm, float(pos_y - 0.5)*cm, unicode(detalle['exentas']))
+                detalle['exentas']=int(value['exentas'])
+                p.drawString(13.5*cm, float(pos_y - 0.5)*cm, unicode('{:,}'.format(detalle['exentas']).replace(",", ".")))
                 if detalle['exentas'] != '':
                     exentas += int(detalle['exentas'])
-                detalle['iva_5']=value['iva_5']
-                p.drawString(15.8*cm, float(pos_y - 0.5)*cm, unicode(detalle['iva_5']))
+                detalle['iva_5']=int(value['iva_5'])
+                p.drawString(15.8*cm, float(pos_y - 0.5)*cm, unicode('{:,}'.format(detalle['iva_5']).replace(",", ".")))
                 if detalle['iva_5'] != '':
                     iva5 += int(detalle['iva_5'])
-                detalle['iva_10']=value['iva_10']
-                p.drawString(18.6*cm, float(pos_y - 0.5)*cm, unicode(detalle['iva_10']))
+                detalle['iva_10']=int(value['iva_10'])
+                p.drawString(18.6*cm, float(pos_y - 0.5)*cm, unicode('{:,}'.format(detalle['iva_10']).replace(",", ".")))
                 if detalle['iva_10'] != '':
                     iva10 += int(detalle['iva_10'])
                 pos_y -= 0.5
                 detalles.append(detalle)
             cantidad =  4 - len(detalles)
             pos_y -= (0.5 * cantidad)
-            p.drawString(13.5*cm, float(y_1ra_imp+3.8)*cm, unicode(exentas)) 
-            p.drawString(15.7*cm, float(y_1ra_imp+3.8)*cm, unicode(iva5))   
-            p.drawString(18*cm, float(y_1ra_imp+3.8)*cm, unicode(iva10))
+            p.drawString(13.5*cm, float(y_1ra_imp+3.8)*cm, unicode('{:,}'.format(exentas).replace(",", "."))) 
+            p.drawString(15.7*cm, float(y_1ra_imp+3.8)*cm, unicode('{:,}'.format(iva5).replace(",", ".")))   
+            p.drawString(18*cm, float(y_1ra_imp+3.8)*cm, unicode('{:,}'.format(iva10).replace(",", ".")))
             pos_y -= 0.5
-            p.drawString(18*cm, float(y_1ra_imp+3.2)*cm, unicode(total_venta))
+            p.drawString(18*cm, float(y_1ra_imp+3.2)*cm, unicode('{:,}'.format(total_venta).replace(",", ".")))
             pos_y -= 1
             numalet= num2words(int(total_venta), lang='es')
             p.drawString(6.5*cm, float(pos_y - 1.5)*cm, unicode(numalet))
-            p.drawString(18*cm, float(pos_y - 1.5)*cm, unicode(total_venta))
+            p.drawString(18*cm, float(pos_y - 1.5)*cm, unicode('{:,}'.format(total_venta).replace(",", ".")))
             total_iva_10 = int(iva10/11)
             total_iva_5 = int(iva5/21)
             total_iva = total_iva_10 + total_iva_5
             pos_y -= 0.5
-            p.drawString(5.2*cm, float(pos_y - 1.6)*cm, unicode(total_iva_5))
-            p.drawString(8.5*cm, float(pos_y - 1.6)*cm, unicode(total_iva_10))
-            p.drawString(13*cm, float(pos_y - 1.6)*cm, unicode(total_iva))
+            p.drawString(5.2*cm, float(pos_y - 1.6)*cm, unicode('{:,}'.format(total_iva_5).replace(",", ".")))
+            p.drawString(8.5*cm, float(pos_y - 1.6)*cm, unicode('{:,}'.format(total_iva_10).replace(",", ".")))
+            p.drawString(13*cm, float(pos_y - 1.6)*cm, unicode('{:,}'.format(total_iva).replace(",", ".")))
             # FIN PRIMERA IMPRESION
-            
+            ######################################################################################################################################
             # INICIO SEGUNDA IMPRESION
             p.drawString(4.4*cm, 12.1*cm, unicode(request.POST.get('fecha', '')))
             if nueva_factura.tipo == 'co':
@@ -486,41 +486,41 @@ def facturar(request):
                 p.drawString(1.7*cm, float(pos_y - 0.5)*cm, unicode(detalle['cantidad']))
                 detalle['concepto']=value['concepto']
                 p.drawString(5*cm, float(pos_y - 0.5)*cm, unicode(detalle['concepto']))
-                detalle['precio_unitario']=value['precio_unitario']
-                p.drawString(11.2*cm, float(pos_y - 0.5)*cm, unicode(detalle['precio_unitario']))
+                detalle['precio_unitario']=int(value['precio_unitario'])
+                p.drawString(11.2*cm, float(pos_y - 0.5)*cm, unicode('{:,}'.format(detalle['precio_unitario']).replace(",", ".")))
                 total_venta +=  int(detalle['cantidad']) * int(detalle['precio_unitario'])
-                detalle['exentas']=value['exentas']
-                p.drawString(13.5*cm, float(pos_y - 0.5)*cm, unicode(detalle['exentas']))
+                detalle['exentas']=int(value['exentas'])
+                p.drawString(13.5*cm, float(pos_y - 0.5)*cm, unicode('{:,}'.format(detalle['exentas']).replace(",", ".")))
                 if detalle['exentas'] != '':
                     exentas += int(detalle['exentas'])
-                detalle['iva_5']=value['iva_5']
-                p.drawString(15.8*cm, float(pos_y - 0.5)*cm, unicode(detalle['iva_5']))
+                detalle['iva_5']=int(value['iva_5'])
+                p.drawString(15.8*cm, float(pos_y - 0.5)*cm, unicode('{:,}'.format(detalle['iva_5']).replace(",", ".")))
                 if detalle['iva_5'] != '':
                     iva5 += int(detalle['iva_5'])
-                detalle['iva_10']=value['iva_10']
-                p.drawString(18.6*cm, float(pos_y - 0.5)*cm, unicode(detalle['iva_10']))
+                detalle['iva_10']=int(value['iva_10'])
+                p.drawString(18.6*cm, float(pos_y - 0.5)*cm, unicode('{:,}'.format(detalle['iva_10']).replace(",", ".")))
                 if detalle['iva_10'] != '':
                     iva10 += int(detalle['iva_10'])
                 pos_y -= 0.5
                 detalles.append(detalle)
             cantidad =  4 - len(detalles)
             pos_y -= (0.5 * cantidad)
-            p.drawString(13.5*cm, 4.8*cm, unicode(exentas)) 
-            p.drawString(15.7*cm, 4.8*cm, unicode(iva5))   
-            p.drawString(18*cm, 4.8*cm, unicode(iva10))
+            p.drawString(13.5*cm, 4.8*cm, unicode('{:,}'.format(exentas).replace(",", "."))) 
+            p.drawString(15.7*cm, 4.8*cm, unicode('{:,}'.format(iva5).replace(",", ".")))   
+            p.drawString(18*cm, 4.8*cm, unicode('{:,}'.format(iva10).replace(",", ".")))
             pos_y -= 0.5
-            p.drawString(18*cm, 4.2*cm, unicode(total_venta))
+            p.drawString(18*cm, 4.2*cm, unicode('{:,}'.format(total_venta).replace(",", ".")))
             pos_y -= 1
             numalet= num2words(int(total_venta), lang='es')
             p.drawString(6.5*cm, float(pos_y - 1.5)*cm, unicode(numalet))
-            p.drawString(18*cm, float(pos_y - 1.5)*cm, unicode(total_venta))
+            p.drawString(18*cm, float(pos_y - 1.5)*cm, unicode('{:,}'.format(total_venta).replace(",", "."))) 
             total_iva_10 = int(iva10/11)
             total_iva_5 = int(iva5/21)
             total_iva = total_iva_10 + total_iva_5
             pos_y -= 0.5
-            p.drawString(5.2*cm, float(pos_y - 1.6)*cm, unicode(total_iva_5))
-            p.drawString(8.5*cm, float(pos_y - 1.6)*cm, unicode(total_iva_10))
-            p.drawString(13*cm, float(pos_y - 1.6)*cm, unicode(total_iva))
+            p.drawString(5.2*cm, float(pos_y - 1.6)*cm, unicode('{:,}'.format(total_iva_5).replace(",", ".")))
+            p.drawString(8.5*cm, float(pos_y - 1.6)*cm, unicode('{:,}'.format(total_iva_10).replace(",", ".")))
+            p.drawString(13*cm, float(pos_y - 1.6)*cm, unicode('{:,}'.format(total_iva).replace(",", ".")))
             # FIN SEGUNDA IMPRESION
             
             p.showPage()
