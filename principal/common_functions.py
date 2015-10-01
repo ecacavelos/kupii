@@ -329,8 +329,9 @@ def obtener_detalle_interes_lote(lote_id,fecha_pago_parsed,proximo_vencimiento_p
 
                     detalles.append(detalle)
 
-                if cuotas_atrasadas>6:
-                    gestion_cobranza = int(0.1*(math.ceil(float(cuotas_atrasadas*monto_cuota))+sumatoria_intereses))
+                if cuotas_atrasadas>=6:
+                    #gestion_cobranza = int(0.1*(math.ceil(float(cuotas_atrasadas*monto_cuota))+sumatoria_intereses))
+                    gestion_cobranza = int(0.05*(math.ceil(float(cuotas_atrasadas*monto_cuota))+sumatoria_intereses))
                     detalles.append({'gestion_cobranza':gestion_cobranza})
             print detalles
             return detalles
