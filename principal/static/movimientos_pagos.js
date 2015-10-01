@@ -394,29 +394,31 @@ function calcularInteres() {
 function dibujarDetalle() {
     //var dato = 'este es un texto que llego por ajax';
     $('#contenido_modal').empty();
-    $('#contenido_modal').append('<div id="listado-item-lote">');
-    $('#contenido_modal').append('<div cellpadding="0" cellspacing="0" class="listado-ventas" align="center">');
-    $('#contenido_modal').append("<th>Cuota Nro.</th><th>Vencimiento</th><th>Dias Atraso</th><th>Interes</th>")
+    modal_html ="";
+    modal_html +='<div id="listado-item-lote">';
+    modal_html +='<div cellpadding="1" cellspacing="0" class="listado-ventas" align="center">';
+    modal_html +="<table class='listado-cuotas-estado' style='text-align: center;'><th>Cuota Nro.</th><th>Vencimiento</th><th>Dias Atraso</th><th>Interes</th>";
 
 
     var nro_cuotas_a_pagar = $('#nro_cuotas_a_pagar').val();
     console.log(detalle);
     if (detalle.length > 0) {
         for (i = 0; i < nro_cuotas_a_pagar; i++) {
-            $('#contenido_modal').append('<tr><td>' + detalle[i]['nro_cuota'] + '</td><td>' +
-            detalle[i]['vencimiento'] + '</td><td>' + detalle[i]['dias_atraso'] +
-            '</td><td><input style="width: 70px;" class="interes" id="interes_' + i + '" type="number" value=' + f(detalle[i]['intereses']).replace(/\./g, '') + '></td></tr>');
+            modal_html +='<tr style="text-align:center;"><td style="text-align:center;">' + detalle[i]['nro_cuota'] + '</td><td style="text-align:center;">' +
+            detalle[i]['vencimiento'] + '</td><td style="text-align:center;">' + detalle[i]['dias_atraso'] +
+            '</td><td style="text-align:center;"><input style="width: 70px;" class="interes" id="interes_' + i + '" type="number" value=' + f(detalle[i]['intereses']).replace(/\./g, '') + '></td></tr>';
             if (i==nro_cuotas_a_pagar-1) {
-                $('#contenido_modal').append('<br>Fecha ultimo vencimiento con 5 dias de gracia: ' + detalle[i]['vencimiento_gracia'] + '</br>');
+            	modal_html +='</table><br>Fecha ultimo vencimiento con 5 dias de gracia: ' + detalle[i]['vencimiento_gracia'] + '</br>';
             }
         }
         if(detalle[detalle.length-1]['gestion_cobranza']){
-            $('#contenido_modal').append('</tr><td>Gestion de Cobranza: </td><td><input style="width: 100px;" class="interes" id="id_gestion_cobranza" type="number" value=' + f(detalle[detalle.length-1]['gestion_cobranza']).replace(/\./g, '') + '></td></tr>');
+            modal_html +='</tr><td>Gestion de Cobranza: </td><td><input style="width: 100px;" class="interes" id="id_gestion_cobranza" type="number" value=' + f(detalle[detalle.length-1]['gestion_cobranza']).replace(/\./g, '') + '></td></tr>';
         }
     }
 
-	$('#contenido_modal').append('<button class="button_verde" id="modificar_mora" data-toggle="modal" data-target=".bs-example-modal-sm" value="Modificar">Modificar</button>');
-	$('#contenido_modal').append('</div>');
+	modal_html +='<button class="button_verde" id="modificar_mora" data-toggle="modal" data-target=".bs-example-modal-sm" value="Modificar">Modificar</button>';
+	modal_html += '</div>'
+	$('#contenido_modal').append(modal_html);
 	detalle_interes = generarDetalleJSON();			
 	$("#detalle").val(detalle_interes);	
 	$('#modificar_mora').click(function() {

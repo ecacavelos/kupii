@@ -23,6 +23,7 @@
 		    + '</div>';
 	$(document).ready(function() {
 		$('#lote').mask('###/###/####');
+		$('#nro-factura').mask('###-###-#######');
 		$("#id_name_cliente").focus();
 		
 		
@@ -171,8 +172,10 @@
 			}
 		});
 		$('#id_nro_cuota_hasta').blur(function(){
-			index = $('.item-detalle').length -1;
+			//index = $('.item-detalle').length -1;
+			index = $('.item-detalle').length;
 				if(index >1 ){
+					$('.item-detalle').remove();
 					$('.item-detalle').remove();
 					$('.detalle_factura').append(item_inicial_detalle_factura);
 					limpiarLiquidacion();
