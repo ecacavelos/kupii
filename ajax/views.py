@@ -461,8 +461,11 @@ def get_detalles_factura(request):
                 cantidad = num_hasta - (num_desde -1)
                 detalle['cantidad'] = cantidad
                 detalle['precio_unitario']= venta.precio_de_cuota
-                detalle['exentas'] = int(round((cantidad * venta.precio_de_cuota) * 0.7))
-                detalle['iva5']= int(round((cantidad * venta.precio_de_cuota) * 0.3))
+                
+                detalle['iva5']= int( ( (cantidad * venta.precio_de_cuota) * 31.5) / 101.5) 
+                
+                detalle['exentas'] = int( (cantidad * venta.precio_de_cuota) - detalle['iva5']) 
+                
                 detalles.append(detalle)
                 '''
                     Se trae los pagos que se van a facturar y se iteran para traer el interes de cada cuota.
