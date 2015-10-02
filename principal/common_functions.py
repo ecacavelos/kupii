@@ -331,7 +331,7 @@ def obtener_detalle_interes_lote(lote_id,fecha_pago_parsed,proximo_vencimiento_p
 
                 if cuotas_atrasadas>=6:
                     #gestion_cobranza = int(0.1*(math.ceil(float(cuotas_atrasadas*monto_cuota))+sumatoria_intereses))
-                    gestion_cobranza = int(0.05*(math.ceil(float(cuotas_atrasadas*monto_cuota))+sumatoria_intereses))
+                    gestion_cobranza = roundup(int(0.05*(math.ceil(float(cuotas_atrasadas*monto_cuota))+sumatoria_intereses)))
                     detalles.append({'gestion_cobranza':gestion_cobranza})
             print detalles
             return detalles
@@ -505,36 +505,71 @@ def calcular_dias_habiles(fecha_ini, fecha_fin):
     
 def roundup(interes):
     #return int(math.ceil(interes / 1000.0)) * 1000
+    
+    ##### Caso redondeado de a 500  ######
     number = interes / 1000.0
-    
+     
     miles = int(number)*1000
-    
+     
     centenas = str(number-int(number))[2:]
+     
+    centenas = int (centenas)
     
-    decenas = int(centenas)%100
-    
-    centenas = (int (centenas)/100)*100
-    
-    if decenas > 10:
-        if decenas >50:
-            centenas= centenas +100
-            decenas = 0
-        elif decenas < 50:
-            decenas = 0
-        elif decenas == 50:
-            decenas = 50
+    if centenas > 10:
+        if centenas > 500:
+            miles = miles +1000
+            centenas = 0
+        elif centenas < 500:
+            centenas = 0
+        elif centenas == 500:
+            centenas = 500
     else:
-        if decenas > 5:
-            centenas= centenas +100
-            decenas = 0
-        elif decenas < 5:
-            decenas = 0
-        elif decenas == 5:
-            decenas = 50 
-    
+        if centenas > 5:
+            miles = miles + 1000
+            centenas = 0
+        elif centenas < 5:
+            centenas = 0
+        elif centenas == 5:
+            centenas = 500
+     
+    decenas = 0 
+     
     resultado = miles+centenas+ decenas
-    
+     
     return resultado
+
+####### Caso redondeado de a 100  #########
+#     #return int(math.ceil(interes / 1000.0)) * 1000
+#     number = interes / 1000.0
+#     
+#     miles = int(number)*1000
+#     
+#     centenas = str(number-int(number))[2:]
+#     
+#     decenas = int(centenas)%100
+#     
+#     centenas = (int (centenas)/100)*100
+#     
+#     if decenas > 10:
+#         if decenas >50:
+#             centenas= centenas +100
+#             decenas = 0
+#         elif decenas < 50:
+#             decenas = 0
+#         elif decenas == 50:
+#             decenas = 50
+#     else:
+#         if decenas > 5:
+#             centenas= centenas +100
+#             decenas = 0
+#         elif decenas < 5:
+#             decenas = 0
+#         elif decenas == 5:
+#             decenas = 50 
+#     
+#     resultado = miles+centenas+ decenas
+#     
+#     return resultado
 
 #Funcion que encuentra todas las ventas de un lote y retorna la ultima
 def get_ultima_venta(lote_id):

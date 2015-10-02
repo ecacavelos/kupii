@@ -306,7 +306,7 @@
   				//qz.print();
 				//pdf = "HOLA MUNDO";
 				alert("Factura Creada");
-				window.location.href = "https://sistema.propar.com.py/facturacion/facturar/";						
+				//window.location.href = "https://sistema.propar.com.py/facturacion/facturar/";						
 				return true;		    						
 			}
 			else{
@@ -407,7 +407,7 @@
 		$('#total-exentas').val(total_exentas.toString());
 		$('#total-iva_10').val(total_iva_10.toString());
 		$('#total-iva_5').val(total_iva_5.toString());
-		total = total_iva_5 + total_iva_10 + exentas;
+		total = total_iva_5 + total_iva_10 + total_exentas;
 		$('#total').val( total.toString());
 		iva_10 = (Math.round(total_iva_10/11));
 		$('#liquidacion-iva_10').val(iva_10.toString());
