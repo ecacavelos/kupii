@@ -290,7 +290,7 @@ def obtener_detalle_interes_lote(lote_id,fecha_pago_parsed,proximo_vencimiento_p
                 if venta.plan_de_pago.cuotas_de_refuerzo != 0:
                     pagos = get_pago_cuotas(venta, None, None)
                     cantidad_pagos_ref = cant_cuotas_pagadas_ref(pagos)
-                    es_ref= True
+                    es_ref= True    
                 else:
                     cantidad_pagos_ref = 0
                     es_ref= False
@@ -331,8 +331,9 @@ def obtener_detalle_interes_lote(lote_id,fecha_pago_parsed,proximo_vencimiento_p
 
                 if cuotas_atrasadas>=6:
                     #gestion_cobranza = int(0.1*(math.ceil(float(cuotas_atrasadas*monto_cuota))+sumatoria_intereses))
-                    gestion_cobranza = roundup(int(0.05*(math.ceil(float(cuotas_atrasadas*monto_cuota))+sumatoria_intereses)))
+                    gestion_cobranza = roundup(0.05*((cuotas_atrasadas*monto_cuota)+sumatoria_intereses) + (0.05*((cuotas_atrasadas*monto_cuota)+sumatoria_intereses))*0.10)
                     detalles.append({'gestion_cobranza':gestion_cobranza})
+                    
             print detalles
             return detalles
         
@@ -519,10 +520,16 @@ def roundup(interes):
         if centenas >= 500:
             miles = miles +1000
             centenas = 0
-        elif centenas < 500:
+        elif centenas < 500 and centenas < 50:
+            centenas = 0
+        elif centenas < 500 and centenas > 50 and centenas < 100:
+            miles = miles +1000
+            centenas = 0
+        else:
             centenas = 0
         #elif centenas == 500:
             #centenas = 500
+        
     else:
         if centenas >= 5:
             miles = miles + 1000
