@@ -282,8 +282,8 @@ def obtener_detalle_interes_lote(lote_id,fecha_pago_parsed,proximo_vencimiento_p
                 #interes_punitorio=0.00030
                 
                 #Intereses IVA
-                interes_iva=0.00013
-                
+                #interes_iva=0.00013
+                interes_iva=0.0001
                 #total_intereses=interes+interes_punitorio+interes_iva
                 total_intereses=interes+interes_iva
                 #Verificar si tiene cuotas de refuerzo
@@ -504,8 +504,37 @@ def calcular_dias_habiles(fecha_ini, fecha_fin):
     
     
 def roundup(interes):
-    return int(math.ceil(interes / 1000.0)) * 1000
-
+    #return int(math.ceil(interes / 1000.0)) * 1000
+    number = interes / 1000.0
+    
+    miles = int(number)*1000
+    
+    centenas = str(number-int(number))[2:]
+    
+    decenas = int(centenas)%100
+    
+    centenas = (int (centenas)/100)*100
+    
+    if decenas > 10:
+        if decenas >50:
+            centenas= centenas +100
+            decenas = 0
+        elif decenas < 50:
+            decenas = 0
+        elif decenas == 50:
+            decenas = 50
+    else:
+        if decenas > 5:
+            centenas= centenas +100
+            decenas = 0
+        elif decenas < 5:
+            decenas = 0
+        elif decenas == 5:
+            decenas = 50 
+    
+    resultado = miles+centenas+ decenas
+    
+    return resultado
 
 #Funcion que encuentra todas las ventas de un lote y retorna la ultima
 def get_ultima_venta(lote_id):

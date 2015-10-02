@@ -414,6 +414,9 @@ function dibujarDetalle() {
         if(detalle[detalle.length-1]['gestion_cobranza']){
             modal_html +='</tr><td>Gestion de Cobranza: </td><td><input style="width: 100px;" class="interes" id="id_gestion_cobranza" type="number" value=' + f(detalle[detalle.length-1]['gestion_cobranza']).replace(/\./g, '') + '></td></tr>';
         }
+    } else {
+    	$('#total_mora').val('');
+    	$('#total_mora2').html('');
     }
 
 	modal_html +='<button class="button_verde" id="modificar_mora" data-toggle="modal" data-target=".bs-example-modal-sm" value="Modificar">Modificar</button>';
