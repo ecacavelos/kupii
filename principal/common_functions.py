@@ -516,21 +516,21 @@ def roundup(interes):
     centenas = int (centenas)
     
     if centenas > 10:
-        if centenas > 500:
+        if centenas >= 500:
             miles = miles +1000
             centenas = 0
         elif centenas < 500:
             centenas = 0
-        elif centenas == 500:
-            centenas = 500
+        #elif centenas == 500:
+            #centenas = 500
     else:
-        if centenas > 5:
+        if centenas >= 5:
             miles = miles + 1000
             centenas = 0
         elif centenas < 5:
             centenas = 0
-        elif centenas == 5:
-            centenas = 500
+        #elif centenas == 5:
+            #centenas = 500
      
     decenas = 0 
      
