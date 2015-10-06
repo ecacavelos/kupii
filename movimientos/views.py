@@ -419,24 +419,83 @@ def cambio_de_lotes(request):
                         fecha_cambio_parsed = datetime.datetime.strptime(data.get('cambio_fecha_de_cambio', ''), "%Y-%m-%d")
                     except:
                         date_parse_error = True
-        
+                
+                #Se obtienen los datos del lote viejo
+                lote_viejo = Lote.objects.get(pk=lote_original_id)
+                
+                #Se se obtiene el lote nuevo 
+                lote_nuevo = Lote.objects.get(pk=lote_nuevo_id)
+                
+                if lote_viejo.manzana.fraccion.propietario_id != lote_nuevo.manzana.fraccion.propietario_id:
+                    c = RequestContext(request, {
+                        'message': 'Los lotes no pertenecen al mismo propietario'
+                    })
+                    return HttpResponse(t.render(c))
+                
+                #Se obtienen los datos de la venta vieja
+                venta_vieja = Venta.objects.get(lote_id=lote_viejo.id)
+                
+                #Se obtienen los pagos de la venta vieja
+                pagos_viejos = PagoDeCuotas.objects.filter(venta_id= venta_vieja.id)
+                
+                #Se setean los datos de la venta nueva
+                venta_nueva = Venta()
+                venta_nueva.fecha_de_venta = fecha_cambio_parsed
+                venta_nueva.cliente = Cliente.objects.get(pk = cliente_id) 
+                venta_nueva.vendedor = venta_vieja.vendedor
+                venta_nueva.plan_de_pago = venta_vieja.plan_de_pago
+                venta_nueva.entrega_inicial = venta_vieja.entrega_inicial
+                venta_nueva.precio_de_cuota = venta_vieja.precio_de_cuota
+                venta_nueva.precio_final_de_venta = venta_vieja.precio_final_de_venta
+                venta_nueva.fecha_primer_vencimiento = venta_vieja.fecha_primer_vencimiento
+                venta_nueva.pagos_realizados = venta_vieja.pagos_realizados
+                venta_nueva.importacion_paralot = False
+                venta_nueva.plan_de_pago_vendedor = venta_vieja.plan_de_pago_vendedor
+                venta_nueva.monto_cuota_refuerzo = venta_vieja.monto_cuota_refuerzo
+                
+                #Se cambia el estado a vendido del nuevo lote 
+                lote_nuevo.estado="3"
+                lote_nuevo.save()
+                
+                #Se crea la nueva venta
+                venta_nueva.lote = lote_nuevo
+                venta_nueva.save()
+                
+                #Se crean los pagos de la nueva venta a partir de los pagos viejos
+                for pago_viejo in pagos_viejos:
+                    pago_nuevo = PagoDeCuotas()
+                    pago_nuevo.venta = venta_nueva
+                    #pago_nuevo.transaccion = pago_viejo.transaccion
+                    pago_nuevo.lote = lote_nuevo
+                    pago_nuevo.fecha_de_pago = pago_viejo.fecha_de_pago
+                    pago_nuevo.nro_cuotas_a_pagar = pago_viejo.nro_cuotas_a_pagar
+                    pago_nuevo.cliente = venta_nueva.cliente
+                    pago_nuevo.plan_de_pago = pago_viejo.plan_de_pago
+                    pago_nuevo.plan_de_pago_vendedores = pago_viejo.plan_de_pago_vendedores
+                    pago_nuevo.vendedor = pago_viejo.vendedor
+                    pago_nuevo.total_de_cuotas = pago_viejo.total_de_cuotas
+                    pago_nuevo.total_de_mora = pago_viejo.total_de_mora
+                    pago_nuevo.total_de_pago = pago_viejo.total_de_pago
+                    #pago_nuevo.factura = pago_viejo.factura
+                    pago_nuevo.detalle = pago_viejo.detalle
+                    pago_nuevo.save()
+                
+                #Se eliminan los pagos de la venta vieja
+                pagos_viejos.delete()
+                #Se Elimina la vieja venta
+                venta_vieja.delete()
+                
+                #Se Pone el lote viejo como lote libre
+                lote_viejo.estado="1"
+                lote_viejo.save()
+                
+                #Se crea el registro del cambio del lote
                 nuevo_cambio = CambioDeLotes()       
                 nuevo_cambio.lote_a_cambiar_id = lote_original_id
                 nuevo_cambio.fecha_de_cambio = fecha_cambio_parsed
                 nuevo_cambio.cliente_id = cliente_id 
                 nuevo_cambio.lote_nuevo_id = lote_nuevo_id
-                
-                
-                lote_nuevo = Lote.objects.get(pk=lote_nuevo_id)
-                lote_nuevo.estado="3"
-                lote_nuevo.save()
-                
-                lote_viejo = Lote.objects.get(pk=lote_original_id)
-                lote_viejo.estado="1"
-                lote_viejo.save()
-                
                 nuevo_cambio.save()
-                
             
             c = RequestContext(request, {
         
