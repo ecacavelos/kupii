@@ -367,7 +367,8 @@ function calcularInteres() {
                 var f1 = $(".fecha_pago").val().split("/");
                 var fecha_pago = new Date(f1[2], f1[1] - 1, f1[0]);
                 //alert(fecha_pago);
-				for(i=0;i<nro_cuotas_a_pagar;i++){
+				//for(i=0;i<nro_cuotas_a_pagar;i++){
+				for(i=0;i<detalle.length;i++){
                     var f2 = (detalle[i]['vencimiento_gracia']).split("/");
                     var fecha_vencimiento_pago = new Date(f2[2], f2[1] - 1, f2[0]);
                     //alert(fecha_vencimiento_pago);
@@ -403,7 +404,8 @@ function dibujarDetalle() {
     var nro_cuotas_a_pagar = $('#nro_cuotas_a_pagar').val();
     console.log(detalle);
     if (detalle.length > 0) {
-        for (i = 0; i < nro_cuotas_a_pagar; i++) {
+        //for (i = 0; i < nro_cuotas_a_pagar; i++) {
+        for (i = 0; i < detalle.length; i++) {	
             modal_html +='<tr style="text-align:center;"><td style="text-align:center;">' + detalle[i]['nro_cuota'] + '</td><td style="text-align:center;">' +
             detalle[i]['vencimiento'] + '</td><td style="text-align:center;">' + detalle[i]['dias_atraso'] +
             '</td><td style="text-align:center;"><input style="width: 70px;" class="interes" id="interes_' + i + '" type="number" value=' + f(detalle[i]['intereses']).replace(/\./g, '') + '></td></tr>';
@@ -653,7 +655,7 @@ function generarDetalleJSON(){
 		var nro_cuotas_a_pagar = $('#nro_cuotas_a_pagar').val();
 		size=detalle.length
 		if (detalle.length > 0) {
-			for (i = 0; i < nro_cuotas_a_pagar; i++) {
+			for (i = 0; i < size; i++) {
 				nro_cuota=detalle[i]['nro_cuota'];
 				intereses=detalle[i]['intereses'];
 				key= 'item' + i

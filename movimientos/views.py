@@ -323,8 +323,9 @@ def calcular_interes(request):
             fecha_pago_parsed = datetime.datetime.strptime(data.get('fecha_pago'), "%d/%m/%Y").date()
 
             proximo_vencimiento_parsed = datetime.datetime.strptime(data.get('proximo_vencimiento'), "%d/%m/%Y").date()
-
             
+            nro_cuotas_a_pagar = data.get('nro_cuotas_a_pagar')
+             
             detalles = obtener_detalle_interes_lote(lote_id,fecha_pago_parsed,proximo_vencimiento_parsed)
 
             return HttpResponse(json.dumps(detalles),content_type="application/json")
