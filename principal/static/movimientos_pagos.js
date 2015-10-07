@@ -368,19 +368,34 @@ function calcularInteres() {
                 var fecha_pago = new Date(f1[2], f1[1] - 1, f1[0]);
                 //alert(fecha_pago);
 				//for(i=0;i<nro_cuotas_a_pagar;i++){
-				for(i=0;i<detalle.length;i++){
-                    var f2 = (detalle[i]['vencimiento_gracia']).split("/");
-                    var fecha_vencimiento_pago = new Date(f2[2], f2[1] - 1, f2[0]);
-                    //alert(fecha_vencimiento_pago);
-                    if(fecha_pago>fecha_vencimiento_pago){
-                        console.log("Sumando intereses");
-                        intereses+=detalle[i]['intereses'];
-                    }
+				
+			for ( i = 0; i < detalle.length; i++) {
+				if (i < 6) {
+					var f2 = (detalle[i]['vencimiento_gracia']).split("/");
+					var fecha_vencimiento_pago = new Date(f2[2], f2[1] - 1, f2[0]);
+					//alert(fecha_vencimiento_pago);
+					if (fecha_pago > fecha_vencimiento_pago) {
+						console.log("Sumando intereses");
+						intereses += detalle[i]['intereses'];
+					}
+				} else {
+					if (i >= 6 && i != (detalle.length - 1)) {
+						var f2 = (detalle[i]['vencimiento_gracia']).split("/");
+						var fecha_vencimiento_pago = new Date(f2[2], f2[1] - 1, f2[0]);
+						//alert(fecha_vencimiento_pago);
+						if (fecha_pago > fecha_vencimiento_pago) {
+							console.log("Sumando intereses");
+							intereses += detalle[i]['intereses'];
+						}
+					} else {
+						gestion_cobranza = detalle[detalle.length-1]['gestion_cobranza']
+					}
 				}
+			}
 
-                if(detalle[detalle.length-1]['gestion_cobranza']){
-                    gestion_cobranza=detalle[detalle.length-1]['gestion_cobranza'];
-                }
+                //if(detalle[detalle.length-1]['gestion_cobranza']){
+                //    gestion_cobranza=detalle[detalle.length-1]['gestion_cobranza'];
+                //}
 			}
 
 			detalle_interes = generarDetalleJSON();			
@@ -405,13 +420,25 @@ function dibujarDetalle() {
     console.log(detalle);
     if (detalle.length > 0) {
         //for (i = 0; i < nro_cuotas_a_pagar; i++) {
-        for (i = 0; i < detalle.length; i++) {	
-            modal_html +='<tr style="text-align:center;"><td style="text-align:center;">' + detalle[i]['nro_cuota'] + '</td><td style="text-align:center;">' +
-            detalle[i]['vencimiento'] + '</td><td style="text-align:center;">' + detalle[i]['dias_atraso'] +
-            '</td><td style="text-align:center;"><input style="width: 70px;" class="interes" id="interes_' + i + '" type="number" value=' + f(detalle[i]['intereses']).replace(/\./g, '') + '></td></tr>';
-            if (i==nro_cuotas_a_pagar-1) {
-            	modal_html +='</table><br>Fecha ultimo vencimiento con 5 dias de gracia: ' + detalle[i]['vencimiento_gracia'] + '</br>';
-            }
+        for (i = 0; i < detalle.length; i++) {
+        	if (i<6){	
+	            modal_html +='<tr style="text-align:center;"><td style="text-align:center;">' + detalle[i]['nro_cuota'] + '</td><td style="text-align:center;">' +
+	            detalle[i]['vencimiento'] + '</td><td style="text-align:center;">' + detalle[i]['dias_atraso'] +
+	            '</td><td style="text-align:center;"><input style="width: 70px;" class="interes" id="interes_' + i + '" type="number" value=' + f(detalle[i]['intereses']).replace(/\./g, '') + '></td></tr>';
+	            
+	            if (i == detalle.length-1) {
+	            	modal_html +='</table><br>Fecha ultimo vencimiento con 5 dias de gracia: ' + detalle[i]['vencimiento_gracia'] + '</br>';
+	            }
+	            
+	        } else if (i>= 6 && i != detalle.length-1){
+	        	modal_html +='<tr style="text-align:center;"><td style="text-align:center;">' + detalle[i]['nro_cuota'] + '</td><td style="text-align:center;">' +
+	            detalle[i]['vencimiento'] + '</td><td style="text-align:center;">' + detalle[i]['dias_atraso'] +
+	            '</td><td style="text-align:center;"><input style="width: 70px;" class="interes" id="interes_' + i + '" type="number" value=' + f(detalle[i]['intereses']).replace(/\./g, '') + '></td></tr>';
+	            
+	            
+	        } else {
+	        	modal_html +='</table><br>Fecha ultimo vencimiento con 5 dias de gracia: ' + detalle[i-1]['vencimiento_gracia'] + '</br>';
+	        }
         }
         if(detalle[detalle.length-1]['gestion_cobranza']){
             modal_html +='</tr><td>Gestion de Cobranza: </td><td><input style="width: 100px;" class="interes" id="id_gestion_cobranza" type="number" value=' + f(detalle[detalle.length-1]['gestion_cobranza']).replace(/\./g, '') + '></td></tr>';
