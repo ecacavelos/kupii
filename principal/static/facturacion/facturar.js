@@ -3,22 +3,15 @@
 	var total_iva_10 = 0;
 	var total_iva_5 = 0;
 	var detalle_valido = true;
-	item_detalle_factura = '<div class="item-detalle">'
-			+ '<input type="text" class= "cantidad-item item" placeholder="Cantidad" size="2" value="">'
-			+ '<input type="text" class="concepto-factura item" placeholder="Concepto">'
-			+ '<input type="text" class= "precio_unitario-item item" placeholder="Precio unitario">'
-			+ '<input type="text" class= "exentas-item item" placeholder="Exentas">'
-			+ '<input type="text" class= "iva_5-item item" placeholder="IVA 5%">'
-			+ '<input type="text" class= "iva_10-item item" placeholder="IVA 10%">'
-			+ '<a href="#" class="add-btn">+</a>'
-		    + '</div>';
+	var cantidad_detalles = 1;
+	
 		item_inicial_detalle_factura = '<div class="item-detalle">'
-			+ '<input type="text" class= "cantidad-item item" placeholder="Cantidad" size="2" value="">'
-			+ '<input type="text" class="concepto-factura item" placeholder="Concepto">'
-			+ '<input type="text" class= "precio_unitario-item item" placeholder="Precio unitario">'
-			+ '<input type="text" class= "exentas-item item" placeholder="Exentas">'
-			+ '<input type="text" class= "iva_5-item item" placeholder="IVA 5%">'
-			+ '<input type="text" class= "iva_10-item item" placeholder="IVA 10%">'
+			+ '<input type="number" id="id_detalle_cantidad_1" class= "cantidad-item item" placeholder="Cantidad" size="2" value="" style="width:60px;">'
+			+ '<input type="text" id="id_detalle_concepto_1" class="concepto-factura item" placeholder="Concepto">'
+			+ '<input type="text" id="id_detalle_precio_unitario_1" class= "precio_unitario-item item" placeholder="Precio unitario">'
+			+ '<input type="text" id="id_detalle_exentas_1" class= "exentas-item item" placeholder="Exentas">'
+			+ '<input type="text" id="id_detalle_iva5_1" class= "iva_5-item item" placeholder="IVA 5%">'
+			+ '<input type="text" id="id_detalle_iva10_1" class= "iva_10-item item" placeholder="IVA 10%">'
 			+ '<a href="#" class="add-btn">+</a>'
 		    + '</div>';
 	$(document).ready(function() {
@@ -81,8 +74,11 @@
 			}
 		});
 		
+		
+		
 		// 2. Se agrega el primer item (al menos debe existir 1).
 		$('.detalle_factura').append(item_inicial_detalle_factura);
+		aplicarFuncionesDetalles();
 		
 		
 		// 3. Para agregar un item.		
@@ -90,15 +86,30 @@
 			// $('.detalle_factura').append(item_detalle_factura);
 		// });		
 		$('.detalle_factura').on("click",".add-btn", function(e){ 
-        	e.preventDefault();         
+        	e.preventDefault();
+        	
+        	cantidad_detalles++;
+        	
+        	item_detalle_factura = '<div class="item-detalle">'
+			+ '<input type="number" id="id_detalle_cantidad_'+cantidad_detalles+'" class= "cantidad-item item" placeholder="Cantidad" size="2" value="" style="width:60px;">'
+			+ '<input type="text" id="id_detalle_concepto_'+cantidad_detalles+'" class="concepto-factura item" placeholder="Concepto">'
+			+ '<input type="text" id="id_detalle_precio_unitario_'+cantidad_detalles+'" class= "precio_unitario-item item" placeholder="Precio unitario">'
+			+ '<input type="text" id="id_detalle_exentas_'+cantidad_detalles+'" class= "exentas-item item" placeholder="Exentas">'
+			+ '<input type="text" id="id_detalle_iva5_'+cantidad_detalles+'" class= "iva_5-item item" placeholder="IVA 5%">'
+			+ '<input type="text" id="id_detalle_iva10_'+cantidad_detalles+'" class= "iva_10-item item" placeholder="IVA 10%">'
+			+ '<a href="#" class="add-btn">+</a>'
+		    + '</div>';
+        	         
         	$('.detalle_factura').append(item_detalle_factura); 
         	$(this).attr('class', 'rm-btn');
         	$(this).html('-');
+        	aplicarFuncionesDetalles();
     	});
 		
 		//4. Para eliminar un item.
 		$('.detalle_factura').on("click",".rm-btn", function(e){ 
-        	e.preventDefault();         
+        	e.preventDefault();
+        	cantidad_detalles = cantidad_detalles-1;         
         	$(this).parent('div').remove(); 
     	});
     	
@@ -568,4 +579,75 @@ function getCurrentDate(){
 	
 	today = dd+ '/'+mm+'/'+yyyy;
 	return today;
+}
+
+function aplicarFuncionesDetalles(){
+	//alert("Hola");
+	// Autocomplete concepto factura
+		$(".concepto-factura").autocomplete({
+			source : "/ajax/get_concepto_factura_by_name/",
+			minLength : 1,
+			create : function(){
+				$(this).data('ui-autocomplete')._renderItem = function(ul,item){
+					return $('<li>').append('<a>' +item.descripcion+'</a>').appendTo(ul);
+					};
+			},
+			select : function(event, ui) {
+				concepto_id = ui.item.pk;
+				//obtengo el id del obejto que activo el evento
+                var current_id = event.target.id;
+                current_id = current_id.split("_");
+                current_id = current_id[3];
+				$("#id_detalle_concepto_"+current_id).val (ui.item.descripcion);
+				$("#id_detalle_precio_unitario_"+current_id).val(ui.item.precio_unitario);
+				//name_cliente=ui.item.fields.nombres+" "+ui.item.fields.apellidos;
+				//$("#id_name_cliente").val(name_cliente);
+				if (ui.item.exentas){
+					$("#id_detalle_exentas_"+current_id).val(0);
+					$("#id_detalle_exentas_"+current_id).val(ui.item.precio_unitario*parseInt($("#id_detalle_cantidad_"+current_id).val()));
+				} else {
+					$("#id_detalle_exentas_"+current_id).val(0);
+				}
+				if (ui.item.iva5){
+					$("#id_detalle_iva5_"+current_id).val(0);
+					$("#id_detalle_iva5_"+current_id).val(ui.item.precio_unitario*parseInt($("#id_detalle_cantidad_"+current_id).val()));
+				} else {
+					$("#id_detalle_iva5_"+current_id).val(0);
+				}
+				if (ui.item.iva10){
+					$("#id_detalle_iva10_"+current_id).val(0);
+					$("#id_detalle_iva10_"+current_id).val(ui.item.precio_unitario*parseInt($("#id_detalle_cantidad_"+current_id).val()));
+				} else {
+					$("#id_detalle_iva10_"+current_id).val(0);
+				}	
+				//$(this).trigger('change'); 
+	    		return false; 
+			}
+		});
+		
+		$('.cantidad-item').change(function() {
+			//obtengo el id del obejto que activo el evento
+                var current_id = this.id;
+                current_id = current_id.split("_");
+                current_id = current_id[3];
+  			if ($("#id_detalle_exentas_"+current_id).val() != 0){
+  					$("#id_detalle_exentas_"+current_id).val(0);
+					$("#id_detalle_exentas_"+current_id).val(parseInt($("#id_detalle_precio_unitario_"+current_id).val())*parseInt($("#id_detalle_cantidad_"+current_id).val()));
+				} else {
+					$("#id_detalle_exentas_"+current_id).val(0);
+				}
+				if ($("#id_detalle_iva5_"+current_id).val() != 0){
+					$("#id_detalle_iva5_"+current_id).val(0);
+					$("#id_detalle_iva5_"+current_id).val(parseInt($("#id_detalle_precio_unitario_"+current_id).val())*parseInt($("#id_detalle_cantidad_"+current_id).val()));
+				} else {
+					$("#id_detalle_iva5_"+current_id).val(0);
+				}
+				if ($("#id_detalle_iva10_"+current_id).val() != 0){
+					$("#id_detalle_iva10_"+current_id).val(0);
+					$("#id_detalle_iva10_"+current_id).val(parseInt($("#id_detalle_precio_unitario_"+current_id).val())*parseInt($("#id_detalle_cantidad_"+current_id).val()));
+				} else {
+					$("#id_detalle_iva10_"+current_id).val(0);
+				}
+		});
+	
 }

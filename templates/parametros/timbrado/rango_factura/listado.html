@@ -66,11 +66,12 @@
 </div>
 <div id="listado-item-lote">
 		<table border="1" cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
-				<th>ID</th><th>Nro Sucursal</th><th>Nro Boca</th><th>Nro Desde</th><th>Nro Hasta</th><th>Usuario</th>
+				<th>ID</th><th>Timbrado</th><th>Nro Sucursal</th><th>Nro Boca</th><th>Nro Desde</th><th>Nro Hasta</th><th>Usuario</th>
 				{% for rango_factura in object_list %}
 				{% if forloop.counter|divisibleby:2 %}
 					<tr>
 						<td><a href="{{rango_factura.id}}">{{rango_factura.id}} <strong>(Ver Detalles)</strong></a></td>
+						<td></td>
 						<td>{{rango_factura.nro_sucursal}}</td>
 						<td>{{rango_factura.nro_boca}}</td>
 						<td>{{rango_factura.nro_desde}}</td>
@@ -80,6 +81,7 @@
 					{% else %}
 					<tr class="bkg_gris">
 						<td><a href="{{rango_factura.id}}">{{rango_factura.id}} <strong>(Ver Detalles)</strong></a></td>
+						<td></td>
 						<td>{{rango_factura.nro_sucursal}}</td>
 						<td>{{rango_factura.nro_boca}}</td>
 						<td>{{rango_factura.nro_desde}}</td>

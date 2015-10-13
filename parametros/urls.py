@@ -20,6 +20,12 @@ urlpatterns = patterns('parametros.views',
     url(r'^timbrado/listado_busqueda_timbrado/$', 'listar_busqueda_timbrado'),
     url(r'^timbrado/agregar/$', 'agregar_timbrado'),
     
+    url(r'^concepto_factura/$', 'concepto_factura'),
+    url(r'^concepto_factura/listado/$', 'consultar_concepto_factura'),
+    url(r'^concepto_factura/listado/(?P<concepto_factura_id>\d+)/$', 'detalle_concepto_factura'),
+    url(r'^concepto_factura/listado_busqueda_timbrado/$', 'listar_busqueda_concepto_factura'),
+    url(r'^concepto_factura/agregar/$', 'agregar_concepto_factura'),
+    
     url(r'^timbrado/listado/(?P<timbrado_id>\d+)/rango_factura/$', 'rango_factura'),
     url(r'^timbrado/listado/(?P<timbrado_id>\d+)/rango_factura/listado/$', 'consultar_rango_factura'),
     url(r'^timbrado/listado/(?P<timbrado_id>\d+)/rango_factura/listado/(?P<rango_factura_id>\d+)/$', 'detalle_rango_factura'),

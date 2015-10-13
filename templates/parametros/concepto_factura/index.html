@@ -1,0 +1,14 @@
+{% extends "lotes/base_lotes.html" %}
+
+{% block content %}
+<div class="gri16 text-izquierda" id="breadcumb">
+	<a href="{% url 'frontend_home' %}">Inicio</a> 
+	<a href="{% url 'frontend_home' %}parametros/">> Parametros</a>
+	<span class="verde-1">> Conceptos de Facturas</span> 
+</div>
+<a href="listado" class="boton-verde">Consultar Conceptos de Facturas</a>
+<br><br><br>
+<a href="agregar" class="boton-verde">Agregar Conceptos de Facturas</a><br>
+<br><br><br>
+<a href="{% url 'frontend_home' %}parametros/" class="boton-verde">Volver a Parametros</a>
+{% endblock %}

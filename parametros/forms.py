@@ -1,8 +1,8 @@
 from django import forms
 from django.forms import Form, ModelForm
 from django.forms.models import modelformset_factory
-from principal.models import PlanDePago, PlanDePagoVendedor, Timbrado, RangoFactura
-from django.forms.widgets import TextInput, Textarea
+from principal.models import PlanDePago, PlanDePagoVendedor, Timbrado, RangoFactura, ConceptoFactura
+from django.forms.widgets import TextInput, Textarea, CheckboxInput
 from django.contrib.auth.models import User
 # Create the form class.
 class PlanDePagoForm(ModelForm):
@@ -54,6 +54,34 @@ class SearchForm(Form):
     filtro = forms.ChoiceField(choices=SEARCH_CHOICES)
     
 TimbradoFormSet = modelformset_factory(Timbrado, extra=0, can_order=True)
+
+# Create the form class.
+class ConceptoFacturaForm(ModelForm):
+    required_css_class = 'required'
+    class Meta:
+        model = ConceptoFactura
+        exclude = ['deuda_contraida']
+        
+        widgets = {
+                 'descripcion': TextInput,
+                 'precio_unitario': TextInput,
+                 'exentas': CheckboxInput,
+                 'iva10': CheckboxInput,
+                 'iva5': CheckboxInput,
+                 
+         }
+        
+class SearchForm(Form):
+    buscar = forms.CharField(max_length=100)
+    SEARCH_CHOICES = (
+        ("N", "Nombre del plan"),
+        ("T", "Tipo del plan"),
+        ("C", "Cantidad de cuotas"),
+        ("I", "ID"),
+    )
+    filtro = forms.ChoiceField(choices=SEARCH_CHOICES)
+    
+ConceptoFacturaFormSet = modelformset_factory(ConceptoFactura, extra=0, can_order=True)
 
 # Create the form class.
 class RangoFacturaForm(ModelForm):

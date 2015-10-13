@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.views.decorators.http import require_http_methods
 from django.template import RequestContext, loader
 from django.core import serializers
-from principal.models import Fraccion, Manzana, Venta, PagoDeCuotas, Propietario, Lote, Cliente, Vendedor, PlanDePago, PlanDePagoVendedor,Timbrado, RecuperacionDeLotes, Factura, TimbradoRangoFacturaUsuario, RangoFactura
+from principal.models import Fraccion, Manzana, Venta, PagoDeCuotas, Propietario, Lote, Cliente, Vendedor, PlanDePago, PlanDePagoVendedor,Timbrado, RecuperacionDeLotes, Factura, TimbradoRangoFacturaUsuario, RangoFactura, ConceptoFactura
 from django.core.urlresolvers import reverse, resolve
 from principal.common_functions import *
 from django.core.serializers.json import DjangoJSONEncoder
@@ -42,7 +42,23 @@ def get_propietario_id_by_name(request):
                 print error
                 #return HttpResponseServerError('No se pudo procesar el pedido')
         else:
-            return HttpResponseRedirect(reverse('login')) 
+            return HttpResponseRedirect(reverse('login'))
+        
+@require_http_methods(["GET"])
+def get_concepto_factura_by_name(request):
+    if request.method == 'GET':
+        if request.user.is_authenticated():
+            try:            
+                name_concepto_factura = request.GET['term']
+                print("term ->" + name_concepto_factura)
+                object_list = ConceptoFactura.objects.filter(descripcion__icontains = name_concepto_factura)
+                labels=["descripcion"]
+                return HttpResponse(json.dumps(custom_json(object_list,labels), cls=DjangoJSONEncoder), content_type="application/json")
+            except Exception, error:
+                print error
+                #return HttpResponseServerError('No se pudo procesar el pedido')
+        else:
+            return HttpResponseRedirect(reverse('login'))  
 
 @require_http_methods(["GET"])
 def get_vendedor_name_id_by_cedula(request):
@@ -568,11 +584,7 @@ def facturar(request):
             #Obtener el detalle
             detalle = request.POST.get('detalle','')
             
-            #obtener numero de cuotas
-            numero_cuota_desde = request.POST.get('nro_cuota_desde','').split("/") 
-            numero_cuota_hasta= request.POST.get('nro_cuota_hasta','').split("/")
-            num_desde = int(numero_cuota_desde[0])
-            num_hasta = int(numero_cuota_hasta[0])
+            
             #Crear un objeto Factura y guardar            
             nueva_factura = Factura()
             nueva_factura.fecha = fecha
@@ -584,13 +596,22 @@ def facturar(request):
             nueva_factura.detalle = detalle
             nueva_factura.lote = lote_id 
             nueva_factura.save()
-            venta = Venta.objects.get(cliente_id= nueva_factura.cliente.id, lote_id= lote_id.id)
-            object_list= get_pago_cuotas(venta, None, None)
-            for x in xrange(0,len(object_list)):
-                if num_desde <= int(object_list[x]['nro_cuota']) <= num_hasta:
-                    pago = PagoDeCuotas.objects.get(pk=object_list[x]['id'])
-                    pago.factura = nueva_factura
-                    pago.save() 
+            #obtener numero de cuotas
+            numero_cuota_desde = request.POST.get('nro_cuota_desde','')
+            numero_cuota_hasta= request.POST.get('nro_cuota_hasta','')
+            if numero_cuota_desde != '' and numero_cuota_hasta !='':
+                numero_cuota_desde = request.POST.get('nro_cuota_desde','').split("/") 
+                numero_cuota_hasta= request.POST.get('nro_cuota_hasta','').split("/")
+                num_desde = int(numero_cuota_desde[0])
+                num_hasta = int(numero_cuota_hasta[0])
+                
+                venta = Venta.objects.get(cliente_id= nueva_factura.cliente.id, lote_id= lote_id.id)
+                object_list= get_pago_cuotas(venta, None, None)
+                for x in xrange(0,len(object_list)):
+                    if num_desde <= int(object_list[x]['nro_cuota']) <= num_hasta:
+                        pago = PagoDeCuotas.objects.get(pk=object_list[x]['id'])
+                        pago.factura = nueva_factura
+                        pago.save() 
             response = HttpResponse(content_type='application/pdf')
             
             nombre_factura = "factura-" + nueva_factura.numero + ".pdf"

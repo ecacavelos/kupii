@@ -64,6 +64,25 @@ class Propietario(models.Model):
             ('ver_listado_propietarios', 'Ver listado de propietarios'),
             ('ver_opciones_propietario', 'Ver opciones de propietarios'),
         )
+        
+class ConceptoFactura(models.Model):
+    descripcion = models.CharField(max_length=255)
+    precio_unitario = models.IntegerField()
+    exentas = models.CharField(max_length=255, blank=True)
+    iva5 = models.BooleanField()
+    iva10 = models.BooleanField()
+    
+    def __unicode__(self):
+        return u'%s %s' % (self.descripcion)
+    def as_json(self):
+        return dict(
+            label= self.descripcion,
+            id=self.id)
+    class Meta:
+        permissions = (
+            ('ver_listado_concepto_factura', 'Ver listado de conceptos de factura'),
+            ('ver_opciones_concepto_factura', 'Ver opciones de conceptos de factura'),
+        )
 
 class Fraccion(models.Model):
     id=models.IntegerField(primary_key=True)
