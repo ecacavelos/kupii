@@ -649,5 +649,30 @@ function aplicarFuncionesDetalles(){
 					$("#id_detalle_iva10_"+current_id).val(0);
 				}
 		});
+		
+		$('.precio_unitario-item').keyup(function() {
+			//obtengo el id del obejto que activo el evento
+                var current_id = this.id;
+                current_id = current_id.split("_");
+                current_id = current_id[4];
+  			if ($("#id_detalle_exentas_"+current_id).val() != 0){
+  					$("#id_detalle_exentas_"+current_id).val(0);
+					$("#id_detalle_exentas_"+current_id).val(parseInt($("#id_detalle_precio_unitario_"+current_id).val())*parseInt($("#id_detalle_cantidad_"+current_id).val()));
+				} else {
+					$("#id_detalle_exentas_"+current_id).val(0);
+				}
+				if ($("#id_detalle_iva5_"+current_id).val() != 0){
+					$("#id_detalle_iva5_"+current_id).val(0);
+					$("#id_detalle_iva5_"+current_id).val(parseInt($("#id_detalle_precio_unitario_"+current_id).val())*parseInt($("#id_detalle_cantidad_"+current_id).val()));
+				} else {
+					$("#id_detalle_iva5_"+current_id).val(0);
+				}
+				if ($("#id_detalle_iva10_"+current_id).val() != 0){
+					$("#id_detalle_iva10_"+current_id).val(0);
+					$("#id_detalle_iva10_"+current_id).val(parseInt($("#id_detalle_precio_unitario_"+current_id).val())*parseInt($("#id_detalle_cantidad_"+current_id).val()));
+				} else {
+					$("#id_detalle_iva10_"+current_id).val(0);
+				}
+		});
 	
 }
