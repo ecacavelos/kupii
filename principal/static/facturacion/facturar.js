@@ -20,6 +20,8 @@
 		$("#id_name_cliente").focus();
 		
 		
+		
+		
 		//Configuraciones del datepicker
 		$("#fecha").datepicker();
 		//$("#fecha").datepicker('setDate', new Date());
@@ -251,7 +253,17 @@
 			if (formOk()){
 				//2. Obtener el JSON del detalle
 				detalle = generarDetalleJSON();			
-				$("#detalle").val(detalle);										
+				$("#detalle").val(detalle);
+				
+				/*
+				$('#total-exentas').val( sacarPuntos( $('#total-exentas').val() ) );
+				$('#total-iva_10').val( sacarPuntos( $('#total-iva_10').val() ) );
+				$('#total-iva_5').val( sacarPuntos( $('#total-iva_5').val() ) );
+				$('#total').val( sacarPuntos( $('#total').val() ) );
+				$('#liquidacion-iva_10').val( sacarPuntos( $('#liquidacion-iva_10').val() ) );
+				$('#liquidacion-iva_5').val( sacarPuntos( $('#liquidacion-iva_5').val() ) );
+				$('#liquidacion-iva').val( sacarPuntos( $('#liquidacion-iva').val() ) );
+				*/										
 				return true;		    						
 			}
 			else{
@@ -337,12 +349,12 @@
 			// Agregamos el elemento mas externo
 			i = index + 1;			
 			//Se obtienen los datos.
-			cantidad = $(this).find(".cantidad-item").val();
+			cantidad = sacarPuntos($(this).find(".cantidad-item").val());
 			concepto = $(this).find(".concepto-factura").val();
-			precio_unitario = $(this).find(".precio_unitario-item").val();
-			exentas = $(this).find(".exentas-item").val();
-			iva_10 = $(this).find(".iva_10-item").val();
-			iva_5 = $(this).find(".iva_5-item").val();
+			precio_unitario = sacarPuntos($(this).find(".precio_unitario-item").val());
+			exentas = sacarPuntos($(this).find(".exentas-item").val());
+			iva_10 = sacarPuntos($(this).find(".iva_10-item").val());
+			iva_5 = sacarPuntos($(this).find(".iva_5-item").val());
 			
 			key = 'item' + i;
 			value = {cantidad : cantidad, concepto : concepto, precio_unitario : precio_unitario, exentas : exentas, iva_10 : iva_10, iva_5 : iva_5 };
@@ -374,16 +386,16 @@
 		var len = $('.item-detalle').length;
 		$(".item-detalle").each(function(index, element ){
 		
-			cantidad = $(this).find(".cantidad-item").val();
+			cantidad = sacarPuntos($(this).find(".cantidad-item").val());
 			cantidad = parseInt(cantidad) || 0;
 			concepto = $(this).find(".concepto-factura").val();
-			precio_unitario = $(this).find(".precio_unitario-item").val();
+			precio_unitario = sacarPuntos($(this).find(".precio_unitario-item").val());
 			precio_unitario = parseInt(precio_unitario) || 0;
 			exentas = $(this).find(".exentas-item").val();
 			exentas = parseInt(exentas) || 0;
-			iva_10 = $(this).find(".iva_10-item").val();
+			iva_10 = sacarPuntos($(this).find(".iva_10-item").val());
 			iva_10 = parseInt(iva_10) || 0;
-			iva_5 = $(this).find(".iva_5-item").val();
+			iva_5 = sacarPuntos($(this).find(".iva_5-item").val());
 			iva_5 = parseInt(iva_5) || 0;
 			total_exentas += exentas;
 			total_iva_10 += iva_10;
@@ -424,7 +436,15 @@
 		$('#liquidacion-iva_10').val(iva_10.toString());
 		iva_5 = (Math.round(total_iva_5/21));
 		$('#liquidacion-iva_5').val(iva_5.toString());
-		$('#liquidacion-iva').val((iva_5 + iva_10).toString());		
+		$('#liquidacion-iva').val((iva_5 + iva_10).toString());
+		
+		$('#total-exentas').mask('###.###.###',{reverse: true});
+		$('#total-iva_10').mask('###.###.###',{reverse: true});
+		$('#total-iva_5').mask('###.###.###',{reverse: true});
+		$('#total').mask('###.###.###',{reverse: true});
+		$('#liquidacion-iva_10').mask('###.###.###',{reverse: true});
+		$('#liquidacion-iva_5').mask('###.###.###',{reverse: true});
+		$('#liquidacion-iva').mask('###.###.###',{reverse: true});		
 	}
 	function limpiarLiquidacion(){
 		$('#total-exentas').val('');
@@ -669,10 +689,37 @@ function aplicarFuncionesDetalles(){
 				}
 				if ($("#id_detalle_iva10_"+current_id).val() != 0){
 					$("#id_detalle_iva10_"+current_id).val(0);
-					$("#id_detalle_iva10_"+current_id).val(parseInt($("#id_detalle_precio_unitario_"+current_id).val())*parseInt($("#id_detalle_cantidad_"+current_id).val()));
+					$("#id_detalle_iva10_"+current_id).val(parseInt(sacarPuntos($("#id_detalle_precio_unitario_"+current_id).val()))*parseInt($("#id_detalle_cantidad_"+current_id).val()));
 				} else {
 					$("#id_detalle_iva10_"+current_id).val(0);
 				}
+				
+				$("#id_detalle_precio_unitario_"+current_id).mask('###.###.###',{reverse: true});
+				$("#id_detalle_exentas_"+current_id).mask('###.###.###',{reverse: true});
+				$("#id_detalle_iva5_"+current_id).mask('###.###.###',{reverse: true});
+				$("#id_detalle_iva10_"+current_id).mask('###.###.###',{reverse: true});
+				validarDetalle();
 		});
+		
+		$("#id_detalle_precio_unitario_1").mask('###.###.###',{reverse: true});
+		$("#id_detalle_exentas_1").mask('###.###.###',{reverse: true});
+		$("#id_detalle_iva5_1").mask('###.###.###',{reverse: true});
+		$("#id_detalle_iva10_1").mask('###.###.###',{reverse: true});
 	
+}
+
+function sacarPuntos(numero){
+	
+	numero =numero.replace(".", "");
+	numero =numero.replace(".", "");
+	numero =numero.replace(".", "");
+	numero =numero.replace(".", "");
+	numero =numero.replace(".", "");
+	
+	return (numero);
+}
+
+function ponerPuntos(numero){
+	
+	return (numero);
 }
