@@ -540,8 +540,8 @@ def liquidacion_propietarios(request):
                     try:             
                         fecha_ini = request.GET['fecha_ini']
                         fecha_fin = request.GET['fecha_fin']
-                        fecha_ini_parsed = datetime.strptime(fecha_ini, "%d/%m/%Y").date()
-                        fecha_fin_parsed = datetime.strptime(fecha_fin, "%d/%m/%Y").date()
+                        fecha_ini_parsed = datetime.datetime.strptime(fecha_ini, "%d/%m/%Y").date()
+                        fecha_fin_parsed = datetime.datetime.strptime(fecha_fin, "%d/%m/%Y").date()
                         tipo_busqueda = request.GET['tipo_busqueda']
                         filas = []
                         lista_pagos = []
