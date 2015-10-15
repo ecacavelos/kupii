@@ -370,7 +370,7 @@ function calcularInteres() {
 				//for(i=0;i<nro_cuotas_a_pagar;i++){
 				
 			for ( i = 0; i < detalle.length; i++) {
-				if (i < 6) {
+				if (detalle[i]['tipo'] == 'normal' ) {
 					var f2 = (detalle[i]['vencimiento_gracia']).split("/");
 					var fecha_vencimiento_pago = new Date(f2[2], f2[1] - 1, f2[0]);
 					//alert(fecha_vencimiento_pago);
@@ -379,17 +379,7 @@ function calcularInteres() {
 						intereses += detalle[i]['intereses'];
 					}
 				} else {
-					if (i >= 6 && i != (detalle.length - 1)) {
-						var f2 = (detalle[i]['vencimiento_gracia']).split("/");
-						var fecha_vencimiento_pago = new Date(f2[2], f2[1] - 1, f2[0]);
-						//alert(fecha_vencimiento_pago);
-						if (fecha_pago > fecha_vencimiento_pago) {
-							console.log("Sumando intereses");
-							intereses += detalle[i]['intereses'];
-						}
-					} else {
-						gestion_cobranza = detalle[detalle.length-1]['gestion_cobranza']
-					}
+					gestion_cobranza = detalle[detalle.length-1]['gestion_cobranza'];
 				}
 			}
 
@@ -421,7 +411,7 @@ function dibujarDetalle() {
     if (detalle.length > 0) {
         //for (i = 0; i < nro_cuotas_a_pagar; i++) {
         for (i = 0; i < detalle.length; i++) {
-        	if (i<6){	
+        	if (detalle[i]['tipo']== 'normal'){	
 	            modal_html +='<tr style="text-align:center;"><td style="text-align:center;">' + detalle[i]['nro_cuota'] + '</td><td style="text-align:center;">' +
 	            detalle[i]['vencimiento'] + '</td><td style="text-align:center;">' + detalle[i]['dias_atraso'] +
 	            '</td><td style="text-align:center;"><input style="width: 70px;" class="interes" id="interes_' + i + '" type="number" value=' + f(detalle[i]['intereses']).replace(/\./g, '') + '></td></tr>';
@@ -430,33 +420,27 @@ function dibujarDetalle() {
 	            	modal_html +='</table><br>Fecha ultimo vencimiento con 5 dias de gracia: ' + detalle[i]['vencimiento_gracia'] + '</br>';
 	            }
 	            
-	        } else if (i>= 6 && i != detalle.length-1){
-	        	modal_html +='<tr style="text-align:center;"><td style="text-align:center;">' + detalle[i]['nro_cuota'] + '</td><td style="text-align:center;">' +
-	            detalle[i]['vencimiento'] + '</td><td style="text-align:center;">' + detalle[i]['dias_atraso'] +
-	            '</td><td style="text-align:center;"><input style="width: 70px;" class="interes" id="interes_' + i + '" type="number" value=' + f(detalle[i]['intereses']).replace(/\./g, '') + '></td></tr>';
-	            
-	            
 	        } else {
 	        	modal_html +='</table><br>Fecha ultimo vencimiento con 5 dias de gracia: ' + detalle[i-1]['vencimiento_gracia'] + '</br>';
+	        	modal_html +='</tr><td>Gestion de Cobranza: </td><td><input style="width: 100px;" class="interes" id="id_gestion_cobranza" type="number" value=' + f(detalle[i]['gestion_cobranza']).replace(/\./g, '') + '></td></tr>';
 	        }
         }
-        if(detalle[detalle.length-1]['gestion_cobranza']){
-            modal_html +='</tr><td>Gestion de Cobranza: </td><td><input style="width: 100px;" class="interes" id="id_gestion_cobranza" type="number" value=' + f(detalle[detalle.length-1]['gestion_cobranza']).replace(/\./g, '') + '></td></tr>';
-        }
+        
     } else {
     	$('#total_mora').val('');
     	$('#total_mora2').html('');
     }
 
-	modal_html +='<button class="button_verde" id="modificar_mora" data-toggle="modal" data-target=".bs-example-modal-sm" value="Modificar">Modificar</button>';
-	modal_html += '</div>'
+	modal_html +='<input type="button" class="button_verde" id="modificar_mora" value="Modificar"/>';
+	modal_html += '</div>';
 	$('#contenido_modal').append(modal_html);
 	detalle_interes = generarDetalleJSON();			
 	$("#detalle").val(detalle_interes);	
 	$('#modificar_mora').click(function() {
 		this.style.backgroundColor = '#66A385';
 		modificarMontos();
-		return false;
+		$('.close').trigger("click");
+		//return true;
 	});
 }
 
@@ -464,26 +448,29 @@ function dibujarDetalle() {
 function modificarMontos(){
 	var intereses =0;
 	global_intereses =0;
+	var gestion_cobranza = 0;
 	if(detalle.length > 0)
 	{
 		var nro_cuotas_a_pagar=$('#nro_cuotas_a_pagar').val();
-		for(i=0;i<nro_cuotas_a_pagar;i++){
-			detalle[i]['intereses']= parseInt($('#interes_' + i).val());
-			intereses+=detalle[i]['intereses'];
+		for(i=0;i<detalle.length;i++){
+			if (detalle[i]['tipo']=='normal'){
+				detalle[i]['intereses']= parseInt($('#interes_' + i).val());
+				intereses+=detalle[i]['intereses'];
+			} else{
+				detalle[i]['gestion_cobranza'] = parseInt($('#id_gestion_cobranza').val());
+				gestion_cobranza = detalle[i]['gestion_cobranza'];
+			}
+			
 		}
-        //var gestion_cobranza = $("#id_gestion_cobranza").val();
-        //intereses+=parseInt(gestion_cobranza);
-        if(detalle[detalle.length-1]['gestion_cobranza']){
-        	detalle[detalle.length-1]['gestion_cobranza'] = parseInt($('#id_gestion_cobranza').val());
-		}
+        
 	}
 	detalle_interes = generarDetalleJSON();			
 	$("#detalle").val(detalle_interes);
-	global_intereses=intereses;
+	global_intereses=intereses+gestion_cobranza;
 	//calculateTotalCuotas();
 	calculateTotalPago();
 }
-function retrieveCliente() {
+function retrieveCliente() { 
 	if ($("#id_cliente").val().toString().length > 0) {
 		// Hacemos un request POST AJAX para obtener los datos del cliente ingresado.
 		var request = $.ajax({
@@ -603,7 +590,8 @@ function calculateTotalPago() {
     if(gestion_cobranza==null){
         gestion_cobranza=0;
     }
-	var total_mora=global_intereses+parseInt(gestion_cobranza);
+	//var total_mora=global_intereses+parseInt(gestion_cobranza);
+	var total_mora=global_intereses;
 	var total_pago = parseInt( total_cuotas) + parseInt( total_mora);
 	total_cuotas = parseInt(total_cuotas);
 	$("#total_mora").val(total_mora);
@@ -630,6 +618,7 @@ function calculateMesPago() {
 		// Actualizamos el formulario con los datos obtenidos del lote.
 		request.done(function(msg) {
 			$("#id_cuota_pagar").empty();
+			//$("#id_gestion_cobranza").val(null);
 			$("#id_cuota_pagar").append('<tr><th>Nro Cuota</th><th>Fechas</th><th>Monto Cuota</th></tr>');
 			addRow(msg);
 		});
@@ -683,24 +672,22 @@ function generarDetalleJSON(){
 		size=detalle.length
 		if (detalle.length > 0) {
 			for (i = 0; i < size; i++) {
-				nro_cuota=detalle[i]['nro_cuota'];
-				intereses=detalle[i]['intereses'];
-				key= 'item' + i
-				value = {nro_cuota : nro_cuota, intereses : intereses};
-				objeto[key] = value; 			
-				JSON.stringify(objeto);
+				if (detalle[i]['tipo']=='normal'){
+					nro_cuota=detalle[i]['nro_cuota'];
+					intereses=detalle[i]['intereses'];
+					key= 'item' + i
+					value = {nro_cuota : nro_cuota, intereses : intereses};
+					objeto[key] = value; 			
+					JSON.stringify(objeto);
+				} else {
+					key= 'item' + i
+					value = {gestion_cobranza :detalle[detalle.length-1]['gestion_cobranza']};
+					objeto[key] = value;
+					JSON.stringify(objeto);
+				}
+				
 			}
-			if(detalle[detalle.length-1]['gestion_cobranza']){
-				key= 'item' + i
-				value = {gestion_cobranza :detalle[detalle.length-1]['gestion_cobranza']};
-				objeto[key] = value;
-				JSON.stringify(objeto);
-			}else{
-				key= 'item' + i
-				value = {gestion_cobranza :'0'};
-				objeto[key] = value;
-				JSON.stringify(objeto);
-			}
+			
 			detalle_json = JSON.stringify(objeto);
 			return detalle_json;
 		}

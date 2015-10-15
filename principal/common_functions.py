@@ -249,7 +249,7 @@ def filtros_establecidos(request, tipo_informe):
 
 
 
-def obtener_detalle_interes_lote(lote_id,fecha_pago_parsed,proximo_vencimiento_parsed):
+def obtener_detalle_interes_lote(lote_id,fecha_pago_parsed,proximo_vencimiento_parsed, nro_cuotas_a_pagar):
     
             resumen_lote=get_cuotas_detail_by_lote(unicode(lote_id))
             cuotas_pagadas=resumen_lote['cant_cuotas_pagadas']
@@ -294,7 +294,13 @@ def obtener_detalle_interes_lote(lote_id,fecha_pago_parsed,proximo_vencimiento_p
                 else:
                     cantidad_pagos_ref = 0
                     es_ref= False
-                for cuota in range(cuotas_atrasadas):
+                    
+                if int(nro_cuotas_a_pagar) < int(cuotas_atrasadas):
+                    rango = int(nro_cuotas_a_pagar)
+                else:
+                    rango = int(cuotas_atrasadas)
+                    
+                for cuota in range(rango):
                     detalle={}
                     fecha_vencimiento=proximo_vencimiento_parsed+MonthDelta(cuota)
                     dias_atraso=(fecha_pago_parsed-fecha_vencimiento).days
@@ -316,6 +322,7 @@ def obtener_detalle_interes_lote(lote_id,fecha_pago_parsed,proximo_vencimiento_p
                     detalle['dias_atraso']=dias_atraso
                     detalle['intereses']=redondeado
                     detalle['vencimiento']=fecha_vencimiento.strftime('%d/%m/%Y')
+                    detalle['tipo']='normal';
 
                     sumatoria_intereses += redondeado
 
@@ -332,7 +339,7 @@ def obtener_detalle_interes_lote(lote_id,fecha_pago_parsed,proximo_vencimiento_p
                 if cuotas_atrasadas>=6:
                     #gestion_cobranza = int(0.1*(math.ceil(float(cuotas_atrasadas*monto_cuota))+sumatoria_intereses))
                     gestion_cobranza = roundup(0.05*((cuotas_atrasadas*monto_cuota)+sumatoria_intereses) + (0.05*((cuotas_atrasadas*monto_cuota)+sumatoria_intereses))*0.10)
-                    detalles.append({'gestion_cobranza':gestion_cobranza})
+                    detalles.append({'gestion_cobranza':gestion_cobranza, 'tipo': 'gestion_cobranza'})
                     
             print detalles
             return detalles
