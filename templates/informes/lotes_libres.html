@@ -149,7 +149,7 @@
 					<tr>
 						<td>{{lote.fraccion}}</td>
 						<td>{{lote.fraccion_id}}</td>
-						<td>{{lote.lote}}</td>
+						<td><a href="{% url 'frontend_detalle_lote' lote.id %}">{{lote.lote}}</a></td>
 						<td>{{lote.superficie}}</td>
 						<td>{{lote.precio_contado}}</td>
 						<td>{{lote.precio_credito}}</td>
@@ -159,7 +159,7 @@
 					<tr class="bkg_gris">
 						<td>{{lote.fraccion}}</td>
 						<td>{{lote.fraccion_id}}</td>
-						<td>{{lote.lote}}</td>
+						<td><a href="{% url 'frontend_detalle_lote' lote.id %}" target="_blank">{{lote.lote}}</a></td>
 						<td>{{lote.superficie}}</td>
 						<td>{{lote.precio_contado}}</td>
 						<td>{{lote.precio_credito}}</td>

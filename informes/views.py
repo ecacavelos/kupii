@@ -54,7 +54,7 @@ def lotes_libres(request):
                     ultimo="&tipo_busqueda="+tipo_busqueda+"&fraccion_ini="+f1+"&frac1="+fraccion_ini+"&fraccion_fin="+f2+"&frac2="+fraccion_fin
                     object_list = []  # lista de lotes
                     if fraccion_ini and fraccion_fin:
-                        manzanas = Manzana.objects.filter(fraccion_id__range=(fraccion_ini, fraccion_fin)).order_by('fraccion_id', 'nro_manzana')
+                        manzanas = Manzana.objects.filter(fraccion_id__range=(fraccion_ini, fraccion_fin)).order_by('fraccion', 'nro_manzana')
                         for m in manzanas:
                             lotes = Lote.objects.filter(manzana=m.id, estado="1").order_by('nro_lote')
                             for l in lotes:
@@ -79,6 +79,7 @@ def lotes_libres(request):
                         lote['precio_contado']=unicode('{:,}'.format(lote_item.precio_contado)).replace(",", ".")                    
                         lote['precio_credito']=unicode('{:,}'.format(lote_item.precio_credito)).replace(",", ".")                    
                         lote['importe_cuota']=unicode('{:,}'.format(precio_cuota)).replace(",", ".")
+                        lote['id'] = lote_item.id
                     # Se suman los TOTALES por FRACCION
                         total_superficie_fraccion += lote_item.superficie 
                         total_contado_fraccion += lote_item.precio_contado
@@ -752,8 +753,8 @@ def liquidacion_vendedores(request):
                     t = loader.get_template('informes/liquidacion_vendedores.html')
                     fecha_ini = request.GET['fecha_ini']
                     fecha_fin = request.GET['fecha_fin']
-                    fecha_ini_parsed = unicode(datetime.strptime(fecha_ini, "%d/%m/%Y").date())
-                    fecha_fin_parsed = unicode(datetime.strptime(fecha_fin, "%d/%m/%Y").date())
+                    fecha_ini_parsed = unicode(datetime.datetime.strptime(fecha_ini, "%d/%m/%Y").date())
+                    fecha_fin_parsed = unicode(datetime.datetime.strptime(fecha_fin, "%d/%m/%Y").date())
                     busqueda_label = request.GET['busqueda_label']
                     vendedor_id=request.GET['busqueda']
                     print("vendedor_id ->" + vendedor_id)
@@ -910,8 +911,8 @@ def liquidacion_gerentes(request):
                     tipo_liquidacion = request.GET['tipo_liquidacion']
                     fecha_ini = request.GET['fecha_ini']
                     fecha_fin = request.GET['fecha_fin']
-                    fecha_ini_parsed = unicode(datetime.strptime(fecha_ini, "%d/%m/%Y").date())
-                    fecha_fin_parsed = unicode(datetime.strptime(fecha_fin, "%d/%m/%Y").date())
+                    fecha_ini_parsed = unicode(datetime.datetime.strptime(fecha_ini, "%d/%m/%Y").date())
+                    fecha_fin_parsed = unicode(datetime.datetime.strptime(fecha_fin, "%d/%m/%Y").date())
                     query=(
                     '''
                     select pc.* from principal_pagodecuotas pc, principal_lote l, principal_manzana m, principal_fraccion f

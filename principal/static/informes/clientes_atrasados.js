@@ -46,8 +46,10 @@ function autocompleteFraccion(){
 			source : base_url,
 			minLength : 1,
 			select : function(event, ui) {
+				event.preventDefault();
 				id_fraccion = ui.item.id;
 				$("#id_fraccion").val(id_fraccion);
+				$("#fraccion").val(id_fraccion);
 			}
 		});
 	}

@@ -17,7 +17,11 @@ function retrieve_lotes_libres() {
 
 function setup_inputs() {
 	$("#id_tipo_busqueda").change(function() {
-		autocompleteFraccion();		
+		autocompleteFraccion();
+		$("#id_fraccion_ini").empty();
+		$("#id_fraccion_ini").val("");
+		$("#id_fraccion_fin").empty();
+		$("#id_fraccion_fin").val("");		
 	});
 	$("#id_fraccion_ini").change(function() {
 		autocompleteFraccion();		
@@ -29,10 +33,10 @@ function setup_inputs() {
 
 
 function autocompleteFraccion(){
-		$("#id_fraccion_ini").empty();
-		$("#id_fraccion_ini").val("");
-		$("#id_fraccion_fin").empty();
-		$("#id_fraccion_fin").val("");
+		//$("#id_fraccion_ini").empty();
+		//$("#id_fraccion_ini").val("");
+		//$("#id_fraccion_fin").empty();
+		//$("#id_fraccion_fin").val("");
 		if ($("#id_tipo_busqueda").val() == "nombre") {
 			var id_fraccion;
 			$("#id_busqueda_label").empty();
@@ -44,6 +48,8 @@ function autocompleteFraccion(){
                 select : function(event, ui) {
 					id_fraccion = ui.item.id;
 					$("#id_frac1").val(id_fraccion);
+					$("#id_fraccion_ini").val(ui.item.label);
+					
 					//alert(id_fraccion);
 				}
 			});
@@ -55,7 +61,8 @@ function autocompleteFraccion(){
 				minLength : 1,
 				select : function(event, ui) {
 					id_fraccion = ui.item.id;
-					$("#id_frac2").val(id_fraccion);					
+					$("#id_frac2").val(id_fraccion);
+					$("#id_fraccion_fin").val(ui.item.label);					
 					//alert(id_fraccion);
 				}
 			});
@@ -68,8 +75,10 @@ function autocompleteFraccion(){
 				source : base_url,
 				minLength : 1,
                 select : function(event, ui) {
+                	event.preventDefault();
 					id_fraccion = ui.item.id;
 					$("#id_frac1").val(id_fraccion);
+					$("#id_fraccion_ini").val(ui.item.id);
 					//alert(id_fraccion);
 				}
 			});
@@ -80,8 +89,10 @@ function autocompleteFraccion(){
 				source : base_url,
 				minLength : 1,
                 select : function(event, ui) {
+                	event.preventDefault();
 					id_fraccion = ui.item.id;
 					$("#id_frac2").val(id_fraccion);
+					$("#id_fraccion_fin").val(ui.item.id);
 					//alert(id_fraccion);
 				}
 			});
