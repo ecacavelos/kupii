@@ -6,6 +6,9 @@ urlpatterns = patterns('parametros.views',
     url(r'^plan_pago/listado/$', 'consultar_plan_de_pago'),
     url(r'^plan_pago/listado/(?P<plandepago_id>\d+)/$', 'detalle_plan_de_pago'),
     url(r'^plan_pago/listado_busqueda_ppagos/$', 'listar_busqueda_ppagos'),
+    
+    url(r'^plan_pago/listado_busqueda_ppagos/(?P<plandepago_id>\d+)', 'detalle_plan_de_pago'),
+    
     url(r'^plan_pago/agregar/$', 'agregar_plan_de_pago'),
     url(r'^plan_pago_vendedores/$', 'plan_de_pago_vendedores'),
     url(r'^plan_pago_vendedores/listado/$', 'consultar_plan_de_pago_vendedores'),
