@@ -1226,7 +1226,7 @@ def lotes_libres_reporte_excel(request):
     fraccion_fin=request.GET['fraccion_fin']
     object_list = []  
     if fraccion_ini and fraccion_fin:
-        manzanas = Manzana.objects.filter(fraccion_id__range=(fraccion_ini, fraccion_fin)).order_by('fraccion_id', 'nro_manzana')
+        manzanas = Manzana.objects.filter(fraccion_id__range=(fraccion_ini, fraccion_fin)).order_by('fraccion', 'nro_manzana')
         for m in manzanas:
             lotes = Lote.objects.filter(manzana=m.id, estado="1").order_by('nro_lote')
             for l in lotes:
@@ -1363,7 +1363,7 @@ def clientes_atrasados_reporte_excel(request):
                               'font: name Arial, bold True;')   
     style2 = xlwt.easyxf('font: name Arial, bold True;')
     
-    fecha_actual= datetime.now()            
+    fecha_actual= datetime.datetime.now()            
     filtros = filtros_establecidos(request.GET,'clientes_atrasados')
     cliente_atrasado= {}
     clientes_atrasados= []
@@ -1436,7 +1436,7 @@ def clientes_atrasados_reporte_excel(request):
                     
             #Seteamos los campos restantes
             total_atrasado = meses_diferencia * cliente_atrasado['importe_cuota']
-            cliente_atrasado['fecha_ultimo_pago']= datetime.strptime(unicode(fecha_ultimo_pago), "%Y-%m-%d").date()
+            cliente_atrasado['fecha_ultimo_pago']= datetime.datetime.strptime(unicode(fecha_ultimo_pago), "%Y-%m-%d").date()
             cliente_atrasado['lote']=(unicode(cliente_atrasado['manzana']).zfill(3) + "/" + unicode(cliente_atrasado['lote']).zfill(4))
             cliente_atrasado['total_atrasado'] = unicode('{:,}'.format(total_atrasado)).replace(",", ".")
             cliente_atrasado['importe_cuota'] = unicode('{:,}'.format(cliente_atrasado['importe_cuota'])).replace(",", ".")
@@ -1497,8 +1497,8 @@ def informe_general_reporte_excel(request):
             '''
         )
     else:
-        fecha_ini_parsed = datetime.strptime(fecha_ini, "%d/%m/%Y").date()
-        fecha_fin_parsed = datetime.strptime(fecha_fin, "%d/%m/%Y").date()
+        fecha_ini_parsed = datetime.datetime.strptime(fecha_ini, "%d/%m/%Y").date()
+        fecha_fin_parsed = datetime.datetime.strptime(fecha_fin, "%d/%m/%Y").date()
         query=(
             '''
             select pc.* from principal_pagodecuotas pc, principal_lote l, principal_manzana m, principal_fraccion f
@@ -1628,8 +1628,8 @@ def informe_general_reporte_excel(request):
 def liquidacion_propietarios_reporte_excel(request):
     fecha_ini = request.GET['fecha_ini']
     fecha_fin = request.GET['fecha_fin']
-    fecha_ini_parsed = datetime.strptime(fecha_ini, "%d/%m/%Y").date()
-    fecha_fin_parsed = datetime.strptime(fecha_fin, "%d/%m/%Y").date()
+    fecha_ini_parsed = datetime.datetime.strptime(fecha_ini, "%d/%m/%Y").date()
+    fecha_fin_parsed = datetime.datetime.strptime(fecha_fin, "%d/%m/%Y").date()
     tipo_busqueda = request.GET['tipo_busqueda']
     filas = []
     lista_pagos = []
@@ -1851,8 +1851,8 @@ def liquidacion_vendedores_reporte_excel(request):
     print("vendedor_id ->" + vendedor_id);
     fecha_ini = request.GET['fecha_ini']
     fecha_fin = request.GET['fecha_fin']
-    fecha_ini_parsed = unicode(datetime.strptime(fecha_ini, "%d/%m/%Y").date())
-    fecha_fin_parsed = unicode(datetime.strptime(fecha_fin, "%d/%m/%Y").date())
+    fecha_ini_parsed = unicode(datetime.datetime.strptime(fecha_ini, "%d/%m/%Y").date())
+    fecha_fin_parsed = unicode(datetime.datetime.strptime(fecha_fin, "%d/%m/%Y").date())
     
     query=(
     '''
@@ -2018,8 +2018,8 @@ def liquidacion_gerentes_reporte_excel(request):
     tipo_liquidacion = request.GET['tipo_liquidacion']
     fecha_ini = request.GET['fecha_ini']
     fecha_fin = request.GET['fecha_fin']
-    fecha_ini_parsed = unicode(datetime.strptime(fecha_ini, "%d/%m/%Y").date())
-    fecha_fin_parsed = unicode(datetime.strptime(fecha_fin, "%d/%m/%Y").date())
+    fecha_ini_parsed = unicode(datetime.datetime.strptime(fecha_ini, "%d/%m/%Y").date())
+    fecha_fin_parsed = unicode(datetime.datetime.strptime(fecha_fin, "%d/%m/%Y").date())
     query=(
     '''
     select pc.* from principal_pagodecuotas pc, principal_lote l, principal_manzana m, principal_fraccion f
@@ -2215,8 +2215,8 @@ def informe_movimientos_reporte_excel(request):
     lote = Lote.objects.get(manzana=manzana.id, nro_lote=lote_int)
     print 'lote->'+unicode(lote.id)
     if fecha_ini != '' and fecha_fin != "":    
-        fecha_ini_parsed = datetime.strptime(fecha_ini, "%d/%m/%Y").date()
-        fecha_fin_parsed = datetime.strptime(fecha_fin, "%d/%m/%Y").date()
+        fecha_ini_parsed = datetime.datetime.strptime(fecha_ini, "%d/%m/%Y").date()
+        fecha_fin_parsed = datetime.datetime.strptime(fecha_fin, "%d/%m/%Y").date()
         try:
             lista_ventas = Venta.objects.filter(lote_id=lote.id, fecha_de_venta__range=(fecha_ini_parsed, fecha_fin_parsed)).order_by('-fecha_de_venta')
             lista_reservas = Reserva.objects.filter(lote_id=lote.id, fecha_de_reserva__range=(fecha_ini_parsed, fecha_fin_parsed))
