@@ -1,10 +1,10 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext, loader
-from principal.models import PlanDePago, PlanDePagoVendedor, Timbrado, RangoFactura, TimbradoRangoFacturaUsuario, ConceptoFactura
+from principal.models import PlanDePago, PlanDePagoVendedor, Timbrado, RangoFactura, TimbradoRangoFacturaUsuario, ConceptoFactura, LogUsuario
 from parametros.forms import PlanDePagoForm, SearchForm, PlanDePagoVendedorForm, TimbradoForm, RangoFacturaForm, ConceptoFacturaForm
 from django.core.urlresolvers import reverse, resolve
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from principal.common_functions import verificar_permisos
+from principal.common_functions import verificar_permisos, loggear_accion
 from principal import permisos
 from django.contrib.auth.models import User
 # Funcion principal del modulo de lotes.
@@ -12,6 +12,22 @@ def parametros(request):
     if request.user.is_authenticated():
         if verificar_permisos(request.user.id, permisos.VER_LISTADO_OPCIONES):
             t = loader.get_template('parametros/index.html')
+            c = RequestContext(request, {})
+            return HttpResponse(t.render(c))
+        else:
+            t = loader.get_template('index2.html')
+            grupo= request.user.groups.get().id
+            c = RequestContext(request, {
+                 'grupo': grupo
+            })
+            return HttpResponse(t.render(c))
+    else:
+        return HttpResponseRedirect(reverse('login')) 
+    
+def log_usuario(request):    
+    if request.user.is_authenticated():
+        if verificar_permisos(request.user.id, permisos.VER_OPCIONES_LOG_USUARIO):
+            t = loader.get_template('parametros/log_usuario/index.html')
             c = RequestContext(request, {})
             return HttpResponse(t.render(c))
         else:
@@ -199,6 +215,64 @@ def consultar_timbrado(request):
                 message = "No se ingresaron datos para la busqueda."
     else:
         object_list = Timbrado.objects.all().order_by('id')
+        search_form = SearchForm({})
+        message = ""
+    paginator = Paginator(object_list, 25)
+    page = request.GET.get('page')
+    try:
+        lista = paginator.page(page)
+    except PageNotAnInteger:
+        lista = paginator.page(1)
+    except EmptyPage:
+        lista = paginator.page(paginator.num_pages)  
+    c = RequestContext(request, {
+        'object_list': lista,
+        'search_form': search_form,
+        'message': message,
+    })
+    return HttpResponse(t.render(c))
+
+#funcion para consultar el listado de todos los logs
+def consultar_log_usuario(request):
+    
+    if request.user.is_authenticated():
+        if verificar_permisos(request.user.id, permisos.VER_LISTADO_LOG_USUARIO):
+            t = loader.get_template('parametros/log_usuario/listado.html')
+            #c = RequestContext(request, {})
+            #return HttpResponse(t.render(c))
+        else:
+            t = loader.get_template('index2.html')
+            grupo= request.user.groups.get().id
+            c = RequestContext(request, {
+                 'grupo': grupo
+            })
+            return HttpResponse(t.render(c))
+    else:
+        return HttpResponseRedirect(reverse('login'))
+    
+    if request.method == 'POST':
+        data = request.POST
+        search_form = SearchForm(data)        
+        object_list = LogUsuario.objects.all().order_by('id')
+        # En caso de que se haya solicitado una busqueda, filtramos de acuerdo al parametro correspondiente.
+        search_field = data.get('filtro', '')
+        message = ''
+        if data.get('boton_buscar'):
+            if data.get('buscar', '') != '':
+                
+                if search_field == 'F':
+                    object_list = LogUsuario.objects.filter(fecha_hora__iexact=data.get('buscar', '')).order_by('id')
+                #elif search_field == 'T':
+                    #object_list = PlanDePago.objects.filter(tipo_de_plan__iexact=data.get('buscar', '')).order_by('id')
+                #elif search_field == 'C':
+                    #object_list = PlanDePago.objects.filter(cantidad_de_cuotas__iexact=data.get('buscar', '')).order_by('id')
+                #elif search_field == 'I':
+                    #object_list = PlanDePago.objects.filter(id=int(data.get('buscar', '')))
+                    
+            else:
+                message = "No se ingresaron datos para la busqueda."
+    else:
+        object_list = LogUsuario.objects.all().order_by('id')
         search_form = SearchForm({})
         message = ""
     paginator = Paginator(object_list, 25)
@@ -426,10 +500,22 @@ def detalle_plan_de_pago(request, plandepago_id):
             if form.is_valid():
                 message = "Se actualizaron los datos."
                 form.save(commit=False)
+                
+                #Se loggea la accion del usuario
+                id_objeto = form.instance.id
+                codigo_lote = ''
+                loggear_accion(request.user, "Actualizar", "Plan de Pago", id_objeto, codigo_lote)
+                
                 object_list.save()
         elif data.get('boton_borrar'):
             c = PlanDePago.objects.get(pk=plandepago_id)
             c.delete()
+            
+            #Se loggea la accion del usuario
+            id_objeto = plandepago_id
+            codigo_lote = ''
+            loggear_accion(request.user, "Borrar", "Plan de pago", id_objeto, codigo_lote)
+            
             return HttpResponseRedirect('/parametros/plan_pago/listado')
     else:
         form = PlanDePagoForm(instance=object_list)
@@ -470,10 +556,23 @@ def detalle_timbrado(request, timbrado_id):
             if form.is_valid():
                 message = "Se actualizaron los datos."
                 form.save(commit=False)
+                
+                #Se loggea la accion del usuario
+                id_objeto = form.instance.id
+                codigo_lote = ''
+                loggear_accion(request.user, "Actualizar", "Timbrado", id_objeto, codigo_lote)
+                
                 object_list.save()
         elif data.get('boton_borrar'):
             c = Timbrado.objects.get(pk=timbrado_id)
+            numero_timbrado = c.numero
             c.delete()
+            
+            #Se loggea la accion del usuario
+            id_objeto = timbrado_id
+            codigo_lote = ''
+            loggear_accion(request.user, "Borrar timbrado("+numero_timbrado+")", "Timbrado", id_objeto, codigo_lote)
+            
             return HttpResponseRedirect('/parametros/timbrado/listado')
     else:
         form = TimbradoForm(instance=object_list)
@@ -515,10 +614,23 @@ def detalle_concepto_factura(request, concepto_factura_id):
             if form.is_valid():
                 message = "Se actualizaron los datos."
                 form.save(commit=False)
+                
+                #Se loggea la accion del usuario
+                id_objeto = form.instance.id
+                codigo_lote = ''
+                loggear_accion(request.user, "Actualizar", "Concepto Factura", id_objeto, codigo_lote)
+                
                 object_list.save()
         elif data.get('boton_borrar'):
             c = ConceptoFactura.objects.get(pk=concepto_factura_id)
+            nombre_concepto = c.descripcion
             c.delete()
+            
+            #Se loggea la accion del usuario
+            id_objeto = concepto_factura_id
+            codigo_lote = ''
+            loggear_accion(request.user, "Borrar Concepto("+nombre_concepto+")", "Concepto factura", id_objeto, codigo_lote)
+            
             return HttpResponseRedirect('/parametros/concepto_factura/listado')
     else:
         form = ConceptoFacturaForm(instance=object_list)
@@ -562,12 +674,24 @@ def detalle_rango_factura(request, timbrado_id, rango_factura_id):
             if form.is_valid():
                 message = "Se actualizaron los datos."
                 form.save(commit=False)
+                
+                #Se loggea la accion del usuario
+                id_objeto = form.instance.id
+                codigo_lote = form.instance.codigo_paralot
+                loggear_accion(request.user, "Actualizar", "Rango Factura", id_objeto, codigo_lote)
+                
                 usuario = TimbradoRangoFacturaUsuario.objects.get(rango_factura_id = rango_factura_id, timbrado_id=timbrado_id)
                 usuario.usuario = User.objects.get(id=form.data['usuario'])
                 usuario.save()
                 object_list.save()
         elif data.get('boton_borrar'):
             c = RangoFactura.objects.get(pk=rango_factura_id)
+            
+            #Se loggea la accion del usuario
+            id_objeto = rango_factura_id
+            codigo_lote = ''
+            loggear_accion(request.user, "Borrar", "Rango Factura", id_objeto, codigo_lote)
+            
             c.delete()
             return HttpResponseRedirect('/parametros/timbrado/'+unicode(timbrado_id)+'/rango_factura/listado')
     else:
@@ -614,10 +738,23 @@ def detalle_plan_de_pago_vendedores(request, plandepago_vendedor_id):
             if form.is_valid():
                 message = "Se actualizaron los datos."
                 form.save(commit=False)
+                
+                #Se loggea la accion del usuario
+                id_objeto = form.instance.id
+                codigo_lote = ''
+                loggear_accion(request.user, "Actualizar", "Planes de pago de Vendedor", id_objeto, codigo_lote)
+                
                 object_list.save()
         elif data.get('boton_borrar'):
             c = PlanDePagoVendedor.objects.get(pk=plandepago_vendedor_id)
+            nombre_plan = c.nombre
             c.delete()
+            
+            #Se loggea la accion del usuario
+            id_objeto = plandepago_vendedor_id
+            codigo_lote = ''
+            loggear_accion(request.user, "Borrar plan de pago vendedor("+nombre_plan+")", "Plan Pago Vendedor", id_objeto, codigo_lote)
+            
             return HttpResponseRedirect('/parametros/plan_pago_vendedores/listado')
     else:
         form = PlanDePagoVendedorForm(instance=object_list)
@@ -653,6 +790,12 @@ def agregar_plan_de_pago(request):
         form = PlanDePagoForm(request.POST)
         if form.is_valid():
             form.save()
+            
+            #Se loggea la accion del usuario
+            id_objeto = form.instance.id
+            codigo_lote = ''
+            loggear_accion(request.user, "Agregar", "Plan de pago", id_objeto, codigo_lote)
+            
             # Redireccionamos al listado de planes de pago luego de agregar el nuevo plan.
             return HttpResponseRedirect('/parametros/plan_pago/listado')
     else:
@@ -685,6 +828,12 @@ def agregar_timbrado(request):
         form = TimbradoForm(request.POST)
         if form.is_valid():
             form.save()
+            
+            #Se loggea la accion del usuario
+            id_objeto = form.instance.id
+            codigo_lote = ''
+            loggear_accion(request.user, "Agregar", "Timbrado", id_objeto, codigo_lote)
+            
             # Redireccionamos al listado de planes de pago luego de agregar el nuevo plan.
             return HttpResponseRedirect('/parametros/timbrado/listado')
     else:
@@ -717,6 +866,12 @@ def agregar_concepto_factura(request):
         form = ConceptoFacturaForm(request.POST)
         if form.is_valid():
             form.save()
+            
+            #Se loggea la accion del usuario
+            id_objeto = form.instance.id
+            codigo_lote = ''
+            loggear_accion(request.user, "Agregar", "Concepto Factura", id_objeto, codigo_lote)
+            
             # Redireccionamos al listado de planes de pago luego de agregar el nuevo plan.
             return HttpResponseRedirect('/parametros/concepto_factura/listado')
     else:
@@ -751,6 +906,12 @@ def agregar_rango_factura(request, timbrado_id):
         if form.is_valid():
             rangoFactura = form.save(commit=False)
             rangoFactura.save()
+            
+            #Se loggea la accion del usuario
+            id_objeto = form.instance.id
+            codigo_lote = ''
+            loggear_accion(request.user, "Agregar", "Rango Factura", id_objeto, codigo_lote)
+            
             timbradoRangoFacturaUsuario = TimbradoRangoFacturaUsuario()
             timbradoRangoFacturaUsuario.timbrado = Timbrado.objects.get(pk=timbrado_id)
             timbradoRangoFacturaUsuario.rango_factura = RangoFactura.objects.get(pk=rangoFactura.id)
@@ -788,6 +949,12 @@ def agregar_plan_de_pago_vendedores(request):
         form = PlanDePagoVendedorForm(request.POST)
         if form.is_valid():
             form.save()
+            
+            #Se loggea la accion del usuario
+            id_objeto = form.instance.id
+            codigo_lote = ''
+            loggear_accion(request.user, "Agregar", "Plan de Pago Vendedor", id_objeto, codigo_lote)
+            
             # Redireccionamos al listado de planes de pago luego de agregar el nuevo plan.
             return HttpResponseRedirect('/parametros/plan_pago_vendedores/listado')
     else:
@@ -958,6 +1125,37 @@ def listar_busqueda_ppagos_vendedores(request):
     id_ppago_vendedor = request.POST['plan_pago_vendedores']
     if id_ppago_vendedor:
         object_list=PlanDePagoVendedor.objects.filter(pk=id_ppago_vendedor)
+    paginator=Paginator(object_list,15)
+    page=request.GET.get('page')
+    try:
+        lista=paginator.page(page)
+    except PageNotAnInteger:
+        lista=paginator.page(1)
+    except EmptyPage:
+        lista=paginator.page(paginator.num_pages)
+        
+    c = RequestContext(request, {
+        'object_list': lista,
+    })
+    return HttpResponse(t.render(c))
+
+def listar_busqueda_log_usuario(request):       
+    if request.user.is_authenticated():
+        if verificar_permisos(request.user.id, permisos.VER_LISTADO_LOG_USUARIO): 
+            t = loader.get_template('parametros/log_usuario/listado.html')
+        else:
+            t = loader.get_template('index2.html')
+            grupo= request.user.groups.get().id
+            c = RequestContext(request, {
+                 'grupo': grupo
+            })
+            return HttpResponse(t.render(c))
+    else:
+        return HttpResponseRedirect(reverse('login')) 
+    
+    id_log_usuario = request.POST['log_usuario']
+    if id_log_usuario:
+        object_list=LogUsuario.objects.filter(pk=id_log_usuario)
     paginator=Paginator(object_list,15)
     page=request.GET.get('page')
     try:

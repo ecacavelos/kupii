@@ -104,8 +104,20 @@ def ventas_de_lotes(request):
                     
                 if  sumatoria_cuotas >= nueva_venta.precio_final_de_venta:
                     nueva_venta.save()
+                    
+                    #Se loggea la accion del usuario
+                    id_objeto = nueva_venta.id
+                    codigo_lote = lote_a_vender.codigo_paralot
+                    loggear_accion(request.user, "Agregar", "Venta", id_objeto, codigo_lote)
+                    
                     lote_a_vender.estado = "3"
                     lote_a_vender.save()
+                    
+                    #Se loggea la accion del usuario
+                    id_objeto = lote_a_vender.id
+                    codigo_lote = lote_a_vender.codigo_paralot
+                    loggear_accion(request.user, "Actualizar estado", "Lote", id_objeto, codigo_lote)
+                    
                     venta_cli = Venta.objects.get(pk=nueva_venta.id)
                 else:
                     return HttpResponseServerError("La sumatoria de las cuotas es menor al precio final de venta.")
@@ -200,8 +212,19 @@ def reservas_de_lotes(request):
                 nueva_reserva.cliente = Cliente.objects.get(pk=cliente_id)
         
                 nueva_reserva.save()
+                
+                #Se loggea la accion del usuario
+                id_objeto = nueva_reserva.id
+                codigo_lote = lote_a_reservar.codigo_paralot
+                loggear_accion(request.user, "Agregar", "Reserva", id_objeto, codigo_lote)
+                
                 lote_a_reservar.estado = "2"
                 lote_a_reservar.save()
+                
+                #Se loggea la accion del usuario
+                id_objeto = lote_a_reservar.id
+                codigo_lote = lote_a_reservar.codigo_paralot
+                loggear_accion(request.user, "Actualizar estado", "Lote", id_objeto, codigo_lote)
         
             c = RequestContext(request, {
             })
@@ -276,6 +299,13 @@ def pago_de_cuotas(request):
                         nuevo_pago.total_de_pago = total_de_pago
                         nuevo_pago.detalle = detalle
                         nuevo_pago.save()
+                        
+                        #Se loggea la accion del usuario
+                        id_objeto = nuevo_pago.id
+                        codigo_lote = nuevo_pago.lote.codigo_paralot
+                        loggear_accion(request.user, "Agregar", "Pago de cuota", id_objeto, codigo_lote)
+                        
+                        
                     except Exception, error:
                         print error
                         pass
@@ -372,8 +402,19 @@ def transferencias_de_lotes(request):
                 nueva_transferencia.vendedor = Vendedor.objects.get(pk=vendedor_id)
         
                 nueva_transferencia.save()
+                
+                #Se loggea la accion del usuario
+                id_objeto = nueva_transferencia.id
+                codigo_lote = nueva_transferencia.lote.codigo_paralot
+                loggear_accion(request.user, "Agregar", "Transferencia", id_objeto, codigo_lote)
+                
                 venta.cliente = Cliente.objects.get(pk=cliente_id)
                 venta.save()
+                
+                #Se loggea la accion del usuario
+                id_objeto = venta.id
+                codigo_lote = nueva_transferencia.lote.codigo_paralot
+                loggear_accion(request.user, "Actualizar", "Venta", id_objeto, codigo_lote)
         
             c = RequestContext(request, {
         
@@ -497,6 +538,11 @@ def cambio_de_lotes(request):
                 nuevo_cambio.cliente_id = cliente_id 
                 nuevo_cambio.lote_nuevo_id = lote_nuevo_id
                 nuevo_cambio.save()
+                
+                #Se loggea la accion del usuario
+                id_objeto = nuevo_cambio.id
+                codigo_lote = lote_viejo.codigo_paralot
+                loggear_accion(request.user, "Cambio a ("+lote_nuevo.codigo_paralot+")", "Lote", id_objeto, codigo_lote)
             
             c = RequestContext(request, {
         
@@ -553,6 +599,11 @@ def recuperacion_de_lotes(request):
                 nueva_recuperacion.save()
                 lote_a_recuperar.estado = "1"
                 lote_a_recuperar.save()
+                
+                #Se loggea la accion del usuario
+                id_objeto = nueva_recuperacion.id
+                codigo_lote = lote_a_recuperar.codigo_paralot
+                loggear_accion(request.user, "Agregar", "Recuperacion", id_objeto, codigo_lote)
                 
             c = RequestContext(request, {
             })
@@ -1888,10 +1939,22 @@ def modificar_pago_de_cuotas(request, id):
                     pago.nro_cuotas_a_pagar = nro_cuotas_a_pagar
                     pago.fecha_de_pago = fecha_pago_parsed
                     pago.save()
+                    
+                    #Se loggea la accion del usuario
+                    id_objeto = pago.id
+                    codigo_lote = ''
+                    loggear_accion(request.user, "Actualizar", "Pago de cuota", id_objeto, codigo_lote)
+                    
                 except Exception, error:
                     print error
                     pass
                 venta.save()
+                
+                #Se loggea la accion del usuario
+                id_objeto = venta.id
+                codigo_lote = venta.lote.codigo_paralot
+                loggear_accion(request.user, "Actualizar", "venta", id_objeto, codigo_lote)
+                
                 t = loader.get_template('movimientos/modificar_pagocuota.html')
                 fecha = pago.fecha_de_pago.strftime('%d/%m/%Y')
                 c = RequestContext(request, {
@@ -1977,6 +2040,12 @@ def modificar_venta(request, id):
                     venta.cliente = cliente
                     venta.vendedor = vendedor
                     venta.save()
+                    
+                    #Se loggea la accion del usuario
+                    id_objeto = venta.id
+                    codigo_lote = venta.lote.codigo_paralot
+                    loggear_accion(request.user, "Actualizar", "Venta", id_objeto, codigo_lote)
+                    
                     object_list = PagoDeCuotas.objects.filter(venta_id=venta).order_by('fecha_de_pago')
                     for pago in object_list:
                         pago.plan_de_pago = venta.plan_de_pago

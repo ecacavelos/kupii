@@ -4,7 +4,7 @@ from principal.models import Propietario
 from propietarios.forms import PropietarioForm, SearchForm
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.urlresolvers import reverse, resolve
-from principal.common_functions import verificar_permisos
+from principal.common_functions import verificar_permisos, loggear_accion
 from principal import permisos
 #from django.views.generic.list_detail import object_list
 
@@ -114,10 +114,23 @@ def detalle_propietario(request, propietario_id):
             if form.is_valid():
                 message = "Se actualizaron los datos."
                 form.save(commit=False)
+                
+                #Se loggea la accion del usuario
+                id_objeto = form.instance.id
+                codigo_lote = ''
+                loggear_accion(request.user, "Actualizar", "Propietario", id_objeto, codigo_lote)
+                
                 object_list.save()
         elif data.get('boton_borrar'):
             c = Propietario.objects.get(pk=propietario_id)
             c.delete()
+            nombre_propietario = c.nombres +" "+ c.apellidos
+            c.delete()
+            #Se loggea la accion del usuario
+            id_objeto = cliente_id
+            codigo_lote = ''
+            loggear_accion(request.user, "Borrar propietario ("+nombre_propietario+")", "Propietario", id_objeto, codigo_lote)
+            
             return HttpResponseRedirect('/propietarios/listado')
     else:
         form = PropietarioForm(instance=object_list)
@@ -151,6 +164,12 @@ def agregar_propietarios(request):
         form = PropietarioForm(request.POST)
         if form.is_valid():
             form.save()
+            
+            #Se loggea la accion del usuario
+            id_objeto = form.instance.id
+            codigo_lote = ''
+            loggear_accion(request.user, "Agregar", "Propietario", id_objeto, codigo_lote)
+            
             # Redireccionamos al listado de propietarios luego de agregar el nuevo propietario.
             return HttpResponseRedirect('/propietarios/listado')
     else:

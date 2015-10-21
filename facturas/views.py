@@ -99,6 +99,13 @@ def facturar_pagos(request, pago_id):
             nueva_factura.lote = lote_id 
             nueva_factura.save()
             
+            
+            #Se loggea la accion del usuario
+            id_objeto = nueva_factura.id
+            codigo_lote = request.POST.get('lote','')
+            loggear_accion(request.user, "Agregar", "Factura", id_objeto, codigo_lote)
+            
+            
             #obtener numero de cuotas
             numero_cuota_desde = request.POST.get('nro_cuota_desde','')
             numero_cuota_hasta= request.POST.get('nro_cuota_hasta','')
@@ -352,6 +359,12 @@ def facturar(request):
             nueva_factura.detalle = detalle
             nueva_factura.lote = lote_id 
             nueva_factura.save()
+            
+            #Se loggea la accion del usuario
+            id_objeto = nueva_factura.id
+            codigo_lote = request.POST.get('lote','')
+            loggear_accion(request.user, "Agregar", "Factura", id_objeto, codigo_lote)
+            
             #obtener numero de cuotas
             numero_cuota_desde = request.POST.get('nro_cuota_desde','')
             numero_cuota_hasta= request.POST.get('nro_cuota_hasta','')
@@ -622,9 +635,22 @@ def detalle_factura(request, factura_id):
                     message = "Se actualizaron los datos."
                     form.save(commit=False)
                     factura.save()
+                    
+                    #Se loggea la accion del usuario
+                    id_objeto = factura.id
+                    codigo_lote = ''
+                    loggear_accion(request.user, "Actualizar", "Factura", id_objeto, codigo_lote)
+                    
             elif data.get('boton_borrar'):
                 c = Factura.objects.get(pk=factura_id)
+                numero_factura = c.numero
                 c.delete()
+                
+                #Se loggea la accion del usuario
+                id_objeto = factura_id
+                codigo_lote = ''
+                loggear_accion(request.user, "Borrar factura("+numero_factura+")", "Factura", id_objeto, codigo_lote)
+                
                 return HttpResponseRedirect('/facturacion/listado')
         else:
             form = FacturaForm(instance=factura)

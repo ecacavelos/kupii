@@ -118,10 +118,21 @@ def detalle_cliente(request, cliente_id):
             if form.is_valid():
                 message = "Se actualizaron los datos."
                 form.save(commit=False)
+                
+                #Se logea la accion del usuario
+                id_objeto = form.instance.id
+                codigo_lote = ''
+                loggear_accion(request.user, "Actualizar", "Cliente", id_objeto, codigo_lote)
+                
                 object_list.save()
         elif data.get('boton_borrar'):
             c = Cliente.objects.get(pk=cliente_id)
+            nombre_cliente = c.nombres +" "+ c.apellidos
             c.delete()
+            #Se loggea la accion del usuario
+            id_objeto = cliente_id
+            codigo_lote = ''
+            loggear_accion(request.user, "Borrar cliente ("+nombre_cliente+")", "Cliente", id_objeto, codigo_lote)
             return HttpResponseRedirect('/clientes/listado')
     else:
         form = ClienteForm(instance=object_list)
@@ -156,6 +167,12 @@ def agregar_clientes(request):
         form = ClienteForm(request.POST)
         if form.is_valid():
             form.save()
+            
+            #Se loggea la accion del usuario
+            id_objeto = form.instance.id
+            codigo_lote = ''
+            loggear_accion(request.user, "Agregar", "Cliente", id_objeto, codigo_lote)
+            
             # Redireccionamos al listado de clientes luego de agregar el nuevo cliente.
             return HttpResponseRedirect('/clientes/listado')
     else:

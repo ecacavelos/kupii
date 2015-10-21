@@ -6,8 +6,9 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
 from django.core.urlresolvers import reverse, resolve
 # Funcion principal del modulo de lotes.
-from principal.common_functions import verificar_permisos
+from principal.common_functions import verificar_permisos, loggear_accion
 from principal import permisos
+from django.contrib.auth.models import User
 def lotes(request):
     
     if request.user.is_authenticated():
@@ -86,17 +87,34 @@ def detalle_lote(request, lote_id):
     ventas_relacionadas = Venta.objects.filter(lote=lote_id)
 
     if request.method == 'POST':
+        request.POST = request.POST.copy()
         data = request.POST
         if data.get('boton_guardar'):
             form = LoteForm(data, instance=object_list)
+            data['nro_lote'] = int(data['nro_lote'])    
+            data['precio_contado'] = int(data['precio_contado'].replace(".", "")) 
+            data['precio_credito'] = int(data['precio_credito'].replace(".", ""))
+            data['precio_costo'] = int(data['precio_costo'].replace(".", ""))
             if form.is_valid():
                 message = "Se actualizaron los datos."
                 message_id = "message-success"
                 form.save(commit=False)
+                
+                #Se loggea la accion del usuario
+                id_objeto = form.instance.id
+                codigo_lote = form.instance.codigo_paralot
+                loggear_accion(request.user, "Actualizar", "Lote", id_objeto, codigo_lote)
+                
                 object_list.save()
         elif data.get('boton_borrar'):
             f = Lote.objects.get(pk=lote_id)
+            codigo_lote = f.codigo_paralot
             f.delete()
+            
+            #Se loggea la accion del usuario
+            id_objeto = lote_id
+            loggear_accion(request.user, "Borrar lote("+codigo_lote+")", "Factura", id_objeto, codigo_lote)
+            
             return HttpResponseRedirect('/lotes/listado')
     else:
         form = LoteForm(instance=object_list)
@@ -161,7 +179,13 @@ def agregar_lotes(request):
         form = LoteForm(request.POST)
         if form.is_valid():
             form.save()
+            id_objeto = form.instance.id
+            codigo_lote = form.instance.codigo_paralot
+            
+            ##id_objeto = 1
+            #codigo_lote = 'lalala'
             # Redireccionamos al listado de lotes luego de agregar el nuevo lote.
+            loggear_accion(request.user, "Agregar", "lote", id_objeto, codigo_lote)
             return HttpResponseRedirect('/lotes/listado')
         else:
             form = LoteForm()

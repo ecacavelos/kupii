@@ -3,6 +3,7 @@ from django.template import RequestContext, loader
 from principal.models import Cobrador
 from cobradores.forms import CobradorForm
 from django.core.urlresolvers import reverse, resolve
+from principal.common_functions import *
 # from django.views.generic.list_detail import object_list
 
 # Funcion principal del modulo de cobradores.
@@ -36,10 +37,21 @@ def detalle_cobrador(request, cobrador_id):
             if form.is_valid():
                 message = "Se actualizaron los datos."
                 form.save(commit=False)
+                #Se loggea la accion del usuario
+                id_objeto = form.instance.id
+                codigo_lote = ''
+                loggear_accion(request.user, "Actualizar", "Cobrador", id_objeto, codigo_lote)
                 object_list.save()
         elif data.get('boton_borrar'):
             f = Cobrador.objects.get(pk=cobrador_id)
+            nombre_cobrador = f.nombres+" "+f.apellidos 
             f.delete()
+            
+            #Se loggea la accion del usuario
+            id_objeto = cobrador_id
+            codigo_lote = ''
+            loggear_accion(request.user, "Borrar cobrador("+nombre_cobrador+")", "Cobrador", id_objeto, codigo_lote)
+            
             return HttpResponseRedirect('/cobradores/listado')
     else:
         form = CobradorForm(instance=object_list)
@@ -59,6 +71,13 @@ def agregar_cobradores(request):
         form = CobradorForm(request.POST)
         if form.is_valid():
             form.save()
+            
+            #Se loggea la accion del usuario
+            id_objeto = form.instance.id
+            codigo_lote = ''
+            loggear_accion(request.user, "Agregar", "Cobrador", id_objeto, codigo_lote)
+            
+            
             # Redireccionamos al listado de cobradores luego de agregar el nuevo cobrador.
             return HttpResponseRedirect('/cobradores/listado')
     else:

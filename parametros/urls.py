@@ -17,6 +17,10 @@ urlpatterns = patterns('parametros.views',
     url(r'^plan_pago_vendedores/agregar/$', 'agregar_plan_de_pago_vendedores'),  
     url(r'^generales/$', 'parametros_generales'),
     
+    url(r'^log_usuario/$', 'log_usuario'),
+    url(r'^log_usuario/listado/$', 'consultar_log_usuario'),
+    url(r'^log_usuario/listado_busqueda_log_usuario/$', 'listar_busqueda_log_usuario'),
+    
     url(r'^timbrado/$', 'timbrado'),
     url(r'^timbrado/listado/$', 'consultar_timbrado'),
     url(r'^timbrado/listado/(?P<timbrado_id>\d+)/$', 'detalle_timbrado'),

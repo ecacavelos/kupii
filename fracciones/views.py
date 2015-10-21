@@ -84,12 +84,20 @@ def detalle_fraccion(request, fraccion_id):
     message = ''
 
     if request.method == 'POST':
+        request.POST = request.POST.copy()
         data = request.POST
         if data.get('boton_guardar'):
             form = FraccionFormAdd(data, instance=object_list)
             if form.is_valid():
                 message = "Se actualizaron los datos."
+                data['fecha_aprobacion'] = datetime.datetime.strptime(data['fecha_aprobacion'], "%d/%m/%Y")
                 form.save(commit=False)
+                
+                #Se loggea la accion del usuario
+                id_objeto = form.instance.id
+                codigo_lote = ''
+                loggear_accion(request.user, "Actualizar", "Fraccion", id_objeto, codigo_lote)
+                
                 object_list.save()
                 #return HttpResponseRedirect('/fracciones/listado')
             else:
@@ -114,6 +122,12 @@ def detalle_fraccion(request, fraccion_id):
                     l.delete()                
                 m.delete()
             f.delete()
+            
+            #Se loggea la accion del usuario
+            id_objeto = fraccion_id
+            codigo_lote = ''
+            loggear_accion(request.user, "Borrar", "Fraccion", id_objeto, codigo_lote)
+            
             return HttpResponseRedirect('/fracciones/listado')        
         
     else:        
@@ -123,6 +137,7 @@ def detalle_fraccion(request, fraccion_id):
         'fraccion': object_list,
         'form': form,
         'message': message,
+        'grupo': grupo,
     })
     return HttpResponse(t.render(c))
 
@@ -150,6 +165,12 @@ def agregar_fracciones(request):
         lotes_por_manzana = lotes_por_manzana.split(",")
         if form.is_valid():
             fraccion = form.save()
+            
+            #Se loggea la accion del usuario
+            id_objeto = form.instance.id
+            codigo_lote = ''
+            loggear_accion(request.user, "Agregar", "Fraccion", id_objeto, codigo_lote)
+            
             cantidad_manzanas = fraccion.cantidad_manzanas
             # cantidad_lotes = fraccion.cantidad_lotes
             for i in range(1, cantidad_manzanas + 1):

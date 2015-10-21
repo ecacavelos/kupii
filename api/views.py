@@ -72,6 +72,8 @@ def consulta(request, cedula):
                                     transaccion.estado = 'Consultado'
                                     transaccion.cliente = cliente
                                     transaccion.save()
+                                    #mas abajo se loggea
+                                    
                                     cabecera = {'id_transaccion': transaccion.pk, 'codigo' : '100'}             
                                     respuesta.append(cabecera)
                                     for venta in ventas_list:
@@ -91,7 +93,13 @@ def consulta(request, cedula):
 #                                         cuotas_a_pagar_detalle = obtener_cuotas_a_pagar(venta,date(2015,4,12),detalle_cuotas)                                        
                                         item['detalle_cuotas'] = cuotas_a_pagar_detalle 
                                         items.append(item)
-                                    respuesta.append(items)                                    
+                                    respuesta.append(items)
+                                    
+                                    #Se logea la accion en el log de usuarios 
+                                    id_objeto = transaccion.id
+                                    codigo_lote = lote.codigo_paralot
+                                    loggear_accion(request.user, "Agregar", "Transaccion", id_objeto, codigo_lote)                                   
+                                    
                                     return HttpResponse(json.dumps(respuesta), content_type="application/json")
                     else:
                         error_msg = 'Cuenta deshabilitada'     
@@ -169,7 +177,13 @@ def pago(request):
                                             error['mensaje'] = error_msg
                                             if transaccion.estado != 'Pagado':
                                                 transaccion.estado = 'Expirado'
-                                                transaccion.save()                                                                                   
+                                                transaccion.save()
+                                                
+                                                #Se logea la accion del usuario
+                                                id_objeto = transaccion.id
+                                                codigo_lote = ''
+                                                loggear_accion(request.user, "Agregar", "Transaccion", id_objeto, codigo_lote)
+                                                                                                                                   
                                             return HttpResponse(json.dumps(error),status=404, content_type="application/json")                                       
                                     else:
                                         detalle_pago = json.loads(detalle_pago_json)                                        
@@ -211,12 +225,27 @@ def pago(request):
                                                 nuevo_pago.total_de_cuotas = venta.precio_de_cuota
                                                 nuevo_pago.total_de_pago = cuotas_a_pagar_detalle[0]['monto_cuota']
                                                 nuevo_pago.total_de_mora = cuotas_a_pagar_detalle[0]['monto_cuota'] - venta.precio_de_cuota
-                                                nuevo_pago.save() 
+                                                nuevo_pago.save()
+                                                
+                                                #Se loggea la accion del usuario
+                                                id_objeto = nuevo_pago.id
+                                                codigo_lote = detalle_pago['codigo_lote']
+                                                loggear_accion(request.user, "Agregar", "Pago de cuota", id_objeto, codigo_lote)
+                                                 
                                                 transaccion.estado = 'Pagado'
-                                                transaccion.save()      
+                                                transaccion.save()
+                                                
+                                                #Se loggea la accion del usuario
+                                                id_objeto = transaccion.id
+                                                codigo_lote = ''
+                                                loggear_accion(request.user, "Actualizar estado", "Transaccion", id_objeto, codigo_lote)
+                                                      
                                                 respuesta = {}
                                                 respuesta['mensaje'] = 'Operacion Exitosa'
-                                                respuesta['codigo'] = '200'                                 
+                                                respuesta['codigo'] = '200'
+                                                
+                                                
+                                                                                 
                                                 return HttpResponse(json.dumps(respuesta), content_type="application/json")
                         else:
                             error_msg = 'Cuenta deshabilitada' 

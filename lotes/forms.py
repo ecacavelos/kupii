@@ -14,6 +14,7 @@ class LoteForm(ModelForm):
                  'nro_lote': TextInput,
                  'precio_contado': TextInput,
                  'precio_credito': TextInput,
+                 'precio_costo': TextInput,
                  'superficie': TextInput,
                  'boleto_nro': TextInput,                 
          }

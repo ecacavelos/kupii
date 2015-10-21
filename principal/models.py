@@ -39,7 +39,26 @@ class Cliente(models.Model):
             ('ver_listado_clientes', 'Ver listado de clientes'),
             ('ver_opciones_cliente', 'Ver opciones de clientes'),
         )    
+
+class LogUsuario(models.Model):
+    fecha_hora = models.DateTimeField()
+    usuario = models.ForeignKey(User,on_delete=models.PROTECT)
+    accion = models.CharField(max_length=255)
+    tipo_objeto = models.CharField(max_length=255)
+    id_objeto = models.CharField(max_length=255)
+    codigo_lote = models.CharField(max_length=255)
     
+    def __unicode__(self):
+        return u'%s %s' % (self.id, self.usuario, self.accion, self.fecha_hora, self.tipo_objeto, self.id_objeto, self.codigo_lote)
+    def as_json(self):
+        return dict(
+            label= self.usuario + ' ' + self.fecha_hora,
+            id=self.id)
+    class Meta:
+        permissions = (
+            ('ver_listado_logusuario', 'Ver listado de log de usuarios'),
+            ('ver_opciones_logusuario', 'Ver opciones de log de usuarios'),
+        )   
 
 class Propietario(models.Model):
     nombres = models.CharField(max_length=255)

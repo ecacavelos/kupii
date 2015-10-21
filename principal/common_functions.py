@@ -1,6 +1,6 @@
 from django.db.models import Count, Min, Sum, Avg
 from principal.models import Lote, Cliente, Vendedor, PlanDePago, Fraccion, Manzana, Venta, Propietario, \
-    PlanDePagoVendedor, PagoDeCuotas, RecuperacionDeLotes
+    PlanDePagoVendedor, PagoDeCuotas, RecuperacionDeLotes, LogUsuario
 from principal.monthdelta import MonthDelta
 from calendar import monthrange
 from datetime import datetime, timedelta
@@ -10,6 +10,7 @@ from django.db.models import Q
 import json
 import math
 import datetime
+from django.contrib.auth.models import User
 
 def get_cuotas_detail_by_lote(lote_id):
     print("buscando pagos del lote --> " + lote_id);
@@ -43,6 +44,15 @@ def get_cuotas_detail_by_lote(lote_id):
                   ('proximo_vencimiento', proximo_vencimiento)])
     return datos
 
+def loggear_accion(usuario, accion, tipo_objeto, id_objeto, codigo_lote = ''):
+    log = LogUsuario()
+    log.fecha_hora= datetime.datetime.now()
+    log.usuario = usuario
+    log.accion = accion
+    log.tipo_objeto = tipo_objeto
+    log.id_objeto = id_objeto
+    log.codigo_lote = codigo_lote
+    log.save()
 
 def get_nro_cuota(pago):
     PagoDeCuotas(pago)

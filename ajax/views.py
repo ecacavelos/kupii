@@ -596,6 +596,12 @@ def facturar(request):
             nueva_factura.detalle = detalle
             nueva_factura.lote = lote_id 
             nueva_factura.save()
+            
+            #Se logea la accion del usuario
+            id_objeto = nueva_factura.id
+            codigo_lote = request.POST.get('lote','')
+            loggear_accion(request.user, "Agregar", "Factura", id_objeto, codigo_lote)
+            
             #obtener numero de cuotas
             numero_cuota_desde = request.POST.get('nro_cuota_desde','')
             numero_cuota_hasta= request.POST.get('nro_cuota_hasta','')
