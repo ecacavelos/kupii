@@ -317,16 +317,17 @@ def detalle_factura(request, factura_id):
                     codigo_lote = ''
                     loggear_accion(request.user, "Actualizar", "Factura", id_objeto, codigo_lote)
                     
-            elif data.get('boton_borrar'):
-                c = Factura.objects.get(pk=factura_id)
-                numero_factura = c.numero
-                c.delete()
+            elif data.get('boton_anular'):
+                f = Factura.objects.get(pk=factura_id)
+                numero_factura = f.numero
+                f.anulado = True
+                f.save()
                 
                 #Se loggea la accion del usuario
                 id_objeto = factura_id
                 codigo_lote = ''
-                loggear_accion(request.user, "Borrar factura("+numero_factura+")", "Factura", id_objeto, codigo_lote)
-                
+                loggear_accion(request.user, "Anular factura("+numero_factura+")", "Factura", id_objeto, codigo_lote)
+                message = "Factura Anulada."
                 return HttpResponseRedirect('/facturacion/listado')
         else:
             form = FacturaForm(instance=factura)
@@ -341,3 +342,5 @@ def detalle_factura(request, factura_id):
         return HttpResponse(t.render(c))    
     else:
         return HttpResponseRedirect(reverse('login'))
+    
+    

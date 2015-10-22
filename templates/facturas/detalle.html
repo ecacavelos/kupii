@@ -62,16 +62,29 @@
 			<tr>
 				<div class="fieldWrapper{% if field.field.required %} required{% endif %}">
 					{% if field.html_name == 'rango_factura' %}
-						<td><label for="timbrado" >Timbrado</label></td>
+						<td><label for="timbrado" >Timbrado:</label></td>
 					{% else %}
-						<td>{{ field.label_tag }}</td>
+						{% if field.html_name == 'anuladi' %}
+							<td><label for="anulado" >Anulado:</label></td>
+						{% else %}
+							<td>{{ field.label_tag }}</td>
+						{% endif %}
 					{% endif %}
-					{% if field.html_name == 'cliente'  or field.html_name == 'rango_factura' or field.html_name == 'detalle' %}
+					{% if field.html_name == 'cliente'  or field.html_name == 'rango_factura' or field.html_name == 'detalle' or field.html_name == 'anulado' %}
 					{%if field.html_name == 'cliente' %}
 					<td colspan="5" class="noimage">{{ factura.cliente }}{{ field.errors }}</td>
 					{% endif %}
 					{%if field.html_name == 'rango_factura' %}
-					<td colspan="5" class="noimage">{{ numero_timbrado }}{{ field.errors }}</td>
+						<td colspan="5" class="noimage">{{ numero_timbrado }}{{ field.errors }}</td>
+					{% endif %}
+					{%if field.html_name == 'anulado' %}
+					<td colspan="5" class="noimage"><b>SI&nbsp;</b>
+						{{ field }}
+						{% if field.value == False %} 
+							<input class="factura-form-button" type="submit" name="boton_anular" value="Anular Factura" />
+						{% endif %}	
+						
+					</td>
 					{% endif %}
 					{%if field.html_name == 'detalle' %}
 					<td colspan="5" class="noimage"></td>
@@ -94,15 +107,21 @@
 					</tr>
 					{% endfor %}
 					{% endif %}
+					
 					{% else %}
 					<td colspan="5">{{ field }}{{ field.errors }}</td>
+					
 				</div>
 				{% endif %}
 			</tr>
 			{% endfor %}
-		</form>
+		
+		
 </div>
 </table>
+</form>	
 <br></br>
-<div id="footer"><a href="{% url 'frontend_home' %}facturacion/listado" class="boton-verde">Volver al Listado de Facturas</a></div>
+<div id="footer">
+	<a href="{% url 'frontend_home' %}facturacion/listado" class="boton-verde">Volver al Listado de Facturas</a>
+	</div>
 {% endblock %}
