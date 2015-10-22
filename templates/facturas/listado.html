@@ -95,7 +95,7 @@ function validar(){
 
 <div id="listado-item-lote">
 	<table width="50%" cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
-		<th>Fecha</th><th>Factura Nro.</th><th>Cliente</th><th>Monto</th>
+		<th>Fecha</th><th>Factura Nro.</th><th>Cliente</th><th>Monto</th><th>Anulada</th>
 {% for hw in object_list %}
 {% if forloop.counter|divisibleby:2 %}
 		<tr>
@@ -111,6 +111,15 @@ function validar(){
 			<td>
 				{{hw.monto}}
 			</td>
+			{% if hw.anulado == true %}
+				<td>
+					SI
+				</td>
+			{% else %}
+				<td>
+					NO
+				</td>
+			{% endif %}
 		</tr>
 		{% else %}
 		<tr class="bkg_gris">
@@ -127,6 +136,15 @@ function validar(){
 			<td>
 				{{hw.monto}}
 			</td>
+			{% if hw.anulado == True %}
+				<td>
+					SI
+				</td>
+			{% else %}
+				<td>
+					NO
+				</td>
+			{% endif %}
 		</tr>
 		{% endif %}
 {% endfor %}

@@ -6,7 +6,7 @@
 	var cantidad_detalles = 1;
 	
 		item_inicial_detalle_factura = '<div class="item-detalle">'
-			+ '<input type="number" id="id_detalle_cantidad_1" class= "cantidad-item item" placeholder="Cantidad" size="2" value="" style="width:60px;">'
+			+ '<input type="number" id="id_detalle_cantidad_1" class= "cantidad-item item" placeholder="Cant." size="2" value="" style="width:60px;">'
 			+ '<input type="text" id="id_detalle_concepto_1" class="concepto-factura item" placeholder="Concepto">'
 			+ '<input type="text" id="id_detalle_precio_unitario_1" class= "precio_unitario-item item" placeholder="Precio unitario">'
 			+ '<input type="text" id="id_detalle_exentas_1" class= "exentas-item item" placeholder="Exentas">'
@@ -19,6 +19,8 @@
 		$('#nro-factura').mask('###-###-#######');
 		$("#id_name_cliente").focus();
 		
+		$("#ajax-print").prop('disabled',true);
+		$("#submit-btn").prop('disabled',true);
 		
 		
 		
@@ -184,6 +186,19 @@
 	    		return false;
 			}
 		});
+		
+		$('#id_name_cliente').blur(function(){
+			validarDetalle();
+		});
+		
+		$('#id_cedula_cliente').blur(function(){
+			validarDetalle();
+		});
+		
+		$('#lote').blur(function(){
+			validarDetalle();
+		});
+		
 		$('#id_nro_cuota_hasta').blur(function(){
 			//index = $('.item-detalle').length -1;
 			index = $('.item-detalle').length;
@@ -210,33 +225,41 @@
 					index = $('.item-detalle').length;
 					var inputs= $('.item-detalle')[index -1].children
 					inputs[0].value=msg[0].cantidad;
-					inputs[1].value="Cuota Nro: "  + $("#id_nro_cuota").val() + " a " + $("#id_nro_cuota_hasta").val();
-					inputs[2].value=msg[0].precio_unitario;
-					inputs[3].value=msg[0].exentas;
-					inputs[4].value=msg[0].iva5;
-					inputs[5].value="0";
+					inputs[2].value="Cuota Nro: "  + $("#id_nro_cuota").val() + " a " + $("#id_nro_cuota_hasta").val();
+					inputs[3].value=msg[0].precio_unitario;
+					inputs[4].value=msg[0].exentas;
+					inputs[5].value=msg[0].iva5;
+					inputs[6].value="0";
+					aplicarFuncionesDetalles();
+					ponerPuntos();
 					validarDetalle();
 					if (msg.length > 1){
-						$('.item-detalle')[index -1].children[6].click();
+						$('.item-detalle')[index -1].children[7].click();
 			        	index = $('.item-detalle').length;
 			        	var inputs= $('.item-detalle')[index -1].children
 						inputs[0].value=msg[1].cantidad;
-						inputs[1].value="Interes Moratorio";
-						inputs[2].value=msg[1].precio_unitario;
-						inputs[3].value=msg[1].exentas;
-						inputs[4].value=msg[1].iva5;
-						inputs[5].value=msg[1].iva10;
+						inputs[2].value="Interes Moratorio";
+						inputs[3].value=msg[1].precio_unitario;
+						inputs[4].value=msg[1].exentas;
+						inputs[5].value=msg[1].iva5;
+						inputs[6].value=msg[1].iva10;
+						
+						ponerPuntos();
+						aplicarFuncionesDetalles();
 						validarDetalle();
 						if (msg.length == 3){
-							$('.item-detalle')[index -1].children[6].click();
+							$('.item-detalle')[index -1].children[7].click();
 				        	index = $('.item-detalle').length;
-				        	var inputs= $('.item-detalle')[index -1].children
+				        	var inputs= $('.item-detalle')[index -1].children;
 							inputs[0].value=msg[2].cantidad;
-							inputs[1].value="Gestion Cobranzas";
-							inputs[2].value=msg[2].precio_unitario;
-							inputs[3].value=msg[2].exentas;
-							inputs[4].value=msg[2].iva5;
-							inputs[5].value=msg[2].iva10;
+							inputs[2].value="Gestion Cobranzas";
+							inputs[3].value=msg[2].precio_unitario;
+							inputs[4].value=msg[2].exentas;
+							inputs[5].value=msg[2].iva5;
+							inputs[6].value=msg[2].iva10;
+							
+							ponerPuntos();
+							aplicarFuncionesDetalles();
 							validarDetalle();
 						}
 					}
@@ -391,7 +414,7 @@
 			concepto = $(this).find(".concepto-factura").val();
 			precio_unitario = sacarPuntos($(this).find(".precio_unitario-item").val());
 			precio_unitario = parseInt(precio_unitario) || 0;
-			exentas = $(this).find(".exentas-item").val();
+			exentas = sacarPuntos($(this).find(".exentas-item").val());
 			exentas = parseInt(exentas) || 0;
 			iva_10 = sacarPuntos($(this).find(".iva_10-item").val());
 			iva_10 = parseInt(iva_10) || 0;
@@ -403,18 +426,24 @@
 			indicador_validez = '#840A0A'; // Por defecto invalido (Rojo)
 			
 			// Requerimieno minimo para un detalle valido
-			if (cantidad != 0  && precio_unitario != 0 && (exentas !=0 || iva_10 != 0 || iva_5 !=0)){
+			if (cantidad != 0  && precio_unitario != 0 && $("#lote").val() != '' && $("#id_name_cliente").val() != '' && (exentas !=0 || iva_10 != 0 || iva_5 !=0)){
 				if (cantidad*precio_unitario == (exentas+iva_10+iva_5)){
 					// VALIDO
 					console.log('Detalle VALIDO');
 					indicador_validez = '#1C842D';
+					$("#ajax-print").prop('disabled',false);
+					$("#submit-btn").prop('disabled',false);
 				}
 				else{
 					detalle_valido = false;
+					$("#ajax-print").prop('disabled',true);
+					$("#submit-btn").prop('disabled',true);
 				}		
 			}
 			else{
 				detalle_valido = false;
+				$("#ajax-print").prop('disabled',true);
+				$("#submit-btn").prop('disabled',true);
 			}
 			$(this).css('background',indicador_validez);	
 		});
@@ -670,6 +699,7 @@ function aplicarFuncionesDetalles(){
 				}
 		});
 		
+		
 		$('.precio_unitario-item').keyup(function() {
 			//obtengo el id del obejto que activo el evento
                 var current_id = this.id;
@@ -719,7 +749,9 @@ function sacarPuntos(numero){
 	return (numero);
 }
 
-function ponerPuntos(numero){
-	
-	return (numero);
+function ponerPuntos(){
+	$(".precio_unitario-item").mask('###.###.###',{reverse: true});
+	$(".exentas-item").mask('###.###.###',{reverse: true});
+	$(".iva_5-item").mask('###.###.###',{reverse: true});
+	$(".iva_10-item").mask('###.###.###',{reverse: true});
 }

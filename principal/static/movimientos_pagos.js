@@ -154,7 +154,7 @@ function validatePago() {
 		if ( $("#facturar").val() == 'NO' ){
 			top.location.href = "/movimientos/pago_cuotas";	
 		} else if ( $("#facturar").val() == 'SI' ){
-			top.location.href = "/facturacion/facturar_pagos/"+msg[0].id;	
+			top.location.href = "/facturacion/facturar_operacion/1/"+msg[0].id;	
 		}
 		
 		

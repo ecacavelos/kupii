@@ -408,6 +408,7 @@ class Factura(models.Model):
     rango_factura = models.ForeignKey(RangoFactura,on_delete=models.PROTECT)
     tipo = models.CharField(max_length=2)
     detalle = models.TextField()
+    anulado = models.BooleanField()
 
 class PagoDeCuotas(models.Model):
     venta = models.ForeignKey(Venta,on_delete=models.PROTECT)

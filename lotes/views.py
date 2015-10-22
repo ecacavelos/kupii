@@ -185,7 +185,7 @@ def agregar_lotes(request):
             ##id_objeto = 1
             #codigo_lote = 'lalala'
             # Redireccionamos al listado de lotes luego de agregar el nuevo lote.
-            loggear_accion(request.user, "Agregar", "lote", id_objeto, codigo_lote)
+            loggear_accion(request.user, "Agregar", "Lote", id_objeto, codigo_lote)
             return HttpResponseRedirect('/lotes/listado')
         else:
             form = LoteForm()
