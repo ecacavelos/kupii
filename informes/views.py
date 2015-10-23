@@ -596,17 +596,20 @@ def liquidacion_propietarios(request):
                                                 montos = calculo_montos_liquidacion_propietarios(pago,venta,lista_cuotas_inm)
                                                 monto_inmobiliaria = montos['monto_inmobiliaria']
                                                 monto_propietario = montos['monto_propietario']
+                                                total_de_cuotas = int(pago['monto'])
+                                                fecha_pago_str = unicode(pago['fecha_de_pago'])
+                                                fecha_pago = unicode(datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
                                                 # Se setean los datos de cada fila
                                                 fila={}
                                                 fila['misma_fraccion'] = ok
                                                 fila['fraccion']=unicode(fraccion)
-                                                fila['fecha_de_pago']=unicode(pago['fecha_de_pago'])
+                                                fila['fecha_de_pago']= fecha_pago
                                                 fila['lote']=unicode(l)
                                                 fila['cliente']=unicode(venta.cliente)
                                                 fila['nro_cuota']=unicode(pago['nro_cuota_y_total'])
-                                                fila['total_de_cuotas']=unicode(pago['monto'])
-                                                fila['monto_inmobiliaria']=unicode(monto_inmobiliaria)
-                                                fila['monto_propietario']=unicode(monto_propietario)
+                                                fila['total_de_cuotas']=unicode('{:,}'.format(total_de_cuotas)).replace(",", ".")
+                                                fila['monto_inmobiliaria']=unicode('{:,}'.format(monto_inmobiliaria)).replace(",", ".")
+                                                fila['monto_propietario']=unicode('{:,}'.format(monto_propietario)).replace(",", ".")
                                                 ok=False
                                                 # Se suman los TOTALES por FRACCION
                                                 total_monto_inm += int(monto_inmobiliaria)
@@ -619,14 +622,14 @@ def liquidacion_propietarios(request):
                                                 total_general_prop += int(monto_propietario)
                                 if total_monto_inm != 0 or total_monto_prop !=0 or total_monto_pagado !=0: 
                                     #Totales por FRACCION
-                                    fila['total_monto_pagado']=unicode(total_monto_pagado)
-                                    fila['total_monto_inmobiliaria']=unicode(total_monto_inm)
-                                    fila['total_monto_propietario']=unicode(total_monto_prop)
+                                    fila['total_monto_pagado']=unicode('{:,}'.format(total_monto_pagado)).replace(",", ".")
+                                    fila['total_monto_inmobiliaria']=unicode('{:,}'.format(total_monto_inm)).replace(",", ".")
+                                    fila['total_monto_propietario']=unicode('{:,}'.format(total_monto_prop)).replace(",", ".")
                                     
                                 #Totales GENERALES
-                                fila['total_general_pagado']=unicode(total_general_pagado)
-                                fila['total_general_inmobiliaria']=unicode(total_general_inm)
-                                fila['total_general_propietario']=unicode(total_general_prop)
+                                fila['total_general_pagado']=unicode('{:,}'.format(total_general_pagado)).replace(",", ".")
+                                fila['total_general_inmobiliaria']=unicode('{:,}'.format(total_general_inm)).replace(",", ".")
+                                fila['total_general_propietario']=unicode('{:,}'.format(total_general_prop)).replace(",", ".")
                                 
                             except Exception, error:
                                 print error                                                                                       
@@ -668,17 +671,19 @@ def liquidacion_propietarios(request):
                                                     montos = calculo_montos_liquidacion_propietarios(pago,venta, lista_cuotas_inm)
                                                     monto_inmobiliaria = montos['monto_inmobiliaria']
                                                     monto_propietario = montos['monto_propietario']
+                                                    fecha_pago_str = unicode(pago['fecha_de_pago'])
+                                                    fecha_pago = unicode(datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
                                                     # Se setean los datos de cada fila
                                                     fila={}
                                                     fila['misma_fraccion'] = ok
                                                     fila['fraccion']=unicode(f)
-                                                    fila['fecha_de_pago']=unicode(pago['fecha_de_pago'])
+                                                    fila['fecha_de_pago']=fecha_pago
                                                     fila['lote']=unicode(l)
                                                     fila['cliente']=unicode(venta.cliente)
                                                     fila['nro_cuota']=unicode(pago['nro_cuota_y_total'])
-                                                    fila['total_de_cuotas']=unicode(pago['monto'])
-                                                    fila['monto_inmobiliaria']=unicode(monto_inmobiliaria)
-                                                    fila['monto_propietario']=unicode(monto_propietario)
+                                                    fila['total_de_cuotas']=unicode('{:,}'.format(int(pago['monto']))).replace(",", ".")
+                                                    fila['monto_inmobiliaria'] = unicode('{:,}'.format(monto_inmobiliaria)).replace(",", ".")
+                                                    fila['monto_propietario']=unicode('{:,}'.format(monto_propietario)).replace(",", ".")
                                                     ok=False
                                                     # Se suman los TOTALES por FRACCION
                                                     total_monto_inm += int(monto_inmobiliaria)
@@ -691,19 +696,19 @@ def liquidacion_propietarios(request):
                                                     total_general_prop += int(monto_propietario)
                                     if total_monto_inm != 0 or total_monto_prop !=0 or total_monto_pagado !=0: 
                                         #Totales por FRACCION
-                                        fila['total_monto_pagado']=unicode(total_monto_pagado)
-                                        fila['total_monto_inmobiliaria']=unicode(total_monto_inm)
-                                        fila['total_monto_propietario']=unicode(total_monto_prop)
+                                        fila['total_monto_pagado']=unicode('{:,}'.format(total_monto_pagado)).replace(",", ".")
+                                        fila['total_monto_inmobiliaria']=unicode('{:,}'.format(total_monto_inm)).replace(",", ".")
+                                        fila['total_monto_propietario']=unicode('{:,}'.format(total_monto_prop)).replace(",", ".")
                                 
                                 if total_monto_inm != 0 or total_monto_prop !=0 or total_monto_pagado !=0:        
                                     #Totales por FRACCION
-                                    fila['total_monto_pagado']=unicode(total_monto_pagado)
-                                    fila['total_monto_inmobiliaria']=unicode(total_monto_inm)
-                                    fila['total_monto_propietario']=unicode(total_monto_prop)
+                                    fila['total_monto_pagado']=unicode('{:,}'.format(total_monto_pagado)).replace(",", ".")
+                                    fila['total_monto_inmobiliaria']=unicode('{:,}'.format(total_monto_inm)).replace(",", ".")
+                                    fila['total_monto_propietario']=unicode('{:,}'.format(total_monto_prop)).replace(",", ".")
                                 #Totales GENERALES
-                                fila['total_general_pagado']=unicode(total_general_pagado)
-                                fila['total_general_inmobiliaria']=unicode(total_general_inm)
-                                fila['total_general_propietario']=unicode(total_general_prop)
+                                fila['total_general_pagado']=unicode('{:,}'.format(total_general_pagado)).replace(",", ".")
+                                fila['total_general_inmobiliaria']=unicode('{:,}'.format(total_general_inm)).replace(",", ".")
+                                fila['total_general_propietario']=unicode('{:,}'.format(total_general_prop)).replace(",", ".")
               
                             except Exception, error:
                                 print error                            
@@ -1679,17 +1684,23 @@ def liquidacion_propietarios_reporte_excel(request):
                             montos = calculo_montos_liquidacion_propietarios(pago,venta,lista_cuotas_inm)
                             monto_inmobiliaria = montos['monto_inmobiliaria']
                             monto_propietario = montos['monto_propietario']
+                            
+                            fecha_pago_str = unicode(pago['fecha_de_pago'])
+                            fecha_pago = unicode(datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
+                            
                             # Se setean los datos de cada fila
                             fila={}
                             fila['misma_fraccion'] = ok
                             fila['fraccion']=unicode(fraccion)
-                            fila['fecha_de_pago']=unicode(pago['fecha_de_pago'])
+                            #fila['fecha_de_pago']=unicode(pago['fecha_de_pago'])
+                            fila['fecha_de_pago']=fecha_pago
                             fila['lote']=unicode(l)
                             fila['cliente']=unicode(venta.cliente)
                             fila['nro_cuota']=unicode(pago['nro_cuota_y_total'])
                             fila['total_de_cuotas']=unicode(pago['monto'])
                             fila['monto_inmobiliaria']=unicode(monto_inmobiliaria)
                             fila['monto_propietario']=unicode(monto_propietario)
+                            
                             ok=False
                             # Se suman los TOTALES por FRACCION
                             total_monto_inm += int(monto_inmobiliaria)
@@ -1772,19 +1783,19 @@ def liquidacion_propietarios_reporte_excel(request):
                                 total_general_prop += int(monto_propietario)
                 if total_monto_inm != 0 or total_monto_prop !=0 or total_monto_pagado !=0:
                     #Totales por FRACCION
-                    fila['total_monto_pagado']=unicode('{:,}'.format(total_monto_pagado)).replace(",", ".")
-                    fila['total_monto_inmobiliaria']=unicode('{:,}'.format(total_monto_inm)).replace(",", ".")
-                    fila['total_monto_propietario']=unicode('{:,}'.format(total_monto_prop)).replace(",", ".")
+                    fila['total_monto_pagado']=unicode(total_monto_pagado)
+                    fila['total_monto_inmobiliaria']=unicode(total_monto_inm)
+                    fila['total_monto_propietario']=unicode(total_monto_prop)
                     
             if total_monto_inm != 0 or total_monto_prop !=0 or total_monto_pagado !=0:        
                 #Totales por FRACCION
-                fila['total_monto_pagado']=unicode('{:,}'.format(total_monto_pagado)).replace(",", ".")
-                fila['total_monto_inmobiliaria']=unicode('{:,}'.format(total_monto_inm)).replace(",", ".")
-                fila['total_monto_propietario']=unicode('{:,}'.format(total_monto_prop)).replace(",", ".")
+                fila['total_monto_pagado']=unicode(total_monto_pagado)
+                fila['total_monto_inmobiliaria']=unicode(total_monto_inm)
+                fila['total_monto_propietario']=unicode(total_monto_prop)
             #Totales GENERALES
-            fila['total_general_pagado']=unicode('{:,}'.format(total_general_pagado)).replace(",", ".")
-            fila['total_general_inmobiliaria']=unicode('{:,}'.format(total_general_inm)).replace(",", ".")
-            fila['total_general_propietario']=unicode('{:,}'.format(total_general_prop)).replace(",", ".")                         
+            fila['total_general_pagado']=unicode(total_general_pagado)
+            fila['total_general_inmobiliaria']=unicode(total_general_inm)
+            fila['total_general_propietario']=unicode(total_general_prop)                         
         except Exception, error:
             print error
         

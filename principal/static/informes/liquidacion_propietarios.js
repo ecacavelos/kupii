@@ -27,6 +27,7 @@ function setup_inputs() {
 	$("#id_fraccion_fin").change(function() {
 		autocompletes();		
 	});
+	autocompletes();
 }
 
 function autocompletes(){
