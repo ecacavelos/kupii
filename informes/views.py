@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError
 from django.template import RequestContext, loader
-from principal.models import Propietario, Fraccion, Lote, Manzana, PagoDeCuotas, Venta, Reserva, CambioDeLotes, RecuperacionDeLotes, TransferenciaDeLotes 
+from principal.models import Propietario, Fraccion, Lote, Manzana, PagoDeCuotas, Venta, Reserva, CambioDeLotes, RecuperacionDeLotes, TransferenciaDeLotes, Factura 
 from operator import itemgetter
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
@@ -711,16 +711,20 @@ def liquidacion_propietarios(request):
                                 fila['total_general_propietario']=unicode('{:,}'.format(total_general_prop)).replace(",", ".")
               
                             except Exception, error:
-                                print error                            
+                                print error
+                        
                         ultimo="&tipo_busqueda="+tipo_busqueda+"&busqueda="+busqueda+"&busqueda_label="+busqueda_label+"&fecha_ini="+fecha_ini+"&fecha_fin="+fecha_fin
-                        paginator = Paginator(filas, 25)
-                        page = request.GET.get('page')
-                        try:
-                            lista = paginator.page(page)
-                        except PageNotAnInteger:
-                            lista = paginator.page(1)
-                        except EmptyPage:
-                            lista = paginator.page(paginator.num_pages)          
+                        
+                        lista = filas
+                        #PAGINADOR
+                        #paginator = Paginator(filas, 25)
+                        #page = request.GET.get('page')
+                        #try:
+                        #    lista = paginator.page(page)
+                        #except PageNotAnInteger:
+                        #    lista = paginator.page(1)
+                        #except EmptyPage:
+                        #    lista = paginator.page(paginator.num_pages)          
                         c = RequestContext(request, {
                             'object_list': lista,
                             'lista_totales' : lista_totales,
@@ -2430,3 +2434,232 @@ def calculo_montos_liquidacion_propietarios(pago,venta, lista_cuotas_inm):
         return monto
     except Exception, error:
         print error
+        
+        
+def informe_facturacion(request):
+    if request.method == 'GET':
+        if request.user.is_authenticated():
+            if verificar_permisos(request.user.id, permisos.VER_INFORMES):
+                if (filtros_establecidos(request.GET,'informe_facturacion') == False):
+                    t = loader.get_template('informes/informe_facturacion.html')                
+                    c = RequestContext(request, {
+                        'object_list': [],
+                    })
+                    return HttpResponse(t.render(c))
+                else: # Parametros SETEADOS
+                    t = loader.get_template('informes/informe_facturacion.html')   
+                    try:             
+                        fecha_ini = request.GET['fecha_ini']
+                        fecha_fin = request.GET['fecha_fin']
+                        fecha_ini_parsed = datetime.datetime.strptime(fecha_ini, "%d/%m/%Y").strftime("%Y-%m-%d")
+                        fecha_fin_parsed = datetime.datetime.strptime(fecha_fin, "%d/%m/%Y").strftime("%Y-%m-%d")
+                        
+                        filas = []
+                        lista_totales = []
+                        
+                        
+                        
+                        
+                        #Totales GENERALES
+                        total_general_facturado = 0
+                        total_general_exentas = 0
+                        total_general_iva5 = 0
+                        total_general_iva10 = 0
+                        
+                        try:
+                            fila={}
+                            facturas = Factura.objects.filter(anulado=False, fecha__range=(fecha_ini_parsed, fecha_fin_parsed))
+                            
+                            for factura in facturas:
+                                
+                                #Totales Factura
+                                total_facturado = 0
+                                total_exentas = 0
+                                total_iva5 = 0
+                                total_iva10 = 0
+                                
+                                fecha_str = unicode(factura.fecha)
+                                fecha = unicode(datetime.datetime.strptime(fecha_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
+                                
+                                # Se setean los datos de cada fila
+                                fila={}
+                                fila['id'] = factura.id
+                                fila['fecha']= fecha
+                                fila['numero']= factura.numero
+                                fila['cliente']=unicode(factura.cliente)
+                                fila['lote']=unicode(factura.lote.codigo_paralot)
+                                fila['tipo']=unicode(factura.tipo)
+                                
+                                lista_detalles=json.loads(factura.detalle)
+                                for key, value in lista_detalles.iteritems():
+                                    total_exentas+=int(value['exentas'])
+                                    total_iva5+=int(value['iva_5'])
+                                    total_iva10+=int(value['iva_10'])
+                                    total_facturado+=int(int(value['cantidad'])*int(value['precio_unitario'])) 
+                                
+                                fila['total_exentas']=unicode('{:,}'.format(total_exentas)).replace(",", ".")
+                                fila['total_iva5']=unicode('{:,}'.format(total_iva5)).replace(",", ".")
+                                fila['total_iva10']=unicode('{:,}'.format(total_iva10)).replace(",", ".")
+                                fila['total_facturado']=unicode('{:,}'.format(total_facturado)).replace(",", ".")
+                                
+                                filas.append(fila)
+                                
+                                #Acumulamos para los TOTALES GENERALES
+                                total_general_exentas += int(total_exentas)
+                                total_general_iva5 += int(total_iva5)
+                                total_general_iva10 += int(total_iva10)
+                                total_general_facturado += int(total_facturado)
+                                
+                            #Totales GENERALES
+                            fila['total_general_facturado']=unicode('{:,}'.format(total_general_facturado)).replace(",", ".")
+                            fila['total_general_exentas']=unicode('{:,}'.format(total_general_exentas)).replace(",", ".")
+                            fila['total_general_iva5']=unicode('{:,}'.format(total_general_iva5)).replace(",", ".")
+                            fila['total_general_iva10']=unicode('{:,}'.format(total_general_iva10)).replace(",", ".")
+                                
+                        except Exception, error:
+                            print error                                                                                       
+                                                    
+                        ultimo="&fecha_ini="+fecha_ini+"&fecha_fin="+fecha_fin
+                        paginator = Paginator(filas, 25)
+                        page = request.GET.get('page')
+                        try:
+                            lista = paginator.page(page)
+                        except PageNotAnInteger:
+                            lista = paginator.page(1)
+                        except EmptyPage:
+                            lista = paginator.page(paginator.num_pages)          
+                        c = RequestContext(request, {
+                            'object_list': lista,
+                            'lista_totales' : lista_totales,
+                            'fecha_ini':fecha_ini,
+                            'fecha_fin':fecha_fin,
+                            'ultimo': ultimo
+                        })
+                        return HttpResponse(t.render(c))    
+                    except Exception, error:
+                        print error
+            else:
+                t = loader.get_template('index2.html')
+                grupo= request.user.groups.get().id
+                c = RequestContext(request, {
+                    'grupo': grupo
+                })
+                return HttpResponse(t.render(c))                                 
+        else:
+            return HttpResponseRedirect(reverse('login'))
+        
+def informe_facturacion_reporte_excel(request):
+    if request.method == 'GET':
+        if request.user.is_authenticated():
+            if verificar_permisos(request.user.id, permisos.VER_INFORMES):
+                if (filtros_establecidos(request.GET,'informe_facturacion') == False):
+                    t = loader.get_template('informes/informe_facturacion.html')                
+                    c = RequestContext(request, {
+                        'object_list': [],
+                    })
+                    return HttpResponse(t.render(c))
+                else: # Parametros SETEADOS
+                    t = loader.get_template('informes/informe_facturacion.html')   
+                    try:             
+                        fecha_ini = request.GET['fecha_ini']
+                        fecha_fin = request.GET['fecha_fin']
+                        fecha_ini_parsed = datetime.datetime.strptime(fecha_ini, "%d/%m/%Y").strftime("%Y-%m-%d")
+                        fecha_fin_parsed = datetime.datetime.strptime(fecha_fin, "%d/%m/%Y").strftime("%Y-%m-%d")
+                        filas = []
+                        lista_totales = []
+                        #Totales GENERALES
+                        total_general_facturado = 0
+                        total_general_exentas = 0
+                        total_general_iva5 = 0
+                        total_general_iva10 = 0
+                        
+                        try:
+                            fila={}
+                            facturas = Factura.objects.filter(anulado=False, fecha__range=(fecha_ini_parsed, fecha_fin_parsed))
+                            
+                            for factura in facturas:
+                                #Totales Factura
+                                total_facturado = 0
+                                total_exentas = 0
+                                total_iva5 = 0
+                                total_iva10 = 0
+                                fecha_str = unicode(factura.fecha)
+                                fecha = unicode(datetime.datetime.strptime(fecha_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
+                                
+                                # Se setean los datos de cada fila
+                                fila={}
+                                fila['id'] = factura.id
+                                fila['fecha']= fecha
+                                fila['numero']= factura.numero
+                                fila['cliente']=unicode(factura.cliente)
+                                fila['lote']=unicode(factura.lote.codigo_paralot)
+                                fila['tipo']=unicode(factura.tipo)
+                                lista_detalles=json.loads(factura.detalle)
+                                
+                                for key, value in lista_detalles.iteritems():
+                                    total_exentas+=int(value['exentas'])
+                                    total_iva5+=int(value['iva_5'])
+                                    total_iva10+=int(value['iva_10'])
+                                    total_facturado+=int(int(value['cantidad'])*int(value['precio_unitario'])) 
+                                fila['total_exentas']=unicode(total_exentas)
+                                fila['total_iva5']=unicode(total_iva5)
+                                fila['total_iva10']=unicode(total_iva10)
+                                fila['total_facturado']=unicode(total_facturado)
+                                filas.append(fila)
+                                #Acumulamos para los TOTALES GENERALES
+                                total_general_exentas += int(total_exentas)
+                                total_general_iva5 += int(total_iva5)
+                                total_general_iva10 += int(total_iva10)
+                                total_general_facturado += int(total_facturado)
+                            #Totales GENERALES
+                            fila['total_general_facturado']=unicode(total_general_facturado)
+                            fila['total_general_exentas']=unicode(total_general_exentas)
+                            fila['total_general_iva5']=unicode(total_general_iva5)
+                            fila['total_general_iva10']=unicode(total_general_iva10)
+                        except Exception, error:
+                            print error                                                                                       
+                        wb = xlwt.Workbook(encoding='utf-8')
+                        sheet = wb.add_sheet('test', cell_overwrite_ok=True)
+                        style = xlwt.easyxf('pattern: pattern solid, fore_colour green; font: name Arial, bold True;')   
+                        style2 = xlwt.easyxf('font: name Arial, bold True;')
+                        style3 = xlwt.easyxf('font: name Arial, bold True;align: horiz center')
+                        sheet.write(0, 0, "Fecha", style)
+                        sheet.write(0, 1, "Numero.", style)
+                        sheet.write(0, 2, "Lote", style)
+                        sheet.write(0, 3, "Cliente.", style)
+                        sheet.write(0, 4, "Tipo", style)
+                        sheet.write(0, 5, "Total Exentas", style)
+                        sheet.write(0, 6, "Total IVA 5", style)
+                        sheet.write(0, 7, "Total IVA 10", style)
+                        sheet.write(0, 8, "Total Facturado", style)
+                        c=0
+                        for fila in filas: 
+                            c += 1
+                            sheet.write(c, 0, fila['fecha'])
+                            sheet.write(c, 1, fila['numero'])
+                            sheet.write(c, 2, fila['lote'])
+                            sheet.write(c, 3, fila['cliente'])
+                            sheet.write(c, 4, fila['tipo'])
+                            sheet.write(c, 5, fila['total_exentas'])
+                            sheet.write(c, 6, fila['total_iva5'])
+                            sheet.write(c, 7, fila['total_iva10'])
+                            sheet.write(c, 8, fila['total_facturado'])
+                            try:
+                                if (fila['total_general_facturado']): 
+                                    c+=1            
+                                    sheet.write(c, 0, "Totales Facturados", style2)
+                                    sheet.write(c, 5, fila['total_general_exentas'],style2)
+                                    sheet.write(c, 6, fila['total_general_iva5'], style2)
+                                    sheet.write(c, 7, fila['total_general_iva10'], style2)
+                                    sheet.write(c, 8, fila['total_general_facturado'], style2)
+                            except Exception, error:
+                                print error 
+                                pass
+                      
+                        response = HttpResponse(content_type='application/vnd.ms-excel')
+                        # Crear un nombre intuitivo         
+                        response['Content-Disposition'] = 'attachment; filename=' + 'informe_facturacion.xls'
+                        wb.save(response)
+                        return response
+                    except Exception, error:
+                            print error 

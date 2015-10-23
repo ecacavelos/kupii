@@ -192,6 +192,14 @@ def filtros_establecidos(request, tipo_informe):
         except:
             print('Parametros no seteados')
             return False
+    elif tipo_informe == 'informe_facturacion':        
+        try:
+            fecha_ini=request['fecha_ini']
+            fecha_fin=request['fecha_fin']
+            return True
+        except:
+            print('Parametros no seteados')
+            return False
     elif tipo_informe == 'clientes_atrasados':
             #Puede filtrar solo por meses de atraso o solo por fraccion o sin ningun filtro
             try:
