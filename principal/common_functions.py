@@ -445,7 +445,7 @@ def get_pago_cuotas(venta, fecha_ini,fecha_fin):
     else:
         #Primero se cuenta cuantos son los pagos anteriores y despues se filtra
         cantidad_pagos_anteriores = PagoDeCuotas.objects.filter(venta_id=venta.id, fecha_de_pago__lt=fecha_ini).aggregate(Sum('nro_cuotas_a_pagar')).values()[0]
-        pagos = PagoDeCuotas.objects.filter(venta_id=venta.id, fecha_de_pago__range=(fecha_ini, fecha_fin))
+        pagos = PagoDeCuotas.objects.filter(venta_id=venta.id, fecha_de_pago__range=(fecha_ini, fecha_fin)).order_by('fecha_de_pago')
         if cantidad_pagos_anteriores == None:
             cantidad_pagos_anteriores = 0
             
