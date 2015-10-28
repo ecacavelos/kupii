@@ -477,7 +477,9 @@ def get_pago_cuotas(venta, fecha_ini,fecha_fin):
                     cuota['nro_cuota_y_total'] = unicode(numero_cuota) + '/' + unicode(pago.plan_de_pago.cantidad_de_cuotas)
                     cuota['nro_cuota'] = unicode(numero_cuota)
                     cuota['monto'] = unicode(monto_cuota)
-                    cuota['refuerzo'] = esRefuerzo                    
+                    cuota['refuerzo'] = esRefuerzo
+                    cuota['lote'] = pago.lote
+                    cuota['fraccion'] = pago.lote.manzana.fraccion
                     ventas_pagos_list.append(cuota)
                     numero_cuota +=1
             else:
@@ -488,6 +490,8 @@ def get_pago_cuotas(venta, fecha_ini,fecha_fin):
                 cuota['nro_cuota'] = unicode(numero_cuota)
                 cuota['monto'] = unicode(monto_cuota)
                 cuota['refuerzo'] = esRefuerzo
+                cuota['lote'] = pago.lote
+                cuota['fraccion'] = pago.lote.manzana.fraccion
                 ventas_pagos_list.append(cuota)
                 numero_cuota +=1
     else:
@@ -501,7 +505,9 @@ def get_pago_cuotas(venta, fecha_ini,fecha_fin):
                     cuota['nro_cuota_y_total'] = unicode(numero_cuota) + '/' + unicode(pago.plan_de_pago.cantidad_de_cuotas)
                     cuota['nro_cuota'] = unicode(numero_cuota)
                     cuota['monto'] = unicode(monto_cuota)
-                    cuota['refuerzo'] = esRefuerzo                    
+                    cuota['refuerzo'] = esRefuerzo
+                    cuota['lote'] = pago.lote
+                    cuota['fraccion'] = pago.lote.manzana.fraccion                    
                     ventas_pagos_list.append(cuota)
                     numero_cuota +=1
             else:
@@ -512,9 +518,13 @@ def get_pago_cuotas(venta, fecha_ini,fecha_fin):
                 cuota['nro_cuota'] = unicode(numero_cuota)
                 cuota['monto'] = unicode(monto_cuota)
                 cuota['refuerzo'] = esRefuerzo
+                cuota['lote'] = pago.lote
+                cuota['fraccion'] = pago.lote.manzana.fraccion
                 ventas_pagos_list.append(cuota)
                 numero_cuota +=1
     return ventas_pagos_list
+
+
 
 def cant_cuotas_pagadas_ref(pagos):
     cuotas_ref_pagadas=0
@@ -633,29 +643,29 @@ def crear_pdf_factura(nueva_factura, request, manzana, lote_id):
     p.setFont("Helvetica", 7)
             
     # INICIO PRIMERA IMPRESION
-    y_1ra_imp = float(14.8)
-    p.drawString(4.4 * cm, float(y_1ra_imp + 11) * cm, unicode(request.POST.get('fecha', '')))
+    y_1ra_imp = float(14.05)
+    p.drawString(4.4 * cm, float(y_1ra_imp + 10.9) * cm, unicode(request.POST.get('fecha', '')))
     if nueva_factura.tipo == 'co':
-        p.drawString(12.55 * cm, float(y_1ra_imp + 11) * cm, "X")
+        p.drawString(12.3 * cm, float(y_1ra_imp + 10.9) * cm, "X")
     else:
-        p.drawString(14.1 * cm, float(y_1ra_imp + 11) * cm, "X")
+        p.drawString(14.1 * cm, float(y_1ra_imp + 10.9) * cm, "X")
             
-    p.drawString(16.6 * cm, float(y_1ra_imp + 11) * cm, unicode(manzana.fraccion.nombre))
+    p.drawString(16.6 * cm, float(y_1ra_imp + 10.9) * cm, unicode(manzana.fraccion.nombre))
             # Solo se imprime el primer nombre y apellido-- Faltaaa
     nombre_ape = nueva_factura.cliente.nombres + " " + nueva_factura.cliente.apellidos
-    p.drawString(5.3 * cm, float(y_1ra_imp + 10.3) * cm, unicode(nombre_ape))
-    p.drawString(16.4 * cm, float(y_1ra_imp + 10.4) * cm, unicode(manzana.nro_manzana))
-    p.drawString(18.7 * cm, float(y_1ra_imp + 10.4) * cm, unicode(lote_id.nro_lote))
+    p.drawString(5.3 * cm, float(y_1ra_imp + 10.25) * cm, unicode(nombre_ape))
+    p.drawString(16.4 * cm, float(y_1ra_imp + 10.25) * cm, unicode(manzana.nro_manzana))
+    p.drawString(18.7 * cm, float(y_1ra_imp + 10.25) * cm, unicode(lote_id.nro_lote))
             
             
     if nueva_factura.cliente.ruc == None:
         nueva_factura.cliente.ruc = ""                
-    p.drawString(2.3 * cm, float(y_1ra_imp + 9.7) * cm, unicode(nueva_factura.cliente.ruc))
-    p.drawString(16.7 * cm, float(y_1ra_imp + 9.7) * cm, unicode(nueva_factura.cliente.telefono_laboral))
+    p.drawString(2.3 * cm, float(y_1ra_imp + 9.5) * cm, unicode(nueva_factura.cliente.ruc))
+    p.drawString(16.7 * cm, float(y_1ra_imp + 9.5) * cm, unicode(nueva_factura.cliente.telefono_laboral))
             
-    p.drawString(3 * cm, float(y_1ra_imp + 9.1) * cm, unicode(nueva_factura.cliente.direccion_cobro))
-    p.drawString(13.1 * cm, float(y_1ra_imp + 9.1) * cm, unicode(lote_id.superficie) + "  mts2")
-    p.drawString(17.6 * cm, float(y_1ra_imp + 9.1) * cm, unicode(lote_id.cuenta_corriente_catastral))
+    p.drawString(3 * cm, float(y_1ra_imp + 8.9) * cm, unicode(nueva_factura.cliente.direccion_cobro))
+    p.drawString(13.1 * cm, float(y_1ra_imp + 8.9) * cm, unicode(lote_id.superficie) + "  mts2")
+    p.drawString(17.6 * cm, float(y_1ra_imp + 8.9) * cm, unicode(lote_id.cuenta_corriente_catastral))
             
     # Se obtienen la lista de los detalles
     lista_detalles = json.loads(nueva_factura.detalle)
@@ -695,12 +705,12 @@ def crear_pdf_factura(nueva_factura, request, manzana, lote_id):
         detalles.append(detalle)
     cantidad = 4 - len(detalles)
     pos_y -= (0.5 * cantidad)
-    p.drawString(13.5 * cm, float(y_1ra_imp + 3.8) * cm, unicode('{:,}'.format(exentas).replace(",", "."))) 
-    p.drawString(15.7 * cm, float(y_1ra_imp + 3.8) * cm, unicode('{:,}'.format(iva5).replace(",", ".")))   
-    p.drawString(18 * cm, float(y_1ra_imp + 3.8) * cm, unicode('{:,}'.format(iva10).replace(",", ".")))
+    p.drawString(13.5 * cm, float(y_1ra_imp + 3.3) * cm, unicode('{:,}'.format(exentas).replace(",", "."))) 
+    p.drawString(15.7 * cm, float(y_1ra_imp + 3.3) * cm, unicode('{:,}'.format(iva5).replace(",", ".")))   
+    p.drawString(18 * cm, float(y_1ra_imp + 3.3) * cm, unicode('{:,}'.format(iva10).replace(",", ".")))
     pos_y -= 0.5
-    p.drawString(18 * cm, float(y_1ra_imp + 3.2) * cm, unicode('{:,}'.format(total_venta).replace(",", ".")))
-    pos_y -= 1
+    p.drawString(18 * cm, float(y_1ra_imp + 2.7) * cm, unicode('{:,}'.format(total_venta).replace(",", ".")))
+    pos_y -= 1.5
     numalet = num2words(int(total_venta), lang='es')
     p.drawString(6.5 * cm, float(pos_y - 1.5) * cm, unicode(numalet))
     p.drawString(18 * cm, float(pos_y - 1.5) * cm, unicode('{:,}'.format(total_venta).replace(",", ".")))
@@ -714,31 +724,31 @@ def crear_pdf_factura(nueva_factura, request, manzana, lote_id):
     # FIN PRIMERA IMPRESION
     ######################################################################################################################################
     # INICIO SEGUNDA IMPRESION
-    p.drawString(4.4 * cm, 12.1 * cm, unicode(request.POST.get('fecha', '')))
+    p.drawString(4.4 * cm, 10.9 * cm, unicode(request.POST.get('fecha', '')))
     if nueva_factura.tipo == 'co':
-        p.drawString(12.55 * cm, 12.1 * cm, "X")
+        p.drawString(12.3 * cm, 10.9 * cm, "X")
     else:
-        p.drawString(14.1 * cm, 12.1 * cm, "X")
+        p.drawString(14.1 * cm, 10.9 * cm, "X")
             
-    p.drawString(16.6 * cm, 12.1 * cm, unicode(manzana.fraccion.nombre))
+    p.drawString(16.6 * cm, 10.9 * cm, unicode(manzana.fraccion.nombre))
     # Solo se imprime el primer nombre y apellido-- Faltaaa
     nombre_ape = nueva_factura.cliente.nombres + " " + nueva_factura.cliente.apellidos
-    p.drawString(5.3 * cm, 11.5 * cm, unicode(nombre_ape))
-    p.drawString(16.4 * cm, 11.5 * cm, unicode(manzana.nro_manzana))
-    p.drawString(18.7 * cm, 11.5 * cm, unicode(lote_id.nro_lote))
+    p.drawString(5.3 * cm, 10.25 * cm, unicode(nombre_ape))
+    p.drawString(16.4 * cm, 10.25 * cm, unicode(manzana.nro_manzana))
+    p.drawString(18.7 * cm, 10.25 * cm, unicode(lote_id.nro_lote))
     if nueva_factura.cliente.ruc == None:
         nueva_factura.cliente.ruc = ""                
-    p.drawString(2.3 * cm, 10.8 * cm, unicode(nueva_factura.cliente.ruc))
-    p.drawString(16.7 * cm, 10.8 * cm, unicode(nueva_factura.cliente.telefono_laboral))
+    p.drawString(2.3 * cm, 9.5 * cm, unicode(nueva_factura.cliente.ruc))
+    p.drawString(16.7 * cm, 9.5 * cm, unicode(nueva_factura.cliente.telefono_laboral))
             
-    p.drawString(3 * cm, 10.2 * cm, unicode(nueva_factura.cliente.direccion_cobro))
-    p.drawString(13.1 * cm, 10.2 * cm, unicode(lote_id.superficie) + "  mts2")
-    p.drawString(17.6 * cm, 10.2 * cm, unicode(lote_id.cuenta_corriente_catastral))
+    p.drawString(3 * cm, 8.9 * cm, unicode(nueva_factura.cliente.direccion_cobro))
+    p.drawString(13.1 * cm, 8.9 * cm, unicode(lote_id.superficie) + "  mts2")
+    p.drawString(17.6 * cm, 8.9 * cm, unicode(lote_id.cuenta_corriente_catastral))
             
     # Se obtienen la lista de los detalles
     lista_detalles = json.loads(nueva_factura.detalle)
     detalles = []
-    pos_y = float(8.6)
+    pos_y = float(7.6)
     exentas = 0
     iva10 = 0
     iva5 = 0
@@ -773,12 +783,12 @@ def crear_pdf_factura(nueva_factura, request, manzana, lote_id):
         detalles.append(detalle)
     cantidad = 4 - len(detalles)
     pos_y -= (0.5 * cantidad)
-    p.drawString(13.5 * cm, 4.8 * cm, unicode('{:,}'.format(exentas).replace(",", "."))) 
-    p.drawString(15.7 * cm, 4.8 * cm, unicode('{:,}'.format(iva5).replace(",", ".")))   
-    p.drawString(18 * cm, 4.8 * cm, unicode('{:,}'.format(iva10).replace(",", ".")))
+    p.drawString(13.5 * cm, 3.3 * cm, unicode('{:,}'.format(exentas).replace(",", "."))) 
+    p.drawString(15.7 * cm, 3.3 * cm, unicode('{:,}'.format(iva5).replace(",", ".")))   
+    p.drawString(18 * cm, 3.3 * cm, unicode('{:,}'.format(iva10).replace(",", ".")))
     pos_y -= 0.5
-    p.drawString(18 * cm, 4.2 * cm, unicode('{:,}'.format(total_venta).replace(",", ".")))
-    pos_y -= 1
+    p.drawString(18 * cm, 2.7 * cm, unicode('{:,}'.format(total_venta).replace(",", ".")))
+    pos_y -= 1.5
     numalet = num2words(int(total_venta), lang='es')
     p.drawString(6.5 * cm, float(pos_y - 1.5) * cm, unicode(numalet))
     p.drawString(18 * cm, float(pos_y - 1.5) * cm, unicode('{:,}'.format(total_venta).replace(",", "."))) 
