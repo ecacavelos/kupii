@@ -409,6 +409,174 @@ class Factura(models.Model):
     tipo = models.CharField(max_length=2)
     detalle = models.TextField()
     anulado = models.BooleanField()
+    
+class CoordenadasFactura(models.Model):
+    #FACTURA 1
+    #Fecha
+    usuario = models.ForeignKey(User,on_delete=models.PROTECT)
+    fecha_1x = models.FloatField()
+    fecha_1y = models.FloatField()
+    #Contado
+    contado_1x = models.FloatField()
+    contado_1y = models.FloatField()
+    #Credito
+    credito_1x = models.FloatField()
+    credito_1y = models.FloatField()
+    #Fraccion
+    fraccion_1x = models.FloatField()
+    fraccion_1y = models.FloatField()
+    #Nombre
+    nombre_1x = models.FloatField()
+    nombre_1y = models.FloatField()
+    #Manzana
+    manzana_1x = models.FloatField()
+    manzana_1y = models.FloatField()
+    #Lote
+    lote_1x = models.FloatField()
+    lote_1y = models.FloatField()
+    #RUC
+    ruc_1x = models.FloatField()
+    ruc_1y = models.FloatField()
+    #Telefono
+    telefono_1x = models.FloatField()
+    telefono_1y = models.FloatField()
+    #Direccion
+    direccion_1x = models.FloatField()
+    direccion_1y = models.FloatField()
+    #Superficie
+    superficie_1x = models.FloatField()
+    superficie_1y = models.FloatField()
+    #Cuenta Corriente Catastral
+    cta_cte_ctral_1x = models.FloatField()
+    cta_cte_ctral_1y = models.FloatField()
+    #Cantidad
+    cantidad_1x = models.FloatField()
+    cantidad_1y = models.FloatField()
+    #Descripcion
+    descripcion_1x = models.FloatField()
+    descripcion_1y = models.FloatField()
+    #Precio Unitario
+    precio_1x = models.FloatField()
+    precio_1y = models.FloatField()
+    #Exentas
+    exentas_1x = models.FloatField()
+    exentas_1y = models.FloatField()
+    #IVA5
+    iva5_1x = models.FloatField()
+    iva5_1y = models.FloatField()
+    #IVA10
+    iva10_1x = models.FloatField()
+    iva10_1y = models.FloatField()
+    #Sub Exentas
+    sub_exentas_1x = models.FloatField()
+    sub_exentas_1y = models.FloatField()
+    #Sub IVA5
+    sub_iva5_1x = models.FloatField()
+    sub_iva5_1y = models.FloatField()
+    #Sub IVA 10
+    sub_iva10_1x = models.FloatField()
+    sub_iva10_1y = models.FloatField()
+    #Total Venta
+    total_venta_1x = models.FloatField()
+    total_venta_1y = models.FloatField()
+    #Total a pagar letras
+    total_a_pagar_letra_1x = models.FloatField()
+    total_a_pagar_letra_1y = models.FloatField()
+    #Total a pagar numero
+    total_a_pagar_num_1x = models.FloatField()
+    total_a_pagar_num_1y = models.FloatField()
+    #Liquidacion iva5
+    liq_iva5_1x = models.FloatField()
+    liq_iva5_1y = models.FloatField()
+    #Liquidacion iva10
+    liq_iva10_1x = models.FloatField()
+    liq_iva10_1y = models.FloatField()
+    #Liquidacion total iva
+    liq_total_iva_1x = models.FloatField()
+    liq_total_iva_1y = models.FloatField()
+    
+    #FACTURA 2
+    #Fecha
+    fecha_2x = models.FloatField()
+    fecha_2y = models.FloatField()
+    #Contado
+    contado_2x = models.FloatField()
+    contado_2y = models.FloatField()
+    #Credito
+    credito_2x = models.FloatField()
+    credito_2y = models.FloatField()
+    #Fraccion
+    fraccion_2x = models.FloatField()
+    fraccion_2y = models.FloatField()
+    #Nombre
+    nombre_2x = models.FloatField()
+    nombre_2y = models.FloatField()
+    #Manzana
+    manzana_2x = models.FloatField()
+    manzana_2y = models.FloatField()
+    #Lote
+    lote_2x = models.FloatField()
+    lote_2y = models.FloatField()
+    #RUC
+    ruc_2x = models.FloatField()
+    ruc_2y = models.FloatField()
+    #Telefono
+    telefono_2x = models.FloatField()
+    telefono_2y = models.FloatField()
+    #Direccion
+    direccion_2x = models.FloatField()
+    direccion_2y = models.FloatField()
+    #Superficie
+    superficie_2x = models.FloatField()
+    superficie_2y = models.FloatField()
+    #Cuenta Corriente Catastral
+    cta_cte_ctral_2x = models.FloatField()
+    cta_cte_ctral_2y = models.FloatField()
+    #Cantidad
+    cantidad_2x = models.FloatField()
+    cantidad_2y = models.FloatField()
+    #Descripcion
+    descripcion_2x = models.FloatField()
+    descripcion_2y = models.FloatField()
+    #Precio Unitario
+    precio_2x = models.FloatField()
+    precio_2y = models.FloatField()
+    #Exentas
+    exentas_2x = models.FloatField()
+    exentas_2y = models.FloatField()
+    #IVA5
+    iva5_2x = models.FloatField()
+    iva5_2y = models.FloatField()
+    #IVA10
+    iva10_2x = models.FloatField()
+    iva10_2y = models.FloatField()
+    #Sub Exentas
+    sub_exentas_2x = models.FloatField()
+    sub_exentas_2y = models.FloatField()
+    #Sub IVA5
+    sub_iva5_2x = models.FloatField()
+    sub_iva5_2y = models.FloatField()
+    #Sub IVA 10
+    sub_iva10_2x = models.FloatField()
+    sub_iva10_2y = models.FloatField()
+    #Total Venta
+    total_venta_2x = models.FloatField()
+    total_venta_2y = models.FloatField()
+    #Total a pagar letras
+    total_a_pagar_letra_2x = models.FloatField()
+    total_a_pagar_letra_2y = models.FloatField()
+    #Total a pagar numero
+    total_a_pagar_num_2x = models.FloatField()
+    total_a_pagar_num_2y = models.FloatField()
+    #Liquidacion iva5
+    liq_iva5_2x = models.FloatField()
+    liq_iva5_2y = models.FloatField()
+    #Liquidacion iva10
+    liq_iva10_2x = models.FloatField()
+    liq_iva10_2y = models.FloatField()
+    #Liquidacion total iva
+    liq_total_iva_2x = models.FloatField()
+    liq_total_iva_2y = models.FloatField()    
 
 class PagoDeCuotas(models.Model):
     venta = models.ForeignKey(Venta,on_delete=models.PROTECT)

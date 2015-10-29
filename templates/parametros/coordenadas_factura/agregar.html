@@ -12,7 +12,9 @@
 <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
 -->
 <script type="text/javascript">
-
+$(document).ready(function(){
+	$( ".grid_6" ).hide();
+});
 var data = [
 		{"label" : "Aragorn"}
 		];
@@ -119,8 +121,12 @@ function _validar(){
 
 $(document).ready(function() {
 	
-	$('#id_monto_fijo_cuotas_gerente').val($('#id_monto_fijo_cuotas_gerente').val().replace(".",","));
-	$('#id_monto_fijo_cuotas_gerente').val(format.call($('#id_monto_fijo_cuotas_gerente').val().split(' ').join(''),'.',','));
+	$("label[for='id_porcentaje_inicial_inmobiliaria']").text("Porcentaje entrega inicial inmoviliaria:");
+	$("label[for='id_porcentaje_inicial_gerente']").text("Porcentaje inicial gerente sucursal:");
+	$("label[for='id_cantidad_cuotas_gerente']").text("Cantidad cuotas gerente sucursal:");
+	$("label[for='id_inicio_cuotas_gerente']").text("Inicio cuotas gerente sucursal:");
+	$("label[for='id_intervalos_cuotas_gerente']").text("Intervalos cuotas gerente sucursal:");
+	$("label[for='id_porcentaje_cuotas_gerente']").text("Porcentaje cuotas gerente sucursal:");
 	
 	$( "#id_cantidad_de_cuotas" ).keyup(function() {
   		solo_numeros_cantidad_de_cuotas();
@@ -170,55 +176,52 @@ $(document).ready(function() {
 
 {% block content %}
 <div class="gri16 text-izquierda" id="breadcumb">
-						<a href="{% url 'frontend_home' %}">Inicio</a> <span class="verde-1">></span>  
-						<a href="{% url 'frontend_home' %}parametros/">Parametros</a> <span class="verde-1">></span>  
-						<a href="{% url 'frontend_home' %}parametros/concepto_factura/listado/">Listado de Conceptos de Facturas</a>  
-						<span class="verde-1">> Detalles de Conceptos de Facturas</span> 
-					</div>
-
-					<div class="clear"></div>
-
-					<div class="grid_10">
-  						<h1>Detalles de Conceptos de Factura</h1>
-					</div>
-
-					<div class="grid_6">
-  						<a href="#" class="historico">Buscar</a>
-					</div>
-
-					<div class="clear"></div>
-<div id="detalle-lote">
-	<div id="detalle-lote-header">
-		<h3 class="detalle-lote-header">Concepto de Factura {{ concepto_factura.id }} </h3>
-	</div>
-			
-		<div id="{{message_id}}">{{ message }}</div>
-	
-	<table width="50%" border="1" cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
-	<form action="/parametros/concepto_factura/listado/{{ concepto_factura.id }}/" method="post" onsubmit="_validar();">
-		{% csrf_token %}
-		{% for field in form %}
-		<tr>
-		<div class="fieldWrapper{% if field.field.required %} required{% endif %}">
-			
-			<td>{{ field.label_tag }}</td><td>{{ field }}{{ field.errors }}</td>
-		</div>
-		</tr>		
-		{% endfor %}
-	</table>
-		<div id="lote-ventas">
-			{% for venta in ventas_relacionadas %}
-				<a href="{% url 'frontend_home' %}lotes/listado/ventas/{{ venta.id }}" target="_blank">{{ venta }}</a>
-			{% endfor %}
-		</div>
-		{%if grupo == 1%}
-			<input class="lote-form-button" type="submit" name="boton_guardar" value="Guardar Cambios" />
-			<input class="lote-form-button" type="submit" name="boton_borrar" value="Borrar este Registro" />
-		{%endif%}
-	</form>
+	<a href="{% url 'frontend_home' %}">Inicio</a> 
+	<a href="{% url 'frontend_home' %}parametros/">> Parametros</a> 
+	<a href="{% url 'frontend_home' %}parametros/coordenadas_factura/">> Coordenadas de Impresion de Facturas</a> 
+	<span class="verde-1">> Agregar Coordenadas de Impresion de Facturas</span> 
 </div>
-<br>
-<div id="footer">
-	<a href="{% url 'frontend_home' %}parametros/concepto_factura/listado" class="boton-verde">Volver al Listado de Conceptos de Facturas</a>
+
+<div class="clear"></div>
+
+<div class="grid_10">
+  <h1>Agregar Coordenadas de Impresion de Facturas</h1>
+</div>
+
+<div class="grid_6">
+  <a href="#" class="historico">Buscar</a>
+</div>
+
+<div class="clear"></div>
+
+<div class="grid_16" align="center">
+	
+	  <form action="" method="post" onsubmit="_validar();">
+	  	<div id="{{message_id}}">{{ message }}</div>
+	  	<table width="94%" border="0" cellpadding="0" cellspacing="0" id="forms" align="center">
+		{% csrf_token %}
+		{% for field in form2 %}
+			
+			<tr>
+	    		<td><strong>{{ field.label_tag }}</strong></td>
+	    		<td class="noimage">{{ field }}{{ field.errors }}</td>
+	    	</tr>		
+		{% endfor %}
+		{% for field in form %}
+			
+			<tr>
+	    		<td><strong>{{ field.label_tag }}</strong></td>
+	    		<td class="noimage">{{ field }}{{ field.errors }}</td>
+	    	</tr>		
+		{% endfor %}
+		
+	    </table>
+	    <input name="" type="submit" value="Grabar" style="margin-bottom: 10px; cursor: pointer;" />
+	  </form>
+	  <a class="boton-verde" href="{% url 'frontend_home' %}parametros/coordenadas_factura/">Volver al menú de Coordenadas de Impresion de Facturas</a>
+	<br><br><br>
+	
+	
+<div class="clear"></div>
 </div>
 {% endblock %}

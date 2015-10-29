@@ -30,6 +30,9 @@ def facturar_operacion(request, tipo_operacion, operacion_id):
             cuota_desde = ''
             cuota_hasta = ''
             
+            tipo_venta = ''
+            precio_venta = ''
+            
             if tipo_operacion == '1': # PAGO DE CUOTA
                 pago = PagoDeCuotas.objects.get(pk=operacion_id)
                 cuota_desde_num = pago.venta.pagos_realizados - pago.nro_cuotas_a_pagar+1
@@ -38,6 +41,8 @@ def facturar_operacion(request, tipo_operacion, operacion_id):
                 
             if tipo_operacion == '2': # VENTA
                 venta = Venta.objects.get(pk=operacion_id)
+                tipo_venta = venta.planDePago.tipo_de_plan
+                precio_venta = venta.precio_final_de_venta
             
             ultimo_timbrado = Timbrado.objects.latest('id')
             trfu = TimbradoRangoFacturaUsuario.objects.get(usuario_id=request.user, timbrado_id = ultimo_timbrado.id)
@@ -59,6 +64,8 @@ def facturar_operacion(request, tipo_operacion, operacion_id):
                 'ultima_factura': ultima_factura,
                 'ultimo_timbrado_numero': trfu.timbrado.numero,
                 'ultimo_timbrado_id': ultimo_timbrado.id,
+                'tipo_venta': tipo_venta,
+                'precio_venta': precio_venta,
 
             })
             return HttpResponse(t.render(c))
@@ -133,7 +140,7 @@ def facturar_operacion(request, tipo_operacion, operacion_id):
                         pago.factura = nueva_factura
                         pago.save()
                          
-            return crear_pdf_factura(nueva_factura, request, manzana, lote_id)
+            return crear_pdf_factura(nueva_factura, request, manzana, lote_id, request.user)
     else:
         return HttpResponseRedirect(reverse('login')) 
 
@@ -225,7 +232,7 @@ def facturar(request):
                         pago = PagoDeCuotas.objects.get(pk=object_list[x]['id'])
                         pago.factura = nueva_factura
                         pago.save() 
-            return crear_pdf_factura(nueva_factura, request, manzana, lote_id)
+            return crear_pdf_factura(nueva_factura, request, manzana, lote_id, request.user)
     else:
         return HttpResponseRedirect(reverse('login')) 
     

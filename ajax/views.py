@@ -620,7 +620,7 @@ def facturar(request):
                         pago.factura = nueva_factura
                         pago.save()
                          
-            response = crear_pdf_factura(nueva_factura, request, manzana, lote_id)
+            response = crear_pdf_factura(nueva_factura, request, manzana, lote_id, request.user)
             response = base64.b64encode(response.content)
             
             return HttpResponse(response);

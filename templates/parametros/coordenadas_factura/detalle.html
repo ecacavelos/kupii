@@ -172,14 +172,14 @@ $(document).ready(function() {
 <div class="gri16 text-izquierda" id="breadcumb">
 						<a href="{% url 'frontend_home' %}">Inicio</a> <span class="verde-1">></span>  
 						<a href="{% url 'frontend_home' %}parametros/">Parametros</a> <span class="verde-1">></span>  
-						<a href="{% url 'frontend_home' %}parametros/concepto_factura/listado/">Listado de Conceptos de Facturas</a>  
+						<a href="{% url 'frontend_home' %}parametros/coordenadas_factura/listado/">Listado de Conceptos de Facturas</a>  
 						<span class="verde-1">> Detalles de Conceptos de Facturas</span> 
 					</div>
 
 					<div class="clear"></div>
 
 					<div class="grid_10">
-  						<h1>Detalles de Conceptos de Factura</h1>
+  						<h1>Detalles de Coordenadas de Impresion de Facturas</h1>
 					</div>
 
 					<div class="grid_6">
@@ -189,13 +189,13 @@ $(document).ready(function() {
 					<div class="clear"></div>
 <div id="detalle-lote">
 	<div id="detalle-lote-header">
-		<h3 class="detalle-lote-header">Concepto de Factura {{ concepto_factura.id }} </h3>
+		<h3 class="detalle-lote-header">Coordenadas de Impresion de Facturas {{ coordenadas_factura.id }} </h3>
 	</div>
 			
 		<div id="{{message_id}}">{{ message }}</div>
 	
 	<table width="50%" border="1" cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
-	<form action="/parametros/concepto_factura/listado/{{ concepto_factura.id }}/" method="post" onsubmit="_validar();">
+	<form action="/parametros/coordenadas_factura/listado/{{ coordenadas_factura.id }}/" method="post" onsubmit="_validar();">
 		{% csrf_token %}
 		{% for field in form %}
 		<tr>
@@ -219,6 +219,6 @@ $(document).ready(function() {
 </div>
 <br>
 <div id="footer">
-	<a href="{% url 'frontend_home' %}parametros/concepto_factura/listado" class="boton-verde">Volver al Listado de Conceptos de Facturas</a>
+	<a href="{% url 'frontend_home' %}parametros/coordenadas_factura/listado" class="boton-verde">Volver al Listado de Coordenadas de Impresion de Facturas</a>
 </div>
 {% endblock %}

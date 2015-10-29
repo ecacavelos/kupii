@@ -1,7 +1,7 @@
 from django import forms
 from django.forms import Form, ModelForm
 from django.forms.models import modelformset_factory
-from principal.models import PlanDePago, PlanDePagoVendedor, Timbrado, RangoFactura, ConceptoFactura
+from principal.models import PlanDePago, PlanDePagoVendedor, Timbrado, RangoFactura, ConceptoFactura, CoordenadasFactura
 from django.forms.widgets import TextInput, Textarea, CheckboxInput
 from django.contrib.auth.models import User
 # Create the form class.
@@ -68,6 +68,17 @@ class ConceptoFacturaForm(ModelForm):
                  'exentas': CheckboxInput,
                  'iva10': CheckboxInput,
                  'iva5': CheckboxInput,
+                 
+         }
+        
+# Create the form class.
+class CoordenadasFacturaForm(ModelForm):
+    required_css_class = 'required'
+    class Meta:
+        model = CoordenadasFactura
+        
+        widgets = {
+                 
                  
          }
         

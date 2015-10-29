@@ -1,6 +1,6 @@
 from django.db.models import Count, Min, Sum, Avg
 from principal.models import Lote, Cliente, Vendedor, PlanDePago, Fraccion, Manzana, Venta, Propietario, \
-    PlanDePagoVendedor, PagoDeCuotas, RecuperacionDeLotes, LogUsuario
+    PlanDePagoVendedor, PagoDeCuotas, RecuperacionDeLotes, LogUsuario, CoordenadasFactura
 from principal.monthdelta import MonthDelta
 from calendar import monthrange
 from datetime import datetime, timedelta
@@ -634,43 +634,46 @@ def get_ultima_venta(lote_id):
 
     return venta
 
-def crear_pdf_factura(nueva_factura, request, manzana, lote_id):
+def crear_pdf_factura(nueva_factura, request, manzana, lote_id, usuario):
     response = HttpResponse(content_type='application/pdf')
     nombre_factura = "factura-" + nueva_factura.numero + ".pdf"
     response['Content-Disposition'] = 'attachment; filename=factura' + str(nueva_factura.id) + '.pdf'
     p = canvas.Canvas(response)
     p.setPageSize((210 * mm, 297 * mm))
     p.setFont("Helvetica", 7)
+    
+    #Obtener las coordenadas de impresion de la factura
+    coor = CoordenadasFactura.objects.get(usuario = usuario)
             
     # INICIO PRIMERA IMPRESION
     y_1ra_imp = float(14.05)
-    p.drawString(4.4 * cm, float(y_1ra_imp + 10.9) * cm, unicode(request.POST.get('fecha', '')))
+    p.drawString(coor.fecha_1x * cm, float(coor.fecha_1y) * cm, unicode(request.POST.get('fecha', '')))
     if nueva_factura.tipo == 'co':
-        p.drawString(12.3 * cm, float(y_1ra_imp + 10.9) * cm, "X")
+        p.drawString(coor.contado_1x * cm, float(coor.contado_1y) * cm, "X")
     else:
-        p.drawString(14.1 * cm, float(y_1ra_imp + 10.9) * cm, "X")
+        p.drawString(coor.credito_1x * cm, float(coor.credito_1y) * cm, "X")
             
-    p.drawString(16.6 * cm, float(y_1ra_imp + 10.9) * cm, unicode(manzana.fraccion.nombre))
+    p.drawString(coor.fraccion_1x * cm, float(coor.fraccion_1y) * cm, unicode(manzana.fraccion.nombre))
             # Solo se imprime el primer nombre y apellido-- Faltaaa
     nombre_ape = nueva_factura.cliente.nombres + " " + nueva_factura.cliente.apellidos
-    p.drawString(5.3 * cm, float(y_1ra_imp + 10.25) * cm, unicode(nombre_ape))
-    p.drawString(16.4 * cm, float(y_1ra_imp + 10.25) * cm, unicode(manzana.nro_manzana))
-    p.drawString(18.7 * cm, float(y_1ra_imp + 10.25) * cm, unicode(lote_id.nro_lote))
+    p.drawString(coor.nombre_1x * cm, float(coor.nombre_1y) * cm, unicode(nombre_ape))
+    p.drawString(coor.manzana_1x * cm, float(coor.manzana_1y) * cm, unicode(manzana.nro_manzana))
+    p.drawString(coor.lote_1x * cm, float(coor.lote_1y) * cm, unicode(lote_id.nro_lote))
             
             
     if nueva_factura.cliente.ruc == None:
         nueva_factura.cliente.ruc = ""                
-    p.drawString(2.3 * cm, float(y_1ra_imp + 9.5) * cm, unicode(nueva_factura.cliente.ruc))
-    p.drawString(16.7 * cm, float(y_1ra_imp + 9.5) * cm, unicode(nueva_factura.cliente.telefono_laboral))
+    p.drawString(coor.ruc_1x * cm, float(coor.ruc_1y) * cm, unicode(nueva_factura.cliente.ruc))
+    p.drawString(coor.telefono_1x * cm, float(coor.telefono_1y) * cm, unicode(nueva_factura.cliente.telefono_laboral))
             
-    p.drawString(3 * cm, float(y_1ra_imp + 8.9) * cm, unicode(nueva_factura.cliente.direccion_cobro))
-    p.drawString(13.1 * cm, float(y_1ra_imp + 8.9) * cm, unicode(lote_id.superficie) + "  mts2")
-    p.drawString(17.6 * cm, float(y_1ra_imp + 8.9) * cm, unicode(lote_id.cuenta_corriente_catastral))
+    p.drawString(coor.direccion_1x * cm, float(coor.direccion_1y) * cm, unicode(nueva_factura.cliente.direccion_cobro))
+    p.drawString(coor.superficie_1x * cm, float(coor.superficie_1y) * cm, unicode(lote_id.superficie) + "  mts2")
+    p.drawString(coor.cta_cte_ctral_1x * cm, float(coor.cta_cte_ctral_1y) * cm, unicode(lote_id.cuenta_corriente_catastral))
             
     # Se obtienen la lista de los detalles
     lista_detalles = json.loads(nueva_factura.detalle)
     detalles = []
-    pos_y = float(y_1ra_imp + 7.5)
+    pos_y = float(coor.cantidad_1y+ 0.5)
     exentas = 0
     iva10 = 0
     iva5 = 0
@@ -683,72 +686,74 @@ def crear_pdf_factura(nueva_factura, request, manzana, lote_id):
         detalle = {}
         detalle['item'] = key
         detalle['cantidad'] = value['cantidad']
-        p.drawString(1.7 * cm, float(pos_y - 0.5) * cm, unicode(detalle['cantidad']))
+        p.drawString(coor.cantidad_1x * cm, float(pos_y - 0.5) * cm, unicode(detalle['cantidad']))
         detalle['concepto'] = value['concepto']
-        p.drawString(5 * cm, float(pos_y - 0.5) * cm, unicode(detalle['concepto']))
+        p.drawString(coor.descripcion_1x * cm, float(pos_y - 0.5) * cm, unicode(detalle['concepto']))
         detalle['precio_unitario'] = int(value['precio_unitario'])
-        p.drawString(11.2 * cm, float(pos_y - 0.5) * cm, unicode('{:,}'.format(detalle['precio_unitario']).replace(",", ".")))
+        p.drawString(coor.precio_1x * cm, float(pos_y - 0.5) * cm, unicode('{:,}'.format(detalle['precio_unitario']).replace(",", ".")))
         total_venta += int(detalle['cantidad']) * int(detalle['precio_unitario'])
         detalle['exentas'] = int(value['exentas'])
-        p.drawString(13.5 * cm, float(pos_y - 0.5) * cm, unicode('{:,}'.format(detalle['exentas']).replace(",", ".")))
+        p.drawString(coor.exentas_1x * cm, float(pos_y - 0.5) * cm, unicode('{:,}'.format(detalle['exentas']).replace(",", ".")))
         if detalle['exentas'] != '':
             exentas += int(detalle['exentas'])
         detalle['iva_5'] = int(value['iva_5'])
-        p.drawString(15.8 * cm, float(pos_y - 0.5) * cm, unicode('{:,}'.format(detalle['iva_5']).replace(",", ".")))
+        p.drawString(coor.iva5_1x * cm, float(pos_y - 0.5) * cm, unicode('{:,}'.format(detalle['iva_5']).replace(",", ".")))
         if detalle['iva_5'] != '':
             iva5 += int(detalle['iva_5'])
         detalle['iva_10'] = int(value['iva_10'])
-        p.drawString(18.6 * cm, float(pos_y - 0.5) * cm, unicode('{:,}'.format(detalle['iva_10']).replace(",", ".")))
+        p.drawString(coor.iva10_1x * cm, float(pos_y - 0.5) * cm, unicode('{:,}'.format(detalle['iva_10']).replace(",", ".")))
         if detalle['iva_10'] != '':
             iva10 += int(detalle['iva_10'])
         pos_y -= 0.5
         detalles.append(detalle)
     cantidad = 4 - len(detalles)
     pos_y -= (0.5 * cantidad)
-    p.drawString(13.5 * cm, float(y_1ra_imp + 3.3) * cm, unicode('{:,}'.format(exentas).replace(",", "."))) 
-    p.drawString(15.7 * cm, float(y_1ra_imp + 3.3) * cm, unicode('{:,}'.format(iva5).replace(",", ".")))   
-    p.drawString(18 * cm, float(y_1ra_imp + 3.3) * cm, unicode('{:,}'.format(iva10).replace(",", ".")))
+    p.drawString(coor.sub_exentas_1x * cm, float(coor.sub_exentas_1y) * cm, unicode('{:,}'.format(exentas).replace(",", "."))) 
+    p.drawString(coor.sub_iva5_1x * cm, float(coor.sub_iva5_1y) * cm, unicode('{:,}'.format(iva5).replace(",", ".")))   
+    p.drawString(coor.sub_iva10_1x * cm, float(coor.sub_iva10_1y) * cm, unicode('{:,}'.format(iva10).replace(",", ".")))
     pos_y -= 0.5
-    p.drawString(18 * cm, float(y_1ra_imp + 2.7) * cm, unicode('{:,}'.format(total_venta).replace(",", ".")))
+    p.drawString(coor.total_venta_1x * cm, float(coor.total_venta_1y) * cm, unicode('{:,}'.format(total_venta).replace(",", ".")))
     pos_y -= 1.5
     numalet = num2words(int(total_venta), lang='es')
-    p.drawString(6.5 * cm, float(pos_y - 1.5) * cm, unicode(numalet))
-    p.drawString(18 * cm, float(pos_y - 1.5) * cm, unicode('{:,}'.format(total_venta).replace(",", ".")))
+    p.drawString(coor.total_a_pagar_letra_1x * cm, float(coor.total_a_pagar_letra_1y) * cm, unicode(numalet))
+    p.drawString(coor.total_a_pagar_num_1x * cm, float(coor.total_a_pagar_num_1y) * cm, unicode('{:,}'.format(total_venta).replace(",", ".")))
     total_iva_10 = int(iva10 / 11)
     total_iva_5 = int(iva5 / 21)
     total_iva = total_iva_10 + total_iva_5
     pos_y -= 0.5
-    p.drawString(5.2 * cm, float(pos_y - 1.6) * cm, unicode('{:,}'.format(total_iva_5).replace(",", ".")))
-    p.drawString(8.5 * cm, float(pos_y - 1.6) * cm, unicode('{:,}'.format(total_iva_10).replace(",", ".")))
-    p.drawString(13 * cm, float(pos_y - 1.6) * cm, unicode('{:,}'.format(total_iva).replace(",", ".")))
+    p.drawString(coor.liq_iva5_1x * cm, float(coor.liq_iva5_1y) * cm, unicode('{:,}'.format(total_iva_5).replace(",", ".")))
+    p.drawString(coor.liq_iva10_1x * cm, float(coor.liq_iva10_1y) * cm, unicode('{:,}'.format(total_iva_10).replace(",", ".")))
+    p.drawString(coor.liq_total_iva_1x * cm, float(coor.liq_total_iva_1y) * cm, unicode('{:,}'.format(total_iva).replace(",", ".")))
     # FIN PRIMERA IMPRESION
     ######################################################################################################################################
     # INICIO SEGUNDA IMPRESION
-    p.drawString(4.4 * cm, 10.9 * cm, unicode(request.POST.get('fecha', '')))
+    p.drawString(coor.fecha_2x * cm, float(coor.fecha_2y) * cm, unicode(request.POST.get('fecha', '')))
     if nueva_factura.tipo == 'co':
-        p.drawString(12.3 * cm, 10.9 * cm, "X")
+        p.drawString(coor.contado_2x * cm, float(coor.contado_2y) * cm, "X")
     else:
-        p.drawString(14.1 * cm, 10.9 * cm, "X")
+        p.drawString(coor.credito_2x * cm, float(coor.credito_2y) * cm, "X")
             
-    p.drawString(16.6 * cm, 10.9 * cm, unicode(manzana.fraccion.nombre))
-    # Solo se imprime el primer nombre y apellido-- Faltaaa
+    p.drawString(coor.fraccion_2x * cm, float(coor.fraccion_2y) * cm, unicode(manzana.fraccion.nombre))
+            # Solo se imprime el primer nombre y apellido-- Faltaaa
     nombre_ape = nueva_factura.cliente.nombres + " " + nueva_factura.cliente.apellidos
-    p.drawString(5.3 * cm, 10.25 * cm, unicode(nombre_ape))
-    p.drawString(16.4 * cm, 10.25 * cm, unicode(manzana.nro_manzana))
-    p.drawString(18.7 * cm, 10.25 * cm, unicode(lote_id.nro_lote))
+    p.drawString(coor.nombre_2x * cm, float(coor.nombre_2y) * cm, unicode(nombre_ape))
+    p.drawString(coor.manzana_2x * cm, float(coor.manzana_2y) * cm, unicode(manzana.nro_manzana))
+    p.drawString(coor.lote_2x * cm, float(coor.lote_2y) * cm, unicode(lote_id.nro_lote))
+            
+            
     if nueva_factura.cliente.ruc == None:
         nueva_factura.cliente.ruc = ""                
-    p.drawString(2.3 * cm, 9.5 * cm, unicode(nueva_factura.cliente.ruc))
-    p.drawString(16.7 * cm, 9.5 * cm, unicode(nueva_factura.cliente.telefono_laboral))
+    p.drawString(coor.ruc_2x * cm, float(coor.ruc_2y) * cm, unicode(nueva_factura.cliente.ruc))
+    p.drawString(coor.telefono_2x * cm, float(coor.telefono_2y) * cm, unicode(nueva_factura.cliente.telefono_laboral))
             
-    p.drawString(3 * cm, 8.9 * cm, unicode(nueva_factura.cliente.direccion_cobro))
-    p.drawString(13.1 * cm, 8.9 * cm, unicode(lote_id.superficie) + "  mts2")
-    p.drawString(17.6 * cm, 8.9 * cm, unicode(lote_id.cuenta_corriente_catastral))
+    p.drawString(coor.direccion_2x * cm, float(coor.direccion_2y) * cm, unicode(nueva_factura.cliente.direccion_cobro))
+    p.drawString(coor.superficie_2x * cm, float(coor.superficie_2y) * cm, unicode(lote_id.superficie) + "  mts2")
+    p.drawString(coor.cta_cte_ctral_2x * cm, float(coor.cta_cte_ctral_2y) * cm, unicode(lote_id.cuenta_corriente_catastral))
             
     # Se obtienen la lista de los detalles
     lista_detalles = json.loads(nueva_factura.detalle)
     detalles = []
-    pos_y = float(7.6)
+    pos_y = float(coor.cantidad_2y+ 0.5)
     exentas = 0
     iva10 = 0
     iva5 = 0
@@ -761,44 +766,44 @@ def crear_pdf_factura(nueva_factura, request, manzana, lote_id):
         detalle = {}
         detalle['item'] = key
         detalle['cantidad'] = value['cantidad']
-        p.drawString(1.7 * cm, float(pos_y - 0.5) * cm, unicode(detalle['cantidad']))
+        p.drawString(coor.cantidad_2x * cm, float(pos_y - 0.5) * cm, unicode(detalle['cantidad']))
         detalle['concepto'] = value['concepto']
-        p.drawString(5 * cm, float(pos_y - 0.5) * cm, unicode(detalle['concepto']))
+        p.drawString(coor.descripcion_2x * cm, float(pos_y - 0.5) * cm, unicode(detalle['concepto']))
         detalle['precio_unitario'] = int(value['precio_unitario'])
-        p.drawString(11.2 * cm, float(pos_y - 0.5) * cm, unicode('{:,}'.format(detalle['precio_unitario']).replace(",", ".")))
+        p.drawString(coor.precio_2x * cm, float(pos_y - 0.5) * cm, unicode('{:,}'.format(detalle['precio_unitario']).replace(",", ".")))
         total_venta += int(detalle['cantidad']) * int(detalle['precio_unitario'])
         detalle['exentas'] = int(value['exentas'])
-        p.drawString(13.5 * cm, float(pos_y - 0.5) * cm, unicode('{:,}'.format(detalle['exentas']).replace(",", ".")))
+        p.drawString(coor.exentas_2x * cm, float(pos_y - 0.5) * cm, unicode('{:,}'.format(detalle['exentas']).replace(",", ".")))
         if detalle['exentas'] != '':
             exentas += int(detalle['exentas'])
         detalle['iva_5'] = int(value['iva_5'])
-        p.drawString(15.8 * cm, float(pos_y - 0.5) * cm, unicode('{:,}'.format(detalle['iva_5']).replace(",", ".")))
+        p.drawString(coor.iva5_2x * cm, float(pos_y - 0.5) * cm, unicode('{:,}'.format(detalle['iva_5']).replace(",", ".")))
         if detalle['iva_5'] != '':
             iva5 += int(detalle['iva_5'])
         detalle['iva_10'] = int(value['iva_10'])
-        p.drawString(18.6 * cm, float(pos_y - 0.5) * cm, unicode('{:,}'.format(detalle['iva_10']).replace(",", ".")))
+        p.drawString(coor.iva10_2x * cm, float(pos_y - 0.5) * cm, unicode('{:,}'.format(detalle['iva_10']).replace(",", ".")))
         if detalle['iva_10'] != '':
             iva10 += int(detalle['iva_10'])
         pos_y -= 0.5
         detalles.append(detalle)
     cantidad = 4 - len(detalles)
     pos_y -= (0.5 * cantidad)
-    p.drawString(13.5 * cm, 3.3 * cm, unicode('{:,}'.format(exentas).replace(",", "."))) 
-    p.drawString(15.7 * cm, 3.3 * cm, unicode('{:,}'.format(iva5).replace(",", ".")))   
-    p.drawString(18 * cm, 3.3 * cm, unicode('{:,}'.format(iva10).replace(",", ".")))
+    p.drawString(coor.sub_exentas_2x * cm, float(coor.sub_exentas_2y) * cm, unicode('{:,}'.format(exentas).replace(",", "."))) 
+    p.drawString(coor.sub_iva5_2x * cm, float(coor.sub_iva5_2y) * cm, unicode('{:,}'.format(iva5).replace(",", ".")))   
+    p.drawString(coor.sub_iva10_2x * cm, float(coor.sub_iva10_2y) * cm, unicode('{:,}'.format(iva10).replace(",", ".")))
     pos_y -= 0.5
-    p.drawString(18 * cm, 2.7 * cm, unicode('{:,}'.format(total_venta).replace(",", ".")))
+    p.drawString(coor.total_venta_2x * cm, float(coor.total_venta_2y) * cm, unicode('{:,}'.format(total_venta).replace(",", ".")))
     pos_y -= 1.5
     numalet = num2words(int(total_venta), lang='es')
-    p.drawString(6.5 * cm, float(pos_y - 1.5) * cm, unicode(numalet))
-    p.drawString(18 * cm, float(pos_y - 1.5) * cm, unicode('{:,}'.format(total_venta).replace(",", "."))) 
+    p.drawString(coor.total_a_pagar_letra_2x * cm, float(coor.total_a_pagar_letra_2y) * cm, unicode(numalet))
+    p.drawString(coor.total_a_pagar_num_2x * cm, float(coor.total_a_pagar_num_2y) * cm, unicode('{:,}'.format(total_venta).replace(",", ".")))
     total_iva_10 = int(iva10 / 11)
     total_iva_5 = int(iva5 / 21)
     total_iva = total_iva_10 + total_iva_5
     pos_y -= 0.5
-    p.drawString(5.2 * cm, float(pos_y - 1.6) * cm, unicode('{:,}'.format(total_iva_5).replace(",", ".")))
-    p.drawString(8.5 * cm, float(pos_y - 1.6) * cm, unicode('{:,}'.format(total_iva_10).replace(",", ".")))
-    p.drawString(13 * cm, float(pos_y - 1.6) * cm, unicode('{:,}'.format(total_iva).replace(",", ".")))
+    p.drawString(coor.liq_iva5_2x * cm, float(coor.liq_iva5_2y) * cm, unicode('{:,}'.format(total_iva_5).replace(",", ".")))
+    p.drawString(coor.liq_iva10_2x * cm, float(coor.liq_iva10_2y) * cm, unicode('{:,}'.format(total_iva_10).replace(",", ".")))
+    p.drawString(coor.liq_total_iva_2x * cm, float(coor.liq_total_iva_2y) * cm, unicode('{:,}'.format(total_iva).replace(",", ".")))
     # FIN SEGUNDA IMPRESION
             
     p.showPage()
