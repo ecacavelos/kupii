@@ -6,23 +6,23 @@
 }
 
 .concepto-factura.item {
-    width: 300px;
+    width: 375px;
 }
 
 .precio_unitario-item.item{
-	width: 110px;
+	width: 100px;
 }
 
 .exentas-item.item{
-	width: 110px;
+	width: 100px;
 }
 
 .iva_5-item.item{
-	width: 110px;
+	width: 100px;
 }
 
 .iva_10-item.item{
-	width: 110px;
+	width: 100px;
 }
 
 #lote-ventas {
