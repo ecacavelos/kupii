@@ -1,8 +1,28 @@
 @charset "utf-8";
 /* CSS Document */
 
+.cantidad-item.item {
+    width: 50px;
+}
+
 .concepto-factura.item {
-    width: 275px;
+    width: 300px;
+}
+
+.precio_unitario-item.item{
+	width: 110px;
+}
+
+.exentas-item.item{
+	width: 110px;
+}
+
+.iva_5-item.item{
+	width: 110px;
+}
+
+.iva_10-item.item{
+	width: 110px;
 }
 
 #lote-ventas {

@@ -439,18 +439,18 @@ def get_mes_pagado_by_id_lote(request):
 def get_pago_cuotas_by_lote_cliente(request):
     if request.method == 'GET':
         if request.user.is_authenticated():
-            try:  
+            #try:  
                 codigo= request.GET.get('lote_id')
                 cedula_cli= request.GET.get('cliente_id')
                 nombre= request.GET.get('nombre')
                 lote =  Lote.objects.get(codigo_paralot= codigo)
                 cliente = Cliente.objects.get(cedula=cedula_cli)
                 venta = Venta.objects.get(lote_id= lote.id, cliente_id=cliente.id)
-                object_list=get_pago_cuotas(venta, None, None)
+                object_list=get_pago_cuotas_2(venta, None, None)
                 labels=["nro_cuota_y_total","nro_cuota"]
                 return HttpResponse(json.dumps(object_list, cls=DjangoJSONEncoder), content_type="application/json")
-            except Exception, error:
-                print error
+            #except Exception, error:
+                #print error
         else:
             return HttpResponseRedirect(reverse('login'))
         
@@ -465,6 +465,10 @@ def get_detalles_factura(request):
                 num_desde = int(nro_cuota_desde[0])
                 num_hasta = int(nro_cuota_hasta[0])
                 lote =  Lote.objects.get(codigo_paralot= codigo)
+                
+                cuotas_pag = (num_hasta - num_desde) + 1
+                cuotas_detalles = get_cuota_information_by_lote(lote.id,cuotas_pag)
+                
                 cliente = Cliente.objects.get(cedula=cedula_cli)
                 venta = Venta.objects.get(lote_id= lote.id, cliente_id=cliente.id)
                 object_list=get_pago_cuotas(venta, None, None)
@@ -480,7 +484,9 @@ def get_detalles_factura(request):
                 
                 detalle['iva5']= int( ( (cantidad * venta.precio_de_cuota) * 31.5) / 101.5) 
                 
-                detalle['exentas'] = int( (cantidad * venta.precio_de_cuota) - detalle['iva5']) 
+                detalle['exentas'] = int( (cantidad * venta.precio_de_cuota) - detalle['iva5'])
+                
+                detalle['cuotas_detalles'] = cuotas_detalles
                 
                 detalles.append(detalle)
                 '''

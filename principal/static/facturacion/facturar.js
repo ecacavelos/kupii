@@ -6,7 +6,7 @@
 	var cantidad_detalles = 1;
 	
 		item_inicial_detalle_factura = '<div class="item-detalle">'
-			+ '<input type="number" id="id_detalle_cantidad_1" class= "cantidad-item item" placeholder="Cant." size="2" value="" style="width:60px;">'
+			+ '<input type="number" id="id_detalle_cantidad_1" class= "cantidad-item item" placeholder="Cant." size="2" value="" style="width:50px;">'
 			+ '<input type="text" id="id_detalle_concepto_1" class="concepto-factura item" placeholder="Concepto">'
 			+ '<input type="text" id="id_detalle_precio_unitario_1" class= "precio_unitario-item item" placeholder="Precio unitario">'
 			+ '<input type="text" id="id_detalle_exentas_1" class= "exentas-item item" placeholder="Exentas">'
@@ -95,7 +95,7 @@
         	cantidad_detalles++;
         	
         	item_detalle_factura = '<div class="item-detalle">'
-			+ '<input type="number" id="id_detalle_cantidad_'+cantidad_detalles+'" class= "cantidad-item item" placeholder="Cantidad" size="2" value="" style="width:60px;">'
+			+ '<input type="number" id="id_detalle_cantidad_'+cantidad_detalles+'" class= "cantidad-item item" placeholder="Cantidad" size="2" value="" style="width:50px;">'
 			+ '<input type="text" id="id_detalle_concepto_'+cantidad_detalles+'" class="concepto-factura item" placeholder="Concepto">'
 			+ '<input type="text" id="id_detalle_precio_unitario_'+cantidad_detalles+'" class= "precio_unitario-item item" placeholder="Precio unitario">'
 			+ '<input type="text" id="id_detalle_exentas_'+cantidad_detalles+'" class= "exentas-item item" placeholder="Exentas">'
@@ -223,9 +223,27 @@
 				// Actualizamos el detalle de la factura
 				request.done(function(msg) {
 					index = $('.item-detalle').length;
-					var inputs= $('.item-detalle')[index -1].children
+					var inputs= $('.item-detalle')[index -1].children;
 					inputs[0].value=msg[0].cantidad;
-					inputs[2].value="Cuota Nro: "  + $("#id_nro_cuota").val() + " a " + $("#id_nro_cuota_hasta").val();
+					ultimo = (msg[0].cuotas_detalles).length - 1;
+					
+					var monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Deciembre"];
+					fecha_1 = msg[0].cuotas_detalles[0].fecha;
+					fecha_2 = msg[0].cuotas_detalles[ultimo].fecha;
+					
+					var parts_1 = fecha_1.split("/");
+					var d1 = new Date(parseInt(parts_1[2], 10), parseInt(parts_1[1], 10) - 1, parseInt(parts_1[0], 10));
+					year_1 = parts_1[2];
+					
+					var parts_2 = fecha_2.split("/");
+					var d2 = new Date(parseInt(parts_2[2], 10), parseInt(parts_2[1], 10) - 1, parseInt(parts_2[0], 10));
+					year_2 = parts_2[2];
+					
+					//alert("Los meses son: " + monthNames[d1.getMonth()]+ ", "+monthNames[d2.getMonth()]);
+					
+					mes_year_1 = monthNames[d1.getMonth()]+"/"+year_1;
+					mes_year_2 =  monthNames[d2.getMonth()]+"/"+year_2;
+					inputs[2].value="Pago de Cuota: "  + $("#id_nro_cuota").val() + " de "+ mes_year_1+", al " + $("#id_nro_cuota_hasta").val()+ " de "+ mes_year_2;
 					inputs[3].value=msg[0].precio_unitario;
 					inputs[4].value=msg[0].exentas;
 					inputs[5].value=msg[0].iva5;
@@ -236,7 +254,7 @@
 					if (msg.length > 1){
 						$('.item-detalle')[index -1].children[7].click();
 			        	index = $('.item-detalle').length;
-			        	var inputs= $('.item-detalle')[index -1].children
+			        	var inputs= $('.item-detalle')[index -1].children;
 						inputs[0].value=msg[1].cantidad;
 						inputs[2].value="Interes Moratorio";
 						inputs[3].value=msg[1].precio_unitario;
