@@ -369,7 +369,7 @@
 				//qz.append("A37,503,0,1,2,3,N,QZ-Hola Mundo!!!\n");
   				//qz.print();
 				//pdf = "HOLA MUNDO";
-				alert("Factura Creada");
+				//alert("Factura Creada");
 				//window.location.href = "https://sistema.propar.com.py/facturacion/facturar/";						
 				return true;		    						
 			}

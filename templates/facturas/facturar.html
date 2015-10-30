@@ -236,7 +236,7 @@ function qzDonePrinting() {
     }
 
     // Alert success message
-    alert('Successfully sent print data to "' + qz.getPrinter() + '" queue.');
+    //alert('Successfully sent print data to "' + qz.getPrinter() + '" queue.');
 }
 
 /***************************************************************************
@@ -254,8 +254,8 @@ function useDefaultPrinter() {
         window['qzDoneFinding'] = function() {
             // Alert the printer name to user
             var printer = qz.getPrinter();
-            alert(printer !== null ? 'Impresora por defecto encontrada: "' + printer + '"':
-            'Impresora por defecto ' + 'no encontrada');
+            //alert(printer !== null ? 'Impresora por defecto encontrada: "' + printer + '"':
+            //'Impresora por defecto ' + 'no encontrada');
 
             // Remove reference to this function
             window['qzDoneFinding'] = null;
