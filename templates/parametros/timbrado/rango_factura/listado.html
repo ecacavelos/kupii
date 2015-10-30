@@ -71,7 +71,7 @@
 				{% if forloop.counter|divisibleby:2 %}
 					<tr>
 						<td><a href="{{rango_factura.id}}">{{rango_factura.id}} <strong>(Ver Detalles)</strong></a></td>
-						<td></td>
+						<td>{{rango_factura.timbrado.numero}}</td>
 						<td>{{rango_factura.nro_sucursal}}</td>
 						<td>{{rango_factura.nro_boca}}</td>
 						<td>{{rango_factura.nro_desde}}</td>
@@ -81,7 +81,7 @@
 					{% else %}
 					<tr class="bkg_gris">
 						<td><a href="{{rango_factura.id}}">{{rango_factura.id}} <strong>(Ver Detalles)</strong></a></td>
-						<td></td>
+						<td>{{rango_factura.timbrado.numero}}</td>
 						<td>{{rango_factura.nro_sucursal}}</td>
 						<td>{{rango_factura.nro_boca}}</td>
 						<td>{{rango_factura.nro_desde}}</td>

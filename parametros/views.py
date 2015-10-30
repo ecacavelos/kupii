@@ -466,12 +466,13 @@ def consultar_rango_factura(request, timbrado_id):
             else:
                 message = "No se ingresaron datos para la busqueda."
     else:
-        object_list = TimbradoRangoFacturaUsuario.objects.filter(timbrado=timbrado_id).order_by('id')        
+        object_list = TimbradoRangoFacturaUsuario.objects.filter(timbrado_id=timbrado_id).order_by('id')        
         rango_factura_list = []
         for trfu in object_list:
-            rango_factura = RangoFactura.objects.get(pk=trfu.timbrado_id)
+            rango_factura = RangoFactura.objects.get(pk=trfu.rango_factura_id)
             rango_factura.usuario = trfu.usuario
-            rango_factura_list.append(rango_factura)                                  
+            rango_factura_list.append(rango_factura)
+            rango_factura.timbrado = trfu.timbrado                                   
         
         search_form = SearchForm({})
         message = ""
