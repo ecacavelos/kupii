@@ -412,6 +412,12 @@ class Factura(models.Model):
     
 class CoordenadasFactura(models.Model):
     #FACTURA 1
+    #Timbrado
+    #timbrado_1x = models.FloatField()
+    #timbrado_1y = models.FloatField()
+    #Numero
+    numero_1x = models.FloatField()
+    numero_1y = models.FloatField()
     #Fecha
     usuario = models.ForeignKey(User,on_delete=models.PROTECT)
     fecha_1x = models.FloatField()
@@ -496,6 +502,12 @@ class CoordenadasFactura(models.Model):
     liq_total_iva_1y = models.FloatField()
     
     #FACTURA 2
+    #Timbrado
+    #timbrado_2x = models.FloatField()
+    #timbrado_2y = models.FloatField()
+    #Numero
+    numero_2x = models.FloatField()
+    numero_2y = models.FloatField()
     #Fecha
     fecha_2x = models.FloatField()
     fecha_2y = models.FloatField()

@@ -730,10 +730,17 @@ def crear_pdf_factura(nueva_factura, request, manzana, lote_id, usuario):
     p.setFont("Helvetica", 7)
     
     #Obtener las coordenadas de impresion de la factura
-    coor = CoordenadasFactura.objects.get(usuario = usuario)
+    try:
+        coor = CoordenadasFactura.objects.get(usuario = usuario)    
+    except Exception, error:
+        coor = CoordenadasFactura.objects.get(usuario_id = 2)
+    
             
     # INICIO PRIMERA IMPRESION
     y_1ra_imp = float(14.05)
+    
+    p.drawString(coor.numero_1x * cm, float(coor.numero_1y) * cm, unicode(nueva_factura.numero))
+    
     p.drawString(coor.fecha_1x * cm, float(coor.fecha_1y) * cm, unicode(request.POST.get('fecha', '')))
     if nueva_factura.tipo == 'co':
         p.drawString(coor.contado_1x * cm, float(coor.contado_1y) * cm, "X")
@@ -814,6 +821,8 @@ def crear_pdf_factura(nueva_factura, request, manzana, lote_id, usuario):
     # FIN PRIMERA IMPRESION
     ######################################################################################################################################
     # INICIO SEGUNDA IMPRESION
+    p.drawString(coor.numero_2x * cm, float(coor.numero_2y) * cm, unicode(nueva_factura.numero))
+    
     p.drawString(coor.fecha_2x * cm, float(coor.fecha_2y) * cm, unicode(request.POST.get('fecha', '')))
     if nueva_factura.tipo == 'co':
         p.drawString(coor.contado_2x * cm, float(coor.contado_2y) * cm, "X")
