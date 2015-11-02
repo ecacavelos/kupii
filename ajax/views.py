@@ -526,8 +526,11 @@ def get_detalles_factura(request):
                 for x in xrange(0 ,len(gestion_cobranza)):
                     if gestion_cobranza[x].detalle != None:
                         detalle= ast.literal_eval(gestion_cobranza[x].detalle)
-                        if detalle['item' + str(len(detalle) -1)]['gestion_cobranza'] != "0":
-                            suma_gestion += detalle['item' + str(len(detalle) -1)]['gestion_cobranza']
+                        try:
+                            if detalle['item' + str(len(detalle) -1)]['gestion_cobranza'] != "0":
+                                suma_gestion += detalle['item' + str(len(detalle) -1)]['gestion_cobranza']
+                        except Exception, error:
+                            print error
                 if suma_gestion != 0:
                     detalle={}
                     detalle['cantidad'] = 1
