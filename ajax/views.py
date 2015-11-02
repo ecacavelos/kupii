@@ -472,6 +472,7 @@ def get_detalles_factura(request):
                 cliente = Cliente.objects.get(cedula=cedula_cli)
                 venta = Venta.objects.get(lote_id= lote.id, cliente_id=cliente.id)
                 object_list=get_pago_cuotas(venta, None, None)
+                #object_list = sorted(object_list, key=lambda k: k['id']) 
                 gestion_cobranza = []
                 interes_moratorio = 0   
                 suma_gestion = 0                     
@@ -494,26 +495,26 @@ def get_detalles_factura(request):
                     Tambien se acumula la gestion de cobranza que hay en las cuotas
                 '''
                 cantidad = 0
+                gestion_procesada = False
+                ultimo_pago = object_list[0]['id']
                 for x in xrange(num_desde -1 ,num_hasta):
                     pago = PagoDeCuotas.objects.get(id= object_list[x]['id'])
+                    if pago.id != ultimo_pago:
+                        ultimo_pago = pago.id
+                        gestion_procesada = False
                     if pago.detalle != None:
                         detalle = ast.literal_eval(pago.detalle)
                         for y in xrange(0, len(detalle)-1):
                             if detalle['item' + str(y)]['nro_cuota'] == (x+1):
                                 interes_moratorio += int(detalle['item' + str(y)]['intereses'])
+                                if gestion_procesada == False and ultimo_pago == pago.id :
+                                    suma_gestion += detalle['item' + str(len(detalle) -1)]['gestion_cobranza']
+                                    gestion_procesada = True
                                 cantidad +=1
                                 break
-                    if len(gestion_cobranza) == 0:
-                        gestion_cobranza.append(pago)
-                    else:
-                        for x in xrange(0,len(gestion_cobranza) -1):
-                            if gestion_cobranza[x].id == pago.id:
-                                ok = True
-                                break
-                            else:
-                                ok = False
-                        if ok == False:
-                            gestion_cobranza.append(pago)
+                           
+                                
+                    
                 if interes_moratorio != 0:
                     detalle={}
                     detalle['cantidad'] = 1
@@ -523,14 +524,6 @@ def get_detalles_factura(request):
                     detalle['iva10'] = interes_moratorio
                     detalles.append(detalle)
                 
-                for x in xrange(0 ,len(gestion_cobranza)):
-                    if gestion_cobranza[x].detalle != None:
-                        detalle= ast.literal_eval(gestion_cobranza[x].detalle)
-                        try:
-                            if detalle['item' + str(len(detalle) -1)]['gestion_cobranza'] != "0":
-                                suma_gestion += detalle['item' + str(len(detalle) -1)]['gestion_cobranza']
-                        except Exception, error:
-                            print error
                 if suma_gestion != 0:
                     detalle={}
                     detalle['cantidad'] = 1

@@ -206,6 +206,7 @@
 					$('.item-detalle').remove();
 					$('.item-detalle').remove();
 					$('.detalle_factura').append(item_inicial_detalle_factura);
+					aplicarFuncionesDetalles();
 					limpiarLiquidacion();
 				}
 			if($("#id_nro_cuota_hasta").val() != '' && $('#id_nro_cuota').val() != ''){
