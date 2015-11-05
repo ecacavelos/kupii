@@ -12,6 +12,7 @@
 <script type="text/javascript">
 $(document).ready(function(){
 	$( ".grid_6" ).hide();
+	
 });
 var data = [
 		{"label" : "Aragorn"}
@@ -44,6 +45,15 @@ function solo_numeros () {
 		//console.log("\n"+res);
 		$("#id_precio_credito").val(res);
 		
+		var res = $("#id_precio_costo").val();
+		for ( i = 0; i < res.length; i++) {
+			res = res.replace(".", "");
+		}
+		res = res.replace(",", ".");
+		//console.log("\n"+str);
+		//console.log("\n"+res);
+		$("#id_precio_costo").val(res);
+		
 		var res = $("#id_superficie").val();
 		for ( i = 0; i < res.length; i++) {
 			res = res.replace(".", "");
@@ -63,6 +73,11 @@ function solo_numeros () {
 	function solo_numeros_comas_puntos_credito () {
 		
 	  	$('#id_precio_credito').val($('#id_precio_credito').val().replace(/[^\d,.]+/g, ''));
+	}
+	
+	function solo_numeros_comas_puntos_costo () {
+		
+	  	$('#id_precio_costo').val($('#id_precio_costo').val().replace(/[^\d,.]+/g, ''));
 	}
 	
 	function solo_numeros_comas_puntos_superfice () {
@@ -94,7 +109,7 @@ function solo_numeros () {
 	}
 		
 $(document).ready(function() {
-	
+	$("#id_codigo_paralot").mask("###/###/####");
 	$('#id_estado').hide();
 	$('#id_estado').val("1");
 	$("label[for='id_estado']").hide();
@@ -107,8 +122,8 @@ $(document).ready(function() {
 	 		$('#id_precio_credito').val(format.call($('#id_precio_credito').val().split(' ').join(''),'.',','));solo_numeros_comas_puntos_credito();
 	});
 	
-	$('#id_precio_credito').on('keyup', function(){
-	 		$('#id_precio_credito').val(format.call($('#id_precio_credito').val().split(' ').join(''),'.',','));solo_numeros_comas_puntos_credito();
+	$('#id_precio_costo').on('keyup', function(){
+	 		$('#id_precio_costo').val(format.call($('#id_precio_costo').val().split(' ').join(''),'.',','));solo_numeros_comas_puntos_costo();
 	});
 	
 	$('#id_superficie').on('keyup', function(){

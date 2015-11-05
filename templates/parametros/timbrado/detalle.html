@@ -13,156 +13,47 @@
 -->
 <script type="text/javascript">
 
-var data = [
-		{"label" : "Aragorn"}
-		];
-
-function solo_numeros_cantidad_de_cuotas () {
-		
-	  	$('#id_cantidad_de_cuotas').val($('#id_cantidad_de_cuotas').val().replace(/\D/g,''));
-}
-	
-function solo_numeros_porcentaje_inicial_inmobiliaria () {
-		
-	  	$('#id_porcentaje_inicial_inmobiliaria').val($('#id_porcentaje_inicial_inmobiliaria').val().replace(/\D/g,''));
-}
-
-function solo_numeros_cantidad_cuotas_inmobiliaria () {
-		
-	  	$('#id_cantidad_cuotas_inmobiliaria').val($('#id_cantidad_cuotas_inmobiliaria').val().replace(/\D/g,''));
-}	
-
-function solo_numeros_inicio_cuotas_inmobiliaria () {
-		
-	  	$('#id_inicio_cuotas_inmobiliaria').val($('#id_inicio_cuotas_inmobiliaria').val().replace(/\D/g,''));
-}
-
-function solo_numeros_intervalos_cuotas_inmobiliaria () {
-		
-	  	$('#id_intervalos_cuotas_inmobiliaria').val($('#id_intervalos_cuotas_inmobiliaria').val().replace(/\D/g,''));
-}
-
-function solo_numeros_porcentaje_cuotas_inmobiliaria () {
-		
-	  	$('#id_porcentaje_cuotas_inmobiliaria').val($('#id_porcentaje_cuotas_inmobiliaria').val().replace(/\D/g,''));
-}
-
-function solo_numeros_porcentaje_cuotas_administracion () {
-		
-	  	$('#id_porcentaje_cuotas_administracion').val($('#id_porcentaje_cuotas_administracion').val().replace(/\D/g,''));
-}
-
-function solo_numeros_porcentaje_inicial_gerente () {
-		
-	  	$('#id_porcentaje_inicial_gerente').val($('#id_porcentaje_inicial_gerente').val().replace(/\D/g,''));
-}
-
-function solo_numeros_cantidad_cuotas_gerente () {
-		
-	  	$('#id_cantidad_cuotas_gerente').val($('#id_cantidad_cuotas_gerente').val().replace(/\D/g,''));
-}
-
-function solo_numeros_inicio_cuotas_gerente () {
-		
-	  	$('#id_inicio_cuotas_gerente').val($('#id_inicio_cuotas_gerente').val().replace(/\D/g,''));
-}
-
-function solo_numeros_intervalos_cuotas_gerente () {
-		
-	  	$('#id_intervalos_cuotas_gerente').val($('#id_intervalos_cuotas_gerente').val().replace(/\D/g,''));
-}
-
-function solo_numeros_porcentaje_cuotas_gerente () {
-		
-	  	$('#id_porcentaje_cuotas_gerente').val($('#id_porcentaje_cuotas_gerente').val().replace(/\D/g,''));
-}
-
-/////////////////////////
-function solo_numeros_monto_fijo_cuotas_gerente () {
-		
-	  	$('#id_monto_fijo_cuotas_gerente').val($('#id_monto_fijo_cuotas_gerente').val().replace(/[^\d,.]+/g, ''));
-}
-
-	//Separador de miles y comas en escritura
-	function format(comma, period) {
-		
-		var comma = comma || ',';
-		var period = period || '.';
-		var split = this.toString().split(',');
-		var numeric = split[0];
-		var decimal = split.length > 1 ? period + split[1] : '';
-		var reg = /(\d+)(\d{3})/;
-		for (var i = 1; i < numeric.length; i++) {
-			numeric = numeric.replace(".", "");
-		}
-		while (reg.test(numeric)) {
-
-			numeric = numeric.replace(reg, '$1' + comma + '$2');
-		}
-		//} else {
-		//	numeric = numeric.substr(0,numeric.length-1);
-		//}
-		
-		return numeric + decimal;
-	}
-
-function _validar(){
-	var res = $("#id_monto_fijo_cuotas_gerente").val();
-	for ( i = 0; i < res.length; i++) {
-		res = res.replace(".", "");
-	}
-	res = res.replace(",", ".");
-	//console.log("\n"+str);
-	//console.log("\n"+res);
-	$("#id_monto_fijo_cuotas_gerente").val(res);
-}
-
 $(document).ready(function() {
 	
-	$('#id_monto_fijo_cuotas_gerente').val($('#id_monto_fijo_cuotas_gerente').val().replace(".",","));
-	$('#id_monto_fijo_cuotas_gerente').val(format.call($('#id_monto_fijo_cuotas_gerente').val().split(' ').join(''),'.',','));
 	
-	$( "#id_cantidad_de_cuotas" ).keyup(function() {
-  		solo_numeros_cantidad_de_cuotas();
-	});
-	$( "#id_porcentaje_inicial_inmobiliaria" ).keyup(function() {
-  		solo_numeros_porcentaje_inicial_inmobiliaria();
-	});
-	$( "#id_cantidad_cuotas_inmobiliaria" ).keyup(function() {
-  		solo_numeros_cantidad_cuotas_inmobiliaria();
-	});
-	$( "#id_inicio_cuotas_inmobiliaria" ).keyup(function() {
-  		solo_numeros_inicio_cuotas_inmobiliaria();
-	});
-	$( "#id_intervalos_cuotas_inmobiliaria" ).keyup(function() {
-  		solo_numeros_intervalos_cuotas_inmobiliaria();
-	});
-	$( "#id_porcentaje_cuotas_inmobiliaria" ).keyup(function() {
-  		solo_numeros_porcentaje_cuotas_inmobiliaria();
-	});
-	$( "#id_porcentaje_cuotas_administracion" ).keyup(function() {
-  		solo_numeros_porcentaje_cuotas_administracion();
-	});
-	$( "#id_porcentaje_inicial_gerente" ).keyup(function() {
-  		solo_numeros_porcentaje_inicial_gerente();
-	});
-	$( "#id_cantidad_cuotas_gerente" ).keyup(function() {
-  		solo_numeros_cantidad_cuotas_gerente();
-	});
-	$( "#id_inicio_cuotas_gerente" ).keyup(function() {
-  		solo_numeros_inicio_cuotas_gerente();
-	});
-	$( "#id_intervalos_cuotas_gerente" ).keyup(function() {
-  		solo_numeros_intervalos_cuotas_gerente();
-  	});
-	$( "#id_porcentaje_cuotas_gerente" ).keyup(function() {
-  		solo_numeros_porcentaje_cuotas_gerente();
-  		
-	});//////////
-	$( "#id_monto_fijo_cuotas_gerente" ).keyup(function() {
-  		$("#id_monto_fijo_cuotas_gerente").val(format.call($("#id_monto_fijo_cuotas_gerente").val().split(' ').join(''),'.',','));solo_numeros_monto_fijo_cuotas_gerente();
-	});
+	$(function($){
+		    $.datepicker.regional['es'] = {
+		        closeText: 'Cerrar',
+		        prevText: '<Ant',
+		        nextText: 'Sig>',
+		        currentText: 'Hoy',
+		        monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+		        monthNamesShort: ['Ene','Feb','Mar','Abr', 'May','Jun','Jul','Ago','Sep', 'Oct','Nov','Dic'],
+		        dayNames: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
+		        dayNamesShort: ['Dom','Lun','Mar','Mié','Juv','Vie','Sáb'],
+		        dayNamesMin: ['Do','Lu','Ma','Mi','Ju','Vi','Sá'],
+		        weekHeader: 'Sm',
+		        dateFormat: 'dd/mm/yy',
+		        firstDay: 1,
+		        isRTL: false,
+		        showMonthAfterYear: false,
+		        yearSuffix: ''
+		    };
+		    $.datepicker.setDefaults($.datepicker.regional['es']);
+		});
 	
+	//var dbDate = $("#id_desde").val();
+    //var date = new Date(dbDate);
+	//$("#id_desde").datepicker({dateFormat: 'dd/mm/yy'}).datepicker('setDate', date);
+	
+	var queryDate1 = $("#id_desde").val();
+	var parsedDate1 = $.datepicker.parseDate('yy-mm-dd', queryDate1);
+	$('#id_desde').datepicker({ dateFormat: 'dd/mm/yy' }); // format to show
+	$('#id_desde').datepicker('setDate', parsedDate1);
+	
+	
+	queryDate2 = $("#id_hasta").val();
+	var parsedDate2 = $.datepicker.parseDate('yy-mm-dd', queryDate2);
+	$('#id_hasta').datepicker({ dateFormat: 'dd/mm/yy' }); // format to show
+	$('#id_hasta').datepicker('setDate', parsedDate2);
+	
+	$("#id_desde").mask('##/##/####');
+	$("#id_hasta").mask('##/##/####');
 	
 });
 </script>

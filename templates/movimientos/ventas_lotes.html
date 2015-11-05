@@ -158,6 +158,8 @@ var data = [
 	</table>
 	<!--<input id="enviar_venta" style="cursor: pointer;" type="submit" value="Guardar Venta" onclick="this.disabled=true;validateVenta()"/>-->
 	<input id="enviar_venta" style="cursor: pointer;" type="button" value="Guardar Venta" onclick="this.disabled=true;validateVenta()"/>
+	<input id="enviar_venta_factura" name="boton_pagar" style="cursor: pointer;" type="button" value="Guardar Venta y Facturar" onclick="this.disabled=true; $('#facturar').val('SI');validateVenta()"/>
+	<input type="hidden" id="facturar" value="" name="facurar">
 	<br><br><br>
 	</form>
 	<div class="clear"></div>

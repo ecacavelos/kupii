@@ -1,8 +1,23 @@
 {% extends "lotes/base_lotes.html" %}
 {% block header_scripts %}
+<script type="text/javascript" src="{{ STATIC_URL }}personas/listado_propietarios.js"></script>
 <script>
 	$(document).ready(function() {
-		autocompletePropietarioPorNombreOCedula();
+		var tipo_busqueda=$("#tipo_busqueda").val();
+		var busqueda_label=$("#busqueda_label").val();			
+		var busqueda=$("#busqueda").val();			
+		
+		$("#busqueda_label").focus(); 
+		autocompletePropietarioPorNombreOCedula(tipo_busqueda, busqueda_label, busqueda);
+		
+		$("#tipo_busqueda").change(function(){
+			//alert("cambió");
+			tipo_busqueda=$("#tipo_busqueda").val();
+			busqueda_label=$("#busqueda_label").val();			
+			busqueda=$("#busqueda").val();	
+			autocompletePropietarioPorNombreOCedula(tipo_busqueda, busqueda_label, busqueda);
+		});
+		
 	});
 	
 	function _cerrar() {
@@ -21,7 +36,6 @@
 		}
 	}
 </script>
-<script type="text/javascript" src="{{ STATIC_URL }}personas/listado_propietarios.js"></script>
 {% endblock %}
 {% block content %}
 <div class="gri16 text-izquierda" id="breadcumb">

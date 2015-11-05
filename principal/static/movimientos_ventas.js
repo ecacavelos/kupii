@@ -15,6 +15,27 @@ $(document).ready(function() {
 	$("#id_fecha_venta2").datepicker({
 		dateFormat : 'dd/mm/yy'
 	});
+	
+	$(function($){
+		    $.datepicker.regional['es'] = {
+		        closeText: 'Cerrar',
+		        prevText: '<Ant',
+		        nextText: 'Sig>',
+		        currentText: 'Hoy',
+		        monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+		        monthNamesShort: ['Ene','Feb','Mar','Abr', 'May','Jun','Jul','Ago','Sep', 'Oct','Nov','Dic'],
+		        dayNames: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
+		        dayNamesShort: ['Dom','Lun','Mar','Mié','Juv','Vie','Sáb'],
+		        dayNamesMin: ['Do','Lu','Ma','Mi','Ju','Vi','Sá'],
+		        weekHeader: 'Sm',
+		        dateFormat: 'dd/mm/yy',
+		        firstDay: 1,
+		        isRTL: false,
+		        showMonthAfterYear: false,
+		        yearSuffix: ''
+		    };
+		    $.datepicker.setDefaults($.datepicker.regional['es']);
+		});
 
 	
 	//autocomplete para cliente
@@ -227,7 +248,11 @@ function validateVenta() {
 			}
 
 		}).done(function (data) {
-			top.location.href = "/movimientos/listado_ventas/";
+			if ( $("#facturar").val() == '' ){
+				top.location.href = "/movimientos/listado_ventas/";	
+			} else if ( $("#facturar").val() == 'SI'  ){
+			top.location.href = "/facturacion/facturar_operacion/2/"+msg[0].id;	
+			}
 		});
 		/*request2.done(function(msg) {
 			top.location.href = "/movimientos/listado_ventas/";
@@ -237,6 +262,7 @@ function validateVenta() {
 			$('#enviar_venta').removeAttr('disabled');
 			return false;
 		});
+		
 	} else {
 		alert("Por favor introduzca el monto.");
 		$('#enviar_venta').removeAttr('disabled');

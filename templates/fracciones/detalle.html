@@ -49,6 +49,7 @@
 		$("#id_fecha_aprobacion").datepicker({ dateFormat: 'dd/mm/yy' });
 		$("#id_fecha_aprobacion").addClass("date");
 		$('.date').mask('##/##/####');
+		$("#id_id").prop('disabled', true);
 		$('#id_cantidad_manzanas').prop('disabled', true);
 		$('#id_cantidad_lotes').prop('disabled', true);
 		$('#id_superficie_total').val($('#id_superficie_total').val().replace(".",","));
@@ -91,8 +92,9 @@
 	function _enviar(){
 		$("#id_cantidad_manzanas").prop('disabled', false);
 		$("#id_cantidad_lotes").prop('disabled', false);
-		var dateTypeVar = $('#id_fecha_aprobacion').datepicker('getDate');
-		$("#id_fecha_aprobacion").val($.datepicker.formatDate('yy-mm-dd', dateTypeVar));
+		$("#id_id").prop('disabled', false);
+		//var dateTypeVar = $('#id_fecha_aprobacion').datepicker('getDate');
+		//$("#id_fecha_aprobacion").val($.datepicker.formatDate('yy-mm-dd', dateTypeVar));
 		var res = $("#id_superficie_total").val();
 		//var res ="";
 		for ( i = 0; i < res.length; i++) {
@@ -160,6 +162,7 @@
 			<input class="lote-form-button" type="submit" name="boton_guardar" value="Guardar Cambios" />
 			<input class="lote-form-button" type="submit" name="boton_borrar" value="Borrar este Registro" />
 		{%endif%}
+		
 	</form>
 </div>
 <br>

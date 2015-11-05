@@ -7,6 +7,8 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from principal.common_functions import verificar_permisos, loggear_accion
 from principal import permisos
 from django.contrib.auth.models import User
+from datetime import datetime, timedelta
+import datetime
 # Funcion principal del modulo de lotes.
 def parametros(request):    
     if request.user.is_authenticated():
@@ -348,6 +350,8 @@ def consultar_concepto_factura(request):
                 message = "No se ingresaron datos para la busqueda."
     else:
         object_list = ConceptoFactura.objects.all().order_by('id')
+        for concepto in object_list:
+            concepto.precio_unitario = unicode('{:,}'.format(concepto.precio_unitario)).replace(",",".")
         search_form = SearchForm({})
         message = ""
     paginator = Paginator(object_list, 25)
@@ -626,11 +630,14 @@ def detalle_timbrado(request, timbrado_id):
     message = ''
 
     if request.method == 'POST':
+        request.POST = request.POST.copy()
         data = request.POST
         if data.get('boton_guardar'):
             form = TimbradoForm(data, instance=object_list)
             if form.is_valid():
                 message = "Se actualizaron los datos."
+                data['desde'] = datetime.datetime.strptime(data['fecha_aprobacion'], "%d/%m/%Y")
+                data['hasta'] = datetime.datetime.strptime(data['fecha_aprobacion'], "%d/%m/%Y")
                 form.save(commit=False)
                 
                 #Se loggea la accion del usuario
@@ -1252,7 +1259,7 @@ def listar_busqueda_rango_factura(request, timbrado_id):
 def listar_busqueda_concepto_factura(request, concepto_factura_id):       
     if request.user.is_authenticated():
         if verificar_permisos(request.user.id, permisos.VER_LISTADO_CONCEPTO_FACTURA):
-            t = loader.get_template('parametros/timbrado/rango_factura/listado.html')
+            t = loader.get_template('parametros/timbrado/concepto_factura/listado.html')
             #c = RequestContext(request, {})
             #return HttpResponse(t.render(c))
         else:

@@ -88,6 +88,20 @@ def consultar_clientes(request):
                     object_list = Cliente.objects.filter(id=int(data.get('buscar', '')))
             else:
                 message = "No se ingresaron datos para la busqueda."
+        
+        paginator=Paginator(object_list,15)
+        page=request.GET.get('page')
+        try:
+            lista=paginator.page(page)
+        except PageNotAnInteger:
+            lista=paginator.page(1)
+        except EmptyPage:
+            lista=paginator.page(paginator.num_pages)
+        c = RequestContext(request, {
+            'object_list': lista,
+            'search_form': search_form,
+            'message': message,
+        })
 
 # Funcion para consultar el detalle de un cliente.
 def detalle_cliente(request, cliente_id):

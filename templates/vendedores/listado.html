@@ -2,7 +2,20 @@
 {% block header_scripts %}
 <script>
 	$(document).ready(function() {
-		autocompleteVendedorPorNombreOCedula();
+		var tipo_busqueda=$("#tipo_busqueda").val();
+		var busqueda_label=$("#busqueda_label").val();			
+		var busqueda=$("#busqueda").val();			
+		
+		$("#busqueda_label").focus(); 
+		autocompleteVendedorPorNombreOCedula(tipo_busqueda, busqueda_label, busqueda);
+		
+		$("#tipo_busqueda").change(function(){
+			//alert("cambió");
+			tipo_busqueda=$("#tipo_busqueda").val();
+			busqueda_label=$("#busqueda_label").val();			
+			busqueda=$("#busqueda").val();	
+			autocompleteVendedorPorNombreOCedula(tipo_busqueda, busqueda_label, busqueda);
+		});
 	});
 	function _cerrar() {
 		window.close();

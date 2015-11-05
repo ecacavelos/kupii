@@ -106,18 +106,24 @@ function solo_numeros_monto_fijo_cuotas_gerente () {
 		return numeric + decimal;
 	}
 
-function _validar(){
-	var res = $("#id_monto_fijo_cuotas_gerente").val();
-	for ( i = 0; i < res.length; i++) {
-		res = res.replace(".", "");
-	}
-	res = res.replace(",", ".");
-	//console.log("\n"+str);
-	//console.log("\n"+res);
-	$("#id_monto_fijo_cuotas_gerente").val(res);
-}
+
 
 $(document).ready(function() {
+	
+	$('#id_precio_unitario').mask("###.###.###");
+	
+	$(".lote-form-button").submit(function() {
+		var numero = $("#id_precio_unitario").val();
+	
+		numero =numero.replace(".", "");
+		numero =numero.replace(".", "");
+		numero =numero.replace(".", "");
+		numero =numero.replace(".", "");
+		numero =numero.replace(".", "");
+		
+		$("#id_precio_unitario").val(numero);
+	});
+	
 	
 	$('#id_monto_fijo_cuotas_gerente').val($('#id_monto_fijo_cuotas_gerente').val().replace(".",","));
 	$('#id_monto_fijo_cuotas_gerente').val(format.call($('#id_monto_fijo_cuotas_gerente').val().split(' ').join(''),'.',','));
@@ -165,6 +171,9 @@ $(document).ready(function() {
 	
 	
 });
+
+
+
 </script>
 {% endblock %}
 

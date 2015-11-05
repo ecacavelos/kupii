@@ -414,7 +414,7 @@ function dibujarDetalle() {
         	if (detalle[i]['tipo']== 'normal'){	
 	            modal_html +='<tr style="text-align:center;"><td style="text-align:center;">' + detalle[i]['nro_cuota'] + '</td><td style="text-align:center;">' +
 	            detalle[i]['vencimiento'] + '</td><td style="text-align:center;">' + detalle[i]['dias_atraso'] +
-	            '</td><td style="text-align:center;"><input style="width: 70px;" class="interes" id="interes_' + i + '" type="number" value=' + f(detalle[i]['intereses']).replace(/\./g, '') + '></td></tr>';
+	            '</td><td style="text-align:center;"><input style="width: 70px;" class="interes" id="interes_' + i + '" type="text" value=' + detalle[i]['intereses'] + '></td></tr>';
 	            
 	            if (i == detalle.length-1) {
 	            	modal_html +='</table><br>Fecha ultimo vencimiento con 5 dias de gracia: ' + detalle[i]['vencimiento_gracia'] + '</br>';
@@ -422,7 +422,7 @@ function dibujarDetalle() {
 	            
 	        } else {
 	        	modal_html +='</table><br>Fecha ultimo vencimiento con 5 dias de gracia: ' + detalle[i-1]['vencimiento_gracia'] + '</br>';
-	        	modal_html +='</tr><td>Gestion de Cobranza: </td><td><input style="width: 100px;" class="interes" id="id_gestion_cobranza" type="number" value=' + f(detalle[i]['gestion_cobranza']).replace(/\./g, '') + '></td></tr>';
+	        	modal_html +='</tr><td>Gestion de Cobranza: </td><td><input style="width: 100px;" class="interes" id="id_gestion_cobranza" type="text" value=' + detalle[i]['gestion_cobranza'] + '></td></tr>';
 	        }
         }
         
@@ -434,10 +434,12 @@ function dibujarDetalle() {
 	modal_html +='<input type="button" class="button_verde" id="modificar_mora" value="Modificar"/>';
 	modal_html += '</div>';
 	$('#contenido_modal').append(modal_html);
+	$(".interes").mask('###.###.###',{reverse: true});
 	detalle_interes = generarDetalleJSON();			
 	$("#detalle").val(detalle_interes);	
 	$('#modificar_mora').click(function() {
 		this.style.backgroundColor = '#66A385';
+		$(".interes").unmask();
 		modificarMontos();
 		$('.close').trigger("click");
 		//return true;
@@ -638,7 +640,7 @@ function addRow(msg){
         }
         else{
             $('input[type="submit"]').removeAttr('disabled');
-            $("#id_cuota_pagar").append('<tr><td>' + msg.cuotas_a_pagar[i].nro_cuota+ '</td><td>' + msg.cuotas_a_pagar[i].fecha+'</td><td>' +msg.cuotas_a_pagar[i].monto_cuota+ '</td></tr>');
+            $("#id_cuota_pagar").append('<tr><td style="text-align: center;">' +msg.cuotas_a_pagar[i].nro_cuota+ '</td><td style="text-align: center;">' + msg.cuotas_a_pagar[i].fecha+'</td><td style="text-align: center;">' + ponerPuntos(msg.cuotas_a_pagar[i].monto_cuota)+ '</td></tr>');
             total_cuotas += msg.cuotas_a_pagar[i].monto_cuota;
         }
 
@@ -669,18 +671,18 @@ function generarDetalleJSON(){
 		detalle_json = '';
 		objeto = {};
 		var nro_cuotas_a_pagar = $('#nro_cuotas_a_pagar').val();
-		size=detalle.length
+		size=detalle.length;
 		if (detalle.length > 0) {
 			for (i = 0; i < size; i++) {
 				if (detalle[i]['tipo']=='normal'){
 					nro_cuota=detalle[i]['nro_cuota'];
 					intereses=detalle[i]['intereses'];
-					key= 'item' + i
+					key= 'item' + i;
 					value = {nro_cuota : nro_cuota, intereses : intereses};
 					objeto[key] = value; 			
 					JSON.stringify(objeto);
 				} else {
-					key= 'item' + i
+					key= 'item' + i;
 					value = {gestion_cobranza :detalle[detalle.length-1]['gestion_cobranza']};
 					objeto[key] = value;
 					JSON.stringify(objeto);
@@ -691,4 +693,22 @@ function generarDetalleJSON(){
 			detalle_json = JSON.stringify(objeto);
 			return detalle_json;
 		}
+}
+
+function ponerPuntos(numero){
+	$("#poner_puntos").val(numero);
+	$("#poner_puntos").mask('###.###.###',{reverse: true});
+	numero = $("#poner_puntos").val();
+	return numero;
+}
+
+function sacarPuntos(numero){
+	
+	numero =numero.replace(".", "");
+	numero =numero.replace(".", "");
+	numero =numero.replace(".", "");
+	numero =numero.replace(".", "");
+	numero =numero.replace(".", "");
+	
+	return (numero);
 }

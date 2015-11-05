@@ -12,20 +12,49 @@ function solo_numeros () {
 	  	$('#id_cedula').val($('#id_cedula').val().replace(/\D/g,''));
 	}
 
-
-var data = [
-		{"label" : "Aragorn"}
-		];
 $(document).ready(function() {
 	$('.grid_6').hide();
 	$("#id_fecha_nacimiento").addClass("date");
 	$("#id_fecha_ingreso").addClass("date");
+	
 	$("#id_fecha_nacimiento").datepicker({ dateFormat: 'dd/mm/yy' });
 	$("#id_fecha_ingreso").datepicker({ dateFormat: 'dd/mm/yy' });
+	
 	$('.date').mask('##/##/####');
 	$( "#id_cedula" ).keyup(function() {
   		solo_numeros();
 	});
+	
+	$(function($){
+		    $.datepicker.regional['es'] = {
+		        closeText: 'Cerrar',
+		        prevText: '<Ant',
+		        nextText: 'Sig>',
+		        currentText: 'Hoy',
+		        monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+		        monthNamesShort: ['Ene','Feb','Mar','Abr', 'May','Jun','Jul','Ago','Sep', 'Oct','Nov','Dic'],
+		        dayNames: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
+		        dayNamesShort: ['Dom','Lun','Mar','Mié','Juv','Vie','Sáb'],
+		        dayNamesMin: ['Do','Lu','Ma','Mi','Ju','Vi','Sá'],
+		        weekHeader: 'Sm',
+		        dateFormat: 'dd/mm/yy',
+		        firstDay: 1,
+		        isRTL: false,
+		        showMonthAfterYear: false,
+		        yearSuffix: ''
+		    };
+		    $.datepicker.setDefaults($.datepicker.regional['es']);
+		});
+	
+	//var dbDate = $("#id_desde").val();
+    //var date = new Date(dbDate);
+	//$("#id_desde").datepicker({dateFormat: 'dd/mm/yy'}).datepicker('setDate', date);
+	/*
+	var queryDate1 = $("#id_desde").val();
+	var parsedDate1 = $.datepicker.parseDate('yy-mm-dd', queryDate1);
+	$('#id_desde').datepicker({ dateFormat: 'dd/mm/yy' }); // format to show
+	$('#id_desde').datepicker('setDate', parsedDate1);
+	*/
 });
 </script>
 {% endblock %}

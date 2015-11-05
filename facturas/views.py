@@ -298,10 +298,10 @@ def detalle_factura(request, factura_id):
             detalle['item']=key
             detalle['cantidad']=value['cantidad']
             detalle['concepto']=value['concepto']
-            detalle['precio_unitario']=value['precio_unitario']
-            detalle['iva_10']=value['iva_10']
-            detalle['iva_5']=value['iva_5']
-            detalle['exentas']=value['exentas']
+            detalle['precio_unitario']=unicode('{:,}'.format(int(value['precio_unitario']))).replace(",",".")
+            detalle['iva_10']=unicode('{:,}'.format(int(value['iva_10']))).replace(",",".")
+            detalle['iva_5']=unicode('{:,}'.format(int(value['iva_5']))).replace(",",".")
+            detalle['exentas']=unicode('{:,}'.format(int(value['exentas']))).replace(",",".")
             detalles.append(detalle)
         if factura.tipo=='co':
             tipo='Contado'

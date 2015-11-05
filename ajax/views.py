@@ -84,8 +84,10 @@ def get_propietario_name_id_by_cedula(request):
                 cedula_propietario = request.GET['term']
                 print("term ->" + cedula_propietario);
                 object_list = Propietario.objects.filter(cedula__icontains= cedula_propietario)
-                data=serializers.serialize('json',list(object_list))
-                return HttpResponse(data,content_type="application/json")
+                #data=serializers.serialize('json',list(object_list))
+                #return HttpResponse(data,content_type="application/json")
+                labels=["nombres","apellidos"]
+                return HttpResponse(json.dumps(custom_json(object_list,labels), cls=DjangoJSONEncoder), content_type="application/json")
             except Exception, error:
                 print error
                 #return HttpResponseServerError('No se pudo procesar el pedido')
@@ -101,10 +103,10 @@ def get_cliente_name_id_by_cedula(request):
                 cedula_cliente = request.GET['term']
                 print("term ->" + cedula_cliente);
                 object_list = Cliente.objects.filter(cedula__icontains= cedula_cliente)
-                #labels=["nombres","apellidos","cedula"]
-                #return HttpResponse(json.dumps(custom_json(object_list,labels), cls=DjangoJSONEncoder), content_type="application/json")
-                data=serializers.serialize('json',list(object_list))
-                return HttpResponse(data,content_type="application/json")
+                labels=["nombres","apellidos","cedula"]
+                return HttpResponse(json.dumps(custom_json(object_list,labels), cls=DjangoJSONEncoder), content_type="application/json")
+                #data=serializers.serialize('json',list(object_list))
+                #return HttpResponse(data,content_type="application/json")
             except Exception, error:
                 print error
                 #return HttpResponseServerError('No se pudo procesar el pedido')
