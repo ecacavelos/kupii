@@ -10,18 +10,24 @@
 	}
 	$(document).ready(function() {
 		//autocomplete para planes de pago
-		var id_plan_pago;
-		$("#id_nombre_timbrado").empty();
-		base_url="/ajax/get_timbrado/";
+		var id_timbrado;
+		$("#id_numero_timbrado").empty();
+		base_url="/ajax/get_timbrado_by_numero/";
 		params="value";
-		$("#id_timbrado").autocomplete({
+		$("#id_numero_timbrado").autocomplete({
 			source : base_url,
 			minLenght : 1,
+			create : function(){
+			$(this).data('ui-autocomplete')._renderItem = function(ul,item){
+				return $('<li>').append('<a>' +item.fields.numero+'</a>').appendTo(ul);
+				};
+			},
 			select : function(event, ui) {
-				id_timbrado = ui.item.id;
-				name_timbrado= ui.item.label;
-				ui.item.value = ui.item.label;
-				$("#id_nombre_timbrado").val(name_timbrado);
+				event.preventDefault();
+				id_timbrado = ui.item.pk;
+				numero_timbrado= ui.item.fields.numero;
+				ui.item.value = ui.item.fields.numero;
+				$("#id_numero_timbrado").val(numero_timbrado);
 				$("#id_timbrado").val(id_timbrado);			
 			}
 		});
@@ -48,7 +54,7 @@
 			<tr>
 				<td>Timbrado:</td>
 				<td><input id="id_timbrado" name="timbrado" type="hidden" maxlength="100"/>
-					<input id="id_nombre_timbrado" type="text" name="nombre_timbrado" maxlength="100" /><br><br>
+					<input id="id_numero_timbrado" type="text" name="numero_timbrado" maxlength="100" /><br><br>
 				</td>
 			</tr>
 			<tr>

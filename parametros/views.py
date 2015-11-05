@@ -436,11 +436,12 @@ def consultar_rango_factura(request, timbrado_id):
             #c = RequestContext(request, {})
             #return HttpResponse(t.render(c))
         else:
+            
             t = loader.get_template('index2.html')
             grupo= request.user.groups.get().id
             c = RequestContext(request, {
                  'grupo': grupo,
-                 'id_timbrado': timbrado_id
+                 'id_timbrado': timbrado_id,
             })
             return HttpResponse(t.render(c))
     else:
@@ -472,6 +473,7 @@ def consultar_rango_factura(request, timbrado_id):
     else:
         object_list = TimbradoRangoFacturaUsuario.objects.filter(timbrado_id=timbrado_id).order_by('id')        
         rango_factura_list = []
+        timbrado = Timbrado.objects.get(pk=timbrado_id)
         for trfu in object_list:
             rango_factura = RangoFactura.objects.get(pk=trfu.rango_factura_id)
             rango_factura.usuario = trfu.usuario
@@ -492,7 +494,8 @@ def consultar_rango_factura(request, timbrado_id):
         'object_list': lista,
         'search_form': search_form,
         'message': message,
-        'id_timbrado': timbrado_id
+        'id_timbrado': timbrado_id,
+        'timbrado': timbrado
     })
     return HttpResponse(t.render(c))
 
@@ -788,7 +791,7 @@ def detalle_coordenadas_factura(request, coordenadas_factura_id):
 
 
 # Funcion para consultar el detalle de un rango_factura.
-def detalle_rango_factura(request, timbrado_id, rango_factura_id):    
+def detalle_rango_factura(request, timbrado_id, rango_factura_id, usuario_id):    
     if request.user.is_authenticated():
         if verificar_permisos(request.user.id, permisos.VER_LISTADO_RANGO_FACTURA):
             t = loader.get_template('parametros/timbrado/rango_factura/detalle.html')
@@ -822,7 +825,7 @@ def detalle_rango_factura(request, timbrado_id, rango_factura_id):
                 codigo_lote = form.instance.codigo_paralot
                 loggear_accion(request.user, "Actualizar", "Rango Factura", id_objeto, codigo_lote)
                 
-                usuario = TimbradoRangoFacturaUsuario.objects.get(rango_factura_id = rango_factura_id, timbrado_id=timbrado_id)
+                usuario = TimbradoRangoFacturaUsuario.objects.get(rango_factura_id = rango_factura_id, timbrado_id=timbrado_id, usuario_id= usuario_id)
                 usuario.usuario = User.objects.get(id=form.data['usuario'])
                 usuario.save()
                 object_list.save()
@@ -837,7 +840,7 @@ def detalle_rango_factura(request, timbrado_id, rango_factura_id):
             c.delete()
             return HttpResponseRedirect('/parametros/timbrado/'+unicode(timbrado_id)+'/rango_factura/listado')
     else:
-        rango = TimbradoRangoFacturaUsuario.objects.get(timbrado_id= timbrado_id, rango_factura_id = rango_factura_id)
+        rango = TimbradoRangoFacturaUsuario.objects.get(timbrado_id= timbrado_id, rango_factura_id = rango_factura_id, usuario_id = usuario_id)
         form = RangoFacturaForm(instance=object_list)
         
         form.initial['usuario'] = unicode(rango.usuario_id)
@@ -849,6 +852,7 @@ def detalle_rango_factura(request, timbrado_id, rango_factura_id):
         'grupo': grupo,
         'id_timbrado': timbrado_id,
         'usuario': User,
+        'trfu_id': rango.id
     })
     return HttpResponse(t.render(c))
 
@@ -1239,10 +1243,19 @@ def listar_busqueda_rango_factura(request, timbrado_id):
     else:
         return HttpResponseRedirect(reverse('login')) 
     
-    id_rango_factura = request.POST['rango_factura']
-    if id_rango_factura:
-        object_list=RangoFactura.objects.filter(pk=id_rango_factura)
-    paginator=Paginator(object_list,15)
+    id_usuario = request.POST['usuario']
+    if id_usuario:
+        rango_factura_list = []
+        object_list = TimbradoRangoFacturaUsuario.objects.filter(timbrado_id=timbrado_id, usuario_id = id_usuario).order_by('id')        
+        rango_factura_list = []
+        timbrado = Timbrado.objects.get(pk=timbrado_id)
+        for trfu in object_list:
+            rango_factura = RangoFactura.objects.get(pk=trfu.rango_factura_id)
+            rango_factura.usuario = trfu.usuario
+            rango_factura_list.append(rango_factura)
+            rango_factura.timbrado = trfu.timbrado
+        #object_list=RangoFactura.objects.filter(pk=id_rango_factura)
+    paginator=Paginator(rango_factura_list,15)
     page=request.GET.get('page')
     try:
         lista=paginator.page(page)
@@ -1253,6 +1266,7 @@ def listar_busqueda_rango_factura(request, timbrado_id):
         
     c = RequestContext(request, {
         'object_list': lista,
+        'id_timbrado':timbrado_id
     })
     return HttpResponse(t.render(c))
 

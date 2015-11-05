@@ -189,6 +189,47 @@ function autocompletePropietarioPorNombreOCedula(tipo_busqueda, busqueda_label, 
 	}
 }
 
+function autocompleteFraccionPorNombreOId(tipo_busqueda, busqueda_label, busqueda){
+	if (tipo_busqueda == 'nombre_fraccion') {
+		console.log("por nombre fraccion");
+	$("#busqueda_label").val("");
+	var id_fraccion;
+	$("#busqueda").empty();
+	base_url = base_context + "/ajax/get_fracciones_by_name/";
+	params = "value";
+	$("#busqueda_label").autocomplete({
+		source : base_url,
+		minLength : 1,
+		select : function(event, ui) {
+			id_fraccion = ui.item.id;
+			$("#busqueda").val(id_fraccion);
+			//alert(id_cliente);
+		}
+	});
+	}
+	
+	if (tipo_busqueda == 'numero') {
+		console.log("por numero fraccion");
+	$("#busqueda_label").val("");
+	var id_fraccion;
+	$("#busqueda").empty();
+	base_url = base_context + "/ajax/get_fracciones_by_id/";
+	params = "value";
+	$("#busqueda_label").autocomplete({
+		source : base_url,
+		minLength : 1,
+		
+		select : function(event, ui) {
+			event.preventDefault();
+			id_fraccion = ui.item.id;
+			$("#busqueda").val(id_fraccion);
+			$("#busqueda_label").val(ui.item.id);
+			//alert(id_cliente);
+		}
+	});
+	}
+}
+
 function autocompleteVendedorPorNombreOCedula(tipo_busqueda, busqueda_label, busqueda){
 	if (tipo_busqueda == 'nombre') {
 		console.log("por nombre");

@@ -72,11 +72,11 @@ $(document).ready(function() {
 					<div class="grid_10">
   						<h1>Detalles de Timbrado</h1>
 					</div>
-
+					<!--
 					<div class="grid_6">
   						<a href="#" class="historico">Buscar</a>
 					</div>
-
+					-->
 					<div class="clear"></div>
 <div id="detalle-lote">
 	<div id="detalle-lote-header">
@@ -110,7 +110,7 @@ $(document).ready(function() {
 </div>
 <br>
 <div id="footer">
-	<a href="rango_factura/" class="boton-verde">Rangos de Facturas del timbrado</a><br>
+	<a href="{% url 'frontend_home' %}parametros/timbrado/listado/{{timbrado.id}}/rango_factura/" class="boton-verde">Rangos de Facturas del timbrado</a><br>
 	<br>
 	<a href="{% url 'frontend_home' %}parametros/timbrado/listado" class="boton-verde">Volver al Listado de Timbrados</a>
 </div>

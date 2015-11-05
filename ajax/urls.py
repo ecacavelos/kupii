@@ -30,6 +30,9 @@ urlpatterns = patterns('ajax.views',
     url(r'^get_pagos_by_ventas/$', 'get_pagos_by_ventas', name='get_pagos_by_ventas'),
     
     url(r'^facturar/$', 'facturar', name='facturar'),
+    
+    url(r'^get_usuario_by_username/$', 'get_usuario_by_username', name='get_usuario_by_username'), 
+    
 #     url(r'^get_lista_pagos/$', 'get_lista_pagos', name='get_lista_pagos'), 
 #     url(r'^get_lista_pagos_gerentes/$', 'get_lista_pagos_gerentes', name='get_lista_pagos_gerentes'), 
 #     url(r'^get_informe_general/$', 'get_informe_general', name='get_informe_general'),

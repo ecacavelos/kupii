@@ -216,9 +216,12 @@ def listar_busqueda_fracciones(request):
     if tipo_busqueda == "numero":
         
         object_list = Fraccion.objects.filter(pk=busqueda)
+        
+    if tipo_busqueda == "nombre_fraccion":
+        object_list = Fraccion.objects.filter(pk=busqueda)
     
-    if tipo_busqueda == "propietario":
-        propietario_list = Propietario.objects.filter(nombres__icontains=busqueda)
+    if tipo_busqueda == "nombre_propietario":
+        propietario_list = Propietario.objects.filter(pk=busqueda)
         for prop in propietario_list:
             query = Fraccion.objects.filter(propietario_id=prop.id)
             if query:

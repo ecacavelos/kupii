@@ -51,21 +51,21 @@ function buscar(){
 </div>
 <div id="listado-item-lote" align="center">
 	<table border="1" cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
-		<th>Nro Manzana</th>
 		<th>Nro Fracci&oacute;n</th>
+		<th>Nro Manzana</th>
 		<th>Cantidad de Lotes</th>
 		{% for hw in object_list %}
 		{% if forloop.counter|divisibleby:2 %}
 			<tr>
-				<td>{{hw.nro_manzana}}</td>
 				<td>{{hw.fraccion_id}}</td>
+				<td>{{hw.nro_manzana}}</td>
 				<td>{{hw.cantidad_lotes}}</td>
 			</tr>
 		{% else %}
 			<tr class="bkg_gris">
+				<td>{{hw.fraccion_id}}</td>
 				<td>{{hw.nro_manzana}}</td>
-					<td>{{hw.fraccion_id}}</td>
-					<td>{{hw.cantidad_lotes}}</td>
+				<td>{{hw.cantidad_lotes}}</td>
 			</tr>
 		{% endif %}		
 		{% endfor %}

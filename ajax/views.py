@@ -365,7 +365,24 @@ def get_timbrado_by_numero(request):
                 numero_timbrado = unicode(request.GET['term'])
                 print("term ->" + numero_timbrado);
                 object_list = Timbrado.objects.filter(numero__icontains= numero_timbrado)
-                data=serializers.serialize('json',list(object_list)) 
+                data=serializers.serialize('json',list(object_list))
+                labels=["numero"] 
+                return HttpResponse(data,content_type="application/json")
+            except Exception, error:
+                print error
+                #return HttpResponseServerError('No se pudo procesar el pedido')
+        else:
+            return HttpResponseRedirect(reverse('login'))
+        
+def get_usuario_by_username(request):
+    if request.method == 'GET':
+        if request.user.is_authenticated():
+            try:            
+                nombre_usuario = unicode(request.GET['term'])
+                print("term ->" + nombre_usuario);
+                object_list = User.objects.filter(username__icontains= nombre_usuario)
+                data=serializers.serialize('json',list(object_list))
+                labels=["username"] 
                 return HttpResponse(data,content_type="application/json")
             except Exception, error:
                 print error

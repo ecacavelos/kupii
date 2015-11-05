@@ -1,18 +1,50 @@
 {% extends "lotes/base_lotes.html" %}
 {% block header_scripts %}
 <script type="text/javascript">
-function buscar(){
-	if($("#tipo_busqueda").val()==0){
-		alert("Debe elegir un tipo de busqueda.");
+	$(document).ready(function() {
+		var tipo_busqueda=$("#tipo_busqueda").val();
+		var busqueda_label=$("#busqueda_label").val();			
+		var busqueda=$("#busqueda").val();			
+		
+		$("#busqueda_label").focus();
+		if(tipo_busqueda == "nombre_propietario"){
+			tipo_busqueda = "nombre";
+			autocompletePropietarioPorNombreOCedula(tipo_busqueda, busqueda_label, busqueda);
+		} else {
+			autocompleteFraccionPorNombreOId(tipo_busqueda, busqueda_label, busqueda);
+		}
+		
+		
+		$("#tipo_busqueda").change(function(){
+			//alert("cambió");
+			tipo_busqueda=$("#tipo_busqueda").val();
+			busqueda_label=$("#busqueda_label").val();			
+			busqueda=$("#busqueda").val();
+			if(tipo_busqueda == "nombre_propietario"){
+				tipo_busqueda = "nombre";
+				autocompletePropietarioPorNombreOCedula(tipo_busqueda, busqueda_label, busqueda);
+			} else {
+				autocompleteFraccionPorNombreOId(tipo_busqueda, busqueda_label, busqueda);
+		}
+		});
+		
+	});
+	
+	function _cerrar() {
+		window.close();
 	}
-	else{
-		if($("#busqueda").val()==""){
-			alert("Debe ingresar un valor para buscar.");
-		}else{
-			$("#frm_busqueda").submit();
+
+	function buscar() {
+		if ($("#tipo_busqueda").val() == 0) {
+			alert("Debe elegir un tipo de busqueda.");
+		} else {
+			if ($("#busqueda_label").val() == "" || $("#busqueda").val() == "") {
+				alert("Debe seleccionar un valor para buscar.");
+			} else {
+				$("#frm_busqueda").submit();
+			}
 		}
 	}
-}
 </script>
 {% endblock %}
 {% block content %}
@@ -35,11 +67,13 @@ function buscar(){
 					<select id="tipo_busqueda" name="tipo_busqueda">
 						<!-- <option value="0">Elija una opcion</option> -->
 						<option value="numero">Numero de Fracci&oacute;n</option>
-						<option value="propietario">Nombre de Propietario</option>
+						<option value="nombre_fraccion">Nombre de Fraccion</option>
+						<option value="nombre_propietario">Nombre de Propietario</option>
 					</select>
 				</td>
 				<td>
-					<input id="busqueda" type="text" name="busqueda" />				
+					<input id="busqueda_label" type="text" name="busqueda_label" />
+					<input id="busqueda" type="hidden" name="busqueda" />				
 				</td>
 				<td>
 					<input type="button" value="Buscar" onclick="buscar();" class="historico" style="cursor: pointer"/>
