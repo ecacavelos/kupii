@@ -2,27 +2,33 @@
 {% block header_scripts %}
 <script type="text/javascript">
 	function buscar() {
-		if ($("#id_nombre_usuario").val() == "") {
-			alert("Debe ingresar el nombre del usuario para buscar.");
+		if ($("#id_usuario").val() == "") {
+			alert("Debe seleccionar un usuario para buscar.");
 		} else {
 			$("#frm_busqueda").submit();
 		}
 	}
 	$(document).ready(function() {
 		//autocomplete para planes de pago
-		var id_coordenada_factura;
-		$("#id_coordenada_factura").empty();
-		base_url="/ajax/get_coordenada_factura_by_username/";
+		var id_usuario;
+		$("#id_nombre_usuario").empty();
+		base_url="/ajax/get_usuario_by_username/";
 		params="value";
 		$("#id_nombre_usuario").autocomplete({
 			source : base_url,
 			minLenght : 1,
+			create : function(){
+			$(this).data('ui-autocomplete')._renderItem = function(ul,item){
+				return $('<li>').append('<a>' +item.fields.username+'</a>').appendTo(ul);
+				};
+			},
 			select : function(event, ui) {
-				id_coordenada = ui.item.id;
-				name_usuario= ui.item.label;
-				ui.item.value = ui.item.label;
-				$("#id_nombre_usuario").val(name_usuario);
-				$("#id_coordenada_factura").val(id_coordenada_factura);			
+				event.preventDefault();
+				id_usuario = ui.item.pk;
+				nombre_usuario= ui.item.fields.username;
+				ui.item.value = ui.item.fields.username;
+				$("#id_nombre_usuario").val(nombre_usuario);
+				$("#id_usuario").val(id_usuario);			
 			}
 		});
 	});
@@ -46,8 +52,8 @@
 				<th class="acciones"  colspan="3"><strong><a href="#" style="color: white;">Filtrar</a></strong></th>
 			</tr>
 			<tr>
-				<td>Coordenadas de Impresion de Facturas:</td>
-				<td><input id="id_coordenadas_factura" name="coordenada_factura" type="hidden" maxlength="100"/>
+				<td>Usuario:</td>
+				<td><input id="id_usuario" name="usuario" type="hidden" maxlength="100"/>
 					<input id="id_nombre_usuario" type="text" name="nombre_usuario" maxlength="100" /><br><br>
 				</td>
 			</tr>

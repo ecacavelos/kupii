@@ -2,23 +2,100 @@
 {% block header_scripts %}
 <script type="text/javascript">
 	function buscar() {
-		if($("#tipo_busqueda").val() == "lote"){
-			if ($("#busqueda").val() == "") {
-				alert("Debe ingresar un nro de lote para buscar.");
-			} else {
-				$("#frm_busqueda").submit();
-			}
+		if ($("#busqueda_label").val() == "" || $("#busqueda").val() == "" ) {
+			alert("Debe seleccionar una busqueda.");
+		} else {
+			$("#frm_busqueda").submit();
 		}
-		else {
-				$("#frm_busqueda").submit();
-			}
 	}
 	$(document).ready(function() {
-
-			$('#busqueda').mask('###/###/####');
+		if ($("#tipo_busqueda").val() == "codigo"){
+			$("#label_busqueda").html("Codigo Lote:");
+			console.log("Por codigo");
+			$('#busqueda_label').mask('###/###/####');
+			$("#busqueda_label").attr("placeholder", "Ej: 001/001/0001");
+			tipo_busqueda=$("#tipo_busqueda").val();
+			busqueda_label=$("#busqueda_label").val();			
+			busqueda=$("#busqueda").val();	
+			autocompleteLotePorCodigoParalot(tipo_busqueda, busqueda_label, busqueda);
+		}
+		if($("#tipo_busqueda").val() == "nombre"){
+			$("#label_busqueda").html("Nombre de Cliente:");
+			console.log("Por nombre cliente");
+			$('#busqueda_label').unmask();
+			$("#busqueda_label").attr("placeholder", "Ej: Juan Perez");
+			tipo_busqueda=$("#tipo_busqueda").val();
+			busqueda_label=$("#busqueda_label").val();			
+			busqueda=$("#busqueda").val();	
+			autocompleteClientePorNombreOCedula(tipo_busqueda, busqueda_label, busqueda);
+		}
+		if($("#tipo_busqueda").val() == "cedula"){
+			$("#label_busqueda").html("Cedula de Cliente:");
+			console.log("Por cedula cliente");
+			$('#busqueda_label').unmask();
+			$("#busqueda_label").attr("placeholder", "Ej: 3497322");
+			tipo_busqueda=$("#tipo_busqueda").val();
+			busqueda_label=$("#busqueda_label").val();			
+			busqueda=$("#busqueda").val();	
+			autocompleteClientePorNombreOCedula(tipo_busqueda, busqueda_label, busqueda);
+		}
+		
+		
+		//autocomplete para concepto factura
+		var id_concepto;
+		$("#id_concepto_factura").empty();
+		base_url="/ajax/get_concepto_factura_by_name/";
+		params="value";
+		$("#id_nombre_concepto").autocomplete({
+			source : base_url,
+			minLenght : 1,
+			select : function(event, ui) {
+				id_concepto = ui.item.id;
+				name_concepto= ui.item.descripcion;
+				ui.item.value = ui.item.descripcion;
+				$("#id_nombre_concepto").val(name_concepto);
+				$("#id_concepto_factura").val(id_concepto);			
+			}
+		});
+		
+		$("#tipo_busqueda").change(function(){
+			if ($("#tipo_busqueda").val() == "codigo"){
+				$("#label_busqueda").html("Codigo Lote:");
+				console.log("Por codigo");
+				$('#busqueda_label').mask('###/###/####');
+				$("#busqueda_label").attr("placeholder", "Ej: 001/001/0001");
+				tipo_busqueda=$("#tipo_busqueda").val();
+				busqueda_label=$("#busqueda_label").val();			
+				busqueda=$("#busqueda").val();	
+				//autocompleteLotePorCodigoParalot(tipo_busqueda, busqueda_label, busqueda);
+			}
+			if($("#tipo_busqueda").val() == "nombre"){
+				$("#label_busqueda").html("Nombre de Cliente:");
+				console.log("Por nombre cliente");
+				$('#busqueda_label').unmask();
+				$("#busqueda_label").attr("placeholder", "Ej: Juan Perez");
+				tipo_busqueda=$("#tipo_busqueda").val();
+				busqueda_label=$("#busqueda_label").val();			
+				busqueda=$("#busqueda").val();	
+				autocompleteClientePorNombreOCedula(tipo_busqueda, busqueda_label, busqueda);
+			}
+			if($("#tipo_busqueda").val() == "cedula"){
+				$("#label_busqueda").html("Cedula de Cliente:");
+				console.log("Por cedula cliente");
+				$('#busqueda_label').unmask();
+				$("#busqueda_label").attr("placeholder", "Ej: 3497322");
+				tipo_busqueda=$("#tipo_busqueda").val();
+				busqueda_label=$("#busqueda_label").val();			
+				busqueda=$("#busqueda").val();	
+				autocompleteClientePorNombreOCedula(tipo_busqueda, busqueda_label, busqueda);
+			}
+			
+		});
+		
 	});
 
 </script>
+
 {% endblock %}
 {% block content %}
 <div class="gri16 text-izquierda" id="breadcumb">
@@ -38,18 +115,21 @@
 				<th class="acciones"  colspan="3"><strong><a href="#" style="color: white;">Filtrar</a></strong></th>
 			</tr>
 			<tr>
-				<td>Nro de Lote:</td>
-				<td><input id="busqueda" type="" name="busqueda" placeholder="Ej: 001/001/0001"/></td>
+				<td id="label_busqueda">Nro de Lote:</td>
+				<td>
+					<input id="busqueda_label" type="" name="busqueda_label"/>
+					<input type="hidden" id="busqueda" type="" name="busqueda"/>
+				</td>
 			</tr>
 			<tr>
-				<td> Lotes por cliente: </td>
+				<td> Lotes por: </td>
 				<td>
 					<select id="tipo_busqueda" name="tipo_busqueda">
-						<!-- <option value="0">Elija una opcion</option> -->
-						<option value="nombre">Nombre</option>
-						<option value="cedula">Cedula</option>
-						<option value="id">ID</option>	
-					</select>	
+						<option value="codigo">Codigo de Lote</option>
+						<option value="nombre">Nombre de Cliente</option>
+						<option value="cedula">Cedula de Cliente</option>	
+					</select>
+					
 				</td>
 				
 			</tr>
@@ -69,22 +149,22 @@
 </div>
 <div id="listado-item-lote">
 	<table border="1" cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
-		<th>Lote Nro</th><th>Manzana Nro</th><th>Nombre Fracci&oacute;n</th><th>ID Fracci&oacute;n</th><th>Estado</th>
+		<th>ID Fracci&oacute;n</th><th>Manzana Nro</th><th>Lote Nro</th><th>Nombre Fracci&oacute;n</th><th>Estado</th>
 		{% for hw in object_list %}
 		{% if forloop.counter|divisibleby:2 %}
 		<tr>
-			<td><a href="{{hw.id}}">{{hw.nro_lote}} <strong>(Ver Detalles)</strong></a></td>
-			<td> {{hw.manzana}} </td>
-			<td> {{hw.manzana.fraccion}} </td>
 			<td> {{hw.manzana.fraccion.id}} </td>
+			<td> {{hw.manzana.nro_manzana}} </td>
+			<td><a href="{{hw.id}}">{{hw.nro_lote}} <strong>(Ver Detalles)</strong></a></td>
+			<td> {{hw.manzana.fraccion}} </td>
 			<td> {{ hw.get_estado_display }} </td>
 		</tr>
 		{% else %}
 		<tr class="bkg_gris">
-			<td><a href="{{hw.id}}">{{hw.nro_lote}} <strong>(Ver Detalles)</strong></a></td>
-			<td> {{hw.manzana}} </td>
-			<td> {{hw.manzana.fraccion}} </td>
 			<td> {{hw.manzana.fraccion.id}} </td>
+			<td> {{hw.manzana.nro_manzana}} </td>
+			<td><a href="{{hw.id}}">{{hw.nro_lote}} <strong>(Ver Detalles)</strong></a></td>
+			<td> {{hw.manzana.fraccion}} </td>
 			<td> {{ hw.get_estado_display }} </td>
 		</tr>
 		{% endif %}

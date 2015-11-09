@@ -20,6 +20,24 @@ import xlwt
 import math
 import json
 from principal.common_functions import *
+from principal import permisos
+
+def facturacion(request):
+    
+    if request.user.is_authenticated():
+        if verificar_permisos(request.user.id, permisos.VER_LISTADO_OPCIONES):
+            t = loader.get_template('facturas/index.html')
+            c = RequestContext(request, {})
+            return HttpResponse(t.render(c))
+        else:
+            t = loader.get_template('index2.html')
+            grupo= request.user.groups.get().id
+            c = RequestContext(request, {
+                 'grupo': grupo
+            })
+            return HttpResponse(t.render(c))
+    else:
+        return HttpResponseRedirect(reverse('login')) 
 
 def facturar_operacion(request, tipo_operacion, operacion_id):
     if request.user.is_authenticated():
@@ -252,17 +270,28 @@ def consultar_facturas(request):
         else: #POST se envia el formulario con los parametros de busqueda.  
             data = request.POST     
             # En caso de que se haya solicitado una busqueda, filtramos de acuerdo al parametro correspondiente.
-            fecha_ini = data.get('fecha_ini', '')
-            fecha_fin = data.get('fecha_fin', '')
-            fecha_ini_parsed = unicode(datetime.strptime(fecha_ini, "%d/%m/%Y").date())
-            fecha_fin_parsed = unicode(datetime.strptime(fecha_fin, "%d/%m/%Y").date())
-            object_list = Factura.objects.filter(fecha__range=(fecha_ini_parsed,fecha_fin_parsed)).order_by('id','fecha')                    
-            monto=0
-            for factura in object_list:
-                lista_detalles=json.loads(factura.detalle)
-                for key, value in lista_detalles.iteritems():
-                    monto+=int(int(value['cantidad'])*int(value['precio_unitario']))
-                factura.monto=unicode('{:,}'.format(monto)).replace(",", ".")
+            tipo_busqueda = data.get('tipo_busqueda')
+            busqueda = data.get('busqueda')
+            if tipo_busqueda == 'rango_fecha':
+                fecha_ini = data.get('fecha_ini', '')
+                fecha_fin = data.get('fecha_fin', '')
+                fecha_ini_parsed = unicode(datetime.datetime.strptime(fecha_ini, "%d/%m/%Y").date())
+                fecha_fin_parsed = unicode(datetime.datetime.strptime(fecha_fin, "%d/%m/%Y").date())
+                object_list = Factura.objects.filter(fecha__range=(fecha_ini_parsed,fecha_fin_parsed)).order_by('id','fecha')                    
+                monto=0
+                for factura in object_list:
+                    lista_detalles=json.loads(factura.detalle)
+                    for key, value in lista_detalles.iteritems():
+                        monto+=int(int(value['cantidad'])*int(value['precio_unitario']))
+                    factura.monto=unicode('{:,}'.format(monto)).replace(",", ".")
+            if tipo_busqueda == 'nro_factura':
+                object_list = Factura.objects.filter(pk=busqueda).order_by('id','fecha')                    
+                monto=0
+                for factura in object_list:
+                    lista_detalles=json.loads(factura.detalle)
+                    for key, value in lista_detalles.iteritems():
+                        monto+=int(int(value['cantidad'])*int(value['precio_unitario']))
+                    factura.monto=unicode('{:,}'.format(monto)).replace(",", ".")
         
         paginator=Paginator(object_list,15)
         page=request.GET.get('page')

@@ -2,27 +2,27 @@
 {% block header_scripts %}
 <script type="text/javascript">
 	function buscar() {
-		if ($("#id_nombre_concepto").val() == "") {
-			alert("Debe ingresar el nombre del plan para buscar.");
+		if ($("#id_nombre_concepto").val() == "" || $("#id_concepto_factura").val() == "" ) {
+			alert("Debe seleccionar el nombre del concepto para buscar.");
 		} else {
 			$("#frm_busqueda").submit();
 		}
 	}
 	$(document).ready(function() {
-		//autocomplete para planes de pago
-		var id_concepto_factura;
+		//autocomplete para concepto factura
+		var id_concepto;
 		$("#id_concepto_factura").empty();
-		base_url="/ajax/get_concepto_factura/";
+		base_url="/ajax/get_concepto_factura_by_name/";
 		params="value";
 		$("#id_nombre_concepto").autocomplete({
 			source : base_url,
 			minLenght : 1,
 			select : function(event, ui) {
-				id_plan = ui.item.id;
-				name_plan= ui.item.label;
-				ui.item.value = ui.item.label;
+				id_concepto = ui.item.id;
+				name_concepto= ui.item.descripcion;
+				ui.item.value = ui.item.descripcion;
 				$("#id_nombre_concepto").val(name_concepto);
-				$("#id_concepto_factura").val(id_concepto_factura);			
+				$("#id_concepto_factura").val(id_concepto);			
 			}
 		});
 	});

@@ -1270,26 +1270,27 @@ def listar_busqueda_rango_factura(request, timbrado_id):
     })
     return HttpResponse(t.render(c))
 
-def listar_busqueda_concepto_factura(request, concepto_factura_id):       
+def listar_busqueda_concepto_factura(request):       
     if request.user.is_authenticated():
         if verificar_permisos(request.user.id, permisos.VER_LISTADO_CONCEPTO_FACTURA):
-            t = loader.get_template('parametros/timbrado/concepto_factura/listado.html')
+            t = loader.get_template('parametros/concepto_factura/listado.html')
             #c = RequestContext(request, {})
             #return HttpResponse(t.render(c))
         else:
             t = loader.get_template('index2.html')
             grupo= request.user.groups.get().id
             c = RequestContext(request, {
-                 'grupo': grupo,
-                 'id_timbrado': timbrado_id
+                 'grupo': grupo
             })
             return HttpResponse(t.render(c))
     else:
         return HttpResponseRedirect(reverse('login')) 
     
-    id_rango_factura = request.POST['rango_factura']
-    if id_rango_factura:
-        object_list=RangoFactura.objects.filter(pk=id_rango_factura)
+    id_concepto_factura = request.POST['concepto_factura']
+    if id_concepto_factura:
+        object_list=ConceptoFactura.objects.filter(pk=id_concepto_factura)
+        for concepto in object_list:
+            concepto.precio_unitario = unicode('{:,}'.format(concepto.precio_unitario)).replace(",",".")
     paginator=Paginator(object_list,15)
     page=request.GET.get('page')
     try:
@@ -1349,9 +1350,14 @@ def listar_busqueda_log_usuario(request):
     else:
         return HttpResponseRedirect(reverse('login')) 
     
-    id_log_usuario = request.POST['log_usuario']
-    if id_log_usuario:
-        object_list=LogUsuario.objects.filter(pk=id_log_usuario)
+    data = request.POST 
+    fecha_ini = data.get('fecha_ini', '')
+    fecha_fin = data.get('fecha_fin', '')
+    fecha_ini_parsed = unicode(datetime.datetime.combine(datetime.datetime.strptime(fecha_ini, "%d/%m/%Y").date(), datetime.datetime.min.time()))
+    fecha_fin_parsed = unicode(datetime.datetime.combine(datetime.datetime.strptime(fecha_fin, "%d/%m/%Y").date(), datetime.datetime.max.time()))
+    object_list = LogUsuario.objects.filter(fecha_hora__range=(fecha_ini_parsed,fecha_fin_parsed)).order_by('fecha_hora')
+    
+    
     paginator=Paginator(object_list,15)
     page=request.GET.get('page')
     try:
@@ -1380,9 +1386,9 @@ def listar_busqueda_coordenadas_factura(request):
     else:
         return HttpResponseRedirect(reverse('login')) 
     
-    id_coordenadas_factura = request.POST['coordenadas_factura']
-    if id_coordenadas_factura:
-        object_list=CoordenadasFactura.objects.filter(pk=id_coordenadas_factura)
+    id_usuario = request.POST['usuario']
+    if id_usuario:
+        object_list=CoordenadasFactura.objects.filter(usuario=id_usuario)
     paginator=Paginator(object_list,15)
     page=request.GET.get('page')
     try:

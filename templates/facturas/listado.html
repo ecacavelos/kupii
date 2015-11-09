@@ -2,6 +2,55 @@
 {% block header_scripts %}
 <script type="text/javascript">
 	$(document).ready(function() {
+		$("#busqueda_label").mask("###-###-#######");
+		if ($("#tipo_busqueda").val()=="rango_fecha"){
+			$("#busqueda_label").hide();
+			$("#label_busqueda").html("Rango de Fecha");
+			$("#label_desde").show();
+			$("#label_hasta").show();
+			$("#label_relleno").hide();
+			$("#label_relleno2").hide();
+		} else {
+			$("#busqueda_label").show();
+			$("#fecha_ini").hide();
+			$("#fecha_fin").hide();
+			$("#label_desde").hide();
+			$("#label_hasta").hide();
+			$("#label_relleno").show();
+			$("#label_relleno2").show();
+			$("#label_busqueda").html("Numero de Factura");
+			$("#busqueda_label").attr("placeholder","001-001-0000001");
+			tipo_busqueda=$("#tipo_busqueda").val();
+			busqueda_label=$("#busqueda_label").val();			
+			busqueda=$("#busqueda").val();	
+			autocompleteFacturaPorNumero(tipo_busqueda, busqueda_label, busqueda);	
+		}
+		
+		$("#tipo_busqueda").change(function(){
+			if ($("#tipo_busqueda").val()=="rango_fecha"){
+				$("#busqueda_label").hide();
+				$("#label_busqueda").html("Rango de Fecha");
+				$("#label_desde").show();
+				$("#label_hasta").show();
+				$("#label_relleno").hide();
+				$("#label_relleno2").hide();
+			} else {
+				$("#busqueda_label").show();
+				$("#fecha_ini").hide();
+				$("#fecha_fin").hide();
+				$("#label_desde").hide();
+				$("#label_hasta").hide();
+				$("#label_relleno").show();
+				$("#label_relleno2").show();
+				$("#label_busqueda").html("Numero de Factura");
+				$("#busqueda_label").attr("placeholder","001-001-0000001");
+				tipo_busqueda=$("#tipo_busqueda").val();
+				busqueda_label=$("#busqueda_label").val();			
+				busqueda=$("#busqueda").val();	
+				autocompleteFacturaPorNumero(tipo_busqueda, busqueda_label, busqueda);	
+			}
+		});
+		
 		//Cambiar calendario a español
 		$.datepicker.regional['es'] = {
 			closeText : 'Cerrar',
@@ -43,12 +92,12 @@
 
 <script type="text/javascript">
 function validar(){
-	if($("#tipo_busqueda").val()==0){
-		alert("Debe elegir un tipo de busqueda.");
+	if($("#tipo_busqueda").val()=="rango_fecha" && ($("#fecha_ini").val() =="" || $("#fecha_fin").val() =="") ){
+		alert("Debe ingresar un rango de fechas.");
 	}
 	else{
-		if($("#busqueda").val()==""){
-			alert("Debe ingresar un nombre para buscar.");
+		if( $("#tipo_busqueda").val()=="nro_factura" && $("#busqueda").val()==""){
+			alert("Debe elegir un numero de factura.");
 		}else{
 			$("#frm_busqueda").submit();
 		}
@@ -72,15 +121,27 @@ function validar(){
 			<tr>
 				<th class="acciones" colspan="3"><strong><a href="#" style="color: white;">Filtrar</a></strong></th>
 			</tr>
-			<th></th><th>Desde:</th><th>Hasta:</th>
+			<th></th><th id="label_desde">Desde:</th><th id="label_hasta">Hasta:</th><th id="label_relleno"></th><th id="label_relleno2"></th>
 			<tr>
-				<td> Rango de Fecha: </td>
+				<td id="label_busqueda"> Rango de Fecha: </td>
 				<td>
 				<input name="fecha_ini" id="fecha_ini" type="text" value="" />
+				<input type="text" name="busqueda_label" id="busqueda_label" value="" />
+				<input type="hidden" id="busqueda" name="busqueda" value="" /> 
 				</td>
 				<td>
 				<input name="fecha_fin" id="fecha_fin" type="text" value="" />
 				</td>
+			</tr>
+			<tr>
+				<td> Buscar por: </td>
+				<td>
+					<select id="tipo_busqueda" name="tipo_busqueda">
+						<option value="rango_fecha">Rango de Fechas</option>
+						<option value="nro_factura">Numero de Factura</option>	
+					</select>
+				</td>
+				
 			</tr>
 			<tr>
 				<td>

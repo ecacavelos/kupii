@@ -223,38 +223,25 @@ def listar_busqueda_lotes(request):
     busqueda = request.POST['busqueda']
     tipo_busqueda=request.POST['tipo_busqueda']
     #se busca un lote
-    if busqueda:        
-        x=unicode(busqueda)
-        fraccion_int = int(x[0:3])
-        manzana_int =int(x[4:7])
-        lote_int = int(x[8:])
-        manzana= Manzana.objects.get(fraccion_id= fraccion_int, nro_manzana= manzana_int)
-        object_list = Lote.objects.filter(manzana=manzana.id, nro_lote=lote_int)
-    elif tipo_busqueda:
-        #se buscan los lotes de un determinado cliente
-        busqueda = request.POST['busqueda_cliente']                
-        lista_lotes=[]        
-        if(tipo_busqueda=='cedula'):            
-            cliente=Cliente.objects.get(Q(cedula=busqueda)| Q(ruc=busqueda))
-            ventas=Venta.objects.filter(cliente_id=cliente.id).order_by('cliente')
-            for venta in ventas:
-                lote=Lote.objects.get(pk=venta.lote_id)
-                lista_lotes.append(lote)
     
-        if(tipo_busqueda=='nombre'):
-            clientes=Cliente.objects.filter(nombres__icontains=busqueda).order_by('id')            
-            for cliente in clientes:
-                ventas=Venta.objects.filter(cliente_id=cliente)
-                for venta in ventas:
-                    lote=Lote.objects.get(pk=venta.lote_id)
-                    lista_lotes.append(lote)
+                    
+    lista_lotes=[]        
+    if(tipo_busqueda=='cedula'):            
+        ventas=Venta.objects.filter(cliente_id=busqueda)
+        for venta in ventas:
+            lote=Lote.objects.get(pk=venta.lote_id)
+            lista_lotes.append(lote)
+    
+    if(tipo_busqueda=='nombre'):
+        ventas=Venta.objects.filter(cliente_id=busqueda)
+        for venta in ventas:
+            lote=Lote.objects.get(pk=venta.lote_id)
+            lista_lotes.append(lote)
         
-        if(tipo_busqueda=='id'):
-            ventas=Venta.objects.filter(cliente_id=busqueda).order_by('cliente')
-            for venta in ventas:
-                lote=Lote.objects.get(pk=venta.lote_id)
-                lista_lotes.append(lote)
-        object_list=lista_lotes
+    if(tipo_busqueda=='codigo'):
+        lote=Lote.objects.get(pk=busqueda)
+        lista_lotes.append(lote)
+    object_list=lista_lotes
             
     paginator=Paginator(object_list,15)
     page=request.GET.get('page')

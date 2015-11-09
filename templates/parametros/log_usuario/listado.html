@@ -2,7 +2,7 @@
 {% block header_scripts %}
 <script type="text/javascript">
 	function buscar() {
-		if ($("#id_log").val() == "") {
+		if ($("#fecha_ini").val() == "" || $("#fecha_ini").val() == "") {
 			alert("Debe ingresar un rango de fecha.");
 		} else {
 			$("#frm_busqueda").submit();
@@ -10,9 +10,42 @@
 	}
 	$(document).ready(function() {
 		
+//Cambiar calendario a español
+		$.datepicker.regional['es'] = {
+			closeText : 'Cerrar',
+			prevText : '<Ant',
+			nextText : 'Sig>',
+			currentText : 'Hoy',
+			monthNames : ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+			monthNamesShort : ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+			dayNames : ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
+			dayNamesShort : ['Dom', 'Lun', 'Mar', 'Mié', 'Juv', 'Vie', 'Sáb'],
+			dayNamesMin : ['Do', 'Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sá'],
+			weekHeader : 'Sm',
+			dateFormat : 'dd/mm/yy',
+			firstDay : 1,
+			isRTL : false,
+			showMonthAfterYear : false,
+			yearSuffix : ''
+		};
+		// Setear idioma al calendario
+		$.datepicker.setDefaults($.datepicker.regional['es']);
 		
+		var fecha_ini = "{{fecha_ini}}";
+		var fecha_fin = "{{fecha_fin}}";
+		
+		$('#fecha_ini').val(fecha_ini);
+		$('#fecha_fin').val(fecha_fin);
+		
+		$('#fecha_ini').mask('##/##/####');
+		$("#fecha_ini").datepicker({
+			dateFormat : 'dd/mm/yy'
+		});
+		$('#fecha_fin').mask('##/##/####');
+		$("#fecha_fin").datepicker({
+			dateFormat : 'dd/mm/yy'
+		});
 	});
-
 </script>
 {%endblock%}
 {% block content %}
@@ -29,12 +62,16 @@
 		{% csrf_token %}
 		<table id="lista-categoria" frame="box">
 			<tr>
-				<th class="acciones"  colspan="3"><strong><a href="#" style="color: white;">Filtrar</a></strong></th>
+				<th class="acciones" colspan="3"><strong><a href="#" style="color: white;">Filtrar</a></strong></th>
 			</tr>
+			<th></th><th id="label_desde">Desde:</th><th id="label_hasta">Hasta:</th>
 			<tr>
-				<td>Log Usuario:</td>
-				<td><input id="id_log" name="timbrado" type="hidden" maxlength="100"/>
-					<input id="id_fecha_log" type="text" name="fecha_timbrado" maxlength="100" /><br><br>
+				<td id="label_busqueda"> Rango de Fecha: </td>
+				<td>
+				<input name="fecha_ini" id="fecha_ini" type="text" value="" />
+				</td>
+				<td>
+				<input name="fecha_fin" id="fecha_fin" type="text" value="" />
 				</td>
 			</tr>
 			<tr>

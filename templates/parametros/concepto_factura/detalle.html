@@ -112,7 +112,7 @@ $(document).ready(function() {
 	
 	$('#id_precio_unitario').mask("###.###.###");
 	
-	$(".lote-form-button").submit(function() {
+	$("#concepto_form").submit(function() {
 		var numero = $("#id_precio_unitario").val();
 	
 		numero =numero.replace(".", "");
@@ -122,53 +122,8 @@ $(document).ready(function() {
 		numero =numero.replace(".", "");
 		
 		$("#id_precio_unitario").val(numero);
+		
 	});
-	
-	
-	$('#id_monto_fijo_cuotas_gerente').val($('#id_monto_fijo_cuotas_gerente').val().replace(".",","));
-	$('#id_monto_fijo_cuotas_gerente').val(format.call($('#id_monto_fijo_cuotas_gerente').val().split(' ').join(''),'.',','));
-	
-	$( "#id_cantidad_de_cuotas" ).keyup(function() {
-  		solo_numeros_cantidad_de_cuotas();
-	});
-	$( "#id_porcentaje_inicial_inmobiliaria" ).keyup(function() {
-  		solo_numeros_porcentaje_inicial_inmobiliaria();
-	});
-	$( "#id_cantidad_cuotas_inmobiliaria" ).keyup(function() {
-  		solo_numeros_cantidad_cuotas_inmobiliaria();
-	});
-	$( "#id_inicio_cuotas_inmobiliaria" ).keyup(function() {
-  		solo_numeros_inicio_cuotas_inmobiliaria();
-	});
-	$( "#id_intervalos_cuotas_inmobiliaria" ).keyup(function() {
-  		solo_numeros_intervalos_cuotas_inmobiliaria();
-	});
-	$( "#id_porcentaje_cuotas_inmobiliaria" ).keyup(function() {
-  		solo_numeros_porcentaje_cuotas_inmobiliaria();
-	});
-	$( "#id_porcentaje_cuotas_administracion" ).keyup(function() {
-  		solo_numeros_porcentaje_cuotas_administracion();
-	});
-	$( "#id_porcentaje_inicial_gerente" ).keyup(function() {
-  		solo_numeros_porcentaje_inicial_gerente();
-	});
-	$( "#id_cantidad_cuotas_gerente" ).keyup(function() {
-  		solo_numeros_cantidad_cuotas_gerente();
-	});
-	$( "#id_inicio_cuotas_gerente" ).keyup(function() {
-  		solo_numeros_inicio_cuotas_gerente();
-	});
-	$( "#id_intervalos_cuotas_gerente" ).keyup(function() {
-  		solo_numeros_intervalos_cuotas_gerente();
-  	});
-	$( "#id_porcentaje_cuotas_gerente" ).keyup(function() {
-  		solo_numeros_porcentaje_cuotas_gerente();
-  		
-	});//////////
-	$( "#id_monto_fijo_cuotas_gerente" ).keyup(function() {
-  		$("#id_monto_fijo_cuotas_gerente").val(format.call($("#id_monto_fijo_cuotas_gerente").val().split(' ').join(''),'.',','));solo_numeros_monto_fijo_cuotas_gerente();
-	});
-	
 	
 });
 
@@ -204,7 +159,7 @@ $(document).ready(function() {
 		<div id="{{message_id}}">{{ message }}</div>
 	
 	<table width="50%" border="1" cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
-	<form action="/parametros/concepto_factura/listado/{{ concepto_factura.id }}/" method="post" onsubmit="_validar();">
+	<form action="/parametros/concepto_factura/listado/{{ concepto_factura.id }}/" method="post" id="concepto_form">
 		{% csrf_token %}
 		{% for field in form %}
 		<tr>

@@ -230,6 +230,50 @@ function autocompleteFraccionPorNombreOId(tipo_busqueda, busqueda_label, busqued
 	}
 }
 
+function autocompleteLotePorCodigoParalot(tipo_busqueda, busqueda_label, busqueda){
+	if (tipo_busqueda == 'codigo') {
+		//console.log("por codigo");
+	$("#busqueda_label").val("");
+	var id_lote;
+	$("#busqueda").empty();
+	base_url = base_context + "/ajax/get_lote_by_codigo_paralot/";
+	params = "value";
+	$("#busqueda_label").autocomplete({
+		source : base_url,
+		minLength : 1,
+		select : function(event, ui) {
+			event.preventDefault();
+			id_lote = ui.item.id;
+			$("#busqueda").val(id_lote);
+			$("#busqueda_label").val(ui.item.codigo_paralot);
+			//alert(id_cliente);
+		}
+	});
+	}
+}
+
+function autocompleteFacturaPorNumero(tipo_busqueda, busqueda_label, busqueda){
+	if (tipo_busqueda == 'nro_factura') {
+		//console.log("por codigo");
+	$("#busqueda_label").val("");
+	var id_factura;
+	$("#busqueda").empty();
+	base_url = base_context + "/ajax/get_factura_by_numero/";
+	params = "value";
+	$("#busqueda_label").autocomplete({
+		source : base_url,
+		minLength : 1,
+		select : function(event, ui) {
+			event.preventDefault();
+			id_factura = ui.item.id;
+			$("#busqueda").val(id_factura);
+			$("#busqueda_label").val(ui.item.numero);
+			//alert(id_cliente);
+		}
+	});
+	}
+}
+
 function autocompleteVendedorPorNombreOCedula(tipo_busqueda, busqueda_label, busqueda){
 	if (tipo_busqueda == 'nombre') {
 		console.log("por nombre");

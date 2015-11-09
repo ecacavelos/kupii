@@ -58,7 +58,39 @@ def get_concepto_factura_by_name(request):
                 print error
                 #return HttpResponseServerError('No se pudo procesar el pedido')
         else:
-            return HttpResponseRedirect(reverse('login'))  
+            return HttpResponseRedirect(reverse('login'))
+        
+@require_http_methods(["GET"])
+def get_lote_by_codigo_paralot(request):
+    if request.method == 'GET':
+        if request.user.is_authenticated():
+            try:            
+                codigo_paralot = request.GET['term']
+                print("term ->" + codigo_paralot)
+                object_list = Lote.objects.filter(codigo_paralot__icontains = codigo_paralot)
+                labels=["codigo_paralot"]
+                return HttpResponse(json.dumps(custom_json(object_list,labels), cls=DjangoJSONEncoder), content_type="application/json")
+            except Exception, error:
+                print error
+                #return HttpResponseServerError('No se pudo procesar el pedido')
+        else:
+            return HttpResponseRedirect(reverse('login'))
+        
+@require_http_methods(["GET"])
+def get_factura_by_numero(request):
+    if request.method == 'GET':
+        if request.user.is_authenticated():
+            try:            
+                numero_factura = request.GET['term']
+                print("term ->" + numero_factura)
+                object_list = Factura.objects.filter(numero__icontains = numero_factura)
+                labels=["numero"]
+                return HttpResponse(json.dumps(custom_json(object_list,labels), cls=DjangoJSONEncoder), content_type="application/json")
+            except Exception, error:
+                print error
+                #return HttpResponseServerError('No se pudo procesar el pedido')
+        else:
+            return HttpResponseRedirect(reverse('login'))   
 
 @require_http_methods(["GET"])
 def get_vendedor_name_id_by_cedula(request):
