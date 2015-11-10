@@ -2,34 +2,88 @@
 {% block header_scripts %}
     <script type="text/javascript">
         $(document).ready(function () {
-            $('#fecha_hasta').mask('##/##/####');
-            $("#fecha_hasta").datepicker({dateFormat: 'dd/mm/yy'});
-            $("#fecha_hasta").hide();
+            //Cambiar calendario a español
+		$.datepicker.regional['es'] = {
+			closeText : 'Cerrar',
+			prevText : '<Ant',
+			nextText : 'Sig>',
+			currentText : 'Hoy',
+			monthNames : ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+			monthNamesShort : ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+			dayNames : ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
+			dayNamesShort : ['Dom', 'Lun', 'Mar', 'Mié', 'Juv', 'Vie', 'Sáb'],
+			dayNamesMin : ['Do', 'Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sá'],
+			weekHeader : 'Sm',
+			dateFormat : 'dd/mm/yy',
+			firstDay : 1,
+			isRTL : false,
+			showMonthAfterYear : false,
+			yearSuffix : ''
+		};
+		// Setear idioma al calendario
+		$.datepicker.setDefaults($.datepicker.regional['es']);
+		var busqueda_label = "{{busqueda_label}}";
+		var busqueda = "{{busqueda}}";
+		var fecha_desde = "{{fecha_desde}}";
+		var fecha_hasta = "{{fecha_hasta}}";
+		var tipo_busqueda = "{{tipo_busqueda}}";
+		
+		
+		
+		 $('#tipo_busqueda').val(tipo_busqueda);
+		 $('#busqueda_label').val(busqueda_label);
+		 $('#fecha_desde').val(fecha_desde);
+		 $('#fecha_hasta').val(fecha_hasta);
+		 $('#busqueda').val(busqueda);
+		 
+		 if ( $("#tipo_busqueda").val() == "" || $("#tipo_busqueda").val() == null ){
+		 	 $("#tipo_busqueda").val("cliente");
+		 }
+		 
+		 desplegar_campos();
         });
+        
         function buscar() {
-            if ($("#tipo_busqueda").val() == 0) {
-                alert("Debe elegir un tipo de busqueda.");
-            }
-            else {
-                if ($("#busqueda").val() == "") {
-                    alert("Debe ingresar un nombre para buscar.");
-                } else {
-                    $("#frm_busqueda").submit();
-                }
-            }
-        }
-        function desplegar_fecha() {
+			if ($("#tipo_busqueda").val() == "") {
+				alert("Debe elegir un tipo de busqueda.");
+			} else {
+				if ($("#tipo_busqueda").val() == "fecha") {
+					if ($("#fecha_desde").val() == "" && $("#fecha_hasta").val() == "" ) {
+						alert("Debe ingresar un valor para buscar.");
+					} else {
+						$("#frm_busqueda").submit();
+					}
+				} else {
+					if ($("#busqueda_label").val() == "") {
+						alert("Debe ingresar un valor para buscar.");
+					} else {
+						$("#frm_busqueda").submit();
+					}	
+				}
+			}
+		}
+			
+        function desplegar_campos() {
             if ($("#tipo_busqueda").val() == 'fecha') {
+            	$("#fecha_desde").show();
                 $("#fecha_hasta").show();
-                $('#busqueda').mask('##/##/####');
-                $("#busqueda").datepicker({dateFormat: 'dd/mm/yy'});
+                $("#busqueda_label").hide();
+                $('#fecha_desde').mask('##/##/####');
+                $("#fecha_desde").datepicker({dateFormat: 'dd/mm/yy'});
+                $('#fecha_hasta').mask('##/##/####');
+                $("#fecha_hasta").datepicker({dateFormat: 'dd/mm/yy'});
+                $('#fecha_desde').attr("placeholder","Ej: dd/mm/aaaa");
+                $('#fecha_hasta').attr("placeholder","Ej: dd/mm/aaaa");
             } else {
+            	$("#fecha_desde").hide();
                 $("#fecha_hasta").hide();
-                $("#busqueda").datepicker("destroy");
-                $("#busqueda").removeClass("hasDatepicker");
-                $("#busqueda").unmask();
+                $("#busqueda_label").show();
+                $("#fecha_desde").val("");
                 $("#fecha_hasta").val("");
-                $("#busqueda").val("");
+                $("#busqueda_label").val("");
+                $('#busqueda_label').attr("placeholder","Ej: Juan Perez");
+                tipo_busqueda = "nombre";
+				autocompleteClientePorNombreOCedula(tipo_busqueda, busqueda_label, busqueda);
             }
         }
     </script>
@@ -52,7 +106,7 @@
                 </tr>
                 <tr>
                     <td>
-                        <select id="tipo_busqueda" name="tipo_busqueda" onchange="desplegar_fecha();">
+                        <select id="tipo_busqueda" name="tipo_busqueda" onchange="desplegar_campos();">
                             <!-- <option value="0">Elija una opcion</option> -->
                             <option value="cliente">Cliente</option>
                             <option value="fecha">Fecha de Cambio</option>
@@ -60,8 +114,9 @@
                 </tr>
                 <tr>
                     <td>
-                        <input id="busqueda" name="busqueda"/>
-
+                        <input type="hidden" id="busqueda" name="busqueda"/>
+						<input type="text" id="busqueda_label" name="busqueda_label"/>
+						<input name="fecha_desde" id="fecha_desde" type="text" value=""/>
                         <input name="fecha_hasta" id="fecha_hasta" type="text" value=""/>
                         <input name="tabla" type="hidden" value="venta"/>
 
@@ -85,34 +140,7 @@
             <th>Fecha de Cambio</th>
             <th>Lote Anterior</th>
             <th>Lote Nuevo</th>
-            {% if busqueda == 'cliente' %}
-                {% for hw in object_list %}
-                    {% for lot in hw %}
-                        <tr>
-                            <td>
-                                {{ lot.id }}
-                            </td>
-                            <td>
-                                {{ lot.cliente }}
-                            </td>
-                            <td>
-                                {{ lot.fecha_de_cambio }}
-                            </td>
-                            <td>
-                                {{ lot.lote_a_cambiar }}
-                            </td>
-                            <td>
-                                {{ lot.lote_nuevo }}
-                            </td>
-
-                        </tr>
-
-
-
-                    {% endfor %}
-                {% endfor %}
-            {% else %}
-                {% for hw in object_list %}
+           	{% for hw in object_list %}
                     <tr>
                         <td>
                             {{ hw.id }}
@@ -133,7 +161,7 @@
                     </tr>
 
                 {% endfor %}
-            {% endif %}
+            
             <div class="pagination">
     <span class="step-links">
         <div class="pagination">

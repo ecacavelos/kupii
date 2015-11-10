@@ -1,5 +1,6 @@
 {% extends "lotes/base_lotes.html" %}
 {% block header_scripts %}
+<script type="text/javascript" src="{{ STATIC_URL }}listados/listado_pagos.js"></script>
 <script type="text/javascript">
 	$(document).ready(function() {
 		//Cambiar calendario a español
@@ -24,18 +25,22 @@
 		$.datepicker.setDefaults($.datepicker.regional['es']);
 		var busqueda_label = "{{busqueda_label}}";
 		var busqueda = "{{busqueda}}";
-		var fecha_hasta = "{{busqueda_label}}";
+		var fecha_desde = "{{fecha_desde}}";
+		var fecha_hasta = "{{fecha_hasta}}";
 		var tipo_busqueda = "{{tipo_busqueda}}";
-
-		$('#tipo_busqueda').val(tipo_busqueda);
-		$('#id_busqueda_label').val(busqueda_label);
-		$('#fecha_hasta').val(fecha_hasta);
-		$('#id_busqueda').val(busqueda);
+		
+		 $('#tipo_busqueda').val(tipo_busqueda);
+		 $('#busqueda_label').val(busqueda_label);
+		 $('#fecha_desde').val(fecha_desde);
+		 $('#fecha_hasta').val(fecha_hasta);
+		 $('#busqueda').val(busqueda);
+		 
+		 desplegar_campos();
 
 	});
 
 </script>
-<script type="text/javascript" src="{{ STATIC_URL }}listados/listado_pagos.js"></script>
+
 {% endblock %}
 {% block content %}
 <div class="gri16 text-izquierda" id="breadcumb">
@@ -46,6 +51,10 @@
 <div class="clear"></div>
 
 <h1>Listado de Pagos</h1>
+
+{% if primera_llamada == True %}
+	<h2>15 ultimos pagos Pagos</h2>
+{% endif %}
 
 <div class="grid_6">
 	<form name="frm_busqueda" id="frm_busqueda" method="get" action="{% url 'frontend_home' %}movimientos/listado_busqueda_pagos/">
@@ -64,8 +73,9 @@
 			</tr>
 			<tr>
 				<td>
-				<input name="busqueda_label" id="id_busqueda_label" type="text" value=""/>
-				<input name="busqueda" id="id_busqueda" type="hidden" value=""/>
+				<input name="busqueda_label" id="busqueda_label" type="text" value=""/>
+				<input name="busqueda" id="busqueda" type="hidden" value=""/>
+				<input name="fecha_desde" id="fecha_desde" type="text" value="" style=" display: none;"/>
 				<input name="fecha_hasta" id="fecha_hasta" type="text" value="" style=" display: none;"/>
 				<input name="tabla" type="hidden" value="venta"/>
 				<input type="button" value="Buscar" onclick="buscar();" class="historico" style="cursor: pointer"/>
@@ -83,10 +93,11 @@
 </div>
 <div id="listado-item-lote">
 	<table width="50%" cellpadding="0" cellspacing="0" class="listado-pagos" align="center">
-		<th>Fracci&oacute;n</th><th>Lote Nro</th><th>Cliente</th><th>Cuotas Pagadas</th><th>Plan de Pago</th><th>Fecha de Pago</th><th>Total de Cuotas</th><th>Total de Mora</th><th>Total de Pago</th>
+		<th>ID</th><th>Fracci&oacute;n</th><th>Lote Nro</th><th>Cliente</th><th>Cuotas Pagadas</th><th>Plan de Pago</th><th>Fecha de Pago</th><th>Total de Cuotas</th><th>Total de Mora</th><th>Total de Pago</th>
 		{% for hw in object_list %}
 		{% if forloop.counter|divisibleby:2 %}
 		<tr>
+			<td> {{hw.id}} </td>
 			<td> {{hw.lote.manzana.fraccion}} </td>
 			<td> {{hw.lote}} </td>
 			<td> {{hw.cliente}} </td>
@@ -99,6 +110,7 @@
 		</tr>
 		{% else %}
 		<tr class="bkg_gris">
+			<td> {{hw.id}} </td>
 			<td> {{hw.lote.manzana.fraccion}} </td>
 			<td> {{hw.lote}} </td>
 			<td> {{hw.cliente}} </td>

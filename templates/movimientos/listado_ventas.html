@@ -25,13 +25,17 @@
 		$.datepicker.setDefaults($.datepicker.regional['es']);
 		var busqueda_label = "{{busqueda_label}}";
 		var busqueda = "{{busqueda}}";
-		var fecha_hasta = "{{busqueda_label}}";
+		var fecha_desde = "{{fecha_desde}}";
+		var fecha_hasta = "{{fecha_hasta}}";
 		var tipo_busqueda = "{{tipo_busqueda}}";
 		
 		 $('#tipo_busqueda').val(tipo_busqueda);
-		 $('#id_busqueda_label').val(busqueda_label);
+		 $('#busqueda_label').val(busqueda_label);
+		 $('#fecha_desde').val(fecha_desde);
 		 $('#fecha_hasta').val(fecha_hasta);
 		 $('#id_busqueda').val(busqueda);
+		 
+		 desplegar_campos();
 		 
 	}); 
 </script>
@@ -65,8 +69,9 @@
 			</tr>
 			<tr>
 				<td>
-				<input name="busqueda_label" id="id_busqueda_label" type="text" value=""/>
+				<input name="busqueda_label" id="busqueda_label" type="text" value=""/>
 				<input name="busqueda" id="id_busqueda" type="hidden" value=""/>
+				<input name="fecha_desde" id="fecha_desde" type="text" value="" style=" display: none;"/>
 				<input name="fecha_hasta" id="fecha_hasta" type="text" value="" style=" display: none;"/>
 				<input name="tabla" type="hidden" value="venta"/>
 				<input type="button" value="Buscar" onclick="buscar();" class="historico" style="cursor: pointer"/>
