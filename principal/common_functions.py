@@ -260,7 +260,7 @@ def filtros_establecidos(request, tipo_informe):
             print('Parametros no seteados')
     elif tipo_informe == "informe_ventas":
         try:
-            lote=request['lote_id']
+            lote=request['busqueda']
             return True
         except:
             print('Parametros no seteados')  

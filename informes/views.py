@@ -2359,13 +2359,8 @@ def informe_ventas(request):
                 else: #Parametros seteados
                     lista_movimientos = []
                     t = loader.get_template('informes/informe_ventas.html')
-                    lote_id=request.GET['lote_id']
-                    x = unicode(lote_id)
-                    fraccion_int = int(x[0:3])
-                    manzana_int = int(x[4:7])
-                    lote_int = int(x[8:])
-                    manzana = Manzana.objects.get(fraccion_id=fraccion_int, nro_manzana=manzana_int)
-                    lote = Lote.objects.get(manzana=manzana.id, nro_lote=lote_int)
+                    lote_id=request.GET['busqueda']
+                    lote = Lote.objects.get(pk=lote_id)
                     lista_ventas = Venta.objects.filter(lote_id=lote.id).order_by('-fecha_de_venta')
                     try:
                         for item_venta in lista_ventas:

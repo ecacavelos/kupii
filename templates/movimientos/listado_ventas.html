@@ -93,7 +93,7 @@
 		{% for lot in object_list %}
 		{% if forloop.counter|divisibleby:2 %}
 		<tr>
-			<td><a href="{% url 'frontend_home' %}lotes/listado/ventas/{{ lot.id }}/">{{lot.id}} <strong>(Ver Detalles)</strong></a></td>
+			<td><a href="{% url 'frontend_home' %}movimientos/modificar_venta/{{ lot.id }}/">{{lot.id}} <strong>(Ver Detalles)</strong></a></td>
 			<td>{{lot.lote}}</td>
 			<td>{{lot.lote.manzana.fraccion}}</td>
 			<td>{{lot.cliente}}</td>
@@ -103,7 +103,7 @@
 		</tr>
 		{% else %}
 		<tr class="bkg_gris">
-			<td><a href="{% url 'frontend_home' %}lotes/listado/ventas/{{ lot.id }}/">{{lot.id}} <strong>(Ver Detalles)</strong></a></td>
+			<td><a href="{% url 'frontend_home' %}movimientos/modificar_venta/{{ lot.id }}/">{{lot.id}} <strong>(Ver Detalles)</strong></a></td>
 			<td>{{lot.lote}}</td>
 			<td>{{lot.lote.manzana.fraccion}}</td>
 			<td>{{lot.cliente}}</td>

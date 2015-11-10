@@ -23,6 +23,14 @@
 			showMonthAfterYear : false,
 			yearSuffix : ''
 		};
+		
+		tipo_busqueda="codigo";
+		busqueda_label=$("#busqueda_label").val();			
+		busqueda=$("#busqueda").val();
+		busqueda_label=$("#busqueda_label").attr("placeholder","Ej: 001/001/0001");	
+		autocompleteLotePorCodigoParalot(tipo_busqueda, busqueda_label, busqueda);
+		
+		
 		// Setear idioma al calendario
 		$.datepicker.setDefaults($.datepicker.regional['es']);
 		var d = new Date();
@@ -40,10 +48,10 @@
 		var fecha_ini = "{{fecha_ini}}";
 		var fecha_fin = "{{fecha_fin}}";
 		var lote_id = "{{lote_id}}";
-		$('#lote_id').val(lote_id);
+		$('#busqueda').val(lote_id);
 		$('#fecha_ini').val(fecha_ini);
 		$('#fecha_fin').val(fecha_fin);
-		$('#lote_id').mask('###/###/####');
+		$('#busqueda_label').mask('###/###/####');
 		$('#fecha_ini').mask('##/##/####');
 		$("#fecha_ini").datepicker({
 			dateFormat : 'dd/mm/yy'
@@ -98,7 +106,7 @@
 	});
 
 	function validar() {
-		if ($('#lote_id').val() == 0 || $('#lote_id').val() == "") {
+		if ($('#busqueda').val() == 0 || $('#busqueda').val() == "") {
 			alert("Debe ingresar un lote");
 			return;
 		}
@@ -127,7 +135,8 @@
 			<tr>
 				<td> Lote: </td>
 				<td>
-				<input name="lote_id" id="lote_id" type="text" value=""/>
+				<input type="hidden" name="busqueda" id="busqueda" type="text" value=""/>
+				<input type="text" name="busqueda_label" id="busqueda_label" type="text" value=""/>
 				</td>
 			</tr>
 			<tr>
