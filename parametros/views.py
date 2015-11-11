@@ -1060,7 +1060,7 @@ def agregar_coordenadas_factura(request):
             return HttpResponseRedirect('/parametros/coordenadas_factura/listado')
     else:
         
-        coor = CoordenadasFactura.objects.get(pk=2)
+        coor = CoordenadasFactura.objects.get(pk=1)
         form = CoordenadasFacturaForm(instance=coor)
 
     c = RequestContext(request, {
