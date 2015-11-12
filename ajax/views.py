@@ -510,7 +510,7 @@ def get_detalles_factura(request):
         if request.user.is_authenticated():
             try:
                 codigo= request.GET.get('lote_id')
-                cedula_cli= request.GET.get('cliente_id')
+                cliente_id= request.GET.get('cliente_id')
                 nro_cuota_desde = request.GET.get('nro_cuota_desde').split("/")
                 nro_cuota_hasta = request.GET.get('nro_cuota_hasta').split("/")
                 num_desde = int(nro_cuota_desde[0])
@@ -520,7 +520,7 @@ def get_detalles_factura(request):
                 cuotas_pag = (num_hasta - num_desde) + 1
                 cuotas_detalles = get_cuota_information_by_lote(lote.id,cuotas_pag)
                 
-                cliente = Cliente.objects.get(cedula=cedula_cli)
+                cliente = Cliente.objects.get(pk=cliente_id)
                 venta = Venta.objects.get(lote_id= lote.id, cliente_id=cliente.id)
                 object_list=get_pago_cuotas(venta, None, None)
                 #object_list = sorted(object_list, key=lambda k: k['id']) 

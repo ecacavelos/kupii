@@ -215,7 +215,7 @@
 					url : "/ajax/get_detalles_factura/",
 					data : {
 						lote_id: $("#lote").val(),
-						cliente_id: $("#id_cedula_cliente").val(),
+						cliente_id: $("#id_cliente").val(),
 						nro_cuota_desde: $("#id_nro_cuota").val(),
 						nro_cuota_hasta: $("#id_nro_cuota_hasta").val()
 					},
