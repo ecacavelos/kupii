@@ -350,9 +350,9 @@ def calcular_interes(request):
             print 'lote_id->' + lote_id
             fecha_pago = data.get('fecha_pago', '')
             proximo_vencimiento = data.get('proximo_vencimiento', '')
-            fecha_pago_parsed = datetime.datetime.strptime(data.get('fecha_pago'), "%d/%m/%Y").date()
+            fecha_pago_parsed = datetime.datetime.strptime(fecha_pago, "%d/%m/%Y").date()
 
-            proximo_vencimiento_parsed = datetime.datetime.strptime(data.get('proximo_vencimiento'), "%d/%m/%Y").date()
+            proximo_vencimiento_parsed = datetime.datetime.strptime(proximo_vencimiento, "%d/%m/%Y").date()
             
             nro_cuotas_a_pagar = data.get('nro_cuotas_a_pagar')
              

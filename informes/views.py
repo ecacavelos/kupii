@@ -2373,6 +2373,7 @@ def informe_ventas(request):
                                 resumen_venta['cantidad_de_cuotas'] = item_venta.plan_de_pago.cantidad_de_cuotas
                                 resumen_venta['precio_final'] = unicode('{:,}'.format(item_venta.precio_final_de_venta)).replace(",",".")
                                 resumen_venta['precio_de_cuota'] = unicode('{:,}'.format(item_venta.precio_de_cuota)).replace(",",".")
+                                resumen_venta['fecha_primer_vencimiento'] = datetime.datetime.strptime(unicode(item_venta.fecha_primer_vencimiento), "%Y-%m-%d").strftime("%d/%m/%Y")
                                 resumen_venta['entrega_inicial'] = unicode('{:,}'.format(item_venta.entrega_inicial)).replace(",",".")
                                 resumen_venta['vendedor'] = item_venta.vendedor
                                 resumen_venta['plan_de_pago'] = item_venta.plan_de_pago

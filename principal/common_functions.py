@@ -117,7 +117,7 @@ def monthdelta(d1, d2):
             break
     return delta
 
-def get_cuota_information_by_lote(lote_id,cuotas_pag):
+def get_cuota_information_by_lote(lote_id,cuotas_pag, facturar = False):
     cant_cuotas_pag =0
     print("lote_id ->" + unicode(lote_id))
     # for item_venta in ventas:
@@ -133,7 +133,11 @@ def get_cuota_information_by_lote(lote_id,cuotas_pag):
     if cant_cuotas_pagadas['nro_cuotas_a_pagar__sum'] == None:
         cant_cuotas_pag = 0
     else:
-        cant_cuotas_pag = cant_cuotas_pagadas['nro_cuotas_a_pagar__sum']
+        if facturar == False:
+            cant_cuotas_pag = cant_cuotas_pagadas['nro_cuotas_a_pagar__sum']
+        else:
+            cant_cuotas_pag = cant_cuotas_pagadas['nro_cuotas_a_pagar__sum'] - cuotas_pag
+    
     cuotas_totales=0
     cuota_a_pagar= {}
     cuotas_a_pagar= []
@@ -297,7 +301,7 @@ def obtener_detalle_interes_lote(lote_id,fecha_pago_parsed,proximo_vencimiento_p
                 fecha_primer_vencimiento=venta.fecha_primer_vencimiento
                 cantidad_ideal_cuotas=monthdelta(fecha_primer_vencimiento, fecha_pago_parsed)
                 #Y obtenemos las cuotas atrasadas
-                cuotas_atrasadas=cantidad_ideal_cuotas-cuotas_pagadas+1
+                cuotas_atrasadas=cantidad_ideal_cuotas-cuotas_pagadas
                 monto_cuota=venta.precio_de_cuota
                 
                 #Intereses (valores constantes)
@@ -362,6 +366,19 @@ def obtener_detalle_interes_lote(lote_id,fecha_pago_parsed,proximo_vencimiento_p
 
                     detalles.append(detalle)
 
+                #Calculamos en base al primer vencimiento, cuantas cuotas debieron haberse pagado hasta la fecha
+                fecha_vencimiento_mes_pago = fecha_primer_vencimiento + MonthDelta(+cantidad_ideal_cuotas)
+                fecha_dias_gracia = fecha_vencimiento_mes_pago + datetime.timedelta(days=5)
+                dias_habiles = calcular_dias_habiles(fecha_vencimiento_mes_pago,fecha_dias_gracia)
+                
+
+                if dias_habiles<5:
+                    fecha_vencimiento_mes_pago = fecha_dias_gracia+datetime.timedelta(days=5-dias_habiles)
+                
+                cantidad_ideal_cuotas=monthdelta(fecha_primer_vencimiento, fecha_vencimiento_mes_pago)
+                #Y obtenemos las cuotas atrasadas
+                cuotas_atrasadas=cantidad_ideal_cuotas-cuotas_pagadas
+                
                 if cuotas_atrasadas>=6:
                     #gestion_cobranza = int(0.1*(math.ceil(float(cuotas_atrasadas*monto_cuota))+sumatoria_intereses))
                     gestion_cobranza = roundup(0.05*((cuotas_atrasadas*monto_cuota)+sumatoria_intereses) + (0.05*((cuotas_atrasadas*monto_cuota)+sumatoria_intereses))*0.10)

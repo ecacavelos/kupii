@@ -155,12 +155,13 @@
 </div>
 <div id="listado-ventas">
 	<table  cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
-		<th>Fecha</th><th>Cliente</th><th>Lote</th><th>Vendedor</th><th>Plan de Pago</th><th>Entrega Inicial</th><th>Precio Cuota</th><th>Precio final de venta</th><th>Pagos Realizados</th><th></th><th></th>
+		<th>Fecha de Venta</th><th>Fecha 1er Vto.</th><th>Cliente</th><th>Lote</th><th>Vendedor</th><th>Plan de Pago</th><th>Entrega Inicial</th><th>Precio Cuota</th><th>Precio final de venta</th><th>Pagos Realizados</th><th></th><th></th>
 		{% for venta in lista_ventas %}
 			{% for pago in venta %}
 			{% if forloop.counter == 1 %}
 				<tr>
 					<td class="recuperada celda_resumen_venta">{{pago.fecha_de_venta}}</td>
+					<td class="recuperada celda_resumen_venta">{{pago.fecha_primer_vencimiento}}</td>
 					<td class="recuperada celda_resumen_venta">{{pago.cliente}}</td>
                     <td class="recuperada celda_resumen_venta">{{ pago.lote}}</td>
                     <td class="recuperada celda_resumen_venta">{{pago.vendedor}}</td>
@@ -180,7 +181,7 @@
 					<td>Nro Cuota: {{pago.nro_cuota}}</td>
 					<td></td>
 					<td colspan="2">Total pagado: {{pago.monto}}</td>
-					<td colspan="2"></td>
+					<td colspan="3"></td>
 					<td><button class="eliminar_pago" value="{{pago.id}}"><img src="/static/custom/img/black_delete.png" /></button></td>
 				</tr>
 			{% endif %}

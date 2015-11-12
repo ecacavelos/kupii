@@ -517,8 +517,8 @@ def get_detalles_factura(request):
                 num_hasta = int(nro_cuota_hasta[0])
                 lote =  Lote.objects.get(codigo_paralot= codigo)
                 
-                cuotas_pag = (num_hasta - num_desde) + 1
-                cuotas_detalles = get_cuota_information_by_lote(lote.id,cuotas_pag)
+                cuotas_pag = ((num_hasta - num_desde) + 1) 
+                cuotas_detalles = get_cuota_information_by_lote(lote.id,cuotas_pag, True)
                 
                 cliente = Cliente.objects.get(pk=cliente_id)
                 venta = Venta.objects.get(lote_id= lote.id, cliente_id=cliente.id)
@@ -559,8 +559,11 @@ def get_detalles_factura(request):
                             if detalle['item' + str(y)]['nro_cuota'] == (x+1):
                                 interes_moratorio += int(detalle['item' + str(y)]['intereses'])
                                 if gestion_procesada == False and ultimo_pago == pago.id :
-                                    suma_gestion += detalle['item' + str(len(detalle) -1)]['gestion_cobranza']
-                                    gestion_procesada = True
+                                    try:
+                                        suma_gestion += detalle['item' + str(len(detalle) -1)]['gestion_cobranza']
+                                        gestion_procesada = True
+                                    except Exception, error:
+                                        print "No tiene gestion de cobranza"
                                 cantidad +=1
                                 break
                            
