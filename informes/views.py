@@ -2367,7 +2367,7 @@ def informe_ventas(request):
                             try:
                                 resumen_venta = {}
                                 resumen_venta['id'] = item_venta.id
-                                resumen_venta['fecha_de_venta'] = item_venta.fecha_de_venta
+                                resumen_venta['fecha_de_venta'] = datetime.datetime.strptime(unicode(item_venta.fecha_de_venta), "%Y-%m-%d").strftime("%d/%m/%Y")
                                 resumen_venta['lote']=item_venta.lote
                                 resumen_venta['cliente'] = item_venta.cliente
                                 resumen_venta['cantidad_de_cuotas'] = item_venta.plan_de_pago.cantidad_de_cuotas
@@ -2383,10 +2383,18 @@ def informe_ventas(request):
                                 print error
                             ventas_pagos_list = []
                             ventas_pagos_list.insert(0,resumen_venta) #El primer elemento de la lista de pagos es el resumen de la venta
+                            contador_cuotas = 0
                             for pago in venta_pagos_query_set:
                                 cuota ={}
-                                cuota['fecha_de_pago'] = pago.fecha_de_pago
+                                cuota['fecha_de_pago'] = datetime.datetime.strptime(unicode(pago.fecha_de_pago), "%Y-%m-%d").strftime("%d/%m/%Y")
                                 cuota['id'] = pago.id
+                                if pago.nro_cuotas_a_pagar > 1:
+                                    cuota['nro_cuota'] = unicode(contador_cuotas+1) +" al "+ unicode(contador_cuotas + pago.nro_cuotas_a_pagar)
+                                    contador_cuotas = contador_cuotas + pago.nro_cuotas_a_pagar
+                                else:
+                                    contador_cuotas = contador_cuotas + pago.nro_cuotas_a_pagar
+                                    cuota['nro_cuota'] = unicode(contador_cuotas) 
+                                
                                 cuota['cantidad_cuotas'] = pago.nro_cuotas_a_pagar
                                 cuota['monto'] =  unicode('{:,}'.format(pago.total_de_pago)).replace(",",".")
                                 ventas_pagos_list.append(cuota)
