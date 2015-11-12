@@ -553,11 +553,12 @@ def get_detalles_factura(request):
                     if pago.id != ultimo_pago:
                         ultimo_pago = pago.id
                         gestion_procesada = False
+                        cantidad= 0
                     if pago.detalle != None:
                         detalle = ast.literal_eval(pago.detalle)
                         for y in xrange(0, len(detalle)-1):
-                            if detalle['item' + str(y)]['nro_cuota'] == (x+1):
-                                interes_moratorio += int(detalle['item' + str(y)]['intereses'])
+                            interes_moratorio += int(detalle['item' + str(cantidad)]['intereses'])
+                            if detalle['item' + str(cantidad)]['nro_cuota'] == (x+1):
                                 if gestion_procesada == False and ultimo_pago == pago.id :
                                     try:
                                         suma_gestion += detalle['item' + str(len(detalle) -1)]['gestion_cobranza']

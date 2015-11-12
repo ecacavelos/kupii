@@ -621,7 +621,7 @@ function calculateMesPago() {
 		request.done(function(msg) {
 			$("#id_cuota_pagar").empty();
 			//$("#id_gestion_cobranza").val(null);
-			$("#id_cuota_pagar").append('<tr><th>Nro Cuota</th><th>Fechas</th><th>Monto Cuota</th></tr>');
+			$("#id_cuota_pagar").append('<tr><th>Nro Cuota</th><th>Fecha Vencimiento</th><th>Monto Cuota</th></tr>');
 			addRow(msg);
 		});
 }
