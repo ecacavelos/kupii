@@ -173,15 +173,19 @@
 					<td class="recuperada celda_resumen_venta"><a href="/movimientos/modificar_venta/{{pago.id}}"><img src="/static/custom/img/black_edit.png" /></a></td>
 					<td class="recuperada celda_resumen_venta"><button class="eliminar" value="{{pago.id}}"><img src="/static/custom/img/black_delete.png" /></button></td>
 				</tr>
+				<tr>
+					<th>Fecha Pago</th><th colspan="2">Cuotas Pagadas</th><th>Fecha Vto.</th><th>Dias Atraso</th><th colspan="1">Nro Cuota</th><th colspan="2">Detalles</th><th colspan="2">Total Pagado</th><th colspan="2"></th>
+				</tr>
 			{% else %}		
 				<tr class="bkg_gris">
 					<td>{{pago.fecha_de_pago}}</td>
-					<td></td>
 					<td colspan="2">{{pago.cantidad_cuotas}} Cuota(s) pagada(s)</td>
-					<td>Nro Cuota: {{pago.nro_cuota}}</td>
-					<td></td>
+					<td>{{pago.vencimiento}}</td>
+					<td>{{pago.dias_atraso}}</td>
+					<td colspan="1">Cuota Nro: {{pago.nro_cuota}}</td>
+					<td colspan="2" style="text-align: right">{{pago.detalle}}</td>
 					<td colspan="2">Total pagado: {{pago.monto}}</td>
-					<td colspan="3"></td>
+					<td colspan="1"></td>
 					<td><button class="eliminar_pago" value="{{pago.id}}"><img src="/static/custom/img/black_delete.png" /></button></td>
 				</tr>
 			{% endif %}

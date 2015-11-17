@@ -1968,7 +1968,12 @@ def eliminar_pagodecuotas(request):
                 data = request.POST         
                 pago = PagoDeCuotas.objects.get(id=int(data.get('id_pago')))              
                 try:
-                    pago.delete()                        
+                    venta_id = pago.venta.id
+                    nro_cuotas_pagadas = pago.nro_cuotas_a_pagar
+                    pago.delete()
+                    venta = Venta.objects.get(pk = venta_id)
+                    venta.pagos_realizados = venta.pagos_realizados - nro_cuotas_pagadas
+                    venta.save()                         
                     ok=True
                 except Exception, error:
                     print error

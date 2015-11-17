@@ -117,7 +117,7 @@ def monthdelta(d1, d2):
             break
     return delta
 
-def get_cuota_information_by_lote(lote_id,cuotas_pag, facturar = False):
+def get_cuota_information_by_lote(lote_id,cuotas_pag, facturar = False, ver_vencimientos = False):
     cant_cuotas_pag =0
     print("lote_id ->" + unicode(lote_id))
     # for item_venta in ventas:
@@ -137,6 +137,9 @@ def get_cuota_information_by_lote(lote_id,cuotas_pag, facturar = False):
             cant_cuotas_pag = cant_cuotas_pagadas['nro_cuotas_a_pagar__sum']
         else:
             cant_cuotas_pag = cant_cuotas_pagadas['nro_cuotas_a_pagar__sum'] - cuotas_pag
+            
+        if ver_vencimientos == True:
+            cant_cuotas_pag = cuotas_pag -1
     
     cuotas_totales=0
     cuota_a_pagar= {}
@@ -278,6 +281,13 @@ def filtros_establecidos(request, tipo_informe):
     return False
 
 
+def obtener_dias_atraso (fecha_pago_parsed, fecha_vencimiento_parsed):
+    if fecha_pago_parsed > fecha_vencimiento_parsed:
+        diferencia = fecha_pago_parsed - fecha_vencimiento_parsed
+        dias_atraso = diferencia.days
+    else:
+        dias_atraso = 0
+    return dias_atraso
 
 def obtener_detalle_interes_lote(lote_id,fecha_pago_parsed,proximo_vencimiento_parsed, nro_cuotas_a_pagar):
     
@@ -829,6 +839,7 @@ def crear_pdf_factura(nueva_factura, request, manzana, lote_id, usuario):
     p = canvas.Canvas(response)
     p.setPageSize((210 * mm, 297 * mm))
     p.setFont("Helvetica", 7)
+
     
     #Obtener las coordenadas de impresion de la factura
     try:
