@@ -556,7 +556,7 @@ def get_detalles_factura(request):
                         cantidad= 0
                     if pago.detalle != None:
                         detalle = ast.literal_eval(pago.detalle)
-                        for y in xrange(0, len(detalle)-1):
+                        for y in xrange(0, len(detalle)):
                             interes_moratorio += int(detalle['item' + str(cantidad)]['intereses'])
                             if detalle['item' + str(cantidad)]['nro_cuota'] == (x+1):
                                 if gestion_procesada == False and ultimo_pago == pago.id :
