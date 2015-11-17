@@ -591,7 +591,7 @@ def liquidacion_propietarios(request):
                                         fecha_pago = unicode(datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
                                         # Se setean los datos de cada fila
                                         fila={}
-                                        fila['misma_fraccion'] = False
+                                        fila['misma_fraccion'] = True
                                         fila['fraccion']=unicode(fraccion)
                                         fila['fecha_de_pago']= fecha_pago
                                         fila['lote']=unicode(pago['lote'])
@@ -617,7 +617,7 @@ def liquidacion_propietarios(request):
                                             
                                 #Totales GENERALES
                                 filas = sorted(filas, key=lambda f: f['fecha_de_pago'])
-                                filas[0]['misma_fraccion']= True
+                                filas[0]['misma_fraccion']= False
                                 fila={}
                                 fila['total_general_pagado']=unicode('{:,}'.format(total_general_pagado)).replace(",", ".")
                                 fila['total_general_inmobiliaria']=unicode('{:,}'.format(total_general_inm)).replace(",", ".")
