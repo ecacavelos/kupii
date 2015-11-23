@@ -1017,3 +1017,14 @@ def crear_pdf_factura(nueva_factura, request, manzana, lote_id, usuario):
     p.showPage()
     p.save()             
     return response;
+def obtener_cantidad_cuotas_pagadas(pago):
+    
+    id_pago = pago.id
+    fecha_pago = pago.fecha_de_pago
+    
+    id_venta = pago.venta.id
+    fecha_venta = pago.venta.fecha_de_venta
+    
+    pagos = PagoDeCuotas.objects.filter(venta=id_venta, fecha_de_pago__range=(fecha_venta, fecha_pago)).order_by('fecha_de_pago','id').aggregate(Sum('nro_cuotas_a_pagar'))
+    cantidad_pagos = pagos['nro_cuotas_a_pagar__sum']
+    return cantidad_pagos

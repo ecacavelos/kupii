@@ -53,7 +53,9 @@ def facturar_operacion(request, tipo_operacion, operacion_id):
             
             if tipo_operacion == '1': # PAGO DE CUOTA
                 pago = PagoDeCuotas.objects.get(pk=operacion_id)
-                cuota_desde_num = pago.venta.pagos_realizados - pago.nro_cuotas_a_pagar+1
+                cantidad_pagos_anteriores = obtener_cantidad_cuotas_pagadas(pago)
+                cuota_desde_num = cantidad_pagos_anteriores - pago.nro_cuotas_a_pagar+1
+                #cuota_desde_num = pago.venta.pagos_realizados - pago.nro_cuotas_a_pagar+1
                 cuota_desde = unicode(cuota_desde_num)+"/"+unicode( pago.plan_de_pago.cantidad_de_cuotas)
                 cuota_hasta = unicode(cuota_desde_num  + pago.nro_cuotas_a_pagar-1)+"/"+unicode( pago.plan_de_pago.cantidad_de_cuotas)
                 
