@@ -647,7 +647,10 @@ def liquidacion_propietarios(request):
                                             
                                 #Totales GENERALES
                                 filas = sorted(filas, key=lambda f: f['fecha_de_pago'])
+                                #try:
                                 filas[0]['misma_fraccion']= False
+                                #except Exception, error:
+                                #    print error
                                 fila={}
                                 fila['total_general_pagado']=unicode('{:,}'.format(total_general_pagado)).replace(",", ".")
                                 fila['total_general_inmobiliaria']=unicode('{:,}'.format(total_general_inm)).replace(",", ".")

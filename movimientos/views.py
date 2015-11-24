@@ -967,7 +967,8 @@ def listar_busqueda_ventas(request):
                 fecha_desde = request.GET['fecha_desde']
                 fecha_hasta = request.GET['fecha_hasta']
                 busqueda = request.GET['busqueda']
-                contado = request.GET['contado']
+                
+                contado = request.GET.get('contado','')
                 ultima_busqueda = "&tipo_busqueda="+tipo_busqueda+"&busqueda_label="+busqueda_label+"&busqueda="+busqueda+"&fecha_hasta="+fecha_hasta+"&contado="+contado
                 if tipo_busqueda=='lote':
                     try:
@@ -1069,7 +1070,8 @@ def listar_busqueda_ventas(request):
                     'tipo_busqueda' : tipo_busqueda,
                     'busqueda_label' : busqueda_label,
                     'fecha_hasta' : fecha_hasta,
-                    'busqueda' : busqueda                      
+                    'busqueda' : busqueda, 
+                    'contado' : contado                    
                 })                             
                 return HttpResponse(t.render(c))
         else:

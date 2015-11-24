@@ -29,7 +29,7 @@
 		$("#fecha_desde").val("");
 		$("#fecha_hasta").val("");	
 		if ($("#tipo_busqueda").val() == 'fecha') {
-			$('#busqueda_label').val("");
+			//$('#busqueda_label').val("");
 			$('#busqueda_label').unmask('');
 			$('#fecha_hasta').val("");
 			$("#fecha_desde").datepicker({
@@ -50,7 +50,7 @@
 			$("#label_contado").show();
 		}
 		if ($("#tipo_busqueda").val() == 'lote') {
-			$('#busqueda_label').val("");
+			//$('#busqueda_label').val("");
 			$("#busqueda_label").datepicker("destroy");
 			$("#busqueda_label").removeClass("hasDatepicker");
 			$('#busqueda_label').mask('###/###/####');
@@ -66,7 +66,7 @@
 			autocompleteLotePorCodigoParalot(tipo_busqueda, busqueda_label, busqueda);
 		}
 		if ($("#tipo_busqueda").val() == 'vendedor') {
-			$("#busqueda_label").val("");
+			//$("#busqueda_label").val("");
 			$('#busqueda_label').unmask('');
 			$("#busqueda_label").datepicker("destroy");
 			$("#busqueda_label").removeClass("hasDatepicker");
@@ -91,7 +91,7 @@
 				});
 		}
 		if ($("#tipo_busqueda").val() == 'cliente'){
-			$("#busqueda_label").val("");
+			//$("#busqueda_label").val("");
 			$('#busqueda_label').unmask('');
 			$("#busqueda_label").datepicker("destroy");
 			$("#busqueda_label").removeClass("hasDatepicker");
@@ -125,7 +125,7 @@
 		
 		if ($("#tipo_busqueda").val() == 'fraccion'){
 			console.log("Por Fraccion");
-			$("#busqueda_label").val("");
+			//$("#busqueda_label").val("");
 			$('#busqueda_label').unmask('');
 			$("#busqueda_label").datepicker("destroy");
 			$("#busqueda_label").removeClass("hasDatepicker");

@@ -896,7 +896,7 @@ def crear_pdf_factura(nueva_factura, request, manzana, lote_id, usuario):
     total_iva = 0           
     total_gral = 0
     total_venta = 0
-    for key, value in lista_detalles.iteritems():
+    for key, value in sorted(lista_detalles.iteritems()):
         detalle = {}
         detalle['item'] = key
         detalle['cantidad'] = value['cantidad']
@@ -978,7 +978,7 @@ def crear_pdf_factura(nueva_factura, request, manzana, lote_id, usuario):
     total_iva = 0           
     total_gral = 0
     total_venta = 0
-    for key, value in lista_detalles.iteritems():
+    for key, value in sorted(lista_detalles.iteritems()):
         detalle = {}
         detalle['item'] = key
         detalle['cantidad'] = value['cantidad']

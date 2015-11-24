@@ -28,13 +28,16 @@
 		var fecha_desde = "{{fecha_desde}}";
 		var fecha_hasta = "{{fecha_hasta}}";
 		var tipo_busqueda = "{{tipo_busqueda}}";
+		var contado = "{{contado}}";
 		
 		 $('#tipo_busqueda').val(tipo_busqueda);
 		 $('#busqueda_label').val(busqueda_label);
 		 $('#fecha_desde').val(fecha_desde);
 		 $('#fecha_hasta').val(fecha_hasta);
 		 $('#id_busqueda').val(busqueda);
-		 
+		 if (contado =="on"){
+		 	$('#contado').prop("checked",true);
+		 }
 		 desplegar_campos();
 		 
 	}); 
@@ -74,7 +77,7 @@
 				<input name="busqueda" id="id_busqueda" type="hidden" value=""/>
 				<input name="fecha_desde" id="fecha_desde" type="text" value="" style=" display: none;"/>
 				<input name="fecha_hasta" id="fecha_hasta" type="text" value="" style=" display: none;"/>
-				<label id="label_contado">Contado</label><input id="contado" name="contado" type="checkbox" />
+				<label id="label_contado">Solo ventas al Contado: </label>&nbsp;<input id="contado" name="contado" type="checkbox" />
 				<input name="tabla" type="hidden" value="venta"/>
 				<input type="button" value="Buscar" onclick="buscar();" class="historico" style="cursor: pointer"/>
 				</td>
