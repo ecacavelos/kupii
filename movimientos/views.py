@@ -966,8 +966,9 @@ def listar_busqueda_ventas(request):
                 busqueda_label = request.GET['busqueda_label']
                 fecha_desde = request.GET['fecha_desde']
                 fecha_hasta = request.GET['fecha_hasta']
-                busqueda = request.GET['busqueda']            
-                ultima_busqueda = "&tipo_busqueda="+tipo_busqueda+"&busqueda_label="+busqueda_label+"&busqueda="+busqueda+"&fecha_hasta="+fecha_hasta
+                busqueda = request.GET['busqueda']
+                contado = request.GET['contado']
+                ultima_busqueda = "&tipo_busqueda="+tipo_busqueda+"&busqueda_label="+busqueda_label+"&busqueda="+busqueda+"&fecha_hasta="+fecha_hasta+"&contado="+contado
                 if tipo_busqueda=='lote':
                     try:
                         lote = request.GET['busqueda_label']                                    
@@ -984,7 +985,8 @@ def listar_busqueda_ventas(request):
                         object_list = Venta.objects.filter(lote_id=lote_id.id)                    
                         if object_list:
                             for i in object_list:
-                                i.precio_final_de_venta = unicode('{:,}'.format(i.precio_final_de_venta)).replace(",", ".")                     
+                                i.precio_final_de_venta = unicode('{:,}'.format(i.precio_final_de_venta)).replace(",", ".")
+                                i.fecha_de_venta = unicode (datetime.datetime.strptime(unicode(i.fecha_de_venta), "%Y-%m-%d").strftime("%d/%m/%Y"))                     
                     except Exception, error:
                         print error
                         object_list= []
@@ -992,10 +994,15 @@ def listar_busqueda_ventas(request):
                 if tipo_busqueda=='cliente':
                     try:
                         cliente_id = request.GET['busqueda']
-                        object_list = Venta.objects.filter(cliente_id=cliente_id)
+                        if contado != "on":
+                            object_list = Venta.objects.filter(cliente_id=cliente_id)
+                        else:
+                            object_list = Venta.objects.filter(cliente_id=cliente_id, plan_de_pago__tipo_de_plan="contado")
+                            
                         if object_list:
                             for i in object_list:
-                                i.precio_final_de_venta = unicode('{:,}'.format(i.precio_final_de_venta)).replace(",", ".")                                                     
+                                i.precio_final_de_venta = unicode('{:,}'.format(i.precio_final_de_venta)).replace(",", ".")
+                                i.fecha_de_venta = unicode (datetime.datetime.strptime(unicode(i.fecha_de_venta), "%Y-%m-%d").strftime("%d/%m/%Y"))                                                     
                     except Exception, error:
                         print error
                         object_list= []
@@ -1003,13 +1010,33 @@ def listar_busqueda_ventas(request):
                 if tipo_busqueda=='vendedor':
                     try:
                         vendedor_id = request.GET['busqueda']                    
-                        object_list = Venta.objects.filter(vendedor_id=vendedor_id)
+                        if contado != "on":
+                            object_list = Venta.objects.filter(vendedor_id=vendedor_id)
+                        else:
+                            object_list = Venta.objects.filter(vendedor_id=vendedor_id, plan_de_pago__tipo_de_plan="contado")
+                           
                         if object_list:
                             for i in object_list:
-                                i.precio_final_de_venta = unicode('{:,}'.format(i.precio_final_de_venta)).replace(",", ".")                                   
+                                i.precio_final_de_venta = unicode('{:,}'.format(i.precio_final_de_venta)).replace(",", ".")
+                                i.fecha_de_venta = unicode (datetime.datetime.strptime(unicode(i.fecha_de_venta), "%Y-%m-%d").strftime("%d/%m/%Y"))                                   
                     except Exception, error:
                         print error
-                        object_list= []    
+                        object_list= []   
+                        
+                if tipo_busqueda=='fraccion':
+                    try:
+                        fraccion_id = request.GET['busqueda']                    
+                        if contado != "on":
+                            object_list = Venta.objects.filter(lote__manzana__fraccion=fraccion_id)
+                        else:
+                            object_list = Venta.objects.filter(lote__manzana__fraccion=fraccion_id, plan_de_pago__tipo_de_plan="contado")
+                        if object_list:
+                            for i in object_list:
+                                i.precio_final_de_venta = unicode('{:,}'.format(i.precio_final_de_venta)).replace(",", ".")
+                                i.fecha_de_venta = unicode (datetime.datetime.strptime(unicode(i.fecha_de_venta), "%Y-%m-%d").strftime("%d/%m/%Y"))                                   
+                    except Exception, error:
+                        print error
+                        object_list= []   
                              
                 if tipo_busqueda=='fecha':
                     try:
@@ -1017,9 +1044,13 @@ def listar_busqueda_ventas(request):
                         fecha_hasta=request.GET['fecha_hasta']
                         fecha_desde_parsed = datetime.datetime.strptime(fecha_desde, "%d/%m/%Y").date()
                         fecha_hasta_parsed= datetime.datetime.strptime(fecha_hasta,"%d/%m/%Y").date()
-                        object_list = Venta.objects.filter(fecha_de_venta__range=(fecha_desde_parsed,fecha_hasta_parsed)).order_by('-fecha_de_venta') 
+                        if contado != "on":
+                            object_list = Venta.objects.filter(fecha_de_venta__range=(fecha_desde_parsed,fecha_hasta_parsed)).order_by('-fecha_de_venta')
+                        else:
+                            object_list = Venta.objects.filter(fecha_de_venta__range=(fecha_desde_parsed,fecha_hasta_parsed), plan_de_pago__tipo_de_plan="contado").order_by('-fecha_de_venta')                         
                         for i in object_list:
-                            i.precio_final_de_venta = unicode('{:,}'.format(i.precio_final_de_venta)).replace(",", ".")                                
+                            i.precio_final_de_venta = unicode('{:,}'.format(i.precio_final_de_venta)).replace(",", ".")
+                            i.fecha_de_venta = unicode (datetime.datetime.strptime(unicode(i.fecha_de_venta), "%Y-%m-%d").strftime("%d/%m/%Y"))                                
                     except Exception, error:
                         print error
                         object_list= []              

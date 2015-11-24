@@ -65,6 +65,7 @@
 					<option value="cliente">Cliente</option>
 					<option value="vendedor">Vendedor</option>
 					<option value="fecha">Fecha de Venta</option>
+					<option value="fraccion">Fraccion</option>
 				</select></td>
 			</tr>
 			<tr>
@@ -73,6 +74,7 @@
 				<input name="busqueda" id="id_busqueda" type="hidden" value=""/>
 				<input name="fecha_desde" id="fecha_desde" type="text" value="" style=" display: none;"/>
 				<input name="fecha_hasta" id="fecha_hasta" type="text" value="" style=" display: none;"/>
+				<label id="label_contado">Contado</label><input id="contado" name="contado" type="checkbox" />
 				<input name="tabla" type="hidden" value="venta"/>
 				<input type="button" value="Buscar" onclick="buscar();" class="historico" style="cursor: pointer"/>
 				</td>
@@ -89,7 +91,7 @@
 </div>
 <div id="listado-item-lote">
 	<table width="50%" cellpadding="0" cellspacing="0" class="listado-ventas" align="center">
-		<th>Venta Nro</th><th>Lote Nro</th><th>Fracci&oacute;n</th><th>Cliente</th><th>Vendedor</th><th>Fecha de Venta</th><th>Precio Final de Venta</th><th>Es Recuperada</th>
+		<th>Venta Nro</th><th>Lote Nro</th><th>Fracci&oacute;n</th><th>Cliente</th><th>Vendedor</th><th>Fecha de Venta</th><th>Precio Final de Venta</th><th>Plan de Pago</th><th>Es Recuperada</th>
 		{% for lot in object_list %}
 		{% if forloop.counter|divisibleby:2 %}
 		<tr>
@@ -100,6 +102,7 @@
 			<td>{{lot.vendedor}}</td>
 			<td>{{lot.fecha_de_venta}}</td>
 			<td>{{lot.precio_final_de_venta}}</td>
+			<td>{{lot.plan_de_pago}}</td>
 			{% if lot.recuperado == True %} 
 				<td>Si</td>
 			{% else %}
@@ -115,6 +118,7 @@
 			<td>{{lot.vendedor}}</td>
 			<td>{{lot.fecha_de_venta}}</td>
 			<td>{{lot.precio_final_de_venta}}</td>
+			<td>{{lot.plan_de_pago}}</td>
 			{% if lot.recuperado == True %} 
 				<td>Si</td>
 			{% else %}
