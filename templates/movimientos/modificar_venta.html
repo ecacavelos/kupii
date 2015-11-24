@@ -98,6 +98,17 @@
 					<input id="id_precio_f_venta" type="text" name="precio_final_venta" maxlength="10" value="{{venta.precio_final_de_venta}}"/>
 					</td>
 				</tr>
+				<tr>
+					<td><label for="precio_final_venta">Recuperado: </label></td>
+					<td class="noimage">
+					{% if venta.recuperado == True%}	
+						<input id="id_recuperado" type="checkbox" name="recuperado"  checked />
+					{% else %}
+						<input id="id_recuperado" type="checkbox" name="recuperado" />
+					{% endif %}
+					
+					</td>
+				</tr>
 			</div>
 		</table>
 		<input id="modificar_venta" style="cursor: pointer;" type="submit" value="Modificar Venta" />

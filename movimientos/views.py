@@ -590,7 +590,9 @@ def recuperacion_de_lotes(request):
         
                 nueva_recuperacion = RecuperacionDeLotes()
                 nueva_recuperacion.lote = Lote.objects.get(pk=lote_id)
-                nueva_recuperacion.venta = Venta.objects.get(pk=venta_id)
+                
+                venta = Venta.objects.get(pk=venta_id)
+                nueva_recuperacion.venta = venta
                 nueva_recuperacion.fecha_de_recuperacion = fecha_recuperacion_parsed
                 nueva_recuperacion.cliente = Cliente.objects.get(pk=cliente_id)
                 nueva_recuperacion.plan_de_pago = PlanDePago.objects.get(pk=plan_pago_id)
@@ -599,6 +601,9 @@ def recuperacion_de_lotes(request):
                 nueva_recuperacion.save()
                 lote_a_recuperar.estado = "1"
                 lote_a_recuperar.save()
+                
+                venta.recuperado = True
+                venta.save()
                 
                 #Se loggea la accion del usuario
                 id_objeto = nueva_recuperacion.id
@@ -632,6 +637,7 @@ def listar_ventas(request):
                     for i in object_list:
                         #i.fecha_de_venta = i.fecha_de_venta.strftime("%Y-%m-%d")
                         i.precio_final_de_venta = unicode('{:,}'.format(i.precio_final_de_venta)).replace(",", ".")
+                        i.fecha_de_venta = unicode (datetime.datetime.strptime(unicode(i.fecha_de_venta), "%Y-%m-%d").strftime("%d/%m/%Y"))
                 paginator = Paginator(object_list, 15)
                 page = request.GET.get('page')
                 try:
@@ -1892,6 +1898,12 @@ def modificar_venta(request, id):
                 #precio_de_cuota_sin_puntos = precio_de_cuota.strip('.') precio_de_cuota.translate(None, string.punctuation)
                 precio_final_venta = data.get('precio_final_venta', '')
                 #precio_final_venta_sin_puntos = precio_final_venta.strip('.').
+                recuperado = data.get('recuperado', '')
+                
+                if recuperado == 'on':
+                    recuperado = True
+                else:
+                    recuperado = False
                 try:
                     venta.fecha_de_venta = fecha_de_venta_parsed
                     venta.fecha_primer_vencimiento = fecha_primer_venc_parsed
@@ -1902,6 +1914,7 @@ def modificar_venta(request, id):
                     venta.plan_de_pago = plandepago
                     venta.cliente = cliente
                     venta.vendedor = vendedor
+                    venta.recuperado = recuperado
                     venta.save()
                     
                     #Se loggea la accion del usuario

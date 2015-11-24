@@ -308,6 +308,7 @@ class Venta(models.Model):
     importacion_paralot=models.BooleanField(blank=False, null=False)
     plan_de_pago_vendedor=models.ForeignKey(PlanDePagoVendedor,on_delete=models.PROTECT)
     monto_cuota_refuerzo = models.BigIntegerField(blank=True, null=True)
+    recuperado = models.BooleanField(blank=False, null=False)
     def __unicode__(self):
         return u'%s a %s - %s' % (unicode(self.lote), self.cliente.nombres, self.cliente.apellidos)    
     def as_json(self):

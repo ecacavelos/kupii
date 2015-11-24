@@ -2378,6 +2378,8 @@ def informe_ventas(request):
                                 resumen_venta['vendedor'] = item_venta.vendedor
                                 resumen_venta['plan_de_pago'] = item_venta.plan_de_pago
                                 resumen_venta['pagos_realizados'] = item_venta.pagos_realizados
+                                resumen_venta['recuperado'] = item_venta.recuperado
+                                
                                 #venta_pagos_query_set = get_pago_cuotas(item_venta,None,None)
                                 venta_pagos_query_set = PagoDeCuotas.objects.filter(venta_id=item_venta.id).order_by("fecha_de_pago","id")
                             except Exception, error:

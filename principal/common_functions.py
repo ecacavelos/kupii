@@ -312,6 +312,14 @@ def obtener_detalle_interes_lote(lote_id,fecha_pago_parsed,proximo_vencimiento_p
                 cantidad_ideal_cuotas=monthdelta(fecha_primer_vencimiento, fecha_pago_parsed)
                 #Y obtenemos las cuotas atrasadas
                 cuotas_atrasadas=cantidad_ideal_cuotas-cuotas_pagadas
+                
+                if cuotas_atrasadas == 0:
+                    fecha_proximo_vencimiento_dias = proximo_vencimiento_parsed
+                    fecha_pago_dias = fecha_pago_parsed
+                    dias_atraso = fecha_pago_dias - fecha_proximo_vencimiento_dias
+                    if dias_atraso.days > 5:
+                        cuotas_atrasadas = 1
+                
                 monto_cuota=venta.precio_de_cuota
                 
                 #Intereses (valores constantes)

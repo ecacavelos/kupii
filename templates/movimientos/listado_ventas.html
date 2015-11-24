@@ -89,7 +89,7 @@
 </div>
 <div id="listado-item-lote">
 	<table width="50%" cellpadding="0" cellspacing="0" class="listado-ventas" align="center">
-		<th>Venta Nro</th><th>Lote Nro</th><th>Fracci&oacute;n</th><th>Cliente</th><th>Vendedor</th><th>Fecha de Venta</th><th>Precio Final de Venta</th>
+		<th>Venta Nro</th><th>Lote Nro</th><th>Fracci&oacute;n</th><th>Cliente</th><th>Vendedor</th><th>Fecha de Venta</th><th>Precio Final de Venta</th><th>Es Recuperada</th>
 		{% for lot in object_list %}
 		{% if forloop.counter|divisibleby:2 %}
 		<tr>
@@ -100,6 +100,11 @@
 			<td>{{lot.vendedor}}</td>
 			<td>{{lot.fecha_de_venta}}</td>
 			<td>{{lot.precio_final_de_venta}}</td>
+			{% if lot.recuperado == True %} 
+				<td>Si</td>
+			{% else %}
+				<td>NO</td>
+			{% endif %}
 		</tr>
 		{% else %}
 		<tr class="bkg_gris">
@@ -110,6 +115,11 @@
 			<td>{{lot.vendedor}}</td>
 			<td>{{lot.fecha_de_venta}}</td>
 			<td>{{lot.precio_final_de_venta}}</td>
+			{% if lot.recuperado == True %} 
+				<td>Si</td>
+			{% else %}
+				<td>NO</td>
+			{% endif %}
 		</tr>
 		{% endif %}
 		{%endfor%}
