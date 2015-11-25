@@ -588,19 +588,69 @@ def liquidacion_propietarios(request):
                                             fila['fecha_de_pago']= fecha_pago
                                             fila['lote']=unicode(venta.lote)
                                             fila['cliente']=unicode(venta.cliente)
-                                            fila['nro_cuota']="1/1"
+                                            fila['nro_cuota']="Venta Contado"
                                             fila['total_de_cuotas']=unicode('{:,}'.format(total_de_cuotas)).replace(",", ".")
                                             fila['monto_inmobiliaria']=unicode('{:,}'.format(monto_inmobiliaria)).replace(",", ".")
                                             fila['monto_propietario']=unicode('{:,}'.format(monto_propietario)).replace(",", ".")
+                                            
+                                            
+                                            monthNames = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+                                            fecha_1 = unicode(datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
+                                            parts_1 = fecha_1.split("/")
+                                            year_1 = parts_1[2];
+                                            mes_1 = int(parts_1[1]) - 1;
+                                            mes_year = monthNames[mes_1]+"/"+year_1;
+                                            fila['mes'] = mes_year
                                             # Se suman los TOTALES por FRACCION
-                                            total_monto_inm += int(monto_inmobiliaria)
-                                            total_monto_prop += int(monto_propietario)
-                                            total_monto_pagado += int(venta.precio_final_de_venta)
+                                            #total_monto_inm += int(monto_inmobiliaria)
+                                            #total_monto_prop += int(monto_propietario)
+                                            #total_monto_pagado += int(venta.precio_final_de_venta)
+                                            
                                             filas.append(fila)
                                             #Acumulamos para los TOTALES GENERALES
                                             total_general_pagado += int(venta.precio_final_de_venta)
                                             total_general_inm += int(monto_inmobiliaria)
                                             total_general_prop += int(monto_propietario)
+                                            
+                                    if venta.entrega_inicial != 0:
+                                        if venta.fecha_de_venta >= fecha_ini_parsed and venta.fecha_de_venta <= fecha_fin_parsed :
+                                            montos = calculo_montos_liquidacion_propietarios_entrega_inicial(venta)
+                                            monto_inmobiliaria = montos['monto_inmobiliaria']
+                                            monto_propietario = montos['monto_propietario']
+                                            total_de_cuotas = int(venta.entrega_inicial)
+                                            fecha_pago_str = unicode(venta.fecha_de_venta)
+                                            fecha_pago = unicode(datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
+                                            # Se setean los datos de cada fila
+                                            fila={}
+                                            fila['misma_fraccion'] = True
+                                            fila['fraccion']=unicode(fraccion)
+                                            fila['fecha_de_pago']= fecha_pago
+                                            fila['lote']=unicode(venta.lote)
+                                            fila['cliente']=unicode(venta.cliente)
+                                            fila['nro_cuota']="Entrega Inicial"
+                                            fila['total_de_cuotas']=unicode('{:,}'.format(total_de_cuotas)).replace(",", ".")
+                                            fila['monto_inmobiliaria']=unicode('{:,}'.format(monto_inmobiliaria)).replace(",", ".")
+                                            fila['monto_propietario']=unicode('{:,}'.format(monto_propietario)).replace(",", ".")
+                                            
+                                            
+                                            monthNames = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+                                            fecha_1 = unicode(datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
+                                            parts_1 = fecha_1.split("/")
+                                            year_1 = parts_1[2];
+                                            mes_1 = int(parts_1[1]) - 1;
+                                            mes_year = monthNames[mes_1]+"/"+year_1;
+                                            fila['mes'] = mes_year
+                                            # Se suman los TOTALES por FRACCION
+                                            #total_monto_inm += int(monto_inmobiliaria)
+                                            #total_monto_prop += int(monto_propietario)
+                                            #total_monto_pagado += int(venta.precio_final_de_venta)
+                                            
+                                            filas.append(fila)
+                                            #Acumulamos para los TOTALES GENERALES
+                                            total_general_pagado += int(venta.entrega_inicial)
+                                            total_general_inm += int(monto_inmobiliaria)
+                                            total_general_prop += int(monto_propietario)
+                                        
                                         
                                     
                                     pagos = get_pago_cuotas(venta, fecha_ini_parsed,fecha_fin_parsed)                                            
@@ -626,7 +676,17 @@ def liquidacion_propietarios(request):
                                         fila['fecha_de_pago']= fecha_pago
                                         fila['lote']=unicode(pago['lote'])
                                         fila['cliente']=unicode(venta.cliente)
+                                        
+                                        cuotas_detalles = get_cuota_information_by_lote(pago['lote'].id, int(pago['nro_cuota']) , True, True)
+                                        monthNames = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+                                        fecha_1 = cuotas_detalles[0]['fecha'] 
+                                        parts_1 = fecha_1.split("/")
+                                        year_1 = parts_1[2];
+                                        mes_1 = int(parts_1[1]) - 1;
+                                        mes_year = monthNames[mes_1]+"/"+year_1;
+                                        
                                         fila['nro_cuota']=unicode(pago['nro_cuota_y_total'])
+                                        fila['mes'] = mes_year
                                         fila['total_de_cuotas']=unicode('{:,}'.format(total_de_cuotas)).replace(",", ".")
                                         fila['monto_inmobiliaria']=unicode('{:,}'.format(monto_inmobiliaria)).replace(",", ".")
                                         fila['monto_propietario']=unicode('{:,}'.format(monto_propietario)).replace(",", ".")
@@ -678,14 +738,24 @@ def liquidacion_propietarios(request):
                                 primer_pago = True
                                 cant_pagos = len(pagos)
                                 c= 0
+                                
+                                
+                                
                                 for pago in pagos:
                                     
                                     #if pago.id==1474699:
                                         #print "pago 1474699"
                                     
-                                    #montos = calculo_montos_liquidacion_propietarios_2(pago,pago.venta,lista_cuotas_inm)
-                                    #monto_inmobiliaria = montos['monto_inmobiliaria']
-                                    #monto_propietario = montos['monto_propietario']
+                                    lista_cuotas_inm =[]
+                                    lista_cuotas_inm.append(pago.venta.plan_de_pago.inicio_cuotas_inmobiliaria)
+                                    numero_cuota = pago.venta.plan_de_pago.inicio_cuotas_inmobiliaria
+                                    for i in range(pago.venta.plan_de_pago.cantidad_cuotas_inmobiliaria -1):
+                                        numero_cuota +=  pago.venta.plan_de_pago.intervalos_cuotas_inmobiliaria
+                                        lista_cuotas_inm.append(numero_cuota)
+                                    
+                                    montos = calculo_montos_liquidacion_propietarios(pago,pago.venta,lista_cuotas_inm)
+                                    monto_inmobiliaria = montos['monto_inmobiliaria']
+                                    monto_propietario = montos['monto_propietario']
                                     total_de_cuotas = int(pago.total_de_cuotas)
                                     fecha_pago_str = unicode(pago.fecha_de_pago)
                                     fecha_pago = unicode(datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
@@ -2571,6 +2641,18 @@ def calculo_montos_liquidacion_propietarios_contado(venta):
     try:                                                     
         monto_inmobiliaria = int(int(venta.precio_final_de_venta) * (float(venta.plan_de_pago.porcentaje_inicial_inmobiliaria) / float(100)))
         monto_propietario = int(venta.precio_final_de_venta) - monto_inmobiliaria
+        
+        monto={}
+        monto['monto_propietario'] = monto_propietario
+        monto['monto_inmobiliaria'] = monto_inmobiliaria
+        return monto
+    except Exception, error:
+        print error
+        
+def calculo_montos_liquidacion_propietarios_entrega_inicial(venta):
+    try:                                                     
+        monto_inmobiliaria = int(int(venta.entrega_inicial) * (float(venta.plan_de_pago.porcentaje_inicial_inmobiliaria) / float(100)))
+        monto_propietario = int(venta.entrega_inicial) - monto_inmobiliaria
         
         monto={}
         monto['monto_propietario'] = monto_propietario
