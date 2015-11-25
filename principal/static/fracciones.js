@@ -7,7 +7,7 @@ $(document).ready(function() {
 
 		var propietario_id;
 		$("#id_name_propietario").empty();
-		base_url = "/ajax/get_propietario_id_by_name/";
+		base_url = base_context + "/ajax/get_propietario_id_by_name/";
 		params = "value";
 		$("#id_name_propietario").autocomplete({
 			source : base_url,
@@ -25,7 +25,7 @@ $(document).ready(function() {
 		var propietario_id;
 		$("#id_cedula_propietario").empty();
 
-		base_url = "/ajax/get_propietario_name_id_by_cedula/";
+		base_url = base_context + "/ajax/get_propietario_name_id_by_cedula/";
 		params = "value";
 		$("#id_cedula_propietario").autocomplete({
 			source : base_url,

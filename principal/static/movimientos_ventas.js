@@ -58,7 +58,7 @@ $(document).ready(function() {
 	//autocomplete para cedula
 	var cliente_id;
 	$("#id_cedula_cliente").empty();
-	base_url = "/ajax/get_cliente_name_id_by_cedula/";
+	base_url = base_context + "/ajax/get_cliente_name_id_by_cedula/";
 	params = "value";
 	$("#id_cedula_cliente").autocomplete({
 		source : base_url,
@@ -79,7 +79,7 @@ $(document).ready(function() {
 //autocomplete para vendedor
 	var vendedor_id;
 	$("#id_name_vendedor").empty();
-	base_url = "/ajax/get_vendedor_id_by_name/";
+	base_url = base_context + "/ajax/get_vendedor_id_by_name/";
 	params = "value";
 	$("#id_name_vendedor").autocomplete({
 		source : base_url,
@@ -96,7 +96,7 @@ $(document).ready(function() {
 	//autocomplete para cedula
 	var cliente_vendedor;
 	$("#id_cedula_vendedor").empty();
-	base_url = "/ajax/get_vendedor_name_id_by_cedula/";
+	base_url = base_context + "/ajax/get_vendedor_name_id_by_cedula/";
 	params = "value";
 	$("#id_cedula_vendedor").autocomplete({
 		source : base_url,
@@ -117,7 +117,7 @@ $(document).ready(function() {
 	//autocomplete para planes de pago
 	var id_plan_pago;
 	$("#id_plan_pago").empty();
-	base_url="/ajax/get_plan_pago/";
+	base_url= base_context + "/ajax/get_plan_pago/";
 	params="value";
 	$("#id_plan_p").autocomplete({
 		source : base_url,
@@ -136,7 +136,7 @@ $(document).ready(function() {
 	//autocomplete para planes de pago de vendedores
 	var id_plan_pago_vendedores;
 	$("#id_plan_pago_vendedores").empty();
-	base_url="/ajax/get_plan_pago_vendedor/";
+	base_url= base_context + "/ajax/get_plan_pago_vendedor/";
 	params="value";
 	$("#id_plan_pv").autocomplete({
 		source : base_url,

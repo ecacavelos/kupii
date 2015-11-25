@@ -28,7 +28,7 @@ function autocompleteFraccion(){
 	if ($("#id_tipo_busqueda").val() == "nombre") {
 		var id_fraccion;
 		$("#fraccion").empty();
-		base_url = "/ajax/get_fracciones_by_name/";
+		base_url = base_context + "/ajax/get_fracciones_by_name/";
 		params = "value";
 		$("#fraccion").autocomplete({
 			source : base_url,
@@ -40,7 +40,7 @@ function autocompleteFraccion(){
 		});
 	}else{
 		$("#id_busqueda_label").empty();
-		base_url = "/ajax/get_fracciones_by_id/";
+		base_url = base_context + "/ajax/get_fracciones_by_id/";
 		params = "value";
 		$("#fraccion").autocomplete({
 			source : base_url,

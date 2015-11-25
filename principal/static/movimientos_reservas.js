@@ -26,7 +26,7 @@ $(document).ready(function() {
 	//autocomplete para cedula
 	var cliente_id;
 	$("#id_cedula_cliente").empty();
-	base_url = "/ajax/get_cliente_name_id_by_cedula/";
+	base_url = base_context + "/ajax/get_cliente_name_id_by_cedula/";
 	params = "value";
 	$("#id_cedula_cliente").autocomplete({
 		source : base_url,
