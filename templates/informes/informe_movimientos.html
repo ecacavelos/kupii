@@ -167,8 +167,9 @@
 			{% for pago in venta %}
 			{% if forloop.counter == 1 %}
 				{% if pago.recuperacion %}
+				<th>Fecha</th><th>Fraccion</th><th>Manzana</th><th>Cliente</th><th>Cuota Nº</th><th>Mes</th><th>Tipo Cuota</th><th>Saldo Anterior</th><th>Monto</th><th>Saldo</th><th></th>
 				<tr>
-					
+						
 						<td class="celda_resumen_venta recuperada">{{pago.fecha_de_venta}}</td>
                         <td class="celda_resumen_venta recuperada">{{pago.lote.manzana.fraccion.nombre}} ({{pago.lote.manzana.fraccion.id}})</td>
                         <td class="celda_resumen_venta recuperada">{{ pago.lote }}</td>
@@ -178,9 +179,11 @@
 						<!-- <td class="celda_resumen_venta recuperada">Cuotas Plan: {{pago.cantidad_de_cuotas}}</td>
 						<td class="celda_resumen_venta recuperada">Precio Final: {{pago.precio_final}}</td> -->
 				</tr>
-				<th>Fecha</th><th>Fraccion</th><th>Manzana</th><th>Cliente</th><th>Cuota Nº</th><th>Mes</th><th>Tipo Cuota</th><th>Saldo Anterior</th><th>Monto</th><th>Saldo</th><th></th>		
+				<th colspan="1">Fecha</th><!--<th>Fraccion</th><th>Manzana</th><th>Cliente</th>--><th colspan="2">Cuota Nº</th><th colspan="2">Mes</th><th>Tipo Cuota</th><th>Saldo Anterior</th><th>Monto</th><th>Saldo</th><th></th><th></th>		
 				{% else %}
+				<th>Fecha</th><th>Fraccion</th><th>Manzana</th><th>Cliente</th><th>Cuota Nº</th><th>Mes</th><th>Tipo Cuota</th><th>Saldo Anterior</th><th>Monto</th><th>Saldo</th><th></th>
 				<tr>
+						
 						<td class="celda_resumen_venta">{{pago.fecha_de_venta}}</td>
                         <td class="celda_resumen_venta">{{pago.lote.manzana.fraccion.nombre}} ({{pago.lote.manzana.fraccion.id}})</td>
                         <td class="celda_resumen_venta">{{ pago.lote}}</td>
@@ -191,38 +194,32 @@
 						<td class="celda_resumen_venta">Precio Final: {{pago.precio_final}}</td> -->
 					
 				</tr>
-				<th>Fecha</th><th>Fraccion</th><th>Manzana</th><th>Cliente</th><th>Cuota Nº</th><th>Mes</th><th>Tipo Cuota</th><th>Saldo Anterior</th><th>Monto</th><th>Saldo</th><th></th>
+				<th colspan="1">Fecha</th><!--<th>Fraccion</th><th>Manzana</th><th>Cliente</th>--><th colspan="2">Cuota Nº</th><th colspan="2">Mes</th><th>Tipo Cuota</th><th>Saldo Anterior</th><th>Monto</th><th>Saldo</th><th></th><th></th>
 				{% endif %}
 				
 			{% else %}
 				{% if forloop.counter|divisibleby:2 %}				
 				<tr>
-					<td>{{pago.fecha_de_pago}}</td>
-					<td></td>
-					<td></td>
-					<td></td>
-					<td>{{pago.nro_cuota}}</td>
-					<td>{{pago.mes}}</td>
+					<td colspan="1">{{pago.fecha_de_pago}}</td>
+					<td colspan="2">{{pago.nro_cuota}}</td>
+					<td colspan="2">{{pago.mes}}</td>
 					<td></td>
 					<td>{{pago.saldo_anterior}}</td>
 					<td>{{pago.monto}}</td>
 					<td>{{pago.saldo}}</td>
-					<td><a href="/movimientos/modificar_pagocuota/{{pago.id}}"><img src="/static/custom/img/black_edit.png" /></a></td>
+					<td colspan="2"><a href="/movimientos/modificar_pagocuota/{{pago.id}}"><img src="/static/custom/img/black_edit.png" /></a></td>
 					<!--<td><a href="/movimientos/eliminar_pagocuota/{{pago.id}}">Holis</a></td>-->
 				</tr>
 				{% else %}
 				<tr class="bkg_gris">
-					<td>{{pago.fecha_de_pago}}</td>
-					<td></td>
-					<td></td>
-					<td></td>
-					<td>{{pago.nro_cuota}}</td>
-					<td>{{pago.mes}}</td>
+					<td colspan="1">{{pago.fecha_de_pago}}</td>
+					<td colspan="2">{{pago.nro_cuota}}</td>
+					<td colspan="2">{{pago.mes}}</td>
 					<td></td>
 					<td>{{pago.saldo_anterior}}</td>
 					<td>{{pago.monto}}</td>
 					<td>{{pago.saldo}}</td>
-					<td><a href="/movimientos/modificar_pagocuota/{{pago.id}}"><img src="/static/custom/img/black_edit.png" /></a></td>
+					<td colspan="2"><a href="/movimientos/modificar_pagocuota/{{pago.id}}"><img src="/static/custom/img/black_edit.png" /></a></td>
 					<!--<td><a href="/movimientos/eliminar_pagocuota/{{pago.id}}">Holis</a></td>-->
 				</tr>
 				{% endif %}
