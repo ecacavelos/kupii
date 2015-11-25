@@ -161,32 +161,39 @@
 <div id="listado-ventas">
 	<h2>Historial de cuotas en VENTAS</h2>
 	<table  cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
-		<th>Fecha</th><th>Fraccion</th><th>Manzana</th><th>Cliente</th><th>Cuota Nº</th><th>Tipo Cuota</th><th>Saldo Anterior</th><th>Monto</th><th>Saldo</th><th></th>
+		
 		{% for venta in lista_ventas %}
+			
 			{% for pago in venta %}
 			{% if forloop.counter == 1 %}
+				{% if pago.recuperacion %}
 				<tr>
-					{% if pago.recuperacion %}
+					
 						<td class="celda_resumen_venta recuperada">{{pago.fecha_de_venta}}</td>
-                        <td class="celda_resumen_venta recuperada">{{pago.lote.manzana.fraccion.id}}</td>
+                        <td class="celda_resumen_venta recuperada">{{pago.lote.manzana.fraccion.nombre}} ({{pago.lote.manzana.fraccion.id}})</td>
                         <td class="celda_resumen_venta recuperada">{{ pago.lote }}</td>
 						<td class="celda_resumen_venta recuperada">{{pago.cliente}}</td>
 						<td colspan="3" class="celda_resumen_venta recuperada">::::::VENTA RECUPERADA:::::</td>
-						<td colspan="3" class="celda_resumen_venta recuperada">Entrega Inicial: {{pago.entrega_incial}}</td>
+						<td colspan="4" class="celda_resumen_venta recuperada">Entrega Inicial: {{pago.entrega_incial}}</td>
 						<!-- <td class="celda_resumen_venta recuperada">Cuotas Plan: {{pago.cantidad_de_cuotas}}</td>
 						<td class="celda_resumen_venta recuperada">Precio Final: {{pago.precio_final}}</td> -->
-						
-					{% else %}
+				</tr>
+				<th>Fecha</th><th>Fraccion</th><th>Manzana</th><th>Cliente</th><th>Cuota Nº</th><th>Mes</th><th>Tipo Cuota</th><th>Saldo Anterior</th><th>Monto</th><th>Saldo</th><th></th>		
+				{% else %}
+				<tr>
 						<td class="celda_resumen_venta">{{pago.fecha_de_venta}}</td>
-                        <td class="celda_resumen_venta">{{pago.lote.manzana.fraccion.id}}</td>
+                        <td class="celda_resumen_venta">{{pago.lote.manzana.fraccion.nombre}} ({{pago.lote.manzana.fraccion.id}})</td>
                         <td class="celda_resumen_venta">{{ pago.lote}}</td>
 						<td class="celda_resumen_venta">{{pago.cliente}}</td>
 						<td colspan="3" class="celda_resumen_venta">::::::VENTA ACTUAL::::::</td>
-						<td colspan="3"class="celda_resumen_venta">Entrega Inicial: {{pago.entrega_inicial}}</td>
+						<td colspan="4"class="celda_resumen_venta">Entrega Inicial: {{pago.entrega_inicial}}</td>
 						<!-- <td class="celda_resumen_venta">Cuotas Plan: {{pago.cantidad_de_cuotas}}</td>
 						<td class="celda_resumen_venta">Precio Final: {{pago.precio_final}}</td> -->
-					{% endif %}
+					
 				</tr>
+				<th>Fecha</th><th>Fraccion</th><th>Manzana</th><th>Cliente</th><th>Cuota Nº</th><th>Mes</th><th>Tipo Cuota</th><th>Saldo Anterior</th><th>Monto</th><th>Saldo</th><th></th>
+				{% endif %}
+				
 			{% else %}
 				{% if forloop.counter|divisibleby:2 %}				
 				<tr>
@@ -195,6 +202,7 @@
 					<td></td>
 					<td></td>
 					<td>{{pago.nro_cuota}}</td>
+					<td>{{pago.mes}}</td>
 					<td></td>
 					<td>{{pago.saldo_anterior}}</td>
 					<td>{{pago.monto}}</td>
@@ -209,6 +217,7 @@
 					<td></td>
 					<td></td>
 					<td>{{pago.nro_cuota}}</td>
+					<td>{{pago.mes}}</td>
 					<td></td>
 					<td>{{pago.saldo_anterior}}</td>
 					<td>{{pago.monto}}</td>

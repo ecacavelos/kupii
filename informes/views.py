@@ -1256,7 +1256,8 @@ def informe_movimientos(request):
                             for item_venta in lista_ventas:
                                 try:
                                     resumen_venta = {}
-                                    resumen_venta['fecha_de_venta'] = item_venta.fecha_de_venta
+                                    fecha_venta_str = unicode(item_venta.fecha_de_venta)
+                                    resumen_venta['fecha_de_venta'] = unicode(datetime.datetime.strptime(fecha_venta_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
                                     resumen_venta['lote']=item_venta.lote
                                     resumen_venta['cliente'] = item_venta.cliente
                                     resumen_venta['cantidad_de_cuotas'] = item_venta.plan_de_pago.cantidad_de_cuotas
@@ -1264,14 +1265,14 @@ def informe_movimientos(request):
                                     resumen_venta['entrega_inicial'] = unicode('{:,}'.format(item_venta.entrega_inicial)).replace(",",".")
                                     RecuperacionDeLotes.objects.get(venta=item_venta.id)
                                     try:
-                                        venta_pagos_query_set = get_pago_cuotas(item_venta,None,None)
+                                        venta_pagos_query_set = get_pago_cuotas_2(item_venta,None,None)
                                         resumen_venta['recuperacion'] = True
                                     except PagoDeCuotas.DoesNotExist:
                                         venta_pagos_query_set = []
                                 except RecuperacionDeLotes.DoesNotExist:
                                     print 'se encontro la venta no recuperada, la venta actual'
                                     try:
-                                        venta_pagos_query_set = get_pago_cuotas(item_venta,None,None)
+                                        venta_pagos_query_set = get_pago_cuotas_2(item_venta,None,None)
                                         resumen_venta['recuperacion'] = False
                                     except PagoDeCuotas.DoesNotExist:
                                         venta_pagos_query_set = []
@@ -1286,12 +1287,22 @@ def informe_movimientos(request):
                                     monto= long(pago['monto'])
                                     saldo=saldo_anterior-monto
                                     cuota ={}
-                                    cuota['fecha_de_pago'] = pago['fecha_de_pago']
+                                    fecha_pago_str = unicode(pago['fecha_de_pago'])
+                                    cuota['fecha_de_pago'] = unicode(datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
                                     cuota['id'] = pago['id']
                                     cuota['nro_cuota'] = pago['nro_cuota_y_total']
-                                    cuota['saldo_anterior'] = saldo_anterior
-                                    cuota['monto'] = pago['monto']
-                                    cuota['saldo'] = saldo
+                                    
+                                    monthNames = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+                                    fecha_1 = unicode(datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
+                                    parts_1 = fecha_1.split("/")
+                                    year_1 = parts_1[2];
+                                    mes_1 = int(parts_1[1]) - 1;
+                                    mes_year = monthNames[mes_1]+"/"+year_1;
+                                    cuota['mes'] = mes_year
+ 
+                                    cuota['saldo_anterior'] = unicode('{:,}'.format(int(saldo_anterior))).replace(",",".")
+                                    cuota['monto'] =  unicode('{:,}'.format(int(pago['monto']))).replace(",",".")
+                                    cuota['saldo'] =  unicode('{:,}'.format(int(saldo))).replace(",",".")
                                     ventas_pagos_list.append(cuota)
                                 lista_movimientos.append(ventas_pagos_list)
                         except Exception, error:
