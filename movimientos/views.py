@@ -1890,6 +1890,98 @@ def modificar_pago_de_cuotas(request, id):
                 return HttpResponse(t.render(c))
         else:
             return HttpResponseRedirect("/login")'''
+   
+def agregar_pago(request, id):        
+    if request.user.is_authenticated():
+        if verificar_permisos(request.user.id, permisos.CHANGE_PAGODECUOTAS):
+            if request.method == 'GET':
+                venta = Venta.objects.get(pk=id)
+                t = loader.get_template('movimientos/agregar_pago.html')
+                c = RequestContext(request, {
+                    'venta': venta
+                })
+            
+            if request.method == 'POST':
+                pago = PagoDeCuotas()
+                data = request.POST
+                venta_id = data.get('venta_id', '')    
+                lote_id = data.get('pago_lote_id', '')
+                nro_cuotas_a_pagar = data.get('nro_cuotas_a_pagar')
+                venta = Venta.objects.get(pk=venta_id)
+                monto_cuota = data.get('monto_cuota')
+                total_de_cuotas = int(monto_cuota) * int(nro_cuotas_a_pagar)
+                total_de_mora = data.get('total_mora')
+                total_de_pago = data.get('monto_total')
+                date_parse_error = False
+                fecha_pago=data.get('fecha', '')
+                fecha_pago_parsed = datetime.datetime.strptime(fecha_pago, "%d/%m/%Y").date()
+    
+                try:
+                    pago.total_de_cuotas = total_de_cuotas
+                    pago.total_de_mora = total_de_mora
+                    pago.total_de_pago = total_de_pago
+                    pago.nro_cuotas_a_pagar = nro_cuotas_a_pagar
+                    pago.fecha_de_pago = fecha_pago_parsed
+                    pago.venta = venta
+                    pago.plan_de_pago = venta.plan_de_pago
+                    pago.cliente = venta.cliente
+                    pago.lote = venta.lote
+                    pago.vendedor = venta.vendedor
+                    pago.plan_de_pago_vendedores = venta.plan_de_pago_vendedor
+                    pago.detalle = None
+                    pago.save()
+                    venta.pagos_realizados = int(nro_cuotas_a_pagar) + int(venta.pagos_realizados)
+                    venta.save()
+                    #Se loggea la accion del usuario
+                    id_objeto = pago.id
+                    codigo_lote = venta.lote.codigo_paralot
+                    loggear_accion(request.user, "Agregar", "Pago de cuota", id_objeto, codigo_lote)
+                    codigo_lote = codigo_lote.replace("/","%2")
+                    return HttpResponseRedirect('/informes/informe_ventas/?busqueda='+unicode(venta.lote.id))
+                except Exception, error:
+                    print error
+                    pass
+                
+                
+                #Se loggea la accion del usuario
+                id_objeto = venta.id
+                codigo_lote = venta.lote.codigo_paralot
+                loggear_accion(request.user, "Actualizar", "venta", id_objeto, codigo_lote)
+                message = "Cuota Creada Exitosamente"
+                t = loader.get_template('movimientos/modificar_pagocuota.html')
+                fecha = pago.fecha_de_pago.strftime('%d/%m/%Y')
+                c = RequestContext(request, {
+                    'message': message,
+                    'pagocuota': pago,
+                    'fecha_pago': fecha
+                })
+            return HttpResponse(t.render(c))
+        else:
+            t = loader.get_template('index2.html')
+            grupo= request.user.groups.get().id
+            c = RequestContext(request, {
+                'grupo': grupo
+            })
+            return HttpResponse(t.render(c))
+    else:
+        return HttpResponseRedirect("/login")   
+        
+    '''
+    def eliminar_pago_de_cuotas(request, id):        
+        if request.user.is_authenticated():
+            if request.method == 'GET':
+                lote = pago.lote.codigo_paralot
+                pago = PagoDeCuotas.objects.get(pk=id)
+                pago.delete()
+                t = loader.get_template('informes/informe_movimientos.html')
+                c = RequestContext(request, {
+                    'lote_id': lote,
+                    'fecha_ini':"",
+                    'fecha_fin':""
+                })
+                return HttpResponse(t.render(c))
+        else:
+            return HttpResponseRedirect("/login")'''
 
 def modificar_venta(request, id):        
     if request.user.is_authenticated():

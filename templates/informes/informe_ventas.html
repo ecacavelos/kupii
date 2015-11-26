@@ -155,7 +155,7 @@
 </div>
 <div id="listado-ventas">
 	<table  cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
-		<th>Fecha de Venta</th><th>Fecha 1er Vto.</th><th>Cliente</th><th>Lote</th><th>Vendedor</th><th>Plan de Pago</th><th>Entrega Inicial</th><th>Precio Cuota</th><th>Precio final de venta</th><th>Cuotas Pagadas</th><th>Es Recuperada</th><th></th><th></th>
+		<th>Fecha de Venta</th><th>Fecha 1er Vto.</th><th>Cliente</th><th>Lote</th><th>Vendedor</th><th>Plan de Pago</th><th>Entrega Inicial</th><th>Precio Cuota</th><th>Precio final de venta</th><th>Cuotas Pagadas</th><th>Es Recuperada</th><th></th><th></th><th></th>
 		{% for venta in lista_ventas %}
 			{% for pago in venta %}
 			{% if forloop.counter == 1 %}
@@ -176,11 +176,12 @@
 						<td class="recuperada celda_resumen_venta">No</td>
 					{% endif %}
 					
+					<td class="recuperada celda_resumen_venta"><a href="/movimientos/agregar_pago/{{pago.id}}"><span style="font-size: 35px; color: #CCCCCC; font-weight: bolder" class="glyphicon glyphicon-plus"></span></a></td>
 					<td class="recuperada celda_resumen_venta"><a href="/movimientos/modificar_venta/{{pago.id}}"><img src="/static/custom/img/black_edit.png" /></a></td>
 					<td class="recuperada celda_resumen_venta"><button class="eliminar" value="{{pago.id}}"><img src="/static/custom/img/black_delete.png" /></button></td>
 				</tr>
 				<tr>
-					<th>Fecha Pago</th><th colspan="2">Cuotas Pagadas</th><th>Fecha Vto.</th><th>Dias Atraso</th><th colspan="1">Nro Cuota</th><th colspan="2">Detalles</th><th colspan="2">Total Pagado</th><th colspan="3"></th>
+					<th>Fecha Pago</th><th colspan="2">Cuotas Pagadas</th><th>Fecha Vto.</th><th>Dias Atraso</th><th colspan="1">Nro Cuota</th><th colspan="2">Detalles</th><th colspan="2">Total Pagado</th><th colspan="4"></th>
 				</tr>
 			{% else %}		
 				<tr class="bkg_gris">
@@ -192,6 +193,7 @@
 					<td colspan="2" style="text-align: right">{{pago.detalle}}</td>
 					<td colspan="2">Total pagado: {{pago.monto}}</td>
 					<td colspan="1"></td>
+					<td></td>
 					<td colspan="1"><a href="/movimientos/modificar_pagocuota/{{pago.id}}"><img src="/static/custom/img/black_edit.png" /></a></td>
 					<td><button class="eliminar_pago" value="{{pago.id}}"><img src="/static/custom/img/black_delete.png" /></button></td>
 				</tr>
