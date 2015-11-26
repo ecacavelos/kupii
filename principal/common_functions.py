@@ -128,7 +128,7 @@ def get_cuota_information_by_lote(lote_id,cuotas_pag, facturar = False, ver_venc
     #         print 'se encontro la venta no recuperada, la venta actual'
     #         venta = item_venta
     if venta_param == None:
-        venta = get_ultima_venta(lote_id)
+        venta = get_ultima_venta(lote_id) 
     else:
         venta = venta_param
     
@@ -837,7 +837,8 @@ def get_ultima_venta(lote_id):
     for item_venta in ventas:
         print 'Obteniendo la ultima venta'
         try:
-            RecuperacionDeLotes.objects.get(venta=item_venta.id)
+            venta_recuperada = RecuperacionDeLotes.objects.get(venta=item_venta.id)
+            venta = item_venta 
         except RecuperacionDeLotes.DoesNotExist:
             print 'se encontro la venta no recuperada, la venta actual'
             venta = item_venta
