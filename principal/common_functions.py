@@ -117,7 +117,7 @@ def monthdelta(d1, d2):
             break
     return delta
 
-def get_cuota_information_by_lote(lote_id,cuotas_pag, facturar = False, ver_vencimientos = False):
+def get_cuota_information_by_lote(lote_id,cuotas_pag, facturar = False, ver_vencimientos = False, venta_param = None):
     cant_cuotas_pag =0
     print("lote_id ->" + unicode(lote_id))
     # for item_venta in ventas:
@@ -127,7 +127,11 @@ def get_cuota_information_by_lote(lote_id,cuotas_pag, facturar = False, ver_venc
     #     except RecuperacionDeLotes.DoesNotExist:
     #         print 'se encontro la venta no recuperada, la venta actual'
     #         venta = item_venta
-    venta = get_ultima_venta(lote_id)
+    if venta_param == None:
+        venta = get_ultima_venta(lote_id)
+    else:
+        venta = venta_param
+    
     cant_cuotas_pagadas = PagoDeCuotas.objects.filter(venta=venta).aggregate(Sum('nro_cuotas_a_pagar'))
     #ventas = Venta.objects.filter(lote_id=lote_id)
     if cant_cuotas_pagadas['nro_cuotas_a_pagar__sum'] == None:

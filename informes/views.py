@@ -677,7 +677,7 @@ def liquidacion_propietarios(request):
                                         fila['lote']=unicode(pago['lote'])
                                         fila['cliente']=unicode(venta.cliente)
                                         
-                                        cuotas_detalles = get_cuota_information_by_lote(pago['lote'].id, int(pago['nro_cuota']) , True, True)
+                                        cuotas_detalles = get_cuota_information_by_lote(pago['lote'].id, int(pago['nro_cuota']) , True, True, venta)
                                         monthNames = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
                                         fecha_1 = cuotas_detalles[0]['fecha'] 
                                         parts_1 = fecha_1.split("/")
@@ -704,6 +704,7 @@ def liquidacion_propietarios(request):
                                         #fila['total_monto_pagado']=unicode('{:,}'.format(total_monto_pagado)).replace(",", ".")
                                         #fila['total_monto_inmobiliaria']=unicode('{:,}'.format(total_monto_inm)).replace(",", ".")
                                         #fila['total_monto_propietario']=unicode('{:,}'.format(total_monto_prop)).replace(",", ".")
+                                        
                                             
                                 #Totales GENERALES
                                 filas = sorted(filas, key=lambda f: f['fecha_de_pago'])
