@@ -167,35 +167,40 @@
 			{% for pago in venta %}
 			{% if forloop.counter == 1 %}
 				{% if pago.recuperacion %}
-				<th>Fecha</th><th>Fraccion</th><th>Manzana</th><th>Cliente</th><th>Cuota Nº</th><th>Mes</th><th>Tipo Cuota</th><th>Saldo Anterior</th><th>Monto</th><th>Saldo</th><th></th>
-				<tr>
+					<tr>
+						<th>Fecha</th><th>Fraccion</th><th>Manzana</th><th>Cliente</th><th>Cuota Nº</th><th>Mes</th><th>Tipo Cuota</th><th>Saldo Anterior</th><th>Monto</th><th>Saldo</th><th></th>
+					</tr>
+					<tr>
+							<td class="celda_resumen_venta recuperada">{{pago.fecha_de_venta}}</td>
+	                        <td class="celda_resumen_venta recuperada">{{pago.lote.manzana.fraccion.nombre}} ({{pago.lote.manzana.fraccion.id}})</td>
+	                        <td class="celda_resumen_venta recuperada">{{ pago.lote }}</td>
+							<td class="celda_resumen_venta recuperada">{{pago.cliente}}</td>
+							<td colspan="3" class="celda_resumen_venta recuperada">::::::VENTA RECUPERADA:::::</td>
+							<td colspan="4" class="celda_resumen_venta recuperada">Entrega Inicial: {{pago.entrega_incial}}</td>
+							<!-- <td class="celda_resumen_venta recuperada">Cuotas Plan: {{pago.cantidad_de_cuotas}}</td>
+							<td class="celda_resumen_venta recuperada">Precio Final: {{pago.precio_final}}</td> -->
+					</tr>
 						
-						<td class="celda_resumen_venta recuperada">{{pago.fecha_de_venta}}</td>
-                        <td class="celda_resumen_venta recuperada">{{pago.lote.manzana.fraccion.nombre}} ({{pago.lote.manzana.fraccion.id}})</td>
-                        <td class="celda_resumen_venta recuperada">{{ pago.lote }}</td>
-						<td class="celda_resumen_venta recuperada">{{pago.cliente}}</td>
-						<td colspan="3" class="celda_resumen_venta recuperada">::::::VENTA RECUPERADA:::::</td>
-						<td colspan="4" class="celda_resumen_venta recuperada">Entrega Inicial: {{pago.entrega_incial}}</td>
-						<!-- <td class="celda_resumen_venta recuperada">Cuotas Plan: {{pago.cantidad_de_cuotas}}</td>
-						<td class="celda_resumen_venta recuperada">Precio Final: {{pago.precio_final}}</td> -->
-				</tr>
-				<th colspan="1">Fecha</th><!--<th>Fraccion</th><th>Manzana</th><th>Cliente</th>--><th colspan="2">Cuota Nº</th><th colspan="2">Mes</th><th>Tipo Cuota</th><th>Saldo Anterior</th><th>Monto</th><th>Saldo</th><th></th><th></th>		
 				{% else %}
-				<th>Fecha</th><th>Fraccion</th><th>Manzana</th><th>Cliente</th><th>Cuota Nº</th><th>Mes</th><th>Tipo Cuota</th><th>Saldo Anterior</th><th>Monto</th><th>Saldo</th><th></th>
-				<tr>
+					<tr>
+						<th>Fecha</th><th>Fraccion</th><th>Manzana</th><th>Cliente</th><th>Cuota Nº</th><th>Mes</th><th>Tipo Cuota</th><th>Saldo Anterior</th><th>Monto</th><th>Saldo</th><th></th>
+					</tr>
+					<tr>
+							<td class="celda_resumen_venta">{{pago.fecha_de_venta}}</td>
+	                        <td class="celda_resumen_venta">{{pago.lote.manzana.fraccion.nombre}} ({{pago.lote.manzana.fraccion.id}})</td>
+	                        <td class="celda_resumen_venta">{{ pago.lote}}</td>
+							<td class="celda_resumen_venta">{{pago.cliente}}</td>
+							<td colspan="3" class="celda_resumen_venta">::::::VENTA ACTUAL::::::</td>
+							<td colspan="4"class="celda_resumen_venta">Entrega Inicial: {{pago.entrega_inicial}}</td>
+							<!-- <td class="celda_resumen_venta">Cuotas Plan: {{pago.cantidad_de_cuotas}}</td>
+							<td class="celda_resumen_venta">Precio Final: {{pago.precio_final}}</td> -->
 						
-						<td class="celda_resumen_venta">{{pago.fecha_de_venta}}</td>
-                        <td class="celda_resumen_venta">{{pago.lote.manzana.fraccion.nombre}} ({{pago.lote.manzana.fraccion.id}})</td>
-                        <td class="celda_resumen_venta">{{ pago.lote}}</td>
-						<td class="celda_resumen_venta">{{pago.cliente}}</td>
-						<td colspan="3" class="celda_resumen_venta">::::::VENTA ACTUAL::::::</td>
-						<td colspan="4"class="celda_resumen_venta">Entrega Inicial: {{pago.entrega_inicial}}</td>
-						<!-- <td class="celda_resumen_venta">Cuotas Plan: {{pago.cantidad_de_cuotas}}</td>
-						<td class="celda_resumen_venta">Precio Final: {{pago.precio_final}}</td> -->
-					
-				</tr>
-				<th colspan="1">Fecha</th><!--<th>Fraccion</th><th>Manzana</th><th>Cliente</th>--><th colspan="2">Cuota Nº</th><th colspan="2">Mes</th><th>Tipo Cuota</th><th>Saldo Anterior</th><th>Monto</th><th>Saldo</th><th></th><th></th>
+					</tr>
+				
 				{% endif %}
+			<tr>
+				<th colspan="1">Fecha</th><!--<th>Fraccion</th><th>Manzana</th><th>Cliente</th>--><th colspan="2">Cuota Nº</th><th colspan="2">Mes</th><th>Tipo Cuota</th><th>Saldo Anterior</th><th>Monto</th><th>Saldo</th><th></th><th></th>	
+			</tr>
 				
 			{% else %}
 				{% if forloop.counter|divisibleby:2 %}				
