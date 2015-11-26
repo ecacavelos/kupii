@@ -24,11 +24,16 @@
 			yearSuffix : ''
 		};
 		
-		tipo_busqueda="codigo";
-		busqueda_label=$("#busqueda_label").val();			
-		busqueda=$("#busqueda").val();
-		busqueda_label=$("#busqueda_label").attr("placeholder","Ej: 001/001/0001");	
+		var tipo_busqueda="codigo";
+		var busqueda_label="";			
+		var busqueda= "";
+		$("#busqueda_label").attr("placeholder","Ej: 001/001/0001");	
 		autocompleteLotePorCodigoParalot(tipo_busqueda, busqueda_label, busqueda);
+		
+		busqueda_label= "{{busqueda_label}}";
+		$("#busqueda_label").val(busqueda_label);			
+		busqueda= "{{busqueda}}";
+		$("#busqueda").val(busqueda);
 		
 		
 		// Setear idioma al calendario
@@ -106,8 +111,8 @@
 	});
 
 	function validar() {
-		if ($('#busqueda').val() == 0 || $('#busqueda').val() == "") {
-			alert("Debe ingresar un lote");
+		if ($('#busqueda').val() == 0 || $('#busqueda_label').val() == "") {
+			alert("Debe seleccionar un lote");
 			return;
 		}
 		$("#frm_busqueda").submit();

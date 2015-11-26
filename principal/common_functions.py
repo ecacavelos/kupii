@@ -600,7 +600,7 @@ def get_pago_cuotas_2(venta, fecha_ini,fecha_fin):
                     cuota['nro_cuota'] = unicode(numero_cuota)
                     cuota['monto'] = unicode(monto_cuota)
                     cuota['refuerzo'] = esRefuerzo
-                    #cuota['lote'] = pago.lote
+                    cuota['lote'] = pago.lote
                     #cuota['fraccion'] = dict(pago.lote.manzana.fraccion)
                     ventas_pagos_list.append(cuota)
                     numero_cuota +=1
@@ -612,7 +612,7 @@ def get_pago_cuotas_2(venta, fecha_ini,fecha_fin):
                 cuota['nro_cuota'] = unicode(numero_cuota)
                 cuota['monto'] = unicode(monto_cuota)
                 cuota['refuerzo'] = esRefuerzo
-                #cuota['lote'] = pago.lote
+                cuota['lote'] = pago.lote
                 #cuota['fraccion'] = pago.lote.manzana.fraccion
                 ventas_pagos_list.append(cuota)
                 numero_cuota +=1
@@ -628,7 +628,7 @@ def get_pago_cuotas_2(venta, fecha_ini,fecha_fin):
                     cuota['nro_cuota'] = unicode(numero_cuota)
                     cuota['monto'] = unicode(monto_cuota)
                     cuota['refuerzo'] = esRefuerzo
-                    #cuota['lote'] = pago.lote
+                    cuota['lote'] = pago.lote
                     #cuota['fraccion'] = pago.lote.manzana.fraccion                    
                     ventas_pagos_list.append(cuota)
                     numero_cuota +=1
@@ -640,7 +640,7 @@ def get_pago_cuotas_2(venta, fecha_ini,fecha_fin):
                 cuota['nro_cuota'] = unicode(numero_cuota)
                 cuota['monto'] = unicode(monto_cuota)
                 cuota['refuerzo'] = esRefuerzo
-                #cuota['lote'] = pago.lote
+                cuota['lote'] = pago.lote
                 #cuota['fraccion'] = pago.lote.manzana.fraccion
                 ventas_pagos_list.append(cuota)
                 numero_cuota +=1

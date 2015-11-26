@@ -199,14 +199,15 @@
 				
 				{% endif %}
 			<tr>
-				<th colspan="1">Fecha</th><!--<th>Fraccion</th><th>Manzana</th><th>Cliente</th>--><th colspan="2">Cuota Nº</th><th colspan="2">Mes</th><th>Tipo Cuota</th><th>Saldo Anterior</th><th>Monto</th><th>Saldo</th><th></th><th></th>	
+				<th colspan="1">Fecha de Pago</th><!--<th>Fraccion</th><th>Manzana</th><th>Cliente</th>--><th colspan="1">Cuota Nº</th><th colspan="1">Vencimiento</th><th colspan="2">Mes</th><th>Tipo Cuota</th><th>Saldo Anterior</th><th>Monto</th><th>Saldo</th><th></th><th></th>	
 			</tr>
 				
 			{% else %}
 				{% if forloop.counter|divisibleby:2 %}				
 				<tr>
 					<td colspan="1">{{pago.fecha_de_pago}}</td>
-					<td colspan="2">{{pago.nro_cuota}}</td>
+					<td colspan="1">{{pago.nro_cuota}}</td>
+					<td colspan="1">{{pago.vencimiento}}</td>
 					<td colspan="2">{{pago.mes}}</td>
 					<td></td>
 					<td>{{pago.saldo_anterior}}</td>
@@ -218,7 +219,8 @@
 				{% else %}
 				<tr class="bkg_gris">
 					<td colspan="1">{{pago.fecha_de_pago}}</td>
-					<td colspan="2">{{pago.nro_cuota}}</td>
+					<td colspan="1">{{pago.nro_cuota}}</td>
+					<td colspan="1">{{pago.vencimiento}}</td>
 					<td colspan="2">{{pago.mes}}</td>
 					<td></td>
 					<td>{{pago.saldo_anterior}}</td>
