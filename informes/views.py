@@ -851,8 +851,9 @@ def liquidacion_propietarios(request):
                                                 fila['monto_inmobiliaria'] = unicode('{:,}'.format(monto_inmobiliaria)).replace(",", ".")
                                                 fila['monto_propietario']=unicode('{:,}'.format(monto_propietario)).replace(",", ".")
                                                 
+                                                cuotas_detalles = get_cuota_information_by_lote(pago['lote'].id, int(pago['nro_cuota']) , True, True, venta)
                                                 monthNames = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
-                                                fecha_1 = unicode(datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
+                                                fecha_1 = cuotas_detalles[0]['fecha'] 
                                                 parts_1 = fecha_1.split("/")
                                                 year_1 = parts_1[2];
                                                 mes_1 = int(parts_1[1]) - 1;
