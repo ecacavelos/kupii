@@ -124,12 +124,12 @@
 			</tr>
 			{% endif %}
 			{% if hw.misma_fraccion == False%}
-			<tr>
-				<th colspan="10" class="celda_resumen_fraccion">{{hw.fraccion}}</th>
-			</tr>
-			<tr>
-				<th>ID</th></thd><th>Fraccion</th><th>Lote</th><th>Fecha de Pago</th><th>Cliente</th><th>Cuota Nº</th><th>Mes</th><th>Monto Pag</th><th>Monto Inmobiliaria</th><th>Monto Prop.</th>
-			</tr>
+				<tr>
+					<th colspan="10" class="celda_resumen_fraccion">{{hw.fraccion}}</th>
+				</tr>
+				<tr>
+					<th>ID</th></thd><th>Fraccion</th><th>Lote</th><th>Fecha de Pago</th><th>Cliente</th><th>Cuota Nº</th><th>Mes</th><th>Monto Pag</th><th>Monto Inmobiliaria</th><th>Monto Prop.</th>
+				</tr>
 			{% endif %}
 		{% if forloop.counter|divisibleby:2 %}
 		<tr>

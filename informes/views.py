@@ -724,7 +724,7 @@ def liquidacion_propietarios(request):
                                                                                                                    
                         else:
                             try:
-                                fila={} 
+                                #fila={} 
                                 propietario_id = request.GET['busqueda']
                                 # Se CERAN  los TOTALES por FRACCION
                                 total_monto_pagado = 0
@@ -739,10 +739,85 @@ def liquidacion_propietarios(request):
                                 g_fraccion = ventas[0].lote.manzana.fraccion
                                 cambio = 0    
                                 for venta in ventas:
-                                     
-                                        if venta.id == 5545:
-                                            print "hola"
-                                    
+                                        
+                                        if venta.plan_de_pago.tipo_de_plan == "contado":
+                                            if venta.fecha_de_venta >= fecha_ini_parsed and venta.fecha_de_venta <= fecha_fin_parsed :
+                                                montos = calculo_montos_liquidacion_propietarios_contado(venta)
+                                                monto_inmobiliaria = montos['monto_inmobiliaria']
+                                                monto_propietario = montos['monto_propietario']
+                                                total_de_cuotas = int(venta.precio_final_de_venta)
+                                                fecha_pago_str = unicode(venta.fecha_de_venta)
+                                                fecha_pago = unicode(datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
+                                                # Se setean los datos de cada fila
+                                                fila={}
+                                                fila['misma_fraccion'] = True
+                                                fila['fraccion']=unicode(fraccion)
+                                                fila['fecha_de_pago']= fecha_pago
+                                                fila['lote']=unicode(venta.lote)
+                                                fila['cliente']=unicode(venta.cliente)
+                                                fila['nro_cuota']="Venta Contado"
+                                                fila['total_de_cuotas']=unicode('{:,}'.format(total_de_cuotas)).replace(",", ".")
+                                                fila['monto_inmobiliaria']=unicode('{:,}'.format(monto_inmobiliaria)).replace(",", ".")
+                                                fila['monto_propietario']=unicode('{:,}'.format(monto_propietario)).replace(",", ".")
+                                                
+                                                
+                                                monthNames = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+                                                fecha_1 = unicode(datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
+                                                parts_1 = fecha_1.split("/")
+                                                year_1 = parts_1[2];
+                                                mes_1 = int(parts_1[1]) - 1;
+                                                mes_year = monthNames[mes_1]+"/"+year_1;
+                                                fila['mes'] = mes_year
+                                                # Se suman los TOTALES por FRACCION
+                                                #total_monto_inm += int(monto_inmobiliaria)
+                                                #total_monto_prop += int(monto_propietario)
+                                                #total_monto_pagado += int(venta.precio_final_de_venta)
+                                                
+                                                filas.append(fila)
+                                                #Acumulamos para los TOTALES GENERALES
+                                                total_general_pagado += int(venta.precio_final_de_venta)
+                                                total_general_inm += int(monto_inmobiliaria)
+                                                total_general_prop += int(monto_propietario)
+                                                
+                                        if venta.entrega_inicial != 0:
+                                            if venta.fecha_de_venta >= fecha_ini_parsed and venta.fecha_de_venta <= fecha_fin_parsed :
+                                                montos = calculo_montos_liquidacion_propietarios_entrega_inicial(venta)
+                                                monto_inmobiliaria = montos['monto_inmobiliaria']
+                                                monto_propietario = montos['monto_propietario']
+                                                total_de_cuotas = int(venta.entrega_inicial)
+                                                fecha_pago_str = unicode(venta.fecha_de_venta)
+                                                fecha_pago = unicode(datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
+                                                # Se setean los datos de cada fila
+                                                fila={}
+                                                fila['misma_fraccion'] = True
+                                                fila['fraccion']=unicode(fraccion)
+                                                fila['fecha_de_pago']= fecha_pago
+                                                fila['lote']=unicode(venta.lote)
+                                                fila['cliente']=unicode(venta.cliente)
+                                                fila['nro_cuota']="Entrega Inicial"
+                                                fila['total_de_cuotas']=unicode('{:,}'.format(total_de_cuotas)).replace(",", ".")
+                                                fila['monto_inmobiliaria']=unicode('{:,}'.format(monto_inmobiliaria)).replace(",", ".")
+                                                fila['monto_propietario']=unicode('{:,}'.format(monto_propietario)).replace(",", ".")
+                                                
+                                                
+                                                monthNames = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+                                                fecha_1 = unicode(datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
+                                                parts_1 = fecha_1.split("/")
+                                                year_1 = parts_1[2];
+                                                mes_1 = int(parts_1[1]) - 1;
+                                                mes_year = monthNames[mes_1]+"/"+year_1;
+                                                fila['mes'] = mes_year
+                                                # Se suman los TOTALES por FRACCION
+                                                #total_monto_inm += int(monto_inmobiliaria)
+                                                #total_monto_prop += int(monto_propietario)
+                                                #total_monto_pagado += int(venta.precio_final_de_venta)
+                                                
+                                                filas.append(fila)
+                                                #Acumulamos para los TOTALES GENERALES
+                                                total_general_pagado += int(venta.entrega_inicial)
+                                                total_general_inm += int(monto_inmobiliaria)
+                                                total_general_prop += int(monto_propietario)
+                                        
                                         #print 'se encontro la venta no recuperada, la venta actual'
                                         pagos =[]
                                         pagos = get_pago_cuotas(venta, fecha_ini_parsed,fecha_fin_parsed)                                            
@@ -755,17 +830,18 @@ def liquidacion_propietarios(request):
                                         if pagos:
                                             for pago in pagos:
                                                 
-                                                #if pago['id'] == 1834910:
-                                                #    print "hola"
-                                                
                                                 montos = calculo_montos_liquidacion_propietarios(pago,venta, lista_cuotas_inm)
                                                 monto_inmobiliaria = montos['monto_inmobiliaria']
                                                 monto_propietario = montos['monto_propietario']
                                                 fecha_pago_str = unicode(pago['fecha_de_pago'])
-                                                fecha_pago = unicode(datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
+                                                try:
+                                                    fecha_pago = unicode(datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
+                                                except Exception, error:
+                                                    print error +": "+ fecha_pago_str
+                                                
                                                 # Se setean los datos de cada fila
                                                 fila={}
-                                                fila['misma_fraccion'] = False
+                                                fila['misma_fraccion'] = True
                                                 fila['fraccion']=unicode(venta.lote.manzana.fraccion)
                                                 fila['fecha_de_pago']=fecha_pago
                                                 fila['lote']=unicode(pago['lote'])
@@ -774,13 +850,22 @@ def liquidacion_propietarios(request):
                                                 fila['total_de_cuotas']=unicode('{:,}'.format(int(pago['monto']))).replace(",", ".")
                                                 fila['monto_inmobiliaria'] = unicode('{:,}'.format(monto_inmobiliaria)).replace(",", ".")
                                                 fila['monto_propietario']=unicode('{:,}'.format(monto_propietario)).replace(",", ".")
+                                                
+                                                monthNames = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+                                                fecha_1 = unicode(datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
+                                                parts_1 = fecha_1.split("/")
+                                                year_1 = parts_1[2];
+                                                mes_1 = int(parts_1[1]) - 1;
+                                                mes_year = monthNames[mes_1]+"/"+year_1;
+                                                fila['mes'] = mes_year
+                                                
                                                 #if venta.lote.manzana.fraccion != g_fraccion: 
                                                 ok=False
                                                 # Se suman los TOTALES por FRACCION
                                                 total_monto_inm += int(monto_inmobiliaria)
                                                 total_monto_prop += int(monto_propietario)
                                                 total_monto_pagado += int(pago['monto'])
-                                                filas_fraccion.append(fila)
+                                                
                                                 #Acumulamos para los TOTALES GENERALES
                                                 total_general_pagado += int(pago['monto'])
                                                 total_general_inm += int(monto_inmobiliaria)
@@ -788,10 +873,14 @@ def liquidacion_propietarios(request):
                                                 
                                                 if pago['fraccion'] != g_fraccion:
                                                     #Totales por FRACCION
-                                                    filas_fraccion = sorted(filas_fraccion, key=lambda f: f['fecha_de_pago'])
-                                                    filas_fraccion[0]['misma_fraccion']= True
+                                                    try:
+                                                        filas_fraccion = sorted(filas_fraccion, key=lambda f: (f['fecha_de_pago']))
+                                                    except Exception, error:
+                                                        print error +": "+ fecha_pago_str
+                                                    filas_fraccion[0]['misma_fraccion']= False
                                                     filas.extend(filas_fraccion)
                                                     filas_fraccion = []
+                                                    filas_fraccion.append(fila)
                                                     fila = {}
                                                     fila['total_monto_pagado']=unicode('{:,}'.format(total_monto_pagado)).replace(",", ".")
                                                     fila['total_monto_inmobiliaria']=unicode('{:,}'.format(total_monto_inm)).replace(",", ".")
@@ -799,16 +888,19 @@ def liquidacion_propietarios(request):
                                                     filas.append(fila)
                                                     g_fraccion = pago['fraccion']
                                                     ok=True
+                                                else:
+                                                    filas_fraccion.append(fila)
                                                 
                                             
                                 #Totales GENERALES
-                                filas = sorted(filas, key=lambda f: f['fecha_de_pago'])
-                                filas[0]['misma_fraccion']= False
+                                #filas = sorted(filas, key=lambda f: f['fecha_de_pago'])
+                                
                                 fila = {}
                                 fila['total_general_pagado']=unicode('{:,}'.format(total_general_pagado)).replace(",", ".")
                                 fila['total_general_inmobiliaria']=unicode('{:,}'.format(total_general_inm)).replace(",", ".")
                                 fila['total_general_propietario']=unicode('{:,}'.format(total_general_prop)).replace(",", ".")
                                 filas.append(fila)
+                                filas[0]['misma_fraccion']= False
               
                             except Exception, error:
                                 print error
