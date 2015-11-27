@@ -885,6 +885,7 @@ def liquidacion_propietarios(request):
                                                     fila['total_monto_pagado']=unicode('{:,}'.format(total_monto_pagado)).replace(",", ".")
                                                     fila['total_monto_inmobiliaria']=unicode('{:,}'.format(total_monto_inm)).replace(",", ".")
                                                     fila['total_monto_propietario']=unicode('{:,}'.format(total_monto_prop)).replace(",", ".")
+                                                    fila['ultimo_pago'] = True
                                                     filas.append(fila)
                                                     g_fraccion = pago['fraccion']
                                                     ok=True
