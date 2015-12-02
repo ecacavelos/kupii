@@ -852,7 +852,7 @@ def roundup(interes):
 
 #Funcion que encuentra todas las ventas de un lote y retorna la ultima
 def get_ultima_venta(lote_id):
-    ventas = Venta.objects.filter(lote_id=lote_id)
+    ventas = Venta.objects.filter(lote_id=lote_id).order_by('fecha_de_venta')
     for item_venta in ventas:
         print 'Obteniendo la ultima venta'
         try:
