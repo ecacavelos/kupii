@@ -119,7 +119,8 @@ def monthdelta(d1, d2):
 
 def get_cuota_information_by_lote(lote_id,cuotas_pag, facturar = False, ver_vencimientos = False, venta_param = None):
     cant_cuotas_pag =0
-    print("lote_id ->" + unicode(lote_id))
+    cant_cuotas_pagadas = {}
+    #print("lote_id ->" + unicode(lote_id))
     # for item_venta in ventas:
     #     print 'Obteniendo la ultima venta'
     #     try:
@@ -132,7 +133,12 @@ def get_cuota_information_by_lote(lote_id,cuotas_pag, facturar = False, ver_venc
     else:
         venta = venta_param
     
-    cant_cuotas_pagadas = PagoDeCuotas.objects.filter(venta=venta).aggregate(Sum('nro_cuotas_a_pagar'))
+    if ver_vencimientos == True:
+        cant_cuotas_pag = cuotas_pag -1
+        cant_cuotas_pagadas['nro_cuotas_a_pagar__sum'] = None
+    else:
+        cant_cuotas_pagadas = PagoDeCuotas.objects.filter(venta=venta).aggregate(Sum('nro_cuotas_a_pagar'))
+    
     #ventas = Venta.objects.filter(lote_id=lote_id)
     if cant_cuotas_pagadas['nro_cuotas_a_pagar__sum'] == None:
         cant_cuotas_pag = 0
@@ -472,15 +478,26 @@ def verificar_permisos(user_id, permiso):
         ok = False
     return ok
 
-def get_pago_cuotas(venta, fecha_ini,fecha_fin):
+def get_pago_cuotas(venta, fecha_ini,fecha_fin, pagos = None, pagos_anteriores = None):
+    cantidad_pagos_anteriores=0
     if fecha_ini == None and fecha_fin == None:
         #Se traen todos los pagos
-        pagos = PagoDeCuotas.objects.filter(venta_id=venta.id).order_by('id')
-        cantidad_pagos_anteriores=0
+        if pagos == None:
+            pagos = PagoDeCuotas.objects.filter(venta_id=venta.id).order_by('id')
+        
     else:
         #Primero se cuenta cuantos son los pagos anteriores y despues se filtra
-        cantidad_pagos_anteriores = PagoDeCuotas.objects.filter(venta_id=venta.id, fecha_de_pago__lt=fecha_ini).aggregate(Sum('nro_cuotas_a_pagar')).values()[0]
-        pagos = PagoDeCuotas.objects.filter(venta_id=venta.id, fecha_de_pago__range=(fecha_ini, fecha_fin)).order_by('fecha_de_pago')
+        if pagos_anteriores == None:
+            cantidad_pagos_anteriores = PagoDeCuotas.objects.filter(venta_id=venta.id, fecha_de_pago__lt=fecha_ini).aggregate(Sum('nro_cuotas_a_pagar')).values()[0]
+        else:
+            for pago in pagos_anteriores:
+                if pago['venta_id'] == venta.id:
+                    cantidad_pagos_anteriores = pago['nro_cuotas_a_pagar__sum']
+                    break
+                    
+        if pagos == None:
+            pagos = PagoDeCuotas.objects.filter(venta_id=venta.id, fecha_de_pago__range=(fecha_ini, fecha_fin)).order_by('fecha_de_pago')
+          
         if cantidad_pagos_anteriores == None:
             cantidad_pagos_anteriores = 0
             
@@ -490,22 +507,35 @@ def get_pago_cuotas(venta, fecha_ini,fecha_fin):
     esRefuerzo = False
     if venta.plan_de_pago.cuotas_de_refuerzo != 0:
         for pago in pagos:
-            if (numero_cuota % venta.plan_de_pago.intervalo_cuota_refuerzo) == 0 and cuotas_ref_pagadas < venta.plan_de_pago.cuotas_de_refuerzo:
-                    monto_cuota = venta.monto_cuota_refuerzo
-                    cuotas_ref_pagadas +=1
-                    esRefuerzo =True
-            else:
-                monto_cuota = venta.precio_de_cuota
-                esRefuerzo = False
-            if pago.nro_cuotas_a_pagar > 1:
-                for x in xrange(1,pago.nro_cuotas_a_pagar + 1):
-                    if (numero_cuota % venta.plan_de_pago.intervalo_cuota_refuerzo) == 0 and cuotas_ref_pagadas < venta.plan_de_pago.cuotas_de_refuerzo:
+            if pago.venta == venta:
+                if (numero_cuota % venta.plan_de_pago.intervalo_cuota_refuerzo) == 0 and cuotas_ref_pagadas < venta.plan_de_pago.cuotas_de_refuerzo:
                         monto_cuota = venta.monto_cuota_refuerzo
                         cuotas_ref_pagadas +=1
                         esRefuerzo =True
-                    else:
-                        monto_cuota = venta.precio_de_cuota
-                        esRefuerzo = False                                  
+                else:
+                    monto_cuota = venta.precio_de_cuota
+                    esRefuerzo = False
+                if pago.nro_cuotas_a_pagar > 1:
+                    for x in xrange(1,pago.nro_cuotas_a_pagar + 1):
+                        if (numero_cuota % venta.plan_de_pago.intervalo_cuota_refuerzo) == 0 and cuotas_ref_pagadas < venta.plan_de_pago.cuotas_de_refuerzo:
+                            monto_cuota = venta.monto_cuota_refuerzo
+                            cuotas_ref_pagadas +=1
+                            esRefuerzo =True
+                        else:
+                            monto_cuota = venta.precio_de_cuota
+                            esRefuerzo = False                                  
+                        cuota ={}
+                        cuota['fecha_de_pago'] = pago.fecha_de_pago
+                        cuota['id'] = pago.id
+                        cuota['nro_cuota_y_total'] = unicode(numero_cuota) + '/' + unicode(pago.plan_de_pago.cantidad_de_cuotas)
+                        cuota['nro_cuota'] = unicode(numero_cuota)
+                        cuota['monto'] = unicode(monto_cuota)
+                        cuota['refuerzo'] = esRefuerzo
+                        cuota['lote'] = pago.lote
+                        cuota['fraccion'] = dict(pago.lote.manzana.fraccion)
+                        ventas_pagos_list.append(cuota)
+                        numero_cuota +=1
+                else:
                     cuota ={}
                     cuota['fecha_de_pago'] = pago.fecha_de_pago
                     cuota['id'] = pago.id
@@ -514,26 +544,27 @@ def get_pago_cuotas(venta, fecha_ini,fecha_fin):
                     cuota['monto'] = unicode(monto_cuota)
                     cuota['refuerzo'] = esRefuerzo
                     cuota['lote'] = pago.lote
-                    cuota['fraccion'] = dict(pago.lote.manzana.fraccion)
+                    cuota['fraccion'] = pago.lote.manzana.fraccion
                     ventas_pagos_list.append(cuota)
                     numero_cuota +=1
-            else:
-                cuota ={}
-                cuota['fecha_de_pago'] = pago.fecha_de_pago
-                cuota['id'] = pago.id
-                cuota['nro_cuota_y_total'] = unicode(numero_cuota) + '/' + unicode(pago.plan_de_pago.cantidad_de_cuotas)
-                cuota['nro_cuota'] = unicode(numero_cuota)
-                cuota['monto'] = unicode(monto_cuota)
-                cuota['refuerzo'] = esRefuerzo
-                cuota['lote'] = pago.lote
-                cuota['fraccion'] = pago.lote.manzana.fraccion
-                ventas_pagos_list.append(cuota)
-                numero_cuota +=1
     else:
         monto_cuota = venta.precio_de_cuota
         for pago in pagos:
-            if pago.nro_cuotas_a_pagar > 1:
-                for x in xrange(1,pago.nro_cuotas_a_pagar + 1):                                  
+            if pago.venta == venta:
+                if pago.nro_cuotas_a_pagar > 1:
+                    for x in xrange(1,pago.nro_cuotas_a_pagar + 1):                                  
+                        cuota ={}
+                        cuota['fecha_de_pago'] = pago.fecha_de_pago
+                        cuota['id'] = pago.id
+                        cuota['nro_cuota_y_total'] = unicode(numero_cuota) + '/' + unicode(pago.plan_de_pago.cantidad_de_cuotas)
+                        cuota['nro_cuota'] = unicode(numero_cuota)
+                        cuota['monto'] = unicode(monto_cuota)
+                        cuota['refuerzo'] = esRefuerzo
+                        cuota['lote'] = pago.lote
+                        cuota['fraccion'] = pago.lote.manzana.fraccion                    
+                        ventas_pagos_list.append(cuota)
+                        numero_cuota +=1
+                else:
                     cuota ={}
                     cuota['fecha_de_pago'] = pago.fecha_de_pago
                     cuota['id'] = pago.id
@@ -542,21 +573,9 @@ def get_pago_cuotas(venta, fecha_ini,fecha_fin):
                     cuota['monto'] = unicode(monto_cuota)
                     cuota['refuerzo'] = esRefuerzo
                     cuota['lote'] = pago.lote
-                    cuota['fraccion'] = pago.lote.manzana.fraccion                    
+                    cuota['fraccion'] = pago.lote.manzana.fraccion
                     ventas_pagos_list.append(cuota)
                     numero_cuota +=1
-            else:
-                cuota ={}
-                cuota['fecha_de_pago'] = pago.fecha_de_pago
-                cuota['id'] = pago.id
-                cuota['nro_cuota_y_total'] = unicode(numero_cuota) + '/' + unicode(pago.plan_de_pago.cantidad_de_cuotas)
-                cuota['nro_cuota'] = unicode(numero_cuota)
-                cuota['monto'] = unicode(monto_cuota)
-                cuota['refuerzo'] = esRefuerzo
-                cuota['lote'] = pago.lote
-                cuota['fraccion'] = pago.lote.manzana.fraccion
-                ventas_pagos_list.append(cuota)
-                numero_cuota +=1
     return ventas_pagos_list
 
 def get_pago_cuotas_2(venta, fecha_ini,fecha_fin):
