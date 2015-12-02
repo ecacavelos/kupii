@@ -134,8 +134,7 @@ def get_cuota_information_by_lote(lote_id,cuotas_pag, facturar = False, ver_venc
         venta = venta_param
     
     if ver_vencimientos == True:
-        cant_cuotas_pag = cuotas_pag -1
-        cant_cuotas_pagadas['nro_cuotas_a_pagar__sum'] = None
+        cant_cuotas_pagadas['nro_cuotas_a_pagar__sum'] = 0
     else:
         cant_cuotas_pagadas = PagoDeCuotas.objects.filter(venta=venta).aggregate(Sum('nro_cuotas_a_pagar'))
     
