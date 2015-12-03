@@ -128,12 +128,12 @@
 					<th colspan="10" class="celda_resumen_fraccion">{{hw.fraccion}}</th>
 				</tr>
 				<tr>
-					<th>ID</th></thd><th>Fraccion</th><th>Lote</th><th>Fecha de Pago</th><th>Cliente</th><th>Cuota Nº</th><th>Mes</th><th>Monto Pag</th><th>Monto Inmobiliaria</th><th>Monto Prop.</th>
+					<!--<th>ID</th>--><th>Fraccion</th><th>Lote</th><th>Fecha de Pago</th><th>Cliente</th><th>Cuota Nº</th><th>Mes</th><th>Monto Pag</th><th>Monto Inmobiliaria</th><th>Monto Prop.</th>
 				</tr>
 			{% endif %}
 		{% if forloop.counter|divisibleby:2 %}
 		<tr>
-			<td>{{hw.id}}</td>
+			<!--<td>{{hw.id}}</td>-->
 			<td>{{hw.fraccion}}</td>
 			<td>{{hw.lote}}</td>
 			<td>{{hw.fecha_de_pago}}</td>
@@ -146,7 +146,7 @@
 		</tr>
 		{% else %}
 		<tr class="bkg_gris">
-			<td>{{hw.id}}</td>
+			<!--<td>{{hw.id}}</td>-->
 			<td>{{hw.fraccion}}</td>
 			<td>{{hw.lote}}</td>
 			<td>{{hw.fecha_de_pago}}</td>
@@ -161,7 +161,7 @@
 		
 		{% if hw.ultimo_pago == True %}
 			<tr>
-				<th colspan="7" class="celda_resumen_fraccion">Resumen de la Fracción</th>
+				<th colspan="6" class="celda_resumen_fraccion">Resumen de la Fracción</th>
 				<td class="celda_resumen_fraccion">{{hw.total_monto_pagado}}</td>
 				<td class="celda_resumen_fraccion">{{hw.total_monto_inmobiliaria}}</td>
 				<td class="celda_resumen_fraccion">{{hw.total_monto_propietario}}</td>
@@ -171,7 +171,7 @@
 		{% if hw.total_general_pagado %}
 		
 		<tr>
-			<th colspan="7" class="celda_resumen_fraccion">Totales Generales</th>
+			<th colspan="6" class="celda_resumen_fraccion">Totales Generales</th>
 			<td class="celda_resumen_fraccion">{{hw.total_general_pagado}}</td>
 			<td class="celda_resumen_fraccion">{{hw.total_general_inmobiliaria}}</td>
 			<td class="celda_resumen_fraccion">{{hw.total_general_propietario}}</td>
