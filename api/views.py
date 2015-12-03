@@ -95,10 +95,10 @@ def consulta(request, cedula):
                                         items.append(item)
                                     respuesta.append(items)
                                     
-                                    #Se logea la accion en el log de usuarios 
+                                    #Se loguea la accion en el log de usuarios
                                     id_objeto = transaccion.id
-                                    codigo_lote = lote.codigo_paralot
-                                    loggear_accion(request.user, "Agregar", "Transaccion", id_objeto, codigo_lote)                                   
+                                    # codigo_lote = lote.codigo_paralot
+                                    # loggear_accion(request.user, "Agregar", "Transaccion", id_objeto)
                                     
                                     return HttpResponse(json.dumps(respuesta), content_type="application/json")
                     else:
@@ -115,12 +115,14 @@ def consulta(request, cedula):
                     error['mensaje'] = error_msg                                        
                     return HttpResponse(json.dumps(error), status=401, content_type="application/json")                    
             except MultiValueDictKeyError:
+                traceback.format_exc()
                 error_msg = 'Sintaxis del request incorrecta'
                 print error_msg
                 error['codigo'] =  '11'
                 error['mensaje'] = error_msg                                                        
                 return HttpResponseBadRequest(json.dumps(error), content_type="application/json")
             except Exception, error:
+                traceback.format_exc()
                 error_msg = 'Error en el servidor'
                 print error_msg
                 error['codigo'] =  '00'
