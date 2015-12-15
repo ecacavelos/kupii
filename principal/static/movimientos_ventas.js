@@ -2,6 +2,7 @@ $(document).ready(function() {
 	//var deshabilitar = true;
 	$("#fecha_hasta").hide();
 	$("#id_lote").keydown(validateLotePre);
+	$("#id_lote").focus();
 	$("#id_lote").keyup(validateLotePost);
 	$("#id_monto_cuota_refuerzo").val("0");
 	$("#main_venta_form").submit(validateVenta);
@@ -150,38 +151,7 @@ $(document).ready(function() {
 		}
 	});
 	
-	function solo_numeros_puntos_precio_venta() {
-		$('#id_precio_venta').val($('#id_precio_venta').val().replace(/[^\d.]+/g, ''));
-	}
-
-	function solo_numeros_puntos_entrega_inicial() {
-		$('#id_entrega_inicial ').val($('#id_entrega_inicial ').val().replace(/[^\d.]+/g, ''));
-	}
-
-	function solo_numeros_puntos_monto_cuota() {
-		$('#id_monto_cuota ').val($('#id_monto_cuota ').val().replace(/[^\d.]+/g, ''));
-	}
 	
-	function solo_numeros_puntos_monto_refuerzo() {
-		$('#id_monto_cuota_refuerzo ').val($('#id_monto_cuota_refuerzo ').val().replace(/[^\d.]+/g, ''));
-	}
-	function format(comma, period) {
-
-		var comma = comma || ',';
-		var period = period || '.';
-		var split = this.toString().split(',');
-		var numeric = split[0];
-		var decimal = split.length > 1 ? period + split[1] : '';
-		var reg = /(\d+)(\d{3})/;
-		for (var i = 1; i < numeric.length; i++) {
-			numeric = numeric.replace(".", "");
-		}
-		while (reg.test(numeric)) {
-
-			numeric = numeric.replace(reg, '$1' + comma + '$2');
-		}
-		return numeric + decimal;
-	}
 
 });
 
@@ -407,3 +377,36 @@ function calculateMontoCuotas() {
 		$("#monto_total_error").html("");
 	}
 };
+
+function solo_numeros_puntos_precio_venta() {
+		$('#id_precio_venta').val($('#id_precio_venta').val().replace(/[^\d.]+/g, ''));
+	}
+
+	function solo_numeros_puntos_entrega_inicial() {
+		$('#id_entrega_inicial ').val($('#id_entrega_inicial ').val().replace(/[^\d.]+/g, ''));
+	}
+
+	function solo_numeros_puntos_monto_cuota() {
+		$('#id_monto_cuota ').val($('#id_monto_cuota ').val().replace(/[^\d.]+/g, ''));
+	}
+	
+	function solo_numeros_puntos_monto_refuerzo() {
+		$('#id_monto_cuota_refuerzo ').val($('#id_monto_cuota_refuerzo ').val().replace(/[^\d.]+/g, ''));
+	}
+	function format(comma, period) {
+
+		var comma = comma || ',';
+		var period = period || '.';
+		var split = this.toString().split(',');
+		var numeric = split[0];
+		var decimal = split.length > 1 ? period + split[1] : '';
+		var reg = /(\d+)(\d{3})/;
+		for (var i = 1; i < numeric.length; i++) {
+			numeric = numeric.replace(".", "");
+		}
+		while (reg.test(numeric)) {
+
+			numeric = numeric.replace(reg, '$1' + comma + '$2');
+		}
+		return numeric + decimal;
+	}

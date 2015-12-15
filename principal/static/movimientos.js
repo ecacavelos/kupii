@@ -200,6 +200,9 @@ function retrievePlanPago() {
 
 				$("#tipo_pago_credito").removeAttr("checked").attr("disabled", "disabled");
 				$("#tipo_pago_contado").prop("checked", true).removeAttr("disabled");
+				
+				//$("#id_monto_cuota_refuerzo").prop("readonly", true);
+				$("#id_monto_cuota_refuerzo").val(0).attr("disabled", "disabled");
 
 				$("#cantidad_cuotas_venta").html("");
 				$("#precio_final_venta").html(precio_contado);
