@@ -91,9 +91,9 @@
 	</form>
 </div>
 <div class="clear"></div>
+<!--
 <div class="pagination">
-    <span class="step-links">
-{#                Mostrando {{ object_list.start_index }}-{{ object_list.end_index }} de {{ object_list.paginator.count }} Resultados#}
+    <span class="step-links"> Mostrando {{ object_list.start_index }}-{{ object_list.end_index }} de {{ object_list.paginator.count }} Resultados
         Cantidad de Registros <select name="cant_reg" id="id_cant_reg" style="width:70px">
             <option value="25">25</option>
             <option value="50">50</option>
@@ -112,22 +112,51 @@
         {%endif%}
     </span>
 </div>
-{##}
-{##}
-{#<div id="listado-cuadro-busqueda">#}
-{#	<br>#}
-{#	<br>#}
-{#</div>#}
+-->
+
+<div id="listado-cuadro-busqueda">
+<br>
+<br>
+</div>
 
 <div id="listado-item-lote">
 	<table border="1.5"cellpadding="0" cellspacing="0" class="listado-clientes-atrasados" align="center">
-		<th>Cliente</th><th>Cod. Lote</th><th>Cuotas Atras.</th>
+		<th>Cliente</th><th>Telefono</th><th>Direccion</th><th>Cod. Lote</th><th>Cuotas Atras.</th>
 		<th>Cuotas Pag.</th><th>Importe Cuota</th><th>Total Atras.</th><th>Total Pag.</th>
 		<th>Valor Total Lote</th><th>%Pag</th><th>Fec. Ultimo. Pago</th>		
 		{% for hw in object_list %}
 			{% if forloop.counter|divisibleby:2 %}
 		<tr>
 			<td>{{hw.cliente}}</td>
+			<td>
+			{% if hw.telefono_particular == "" or hw.telefono_particular == None  %} 
+				-
+			{% else %}
+				<b>tel1: </b>{{hw.telefono_particular}}
+			{% endif %} 
+			
+			{% if hw.celular_1 == "" or hw.celular1 == None  %} 
+				-
+			{% else %}
+				<b>tel2: </b>{{hw.telefono_celular}}
+			{% endif %}
+			
+			</td>
+			
+			<td>
+			{% if hw.direccion_particular == "" or hw.direccion_particular == None  %} 
+				-
+			{% else %}
+				<b>dir1: </b>{{hw.direccion_particular}}
+			{% endif %} 
+			
+			{% if hw.direccion_cobro == "" or hw.direccion_cobro == None  %} 
+				-
+			{% else %}
+				<b>dir2: </b>{{hw.direccion_cobro}}
+			{% endif %}
+			
+			</td>
 			<td>{{hw.lote}}</td>
 			<td>{{hw.cuotas_atrasadas}}</td>
 			<td>{{hw.cuotas_pagadas}}</td>
@@ -141,6 +170,36 @@
 			{% else %}
 		<tr class="bkg_gris">
 			<td>{{hw.cliente}}</td>
+			<td>
+			{% if hw.telefono_particular == "" or hw.telefono_particular == None  %} 
+				-
+			{% else %}
+				<b>tel1: </b>{{hw.telefono_particular}}
+			{% endif %} 
+			
+			{% if hw.celular_1 == "" or hw.celular1 == None  %} 
+				-
+			{% else %}
+				<b>tel2: </b>{{hw.telefono_celular}}
+			{% endif %}
+			
+			</td>
+			
+			<td>
+			{% if hw.direccion_particular == "" or hw.direccion_particular == None  %} 
+				-
+			{% else %}
+				<b>dir1: </b>{{hw.direccion_particular}}
+			{% endif %} 
+			
+			{% if hw.direccion_cobro == "" or hw.direccion_cobro == None  %} 
+				-
+			{% else %}
+				<b>dir2: </b>{{hw.direccion_cobro}}
+			{% endif %}
+			
+			</td>
+			
 			<td>{{hw.lote}}</td>
 			<td>{{hw.cuotas_atrasadas}}</td>
 			<td>{{hw.cuotas_pagadas}}</td>
@@ -155,9 +214,9 @@
 		{% endfor %}
 	</table>
 </div>
+<!--
 <div class="pagination">
-    <span class="step-links">
-{#                Mostrando {{ object_list.start_index }}-{{ object_list.end_index }} de {{ object_list.paginator.count }} Resultados#}
+    <span class="step-links"> Mostrando {{ object_list.start_index }}-{{ object_list.end_index }} de {{ object_list.paginator.count }} Resultados
         Cantidad de Registros <select name="cant_reg" id="id_cant_reg" style="width:70px">
             <option value="25">25</option>
             <option value="50">50</option>
@@ -176,6 +235,7 @@
         {%endif%}
     </span>
 </div>
+-->
 
 <div id="footer">
 	<a href="{% url 'frontend_home' %}informes" class="boton-verde">Volver al módulo de Informes</a>

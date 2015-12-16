@@ -301,6 +301,7 @@ def clientes_atrasados(request):
                             i = i+1
                         try:                        
                             ultimo_pago = PagoDeCuotas.objects.filter(cliente_id= cliente_atrasado['id']).order_by('-fecha_de_pago')[:1].get()
+                            cliente_persona = Cliente.objects.get(pk = cliente_atrasado['id']) 
                         except PagoDeCuotas.DoesNotExist:
                             ultimo_pago = None
                             
@@ -326,43 +327,48 @@ def clientes_atrasados(request):
                             
                         #Seteamos los campos restantes
                         total_atrasado = meses_diferencia * cliente_atrasado['importe_cuota']
-                        cliente_atrasado['fecha_ultimo_pago']= fecha_ultimo_pago.strftime("%Y-%m-%d")
+                        cliente_atrasado['fecha_ultimo_pago']= fecha_ultimo_pago.strftime("%d/%m/%Y")
                         cliente_atrasado['lote']=(unicode(cliente_atrasado['manzana']).zfill(3) + "/" + unicode(cliente_atrasado['lote']).zfill(4))
                         cliente_atrasado['total_atrasado'] = unicode('{:,}'.format(total_atrasado)).replace(",", ".")
                         cliente_atrasado['importe_cuota'] = unicode('{:,}'.format(cliente_atrasado['importe_cuota'])).replace(",", ".")
                         cliente_atrasado['total_pagado'] = unicode('{:,}'.format(cliente_atrasado['total_pagado'])).replace(",", ".")
-                        cliente_atrasado['valor_total_lote'] = unicode('{:,}'.format(cliente_atrasado['valor_total_lote'])).replace(",", ".") 
+                        cliente_atrasado['valor_total_lote'] = unicode('{:,}'.format(cliente_atrasado['valor_total_lote'])).replace(",", ".")
+                        cliente_atrasado['direccion_particular'] = unicode (cliente_persona.direccion_particular) 
+                        cliente_atrasado['direccion_cobro']=  unicode (cliente_persona.direccion_cobro )
+                        cliente_atrasado['telefono_particular'] = unicode (cliente_persona.telefono_particular)
+                        cliente_atrasado['celular_1'] = unicode (cliente_persona.celular_1 )
                     if meses_peticion == 0:
                         meses_peticion =''  
                     a = len(clientes_atrasados)
                     if a > 0:                    
                         ultimo="&fraccion="+unicode(fraccion)+"&meses_atraso="+unicode(meses_peticion)
-
+                        lista = clientes_atrasados
                         #cantidad de registros a mostrar, determinada por el usuario
-                        try:
-                            cant_reg = request.GET['cant_reg']
-                            if cant_reg=='todos':
-                                paginator = Paginator(clientes_atrasados, len(clientes_atrasados))
-                            else:
-                                p=range(int(cant_reg))
-                                paginator = Paginator(clientes_atrasados, len(p))
-                        except:
-                            cant_reg=25
-                            paginator = Paginator(clientes_atrasados, 25)
-
-                        page = request.GET.get('page')
-                        try:
-                            lista = paginator.page(page)
-                        except PageNotAnInteger:
-                            lista = paginator.page(1)
-                        except EmptyPage:
-                            lista = paginator.page(paginator.num_pages)                
+#                         try:
+#                             cant_reg = request.GET['cant_reg']
+#                             if cant_reg=='todos':
+#                                 paginator = Paginator(clientes_atrasados, len(clientes_atrasados))
+#                             else:
+#                                 p=range(int(cant_reg))
+#                                 paginator = Paginator(clientes_atrasados, len(p))
+#                         except:
+#                             cant_reg=25
+#                             paginator = Paginator(clientes_atrasados, 25)
+# 
+#                         page = request.GET.get('page')
+#                         try:
+#                             lista = paginator.page(page)
+#                         except PageNotAnInteger:
+#                             lista = paginator.page(1)
+#                         except EmptyPage:
+#                             lista = paginator.page(paginator.num_pages)
+                                        
                         c = RequestContext(request, {
                             'fraccion': fraccion,                        
                             'meses_atraso': meses_peticion,
                             'ultimo': ultimo,
                             'object_list': lista,
-                            'cant_reg':cant_reg,
+                            #'cant_reg':cant_reg,
                             'clientes_atrasados' : clientes_atrasados                        
                         })                     
                         return HttpResponse(t.render(c))
