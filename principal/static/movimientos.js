@@ -215,6 +215,7 @@ function retrievePlanPago() {
 			
 			$("#id_fecha_vencimiento").datepicker("setDate", $('#id_fecha').val()).removeAttr("disabled");
 			$("#id_fecha_vencimiento").mask('##/##/####');
+			$("#id_plan_pv").focus();
 		});
 		// En caso de no poder obtener los datos del plan de pagos, indicamos el error.
 		request.fail(function(jqXHR, textStatus) {
