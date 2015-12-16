@@ -15,6 +15,7 @@
 	  </tr>
 	  <tr>
 	    <td><strong><a href="{% url 'frontend_home' %}manzanas">Manzanas</a></strong></td>
+	    <td width="25px"></td>
 	    <td width="25px" title="Ver Manzanas"><a href="{% url 'frontend_home' %}manzanas/listado/"><span class="glyphicon glyphicon-list-alt"></span></a></td>
 	  </tr>
 	  <tr>
@@ -50,6 +51,7 @@
 	  </tr>
 	  <tr>
 	    <td><strong><a href="parametros/log_usuario">Logs de Usuarios</a></strong></td>
+	    <td width="25px"></td>
 	    <td width="25px" title="Ver Logs de Usuarios"><a href="{% url 'frontend_home' %}parametros/log_usuario/listado/"><span class="glyphicon glyphicon-list-alt"></span></a></td>
 	  </tr>
 	  <tr>
@@ -100,25 +102,37 @@
  <div class="grid_6">
 	<table width="90%" border="0" cellpadding="0" cellspacing="0" id="lista-categoria" align="center">
 		<tr>
-			<th class="acciones"><strong><a href="{% url 'frontend_home' %}movimientos/" style="color: white;">Acciones</a></strong></th>
+			<th class="acciones" colspan="3"><strong><a href="{% url 'frontend_home' %}movimientos/" style="color: white;">Acciones</a></strong></th>
 		</tr>
 		<tr>
-			<td class="last" title="Vender Lote"><a href="{% url 'frontend_home' %}movimientos/ventas_lotes/">Vender Lote</a></td>
+			<td title="Vender Lote"><a href="{% url 'frontend_home' %}movimientos/ventas_lotes/">Vender Lote</a></td>
+			<td width="25px" title="Agregar Venta"><a href="{% url 'frontend_home' %}movimientos/ventas_lotes/"><span class="glyphicon glyphicon-pencil"></span></a></td>
+	    	<td width="25px" title="Ver Ventas"><a href="{% url 'frontend_home' %}movimientos/listado_ventas/"><span class="glyphicon glyphicon-list-alt"></span></a></td> 
 		</tr>
 		<tr>
-			<td class="last" title="Pago de Cuotas"><a href="{% url 'frontend_home' %}movimientos/pago_cuotas/">Pago de Cuotas</a></td>
+			<td title="Pago de Cuotas"><a href="{% url 'frontend_home' %}movimientos/pago_cuotas/">Pago de Cuotas</a></td>
+			<td width="25px" title="Agregar Pago"><a href="{% url 'frontend_home' %}movimientos/pago_cuotas/"><span class="glyphicon glyphicon-pencil"></span></a></td>
+	    	<td width="25px" title="Ver Pagos"><a href="{% url 'frontend_home' %}movimientos/listado_pagos/"><span class="glyphicon glyphicon-list-alt"></span></a></td>
 		</tr>		
 		<tr>
-			<td class="last" title="Reservar Lote"><a href="{% url 'frontend_home' %}movimientos/reservas_lotes/">Reservar Lote</a></td>
+			<td title="Reservar Lote"><a href="{% url 'frontend_home' %}movimientos/reservas_lotes/">Reservar Lote</a></td>
+			<td width="25px" title="Agregar Reserva"><a href="{% url 'frontend_home' %}movimientos/reservas_lotes/"><span class="glyphicon glyphicon-pencil"></span></a></td>
+	    	<td width="25px" title="Ver Reservas"><a href="{% url 'frontend_home' %}movimientos/listado_reservas/"><span class="glyphicon glyphicon-list-alt"></span></a></td>
 		</tr>
 		<tr>
-			<td class="last" title="Transferencia de Lote"><a href="{% url 'frontend_home' %}movimientos/transferencias_lotes/">Transferencia de Lote</a></td>
+			<td title="Transferencia de Lote"><a href="{% url 'frontend_home' %}movimientos/transferencias_lotes/">Transferencia de Lote</a></td>
+			<td width="25px" title="Agregar Transferencia"><a href="{% url 'frontend_home' %}movimientos/transferencias_lotes/"><span class="glyphicon glyphicon-pencil"></span></a></td>
+	    	<td width="25px" title="Ver Transferencias"><a href="{% url 'frontend_home' %}movimientos/listado_transferencias/"><span class="glyphicon glyphicon-list-alt"></span></a></td>
 		</tr>
 		<tr>
-			<td class="last" title="Cambio de Lote"><a href="{% url 'frontend_home' %}movimientos/cambio_lotes/">Cambio de Lote</a></td>
+			<td title="Cambio de Lote"><a href="{% url 'frontend_home' %}movimientos/cambio_lotes/">Cambio de Lote</a></td>
+			<td width="25px" title="Agregar Cambio"><a href="{% url 'frontend_home' %}movimientos/cambio_lotes/"><span class="glyphicon glyphicon-pencil"></span></a></td>
+	    	<td width="25px" title="Ver Cambios"><a href="{% url 'frontend_home' %}movimientos/listado_cambios/"><span class="glyphicon glyphicon-list-alt"></span></a></td>
 		</tr>
 		<tr>
-			<td class="last" title="Recuperacion de Lote"><a href="{% url 'frontend_home' %}movimientos/recuperacion_lotes/">Recuperacion de Lote</a></td>
+			<td title="Recuperacion de Lote"><a href="{% url 'frontend_home' %}movimientos/recuperacion_lotes/">Recuperacion de Lote</a></td>
+			<td width="25px" title="Agregar Recuperacion"><a href="{% url 'frontend_home' %}movimientos/recuperacion_lotes/"><span class="glyphicon glyphicon-pencil"></span></a></td>
+	    	<td width="25px" title="Ver Recuperaciones"><a href="{% url 'frontend_home' %}movimientos/listado_recuperaciones/"><span class="glyphicon glyphicon-list-alt"></span></a></td>
 		</tr>
 	</table>
 </div>
