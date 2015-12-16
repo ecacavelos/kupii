@@ -18,6 +18,7 @@ var data = [
 		];
 $(document).ready(function() {
 	$('.grid_6').hide();
+	$("#id_cedula").focus();
 	$("#id_fecha_nacimiento").addClass("date");
 	$("#id_fecha_nacimiento").datepicker({ dateFormat: 'dd/mm/yy' });
 	$('.date').mask('##/##/####');

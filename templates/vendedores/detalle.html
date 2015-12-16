@@ -43,6 +43,7 @@ var data = [
 		];
 $(document).ready(function() {
 	$('.grid_6').hide();
+	$("#id_nombres").focus();
 	$("#id_fecha_ingreso").addClass("date");
 	$("#id_fecha_ingreso").datepicker({ dateFormat: 'dd/mm/yy' });
 	$('.date').mask('##/##/####');

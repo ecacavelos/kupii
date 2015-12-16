@@ -14,7 +14,7 @@ $(document).ready(function() {
 	//$("#id_fecha").datepicker("setDate", new Date());
 	//$("#id_fecha").datepicker('disable');
 	
-	base_url = "/ajax/get_cliente_id_by_name/";
+	base_url = base_context + "/ajax/get_cliente_id_by_name/";
 		params = "value";
 		$("#id_nombre_cliente").autocomplete({
 			source : base_url,
@@ -29,7 +29,7 @@ $(document).ready(function() {
 		});
 		
 		//cliente por cedula
-		base_url = "/ajax/get_cliente_name_id_by_cedula/";
+		base_url = base_context + "/ajax/get_cliente_name_id_by_cedula/";
 		params = "value";
 		$("#id_cedula_cliente").autocomplete({
 			source : base_url,
@@ -46,7 +46,7 @@ $(document).ready(function() {
 		});
 		
 		//vendodor por cedula
-		base_url = "/ajax/get_vendedor_name_id_by_cedula/";
+		base_url = base_context + "/ajax/get_vendedor_name_id_by_cedula/";
 		params = "value";
 		$("#id_cedula_vendedor").autocomplete({
 			source : base_url,
@@ -62,7 +62,7 @@ $(document).ready(function() {
 			}
 		});
 		
-		base_url = "/ajax/get_vendedor_id_by_name/";
+		base_url = base_context + "/ajax/get_vendedor_id_by_name/";
 		params = "value";
 		$("#id_nombre_vendedor").autocomplete({
 			source : base_url,

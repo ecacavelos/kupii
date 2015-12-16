@@ -1,6 +1,7 @@
 $(document).ready(function() {
 	$("#id_lote").keydown(validateLotePre);
 	$("#id_lote").keyup(validateLotePost);
+	$("#id_lote").focus();
 
 	//$("#main_reserva_form").submit(validateReserva);
 

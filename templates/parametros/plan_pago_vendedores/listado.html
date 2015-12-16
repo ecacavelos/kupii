@@ -9,10 +9,11 @@
 		}
 	}
 	$(document).ready(function() {
+		$("#id_plan_pv").focus();
 		//autocomplete para planes de pago de vendedores
 		var id_plan_pago_vendedores;
 		$("#id_plan_pago_vendedores").empty();
-		base_url="/ajax/get_plan_pago_vendedor/";
+		base_url= base_context + "/ajax/get_plan_pago_vendedor/";
 		params="value";
 		$("#id_plan_pv").autocomplete({
 			source : base_url,

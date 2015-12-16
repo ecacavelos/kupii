@@ -9,6 +9,7 @@
 		}
 	}
 	$(document).ready(function() {
+		$("#busqueda_label").focus();
 		if ($("#tipo_busqueda").val() == "codigo"){
 			$("#label_busqueda").html("Codigo Lote:");
 			console.log("Por codigo");
@@ -44,7 +45,7 @@
 		//autocomplete para concepto factura
 		var id_concepto;
 		$("#id_concepto_factura").empty();
-		base_url="/ajax/get_concepto_factura_by_name/";
+		base_url= base_context + "/ajax/get_concepto_factura_by_name/";
 		params="value";
 		$("#id_nombre_concepto").autocomplete({
 			source : base_url,

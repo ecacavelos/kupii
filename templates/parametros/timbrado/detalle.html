@@ -40,7 +40,7 @@ $(document).ready(function() {
 	//var dbDate = $("#id_desde").val();
     //var date = new Date(dbDate);
 	//$("#id_desde").datepicker({dateFormat: 'dd/mm/yy'}).datepicker('setDate', date);
-	
+	$('#id_desde').focus();
 	var queryDate1 = $("#id_desde").val();
 	var parsedDate1 = $.datepicker.parseDate('yy-mm-dd', queryDate1);
 	$('#id_desde').datepicker({ dateFormat: 'dd/mm/yy' }); // format to show

@@ -118,6 +118,8 @@ function _validar(){
 }
 
 $(document).ready(function() {
+	$( "#id_nombre_del_plan" ).focus();
+	
 	
 	$('#id_monto_fijo_cuotas_gerente').val($('#id_monto_fijo_cuotas_gerente').val().replace(".",","));
 	$('#id_monto_fijo_cuotas_gerente').val(format.call($('#id_monto_fijo_cuotas_gerente').val().split(' ').join(''),'.',','));

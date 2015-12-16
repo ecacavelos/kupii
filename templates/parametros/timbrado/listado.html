@@ -11,8 +11,9 @@
 	$(document).ready(function() {
 		//autocomplete para planes de pago
 		var id_timbrado;
+		$("#id_numero_timbrado").focus();
 		$("#id_numero_timbrado").empty();
-		base_url="/ajax/get_timbrado_by_numero/";
+		base_url= base_context + "/ajax/get_timbrado_by_numero/";
 		params="value";
 		$("#id_numero_timbrado").autocomplete({
 			source : base_url,

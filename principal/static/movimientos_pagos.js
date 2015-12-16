@@ -9,6 +9,7 @@ $(document).ready(function() {
 	$('.grid_6').hide();
 	$('.fecha_pago').mask('##/##/####');
 	var detalle_interes = "";
+	$("#id_lote").focus();
 	if(grupo != "2"){
 		$(".fecha_pago").datepicker({
 			closeText : 'Cerrar',

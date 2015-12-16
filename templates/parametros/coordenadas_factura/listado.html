@@ -11,8 +11,9 @@
 	$(document).ready(function() {
 		//autocomplete para planes de pago
 		var id_usuario;
+		$("#id_nombre_usuario").focus();
 		$("#id_nombre_usuario").empty();
-		base_url="/ajax/get_usuario_by_username/";
+		base_url= base_context + "/ajax/get_usuario_by_username/";
 		params="value";
 		$("#id_nombre_usuario").autocomplete({
 			source : base_url,

@@ -1,5 +1,6 @@
 $(document).ready(function() {
 	$("#id_lote").keydown(validateLotePre);
+	$("#id_lote").focus();
 	$("#id_lote").keyup(validateLotePost);
 	//$("#main_recuperacion_form").submit(validateRecuperacion);
 	$('#monto_cuota_venta').mask('000.000.000.000.000.000.000', {

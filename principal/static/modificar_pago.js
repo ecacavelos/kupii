@@ -1,4 +1,5 @@
 $(document).ready(function() {
+	$("#id_fecha").focus();
 	// Setear idioma al calendario
 	$.datepicker.setDefaults($.datepicker.regional['es']);
 	$("#id_fecha").datepicker({

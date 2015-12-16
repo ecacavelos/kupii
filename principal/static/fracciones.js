@@ -3,7 +3,7 @@ $(document).ready(function() {
 		$('.date').mask('##/##/####');
 		$( "#boton_cantidad_lotes" ).hide();
 		$( ".grid_6" ).hide();
-		
+		$("#id_id").focus();
 
 		var propietario_id;
 		$("#id_name_propietario").empty();

@@ -12,6 +12,7 @@
 <script type="text/javascript">
 $(document).ready(function(){
 	$( ".grid_6" ).hide();
+	$("#id_fraccion").focus();
 	
 });
 var data = [
@@ -134,7 +135,7 @@ $(document).ready(function() {
 	var fraccion_id;
 	//$("#id_manzana").empty();
 
-	base_url = "/ajax/get_fracciones_by_name/";
+	base_url = base_context + "/ajax/get_fracciones_by_name/";
 	params = "";
 	 $( "#id_fraccion" ).autocomplete({
 	  source:  base_url,

@@ -4,6 +4,7 @@ $(document).ready(function() {
 	$("#id_lote").keyup(validateLotePost);
 	$("#id_lote2").keydown(validateLotePre);
 	$("#id_lote2").keyup(validateLotePost);
+	$("#id_lote").focus();
 
 	$('#id_fecha').mask('##/##/####');
 	$("#id_fecha").datepicker({ dateFormat: 'dd/mm/yy' });
