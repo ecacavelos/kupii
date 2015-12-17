@@ -36,6 +36,7 @@
 		$('#id_busqueda').val(busqueda);
 
 		$('#fecha_ini').mask('##/##/####');
+		$('#monto_otros_descuentos').mask('###.###.###.###',{reverse: true});
 		$("#fecha_ini").datepicker({
 			dateFormat : 'dd/mm/yy'
 		});
@@ -44,6 +45,18 @@
 			dateFormat : 'dd/mm/yy'
 		});
 
+		$("#ley").keyup(function() {
+  			calcular_total_a_cobrar();
+		});
+		
+		$("#impuesto_renta").keyup(function() {
+  			calcular_total_a_cobrar();
+		});
+		
+		$("#monto_otros_descuentos").keyup(function() {
+  			calcular_total_a_cobrar();
+		});
+		
 		if ($("#fecha_ini").val() == "" && $("#fecha_fin").val() == "") {//parametros no seteados
 			$('.listado-pagos').hide();
 			$('.pagination').hide();
@@ -171,13 +184,27 @@
 		
 		{% if hw.total_general_pagado %}
 		
-		<tr>
-			<th colspan="6" class="celda_resumen_fraccion">Totales Generales</th>
-			<td class="celda_resumen_fraccion">{{hw.total_general_pagado}}</td>
-			<td class="celda_resumen_fraccion">{{hw.total_general_inmobiliaria}}</td>
-			<td class="celda_resumen_fraccion">{{hw.total_general_propietario}}</td>
-
-		</tr>
+			<tr>
+				<th colspan="6" class="celda_resumen_fraccion">Totales Generales</th>
+				<td class="celda_resumen_fraccion">{{hw.total_general_pagado}}</td>
+				<td class="celda_resumen_fraccion">{{hw.total_general_inmobiliaria}}</td>
+				<td id="total_general_propietario" class="celda_resumen_fraccion">{{hw.total_general_propietario}}</td>
+	
+			</tr>
+			<tr>
+				<th colspan="9" class="celda_resumen_fraccion">Resumen Impositivo</th>
+			</tr>
+			<tr>
+				<th>Ley 1421/05</th><th>Impuesto a la Renta 4.5%</th><th>IVA Comisión</th><th colspan="4">Descripcion Otros Descuentos</th><th>Monto de Descuento</th><th>Total a Cobrar</th>
+			</tr>
+			<tr>
+				<td><input type="text" id="ley" name="ley" style="text-align: center" value="{{hw.ley}}" /></td>
+				<td><input type="text" id="impuesto_renta" name="impuesto_renta" style="text-align: center" value="{{hw.impuesto_renta}}" /></td>
+				<td id="iva_comision">{{hw.iva_comision}}</td>
+				<td colspan="4"><input type="text" id="descripcion_otros_descuentos" name="descripcion_otros_descuentos" style="width: 300px; text-align: center" /></td>
+				<td><input type="text" id="monto_otros_descuentos" name="monto_otros_descuentos" style="text-align: center" /></td>
+				<td><input type="text" id="total_a_cobrar" name="total_a_cobrar" style="text-align: center" value="{{hw.total_a_cobrar}}" readonly="" /> </td>
+			</tr>
 		{% endif %}
 		
 		{% endfor %}

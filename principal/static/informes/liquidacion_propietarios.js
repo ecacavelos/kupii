@@ -2,6 +2,53 @@ function retrieve_liquidacion_propietarios() {
     window.location.href = base_context + "/informes/liquidacion_propietarios_reporte_excel?fecha_ini=" + $('#fecha_ini').val() + "&fecha_fin=" + $('#fecha_fin').val() + "&tipo_busqueda=" + $('#id_tipo_busqueda').val() + "&busqueda=" + $('#id_busqueda').val();
 }
 
+function calcular_total_a_cobrar(){
+	var ley = parseInt(sacarPuntos($("#ley").val()));
+	if (isNaN(ley)){
+		ley = 0;
+	}
+	var impuesto_renta = parseInt(sacarPuntos($("#impuesto_renta").val()));
+	if (isNaN(impuesto_renta)){
+		impuesto_renta= 0;
+	}
+	var iva_comision = parseInt(sacarPuntos($("#iva_comision").html()));
+	if (isNaN(iva_comision)){
+		iva_comision = 0;
+	}
+	var monto_otros_descuentos = parseInt(sacarPuntos($("#monto_otros_descuentos").val()));
+	if (isNaN(monto_otros_descuentos)){
+		monto_otros_descuentos = 0;
+	}
+	var total_general_propietario = parseInt(sacarPuntos($("#total_general_propietario").html()));
+	
+	$("#ley").val(ley);
+	$("#impuesto_renta").val(impuesto_renta);
+	$("#iva_comision").html(iva_comision);
+	$("#monto_otros_descuentos").val(monto_otros_descuentos);
+	$("#total_a_cobrar").val(total_general_propietario-(ley+impuesto_renta+iva_comision+monto_otros_descuentos));
+	
+	ponerPuntos();
+}
+
+function sacarPuntos(numero){
+	
+	numero =numero.replace(".", "");
+	numero =numero.replace(".", "");
+	numero =numero.replace(".", "");
+	numero =numero.replace(".", "");
+	numero =numero.replace(".", "");
+	
+	return (numero);
+}
+
+function ponerPuntos(){
+	$("#ley").mask('###.###.###',{reverse: true});
+	$("#impuesto_renta").mask('###.###.###',{reverse: true});
+	$("#monto_otros_descuentos").mask('###.###.###',{reverse: true});
+	$("#iva_comision").mask('###.###.###',{reverse: true});
+	$("#total_a_cobrar").mask('###.###.###',{reverse: true});
+}
+
 function validar() {
     if ($('#fecha_ini').val() == "" || $('#fecha_fin').val() == "") {
         alert("Debe ingresar un rango de fechas");

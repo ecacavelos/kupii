@@ -723,6 +723,13 @@ def liquidacion_propietarios(request):
                                 fila['total_general_pagado']=unicode('{:,}'.format(total_general_pagado)).replace(",", ".")
                                 fila['total_general_inmobiliaria']=unicode('{:,}'.format(total_general_inm)).replace(",", ".")
                                 fila['total_general_propietario']=unicode('{:,}'.format(total_general_prop)).replace(",", ".")
+                                ley = int(total_general_pagado*0.015)
+                                fila['ley'] = unicode('{:,}'.format(ley)).replace(",", ".")
+                                impuesto_renta = int ((total_general_pagado-ley)*0.045)
+                                fila['impuesto_renta'] = unicode('{:,}'.format( impuesto_renta )).replace(",", ".")
+                                iva_comision = int(total_general_inm*0.1)
+                                fila['iva_comision'] = unicode('{:,}'.format( iva_comision )).replace(",", ".")
+                                fila['total_a_cobrar'] = unicode('{:,}'.format( total_general_prop - (ley + impuesto_renta + iva_comision) )).replace(",", ".")
                                 filas.append(fila)
                                 
                             except Exception, error:
@@ -922,6 +929,13 @@ def liquidacion_propietarios(request):
                                 fila['total_general_pagado']=unicode('{:,}'.format(total_general_pagado)).replace(",", ".")
                                 fila['total_general_inmobiliaria']=unicode('{:,}'.format(total_general_inm)).replace(",", ".")
                                 fila['total_general_propietario']=unicode('{:,}'.format(total_general_prop)).replace(",", ".")
+                                ley = int(total_general_pagado*0.015)
+                                fila['ley'] = unicode('{:,}'.format(ley)).replace(",", ".")
+                                impuesto_renta = int ((total_general_pagado-ley)*0.045)
+                                fila['impuesto_renta'] = unicode('{:,}'.format( impuesto_renta )).replace(",", ".")
+                                iva_comision = int(total_general_inm*0.1)
+                                fila['iva_comision'] = unicode('{:,}'.format( iva_comision )).replace(",", ".")
+                                fila['total_a_cobrar'] = unicode('{:,}'.format( total_general_prop - (ley + impuesto_renta + iva_comision) )).replace(",", ".")
                                 filas.append(fila)
                                 filas[0]['misma_fraccion']= False
                                 
