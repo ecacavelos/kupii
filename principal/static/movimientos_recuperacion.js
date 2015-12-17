@@ -68,7 +68,7 @@ function validateRecuperacion() {
 		}
 	});
 	request7.done(function(msg) {
-		top.location.href = "/movimientos/listado_recuperacion";
+		top.location.href = "/lotes/listado_busqueda_lotes/"+global_lote_id+"/";
 	});
 	request7.fail(function(jqXHR, textStatus) {
 		alert("Se encontró un error en la recuperacion, favor verifique los datos");
@@ -102,7 +102,7 @@ function retrieveLote() {
 		// Hacemos un request POST AJAX para obtener los datos del lote ingresado.
 		var request = $.ajax({
 			type : "GET",			
-			url : "/datos/10/",
+			url : base_context+"/datos/10/",
 			data : {
 				fraccion : splitted_id[0],
 				manzana : splitted_id[1],
@@ -120,6 +120,7 @@ function retrieveLote() {
 			$("#lote_superficie").html(sup);
 			$("#lote_superficie").html(String(format.call($("#lote_superficie").html().split(' ').join(''),'.',',')));
 			$("#lote_seleccionado_detalles").html(s);
+			$("#id_fecha_ultimo_pago").html(msg.fecha_ultimo_pago);
 			
 			lote_id = msg.lote_id;
 			var d = new Date();

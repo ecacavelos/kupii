@@ -221,6 +221,13 @@ def retrieve_lote_recuperacion(request):
             response_data['precio_contado'] = r[0].precio_contado
             response_data['precio_credito'] = r[0].precio_credito
             
+            ultima_venta = Venta.objects.filter(lote_id = r[0].id ).latest('fecha_de_venta')
+            try:
+                ultimo_pago = PagoDeCuotas.objects.filter(venta_id = ultima_venta.id).latest('fecha_de_pago')
+                response_data['fecha_ultimo_pago'] = ultimo_pago.fecha_de_pago.strftime("%d/%m/%Y")
+            except:
+                response_data['fecha_ultimo_pago'] = ultima_venta.fecha_de_venta.strftime("%d/%m/%Y")
+            
             return HttpResponse(json.dumps(response_data), content_type="application/json")
         else:
             return HttpResponseServerError("No se encontraron lotes.")

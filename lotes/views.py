@@ -116,6 +116,26 @@ def detalle_lote(request, lote_id):
             loggear_accion(request.user, "Borrar lote("+codigo_lote+")", "Factura", id_objeto, codigo_lote)
             
             return HttpResponseRedirect('/lotes/listado')
+        
+        elif data.get('boton_guardar_a_recuperacion'):
+            form = LoteForm(data, instance=object_list)
+            data['nro_lote'] = int(data['nro_lote'])    
+            data['precio_contado'] = int(data['precio_contado'].replace(".", "")) 
+            data['precio_credito'] = int(data['precio_credito'].replace(".", ""))
+            data['precio_costo'] = int(data['precio_costo'].replace(".", ""))
+            if form.is_valid():
+                message = "Se actualizaron los datos."
+                message_id = "message-success"
+                form.save(commit=False)
+                
+                #Se loggea la accion del usuario
+                id_objeto = form.instance.id
+                codigo_lote = form.instance.codigo_paralot
+                loggear_accion(request.user, "Actualizar", "Lote", id_objeto, codigo_lote)
+                
+                object_list.save()
+            
+            return HttpResponseRedirect('/movimientos/recuperacion_lotes/')
     else:
         form = LoteForm(instance=object_list)
     
