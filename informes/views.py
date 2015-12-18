@@ -777,7 +777,7 @@ def liquidacion_propietarios(request):
                                                 # Se setean los datos de cada fila
                                                 fila={}
                                                 fila['misma_fraccion'] = True
-                                                fila['fraccion']=unicode(fraccion)
+                                                fila['fraccion']=unicode(venta.lote.manzana.fraccion)
                                                 fila['fecha_de_pago']= fecha_pago
                                                 fila['lote']=unicode(venta.lote)
                                                 fila['cliente']=unicode(venta.cliente)
@@ -816,7 +816,7 @@ def liquidacion_propietarios(request):
                                                 # Se setean los datos de cada fila
                                                 fila={}
                                                 fila['misma_fraccion'] = True
-                                                fila['fraccion']=unicode(fraccion)
+                                                fila['fraccion']=unicode(venta.lote.manzana.fraccion)
                                                 fila['fecha_de_pago']= fecha_pago
                                                 fila['lote']=unicode(venta.lote)
                                                 fila['cliente']=unicode(venta.cliente)
