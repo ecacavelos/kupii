@@ -25,9 +25,13 @@ function calcular_total_a_cobrar(){
 	$("#impuesto_renta").val(impuesto_renta);
 	$("#iva_comision").html(iva_comision);
 	$("#monto_otros_descuentos").val(monto_otros_descuentos);
-	$("#total_a_cobrar").val(total_general_propietario-(ley+impuesto_renta+iva_comision+monto_otros_descuentos));
+	resta = total_general_propietario-(ley+impuesto_renta+iva_comision+monto_otros_descuentos);
 	
-	ponerPuntos();
+	var negativo = false;
+	if (resta <0){
+		negativo = true;
+	}
+	ponerPuntos(negativo, resta);
 }
 
 function sacarPuntos(numero){
@@ -41,12 +45,27 @@ function sacarPuntos(numero){
 	return (numero);
 }
 
-function ponerPuntos(){
+function ponerPuntos(negativo, resta){
 	$("#ley").mask('###.###.###',{reverse: true});
 	$("#impuesto_renta").mask('###.###.###',{reverse: true});
 	$("#monto_otros_descuentos").mask('###.###.###',{reverse: true});
 	$("#iva_comision").mask('###.###.###',{reverse: true});
+	valor = Math.abs(resta);
+	$("#total_a_cobrar").html("");
+	$("#total_a_cobrar").unmask();
+	$("#total_a_cobrar").html(valor);
 	$("#total_a_cobrar").mask('###.###.###',{reverse: true});
+	
+	if (negativo){
+		total = "-"+$("#total_a_cobrar").html();
+		$("#total_a_cobrar").unmask('###.###.###',{reverse: true});
+		$("#total_a_cobrar").html(total);
+	} else {
+		total = $("#total_a_cobrar").html();
+		$("#total_a_cobrar").unmask('###.###.###',{reverse: true});
+		$("#total_a_cobrar").html(total);
+	}
+	
 }
 
 function validar() {
