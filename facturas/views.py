@@ -366,7 +366,8 @@ def detalle_factura(request, factura_id):
                 codigo_lote = ''
                 loggear_accion(request.user, "Anular factura("+numero_factura+")", "Factura", id_objeto, codigo_lote)
                 message = "Factura Anulada."
-                return HttpResponseRedirect('/facturacion/listado')
+                #return HttpResponseRedirect('/facturacion/listado')
+                return HttpResponseRedirect(reverse('frontend_listado_facturas'))
         else:
             form = FacturaForm(instance=factura)
     

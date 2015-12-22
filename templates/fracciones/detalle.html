@@ -142,7 +142,7 @@
 		<div id="{{message_id}}">{{ message }}</div>
 	
 	<table width="50%" border="1" cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
-	<form action="/fracciones/listado/{{ fraccion.id }}/" method="post" id="form_mod_fraccion">
+	<form action="" method="post" id="form_mod_fraccion">
 		{% csrf_token %}
 		{% for hidden in form.hidden_fields %}
 			{{ hidden }}

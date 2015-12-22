@@ -115,7 +115,8 @@ def detalle_lote(request, lote_id):
             id_objeto = lote_id
             loggear_accion(request.user, "Borrar lote("+codigo_lote+")", "Factura", id_objeto, codigo_lote)
             
-            return HttpResponseRedirect('/lotes/listado')
+            #return HttpResponseRedirect('/lotes/listado')
+            return HttpResponseRedirect(reverse('frontend_listado_lotes'))
         
         elif data.get('boton_guardar_a_recuperacion'):
             form = LoteForm(data, instance=object_list)
@@ -135,7 +136,8 @@ def detalle_lote(request, lote_id):
                 
                 object_list.save()
             
-            return HttpResponseRedirect('/movimientos/recuperacion_lotes/')
+            #return HttpResponseRedirect('/movimientos/recuperacion_lotes/')
+            return HttpResponseRedirect(reverse('frontend_recuperacion_lotes'))
     else:
         form = LoteForm(instance=object_list)
     
@@ -206,7 +208,8 @@ def agregar_lotes(request):
             #codigo_lote = 'lalala'
             # Redireccionamos al listado de lotes luego de agregar el nuevo lote.
             loggear_accion(request.user, "Agregar", "Lote", id_objeto, codigo_lote)
-            return HttpResponseRedirect('/lotes/listado')
+            #return HttpResponseRedirect('/lotes/listado')
+            return HttpResponseRedirect(reverse('frontend_listado_lotes'))
         else:
             form = LoteForm()
             form2 = FraccionManzana()

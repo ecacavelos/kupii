@@ -6,6 +6,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.urlresolvers import reverse, resolve
 from principal.common_functions import verificar_permisos, loggear_accion
 from principal import permisos
+from propar01 import settings
 #from django.views.generic.list_detail import object_list
 
 
@@ -125,13 +126,13 @@ def detalle_propietario(request, propietario_id):
             c = Propietario.objects.get(pk=propietario_id)
             c.delete()
             nombre_propietario = c.nombres +" "+ c.apellidos
-            c.delete()
+            
             #Se loggea la accion del usuario
-            id_objeto = cliente_id
+            id_objeto = propietario_id
             codigo_lote = ''
             loggear_accion(request.user, "Borrar propietario ("+nombre_propietario+")", "Propietario", id_objeto, codigo_lote)
-            
-            return HttpResponseRedirect('/propietarios/listado')
+            return HttpResponseRedirect(reverse('frontend_listado_propietarios'))
+            #return HttpResponseRedirect(settings.URL_PREFIX +'/propietarios/listado/')
     else:
         form = PropietarioForm(instance=object_list)
  
@@ -171,7 +172,7 @@ def agregar_propietarios(request):
             loggear_accion(request.user, "Agregar", "Propietario", id_objeto, codigo_lote)
             
             # Redireccionamos al listado de propietarios luego de agregar el nuevo propietario.
-            return HttpResponseRedirect('/propietarios/listado')
+            return HttpResponseRedirect(reverse('frontend_listado_propietarios'))
     else:
         form = PropietarioForm()
 

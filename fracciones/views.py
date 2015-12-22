@@ -79,7 +79,7 @@ def detalle_fraccion(request, fraccion_id):
             return HttpResponse(t.render(c))
     else:
         return HttpResponseRedirect(reverse('login'))    
-
+    
     object_list = Fraccion.objects.get(pk=fraccion_id)
     message = ''
 
@@ -128,8 +128,25 @@ def detalle_fraccion(request, fraccion_id):
             codigo_lote = ''
             loggear_accion(request.user, "Borrar", "Fraccion", id_objeto, codigo_lote)
             
-            return HttpResponseRedirect('/fracciones/listado')        
-        
+            #return HttpResponseRedirect('/fracciones/listado')
+            return HttpResponseRedirect(reverse('frontend_listado_fracciones'))
+                
+        else:
+            form = FraccionFormAdd(data, instance=object_list)
+            if form.is_valid():
+                message = "Se actualizaron los datos."
+                data['fecha_aprobacion'] = datetime.datetime.strptime(data['fecha_aprobacion'], "%d/%m/%Y")
+                form.save(commit=False)
+                
+                #Se loggea la accion del usuario
+                id_objeto = form.instance.id
+                codigo_lote = ''
+                loggear_accion(request.user, "Actualizar", "Fraccion", id_objeto, codigo_lote)
+                
+                object_list.save()
+                #return HttpResponseRedirect('/fracciones/listado')
+            else:
+                message = "No se pudo actualizar los datos."
     else:        
         form = FraccionForm(instance=object_list)
                 
@@ -183,7 +200,8 @@ def agregar_fracciones(request):
             # total_manzanas = form.
             # while 
             # Redireccionamos al listado de clientes luego de agregar el nuevo cliente.
-            return HttpResponseRedirect('/fracciones/listado')
+            #return HttpResponseRedirect('/fracciones/listado')
+            return HttpResponseRedirect(reverse('frontend_listado_fracciones'))
     else:
         form = FraccionForm()
 

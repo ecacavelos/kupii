@@ -58,7 +58,8 @@ def agregar_lotes_por_manzana(request):
         if form.is_valid():
             Manzana = form.save()
             
-            return HttpResponseRedirect('/manzanas/listado')
+            #return HttpResponseRedirect('/manzanas/listado')
+            return HttpResponseRedirect(reverse('frontend_listado_manzanas'))
     else:
         form = ManzanaForm()
 
@@ -92,7 +93,8 @@ def detalle_manzana(request, manzana_id):
         elif data.get('boton_borrar'):
             f = Manzana.objects.get(pk=manzana_id)
             f.delete()
-            return HttpResponseRedirect('/manzanas/listado')
+            #return HttpResponseRedirect('/manzanas/listado')
+            return HttpResponseRedirect(reverse('frontend_listado_manzanas'))
     else:        
         form = ManzanaForm(instance=object_list)
                  

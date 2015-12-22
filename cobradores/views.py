@@ -52,7 +52,8 @@ def detalle_cobrador(request, cobrador_id):
             codigo_lote = ''
             loggear_accion(request.user, "Borrar cobrador("+nombre_cobrador+")", "Cobrador", id_objeto, codigo_lote)
             
-            return HttpResponseRedirect('/cobradores/listado')
+            #return HttpResponseRedirect('/cobradores/listado')
+            return HttpResponseRedirect(reverse('frontend_listado_cobradores'))
     else:
         form = CobradorForm(instance=object_list)
     
@@ -79,7 +80,8 @@ def agregar_cobradores(request):
             
             
             # Redireccionamos al listado de cobradores luego de agregar el nuevo cobrador.
-            return HttpResponseRedirect('/cobradores/listado')
+            #return HttpResponseRedirect('/cobradores/listado')
+            return HttpResponseRedirect(reverse('frontend_listado_cobradores'))
     else:
         form = CobradorForm()
 

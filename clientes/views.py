@@ -6,6 +6,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.urlresolvers import reverse, resolve
 from principal.common_functions import *
 from principal import permisos
+from propar01 import settings
 #from django.views.generic.list_detail import object_list
 
 # Funcion principal del modulo de clientes.
@@ -147,7 +148,8 @@ def detalle_cliente(request, cliente_id):
             id_objeto = cliente_id
             codigo_lote = ''
             loggear_accion(request.user, "Borrar cliente ("+nombre_cliente+")", "Cliente", id_objeto, codigo_lote)
-            return HttpResponseRedirect('/clientes/listado')
+            return HttpResponseRedirect(reverse('frontend_listado_clientes'))
+            #return HttpResponseRedirect(settings.URL_PREFIX +'/clientes/listado')
     else:
         form = ClienteForm(instance=object_list)
 
@@ -188,7 +190,8 @@ def agregar_clientes(request):
             loggear_accion(request.user, "Agregar", "Cliente", id_objeto, codigo_lote)
             
             # Redireccionamos al listado de clientes luego de agregar el nuevo cliente.
-            return HttpResponseRedirect('/clientes/listado')
+            #return HttpResponseRedirect(settings.URL_PREFIX +'/clientes/listado')
+            return HttpResponseRedirect(reverse('frontend_listado_clientes'))
     else:
         form = ClienteForm()
 

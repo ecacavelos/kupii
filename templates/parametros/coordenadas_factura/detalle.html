@@ -196,7 +196,7 @@ $(document).ready(function() {
 		<div id="{{message_id}}">{{ message }}</div>
 	
 	<table width="50%" border="1" cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
-	<form action="/parametros/coordenadas_factura/listado/{{ coordenadas_factura.id }}/" method="post" onsubmit="_validar();">
+	<form action="" method="post" onsubmit="_validar();">
 		{% csrf_token %}
 		{% for field in form %}
 		<tr>
