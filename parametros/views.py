@@ -721,7 +721,7 @@ def detalle_concepto_factura(request, concepto_factura_id):
             loggear_accion(request.user, "Borrar Concepto("+nombre_concepto+")", "Concepto factura", id_objeto, codigo_lote)
             
             #return HttpResponseRedirect('/parametros/concepto_factura/listado')
-            return HttpResponseRedirect(reverse('frontend_concepto_factura_listado')
+            return HttpResponseRedirect(reverse('frontend_concepto_factura_listado'))
             
     else:
         form = ConceptoFacturaForm(instance=object_list)
@@ -782,7 +782,7 @@ def detalle_coordenadas_factura(request, coordenadas_factura_id):
             loggear_accion(request.user, "Borrar Coordenadas("+nombre_usuario+")", "Coordenadas factura", id_objeto, codigo_lote)
             
             #return HttpResponseRedirect('/parametros/coordenadas_factura/listado')
-            return HttpResponseRedirect(reverse('frontend_coorndenadas_factura_listado')
+            return HttpResponseRedirect(reverse('frontend_coorndenadas_factura_listado'))
     else:
         form = CoordenadasFacturaForm(instance=object_list)
 
@@ -1116,7 +1116,7 @@ def agregar_rango_factura(request, timbrado_id):
             timbradoRangoFacturaUsuario.usuario = User.objects.get(id=form.data['usuario'])
             timbradoRangoFacturaUsuario.save()
             # Redireccionamos al listado de planes de pago luego de agregar el nuevo plan.
-            return HttpResponseRedirect(settings.URL_PREFIX'/parametros/timbrado/listado/'+unicode(timbrado_id)+'/rango_factura/listado')
+            return HttpResponseRedirect(settings.URL_PREFIX+'/parametros/timbrado/listado/'+unicode(timbrado_id)+'/rango_factura/listado')
     else:
         form = RangoFacturaForm()
 
