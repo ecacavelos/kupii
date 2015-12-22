@@ -95,7 +95,8 @@ def detalle_vendedor(request, vendedor_id):
         elif data.get('boton_borrar'):
             f = Vendedor.objects.get(pk=vendedor_id)
             f.delete()
-            return HttpResponseRedirect('/vendedores/listado')
+            #return HttpResponseRedirect('/vendedores/listado')
+            return HttpResponseRedirect(reverse('frontend_listado_vendedores'))
     else:
         form = VendedorForm(instance=object_list)
 
@@ -130,7 +131,8 @@ def agregar_vendedores(request):
         if form.is_valid():
             form.save()
             # Redireccionamos al listado de lotes luego de agregar el nuevo lote.
-            return HttpResponseRedirect('/vendedores/listado')
+            #return HttpResponseRedirect('/vendedores/listado')
+            return HttpResponseRedirect(reverse('frontend_listado_lotes'))
     else:
         form = VendedorForm()
 

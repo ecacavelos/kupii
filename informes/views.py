@@ -242,7 +242,9 @@ def listar_clientes_atrasados(request):
             })
             return HttpResponse(t.render(c))
     else:
-        return HttpResponseRedirect("/informes/clientes_atrasados") 
+        #return HttpResponseRedirect("/informes/clientes_atrasados")
+        return HttpResponseRedirect(reverse('frontend_clientes_atrasados'))
+         
 
 def clientes_atrasados(request):
     if request.method == 'GET':

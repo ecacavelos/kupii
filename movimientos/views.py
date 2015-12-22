@@ -1938,7 +1938,8 @@ def agregar_pago(request, id):
                     loggear_accion(request.user, "Agregar", "Pago de cuota", id_objeto, codigo_lote)
                     
                     codigo_lote = codigo_lote.replace("/","%2F")
-                    return HttpResponseRedirect('/informes/informe_ventas/?busqueda='+unicode(venta.lote.id)+'&busqueda_label='+unicode(codigo_lote))
+                    #return HttpResponseRedirect('/informes/informe_ventas/?busqueda='+unicode(venta.lote.id)+'&busqueda_label='+unicode(codigo_lote))
+                    return HttpResponseRedirect(reverse('frontend_informe_ventas')+'?busqueda='+unicode(venta.lote.id)+'&busqueda_label='+unicode(codigo_lote))
                 except Exception, error:
                     print error
                     pass
