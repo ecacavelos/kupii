@@ -662,7 +662,7 @@ def detalle_timbrado(request, timbrado_id):
             loggear_accion(request.user, "Borrar timbrado("+numero_timbrado+")", "Timbrado", id_objeto, codigo_lote)
             
             #return HttpResponseRedirect('/parametros/timbrado/listado')
-            return HttpResponseRedirect(reverse('frontend_timbrado_listado')
+            return HttpResponseRedirect(reverse('frontend_timbrado_listado'))
     else:
         form = TimbradoForm(instance=object_list)
 
