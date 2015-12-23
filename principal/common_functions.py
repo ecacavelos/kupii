@@ -949,6 +949,7 @@ def crear_pdf_factura(nueva_factura, request, manzana, lote_id, usuario):
     p.drawString(coor.sub_iva5_1x * cm, float(coor.sub_iva5_1y) * cm, unicode('{:,}'.format(iva5).replace(",", ".")))   
     p.drawString(coor.sub_iva10_1x * cm, float(coor.sub_iva10_1y) * cm, unicode('{:,}'.format(iva10).replace(",", ".")))
     pos_y -= 0.5
+    p.drawString(coor.total_a_pagar_exentas_iva5_1x * cm, float(coor.total_a_pagar_exentas_iva5_1y) * cm, unicode('{:,}'.format(exentas+iva5).replace(",", ".")))
     p.drawString(coor.total_venta_1x * cm, float(coor.total_venta_1y) * cm, unicode('{:,}'.format(total_venta).replace(",", ".")))
     pos_y -= 1.5
     numalet = num2words(int(total_venta), lang='es')
@@ -1031,6 +1032,7 @@ def crear_pdf_factura(nueva_factura, request, manzana, lote_id, usuario):
     p.drawString(coor.sub_iva5_2x * cm, float(coor.sub_iva5_2y) * cm, unicode('{:,}'.format(iva5).replace(",", ".")))   
     p.drawString(coor.sub_iva10_2x * cm, float(coor.sub_iva10_2y) * cm, unicode('{:,}'.format(iva10).replace(",", ".")))
     pos_y -= 0.5
+    p.drawString(coor.total_a_pagar_exentas_iva5_2x * cm, float(coor.total_a_pagar_exentas_iva5_2y) * cm, unicode('{:,}'.format(exentas+iva5).replace(",", ".")))
     p.drawString(coor.total_venta_2x * cm, float(coor.total_venta_2y) * cm, unicode('{:,}'.format(total_venta).replace(",", ".")))
     pos_y -= 1.5
     numalet = num2words(int(total_venta), lang='es')

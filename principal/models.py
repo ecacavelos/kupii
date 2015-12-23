@@ -489,6 +489,9 @@ class CoordenadasFactura(models.Model):
     #Total a pagar letras
     total_a_pagar_letra_1x = models.FloatField()
     total_a_pagar_letra_1y = models.FloatField()
+    #Total a pagar exentas iva5
+    total_a_pagar_exentas_iva5_1x = models.FloatField()
+    total_a_pagar_exentas_iva5_1y = models.FloatField()
     #Total a pagar numero
     total_a_pagar_num_1x = models.FloatField()
     total_a_pagar_num_1y = models.FloatField()
@@ -578,6 +581,9 @@ class CoordenadasFactura(models.Model):
     #Total a pagar letras
     total_a_pagar_letra_2x = models.FloatField()
     total_a_pagar_letra_2y = models.FloatField()
+    #Total a pagar exentas iva5
+    total_a_pagar_exentas_iva5_2x = models.FloatField()
+    total_a_pagar_exentas_iva5_2y = models.FloatField()
     #Total a pagar numero
     total_a_pagar_num_2x = models.FloatField()
     total_a_pagar_num_2y = models.FloatField()
