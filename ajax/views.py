@@ -557,16 +557,19 @@ def get_detalles_factura(request):
                     if pago.detalle != None:
                         detalle = ast.literal_eval(pago.detalle)
                         for y in xrange(0, len(detalle)):
-                            interes_moratorio += int(detalle['item' + str(cantidad)]['intereses'])
-                            if detalle['item' + str(cantidad)]['nro_cuota'] == (x+1):
-                                if gestion_procesada == False and ultimo_pago == pago.id :
-                                    try:
-                                        suma_gestion += detalle['item' + str(len(detalle) -1)]['gestion_cobranza']
-                                        gestion_procesada = True
-                                    except Exception, error:
-                                        print "No tiene gestion de cobranza"
-                                cantidad +=1
-                                break
+                            try:
+                                interes_moratorio += int(detalle['item' + str(cantidad)]['intereses'])
+                                if detalle['item' + str(cantidad)]['nro_cuota'] == (x+1):
+                                    if gestion_procesada == False and ultimo_pago == pago.id :
+                                        try:
+                                            suma_gestion += detalle['item' + str(len(detalle) -1)]['gestion_cobranza']
+                                            gestion_procesada = True
+                                        except Exception, error:
+                                            print "No tiene gestion de cobranza"
+                                    cantidad +=1
+                                    break
+                            except Exception, error:
+                                print error
                            
                                 
                     
