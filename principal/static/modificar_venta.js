@@ -17,6 +17,8 @@ $(document).ready(function() {
 		autocompleteVendedorNombre('id_name_vendedor', 'id_vendedor');
 	// 3. Se setea el autocomplete para buscar plan de pago
 		autocompletePlandePago('id_name_ppago', 'id_plan_de_pago');
+	// 4. Se setea el autocomplete para buscar plan de pago vendedor
+		autocompletePlandePagoVendedor('id_name_ppago_vendedor', 'id_plan_de_pago_vendedor');
 	//Cambiar calendario a español
 	$.datepicker.regional['es'] = {
 		closeText : 'Cerrar',
@@ -188,6 +190,40 @@ function autocompletePlandePago(input_id,  id_plandepago_input_id){
 			planpago_id = ui.item.id;
 			$(input_id).val(ui.item.nombre_del_plan);
 			$(id_plandepago_input_id).val(planpago_id);
+			$(this).trigger('change'); 
+    		return false; 
+		}
+	});
+}
+
+/*
+ * AUTOCOMPLETE para Plan de Pago Vendedor
+ * Busca por el nombre del plan de pago
+ * parametros: 
+ * 1. id del input 
+ * 2. id del input donde se coloca el nombre del plan de pago
+ * */
+function autocompletePlandePagoVendedor(input_id,  id_plandepago_vendedor_input_id){
+	
+	input_id = '#' + input_id;
+	id_plandepago_vendedor_input_id = '#' + id_plandepago_vendedor_input_id;
+	var planpago_vendedor_id;
+	$(input_id).empty();		
+	base_url = base_context + "/ajax/get_plan_pago_vendedor/";
+	params = "value";
+	$(input_id).autocomplete({
+		source : base_url,
+		minLength : 1,
+		create : function(){
+			$(this).data('ui-autocomplete')._renderItem = function(ul,item){
+				return $('<li>').append('<a>'+ item.nombre +'</a>').appendTo(ul);
+				};
+		},
+		select : function(event, ui) {
+			alert("Al modificar el plan de pago esto modificara a todos los pagos relacionados a la venta");
+			planpago_vendedor_id = ui.item.id;
+			$(input_id).val(ui.item.nombre);
+			$(id_plandepago_input_id).val(planpago_vendedor_id);
 			$(this).trigger('change'); 
     		return false; 
 		}

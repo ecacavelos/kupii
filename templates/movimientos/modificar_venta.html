@@ -73,6 +73,13 @@
 					</td>
 				</tr>
 				<tr>
+					<td><label for="plan">Plan de Pago Vendedor: </label></td>
+					<td class="noimage">
+						<input id="id_plan_de_pago_vendedor" type="hidden" name="plan_de_pago_vendedor"  maxlength="100" value="{{venta.plan_de_pago_vendedor.id}}"/>
+						<input id="id_name_ppago_vendedor" type="text" name="name_ppago_vendedor" value="{{venta.plan_de_pago_vendedor.nombre}}"  maxlength="10"/>
+					</td>
+				</tr>
+				<tr>
 					<td><label for="pagos_realizados">Pagos_realizados: </label></td>
 					<td class="noimage">
 						<input id="pagos_realizados" type="text" name="pagos_realizados" maxlength="10" value="{{venta.pagos_realizados}}"/>

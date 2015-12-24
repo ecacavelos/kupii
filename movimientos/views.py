@@ -2016,6 +2016,8 @@ def modificar_venta(request, id):
                 cliente = Cliente.objects.get(pk=int(id_cliente))
                 id_plandepago = data.get('plan_de_pago', '')
                 plandepago = PlanDePago.objects.get(pk=int(id_plandepago))
+                id_plandepago_vendedor = data.get('plan_de_pago_vendedor', '')
+                plandepago_vendedor = PlanDePagoVendedor.objects.get(pk=int(id_plandepago_vendedor))
                 id_vendedor = data.get('vendedor', '')
                 vendedor = Vendedor.objects.get(pk=int(id_vendedor))
                 pagos_realizados = data.get('pagos_realizados', '')
@@ -2039,6 +2041,7 @@ def modificar_venta(request, id):
                     venta.precio_final_de_venta = int(precio_final_venta)
                     venta.pagos_realizados = int(pagos_realizados)
                     venta.plan_de_pago = plandepago
+                    venta.plan_de_pago_vendedor = plandepago_vendedor
                     venta.cliente = cliente
                     venta.vendedor = vendedor
                     venta.recuperado = recuperado
@@ -2054,6 +2057,7 @@ def modificar_venta(request, id):
                         pago.plan_de_pago = venta.plan_de_pago
                         pago.vendedor = venta.vendedor
                         pago.cliente = venta.cliente
+                        pago.plan_de_pago_vendedor = venta.plan_de_pago_vendedor
                         pago.save()
                 except Exception, error:
                     print error
