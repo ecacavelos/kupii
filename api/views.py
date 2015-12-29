@@ -29,8 +29,10 @@ import pytz
 # data = serializers.serialize('xml', all_objects)
 #data = serializers.serialize('json', list(objectQuerySet), fields=('fileName','id'))
 @require_http_methods(["GET"])
-def consulta(request, cedula):  
+def consulta(request, codigo_consulta):  
     codigo_base_error_consulta  = 'c'
+    #tipo_consulta = 'cliente'
+    tipo_consulta = 'codigo_lote'
     error = {}    
     if request.method == 'GET':
                                
@@ -46,61 +48,123 @@ def consulta(request, cedula):
                     if user.is_active:
                         
                             print("User is valid, active and authenticated")
-                            print("cedula de identidad ->" + cedula)
-                            #2. Se obtiene cliente
-                            cliente = Cliente.objects.get(cedula = cedula)
-                            if not cliente:                           
-                                error_msg = 'Cliente no encontrado'     
-                                print error_msg
-                                error['codigo'] = codigo_base_error_consulta + '31'
-                                error['mensaje'] = error_msg
-                                return HttpResponse(json.dumps(error),status=404, content_type="application/json")                        
-                            else:
-#                                 cliente_serialized = serializers.serialize('python', cliente)
-                                #2. Se obtienen las ventas de dicho cliente
-                                ventas_list = Venta.objects.filter(cliente = cliente)                                
-                                if not ventas_list:
-                                    error_msg = 'Cliente no tiene compras actuales'
+                            
+                            
+                            if tipo_consulta == 'cliente':
+                                print("cedula de identidad ->" + codigo_consulta)
+                                #2. Se obtiene cliente
+                                cliente = Cliente.objects.get(cedula = cedula)
+                                if not cliente:                           
+                                    error_msg = 'Cliente no encontrado'     
                                     print error_msg
-                                    error['codigo'] = codigo_base_error_consulta + '32'
-                                    error['mensaje'] = error_msg                                    
-                                    return HttpResponse(json.dumps(error),status=404, content_type="application/json")                                                            
-                                else:                                    
-                                    items = [] # Aqui se almacena la lista de ventas disponibles para el pago.
-                                    respuesta = []
-                                    transaccion = Transaccion()
-                                    transaccion.estado = 'Consultado'
-                                    transaccion.cliente = cliente
-                                    transaccion.save()
-                                    #mas abajo se loggea
-                                    
-                                    cabecera = {'id_transaccion': transaccion.pk, 'codigo' : '100'}             
-                                    respuesta.append(cabecera)
-                                    for venta in ventas_list:
-                                        #3. Por cada venta se va generando la informacion necesaria para cada venta que requiere pago.
-                                        item = {}
-                                        lote = Lote.objects.filter(id = venta.lote_id)
-                                        lote_serialized = serializers.serialize('python', lote)                                        
-                                        detalle_cuotas = get_cuotas_detail_by_lote(unicode(lote_serialized[0]['pk']))
-                                        cuota_detalle = get_cuota_information_by_lote(unicode(lote_serialized[0]['pk']),1)
-                                        item['codigo_lote'] = lote_serialized[0]['fields']['codigo_paralot']
-                                        item['cuotas_pagadas'] = detalle_cuotas['cant_cuotas_pagadas']
-                                        item['total_cuotas'] = detalle_cuotas['cantidad_total_cuotas']                                        
-                                        item['numero_cuota_a_pagar'] = cuota_detalle[0]['nro_cuota'].split('/')[0]                    
-                                        item['fecha_vencimiento'] = detalle_cuotas['proximo_vencimiento']
-                                        hoy = date.today()
-                                        cuotas_a_pagar_detalle = obtener_cuotas_a_pagar(venta,hoy,detalle_cuotas)
-#                                         cuotas_a_pagar_detalle = obtener_cuotas_a_pagar(venta,date(2015,4,12),detalle_cuotas)                                        
-                                        item['detalle_cuotas'] = cuotas_a_pagar_detalle 
-                                        items.append(item)
-                                    respuesta.append(items)
-                                    
-                                    #Se loguea la accion en el log de usuarios
-                                    id_objeto = transaccion.id
-                                    # codigo_lote = lote.codigo_paralot
-                                    # loggear_accion(request.user, "Agregar", "Transaccion", id_objeto)
-                                    
-                                    return HttpResponse(json.dumps(respuesta), content_type="application/json")
+                                    error['codigo'] = codigo_base_error_consulta + '31'
+                                    error['mensaje'] = error_msg
+                                    return HttpResponse(json.dumps(error),status=404, content_type="application/json")                        
+                                else:
+    #                                 cliente_serialized = serializers.serialize('python', cliente)
+                                    #2. Se obtienen las ventas de dicho cliente
+                                    ventas_list = Venta.objects.filter(cliente = cliente, lote__estado=3)                                
+                                    if not ventas_list:
+                                        error_msg = 'Cliente no tiene compras actuales'
+                                        print error_msg
+                                        error['codigo'] = codigo_base_error_consulta + '32'
+                                        error['mensaje'] = error_msg                                    
+                                        return HttpResponse(json.dumps(error),status=404, content_type="application/json")                                                            
+                                    else:                                    
+                                        items = [] # Aqui se almacena la lista de ventas disponibles para el pago.
+                                        respuesta = []
+                                        transaccion = Transaccion()
+                                        transaccion.estado = 'Consultado'
+                                        transaccion.cliente = cliente
+                                        transaccion.save()
+                                        #mas abajo se loggea
+                                        
+                                        cabecera = {'id_transaccion': transaccion.pk, 'codigo' : '100'}             
+                                        respuesta.append(cabecera)
+                                        for venta in ventas_list:
+                                            #3. Por cada venta se va generando la informacion necesaria para cada venta que requiere pago.
+                                            item = {}
+                                            lote = Lote.objects.filter(id = venta.lote_id)
+                                            lote_serialized = serializers.serialize('python', lote)                                        
+                                            detalle_cuotas = get_cuotas_detail_by_lote(unicode(lote_serialized[0]['pk']))
+                                            cuota_detalle = get_cuota_information_by_lote(unicode(lote_serialized[0]['pk']),1)
+                                            item['codigo_lote'] = lote_serialized[0]['fields']['codigo_paralot']
+                                            item['cuotas_pagadas'] = detalle_cuotas['cant_cuotas_pagadas']
+                                            item['total_cuotas'] = detalle_cuotas['cantidad_total_cuotas']                                        
+                                            item['numero_cuota_a_pagar'] = cuota_detalle[0]['nro_cuota'].split('/')[0]                    
+                                            item['fecha_vencimiento'] = detalle_cuotas['proximo_vencimiento']
+                                            hoy = date.today()
+                                            cuotas_a_pagar_detalle = obtener_cuotas_a_pagar(venta,hoy,detalle_cuotas)
+    #                                         cuotas_a_pagar_detalle = obtener_cuotas_a_pagar(venta,date(2015,4,12),detalle_cuotas)                                        
+                                            item['detalle_cuotas'] = cuotas_a_pagar_detalle 
+                                            items.append(item)
+                                        respuesta.append(items)
+                                        
+                                        #Se loguea la accion en el log de usuarios
+                                        id_objeto = transaccion.id
+                                        # codigo_lote = lote.codigo_paralot
+                                        # loggear_accion(request.user, "Agregar", "Transaccion", id_objeto)
+                                        
+                                        return HttpResponse(json.dumps(respuesta), content_type="application/json")
+                            elif tipo_consulta == 'codigo_lote':
+                                codigo_consulta= codigo_consulta.replace("-", "/")
+                                print("codigo de lote ->" + codigo_consulta)
+                                #2. Se obtiene el lote
+                                lote = Lote.objects.get(codigo_paralot = codigo_consulta)
+                                if not lote:                           
+                                    error_msg = 'Lote no encontrado'     
+                                    print error_msg
+                                    error['codigo'] = codigo_base_error_consulta + '31'
+                                    error['mensaje'] = error_msg
+                                    return HttpResponse(json.dumps(error),status=404, content_type="application/json")                        
+                                else:
+    #                                 cliente_serialized = serializers.serialize('python', cliente)
+                                    #2. Se obtienen las ventas de dicho lote
+                                    ventas_list = Venta.objects.filter(Q(lote = lote, recuperado=None) | Q(lote = lote, recuperado=False) )                                
+                                    if not ventas_list:
+                                        error_msg = 'Lote no tiene ventas actuales'
+                                        print error_msg
+                                        error['codigo'] = codigo_base_error_consulta + '32'
+                                        error['mensaje'] = error_msg                                    
+                                        return HttpResponse(json.dumps(error),status=404, content_type="application/json")                                                            
+                                    else:                                    
+                                        items = [] # Aqui se almacena la lista de ventas disponibles para el pago.
+                                        respuesta = []
+                                        transaccion = Transaccion()
+                                        transaccion.estado = 'Consultado'
+                                        transaccion.cliente = ventas_list[0].cliente
+                                        transaccion.save()
+                                        #mas abajo se loggea
+                                        
+                                        cabecera = {'id_transaccion': transaccion.pk, 'codigo' : '100'}             
+                                        respuesta.append(cabecera)
+                                        for venta in ventas_list:
+                                            #3. Por cada venta se va generando la informacion necesaria para cada venta que requiere pago.
+                                            item = {}
+                                            lote = Lote.objects.filter(id = venta.lote_id)
+                                            lote_serialized = serializers.serialize('python', lote)                                        
+                                            detalle_cuotas = get_cuotas_detail_by_lote(unicode(lote_serialized[0]['pk']))
+                                            cuota_detalle = get_cuota_information_by_lote(unicode(lote_serialized[0]['pk']),1)
+                                            item['codigo_lote'] = lote_serialized[0]['fields']['codigo_paralot']
+                                            item['cuotas_pagadas'] = detalle_cuotas['cant_cuotas_pagadas']
+                                            item['total_cuotas'] = detalle_cuotas['cantidad_total_cuotas']                                        
+                                            item['numero_cuota_a_pagar'] = cuota_detalle[0]['nro_cuota'].split('/')[0]                    
+                                            item['fecha_vencimiento'] = detalle_cuotas['proximo_vencimiento']
+                                            hoy = date.today()
+                                            cuotas_a_pagar_detalle = obtener_cuotas_a_pagar(venta,hoy,detalle_cuotas)
+    #                                         cuotas_a_pagar_detalle = obtener_cuotas_a_pagar(venta,date(2015,4,12),detalle_cuotas)                                        
+                                            item['detalle_cuotas'] = cuotas_a_pagar_detalle 
+                                            items.append(item)
+                                        respuesta.append(items)
+                                        
+                                        #Se loguea la accion en el log de usuarios
+                                        id_objeto = transaccion.id
+                                        # codigo_lote = lote.codigo_paralot
+                                        # loggear_accion(request.user, "Agregar", "Transaccion", id_objeto)
+                                        
+                                        return HttpResponse(json.dumps(respuesta), content_type="application/json")
+                                
+                                
                     else:
                         error_msg = 'Cuenta deshabilitada'     
                         print error_msg

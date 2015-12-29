@@ -417,18 +417,28 @@ def obtener_cuotas_a_pagar(venta,fecha_pago,resumen_cuotas_a_pagar):
 
     if (datetime.datetime.strptime(resumen_cuotas_a_pagar['proximo_vencimiento'], "%d/%m/%Y").date() < fecha_pago):
         print 'Hay al menos 1 cuota en mora'
-        intereses = obtener_detalle_interes_lote(venta.lote.id,fecha_pago,datetime.datetime.strptime(resumen_cuotas_a_pagar['proximo_vencimiento'], "%d/%m/%Y").date())
+        try:
+            #Calculamos en base al primer vencimiento, cuantas cuotas debieron haberse pagado hasta la fecha
+            fecha_primer_vencimiento=venta.fecha_primer_vencimiento
+            cantidad_ideal_cuotas=monthdelta(fecha_primer_vencimiento, fecha_pago)
+            #Y obtenemos las cuotas atrasadas
+            cuotas_atrasadas=cantidad_ideal_cuotas-int(resumen_cuotas_a_pagar['cant_cuotas_pagadas'])
+            intereses = obtener_detalle_interes_lote(venta.lote.id,fecha_pago,datetime.datetime.strptime(resumen_cuotas_a_pagar['proximo_vencimiento'], "%d/%m/%Y").date(),cuotas_atrasadas)
+        except Exception, error:
+            print error
         interes_total = 0 
         for interes_item in intereses:
-            interes_total+=interes_item['intereses']
+            if interes_item['tipo'] == 'normal':
+                interes_total+=interes_item['intereses']
         if len(intereses)<=5: # Hasta 5 cuotas
             for interes_item in intereses:
-                cuota = {
-                    'numero_cuota': interes_item['nro_cuota'],
-                    'monto_cuota':venta.precio_de_cuota + interes_total, 
-                    'vencimiento': interes_item['vencimiento'],
-                    'fecha_pago' : fecha_pago.strftime("%d/%m/%Y")
-                    }
+                if interes_item['tipo'] == 'normal':
+                    cuota = {
+                        'numero_cuota': interes_item['nro_cuota'],
+                        'monto_cuota':venta.precio_de_cuota + interes_total, 
+                        'vencimiento': interes_item['vencimiento'],
+                        'fecha_pago' : fecha_pago.strftime("%d/%m/%Y")
+                        }
             
                 lista_cuotas.append(cuota)
             # Ademas de las cuotas con mora se agrega la cuota actual que es posible pagar
