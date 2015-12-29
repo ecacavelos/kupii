@@ -153,7 +153,14 @@ def consulta(request, codigo_consulta):
                                             hoy = date.today()
                                             cuotas_a_pagar_detalle = obtener_cuotas_a_pagar(venta,hoy,detalle_cuotas)
     #                                         cuotas_a_pagar_detalle = obtener_cuotas_a_pagar(venta,date(2015,4,12),detalle_cuotas)                                        
-                                            item['detalle_cuotas'] = cuotas_a_pagar_detalle 
+                                            item['detalle_cuotas'] = cuotas_a_pagar_detalle
+                                            
+                                            fecha_primer_vencimiento=venta.fecha_primer_vencimiento
+                                            cantidad_ideal_cuotas=monthdelta(fecha_primer_vencimiento, hoy)
+                                            #Y obtenemos las cuotas atrasadas
+                                            cuotas_atrasadas=cantidad_ideal_cuotas-int(detalle_cuotas['cant_cuotas_pagadas'])
+                                            
+                                            item['cuotas_atrasadas'] = cuotas_atrasadas 
                                             items.append(item)
                                         respuesta.append(items)
                                         

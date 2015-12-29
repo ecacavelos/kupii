@@ -426,27 +426,37 @@ def obtener_cuotas_a_pagar(venta,fecha_pago,resumen_cuotas_a_pagar):
             intereses = obtener_detalle_interes_lote(venta.lote.id,fecha_pago,datetime.datetime.strptime(resumen_cuotas_a_pagar['proximo_vencimiento'], "%d/%m/%Y").date(),cuotas_atrasadas)
         except Exception, error:
             print error
-        interes_total = 0 
+        interes_total = 0
+        sumatoria_cuotas = 0
+        cantidad_cuotas = 0 
         for interes_item in intereses:
             if interes_item['tipo'] == 'normal':
                 interes_total+=interes_item['intereses']
         if len(intereses)<=5: # Hasta 5 cuotas
             for interes_item in intereses:
                 if interes_item['tipo'] == 'normal':
+                    cantidad_cuotas = cantidad_cuotas+1
+                    sumatoria_cuotas = sumatoria_cuotas + venta.precio_de_cuota + interes_total
                     cuota = {
+                        'cantidad_cuotas': cantidad_cuotas,
                         'numero_cuota': interes_item['nro_cuota'],
                         'monto_cuota':venta.precio_de_cuota + interes_total, 
                         'vencimiento': interes_item['vencimiento'],
-                        'fecha_pago' : fecha_pago.strftime("%d/%m/%Y")
+                        'fecha_pago' : fecha_pago.strftime("%d/%m/%Y"),
+                        'monto_sumatoria_cuotas': sumatoria_cuotas
                         }
             
                 lista_cuotas.append(cuota)
             # Ademas de las cuotas con mora se agrega la cuota actual que es posible pagar
             vencimiento_cuota_acutal = datetime.datetime.strptime(resumen_cuotas_a_pagar['proximo_vencimiento'], "%d/%m/%Y").date() + MonthDelta(len(intereses))
-            cuota = {'numero_cuota': resumen_cuotas_a_pagar['cant_cuotas_pagadas'] + len(intereses) + 1 ,
+            cuota = {
+                 'cantidad_cuotas': cantidad_cuotas+1,
+                 'numero_cuota': resumen_cuotas_a_pagar['cant_cuotas_pagadas'] + len(intereses) + 1 ,
                  'monto_cuota':venta.precio_de_cuota , 
                  'vencimiento': vencimiento_cuota_acutal.strftime("%d/%m/%Y"),
-                 'fecha_pago' : fecha_pago.strftime("%d/%m/%Y")}
+                 'fecha_pago' : fecha_pago.strftime("%d/%m/%Y"),
+                 'monto_sumatoria_cuotas': sumatoria_cuotas+venta.precio_de_cuota
+                 }
             lista_cuotas.append(cuota)
         else:    
             
@@ -457,10 +467,13 @@ def obtener_cuotas_a_pagar(venta,fecha_pago,resumen_cuotas_a_pagar):
             return error
     else:
         print 'Cliente esta al dia, solo debe abonar una cuota'
-        cuota = {'numero_cuota': resumen_cuotas_a_pagar['cant_cuotas_pagadas'] + 1 ,
+        cuota = {'cantidad_cuotas': cantidad_cuotas,
+                 'numero_cuota': resumen_cuotas_a_pagar['cant_cuotas_pagadas'] + 1 ,
                  'monto_cuota':venta.precio_de_cuota , 
                  'vencimiento': resumen_cuotas_a_pagar['proximo_vencimiento'],
-                 'fecha_pago' : fecha_pago.strftime("%d/%m/%Y")}
+                 'fecha_pago' : fecha_pago.strftime("%d/%m/%Y"),
+                 'monto_sumatoria_cuotas': sumatoria_cuotas+venta.precio_de_cuota
+                 }
         lista_cuotas.append(cuota)
         
     return lista_cuotas
