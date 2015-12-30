@@ -205,9 +205,12 @@ def consulta(request, codigo_consulta):
 @require_http_methods(["POST"])
 @csrf_exempt
 def pago(request):  
-    error = {}    
+    error = {}
+    tipo_metodo = 'post'
+    #tipo_metodo = 'json_post'    
     codigo_base_error_pago  = 'p'
-    if request.method == 'POST':                           
+    if request.method == 'POST':
+        if tipo_metodo == 'json_post':
             try:                
                 username = request.GET['username']
                 password = request.GET['password']
@@ -243,7 +246,7 @@ def pago(request):
                                     error['mensaje'] = error_msg
                                     return HttpResponse(json.dumps(error),status=404, content_type="application/json")
                                 else: # Estado valido                                                                        
-                                    if (datetime.now(pytz.utc) - transaccion.created).seconds/60 > 30: #TIMEOUT
+                                    if (datetime.datetime.now(pytz.utc) - transaccion.created).seconds/60 > 30: #TIMEOUT
                                             error_msg = 'Timeout'
                                             print error_msg
                                             error['codigo'] = codigo_base_error_pago + '33'
@@ -303,15 +306,14 @@ def pago(request):
                                                 #Se loggea la accion del usuario
                                                 id_objeto = nuevo_pago.id
                                                 codigo_lote = detalle_pago['codigo_lote']
-                                                loggear_accion(request.user, "Agregar", "Pago de cuota", id_objeto, codigo_lote)
+                                                loggear_accion(user, "Agregar", "Pago de cuota", id_objeto, codigo_lote)
                                                  
                                                 transaccion.estado = 'Pagado'
                                                 transaccion.save()
                                                 
                                                 #Se loggea la accion del usuario
                                                 id_objeto = transaccion.id
-                                                codigo_lote = ''
-                                                loggear_accion(request.user, "Actualizar estado", "Transaccion", id_objeto, codigo_lote)
+                                                loggear_accion(user, "Actualizar estado", "Transaccion", id_objeto, codigo_lote)
                                                       
                                                 respuesta = {}
                                                 respuesta['mensaje'] = 'Operacion Exitosa'
@@ -355,6 +357,155 @@ def pago(request):
                     return HttpResponse(json.dumps(error),status=404, content_type="application/json")
                 error['codigo'] = '00'
                 error['mensaje'] = 'Error en el servidor'                    
+        else:#########################################  P O S T #############################################
+            try:                
+                username = request.GET['username']
+                password = request.GET['password']
+                transaccion_id = request.GET['transaccion_id']
+                print 'Pago para transaccion id: ' + transaccion_id 
+                detalle_pago_post = request.POST
+                print 'POST recibido: ' + unicode(detalle_pago_post)
+                if not detalle_pago_post:
+                    print('Error en los parametros del request')
+                    error['codigo'] =  '12'
+                    error['mensaje'] = 'Request sin datos en el cuerpo'                    
+                    return HttpResponseBadRequest(json.dumps(error), content_type="application/json")
+                else:                
+                    #1. Autenticacion
+                    user = authenticate(username=username, password=password)
+                    if user is not None:
+                        # the password verified for the user
+                        if user.is_active:                        
+                            #2. Se obtiene la transaccion
+                            transaccion = Transaccion.objects.get(Q(id=transaccion_id))
+#                             transaccion_tmstmp = transaccion.created.replace(tzinfo=None)
+                            if not transaccion: 
+                                error_msg = 'Transaccion no encontrada' 
+                                print error_msg
+                                error['codigo'] = codigo_base_error_pago + '31'
+                                error['mensaje'] = error_msg
+                                return HttpResponse(json.dumps(error),status=404, content_type="application/json")                        
+                            else:
+                                if transaccion.estado != 'Consultado':
+                                    error_msg = 'Transaccion con estado invalido' 
+                                    print error_msg
+                                    error['codigo'] = codigo_base_error_pago + '32'
+                                    error['mensaje'] = error_msg
+                                    return HttpResponse(json.dumps(error),status=404, content_type="application/json")
+                                else: # Estado valido                                                                        
+                                    if (datetime.datetime.now(pytz.utc) - transaccion.created).seconds/60 > 30: #TIMEOUT
+                                            error_msg = 'Timeout'
+                                            print error_msg
+                                            error['codigo'] = codigo_base_error_pago + '33'
+                                            error['mensaje'] = error_msg
+                                            if transaccion.estado != 'Pagado':
+                                                transaccion.estado = 'Expirado'
+                                                transaccion.save()
+                                                
+                                                #Se logea la accion del usuario
+                                                id_objeto = transaccion.id
+                                                codigo_lote = ''
+                                                loggear_accion(request.user, "Agregar", "Transaccion", id_objeto, codigo_lote)
+                                                                                                                                   
+                                            return HttpResponse(json.dumps(error),status=404, content_type="application/json")                                       
+                                    else:
+                                        detalle_pago = detalle_pago_post                                        
+                                        lote = Lote.objects.get(codigo_paralot = detalle_pago['codigo_lote'])
+                                        venta = Venta.objects.get(Q(lote=lote),Q(cliente=transaccion.cliente))                                
+                                        detalle_cuotas = get_cuotas_detail_by_lote(unicode(lote.id))
+                                        hoy = date.today()
+                                        cuotas_a_pagar_detalle = obtener_cuotas_a_pagar(venta,hoy,detalle_cuotas)                                
+                                        if not cuotas_a_pagar_detalle:
+                                            error_msg = 'Cuota a pagar no encontrada' 
+                                            print error_msg
+                                            error['codigo'] = codigo_base_error_pago + '34'
+                                            error['mensaje'] = error_msg                                            
+                                            return HttpResponse(json.dumps(error),status=404, content_type="application/json")
+                                        else:    
+                                            if unicode(detalle_pago['cantidad_cuotas']).isdigit() != True:
+                                                error_msg = 'Numero de cuotas a pagar incorrecta.' 
+                                                print error_msg
+                                                error['codigo'] = codigo_base_error_pago + '35'
+                                                error['mensaje'] = error_msg
+                                                return HttpResponse(json.dumps(error),status=404, content_type="application/json")
+                                            elif unicode(detalle_pago['monto_total']).isdigit() != True:
+                                                error_msg = 'Monto total a pagar incorrecto.'
+                                                print error_msg
+                                                error['codigo'] = codigo_base_error_pago + '44'
+                                                error['mensaje'] = error_msg
+                                                return HttpResponse(json.dumps(error),status=404, content_type="application/json")   
+                                            else: # Parametros totalmente correctos, emitir el pago
+                                             
+                                                nuevo_pago = PagoDeCuotas()
+                                                nuevo_pago.venta = venta
+                                                nuevo_pago.lote = lote
+                                                nuevo_pago.transaccion = transaccion
+                                                nuevo_pago.fecha_de_pago = hoy
+                                                nuevo_pago.nro_cuotas_a_pagar = int(detalle_pago['cantidad_cuotas'])
+                                                nuevo_pago.cliente = transaccion.cliente
+                                                nuevo_pago.plan_de_pago = venta.plan_de_pago
+                                                nuevo_pago.plan_de_pago_vendedores= venta.plan_de_pago_vendedor
+                                                nuevo_pago.vendedor = venta.vendedor
+                                                nuevo_pago.total_de_cuotas = venta.precio_de_cuota
+                                                nuevo_pago.total_de_pago = int(detalle_pago['monto_total'])
+                                                nuevo_pago.total_de_mora = int(detalle_pago['monto_total']) - venta.precio_de_cuota
+                                                nuevo_pago.save()
+                                                
+                                                #Se loggea la accion del usuario
+                                                id_objeto = nuevo_pago.id
+                                                codigo_lote = detalle_pago['codigo_lote']
+                                                loggear_accion(user, "Agregar", "Pago de cuota", id_objeto, codigo_lote)
+                                                 
+                                                transaccion.estado = 'Pagado'
+                                                transaccion.save()
+                                                
+                                                #Se loggea la accion del usuario
+                                                id_objeto = transaccion.id
+                                                loggear_accion(user, "Actualizar estado", "Transaccion", id_objeto, codigo_lote)
+                                                      
+                                                respuesta = {}
+                                                respuesta['mensaje'] = 'Operacion Exitosa'
+                                                respuesta['codigo'] = '200'
+                                                
+                                                
+                                                                                 
+                                                return HttpResponse(json.dumps(respuesta), content_type="application/json")
+                        else:
+                            error_msg = 'Cuenta deshabilitada' 
+                            print error_msg
+                            error['codigo'] =  '22'
+                            error['mensaje'] = error_msg                            
+                            return HttpResponse(json.dumps(error),status=401, content_type="application/json")                        
+                    else:
+                        # the authentication system was unable to verify the username and password
+                        error_msg = 'Usuario o password incorrecto'  
+                        print error_msg
+                        error['codigo'] = '21'
+                        error['mensaje'] = error_msg
+                        return HttpResponse(json.dumps(error), status=401, content_type="application/json")                    
+            except MultiValueDictKeyError:
+                error_msg = 'Sintaxis del request incorrecta'
+                print error_msg
+                error['codigo'] =  '11'
+                error['mensaje'] = error_msg
+                return HttpResponseBadRequest(json.dumps(error), content_type="application/json")
+            except Exception, error2:
+                print error2
+                if error2.message == 'Transaccion matching query does not exist.':
+                    error_msg = 'Transaccion no encontrada'
+                    print error_msg
+                    error['codigo'] = codigo_base_error_pago + '46'
+                    error['mensaje'] = error_msg
+                    return HttpResponse(json.dumps(error),status=404, content_type="application/json")
+                elif error2.message == 'Venta matching query does not exist.':
+                    error_msg = 'No se encontro la venta'
+                    print error_msg
+                    error['codigo'] = codigo_base_error_pago + '48'
+                    error['mensaje'] = error_msg
+                    return HttpResponse(json.dumps(error),status=404, content_type="application/json")
+                error['codigo'] = '00'
+                error['mensaje'] = 'Error en el servidor'
+            
                 return HttpResponseServerError(json.dumps(error), content_type="application/json")                
  
  
