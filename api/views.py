@@ -359,9 +359,9 @@ def pago(request):
                 error['mensaje'] = 'Error en el servidor'                    
         else:#########################################  P O S T #############################################
             try:                
-                username = request.GET['username']
-                password = request.GET['password']
-                transaccion_id = request.GET['transaccion_id']
+                username = request.POST['username']
+                password = request.POST['password']
+                transaccion_id = request.POST['transaccion_id']
                 print 'Pago para transaccion id: ' + transaccion_id 
                 detalle_pago_post = request.POST
                 print 'POST recibido: ' + unicode(detalle_pago_post)
