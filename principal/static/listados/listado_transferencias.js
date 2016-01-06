@@ -68,6 +68,7 @@ function validateTransferencia() {
 			transferencia_fecha_de_transferencia : $("#id_fecha").val(),
 			transferencia_cliente_original_id : $("#id_cliente_original").val(),
 			transferencia_cliente_id : $("#id_cliente").val(),
+			transferencia_cliente_cedula : $("#id_cedula_cliente").val(),
 			transferencia_plan_de_pago_id : $("#id_plan_pago").val(),
 			transferencia_vendedor_id : $("#id_vendedor").val(),
 		}

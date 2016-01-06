@@ -23,11 +23,15 @@ function retrieveCedula() {
 	}
 }	
 
+function asignarRUC() {
+	var cedula=$("#id_cedula").val();	
+	$("#id_ruc").val(cedula);
+
+}
+
 function asignarDireccion() {
 	var direccion_cobro=$("#id_direccion_particular").val();	
-	$("#id_direccion_cobro").val(direccion_cobro);
-
-	
+	$("#id_direccion_cobro").val(direccion_cobro);	
 }
 
 

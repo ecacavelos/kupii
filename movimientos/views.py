@@ -377,6 +377,7 @@ def transferencias_de_lotes(request):
         
                 cliente_original_id = data.get('transferencia_cliente_original_id', '')
                 cliente_id = data.get('transferencia_cliente_id', '')
+                cedula_cli = data.get('transferencia_cliente_cedula', '')
                 vendedor_id = data.get('transferencia_vendedor_id', '')
                 plan_pago_id = data.get('transferencia_plan_de_pago_id', '')
         
@@ -397,7 +398,10 @@ def transferencias_de_lotes(request):
                 nueva_transferencia.lote = Lote.objects.get(pk=lote_id)
                 nueva_transferencia.fecha_de_transferencia = fecha_transferencia_parsed
                 nueva_transferencia.cliente_original = Cliente.objects.get(pk=cliente_original_id)
-                nueva_transferencia.cliente = Cliente.objects.get(pk=cliente_id)
+                if cliente_id != "":
+                    nueva_transferencia.cliente = Cliente.objects.get(pk=cliente_id)
+                else:
+                    nueva_transferencia.cliente = Cliente.objects.get(cedula=cedula_cli)
                 nueva_transferencia.plan_de_pago = PlanDePago.objects.get(pk=plan_pago_id)
                 nueva_transferencia.vendedor = Vendedor.objects.get(pk=vendedor_id)
         

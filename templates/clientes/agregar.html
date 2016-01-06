@@ -9,8 +9,23 @@
 <script type="text/javascript">
 	function _enviar(){
 	if (self.opener != null ){
-		self.opener.main_venta_form.id_name_cliente.value = $("#id_nombres").val() +' '+ $("#id_apellidos").val() ;
-		self.opener.main_venta_form.id_cedula_cliente.value = $("#id_cedula").val();
+		//opener venta
+		try {
+		    self.opener.main_venta_form.id_name_cliente.value = $("#id_nombres").val() +' '+ $("#id_apellidos").val() ;
+			self.opener.main_venta_form.id_cedula_cliente.value = $("#id_cedula").val();
+		}
+		catch(err) {
+		    console.log("No viene de venta");
+		}
+		try {
+			//opener transferencia
+			self.opener.main_transferencia_form.id_nombre_cliente.value = $("#id_nombres").val() +' '+ $("#id_apellidos").val() ;
+			self.opener.main_transferencia_form.id_cedula_cliente.value = $("#id_cedula").val();	
+		}catch(err) {
+		    console.log("No viene de transferencia");
+		}
+		
+		
 		$("#form_add_cliente").submit();
 		//window.close();
 	} else {
@@ -77,12 +92,19 @@
 			{%if field.html_name == 'direccion_cobro' %}
 			<td class="noimage">{{ field }} {{ field.errors }}</td>
 			<td>
-			<input id="id_boton" value="Usar direccion particular" name="boton" type="button" onclick="asignarDireccion()">
+			<input id="id_boton_direccion" value="Usar direccion particular" name="boton" type="button" onclick="asignarDireccion()">
 			</td>
 			{%else%}
+				{%if field.html_name == 'ruc' %}
+				<td class="noimage">{{ field }} {{ field.errors }}</td>
+				<td>
+				<input id="id_boton_ruc" value="Usar nro de cedula" name="boton" type="button" onclick="asignarRUC()">
+				</td>
+				{%else%}
 									
 				<td class="noimage">{{ field }} {{ field.errors }}</td>
 			
+			{%endif%}
 			{%endif%}
 			{%endif%}			
 			</tr>
