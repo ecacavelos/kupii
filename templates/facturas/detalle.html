@@ -65,7 +65,7 @@
 					{% if field.html_name == 'rango_factura' %}
 						<td><label for="timbrado" >Timbrado:</label></td>
 					{% else %}
-						{% if field.html_name == 'anuladi' %}
+						{% if field.html_name == 'anulado' %}
 							<td><label for="anulado" >Anulado:</label></td>
 						{% else %}
 							<td>{{ field.label_tag }}</td>
@@ -74,6 +74,9 @@
 					{% if field.html_name == 'cliente'  or field.html_name == 'rango_factura' or field.html_name == 'detalle' or field.html_name == 'anulado' %}
 					{%if field.html_name == 'cliente' %}
 					<td colspan="5" class="noimage">{{ factura.cliente }}{{ field.errors }}</td>
+					{% endif %}
+					{%if field.html_name == 'lote' %}
+					<td colspan="5" class="noimage">{{ factura.lote }}{{ field.errors }}</td>
 					{% endif %}
 					{%if field.html_name == 'rango_factura' %}
 						<td colspan="5" class="noimage">{{ numero_timbrado }}{{ field.errors }}</td>
@@ -86,6 +89,9 @@
 						{% endif %}	
 						
 					</td>
+					<tr>
+						<td><label for="monto" >Monto:</label></td><td colspan="5">{{ factura.monto }}</td>
+					</tr>
 					{% endif %}
 					{%if field.html_name == 'detalle' %}
 					<td colspan="5" class="noimage"></td>
@@ -110,6 +116,7 @@
 					{% endif %}
 					
 					{% else %}
+					
 					<td colspan="5">{{ field }}{{ field.errors }}</td>
 					
 				</div>

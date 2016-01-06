@@ -263,8 +263,8 @@ def consultar_facturas(request):
         if request.method == 'GET':
             #Mostrar la lista de todas las facturas.  
             object_list = Factura.objects.all().order_by('id','-fecha')
-            monto=0
             for factura in object_list:
+                monto=0
                 lista_detalles=json.loads(factura.detalle)
                 for key, value in lista_detalles.iteritems():
                     monto+=int(int(value['cantidad'])*int(value['precio_unitario'])) 
@@ -280,16 +280,16 @@ def consultar_facturas(request):
                 fecha_ini_parsed = unicode(datetime.datetime.strptime(fecha_ini, "%d/%m/%Y").date())
                 fecha_fin_parsed = unicode(datetime.datetime.strptime(fecha_fin, "%d/%m/%Y").date())
                 object_list = Factura.objects.filter(fecha__range=(fecha_ini_parsed,fecha_fin_parsed)).order_by('id','fecha')                    
-                monto=0
                 for factura in object_list:
+                    monto=0
                     lista_detalles=json.loads(factura.detalle)
                     for key, value in lista_detalles.iteritems():
                         monto+=int(int(value['cantidad'])*int(value['precio_unitario']))
                     factura.monto=unicode('{:,}'.format(monto)).replace(",", ".")
             if tipo_busqueda == 'nro_factura':
                 object_list = Factura.objects.filter(pk=busqueda).order_by('id','fecha')                    
-                monto=0
                 for factura in object_list:
+                    monto=0
                     lista_detalles=json.loads(factura.detalle)
                     for key, value in lista_detalles.iteritems():
                         monto+=int(int(value['cantidad'])*int(value['precio_unitario']))
@@ -323,6 +323,7 @@ def detalle_factura(request, factura_id):
         numero_timbrado = trfu.timbrado.numero 
         lista_detalles=json.loads(factura.detalle)
         detalles=[]
+        monto = 0
         for key, value in lista_detalles.iteritems():
             detalle={}
             #detalle['precio_unitario']=unicode('{:,}'.format(value['precio_unitario']))
@@ -334,11 +335,13 @@ def detalle_factura(request, factura_id):
             detalle['iva_5']=unicode('{:,}'.format(int(value['iva_5']))).replace(",",".")
             detalle['exentas']=unicode('{:,}'.format(int(value['exentas']))).replace(",",".")
             detalles.append(detalle)
+            monto += int(value['cantidad']) * int(value['precio_unitario'])
         if factura.tipo=='co':
             tipo='Contado'
         else:
             tipo='Credito'
         factura.tipo=tipo
+        factura.monto =  unicode('{:,}'.format(monto).replace(",","."))
         message = ''
             
         if request.method == 'POST':
