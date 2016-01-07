@@ -35,9 +35,16 @@ function setup_inputs() {
 		$("#id_busqueda_label").autocomplete({
 			source : base_url,
 			minLength : 1,
+			create : function(){
+			$(this).data('ui-autocomplete')._renderItem = function(ul,item){
+				return $('<li>').append('<a>'+item.cedula +" - "+item.nombres + " "+ item.apellidos+'</a>').appendTo(ul);
+				};
+			},
 			select : function(event, ui) {
+				event.preventDefault();
 			id_vendedor = ui.item.id;
 			$("#id_busqueda").val(id_vendedor);
+			$("#id_busqueda_label").val(ui.item.nombres + " "+ ui.item.apellidos);
 			//alert(id_vendedor);
 			}
 		});

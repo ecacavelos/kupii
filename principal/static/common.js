@@ -20,13 +20,14 @@ function autocompleteClienteRucONombre(input_id, cedula_input_id, id_cliente_inp
 		minLength : 1,
 		create : function(){
 			$(this).data('ui-autocomplete')._renderItem = function(ul,item){
-				return $('<li>').append('<a>' +item.fields.nombres + " "+ item.fields.apellidos+'</a>').appendTo(ul);
+				return $('<li>').append('<a>'+item.cedula +" - "+item.nombres + " "+ item.apellidos+'</a>').appendTo(ul);
 				};
 		},
 		select : function(event, ui) {
-			cliente_id = ui.item.pk;
+			event.preventDefault();
+			cliente_id = ui.item.id;
 			cedula_cliente= ui.item.fields.cedula;
-			$(input_id).val(ui.item.fields.nombres+" "+ui.item.fields.apellidos);
+			$(input_id).val(ui.item.nombres+" "+ui.item.apellidos);
 			//name_cliente=ui.item.fields.nombres+" "+ui.item.fields.apellidos;
 			//$("#id_name_cliente").val(name_cliente);
 			$(id_cliente_input_id).val(cliente_id);
@@ -59,13 +60,14 @@ function autocompletePropietarioRucONombre(input_id, cedula_input_id, id_propiet
 		minLength : 1,
 		create : function(){
 			$(this).data('ui-autocomplete')._renderItem = function(ul,item){
-				return $('<li>').append('<a>' +item.fields.nombres + " "+ item.fields.apellidos+'</a>').appendTo(ul);
+				return $('<li>').append('<a>'+item.cedula +" - "+item.nombres + " "+ item.apellidos+'</a>').appendTo(ul);
 				};
 		},
 		select : function(event, ui) {
-			propietario_id = ui.item.pk;
-			cedula_cliente= ui.item.fields.cedula;
-			$(input_id).val(ui.item.fields.nombres+" "+ui.item.fields.apellidos);
+			event.preventDefault();
+			propietario_id = ui.item.id;
+			cedula_cliente= ui.item.cedula;
+			$(input_id).val(ui.item.fields.nombres+" "+ui.item.apellidos);
 			//name_cliente=ui.item.fields.nombres+" "+ui.item.fields.apellidos;
 			//$("#id_name_cliente").val(name_cliente);
 			$(id_propietario_input_id).val(propietario_id);
@@ -119,9 +121,16 @@ function autocompleteClientePorNombreOCedula(tipo_busqueda, busqueda_label, busq
 	$("#busqueda_label").autocomplete({
 		source : base_url,
 		minLength : 1,
+		create : function(){
+			$(this).data('ui-autocomplete')._renderItem = function(ul,item){
+				return $('<li>').append('<a>'+item.cedula +" - "+item.nombres + " "+ item.apellidos+'</a>').appendTo(ul);
+				};
+		},
 		select : function(event, ui) {
+			event.preventDefault();
 			id_cliente = ui.item.id;
 			$("#busqueda").val(id_cliente);
+			$("#busqueda_label").val(ui.item.nombres+" "+ui.item.apellidos);
 			//alert(id_cliente);
 		}
 	});
@@ -159,7 +168,14 @@ function autocompletePropietarioPorNombreOCedula(tipo_busqueda, busqueda_label, 
 	$("#busqueda_label").autocomplete({
 		source : base_url,
 		minLength : 1,
+		create : function(){
+			$(this).data('ui-autocomplete')._renderItem = function(ul,item){
+				return $('<li>').append('<a>'+item.cedula +" - "+item.nombres + " "+ item.apellidos+'</a>').appendTo(ul);
+				};
+		},
 		select : function(event, ui) {
+			event.preventDefault();
+			$("#busqueda_label").val(ui.item.nombres+" "+ui.item.apellidos);
 			id_propietario = ui.item.id;
 			$("#busqueda").val(id_propietario);
 			//alert(id_cliente);
@@ -285,9 +301,16 @@ function autocompleteVendedorPorNombreOCedula(tipo_busqueda, busqueda_label, bus
 	$("#busqueda_label").autocomplete({
 		source : base_url,
 		minLength : 1,
+		create : function(){
+			$(this).data('ui-autocomplete')._renderItem = function(ul,item){
+				return $('<li>').append('<a>'+item.cedula +" - "+item.nombres + " "+ item.apellidos+'</a>').appendTo(ul);
+				};
+		},
 		select : function(event, ui) {
+			event.preventDefault();
 			id_vendedor = ui.item.id;
 			$("#busqueda").val(id_vendedor);
+			$("#busqueda_label").val(ui.item.nombres+" "+ui.item.apellidos);
 			//alert(id_cliente);
 		}
 	});
@@ -335,7 +358,7 @@ function autocompleteVendedorNombre(input_id,  id_vendedor_input_id){
 		minLength : 1,
 		create : function(){
 			$(this).data('ui-autocomplete')._renderItem = function(ul,item){
-				return $('<li>').append('<a>' +item.nombres + " "+ item.apellidos+'</a>').appendTo(ul);
+				return $('<li>').append('<a>'+item.cedula +" - "+item.nombres + " "+ item.apellidos+'</a>').appendTo(ul);
 				};
 		},
 		select : function(event, ui) {

@@ -143,13 +143,19 @@ function autocompletes(){
         $("#id_busqueda_label").autocomplete({
             source: base_url,
             minLength: 1,
-            select: function (event, ui) {
+            create : function(){
+			$(this).data('ui-autocomplete')._renderItem = function(ul,item){
+				return $('<li>').append('<a>'+item.cedula +" - "+item.nombres + " "+ item.apellidos+'</a>').appendTo(ul);
+				};
+			},
+			select : function(event, ui) {
+				event.preventDefault();
                 //alert('hola');
                 id_propietario = ui.item.id;
-                //name_propietario=ui.item.label;
+                name_propietario=ui.item.nombres+" "+ui.item.apellidos;
                 //alert(id_propietario);
                 $('#id_busqueda').val(id_propietario);
-                //$('#id_busqueda_label').val(name_propietario);
+                $('#id_busqueda_label').val(name_propietario);
             }
         });
     }

@@ -7,42 +7,48 @@ $(document).ready(function() {
 
 
 //autocomplete para cliente
-	var cliente_id;
-	$("#id_nombre_cliente").empty();
-	base_url = base_context + "/ajax/get_cliente_id_by_name/";
-	params = "value";
-	$("#id_nombre_cliente").autocomplete({
-		source : base_url,
-		minLength : 1,
-		select : function(event, ui) {
-			id_cliente = ui.item.pk;
-			cedula_cliente= ui.item.fields.cedula;
-            name_cliente=ui.item.fields.label;
-			$("#id_cliente").val(id_cliente);
-            $("#id_nombre_cliente").val(name_cliente);
-			$("#id_cedula_cliente").val(cedula_cliente);
-		}
-	});
+base_url = base_context + "/ajax/get_cliente_id_by_name/";
+		params = "value";
+		$("#id_nombre_cliente").autocomplete({
+			source : base_url,
+			minLength : 1,
+			create : function(){
+			$(this).data('ui-autocomplete')._renderItem = function(ul,item){
+				return $('<li>').append('<a>'+item.cedula +" - "+item.nombres + " "+ item.apellidos+'</a>').appendTo(ul);
+				};
+			},
+			select : function(event, ui) {
+				event.preventDefault();
+				id_cliente = ui.item.id;
+				cedula_cliente = ui.item.cedula;
+				$("#id_cliente").val(id_cliente);
+				$("#id_cedula_cliente").val(cedula_cliente);
+				$("#id_nombre_cliente").val(ui.item.nombres + " "+ ui.item.apellidos);
+			}
+		});
 		
 	//autocomplete para cedula
-	var cliente_id;
-	$("#id_cedula_cliente").empty();
 	base_url = base_context + "/ajax/get_cliente_name_id_by_cedula/";
-	params = "value";
-	$("#id_cedula_cliente").autocomplete({
-		source : base_url,
-		minLength : 1,
-		select : function(event, ui) {
-			id_cliente = ui.item.pk;
-			name_cliente= ui.item.fields.label;
-			cedula_cliente= ui.item.fields.cedula;
-			ui.item.value = ui.item.fields.cedula;
-			$("#id_cliente").val(id_cliente);
-			$("#id_nombre_cliente").val(name_cliente);
-			$("#id_cedula_cliente").val(cedula_cliente);
-				
-		}
-	});
+		params = "value";
+		$("#id_cedula_cliente").autocomplete({
+			source : base_url,
+			minLength : 1,
+			create : function(){
+			$(this).data('ui-autocomplete')._renderItem = function(ul,item){
+				return $('<li>').append('<a>'+item.cedula +" - "+item.nombres + " "+ item.apellidos+'</a>').appendTo(ul);
+				};
+			},
+			select : function(event, ui) {
+				event.preventDefault();
+				id_cliente = ui.item.id;
+				name_cliente= ui.item.nombres +" "+ui.item.apellidos ;
+				cedula_cliente = ui.item.cedula;
+				ui.item.value = ui.item.cedula;
+				$("#id_cliente").val(id_cliente);
+				$("#id_cedula_cliente").val(cedula_cliente);
+				$("#id_nombre_cliente").val(name_cliente);
+			}
+		});
     });
 window.onload = function() {
 };

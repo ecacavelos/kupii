@@ -931,8 +931,8 @@ def crear_pdf_factura(nueva_factura, request, manzana, lote_id, usuario):
         nueva_factura.cliente.ruc = ""                
     p.drawString(coor.ruc_1x * cm, float(coor.ruc_1y) * cm, unicode(nueva_factura.cliente.ruc))
     p.drawString(coor.telefono_1x * cm, float(coor.telefono_1y) * cm, unicode(nueva_factura.cliente.telefono_laboral))
-            
-    p.drawString(coor.direccion_1x * cm, float(coor.direccion_1y) * cm, unicode(nueva_factura.cliente.direccion_cobro))
+    direccion_1_str = (nueva_factura.cliente.direccion_cobro[:56] + '..') if len(nueva_factura.cliente.direccion_cobro) > 56 else nueva_factura.cliente.direccion_cobro        
+    p.drawString(coor.direccion_1x * cm, float(coor.direccion_1y) * cm, unicode(direccion_1_str))
     p.drawString(coor.superficie_1x * cm, float(coor.superficie_1y) * cm, unicode(lote_id.superficie) + "  mts2")
     p.drawString(coor.cta_cte_ctral_1x * cm, float(coor.cta_cte_ctral_1y) * cm, unicode(lote_id.cuenta_corriente_catastral))
             
@@ -1014,8 +1014,8 @@ def crear_pdf_factura(nueva_factura, request, manzana, lote_id, usuario):
         nueva_factura.cliente.ruc = ""                
     p.drawString(coor.ruc_2x * cm, float(coor.ruc_2y) * cm, unicode(nueva_factura.cliente.ruc))
     p.drawString(coor.telefono_2x * cm, float(coor.telefono_2y) * cm, unicode(nueva_factura.cliente.telefono_laboral))
-            
-    p.drawString(coor.direccion_2x * cm, float(coor.direccion_2y) * cm, unicode(nueva_factura.cliente.direccion_cobro))
+    direccion_2_str = (nueva_factura.cliente.direccion_cobro[:56] + '..') if len(nueva_factura.cliente.direccion_cobro) > 56 else nueva_factura.cliente.direccion_cobro        
+    p.drawString(coor.direccion_2x * cm, float(coor.direccion_2y) * cm, unicode(direccion_2_str))
     p.drawString(coor.superficie_2x * cm, float(coor.superficie_2y) * cm, unicode(lote_id.superficie) + "  mts2")
     p.drawString(coor.cta_cte_ctral_2x * cm, float(coor.cta_cte_ctral_2y) * cm, unicode(lote_id.cuenta_corriente_catastral))
             
@@ -1088,5 +1088,6 @@ def obtener_cantidad_cuotas_pagadas(pago):
     fecha_venta = pago.venta.fecha_de_venta
     
     pagos = PagoDeCuotas.objects.filter(venta=id_venta, fecha_de_pago__range=(fecha_venta, fecha_pago)).order_by('fecha_de_pago','id').aggregate(Sum('nro_cuotas_a_pagar'))
+    print PagoDeCuotas.objects.filter(venta=id_venta, fecha_de_pago__range=(fecha_venta, fecha_pago)).order_by('fecha_de_pago','id').query
     cantidad_pagos = pagos['nro_cuotas_a_pagar__sum']
     return cantidad_pagos

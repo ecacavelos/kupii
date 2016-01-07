@@ -22,6 +22,7 @@ from reportlab.lib.units import mm
 from num2words import num2words
 import base64
 import ast
+from django.db import connection
 
 #Ejemplo nuevo esquema de serializacion:
 # all_objects = list(Restaurant.objects.all()) + list(Place.objects.all())
@@ -35,9 +36,34 @@ def get_propietario_id_by_name(request):
             try:            
                 name_propietario = request.GET['term']
                 print("term ->" + name_propietario)
-                object_list = Propietario.objects.filter(nombres__icontains = name_propietario)
-                labels=["nombres","apellidos"]
-                return HttpResponse(json.dumps(custom_json(object_list,labels), cls=DjangoJSONEncoder), content_type="application/json")
+                #object_list = Propietario.objects.filter(nombres__icontains = name_propietario)
+                #labels=["cedula","nombres","apellidos"]
+                #return HttpResponse(json.dumps(custom_json(object_list,labels), cls=DjangoJSONEncoder), content_type="application/json")
+            
+                
+                query = (
+                '''
+                SELECT *
+                FROM principal_propietario
+                WHERE CONCAT (UPPER(nombres), ' ', UPPER(apellidos)) like UPPER('%'''+name_propietario+'''%')
+                '''
+                )
+                
+                cursor = connection.cursor()
+                cursor.execute(query)      
+                results= cursor.fetchall()
+                lista_propietarios = []
+                for r in results:
+                    propietario = {}
+                    propietario['id'] = r[0]
+                    propietario['cedula'] = r[5]
+                    propietario['nombres'] = r[1]
+                    propietario['apellidos'] = r[2]
+                    lista_propietarios.append(propietario)
+                
+                labels=["cedula","nombres","apellidos"]
+                return HttpResponse(json.dumps(lista_propietarios, cls=DjangoJSONEncoder), content_type="application/json")
+            
             except Exception, error:
                 print error
                 #return HttpResponseServerError('No se pudo procesar el pedido')
@@ -100,7 +126,7 @@ def get_vendedor_name_id_by_cedula(request):
                 cedula_vendedor = request.GET['term']
                 print("term ->" + cedula_vendedor);
                 object_list = Vendedor.objects.filter(cedula__icontains= cedula_vendedor)
-                labels=["nombres","apellidos"]
+                labels=["cedula","nombres","apellidos"]
                 return HttpResponse(json.dumps(custom_json(object_list,labels), cls=DjangoJSONEncoder), content_type="application/json")
             except Exception, error:
                 print error
@@ -118,7 +144,7 @@ def get_propietario_name_id_by_cedula(request):
                 object_list = Propietario.objects.filter(cedula__icontains= cedula_propietario)
                 #data=serializers.serialize('json',list(object_list))
                 #return HttpResponse(data,content_type="application/json")
-                labels=["nombres","apellidos"]
+                labels=["cedula","nombres","apellidos"]
                 return HttpResponse(json.dumps(custom_json(object_list,labels), cls=DjangoJSONEncoder), content_type="application/json")
             except Exception, error:
                 print error
@@ -135,7 +161,7 @@ def get_cliente_name_id_by_cedula(request):
                 cedula_cliente = request.GET['term']
                 print("term ->" + cedula_cliente);
                 object_list = Cliente.objects.filter(cedula__icontains= cedula_cliente)
-                labels=["nombres","apellidos","cedula"]
+                labels=["cedula","nombres","apellidos"]
                 return HttpResponse(json.dumps(custom_json(object_list,labels), cls=DjangoJSONEncoder), content_type="application/json")
                 #data=serializers.serialize('json',list(object_list))
                 #return HttpResponse(data,content_type="application/json")
@@ -150,11 +176,39 @@ def get_cliente_id_by_name(request):
         if request.user.is_authenticated():
             try:            
                 name_cliente = request.GET['term']
+                nombre = request.GET['term']
                 print("term ->" + name_cliente);
-                print Cliente.objects.filter(nombres__icontains= name_cliente).query
-                object_list = Cliente.objects.filter(nombres__icontains= name_cliente)
-                labels=["nombres","apellidos"]
-                return HttpResponse(json.dumps(custom_json(object_list,labels), cls=DjangoJSONEncoder), content_type="application/json")
+                #print Cliente.objects.filter(nombres__icontains= name_cliente).query
+                #name_cliente = name_cliente.split(" ")
+                #print Cliente.objects.filter(nombres__icontains= name_cliente).query
+                #if len(name_cliente) > 1:
+                #    object_list = Cliente.objects.filter(nombres__icontains= name_cliente[0], apellidos__icontains= name_cliente[1])
+                #else:
+                #    object_list = Cliente.objects.filter(nombres__icontains= name_cliente[0])
+                    
+                query = (
+                '''
+                SELECT *
+                FROM principal_cliente
+                WHERE CONCAT (UPPER(nombres), ' ', UPPER(apellidos)) like UPPER('%'''+nombre+'''%')
+                '''
+                )
+                
+                cursor = connection.cursor()
+                cursor.execute(query)      
+                results= cursor.fetchall()
+                lista_clientes = []
+                for r in results:
+                    cliente = {}
+                    cliente['id'] = r[0]
+                    cliente['cedula'] = r[4]
+                    cliente['nombres'] = r[1]
+                    cliente['apellidos'] = r[2]
+                    lista_clientes.append(cliente)
+                
+                labels=["cedula","nombres","apellidos"]
+                return HttpResponse(json.dumps(lista_clientes, cls=DjangoJSONEncoder), content_type="application/json")
+                #return HttpResponse(json.dumps(custom_json(lista_clientes,labels), cls=DjangoJSONEncoder), content_type="application/json")
             except Exception, error:
                 print error
                 #return HttpResponseServerError('No se pudo procesar el pedido')
@@ -167,9 +221,33 @@ def get_vendedor_id_by_name(request):
             try:            
                 name_vendedor = request.GET['term']
                 print("term ->" + name_vendedor);
-                object_list = Vendedor.objects.filter(nombres__icontains= name_vendedor)
-                labels=["nombres","apellidos"]
-                return HttpResponse(json.dumps(custom_json(object_list,labels), cls=DjangoJSONEncoder), content_type="application/json")
+                #object_list = Vendedor.objects.filter(nombres__icontains= name_vendedor)
+                #labels=["cedula","nombres","apellidos"]
+                #return HttpResponse(json.dumps(custom_json(object_list,labels), cls=DjangoJSONEncoder), content_type="application/json")
+            
+                query = (
+                '''
+                SELECT *
+                FROM principal_vendedor
+                WHERE CONCAT (UPPER(nombres), ' ', UPPER(apellidos)) like UPPER('%'''+name_vendedor+'''%')
+                '''
+                )
+                
+                cursor = connection.cursor()
+                cursor.execute(query)      
+                results= cursor.fetchall()
+                lista_vendedores = []
+                for r in results:
+                    vendedor = {}
+                    vendedor['id'] = r[0]
+                    vendedor['cedula'] = r[3]
+                    vendedor['nombres'] = r[1]
+                    vendedor['apellidos'] = r[2]
+                    lista_vendedores.append(vendedor)
+                
+                labels=["cedula","nombres","apellidos"]
+                return HttpResponse(json.dumps(lista_vendedores, cls=DjangoJSONEncoder), content_type="application/json")
+            
             except Exception, error:
                 print error
                 #return HttpResponseServerError('No se pudo procesar el pedido')
@@ -428,13 +506,39 @@ def get_cliente_id_by_name_or_ruc(request):
             try:            
                 name_cliente = request.GET['term']
                 print("term ->" + name_cliente);
-                term = name_cliente.split()
-                if len(term) > 1:
-                    object_list = Cliente.objects.filter(nombres__icontains= term[0], apellidos__icontains= term[1])
-                else:
-                    object_list = Cliente.objects.filter(nombres__icontains= term[0])
-                data=serializers.serialize('json',list(object_list)) 
-                return HttpResponse(data,content_type="application/json")
+                #term = name_cliente.split()
+                #if len(term) > 1:
+                #    object_list = Cliente.objects.filter(nombres__icontains= term[0], apellidos__icontains= term[1])
+                #else:
+                #    object_list = Cliente.objects.filter(nombres__icontains= term[0])
+                #data=serializers.serialize('json',list(object_list)) 
+                #return HttpResponse(data,content_type="application/json")
+            
+                
+                query = (
+                '''
+                SELECT *
+                FROM principal_cliente
+                WHERE CONCAT (UPPER(nombres), ' ', UPPER(apellidos)) like UPPER('%'''+name_cliente+'''%')
+                '''
+                )
+                
+                cursor = connection.cursor()
+                cursor.execute(query)      
+                results= cursor.fetchall()
+                lista_clientes = []
+                for r in results:
+                    cliente = {}
+                    cliente['id'] = r[0]
+                    cliente['cedula'] = r[4]
+                    cliente['nombres'] = r[1]
+                    cliente['apellidos'] = r[2]
+                    lista_clientes.append(cliente)
+                
+                labels=["cedula","nombres","apellidos"]
+                return HttpResponse(json.dumps(lista_clientes, cls=DjangoJSONEncoder), content_type="application/json")
+            
+            
             except Exception, error:
                 print error
                 #return HttpResponseServerError('No se pudo procesar el pedido')
@@ -448,7 +552,7 @@ def get_vendedor_id_by_name_or_cedula(request):
                 name_vendedor = request.GET['term']
                 print("term ->" + name_vendedor);
                 object_list = Vendedor.objects.filter(nombres__icontains= name_vendedor)
-                labels=["nombres","apellidos"]
+                labels=["cedula","nombres","apellidos"]
                 return HttpResponse(json.dumps(custom_json(object_list,labels), cls=DjangoJSONEncoder), content_type="application/json")
             except Exception, error:
                 print error
@@ -644,6 +748,8 @@ def facturar(request):
             #Obtener el detalle
             detalle = request.POST.get('detalle','')
             
+            #Obtener observacion
+            observacion = request.POST.get('observacion','')
             
             #Crear un objeto Factura y guardar            
             nueva_factura = Factura()
@@ -655,7 +761,8 @@ def facturar(request):
             nueva_factura.tipo = tipo
             nueva_factura.detalle = detalle
             nueva_factura.lote = lote_id
-            nueva_factura.anulado = False 
+            nueva_factura.anulado = False
+            nueva_factura.observacion = observacion 
             nueva_factura.save()
             
             #Se logea la accion del usuario

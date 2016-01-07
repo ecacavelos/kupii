@@ -47,11 +47,19 @@ $(document).ready(function() {
 	$("#id_name_cliente").autocomplete({
 		source : base_url,
 		minLength : 1,
+		create : function(){
+			$(this).data('ui-autocomplete')._renderItem = function(ul,item){
+				return $('<li>').append('<a>'+item.cedula +" - "+item.nombres + " "+ item.apellidos+'</a>').appendTo(ul);
+				};
+		},
 		select : function(event, ui) {
+			event.preventDefault();
 			id_cliente = ui.item.id;
 			cedula_cliente= ui.item.cedula;
 			$("#id_cliente").val(id_cliente);
 			$("#id_cedula_cliente").val(cedula_cliente);
+			name_cliente=ui.item.nombres+" "+ui.item.apellidos;
+			$("#id_name_cliente").val(name_cliente);
 
 		}
 	});
@@ -85,12 +93,19 @@ $(document).ready(function() {
 	$("#id_name_vendedor").autocomplete({
 		source : base_url,
 		minLength : 1,
+		create : function(){
+			$(this).data('ui-autocomplete')._renderItem = function(ul,item){
+				return $('<li>').append('<a>'+item.cedula +" - "+item.nombres + " "+ item.apellidos+'</a>').appendTo(ul);
+				};
+		},
 		select : function(event, ui) {
+			event.preventDefault();
 			id_vendedor = ui.item.id;
 			cedula_vendedor= ui.item.cedula;
 			$("#id_vendedor").val(id_vendedor);
 			$("#id_cedula_vendedor").val(cedula_vendedor);
-
+			name_vendedor=ui.item.nombres+" "+ui.item.apellidos;
+			$("#id_name_vendedor").val(name_vendedor);
 		}
 	});
 		

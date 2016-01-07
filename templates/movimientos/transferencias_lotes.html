@@ -16,7 +16,14 @@ base_url = base_context + "/ajax/get_cliente_id_by_name/";
 		$("#id_nombre_cliente").autocomplete({
 			source : base_url,
 			minLength : 1,
+			create : function(){
+			$(this).data('ui-autocomplete')._renderItem = function(ul,item){
+				return $('<li>').append('<a>'+item.cedula +" - "+item.nombres + " "+ item.apellidos+'</a>').appendTo(ul);
+				};
+			},
 			select : function(event, ui) {
+				event.preventDefault();
+				$("#id_nombre_cliente").val(ui.item.nombres+" "+ui.item.apellidos);
 				id_cliente = ui.item.id;
 				cedula_cliente = ui.item.cedula;
 				$("#id_cliente").val(id_cliente);
@@ -31,9 +38,15 @@ base_url = base_context + "/ajax/get_cliente_id_by_name/";
 		$("#id_cedula_cliente").autocomplete({
 			source : base_url,
 			minLength : 1,
+			create : function(){
+			$(this).data('ui-autocomplete')._renderItem = function(ul,item){
+				return $('<li>').append('<a>'+item.cedula +" - "+item.nombres + " "+ item.apellidos+'</a>').appendTo(ul);
+				};
+			},
 			select : function(event, ui) {
+				event.preventDefault();
 				id_cliente = ui.item.id;
-				name_cliente= ui.item.label;
+				name_cliente= ui.item.nombres+" "+ui.item.apellidos;
 				cedula_cliente = ui.item.cedula;
 				ui.item.value = ui.item.cedula;
 				$("#id_cliente").val(id_cliente);
