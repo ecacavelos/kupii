@@ -121,6 +121,9 @@ def facturar_operacion(request, tipo_operacion, operacion_id):
             #Obtener el detalle
             detalle = request.POST.get('detalle','')
             
+            #Obtener observacion
+            observacion = request.POST.get('observacion','')
+            
             
             #Crear un objeto Factura y guardar            
             nueva_factura = Factura()
@@ -133,7 +136,8 @@ def facturar_operacion(request, tipo_operacion, operacion_id):
             nueva_factura.tipo = tipo
             nueva_factura.detalle = detalle
             nueva_factura.lote = lote_id
-            nueva_factura.anulado = False  
+            nueva_factura.anulado = False
+            nueva_factura.observacion = observacion
             nueva_factura.save()
             
             
@@ -217,6 +221,8 @@ def facturar(request):
             #Obtener el detalle
             detalle = request.POST.get('detalle','')
             
+            #Obtener observacion
+            observacion = request.POST.get('observacion','')            
             
             #Crear un objeto Factura y guardar            
             nueva_factura = Factura()
@@ -228,7 +234,8 @@ def facturar(request):
             nueva_factura.tipo = tipo
             nueva_factura.detalle = detalle
             nueva_factura.lote = lote_id
-            nueva_factura.anulado = False  
+            nueva_factura.anulado = False
+            nueva_factura.observacion = observacion  
             nueva_factura.save()
             
             #Se loggea la accion del usuario

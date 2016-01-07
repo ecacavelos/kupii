@@ -336,6 +336,7 @@
 						detalle: $("#detalle").val(),
 						nro_cuota_desde : $("#id_nro_cuota").val(),
 						nro_cuota_hasta : $("#id_nro_cuota_hasta").val(),
+						observacion: $("#observacion").val(),
 						
 					},
 					dataType : "aplication/pdf"

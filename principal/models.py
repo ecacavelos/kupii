@@ -410,6 +410,7 @@ class Factura(models.Model):
     tipo = models.CharField(max_length=2)
     detalle = models.TextField()
     anulado = models.BooleanField()
+    observacion = models.TextField()
     
 class CoordenadasFactura(models.Model):
     #FACTURA 1
