@@ -29,8 +29,8 @@
 		if ($("#tipo_busqueda").val() == 0) {
 			alert("Debe elegir un tipo de busqueda.");
 		} else {
-			if ($("#busqueda_label").val() == "" || $("#busqueda").val() == "") {
-				alert("Debe seleccionar un valor para buscar.");
+			if ($("#busqueda_label").val() == "" && $("#busqueda").val() == "") {
+				alert("Debe ingresar o seleccionar un valor para buscar.");
 			} else {
 				$("#frm_busqueda").submit();
 			}

@@ -12,6 +12,7 @@ from principal.monthdelta import MonthDelta
 from django.core import serializers
 from principal.common_functions import verificar_permisos
 from principal import permisos
+from django.db import connection
  
 # Funcion principal del modulo de lotes.
 def movimientos(request):
@@ -876,21 +877,99 @@ def listar_busqueda_personas(request):
                 #try:
                 tabla = request.GET['tabla']
                 busqueda = request.GET['busqueda']
+                busqueda_label = request.GET['busqueda_label']
                 tipo_busqueda=request.GET['tipo_busqueda']            
                 print 'busqueda->' + busqueda
                 if tabla=='cliente':
-                    t = loader.get_template('clientes/listado.html') 
-                    object_list = Cliente.objects.filter(pk=busqueda)
+                    if busqueda != '':
+                        t = loader.get_template('clientes/listado.html') 
+                        object_list = Cliente.objects.filter(pk=busqueda)
+                    else:
+                        t = loader.get_template('clientes/listado.html')
+                        query = (
+                        '''
+                        SELECT *
+                        FROM principal_cliente
+                        WHERE CONCAT (UPPER(nombres), ' ', UPPER(apellidos)) like UPPER('%'''+busqueda_label+'''%')
+                        '''
+                        )
+                        
+                        cursor = connection.cursor()
+                        cursor.execute(query)      
+                        results= cursor.fetchall()
+                        lista_clientes = []
+                        for r in results:
+                            cliente = {}
+                            cliente['id'] = r[0]
+                            cliente['cedula'] = r[4]
+                            cliente['nombres'] = r[1]
+                            cliente['apellidos'] = r[2]
+                            cliente['direccion_cobro'] = r[9]
+                            cliente['telefono_particular'] = r[10]
+                            lista_clientes.append(cliente)
+                        
+                        object_list = lista_clientes
                                                    
                 if tabla=='propietario':
-                    t = loader.get_template('propietarios/listado.html')
-                    object_list = Propietario.objects.filter(pk=busqueda)
+                    if busqueda != '':
+                        t = loader.get_template('propietarios/listado.html')
+                        object_list = Propietario.objects.filter(pk=busqueda)
+                    else:
+                        t = loader.get_template('propietarios/listado.html')
+                        query = (
+                        '''
+                        SELECT *
+                        FROM principal_propietario
+                        WHERE CONCAT (UPPER(nombres), ' ', UPPER(apellidos)) like UPPER('%'''+busqueda_label+'''%')
+                        '''
+                        )
+                        
+                        cursor = connection.cursor()
+                        cursor.execute(query)      
+                        results= cursor.fetchall()
+                        lista_propietarios = []
+                        for r in results:
+                            propietario = {}
+                            propietario['id'] = r[0]
+                            propietario['cedula'] = r[5]
+                            propietario['nombres'] = r[1]
+                            propietario['apellidos'] = r[2]
+                            propietario['direccion_particular'] = r[7]
+                            propietario['telefono_particular'] = r[8]
+                            lista_propietarios.append(propietario)
+                        
+                        object_list = lista_propietarios
                            
                 if tabla=='vendedor':
-                    t = loader.get_template('vendedores/listado.html')
-                    object_list = Vendedor.objects.filter(pk=busqueda)
+                    if busqueda != '':
+                        t = loader.get_template('vendedores/listado.html')
+                        object_list = Vendedor.objects.filter(pk=busqueda)
+                    else:
+                        t = loader.get_template('vendedores/listado.html')
+                        query = (
+                        '''
+                        SELECT *
+                        FROM principal_vendedor
+                        WHERE CONCAT (UPPER(nombres), ' ', UPPER(apellidos)) like UPPER('%'''+busqueda_label+'''%')
+                        '''
+                        )
+                        
+                        cursor = connection.cursor()
+                        cursor.execute(query)      
+                        results= cursor.fetchall()
+                        lista_vendedores = []
+                        for r in results:
+                            vendedor = {}
+                            vendedor['id'] = r[0]
+                            vendedor['cedula'] = r[3]
+                            vendedor['nombres'] = r[1]
+                            vendedor['apellidos'] = r[2]
+                            vendedor['direccion'] = r[4]
+                            vendedor['telefono'] = r[5]
+                            lista_vendedores.append(vendedor)
+                        object_list = lista_vendedores
                 
-                ultima_busqueda = "&tabla="+tabla+"&busqueda="+busqueda+"&tipo_busqueda="+tipo_busqueda      
+                ultima_busqueda = "&tabla="+tabla+"&busqueda="+busqueda+"&tipo_busqueda="+tipo_busqueda+"&busqueda_label="+busqueda_label      
                 paginator=Paginator(object_list,15)
                 page=request.GET.get('page')
                 try:

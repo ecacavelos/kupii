@@ -121,9 +121,11 @@ function autocompleteClientePorNombreOCedula(tipo_busqueda, busqueda_label, busq
 	$("#busqueda_label").autocomplete({
 		source : base_url,
 		minLength : 1,
+		dataType: "json",
 		create : function(){
 			$(this).data('ui-autocomplete')._renderItem = function(ul,item){
 				return $('<li>').append('<a>'+item.cedula +" - "+item.nombres + " "+ item.apellidos+'</a>').appendTo(ul);
+				console.log(item);
 				};
 		},
 		select : function(event, ui) {
@@ -145,6 +147,12 @@ function autocompleteClientePorNombreOCedula(tipo_busqueda, busqueda_label, busq
 	$("#busqueda_label").autocomplete({
 		source : base_url,
 		minLength : 1,
+		create : function(){
+			$(this).data('ui-autocomplete')._renderItem = function(ul,item){
+				return $('<li>').append('<a>'+item.cedula +" - "+item.nombres + " "+ item.apellidos+'</a>').appendTo(ul);
+				console.log(item);
+				};
+		},
 		select : function(event, ui) {
 			id_cliente = ui.item.id;
 			event.preventDefault();
@@ -193,7 +201,11 @@ function autocompletePropietarioPorNombreOCedula(tipo_busqueda, busqueda_label, 
 	$("#busqueda_label").autocomplete({
 		source : base_url,
 		minLength : 1,
-		
+		create : function(){
+			$(this).data('ui-autocomplete')._renderItem = function(ul,item){
+				return $('<li>').append('<a>'+item.cedula +" - "+item.nombres + " "+ item.apellidos+'</a>').appendTo(ul);
+				};
+		},
 		select : function(event, ui) {
 			event.preventDefault();
 			id_propietario = ui.item.id;

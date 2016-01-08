@@ -9,6 +9,7 @@ from django.core.urlresolvers import reverse, resolve
 from principal.common_functions import verificar_permisos, loggear_accion
 from principal import permisos
 from django.contrib.auth.models import User
+from django.db import connection
 def lotes(request):
     
     if request.user.is_authenticated():
@@ -245,25 +246,63 @@ def listar_busqueda_lotes(request):
     
     busqueda = request.POST['busqueda']
     tipo_busqueda=request.POST['tipo_busqueda']
+    busqueda_label = request.POST['busqueda_label']
     #se busca un lote
     
                     
     lista_lotes=[]        
-    if(tipo_busqueda=='cedula'):            
-        ventas=Venta.objects.filter(cliente_id=busqueda)
-        for venta in ventas:
-            lote=Lote.objects.get(pk=venta.lote_id)
-            lista_lotes.append(lote)
+    if(tipo_busqueda=='cedula'):
+        if busqueda != '':       
+            ventas=Venta.objects.filter(cliente_id=busqueda)
+            for venta in ventas:
+                lote=Lote.objects.get(pk=venta.lote_id)
+                lista_lotes.append(lote)
+        else:
+            clientes = Cliente.objects.filter(cedula__icontains=busqueda_label)
+            for cliente in clientes:
+                ventas = Venta.objects.filter(cliente_id = cliente.id)
+                for venta in ventas:
+                    lote=Lote.objects.get(pk=venta.lote_id)
+                    lote.cliente = venta.cliente
+                    lista_lotes.append(lote)
+            
+                        
     
     if(tipo_busqueda=='nombre'):
-        ventas=Venta.objects.filter(cliente_id=busqueda)
-        for venta in ventas:
-            lote=Lote.objects.get(pk=venta.lote_id)
-            lista_lotes.append(lote)
+        if busqueda != '':
+            ventas=Venta.objects.filter(cliente_id=busqueda, recuperada = False)
+            for venta in ventas:
+                lote=Lote.objects.get(pk=venta.lote_id)
+                lote.cliente = venta.cliente
+                lista_lotes.append(lote)
+        else:
+            query = (
+                        '''
+                        SELECT id
+                        FROM principal_cliente
+                        WHERE CONCAT (UPPER(nombres), ' ', UPPER(apellidos)) like UPPER('%'''+busqueda_label+'''%')
+                        '''
+            )
+                        
+            cursor = connection.cursor()
+            cursor.execute(query)      
+            results= cursor.fetchall()
+            lista_clientes = []
+            for r in results:
+                ventas = Venta.objects.filter(cliente_id = r[0])
+                for venta in ventas:
+                    lote=Lote.objects.get(pk=venta.lote_id)
+                    lote.cliente = venta.cliente
+                    lista_lotes.append(lote)
+                        
+            
         
     if(tipo_busqueda=='codigo'):
-        lote=Lote.objects.get(pk=busqueda)
-        lista_lotes.append(lote)
+        if busqueda != '':
+            lote=Lote.objects.get(pk=busqueda)
+            lista_lotes.append(lote)
+        else:
+            lista_lotes = Lote.objects.filter(codigo_paralot__icontains=busqueda_label) 
     object_list=lista_lotes
             
     paginator=Paginator(object_list,15)
