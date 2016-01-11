@@ -1,6 +1,6 @@
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError
 from django.template import RequestContext, loader
-from principal.models import Lote, Venta, Manzana, Fraccion, Propietario, Cliente
+from principal.models import Lote, Venta, Manzana, Fraccion, Propietario, Cliente, RecuperacionDeLotes
 from lotes.forms import LoteForm, FraccionManzana
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
@@ -45,7 +45,26 @@ def consultar_lotes(request):
     else:
         return HttpResponseRedirect(reverse('login')) 
     
-    object_list = Lote.objects.all().order_by( 'id','manzana')
+    object_list = Lote.objects.all().order_by( 'manzana__fraccion','manzana__nro_manzana', 'nro_lote')[:15]
+    
+    for lote in object_list:
+        if lote.estado == '3':
+            try:
+                venta = Venta.objects.filter(lote_id = lote.id).order_by('-fecha_de_venta')
+                venta = venta[0]
+                cliente = venta.cliente
+                lote.cliente = cliente
+            except Exception, error:
+                try:
+                    recuperacion = RecuperacionDeLotes.objects.filter(lote_id = lote.id).order_by('-fecha_de_recuperacion')
+                    venta = recuperacion[0].venta
+                    cliente = venta.cliente
+                    lote.cliente = cliente
+                except Exception, error:
+                    lote.cliente = 'Lote "vendido" sin venta ni recuperacion'
+                    print " El lote vendido no esta asociado a una venta u recuperacion."
+        
+        
     
     paginator=Paginator(object_list,15)
     page=request.GET.get('page')
@@ -244,9 +263,12 @@ def listar_busqueda_lotes(request):
         return HttpResponseRedirect(reverse('login')) 
     
     
-    busqueda = request.POST['busqueda']
-    tipo_busqueda=request.POST['tipo_busqueda']
-    busqueda_label = request.POST['busqueda_label']
+    
+    busqueda = request.GET.get('busqueda','')
+    tipo_busqueda=request.GET.get('tipo_busqueda','')
+    busqueda_label = request.GET.get('busqueda_label','')
+    
+    
     #se busca un lote
     
                     
@@ -260,7 +282,7 @@ def listar_busqueda_lotes(request):
         else:
             clientes = Cliente.objects.filter(cedula__icontains=busqueda_label)
             for cliente in clientes:
-                ventas = Venta.objects.filter(cliente_id = cliente.id, recuperado = False)
+                ventas = Venta.objects.filter(cliente_id = cliente.id)
                 for venta in ventas:
                     lote=Lote.objects.get(pk=venta.lote_id)
                     lote.cliente = venta.cliente
@@ -270,7 +292,7 @@ def listar_busqueda_lotes(request):
     
     if(tipo_busqueda=='nombre'):
         if busqueda != '':
-            ventas=Venta.objects.filter(cliente_id=busqueda, recuperado = False)
+            ventas=Venta.objects.filter(cliente_id=busqueda, lote__estado = '3')
             for venta in ventas:
                 lote=Lote.objects.get(pk=venta.lote_id)
                 lote.cliente = venta.cliente
@@ -289,7 +311,7 @@ def listar_busqueda_lotes(request):
             results= cursor.fetchall()
             lista_clientes = []
             for r in results:
-                ventas = Venta.objects.filter(cliente_id = r[0], recuperado = False)
+                ventas = Venta.objects.filter(cliente_id = r[0], lote__estado = '3')
                 for venta in ventas:
                     try:
                         lote=Lote.objects.get(pk=venta.lote_id)
@@ -306,7 +328,25 @@ def listar_busqueda_lotes(request):
             lote=Lote.objects.get(pk=busqueda)
             lista_lotes.append(lote)
         else:
-            lista_lotes = Lote.objects.filter(codigo_paralot__icontains=busqueda_label) 
+            lista_lotes = Lote.objects.filter(codigo_paralot__icontains=busqueda_label)
+            for lote in lista_lotes:
+                if lote.estado == '3':
+                    try:
+                        venta = Venta.objects.filter(lote_id = lote.id).order_by('-fecha_de_venta')
+                        venta = venta[0]
+                        cliente = venta.cliente
+                        lote.cliente = cliente
+                    except Exception, error:
+                        try:
+                            recuperacion = RecuperacionDeLotes.objects.filter(lote_id = lote.id).order_by('-fecha_de_recuperacion')
+                            venta = recuperacion[0].venta
+                            cliente = venta.cliente
+                            lote.cliente = cliente
+                        except Exception, error:
+                            lote.cliente = 'Lote "vendido" sin venta ni recuperacion'
+                            print " El lote vendido no esta asociado a una venta u recuperacion."
+                    
+    ultima_busqueda = "&tabla=&busqueda="+busqueda+"&tipo_busqueda="+tipo_busqueda+"&busqueda_label="+busqueda_label 
     object_list=lista_lotes
             
     paginator=Paginator(object_list,15)
@@ -321,6 +361,7 @@ def listar_busqueda_lotes(request):
         
     c = RequestContext(request, {
         'object_list': lista,
+        'ultima_busqueda': ultima_busqueda,
     })
     return HttpResponse(t.render(c))
 

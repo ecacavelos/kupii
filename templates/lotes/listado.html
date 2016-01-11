@@ -116,7 +116,7 @@
 <h1>Listado de Lotes</h1>
 
 <div class="grid_6">
-	<form name="frm_busqueda" id="frm_busqueda" method="post" action="/lotes/listado_busqueda_lotes/">
+	<form name="frm_busqueda" id="frm_busqueda" method="get" action="/lotes/listado_busqueda_lotes/">
 		{% csrf_token %}
 		<table id="lista-categoria" frame="box">
 			<tr>
@@ -157,7 +157,7 @@
 </div>
 <div id="listado-item-lote">
 	<table border="1" cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
-		<th>ID Fracci&oacute;n</th><th>Manzana Nro</th><th>Lote Nro</th><th>Nombre Fracci&oacute;n</th><!--<th>Cliente</th>--><th>Estado</th>
+		<th>ID Fracci&oacute;n</th><th>Manzana Nro</th><th>Lote Nro</th><th>Nombre Fracci&oacute;n</th><th>Cliente</th><th>Estado</th>
 		{% for hw in object_list %}
 		{% if forloop.counter|divisibleby:2 %}
 		<tr>
@@ -165,7 +165,7 @@
 			<td> {{hw.manzana.nro_manzana}} </td>
 			<td><a href="{{hw.id}}">{{hw.nro_lote}} <strong>(Ver Detalles)</strong></a></td>
 			<td> {{hw.manzana.fraccion}} </td>
-			<!--<td> {{hw.cliente}} </td>-->
+			<td> {{hw.cliente}} </td>
 			<td> {{ hw.get_estado_display }} </td>
 		</tr>
 		{% else %}
@@ -174,7 +174,7 @@
 			<td> {{hw.manzana.nro_manzana}} </td>
 			<td><a href="{{hw.id}}">{{hw.nro_lote}} <strong>(Ver Detalles)</strong></a></td>
 			<td> {{hw.manzana.fraccion}} </td>
-			<!--<td> {{hw.cliente}} </td>-->
+			<td> {{hw.cliente}} </td>
 			<td> {{ hw.get_estado_display }} </td>
 		</tr>
 		{% endif %}
