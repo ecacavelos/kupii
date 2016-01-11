@@ -260,7 +260,7 @@ def listar_busqueda_lotes(request):
         else:
             clientes = Cliente.objects.filter(cedula__icontains=busqueda_label)
             for cliente in clientes:
-                ventas = Venta.objects.filter(cliente_id = cliente.id)
+                ventas = Venta.objects.filter(cliente_id = cliente.id, recuperado = False)
                 for venta in ventas:
                     lote=Lote.objects.get(pk=venta.lote_id)
                     lote.cliente = venta.cliente
@@ -270,7 +270,7 @@ def listar_busqueda_lotes(request):
     
     if(tipo_busqueda=='nombre'):
         if busqueda != '':
-            ventas=Venta.objects.filter(cliente_id=busqueda, recuperada = False)
+            ventas=Venta.objects.filter(cliente_id=busqueda, recuperado = False)
             for venta in ventas:
                 lote=Lote.objects.get(pk=venta.lote_id)
                 lote.cliente = venta.cliente
@@ -289,11 +289,15 @@ def listar_busqueda_lotes(request):
             results= cursor.fetchall()
             lista_clientes = []
             for r in results:
-                ventas = Venta.objects.filter(cliente_id = r[0])
+                ventas = Venta.objects.filter(cliente_id = r[0], recuperado = False)
                 for venta in ventas:
-                    lote=Lote.objects.get(pk=venta.lote_id)
-                    lote.cliente = venta.cliente
-                    lista_lotes.append(lote)
+                    try:
+                        lote=Lote.objects.get(pk=venta.lote_id)
+                        lote.cliente = venta.cliente
+                        lista_lotes.append(lote)
+                    except Exception, error:
+                        print "No existe el lote "+ unicode(venta.lote_id) +" de la venta "+unicode(venta.id)
+                        
                         
             
         
