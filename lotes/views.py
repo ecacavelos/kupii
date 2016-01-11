@@ -55,14 +55,8 @@ def consultar_lotes(request):
                 cliente = venta.cliente
                 lote.cliente = cliente
             except Exception, error:
-                try:
-                    recuperacion = RecuperacionDeLotes.objects.filter(lote_id = lote.id).order_by('-fecha_de_recuperacion')
-                    venta = recuperacion[0].venta
-                    cliente = venta.cliente
-                    lote.cliente = cliente
-                except Exception, error:
-                    lote.cliente = 'Lote "vendido" sin venta ni recuperacion'
-                    print " El lote vendido no esta asociado a una venta u recuperacion."
+                lote.cliente = 'Lote de estado "vendido" sin venta asociada'
+                print "El lote vendido no esta asociado a una venta."
         
         
     
@@ -285,8 +279,9 @@ def listar_busqueda_lotes(request):
                 ventas = Venta.objects.filter(cliente_id = cliente.id)
                 for venta in ventas:
                     lote=Lote.objects.get(pk=venta.lote_id)
-                    lote.cliente = venta.cliente
-                    lista_lotes.append(lote)
+                    if lote.estado == '3':
+                        lote.cliente = venta.cliente
+                        lista_lotes.append(lote)
             
                         
     
@@ -295,8 +290,9 @@ def listar_busqueda_lotes(request):
             ventas=Venta.objects.filter(cliente_id=busqueda, lote__estado = '3')
             for venta in ventas:
                 lote=Lote.objects.get(pk=venta.lote_id)
-                lote.cliente = venta.cliente
-                lista_lotes.append(lote)
+                if lote.estado == '3':
+                    lote.cliente = venta.cliente
+                    lista_lotes.append(lote)
         else:
             query = (
                         '''
@@ -328,7 +324,7 @@ def listar_busqueda_lotes(request):
             lote=Lote.objects.get(pk=busqueda)
             lista_lotes.append(lote)
         else:
-            lista_lotes = Lote.objects.filter(codigo_paralot__icontains=busqueda_label)
+            lista_lotes = Lote.objects.filter(codigo_paralot__icontains=busqueda_label).order_by('manzana__fraccion', 'manzana__nro_manzana', 'nro_lote')
             for lote in lista_lotes:
                 if lote.estado == '3':
                     try:
@@ -337,17 +333,12 @@ def listar_busqueda_lotes(request):
                         cliente = venta.cliente
                         lote.cliente = cliente
                     except Exception, error:
-                        try:
-                            recuperacion = RecuperacionDeLotes.objects.filter(lote_id = lote.id).order_by('-fecha_de_recuperacion')
-                            venta = recuperacion[0].venta
-                            cliente = venta.cliente
-                            lote.cliente = cliente
-                        except Exception, error:
-                            lote.cliente = 'Lote "vendido" sin venta ni recuperacion'
-                            print " El lote vendido no esta asociado a una venta u recuperacion."
+                        lote.cliente = 'Lote de estado "vendido" sin venta asociada'
+                        print "El lote vendido no esta asociado a una venta."
                     
-    ultima_busqueda = "&tabla=&busqueda="+busqueda+"&tipo_busqueda="+tipo_busqueda+"&busqueda_label="+busqueda_label 
+    ultima_busqueda = "&tabla=&busqueda="+busqueda+"&tipo_busqueda="+tipo_busqueda+"&busqueda_label="+busqueda_label
     object_list=lista_lotes
+    
             
     paginator=Paginator(object_list,15)
     page=request.GET.get('page')
