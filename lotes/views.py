@@ -120,7 +120,8 @@ def detalle_lote(request, lote_id):
                 id_objeto = form.instance.id
                 codigo_lote = form.instance.codigo_paralot
                 loggear_accion(request.user, "Actualizar", "Lote", id_objeto, codigo_lote)
-                object_list.boleto_nro = 0
+                if object_list.boleto_nro == '':
+                    object_list.boleto_nro = 0
                 object_list.save()
         elif data.get('boton_borrar'):
             f = Lote.objects.get(pk=lote_id)
@@ -151,7 +152,8 @@ def detalle_lote(request, lote_id):
                 id_objeto = form.instance.id
                 codigo_lote = form.instance.codigo_paralot
                 loggear_accion(request.user, "Actualizar", "Lote", id_objeto, codigo_lote)
-                object_list.boleto_nro = 0
+                if object_list.boleto_nro == '':
+                    object_list.boleto_nro = 0
                 object_list.save()
             
             #return HttpResponseRedirect('/movimientos/recuperacion_lotes/')
