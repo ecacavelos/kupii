@@ -42,6 +42,13 @@ function solo_numeros () {
 		//console.log("\n"+res);
 		$("#id_precio_credito").val(res);
 		
+		var res = $("#id_precio_costo").val();
+		for ( i = 0; i < res.length; i++) {
+			res = res.replace(".", "");
+		}
+		res = res.replace(",", ".");
+		$("#id_precio_costo").val(res);
+		
 		var res = $("#id_superficie").val();
 		for ( i = 0; i < res.length; i++) {
 			res = res.replace(".", "");
@@ -52,7 +59,8 @@ function solo_numeros () {
 		$("#id_superficie").val(res);
 		$("#id_manzana").prop('disabled', false);
 		$("#id_nro_lote").prop('disabled', false);
-		$("#id_estado").prop('disabled', false);	
+		$("#id_estado").prop('disabled', false);
+		$("#id_codigo_paralot").prop('disabled', false);
 	}
 
 	function solo_numeros_comas_puntos_contado () {
@@ -104,7 +112,7 @@ $(document).ready(function() {
 	$('#id_manzana').prop('disabled', true);
 	$('#id_nro_lote').prop('disabled', true);
 	$('#id_estado').prop('disabled', true);
-	$('#id_precio_costo').prop('disabled', true);
+	//$('#id_precio_costo').prop('disabled', true);
 	$('#id_codigo_paralot').prop('disabled', true);
 	
 	$('#id_superficie').val($('#id_superficie').val().replace(".",","));
@@ -127,11 +135,8 @@ $(document).ready(function() {
 	 		$('#id_precio_credito').val(format.call($('#id_precio_credito').val().split(' ').join(''),'.',','));solo_numeros_comas_puntos_credito();
 	});
 	
-	$('#id_precio_credito').on('keyup', function(){
-	 		$('#id_precio_credito').val(format.call($('#id_precio_credito').val().split(' ').join(''),'.',','));solo_numeros_comas_puntos_credito();
-	});
 	
-	$('#id_precio_credito').on('keyup', function(){
+	$('#id_precio_costo').on('keyup', function(){
 	 		$('#id_precio_costo').val(format.call($('#id_precio_costo').val().split(' ').join(''),'.',','));solo_numeros_comas_puntos_costo();
 	});
 	
@@ -177,7 +182,7 @@ $(document).ready(function() {
 		<div id="{{message_id}}">{{ message }}</div>
 	
 	
-	<form action="" name="form_mod_lote" onsubmit="_validar();">
+	<form action="" name="form_mod_lote" method="post" onsubmit="_validar();">
 	<table width="50%" border="1" cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
 		{% csrf_token %}
 		{% for field in form %}

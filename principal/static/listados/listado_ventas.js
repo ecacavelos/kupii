@@ -21,6 +21,7 @@
 	}	
 	
 	function desplegar_campos() {
+		$("#busqueda_label").autocomplete();
 		$("#fecha_desde").hide();
 		$("#fecha_hasta").hide();
 		$("#contado").hide();
@@ -62,7 +63,8 @@
 			$("#busqueda_label").show();
 			tipo_busqueda="codigo";
 			busqueda_label=$("#busqueda_label").val();			
-			busqueda=$("#busqueda").val();	
+			busqueda=$("#busqueda").val();
+			$("#busqueda_label").autocomplete("destroy");	
 			autocompleteLotePorCodigoParalot(tipo_busqueda, busqueda_label, busqueda);
 		}
 		if ($("#tipo_busqueda").val() == 'vendedor') {
@@ -80,10 +82,20 @@
 			$("#id_busqueda").empty();
 			base_url = base_context + "/ajax/get_vendedor_id_by_name/";
 			params = "value";
+			$("#busqueda_label").autocomplete("destroy");
 			$("#busqueda_label").autocomplete({
 				source : base_url,
 				minLength : 1,
+				create : function() {
+								$(this).data('ui-autocomplete')._renderItem = function (ul, item){
+									return $('<li>')
+										.append('<a>'+ item.cedula+"-"+ item.nombres+" "+item.apellidos+ '</a>')
+										.appendTo(ul);
+									};
+								},
 				select : function(event, ui) {
+					event.preventDefault();
+					$("#busqueda_label").val(ui.item.nombres+" "+ui.item.apellidos);
 					id_vendedor = ui.item.id;
 					$("#id_busqueda").val(id_vendedor);
 					//alert(id_vendedor);
@@ -105,19 +117,23 @@
 			$("#id_busqueda").empty();
 			base_url = base_context + "/ajax/get_cliente_id_by_name/";
 			params = "value";
+			
+			$("#busqueda_label").autocomplete("destroy");
 			$("#busqueda_label").autocomplete({
 				source : base_url,
 				minLength : 1,
                 create : function() {
 								$(this).data('ui-autocomplete')._renderItem = function (ul, item){
 									return $('<li>')
-										.append('<a>'+ item.nombres+" "+item.apellidos+ '</a>')
+										.append('<a>'+ item.cedula+"-"+ item.nombres+" "+item.apellidos+ '</a>')
 										.appendTo(ul);
 									};
 								},
 				select : function(event, ui) {
+					event.preventDefault();
 					id_cliente = ui.item.id;
 					$("#id_busqueda").val(id_cliente);
+					$("#busqueda_label").val(ui.item.nombres+" "+ui.item.apellidos);
 					//alert(id_cliente);
 					}
 				});			
@@ -139,6 +155,7 @@
 			$("#id_busqueda").empty();
 			base_url = base_context + "/ajax/get_fracciones_by_name/";
 			params = "value";
+			$("#busqueda_label").autocomplete("destroy");
 			$("#busqueda_label").autocomplete({
 				source : base_url,
 				minLength : 1,
@@ -150,8 +167,10 @@
 									};
 								},
 				select : function(event, ui) {
+					event.preventDefault();
 					id_fraccion = ui.item.id;
 					$("#id_busqueda").val(id_fraccion);
+					$("#busqueda_label").val(ui.item.nombre);
 					//alert(id_cliente);
 					}
 				});			

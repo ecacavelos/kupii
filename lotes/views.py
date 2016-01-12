@@ -322,6 +322,15 @@ def listar_busqueda_lotes(request):
     if(tipo_busqueda=='codigo'):
         if busqueda != '':
             lote=Lote.objects.get(pk=busqueda)
+            if lote.estado == '3':
+                try:
+                    venta = Venta.objects.filter(lote_id = lote.id).order_by('-fecha_de_venta')
+                    venta = venta[0]
+                    cliente = venta.cliente
+                    lote.cliente = cliente
+                except Exception, error:
+                    lote.cliente = 'Lote de estado "vendido" sin venta asociada'
+                    print "El lote vendido no esta asociado a una venta."
             lista_lotes.append(lote)
         else:
             lista_lotes = Lote.objects.filter(codigo_paralot__icontains=busqueda_label).order_by('manzana__fraccion', 'manzana__nro_manzana', 'nro_lote')
