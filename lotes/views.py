@@ -105,6 +105,8 @@ def detalle_lote(request, lote_id):
         data = request.POST
         if data.get('boton_guardar'):
             form = LoteForm(data, instance=object_list)
+            if data['boleto_nro'] == '':
+                data['boleto_nro'] = 0
             data['nro_lote'] = int(data['nro_lote'])    
             data['precio_contado'] = int(data['precio_contado'].replace(".", "")) 
             data['precio_credito'] = int(data['precio_credito'].replace(".", ""))
@@ -118,7 +120,7 @@ def detalle_lote(request, lote_id):
                 id_objeto = form.instance.id
                 codigo_lote = form.instance.codigo_paralot
                 loggear_accion(request.user, "Actualizar", "Lote", id_objeto, codigo_lote)
-                
+                object_list.boleto_nro = 0
                 object_list.save()
         elif data.get('boton_borrar'):
             f = Lote.objects.get(pk=lote_id)
@@ -134,6 +136,8 @@ def detalle_lote(request, lote_id):
         
         elif data.get('boton_guardar_a_recuperacion'):
             form = LoteForm(data, instance=object_list)
+            if data['boleto_nro'] == '':
+                data['boleto_nro'] = 0
             data['nro_lote'] = int(data['nro_lote'])    
             data['precio_contado'] = int(data['precio_contado'].replace(".", "")) 
             data['precio_credito'] = int(data['precio_credito'].replace(".", ""))
@@ -147,7 +151,7 @@ def detalle_lote(request, lote_id):
                 id_objeto = form.instance.id
                 codigo_lote = form.instance.codigo_paralot
                 loggear_accion(request.user, "Actualizar", "Lote", id_objeto, codigo_lote)
-                
+                object_list.boleto_nro = 0
                 object_list.save()
             
             #return HttpResponseRedirect('/movimientos/recuperacion_lotes/')
