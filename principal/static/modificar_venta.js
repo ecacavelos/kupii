@@ -114,6 +114,7 @@ function autocompleteClienteRucONombre(input_id, cedula_input_id, id_cliente_inp
 				};
 		},
 		select : function(event, ui) {
+			event.preventDefault();
 			alert("Al modificar el cliente esto modificara a todos los pagos relacionados a la venta");
 			cliente_id = ui.item.pk;
 			cedula_cliente= ui.item.fields.cedula;

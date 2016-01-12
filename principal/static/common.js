@@ -26,7 +26,7 @@ function autocompleteClienteRucONombre(input_id, cedula_input_id, id_cliente_inp
 		select : function(event, ui) {
 			event.preventDefault();
 			cliente_id = ui.item.id;
-			cedula_cliente= ui.item.fields.cedula;
+			cedula_cliente= ui.item.cedula;
 			$(input_id).val(ui.item.nombres+" "+ui.item.apellidos);
 			//name_cliente=ui.item.fields.nombres+" "+ui.item.fields.apellidos;
 			//$("#id_name_cliente").val(name_cliente);

@@ -63,13 +63,13 @@
 			minLength : 1,
 			create : function(){
 				$(this).data('ui-autocomplete')._renderItem = function(ul,item){
-					return $('<li>').append('<a>' +item.fields.cedula+' '+item.fields.nombres+' '+item.fields.apellidos+'</a>').appendTo(ul);
+					return $('<li>').append('<a>' +item.cedula+' '+item.nombres+' '+item.apellidos+'</a>').appendTo(ul);
 					};
 			},
 			select : function(event, ui) {
 				cliente_id = ui.item.pk;
-				$("#id_name_cliente").val (ui.item.fields.nombres+" "+ui.item.fields.apellidos);
-				$("#id_cedula_cliente").val(ui.item.fields.cedula);
+				$("#id_name_cliente").val (ui.item.nombres+" "+ui.item.apellidos);
+				$("#id_cedula_cliente").val(ui.item.cedula);
 				//name_cliente=ui.item.fields.nombres+" "+ui.item.fields.apellidos;
 				//$("#id_name_cliente").val(name_cliente);
 				$("#id_cliente").val(cliente_id);
