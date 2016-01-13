@@ -414,7 +414,8 @@ def obtener_detalle_interes_lote(lote_id,fecha_pago_parsed,proximo_vencimiento_p
 def obtener_cuotas_a_pagar(venta,fecha_pago,resumen_cuotas_a_pagar):
     
     lista_cuotas = []
-
+    cantidad_cuotas = 0
+    sumatoria_cuotas = 0 
     if (datetime.datetime.strptime(resumen_cuotas_a_pagar['proximo_vencimiento'], "%d/%m/%Y").date() < fecha_pago):
         print 'Hay al menos 1 cuota en mora'
         try:
@@ -427,8 +428,6 @@ def obtener_cuotas_a_pagar(venta,fecha_pago,resumen_cuotas_a_pagar):
         except Exception, error:
             print error
         interes_total = 0
-        sumatoria_cuotas = 0
-        cantidad_cuotas = 0 
         for interes_item in intereses:
             if interes_item['tipo'] == 'normal':
                 interes_total+=interes_item['intereses']

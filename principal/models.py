@@ -346,6 +346,8 @@ class Transaccion(models.Model):
     estado = models.CharField(max_length=30)
     cliente = models.ForeignKey(Cliente,on_delete=models.PROTECT)
     created = models.DateTimeField(auto_now_add=True)
+    id_transaccion_externa = models.IntegerField()
+    updated = models.DateTimeField()
    
 class Timbrado(models.Model):
     desde = models.DateField()
