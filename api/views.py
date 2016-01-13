@@ -440,13 +440,13 @@ def pago(request):
                                             elif unicode(detalle_pago['monto_total']).isdigit() != True:
                                                 error_msg = 'Monto total a pagar incorrecto.'
                                                 print error_msg
-                                                error['codigo'] = codigo_base_error_pago + '44'
+                                                error['codigo'] = codigo_base_error_pago + '36'
                                                 error['mensaje'] = error_msg
                                                 return HttpResponse(json.dumps(error),status=404, content_type="application/json")
                                             elif unicode(detalle_pago['id_transaccion_externa']).isdigit() != True:
-                                                error_msg = 'Monto total a pagar incorrecto.'
+                                                error_msg = 'Id Transaccion externa incorrecta.'
                                                 print error_msg
-                                                error['codigo'] = codigo_base_error_pago + '44'
+                                                error['codigo'] = codigo_base_error_pago + '37'
                                                 error['mensaje'] = error_msg
                                                 return HttpResponse(json.dumps(error),status=404, content_type="application/json")     
                                             else: # Parametros totalmente correctos, emitir el pago
