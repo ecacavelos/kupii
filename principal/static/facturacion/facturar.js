@@ -59,7 +59,7 @@
 		
 				
 		$("#id_cedula_cliente").autocomplete({
-			source : "/ajax/get_cliente_name_id_by_cedula/",
+			source : base_context +"/ajax/get_cliente_name_id_by_cedula/",
 			minLength : 1,
 			create : function(){
 				$(this).data('ui-autocomplete')._renderItem = function(ul,item){
@@ -654,7 +654,7 @@ function aplicarFuncionesDetalles(){
 	//alert("Hola");
 	// Autocomplete concepto factura
 		$(".concepto-factura").autocomplete({
-			source : "/ajax/get_concepto_factura_by_name/",
+			source : base_context+"/ajax/get_concepto_factura_by_name/",
 			minLength : 1,
 			create : function(){
 				$(this).data('ui-autocomplete')._renderItem = function(ul,item){

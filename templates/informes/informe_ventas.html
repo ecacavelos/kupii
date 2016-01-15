@@ -164,7 +164,7 @@
 		{% for venta in lista_ventas %}
 			{% for pago in venta %}
 			{% if forloop.counter == 1 %}
-			<th>Fecha de Venta</th><th>Fecha 1er Vto.</th><th>Cliente</th><th>Lote</th><th>Vendedor</th><th>Plan de Pago</th><th>Entrega Inicial</th><th>Precio Cuota</th><th>Precio final de venta</th><th>Cuotas Pagadas</th><th>Es Recuperada</th><th></th><th></th><th></th>
+			<th>Fecha de Venta</th><th>Fecha 1er Vto.</th><th>Cliente</th><th>Lote</th><th>Vendedor</th><th>Plan de Pago</th><th>Entrega Inicial</th><th>Precio Cuota</th><th>Precio final de venta</th><th>Cuotas Pagadas</th><th>Es Recuperada</th><th colspan="3">Acciones</th>
 				<tr>
 					<td class="recuperada celda_resumen_venta">{{pago.fecha_de_venta}}</td>
 					<td class="recuperada celda_resumen_venta">{{pago.fecha_primer_vencimiento}}</td>
@@ -187,7 +187,7 @@
 					<td class="recuperada celda_resumen_venta"><button class="eliminar" value="{{pago.id}}"><img src="/static/custom/img/black_delete.png" /></button></td>
 				</tr>
 				<tr>
-					<th>Fecha Pago</th><th colspan="2">Cuotas Pagadas</th><th>Fecha Vto.</th><th>Dias Atraso</th><th colspan="1">Nro Cuota</th><th colspan="2">Detalles</th><th colspan="2">Total Pagado</th><th colspan="4"></th>
+					<th>Fecha Pago</th><th colspan="2">Cuotas Pagadas</th><th>Fecha Vto.</th><th>Dias Atraso</th><th colspan="1">Nro Cuota</th><th colspan="2">Detalles</th><th colspan="1">Total Pagado</th><th>Transaccion</th><th>Factura</th><th colspan="3">Acciones</th>
 				</tr>
 			{% else %}		
 				<tr class="bkg_gris">
@@ -197,8 +197,20 @@
 					<td>{{pago.dias_atraso}}</td>
 					<td colspan="1">Cuota Nro: {{pago.nro_cuota}}</td>
 					<td colspan="2" style="text-align: right">{{pago.detalle}}</td>
-					<td colspan="2">Total pagado: {{pago.monto}}</td>
-					<td colspan="1"></td>
+					<td colspan="1">Total pagado: {{pago.monto}}</td>
+					
+					{% if pago.id_transaccion %}
+						<td> {{pago.id_transaccion}} </td>
+					{% else %}
+						<td> Interna </td>
+					{% endif %}
+					
+					{% if pago.factura %}
+						<td> {{pago.factura.numero}} </td>
+					{% else %}
+						<td> No Facturado </td>
+					{% endif %}
+					
 					<td></td>
 					<td colspan="1"><a href="/movimientos/modificar_pagocuota/{{pago.id}}"><img src="/static/custom/img/black_edit.png" /></a></td>
 					<td><button class="eliminar_pago" value="{{pago.id}}"><img src="/static/custom/img/black_delete.png" /></button></td>

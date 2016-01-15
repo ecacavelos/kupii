@@ -2879,6 +2879,15 @@ def informe_ventas(request):
                                 cuota['detalle'] = ""
                                 cuota['dias_atraso'] = ""
                                 cuota['vencimiento'] = ""
+                                try:
+                                    cuota['id_transaccion'] = pago.transaccion.id
+                                except:
+                                    cuota['id_transaccion'] = None
+                                
+                                if pago.factura_id != None:
+                                    cuota['factura'] = pago.factura
+                                else:
+                                    cuota['factura'] = None
                                 #Si se paga mas de una cuota
                                 if pago.nro_cuotas_a_pagar > 1:
                                     cuota['nro_cuota'] = unicode(contador_cuotas+1) +" al "+ unicode(contador_cuotas + pago.nro_cuotas_a_pagar)

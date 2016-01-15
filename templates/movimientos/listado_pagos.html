@@ -94,7 +94,7 @@
 </div>
 <div id="listado-item-lote">
 	<table width="50%" cellpadding="0" cellspacing="0" class="listado-pagos" align="center">
-		<th>ID</th><th>Fracci&oacute;n</th><th>Lote Nro</th><th>Cliente</th><th>Cuotas Pagadas</th><th>Plan de Pago</th><th>Fecha de Pago</th><th>Total de Cuotas</th><th>Total de Mora</th><th>Total de Pago</th>
+		<th>ID</th><th>Fracci&oacute;n</th><th>Lote Nro</th><th>Cliente</th><th>Cuotas Pagadas</th><th>Plan de Pago</th><th>Fecha de Pago</th><th>Total de Cuotas</th><th>Total de Mora</th><th>Total de Pago</th><th>Transaccion</th><th>Factura</th>
 		{% for hw in object_list %}
 		{% if forloop.counter|divisibleby:2 %}
 		<tr>
@@ -108,6 +108,17 @@
 			<td> {{hw.total_de_cuotas}} </td>
 			<td> {{hw.total_de_mora}} </td>
 			<td> {{hw.total_de_pago}} </td>
+			{% if hw.transaccion %}
+				<td> {{hw.transaccion.id}} </td>
+			{% else %}
+				<td> Interna </td>
+			{% endif %}
+			
+			{% if hw.factura %}
+				<td> {{hw.factura.numero}} </td>
+			{% else %}
+				<td> No Facturado </td>
+			{% endif %}
 		</tr>
 		{% else %}
 		<tr class="bkg_gris">
@@ -121,6 +132,17 @@
 			<td> {{hw.total_de_cuotas}} </td>
 			<td> {{hw.total_de_mora}} </td>
 			<td> {{hw.total_de_pago}} </td>
+			{% if hw.transaccion %}
+				<td> {{hw.transaccion.id}} </td>
+			{% else %}
+				<td> Interna </td>
+			{% endif %}
+			
+			{% if hw.factura %}
+				<td> {{hw.factura.numero}} </td>
+			{% else %}
+				<td> No Facturado </td>
+			{% endif %}
 		</tr>
 		{%endif%}
 		{%endfor%}

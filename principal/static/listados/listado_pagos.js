@@ -21,6 +21,7 @@ function buscar() {
 	}	
 	
 	function desplegar_campos() {
+		$("#busqueda_label").autocomplete();
 		$("#fecha_desde").hide();
 		$("#fecha_hasta").hide();
 		$("#busqueda_label").show();
@@ -56,7 +57,8 @@ function buscar() {
 			$("#busqueda_label").show();
 			tipo_busqueda="codigo";
 			busqueda_label=$("#busqueda_label").val();			
-			busqueda=$("#busqueda").val();	
+			busqueda=$("#busqueda").val();
+			$("#busqueda_label").autocomplete("destroy");	
 			autocompleteLotePorCodigoParalot(tipo_busqueda, busqueda_label, busqueda);
 		}
 		
@@ -72,6 +74,7 @@ function buscar() {
 			var id_cliente;
 			$("#id_busqueda").empty();
 			tipo_busqueda = "nombre";
+			$("#busqueda_label").autocomplete("destroy");
 			autocompleteClientePorNombreOCedula(tipo_busqueda, busqueda_label, busqueda);		
 		}
 	}
