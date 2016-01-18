@@ -144,7 +144,7 @@ def consulta(request, codigo_consulta):
                                             item = {}
                                             lote = Lote.objects.filter(id = venta.lote_id)
                                             lote_log = Lote.objects.get(id = venta.lote_id)
-                                            lote_serialized = serializers.serialize('python', lote)                                        
+                                            lote_serialized = serializers.serialize('python', lote)
                                             detalle_cuotas = get_cuotas_detail_by_lote(unicode(lote_serialized[0]['pk']))
                                             cuota_detalle = get_cuota_information_by_lote(unicode(lote_serialized[0]['pk']),1)
                                             item['codigo_lote'] = lote_serialized[0]['fields']['codigo_paralot']
@@ -366,19 +366,20 @@ def pago(request):
                 error['mensaje'] = 'Error en el servidor'                    
         else:#########################################  P O S T #############################################
             try:                
-                username = request.POST['username']
-                password = request.POST['password']
-                transaccion_id = request.POST['transaccion_id']
-                transaccion_externa_id = request.POST['id_transaccion_externa']
-                print 'Pago para transaccion id: ' + transaccion_id 
                 detalle_pago_post = request.POST
-                print 'POST recibido: ' + unicode(detalle_pago_post)
                 if not detalle_pago_post:
-                    print('Error en los parametros del request')
-                    error['codigo'] =  '12'
-                    error['mensaje'] = 'Request sin datos en el cuerpo'                    
-                    return HttpResponseBadRequest(json.dumps(error), content_type="application/json")
-                else:                
+                    respuesta = {}
+                    respuesta['mensaje'] = 'Conexion Exitosa'
+                    respuesta['codigo'] = '200'
+                    return HttpResponse(json.dumps(respuesta), content_type="application/json")                   
+                else:
+                    print 'POST recibido: ' + unicode(detalle_pago_post)  
+                    username = request.POST['username']
+                    password = request.POST['password']
+                    transaccion_id = request.POST['transaccion_id']
+                    print 'Pago para transaccion id: ' + transaccion_id 
+                    transaccion_externa_id = request.POST['id_transaccion_externa']
+                    
                     #1. Autenticacion
                     user = authenticate(username=username, password=password)
                     if user is not None:
@@ -423,6 +424,7 @@ def pago(request):
                                         venta = Venta.objects.filter(lote=lote, cliente=transaccion.cliente).latest('id')                                
                                         detalle_cuotas = get_cuotas_detail_by_lote(unicode(lote.id))
                                         hoy = date.today()
+                                        ahora = datetime.datetime.now()
                                         cuotas_a_pagar_detalle = obtener_cuotas_a_pagar(venta,hoy,detalle_cuotas)                                
                                         if not cuotas_a_pagar_detalle:
                                             error_msg = 'Cuota a pagar no encontrada' 
@@ -450,7 +452,27 @@ def pago(request):
                                                 error['mensaje'] = error_msg
                                                 return HttpResponse(json.dumps(error),status=404, content_type="application/json")     
                                             else: # Parametros totalmente correctos, emitir el pago
-                                             
+                                                
+                                                detalle_cuotas = get_cuotas_detail_by_lote(unicode(lote.id))
+                                                cuota_detalle = get_cuota_information_by_lote(unicode(lote.id),1)
+                                                                   
+                                                vencimiento = detalle_cuotas['proximo_vencimiento']
+                                                proximo_vencimiento_parsed = datetime.datetime.strptime(vencimiento , "%d/%m/%Y").date()
+                                                detalles = obtener_detalle_interes_lote(lote.id,hoy,proximo_vencimiento_parsed, int(detalle_pago['cantidad_cuotas']))
+                                                lista_detalles_json = []
+                                                detalles_json = {}
+                                                item = 0
+                                                for detalle in detalles:
+                                                    
+                                                    detalles_json['item'+unicode(item)] = detalle
+                                                    lista_detalles_json.append(detalles_json)
+                                                    item = item +1
+                                                    
+                                                    
+                                                
+                                                lista_detalles_json = json.dumps(detalles_json)
+                                                
+                                                
                                                 nuevo_pago = PagoDeCuotas()
                                                 nuevo_pago.venta = venta
                                                 nuevo_pago.lote = lote
@@ -464,6 +486,7 @@ def pago(request):
                                                 nuevo_pago.total_de_cuotas = venta.precio_de_cuota
                                                 nuevo_pago.total_de_pago = int(detalle_pago['monto_total'])
                                                 nuevo_pago.total_de_mora = int(detalle_pago['monto_total']) - venta.precio_de_cuota
+                                                nuevo_pago.detalle = lista_detalles_json
                                                 nuevo_pago.save()
                                                 
                                                 venta.pagos_realizados = venta.pagos_realizados + nuevo_pago.nro_cuotas_a_pagar  
@@ -533,27 +556,29 @@ def reversion(request):
     error = {}
     codigo_base_error_reversion  = 'r'
     if request.method == 'POST':
-        try:                
-            username = request.POST['username']
-            password = request.POST['password']
-            transaccion_id = request.POST['transaccion_id']
-            transaccion_externa_id = request.POST['id_transaccion_externa']
-            print 'Reversion para transaccion id: ' + transaccion_id 
+        try:
             detalle_reversion_post = request.POST
-            print 'POST recibido: ' + unicode(detalle_reversion_post)
             if not detalle_reversion_post:
-                print('Error en los parametros del request')
-                error['codigo'] =  '12'
-                error['mensaje'] = 'Request sin datos en el cuerpo'                    
-                return HttpResponseBadRequest(json.dumps(error), content_type="application/json")
-            else:                
+                respuesta = {}
+                respuesta['mensaje'] = 'Conexion Exitosa'
+                respuesta['codigo'] = '200'
+                return HttpResponse(json.dumps(respuesta), content_type="application/json")                   
+            else:
+                print 'POST recibido: ' + unicode(detalle_reversion_post)  
+                username = request.POST['username']
+                password = request.POST['password']
+                #transaccion_id = request.POST['transaccion_id']
+                transaccion_externa_id = request.POST['id_transaccion_externa']
+                print 'Reversion para id transaccion externa: ' + transaccion_externa_id                
+              
                 #1. Autenticacion
                 user = authenticate(username=username, password=password)
                 if user is not None:
                     # the password verified for the user
                     if user.is_active:                        
                         #2. Se obtiene la transaccion
-                        transaccion = Transaccion.objects.get(id = transaccion_id, id_transaccion_externa=transaccion_externa_id)
+                        #transaccion = Transaccion.objects.get(id = transaccion_id, id_transaccion_externa=transaccion_externa_id)
+                        transaccion = Transaccion.objects.get(id_transaccion_externa=transaccion_externa_id)
 #                            transaccion_tmstmp = transaccion.created.replace(tzinfo=None)
                         if not transaccion: 
                             error_msg = 'Transaccion no encontrada' 

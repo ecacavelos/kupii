@@ -428,18 +428,17 @@ def obtener_cuotas_a_pagar(venta,fecha_pago,resumen_cuotas_a_pagar):
         except Exception, error:
             print error
         interes_total = 0
-        for interes_item in intereses:
-            if interes_item['tipo'] == 'normal':
-                interes_total+=interes_item['intereses']
         if len(intereses)<=5: # Hasta 5 cuotas
             for interes_item in intereses:
                 if interes_item['tipo'] == 'normal':
                     cantidad_cuotas = cantidad_cuotas+1
+                    interes_total+=interes_item['intereses']
                     sumatoria_cuotas = sumatoria_cuotas + venta.precio_de_cuota + interes_total
                     cuota = {
                         'cantidad_sumatoria_cuotas': cantidad_cuotas,
                         'numero_cuota': interes_item['nro_cuota'],
                         'monto_cuota':venta.precio_de_cuota,
+                        'interes': interes_item['intereses'],
                         'interes_total': interes_total,
                         'monto_total_a_pagar': venta.precio_de_cuota +  interes_total, 
                         'vencimiento': interes_item['vencimiento'],
@@ -454,6 +453,7 @@ def obtener_cuotas_a_pagar(venta,fecha_pago,resumen_cuotas_a_pagar):
                  'cantidad_sumatoria_cuotas': cantidad_cuotas+1,
                  'numero_cuota': resumen_cuotas_a_pagar['cant_cuotas_pagadas'] + len(intereses) + 1 ,
                  'monto_cuota':venta.precio_de_cuota,
+                 'interes': 0,
                  'interes_total': 0,
                  'monto_total_a_pagar': venta.precio_de_cuota,  
                  'vencimiento': vencimiento_cuota_acutal.strftime("%d/%m/%Y"),
@@ -473,6 +473,7 @@ def obtener_cuotas_a_pagar(venta,fecha_pago,resumen_cuotas_a_pagar):
         cuota = {'cantidad_sumatoria_cuotas': cantidad_cuotas,
                  'numero_cuota': resumen_cuotas_a_pagar['cant_cuotas_pagadas'] + 1 ,
                  'monto_cuota':venta.precio_de_cuota,
+                 'interes': 0,
                  'interes_total': 0,
                  'monto_total_a_pagar': venta.precio_de_cuota,   
                  'vencimiento': resumen_cuotas_a_pagar['proximo_vencimiento'],
