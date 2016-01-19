@@ -318,7 +318,8 @@ def obtener_detalle_interes_lote(lote_id,fecha_pago_parsed,proximo_vencimiento_p
 
                 #Calculamos en base al primer vencimiento, cuantas cuotas debieron haberse pagado hasta la fecha
                 fecha_primer_vencimiento=venta.fecha_primer_vencimiento
-                cantidad_ideal_cuotas=monthdelta(fecha_primer_vencimiento, fecha_pago_parsed)
+                cantidad_ideal_cuotas=monthdelta(fecha_primer_vencimiento, fecha_pago_parsed) +1
+                        #cantidad_ideal_cuotas=monthdelta(fecha_primer_vencimiento, fecha_pago_parsed) +1
                 #Y obtenemos las cuotas atrasadas
                 cuotas_atrasadas=cantidad_ideal_cuotas-cuotas_pagadas
                 
