@@ -207,7 +207,7 @@ def consulta(request, codigo_consulta):
 
 
             
-@require_http_methods(["POST"])
+@require_http_methods(["POST","GET"])
 @csrf_exempt
 def pago(request):  
     error = {}
@@ -369,6 +369,8 @@ def pago(request):
                 detalle_pago_post = request.POST
                 if not detalle_pago_post:
                     respuesta = {}
+                    print "Post de pago sin parametros para prueba de conexion"
+                    print unicode(request.POST)
                     respuesta['mensaje'] = 'Conexion Exitosa'
                     respuesta['codigo'] = '200'
                     return HttpResponse(json.dumps(respuesta), content_type="application/json")                   
@@ -548,9 +550,14 @@ def pago(request):
                 error['codigo'] = '00'
                 error['mensaje'] = 'Error en el servidor'
             
-                return HttpResponseServerError(json.dumps(error), content_type="application/json")                
+                return HttpResponseServerError(json.dumps(error), content_type="application/json")  
+    else:
+        respuesta = {}
+        respuesta['mensaje'] = 'Conexion Exitosa'
+        respuesta['codigo'] = '200'
+        return HttpResponse(json.dumps(respuesta), content_type="application/json") 
  
-@require_http_methods(["POST"])
+@require_http_methods(["POST","GET"])
 @csrf_exempt
 def reversion(request):  
     error = {}
@@ -560,6 +567,8 @@ def reversion(request):
             detalle_reversion_post = request.POST
             if not detalle_reversion_post:
                 respuesta = {}
+                print "Post de reversion sin parametros para prueba de conexion"
+                print unicode(request.POST)
                 respuesta['mensaje'] = 'Conexion Exitosa'
                 respuesta['codigo'] = '200'
                 return HttpResponse(json.dumps(respuesta), content_type="application/json")                   
@@ -681,4 +690,9 @@ def reversion(request):
             error['codigo'] = '00'
             error['mensaje'] = 'Error en el servidor'
             
-            return HttpResponseServerError(json.dumps(error), content_type="application/json")                
+            return HttpResponseServerError(json.dumps(error), content_type="application/json")  
+    else:
+        respuesta = {}
+        respuesta['mensaje'] = 'Conexion Exitosa'
+        respuesta['codigo'] = '200'
+        return HttpResponse(json.dumps(respuesta), content_type="application/json")              
