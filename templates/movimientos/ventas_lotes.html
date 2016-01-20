@@ -77,7 +77,7 @@ var data = [
 		<tr>
 			<td><label>Cliente: </label></td>
 			<td class="noimage"><input id="id_cliente" type="hidden" name="cliente"  maxlength="100" onchange="retrieveCliente()" value="" />
-				<input id="id_name_cliente" type="text" name="name_cliente" placeholder="Ingrese el Nombre"  maxlength="100" /> <br><br>				
+				<input id="id_name_cliente" type="text" name="name_cliente" placeholder="Ingrese el Nombre"  maxlength="100"  style="width: 300px;" /> <br><br>				
 				<input id="id_cedula_cliente" type="text" name="cedula_cliente" placeholder="Ingrese el Nro. de C.I."  maxlength="100" />
 				o <a href="{% url 'frontend_home' %}clientes/agregar/" class="boton-verde" target="_blank">Agregar Nuevo Cliente</a> {{ field.errors }}<br><br>			
 			</td>
@@ -89,7 +89,7 @@ var data = [
 		<tr>
 			<td><label>Vendedor: </label></td>
 			<td class="noimage"><input id="id_vendedor" type="hidden" name="vendedor" maxlength="100" onchange="retrieveVendedor()" />
-				<input id="id_name_vendedor" type="text" name="name_vendedor" placeholder="Ingrese el Nombre" maxlength="100" /> <br><br>
+				<input id="id_name_vendedor" type="text" name="name_vendedor" placeholder="Ingrese el Nombre" maxlength="100" style="width: 300px;" /> <br><br>
 				<input id="id_cedula_vendedor" type="text" name="cedula_vendedor" placeholder="Ingrese el Nro. de C.I."  maxlength="100" />
 				o <a href="{% url 'frontend_home' %}vendedores/agregar/" class="boton-verde" target="_blank">Agregar Nuevo Vendedor</a> {{ field.errors }}<br><br>	
 			</td>
@@ -101,7 +101,7 @@ var data = [
 		<tr>
 			<td><label>Plan de Pago: </label></td>
 			<td class="noimage"><input id="id_plan_pago" name="plan_pago" type="hidden" maxlength="100" onchange="retrievePlanPago()"/>
-				<input id="id_plan_p" type="text" name="plan_p" maxlength="100" /><br><br>
+				<input id="id_plan_p" type="text" name="plan_p" maxlength="100" style="width: 300px;" /><br><br>
 				<input id="id_cant_cuotas_ref" type="hidden" name="cuotas_ref"/>
 			</td>
 			
@@ -111,7 +111,7 @@ var data = [
 		<tr>
 			<td><label>Plan de Pago Vendedor: </label></td>
 			<td class="noimage"><input id="id_plan_pago_vendedores" name="plan_pago_vendedores" type="hidden" maxlength="100" onchange="retrievePlanPagoVendedor()"/>
-				<input id="id_plan_pv" type="text" name="plan_pv" maxlength="100" /><br><br>
+				<input id="id_plan_pv" type="text" name="plan_pv" maxlength="100" style="width: 300px;" /><br><br>
 			</td>
 			
 		</tr>
