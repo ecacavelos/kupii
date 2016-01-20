@@ -68,9 +68,13 @@ def lotes_libres(request):
                     total_credito_fraccion = 0
                     total_superficie_fraccion = 0
                     total_lotes = 0
+                    misma_fraccion = True
                     for index, lote_item in enumerate(object_list):
                         lote={}
-                    # Se setean los datos de cada fila 
+                    # Se setean los datos de cada fila
+                        if misma_fraccion == True:
+                            misma_fraccion = False
+                            lote['misma_fraccion'] = misma_fraccion 
                         precio_cuota=int(math.ceil(lote_item.precio_credito/130))
                         lote['fraccion_id']=unicode(lote_item.manzana.fraccion.id)
                         lote['fraccion']=unicode(lote_item.manzana.fraccion)
@@ -93,6 +97,7 @@ def lotes_libres(request):
                             lote['total_contado_fraccion'] =  unicode('{:,}'.format(total_contado_fraccion)).replace(",", ".")
                             lote['total_superficie_fraccion'] =  unicode('{:,}'.format(total_superficie_fraccion)).replace(",", ".")
                             lote['total_lotes'] =  unicode('{:,}'.format(total_lotes)).replace(",", ".")
+                            
                     #Hay cambio de lote pero NO es el ultimo elemento todavia
                         elif (lote_item.manzana.fraccion.id != object_list[index+1].manzana.fraccion.id):
                             lote['total_importe_cuotas'] = unicode('{:,}'.format(total_importe_cuotas)).replace(",", ".") 
@@ -106,27 +111,30 @@ def lotes_libres(request):
                             total_credito_fraccion = 0
                             total_superficie_fraccion = 0
                             total_lotes = 0
+                            misma_fraccion = True
+                            
                         lotes.append(lote)
-
+                    #sin paginacion
+                    lista = lotes
                     #cantidad de registros a mostrar, determinada por el usuario
-                    try:
-                        cant_reg = request.GET['cant_reg']
-                        if cant_reg=='todos':
-                            paginator = Paginator(lotes, len(lotes))
-                        else:
-                            p=range(int(cant_reg))
-                            paginator = Paginator(lotes, len(p))
-                    except:
-                        cant_reg=25
-                        paginator = Paginator(lotes, 25)
-
-                    page = request.GET.get('page')
-                    try:
-                        lista = paginator.page(page)
-                    except PageNotAnInteger:
-                        lista = paginator.page(1)
-                    except EmptyPage:
-                        lista = paginator.page(paginator.num_pages)
+#                     try:
+#                         cant_reg = request.GET['cant_reg']
+#                         if cant_reg=='todos':
+#                             paginator = Paginator(lotes, len(lotes))
+#                         else:
+#                             p=range(int(cant_reg))
+#                             paginator = Paginator(lotes, len(p))
+#                     except:
+#                         cant_reg=25
+#                         paginator = Paginator(lotes, 25)
+# 
+#                     page = request.GET.get('page')
+#                     try:
+#                         lista = paginator.page(page)
+#                     except PageNotAnInteger:
+#                         lista = paginator.page(1)
+#                     except EmptyPage:
+#                         lista = paginator.page(paginator.num_pages)
 
                     c = RequestContext(request, {
                         'tipo_busqueda' : tipo_busqueda,
@@ -134,7 +142,7 @@ def lotes_libres(request):
                         'fraccion_fin': fraccion_fin,
                         'ultimo': ultimo,
                         'lista_lotes': lista,
-                        'cant_reg':cant_reg,
+                        #'cant_reg':cant_reg,
                         'frac1' : f1,
                         'frac2' : f2
                     })
