@@ -104,6 +104,7 @@ def consulta(request, codigo_consulta):
                                         id_objeto = transaccion.id
                                         codigo_lote = lote.codigo_paralot
                                         loggear_accion(request.user, "Agregar", "Transaccion", id_objeto, codigo_lote)
+                                        print "Consulta de transaccion id: "+unicode(id_objeto)+" finalizada."
                                         
                                         return HttpResponse(json.dumps(respuesta), content_type="application/json")
 ###################################### CODIGO DE LOTE ######################################################################################################
@@ -173,6 +174,7 @@ def consulta(request, codigo_consulta):
                                         id_objeto = transaccion.id
                                         codigo_lote = lote_log.codigo_paralot
                                         loggear_accion(user, "Agregar", "Transaccion", id_objeto, codigo_lote)
+                                        print "Consulta de transaccion id: "+unicode(id_objeto)+" finalizada."
                                         
                                         return HttpResponse(json.dumps(respuesta), content_type="application/json")
                                 
@@ -326,7 +328,7 @@ def pago(request):
                                                 respuesta['mensaje'] = 'Operacion Exitosa'
                                                 respuesta['codigo'] = '200'
                                                 
-                                                
+                                                print "Pago de transaccion id: "+unicode(id_objeto)+" finalizada."
                                                                                  
                                                 return HttpResponse(json.dumps(respuesta), content_type="application/json")
                         else:
@@ -418,6 +420,8 @@ def pago(request):
                                                 id_objeto = transaccion.id
                                                 codigo_lote = ''
                                                 loggear_accion(request.user, "Actualizar estado", "Transaccion", id_objeto, codigo_lote)
+                                                
+                                                print "Pago de transaccion id: "+unicode(id_objeto)+" finalizado."
                                                                                                                                    
                                             return HttpResponse(json.dumps(error),status=404, content_type="application/json")                                       
                                     else:
@@ -511,7 +515,7 @@ def pago(request):
                                                 respuesta['mensaje'] = 'Operacion Exitosa'
                                                 respuesta['codigo'] = '200'
                                                 
-                                                
+                                                print "Pago de transaccion id: "+unicode(id_objeto)+" finalizado."
                                                                                  
                                                 return HttpResponse(json.dumps(respuesta), content_type="application/json")
                         else:
@@ -651,7 +655,7 @@ def reversion(request):
                                         respuesta['mensaje'] = 'Operacion Exitosa'
                                         respuesta['codigo'] = '200'
                                                 
-                                                
+                                        print "Reversion de transaccion id: "+unicode(id_objeto)+" finalizada."        
                                                                                  
                                         return HttpResponse(json.dumps(respuesta), content_type="application/json")
                     else:
