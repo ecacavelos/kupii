@@ -161,7 +161,7 @@ def consulta(request, codigo_consulta):
                                             fecha_primer_vencimiento=venta.fecha_primer_vencimiento
                                             cantidad_ideal_cuotas=monthdelta(fecha_primer_vencimiento, hoy)
                                             #Y obtenemos las cuotas atrasadas
-                                            if cantidad_ideal_cuotas != 0:
+                                            if cantidad_ideal_cuotas > 0:
                                                 cuotas_atrasadas=cantidad_ideal_cuotas-int(detalle_cuotas['cant_cuotas_pagadas'])
                                             else:
                                                 cuotas_atrasadas=0
