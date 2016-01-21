@@ -471,7 +471,7 @@ def obtener_cuotas_a_pagar(venta,fecha_pago,resumen_cuotas_a_pagar):
             return error
     else:
         print 'Cliente esta al dia, solo debe abonar una cuota'
-        cuota = {'cantidad_sumatoria_cuotas': cantidad_cuotas,
+        cuota = {'cantidad_sumatoria_cuotas': 1,
                  'numero_cuota': resumen_cuotas_a_pagar['cant_cuotas_pagadas'] + 1 ,
                  'monto_cuota':venta.precio_de_cuota,
                  'interes': 0,
