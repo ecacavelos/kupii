@@ -97,6 +97,7 @@ function setup_inputs() {
 }
 
 function autocompletes(){
+	$("#id_busqueda_label").autocomplete();
     if ($("#id_busqueda").val() == "") {
         $("#fecha_ini").prop('disabled', true);
         $("#fecha_fin").prop('disabled', true);
@@ -117,6 +118,7 @@ function autocompletes(){
         $("#id_busqueda_label").empty();
         base_url = base_context + "/ajax/get_fracciones_by_name/";
         params = "value";
+        $("#id_busqueda_label").autocomplete("destroy");
         $("#id_busqueda_label").autocomplete({
             source: base_url,
             minLength: 1,
@@ -140,6 +142,7 @@ function autocompletes(){
         $("#id_busqueda_label").empty('OLA');
         base_url = base_context + "/ajax/get_propietario_id_by_name/";
         params = "value";
+        $("#id_busqueda_label").autocomplete("destroy");
         $("#id_busqueda_label").autocomplete({
             source: base_url,
             minLength: 1,

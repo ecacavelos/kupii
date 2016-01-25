@@ -279,7 +279,7 @@ class Lote(models.Model):
     )
     estado = models.CharField(max_length=1, choices=ESTADO_CHOICES)
     def __unicode__(self):
-        return (unicode(self.manzana).zfill(3) + "/" + unicode(self.nro_lote).zfill(4))
+        return (unicode(self.codigo_paralot))
     
     def as_json(self):
         return dict(
