@@ -2074,6 +2074,11 @@ def liquidacion_propietarios_reporte_excel(request):
     monto_inmobiliaria = 0
     monto_propietario = 0
     busqueda = request.GET['busqueda']
+    
+    descripcion = request.GET.get('descripcion_otros_descuentos', '')
+    monto_descuento = request.GET.get('monto_otros_descuentos', '')
+    total_a_cobrar = request.GET['total_a_cobrar']
+    
     #busqueda_label = request.GET['busqueda_label']                    
     if tipo_busqueda == "fraccion":
         try:
@@ -2605,18 +2610,18 @@ def liquidacion_propietarios_reporte_excel(request):
         
     wb = xlwt.Workbook(encoding='utf-8')
     sheet = wb.add_sheet('test', cell_overwrite_ok=True)
-    style = xlwt.easyxf('pattern: pattern solid, fore_colour light-blue;'
+    style = xlwt.easyxf('pattern: pattern solid, fore_colour white;'
                               'font: name Gill Sans MT Condensed, bold True; align: horiz center')   
-    style2 = xlwt.easyxf('pattern: pattern solid, fore_colour light-blue;'
-                         'font: name Gill Sans MT Condensed, height 160;')
+    style2 = xlwt.easyxf('pattern: pattern solid, fore_colour white;'
+                         'font: name Gill Sans MT Condensed, bold True, height 160;')
     style3 = xlwt.easyxf('font: name Gill Sans MT Condensed, height 160 ; align: horiz center')
     style4 = xlwt.easyxf('font: name Gill Sans MT Condensed, height 160 ; align: horiz right')
-    style5 = xlwt.easyxf('pattern: pattern solid, fore_colour light-blue;''font: name Gill Sans MT Condensed, height 160 ; align: horiz right')
+    style5 = xlwt.easyxf('pattern: pattern solid, fore_colour white;''font: name Gill Sans MT Condensed, bold True, height 160 ; align: horiz right')
     
     style_normal = xlwt.easyxf('font: name Gill Sans MT Condensed, height 160;')
     style_normal_centrado = xlwt.easyxf('font: name Gill Sans MT Condensed, height 160; align: horiz center')
     
-    style_fraccion = xlwt.easyxf('pattern: pattern solid, fore_colour light-green;'
+    style_fraccion = xlwt.easyxf('pattern: pattern solid, fore_colour white;'
                               'font: name Gill Sans MT Condensed, bold True; align: horiz center')  
     #Titulo
     #sheet.write_merge(0,0,0,7, 'PROPAR S.R.L.' ,style3)
@@ -2633,14 +2638,7 @@ def liquidacion_propietarios_reporte_excel(request):
      )
     #sheet.footer_str = 'things'
     
-    sheet.write(0, 0, 'Lote', style)
-    sheet.write(0, 1, 'Fecha de pago', style)
-    sheet.write(0, 2, 'Cliente', style)
-    sheet.write(0, 3, 'Nro cuota', style)
-    sheet.write(0, 4, 'Mes', style)
-    sheet.write(0, 5, 'Monto Pagado', style)
-    sheet.write(0, 6, 'Monto Inmob', style)
-    sheet.write(0, 7, 'Monto Prop', style)
+    
     
     c=0
     for pago in filas:
@@ -2662,6 +2660,16 @@ def liquidacion_propietarios_reporte_excel(request):
                     #sheet.write(c, 0, "Fraccion: " + pago['fraccion'],style2)                  
                     sheet.write_merge(c,c,0,7, pago['fraccion'],style_fraccion)
                     c +=1
+                    sheet.write(c, 0, 'Lote', style)
+                    sheet.write(c, 1, 'Fecha de pago', style)
+                    sheet.write(c, 2, 'Cliente', style)
+                    sheet.write(c, 3, 'Nro cuota', style)
+                    sheet.write(c, 4, 'Mes', style)
+                    sheet.write(c, 5, 'Monto Pagado', style)
+                    sheet.write(c, 6, 'Monto Inmob', style)
+                    sheet.write(c, 7, 'Monto Prop', style)
+                    c +=1
+                    
                 sheet.write(c, 0, pago['lote'],style_normal_centrado)
                 sheet.write(c, 1, pago['fecha_de_pago'],style_normal_centrado)
                 sheet.write(c, 2, pago['cliente'],style_normal)
@@ -2691,6 +2699,28 @@ def liquidacion_propietarios_reporte_excel(request):
                     sheet.write(c, 5, pago['total_general_pagado'],style5)
                     sheet.write(c, 6, pago['total_general_inmobiliaria'], style5)
                     sheet.write(c, 7, pago['total_general_propietario'], style5)
+                    
+                    c+=2
+                    
+                    sheet.write_merge(c,c,0,7, "RESUMEN IMPOSITIVO",style_fraccion)
+                    c+=1 
+                    sheet.write(c, 0, "Ley 1421/05",style)
+                    sheet.write(c, 1, "Imp Renta 4.5%", style)
+                    sheet.write(c, 2, "IVA Comisión", style)
+                    sheet.write_merge(c,c,3,5, "Descripcion Otros Descuentos", style)
+                    sheet.write(c, 6, "Monto Descuento", style)
+                    sheet.write(c, 7, "Total", style)
+                    
+                    c+=1  
+                    
+                    sheet.write(c, 0, pago['ley'],style4)
+                    sheet.write(c, 1, pago['impuesto_renta'], style4)
+                    sheet.write(c, 2, pago['iva_comision'], style4)
+                    sheet.write_merge(c,c,3,5, descripcion, style_normal_centrado)
+                    sheet.write(c, 6, monto_descuento, style4)
+                    sheet.write(c, 7, total_a_cobrar, style4)
+                    
+                    
             except Exception, error:
                 print error 
                 pass
