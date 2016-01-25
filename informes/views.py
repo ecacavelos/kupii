@@ -1783,12 +1783,6 @@ def lotes_libres_reporte_excel(request):
 
 def clientes_atrasados_reporte_excel(request):
     
-    wb = xlwt.Workbook(encoding='utf-8')
-    sheet = wb.add_sheet('test', cell_overwrite_ok=True)
-    style = xlwt.easyxf('pattern: pattern solid, fore_colour green;'
-                              'font: name Arial, bold True;')   
-    style2 = xlwt.easyxf('font: name Arial, bold True;')
-    
     fecha_actual= datetime.datetime.now()            
     filtros = filtros_establecidos(request.GET,'clientes_atrasados')
     cliente_atrasado= {}
@@ -1862,7 +1856,7 @@ def clientes_atrasados_reporte_excel(request):
                     
             #Seteamos los campos restantes
             total_atrasado = meses_diferencia * cliente_atrasado['importe_cuota']
-            cliente_atrasado['fecha_ultimo_pago']= datetime.datetime.strptime(unicode(fecha_ultimo_pago), "%Y-%m-%d").date()
+            cliente_atrasado['fecha_ultimo_pago']= datetime.datetime.strptime(unicode(fecha_ultimo_pago), "%Y-%m-%d").strftime("%d/%m/%Y")
             cliente_atrasado['lote']=(unicode(cliente_atrasado['manzana']).zfill(3) + "/" + unicode(cliente_atrasado['lote']).zfill(4))
             cliente_atrasado['total_atrasado'] = unicode('{:,}'.format(total_atrasado)).replace(",", ".")
             cliente_atrasado['importe_cuota'] = unicode('{:,}'.format(cliente_atrasado['importe_cuota'])).replace(",", ".")
@@ -1874,30 +1868,90 @@ def clientes_atrasados_reporte_excel(request):
     except Exception, error:
         print error    
         #return HttpResponseServerError("No se pudo obtener el Listado de Clientes Atrasados.")              
-    if clientes_atrasados:        
+    if clientes_atrasados:
+        
+        wb = xlwt.Workbook(encoding='utf-8')
+        sheet = wb.add_sheet('test', cell_overwrite_ok=True)
+        style = xlwt.easyxf('pattern: pattern solid, fore_colour white;'
+                              'font: name Gill Sans MT Condensed, bold True, height 160; align: horiz center')
+        style2 = xlwt.easyxf('font: name Gill Sans MT Condensed, height 160;')
+        
+        style3 = xlwt.easyxf('font: name Gill Sans MT Condensed, height 160 ; align: horiz right')
+        
+        style4 = xlwt.easyxf('font: name Gill Sans MT Condensed, height 160 ; align: horiz center')
+        
+        usuario = unicode(request.user)
+        sheet.header_str = (
+                            u"&LFecha: &D Hora: &T \nUsuario: "+usuario+" "
+                            u"&CPROPAR S.R.L.\n CLIENTES ATRASADOS "
+                            u"&RMeses de Atraso: "+unicode(meses_peticion)+" \nPage &P of &N"
+                            )
+                
         sheet.write(0, 0, "Cliente", style)
         sheet.write(0, 1, "Lote", style)
-        sheet.write(0, 2, "Cuotas Atras.", style)
-        sheet.write(0, 3, "Cuotas Pagadas", style)
-        sheet.write(0, 4, "Importe c/ cuota", style)
-        sheet.write(0, 5, "Total Atrasado", style)
-        sheet.write(0, 6, "Total Pagado", style)
-        sheet.write(0, 7, "Valor Total del Lote", style)
-        sheet.write(0, 8, "% Pagado", style)
-        sheet.write(0, 9, "Fec. Ult. Pago", style)
+        sheet.write(0, 2, "C.A.", style)
+        sheet.write(0, 3, "C.P.", style)
+        sheet.write(0, 4, "Importe C", style)
+        sheet.write(0, 5, "Total A.", style)
+        sheet.write(0, 6, "Total P.", style)
+        sheet.write(0, 7, "Total Lote", style)
+        sheet.write(0, 8, "% P.", style)
+        sheet.write(0, 9, "Fecha U.P.", style)
+        
+        #Ancho de la columna Lote
+        col_lote = sheet.col(1)
+        col_lote.width = 256 * 10   # 12 characters wide
+            
+        #Ancho de la columna Fecha
+        col_fecha = sheet.col(9)
+        col_fecha.width = 256 * 8   # 10 characters wide
+            
+        #Ancho de la columna Nombre
+        col_nombre = sheet.col(0)
+        col_nombre.width = 256 * 25   # 25 characters wide 
+        
+        #Ancho de la columna Nro cuota
+        col_nro_cuota = sheet.col(2)
+        col_nro_cuota.width = 256 * 3   # 6 characters wide
+            
+        #Ancho de la columna Nro cuota
+        col_nro_cuota = sheet.col(3)
+        col_nro_cuota.width = 256 * 3   # 6 characters wide
+            
+        #Ancho de la columna mes
+        col_mes = sheet.col(4)
+        col_mes.width = 256 * 11   # 8 characters wide
+            
+        #Ancho de la columna monto pagado
+        col_monto_pagado = sheet.col(5)
+        col_monto_pagado.width = 256 * 11   # 11 characters wide
+            
+        #Ancho de la columna monto inmobiliarioa
+        col_monto_inmo = sheet.col(6)
+        col_monto_inmo.width = 256 * 11   # 11 characters wide
+            
+        #Ancho de la columna monto propietario
+        col_nombre = sheet.col(7)
+        col_nombre.width = 256 * 11   # 11 characters wide
+        
+        #Ancho de la columna monto propietario
+        col_nombre = sheet.col(8)
+        col_nombre.width = 256 * 4   # 11 characters wide
+        
+        
         i = 0
         c = 1
         for i in range(len(clientes_atrasados)):        
-            sheet.write(c, 0, clientes_atrasados[i]['cliente'])
-            sheet.write(c, 1, unicode(clientes_atrasados[i]['lote']))
-            sheet.write(c, 2, unicode(clientes_atrasados[i]['cuotas_atrasadas']))
-            sheet.write(c, 3, unicode(clientes_atrasados[i]['cuotas_pagadas']))
-            sheet.write(c, 4, unicode(clientes_atrasados[i]['importe_cuota']))
-            sheet.write(c, 5, unicode(clientes_atrasados[i]['total_atrasado']))
-            sheet.write(c, 6, unicode(clientes_atrasados[i]['total_pagado']))
-            sheet.write(c, 7, unicode(clientes_atrasados[i]['valor_total_lote']))
-            sheet.write(c, 8, unicode(clientes_atrasados[i]['porc_pagado']))
-            sheet.write(c, 9,unicode(clientes_atrasados[i]['fecha_ultimo_pago']))
+            sheet.write(c, 0, clientes_atrasados[i]['cliente'],style2)
+            sheet.write(c, 1, unicode(clientes_atrasados[i]['lote']),style4)
+            sheet.write(c, 2, unicode(clientes_atrasados[i]['cuotas_atrasadas']),style4)
+            sheet.write(c, 3, unicode(clientes_atrasados[i]['cuotas_pagadas']),style4)
+            sheet.write(c, 4, unicode(clientes_atrasados[i]['importe_cuota']),style3)
+            sheet.write(c, 5, unicode(clientes_atrasados[i]['total_atrasado']),style3)
+            sheet.write(c, 6, unicode(clientes_atrasados[i]['total_pagado']),style3)
+            sheet.write(c, 7, unicode(clientes_atrasados[i]['valor_total_lote']),style3)
+            sheet.write(c, 8, unicode(clientes_atrasados[i]['porc_pagado']),style4)
+            sheet.write(c, 9,unicode(clientes_atrasados[i]['fecha_ultimo_pago']),style2)
             c += 1
     response = HttpResponse(content_type='application/vnd.ms-excel')
     # Crear un nombre intuitivo         
