@@ -426,7 +426,9 @@ def informe_general(request):
                     fraccion_fin=request.GET['frac2']
                     f1=request.GET['fraccion_ini']
                     f2=request.GET['fraccion_fin']
+                    filas_fraccion = []
                     ultimo="&tipo_busqueda="+tipo_busqueda+"&fraccion_ini="+f1+"&frac1="+fraccion_ini+"&fraccion_fin="+f2+"&frac2="+fraccion_fin+"&fecha_ini="+fecha_ini+"&fecha_fin="+fecha_fin
+                    g_fraccion = ''
                     if fecha_ini == '' and fecha_fin == '':
                         query=(
                         '''
@@ -460,68 +462,123 @@ def informe_general(request):
                     total_cuotas=0
                     total_mora=0
                     total_pagos=0
+                    
+                    total_general_cuotas=0
+                    total_general_mora=0
+                    total_general_pagos=0
+                    #ver esto
                     for i, cuota_item in enumerate(object_list):
                         #Se setean los datos de cada fila
                         cuota={}
+                        cuota['misma_fraccion'] = True
                         nro_cuota=get_nro_cuota(cuota_item)
-                        cuota['fraccion_id']=unicode(cuota_item.lote.manzana.fraccion.id)
-                        cuota['fraccion']=unicode(cuota_item.lote.manzana.fraccion)
-                        cuota['lote']=unicode(cuota_item.lote)
-                        cuota['cliente']=unicode(cuota_item.cliente)
-                        cuota['cuota_nro']=unicode(nro_cuota)+'/'+unicode(cuota_item.plan_de_pago.cantidad_de_cuotas)
-                        cuota['plan_de_pago']=cuota_item.plan_de_pago.nombre_del_plan
-                        cuota['fecha_pago']=unicode(cuota_item.fecha_de_pago.strftime("%d/%m/%Y"))
-                        cuota['total_de_cuotas']=unicode('{:,}'.format(cuota_item.total_de_cuotas)).replace(",", ".") 
-                        cuota['total_de_mora']=unicode('{:,}'.format(cuota_item.total_de_mora)).replace(",", ".")
-                        cuota['total_de_pago']=unicode('{:,}'.format(cuota_item.total_de_pago)).replace(",", ".")
-    
-                        #Se suman los totales por fraccion
-                        total_cuotas+=cuota_item.total_de_cuotas
-                        total_mora+=cuota_item.total_de_mora
-                        total_pagos+=cuota_item.total_de_pago
-                        
-                        #Es el ultimo lote, cerramos los totales de fraccion
-                        if (len(object_list)-1 == i):
-                            cuota['total_cuotas']=unicode('{:,}'.format(total_cuotas)).replace(",", ".") 
-                            cuota['total_mora']=unicode('{:,}'.format(total_mora)).replace(",", ".")
-                            cuota['total_pago']=unicode('{:,}'.format(total_pagos)).replace(",", ".")
+                        if g_fraccion == '':
+                            g_fraccion = cuota_item.lote.manzana.fraccion.id
+                            cuota['misma_fraccion'] = False
+                        if g_fraccion != cuota_item.lote.manzana.fraccion.id:
                             
-                        #Hay cambio de lote pero NO es el ultimo elemento todavia
-                        elif (cuota_item.lote.manzana.fraccion.id != object_list[i+1].lote.manzana.fraccion.id):
+                            filas_fraccion[0]['misma_fraccion']= False
+                            cuotas.extend(filas_fraccion)
+                            filas_fraccion = []
+                            
+                            g_fraccion = cuota_item.lote.manzana.fraccion.id
+                            
+                            cuota={}
+                            #cuota['misma_fraccion'] = False
                             cuota['total_cuotas']=unicode('{:,}'.format(total_cuotas)).replace(",", ".") 
                             cuota['total_mora']=unicode('{:,}'.format(total_mora)).replace(",", ".")
                             cuota['total_pago']=unicode('{:,}'.format(total_pagos)).replace(",", ".")
-                        
-                        #Se CERAN  los TOTALES por FRACCION
+                            cuota['ultimo_pago'] = True
+                            cuotas.append(cuota)
+                            
                             total_cuotas=0
                             total_mora=0
                             total_pagos=0
-                        
-                        cuotas.append(cuota)                
-
-                    #cantidad de registros a mostrar, determinada por el usuario
-                    try:
-                        cant_reg = request.GET['cant_reg']
-                        if cant_reg=='todos':
-                            paginator = Paginator(cuotas, len(cuotas))
+                            
+                            cuota = {}
+                            cuota['misma_fraccion'] = False
+                            cuota['ultimo_pago'] = False
+                            cuota['fraccion_id']=unicode(cuota_item.lote.manzana.fraccion.id)
+                            cuota['fraccion']=unicode(cuota_item.lote.manzana.fraccion)
+                            cuota['lote']=unicode(cuota_item.lote)
+                            cuota['cliente']=unicode(cuota_item.cliente)
+                            cuota['cuota_nro']=unicode(nro_cuota)+'/'+unicode(cuota_item.plan_de_pago.cantidad_de_cuotas)
+                            cuota['plan_de_pago']=cuota_item.plan_de_pago.nombre_del_plan
+                            cuota['fecha_pago']=unicode(cuota_item.fecha_de_pago.strftime("%d/%m/%Y"))
+                            cuota['total_de_cuotas']=unicode('{:,}'.format(cuota_item.total_de_cuotas)).replace(",", ".") 
+                            cuota['total_de_mora']=unicode('{:,}'.format(cuota_item.total_de_mora)).replace(",", ".")
+                            cuota['total_de_pago']=unicode('{:,}'.format(cuota_item.total_de_pago)).replace(",", ".")
+                            #Se suman los totales por fraccion
+                            total_cuotas+=cuota_item.total_de_cuotas
+                            total_mora+=cuota_item.total_de_mora
+                            total_pagos+=cuota_item.total_de_pago
+                            
+                            total_general_cuotas+=cuota_item.total_de_cuotas
+                            total_general_mora+=cuota_item.total_de_mora
+                            total_general_pagos+=cuota_item.total_de_pago
+                            
+                            filas_fraccion.append(cuota)
+                            
                         else:
-                            p=range(int(cant_reg))
-                            paginator = Paginator(cuotas, len(p))
-                    except:
-                        cant_reg=25
-                        paginator = Paginator(cuotas, 25)
-                    
-
-                    page = request.GET.get('page')
-                    try:
-                        lista = paginator.page(page)
-                    except PageNotAnInteger:
-                        lista = paginator.page(1)
-                    except EmptyPage:
-                        lista = paginator.page(paginator.num_pages) 
+                            cuota['ultimo_pago'] = False
+                            cuota['misma_fraccion'] = True
+                            cuota['fraccion_id']=unicode(cuota_item.lote.manzana.fraccion.id)
+                            cuota['fraccion']=unicode(cuota_item.lote.manzana.fraccion)
+                            cuota['lote']=unicode(cuota_item.lote)
+                            cuota['cliente']=unicode(cuota_item.cliente)
+                            cuota['cuota_nro']=unicode(nro_cuota)+'/'+unicode(cuota_item.plan_de_pago.cantidad_de_cuotas)
+                            cuota['plan_de_pago']=cuota_item.plan_de_pago.nombre_del_plan
+                            cuota['fecha_pago']=unicode(cuota_item.fecha_de_pago.strftime("%d/%m/%Y"))
+                            cuota['total_de_cuotas']=unicode('{:,}'.format(cuota_item.total_de_cuotas)).replace(",", ".") 
+                            cuota['total_de_mora']=unicode('{:,}'.format(cuota_item.total_de_mora)).replace(",", ".")
+                            cuota['total_de_pago']=unicode('{:,}'.format(cuota_item.total_de_pago)).replace(",", ".")
+                            #Se suman los totales por fraccion
+                            total_cuotas+=cuota_item.total_de_cuotas
+                            total_mora+=cuota_item.total_de_mora
+                            total_pagos+=cuota_item.total_de_pago
+                            
+                            total_general_cuotas+=cuota_item.total_de_cuotas
+                            total_general_mora+=cuota_item.total_de_mora
+                            total_general_pagos+=cuota_item.total_de_pago
+                            
+                            filas_fraccion.append(cuota)
+                                        
+                    cuotas.extend(filas_fraccion)
+                    cuota={}    
+                    cuota['total_cuotas']=unicode('{:,}'.format(total_cuotas)).replace(",", ".") 
+                    cuota['total_mora']=unicode('{:,}'.format(total_mora)).replace(",", ".")
+                    cuota['total_pago']=unicode('{:,}'.format(total_pagos)).replace(",", ".")
+                    cuota['ultimo_pago'] = True
+                    cuotas.append(cuota)
+                    cuota = {}
+                    cuota['total_general_cuotas']=unicode('{:,}'.format(total_general_cuotas)).replace(",", ".") 
+                    cuota['total_general_mora']=unicode('{:,}'.format(total_general_mora)).replace(",", ".")
+                    cuota['total_general_pago']=unicode('{:,}'.format(total_general_pagos)).replace(",", ".")
+                    cuotas.append(cuota)
+                    lista = cuotas
+#                     #cantidad de registros a mostrar, determinada por el usuario
+#                     try:
+#                         cant_reg = request.GET['cant_reg']
+#                         if cant_reg=='todos':
+#                             paginator = Paginator(cuotas, len(cuotas))
+#                         else:
+#                             p=range(int(cant_reg))
+#                             paginator = Paginator(cuotas, len(p))
+#                     except:
+#                         cant_reg=25
+#                         paginator = Paginator(cuotas, 25)
+#                     
+# 
+#                     page = request.GET.get('page')
+#                     try:
+#                         lista = paginator.page(page)
+#                     except PageNotAnInteger:
+#                         lista = paginator.page(1)
+#                     except EmptyPage:
+#                         lista = paginator.page(paginator.num_pages) 
                     c = RequestContext(request, {
                         'tipo_busqueda' : tipo_busqueda,
-                        'cant_reg': cant_reg,
+                        #'cant_reg': cant_reg,
                         'fraccion_ini': fraccion_ini,
                         'fraccion_fin': fraccion_fin,
                         'fecha_ini': fecha_ini,
@@ -1964,7 +2021,9 @@ def informe_general_reporte_excel(request):
     fecha_fin=request.GET['fecha_fin']
     fraccion_ini=request.GET['fraccion_ini']
     fraccion_fin=request.GET['fraccion_fin']
-    cuotas=[]    
+    cuotas=[]
+    g_fraccion = ''
+    filas_fraccion = []    
     if fecha_ini == '' and fecha_fin == '':
         query=(
             '''
@@ -1993,110 +2052,232 @@ def informe_general_reporte_excel(request):
         )
     object_list=list(PagoDeCuotas.objects.raw(query)) 
     #Totales por FRACCION
+    
     total_cuotas=0
     total_mora=0
     total_pagos=0
-      
-    #Totales GENERALES
+                    
     total_general_cuotas=0
     total_general_mora=0
     total_general_pagos=0
-        
+    #ver esto
     for i, cuota_item in enumerate(object_list):
         #Se setean los datos de cada fila
         cuota={}
+        cuota['misma_fraccion'] = True
         nro_cuota=get_nro_cuota(cuota_item)
-        cuota['fraccion_id']=unicode(cuota_item.lote.manzana.fraccion.id)
-        cuota['fraccion']=unicode(cuota_item.lote.manzana.fraccion)
-        cuota['lote']=unicode(cuota_item.lote)
-        cuota['cliente']=unicode(cuota_item.cliente)
-        cuota['cuota_nro']=unicode(nro_cuota)+'/'+unicode(cuota_item.plan_de_pago.cantidad_de_cuotas)
-        cuota['plan_de_pago']=cuota_item.plan_de_pago.nombre_del_plan
-        cuota['fecha_pago']=unicode(cuota_item.fecha_de_pago)
-        cuota['total_de_cuotas']=unicode('{:,}'.format(cuota_item.total_de_cuotas)).replace(",", ".") 
-        cuota['total_de_mora']=unicode('{:,}'.format(cuota_item.total_de_mora)).replace(",", ".")
-        cuota['total_de_pago']=unicode('{:,}'.format(cuota_item.total_de_pago)).replace(",", ".")
-
-        #Se suman los totales por fraccion
-        total_cuotas+=cuota_item.total_de_cuotas
-        total_mora+=cuota_item.total_de_mora
-        total_pagos+=cuota_item.total_de_pago
+        if g_fraccion == '':
+            g_fraccion = cuota_item.lote.manzana.fraccion.id
+            cuota['misma_fraccion'] = False
+        if g_fraccion != cuota_item.lote.manzana.fraccion.id:
             
-        #Y acumulamos para los totales generales
-        total_general_cuotas+=cuota_item.total_de_cuotas
-        total_general_mora+=cuota_item.total_de_mora
-        total_general_pagos+=cuota_item.total_de_pago
-            
-        #Es el ultimo lote, cerramos los totales de fraccion y los totales generales
-        if (len(object_list)-1 == i):
+            filas_fraccion[0]['misma_fraccion']= False
+            cuotas.extend(filas_fraccion)
+            filas_fraccion = []
+                            
+            g_fraccion = cuota_item.lote.manzana.fraccion.id
+                            
+            cuota={}
+            #cuota['misma_fraccion'] = False
             cuota['total_cuotas']=unicode('{:,}'.format(total_cuotas)).replace(",", ".") 
             cuota['total_mora']=unicode('{:,}'.format(total_mora)).replace(",", ".")
             cuota['total_pago']=unicode('{:,}'.format(total_pagos)).replace(",", ".")
-                
-            cuota['total_general_cuotas']=unicode('{:,}'.format(total_general_cuotas)).replace(",", ".") 
-            cuota['total_general_mora']=unicode('{:,}'.format(total_general_mora)).replace(",", ".")
-            cuota['total_general_pago']=unicode('{:,}'.format(total_general_pagos)).replace(",", ".")
-                        
-        #Hay cambio de lote pero NO es el ultimo elemento todavia
-        elif (cuota_item.lote.manzana.fraccion.id != object_list[i+1].lote.manzana.fraccion.id):
-            cuota['total_cuotas']=unicode('{:,}'.format(total_cuotas)).replace(",", ".") 
-            cuota['total_mora']=unicode('{:,}'.format(total_mora)).replace(",", ".")
-            cuota['total_pago']=unicode('{:,}'.format(total_pagos)).replace(",", ".")
-                    
-            #Se CERAN  los TOTALES por FRACCION
+            cuota['ultimo_pago'] = True
+            cuotas.append(cuota)
+                            
             total_cuotas=0
             total_mora=0
             total_pagos=0
-                    
-        cuotas.append(cuota)
+                            
+            cuota = {}
+            cuota['misma_fraccion'] = False
+            cuota['ultimo_pago'] = False
+            cuota['fraccion_id']=unicode(cuota_item.lote.manzana.fraccion.id)
+            cuota['fraccion']=unicode(cuota_item.lote.manzana.fraccion)
+            cuota['lote']=unicode(cuota_item.lote)
+            cuota['cliente']=unicode(cuota_item.cliente)
+            cuota['cuota_nro']=unicode(nro_cuota)+'/'+unicode(cuota_item.plan_de_pago.cantidad_de_cuotas)
+            cuota['plan_de_pago']=cuota_item.plan_de_pago.nombre_del_plan
+            cuota['fecha_pago']=unicode(cuota_item.fecha_de_pago.strftime("%d/%m/%Y"))
+            cuota['total_de_cuotas']=unicode('{:,}'.format(cuota_item.total_de_cuotas)).replace(",", ".") 
+            cuota['total_de_mora']=unicode('{:,}'.format(cuota_item.total_de_mora)).replace(",", ".")
+            cuota['total_de_pago']=unicode('{:,}'.format(cuota_item.total_de_pago)).replace(",", ".")
+            #Se suman los totales por fraccion
+            total_cuotas+=cuota_item.total_de_cuotas
+            total_mora+=cuota_item.total_de_mora
+            total_pagos+=cuota_item.total_de_pago
+            
+            total_general_cuotas+=cuota_item.total_de_cuotas
+            total_general_mora+=cuota_item.total_de_mora
+            total_general_pagos+=cuota_item.total_de_pago
+                            
+            filas_fraccion.append(cuota)
+                            
+        else:
+            cuota['ultimo_pago'] = False
+            cuota['misma_fraccion'] = True
+            cuota['fraccion_id']=unicode(cuota_item.lote.manzana.fraccion.id)
+            cuota['fraccion']=unicode(cuota_item.lote.manzana.fraccion)
+            cuota['lote']=unicode(cuota_item.lote)
+            cuota['cliente']=unicode(cuota_item.cliente)
+            cuota['cuota_nro']=unicode(nro_cuota)+'/'+unicode(cuota_item.plan_de_pago.cantidad_de_cuotas)
+            cuota['plan_de_pago']=cuota_item.plan_de_pago.nombre_del_plan
+            cuota['fecha_pago']=unicode(cuota_item.fecha_de_pago.strftime("%d/%m/%Y"))
+            cuota['total_de_cuotas']=unicode('{:,}'.format(cuota_item.total_de_cuotas)).replace(",", ".") 
+            cuota['total_de_mora']=unicode('{:,}'.format(cuota_item.total_de_mora)).replace(",", ".")
+            cuota['total_de_pago']=unicode('{:,}'.format(cuota_item.total_de_pago)).replace(",", ".")
+            #Se suman los totales por fraccion
+            total_cuotas+=cuota_item.total_de_cuotas
+            total_mora+=cuota_item.total_de_mora
+            total_pagos+=cuota_item.total_de_pago
+                        
+            total_general_cuotas+=cuota_item.total_de_cuotas
+            total_general_mora+=cuota_item.total_de_mora
+            total_general_pagos+=cuota_item.total_de_pago
+                            
+            filas_fraccion.append(cuota)
+                                        
+    cuotas.extend(filas_fraccion)
+    cuota={}    
+    cuota['total_cuotas']=unicode('{:,}'.format(total_cuotas)).replace(",", ".") 
+    cuota['total_mora']=unicode('{:,}'.format(total_mora)).replace(",", ".")
+    cuota['total_pago']=unicode('{:,}'.format(total_pagos)).replace(",", ".")
+    cuota['ultimo_pago'] = True
+    cuotas.append(cuota)
+    cuota = {}
+    cuota['total_general_cuotas']=unicode('{:,}'.format(total_general_cuotas)).replace(",", ".") 
+    cuota['total_general_mora']=unicode('{:,}'.format(total_general_mora)).replace(",", ".")
+    cuota['total_general_pago']=unicode('{:,}'.format(total_general_pagos)).replace(",", ".")
+    cuotas.append(cuota)
+    lista = cuotas
         
     wb = xlwt.Workbook(encoding='utf-8')
     sheet = wb.add_sheet('test', cell_overwrite_ok=True)
-    style = xlwt.easyxf('pattern: pattern solid, fore_colour green;'
-                              'font: name Arial, bold True;')   
-    style2 = xlwt.easyxf('font: name Arial, bold True;')
+    style = xlwt.easyxf('pattern: pattern solid, fore_colour white;'
+                              'font: name Gill Sans MT Condensed, bold True; align: horiz center')   
+    style2 = xlwt.easyxf('pattern: pattern solid, fore_colour white;'
+                         'font: name Gill Sans MT Condensed, bold True, height 160;')
+    style3 = xlwt.easyxf('font: name Gill Sans MT Condensed, height 160 ; align: horiz center')
+    style4 = xlwt.easyxf('font: name Gill Sans MT Condensed, height 160 ; align: horiz right')
+    style5 = xlwt.easyxf('pattern: pattern solid, fore_colour white;''font: name Gill Sans MT Condensed, bold True, height 160 ; align: horiz right')
+    
+    style_normal = xlwt.easyxf('font: name Gill Sans MT Condensed, height 160;')
+    style_normal_centrado = xlwt.easyxf('font: name Gill Sans MT Condensed, height 160; align: horiz center')
+    
+    style_fraccion = xlwt.easyxf('pattern: pattern solid, fore_colour white;'
+                              'font: name Gill Sans MT Condensed, bold True; align: horiz center')  
+    #Titulo
+    #sheet.write_merge(0,0,0,7, 'PROPAR S.R.L.' ,style3)
+    #sheet.write_merge(1,1,1,7, 'Sistema de Control de Loteamiento' ,style3)
+    
+    #sheet.header_str = 'PROPAR S.R.L.'
+    periodo_1 = fecha_ini
+    periodo_2 = fecha_fin
+    usuario = unicode(request.user)
+    sheet.header_str = (
+     u"&LFecha: &D Hora: &T \nUsuario: "+usuario+" "
+     u"&CPROPAR S.R.L.\n INFORME GENERAL DE PAGOS  "
+     u"&RPeriodo del "+periodo_1+" al "+periodo_2+" \nPage &P of &N"
+     )
     # cabeceras
-    sheet.write(0, 0, "Fraccion", style)
-    sheet.write(0, 1, "Lote Nro.", style)
-    sheet.write(0, 2, "Cliente", style)
-    sheet.write(0, 3, "Cuota Nro.", style)
-    sheet.write(0, 4, "Plan de Pago", style)
-    sheet.write(0, 5, "Fecha de Pago", style)
-    sheet.write(0, 6, "Total de Cuotas", style)
-    sheet.write(0, 7, "Total de Mora", style)
-    sheet.write(0, 8, "Total de Pago", style)
+    #sheet.write(0, 0, "Fraccion", style)
 
     # contador de filas
     c = 0
     for cuota in cuotas:
-        c += 1
-        sheet.write(c, 0, cuota['fraccion'])
-        sheet.write(c, 1, cuota['lote'])
-        sheet.write(c, 2, cuota['cliente'])
-        sheet.write(c, 3, cuota['cuota_nro'])
-        sheet.write(c, 4, cuota['plan_de_pago'])
-        sheet.write(c, 5, cuota['fecha_pago'])
-        sheet.write(c, 6, cuota['total_de_cuotas'])
-        sheet.write(c, 7, cuota['total_de_mora'])
-        sheet.write(c, 8, cuota['total_de_pago'])
-                       
         try:
-            if cuota['total_cuotas']:
+        
+            if cuota['total_monto'] == True and cuota['ultimo_pago'] == False: 
                 c += 1            
                 sheet.write(c, 0, "Totales de Fraccion", style2)
-                sheet.write(c, 6, cuota['total_cuotas'], style2)
-                sheet.write(c, 7, cuota['total_mora'], style2)
-                sheet.write(c, 8, cuota['total_pago'], style2)
-                           
-            if cuota['total_general_cuotas']:
-                c += 1            
-                sheet.write(c, 0, "Totales Generales", style2)
-                sheet.write(c, 6, cuota['total_general_cuotas'], style2)
-                sheet.write(c, 7, cuota['total_general_mora'], style2)
-                sheet.write(c, 8, cuota['total_general_pago'], style2)                
+                sheet.write(c, 5, cuota['total_cuotas'], style5)
+                sheet.write(c, 6, cuota['total_mora'], style5)
+                sheet.write(c, 7, cuota['total_pago'], style5)
         except Exception, error:
-            print error
+                #print error 
+                pass     
+        c+=1
+        try:    
+            if cuota['misma_fraccion'] == False:
+                sheet.write_merge(c,c,0,7, cuota['fraccion'],style_fraccion)
+                c +=1
+                
+                sheet.write(c, 0, "Lote", style)
+                sheet.write(c, 1, "Cliente", style)
+                sheet.write(c, 2, "Cuota.", style)
+                sheet.write(c, 3, "Plan de Pago", style)
+                sheet.write(c, 4, "Fecha", style)
+                sheet.write(c, 5, "Total Cuotas", style)
+                sheet.write(c, 6, "Total Mora", style)
+                sheet.write(c, 7, "Total Pago", style)
+                c +=1                
+                
+            sheet.write(c, 0, cuota['lote'],style_normal_centrado)
+            sheet.write(c, 1, cuota['cliente'],style_normal)
+            sheet.write(c, 2, cuota['cuota_nro'],style_normal_centrado)
+            sheet.write(c, 3, cuota['plan_de_pago'],style_normal)
+            sheet.write(c, 4, cuota['fecha_pago'],style_normal_centrado)
+            sheet.write(c, 5, cuota['total_de_cuotas'],style4)
+            sheet.write(c, 6, cuota['total_de_mora'],style4)
+            sheet.write(c, 7, cuota['total_de_pago'],style4)
+            
+        except Exception, error:
+                print error 
+                #pass
+                       
+        try:
+            if (cuota['ultimo_pago'] == True): 
+                c+=1            
+                sheet.write_merge(c,c,0,4, "Totales de Fraccion", style2)
+                sheet.write(c, 5, cuota['total_cuotas'], style5)
+                sheet.write(c, 6, cuota['total_mora'], style5)
+                sheet.write(c, 7, cuota['total_pago'], style5)
+        except Exception, error:
+                #print error 
+                pass
+        try:                   
+            if cuota['total_general_cuotas']:
+                c += 1
+                sheet.write_merge(c,c,0,4, "Totales Generales", style2)
+                sheet.write(c, 5, cuota['total_general_cuotas'], style5)
+                sheet.write(c, 6, cuota['total_general_mora'], style5)
+                sheet.write(c, 7, cuota['total_general_pago'], style5)                
+        except Exception, error:
+            #print error
             pass
+    #holaaa
+    
+    #Ancho de la columna Lote
+    col_lote = sheet.col(0)
+    col_lote.width = 256 * 8   # 12 characters wide
+            
+    #Ancho de la columna Fecha
+    col_fecha = sheet.col(4)
+    col_fecha.width = 256 * 10   # 10 characters wide
+            
+    #Ancho de la columna Nombre
+    col_nombre = sheet.col(1)
+    col_nombre.width = 256 * 25   # 25 characters wide 
+            
+    #Ancho de la columna Nro cuota
+    col_nro_cuota = sheet.col(2)
+    col_nro_cuota.width = 256 * 6   # 6 characters wide
+    
+    #Ancho de la columna mes
+    col_mes = sheet.col(3)
+    col_mes.width = 256 * 20   # 8 characters wide
+    
+    #Ancho de la columna monto pagado
+    col_monto_pagado = sheet.col(5)
+    col_monto_pagado.width = 256 * 11   # 11 characters wide
+    
+    #Ancho de la columna monto inmobiliarioa
+    col_monto_inmo = sheet.col(6)
+    col_monto_inmo.width = 256 * 11   # 11 characters wide
+            
+    #Ancho de la columna monto propietario
+    col_nombre = sheet.col(7)
+    col_nombre.width = 256 * 11   # 11 characters wide
        
     
     response = HttpResponse(content_type='application/vnd.ms-excel')
