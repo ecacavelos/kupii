@@ -67,7 +67,7 @@
 					};
 			},
 			select : function(event, ui) {
-				cliente_id = ui.item.pk;
+				cliente_id = ui.item.id;
 				$("#id_name_cliente").val (ui.item.nombres+" "+ui.item.apellidos);
 				$("#id_cedula_cliente").val(ui.item.cedula);
 				//name_cliente=ui.item.fields.nombres+" "+ui.item.fields.apellidos;
@@ -481,9 +481,11 @@
 		$('#total-iva_5').val(total_iva_5.toString());
 		total = total_iva_5 + total_iva_10 + total_exentas;
 		$('#total').val( total.toString());
-		iva_10 = (Math.round(total_iva_10/11));
+		//iva_10 = (Math.round(total_iva_10/11));
+		iva_10 = (parseInt(total_iva_10/11));
 		$('#liquidacion-iva_10').val(iva_10.toString());
-		iva_5 = (Math.round(total_iva_5/21));
+		//iva_5 = (Math.round(total_iva_5/21));
+		iva_5 = (parseInt(total_iva_5/21));
 		$('#liquidacion-iva_5').val(iva_5.toString());
 		$('#liquidacion-iva').val((iva_5 + iva_10).toString());
 		
