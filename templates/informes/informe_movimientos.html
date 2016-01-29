@@ -86,6 +86,31 @@
 				$('#listado-reservas').hide();	
 			$('.pagination').show();
 		//}
+		
+		base_url = base_context + "/ajax/get_lote_by_codigo_paralot/";
+		$("#lote_ini").autocomplete({
+			source : base_url,
+			minLength : 1,
+			select : function(event, ui) {
+				event.preventDefault();
+				id_lote = ui.item.id;
+				$("#busqueda").val(id_lote);
+				$("#lote_ini").val(ui.item.codigo_paralot);
+				//alert(id_cliente);
+			}
+		});
+		
+		$("#lote_fin").autocomplete({
+			source : base_url,
+			minLength : 1,
+			select : function(event, ui) {
+				event.preventDefault();
+				id_lote = ui.item.id;
+				$("#busqueda").val(id_lote);
+				$("#lote_fin").val(ui.item.codigo_paralot);
+				//alert(id_cliente);
+			}
+		});
 
 	});
 
@@ -94,7 +119,7 @@
 			alert("Debe ingresar un lote");
 			return;
 		}
-		window.location.href = "/informes/informe_movimientos_reporte_excel?fecha_ini=" + $('#fecha_ini').val() + "&fecha_fin=" + $('#fecha_fin').val() + "&lote_id=" + $('#lote_id').val();
+		window.location.href = "/informes/informe_movimientos_reporte_excel?fecha_ini=" + $('#fecha_ini').val() + "&fecha_fin=" + $('#fecha_fin').val() + "&lote_ini=" + $('#lote_ini').val()+ "&lote_fin=" + $('#lote_fin').val();
 	}
 
 	function validar() {
@@ -169,38 +194,38 @@
 			{% if forloop.counter == 1 %}
 				{% if pago.recuperacion %}
 					<tr>
-						<th>Fecha</th><th>Fraccion</th><th>Manzana</th><th>Cliente</th><th>Cuota Nº</th><th>Mes</th><th>Tipo Cuota</th><th>Saldo Anterior</th><th>Monto</th><th>Saldo</th><th></th>
+						<th>Fecha</th><th>Fraccion</th><th>Lote</th><th>Cliente</th><th>Tipo</th><th colspan="2">Estado</th><th colspan="2">Entrega Inicial</th><th colspan="1">Precio de Venta</th>
 					</tr>
 					<tr>
 							<td class="celda_resumen_venta recuperada">{{pago.fecha_de_venta}}</td>
 	                        <td class="celda_resumen_venta recuperada">{{pago.lote.manzana.fraccion.nombre}} ({{pago.lote.manzana.fraccion.id}})</td>
 	                        <td class="celda_resumen_venta recuperada">{{ pago.lote }}</td>
 							<td class="celda_resumen_venta recuperada">{{pago.cliente}}</td>
-							<td colspan="3" class="celda_resumen_venta recuperada">::::::VENTA RECUPERADA:::::</td>
-							<td colspan="4" class="celda_resumen_venta recuperada">Entrega Inicial: {{pago.entrega_incial}}</td>
-							<!-- <td class="celda_resumen_venta recuperada">Cuotas Plan: {{pago.cantidad_de_cuotas}}</td>
-							<td class="celda_resumen_venta recuperada">Precio Final: {{pago.precio_final}}</td> -->
+							<td class="celda_resumen_venta recuperada">{{pago.tipo_de_venta}}</td>
+							<td colspan="2" class="celda_resumen_venta recuperada">VENTA RECUPERADA</td>
+							<td colspan="2" class="celda_resumen_venta recuperada">{{pago.entrega_inicial}}</td>
+							<td class="celda_resumen_venta recuperada">{{pago.precio_final}}</td>
 					</tr>
 						
 				{% else %}
 					<tr>
-						<th>Fecha</th><th>Fraccion</th><th>Manzana</th><th>Cliente</th><th>Cuota Nº</th><th>Mes</th><th>Tipo Cuota</th><th>Saldo Anterior</th><th>Monto</th><th>Saldo</th><th></th>
+						<th>Fecha</th><th>Fraccion</th><th>Lote</th><th>Cliente</th><th>Tipo</th><th colspan="2">Estado</th><th colspan="2">Entrega Inicial</th><th colspan="1">Precio de Venta</th>
 					</tr>
 					<tr>
 							<td class="celda_resumen_venta">{{pago.fecha_de_venta}}</td>
 	                        <td class="celda_resumen_venta">{{pago.lote.manzana.fraccion.nombre}} ({{pago.lote.manzana.fraccion.id}})</td>
-	                        <td class="celda_resumen_venta">{{ pago.lote}}</td>
+	                        <td class="celda_resumen_venta">{{pago.lote}}</td>
 							<td class="celda_resumen_venta">{{pago.cliente}}</td>
-							<td colspan="3" class="celda_resumen_venta">::::::VENTA ACTUAL::::::</td>
-							<td colspan="4"class="celda_resumen_venta">Entrega Inicial: {{pago.entrega_inicial}}</td>
-							<!-- <td class="celda_resumen_venta">Cuotas Plan: {{pago.cantidad_de_cuotas}}</td>
-							<td class="celda_resumen_venta">Precio Final: {{pago.precio_final}}</td> -->
+							<td class="celda_resumen_venta">{{pago.tipo_de_venta}}</td>
+							<td colspan="2" class="celda_resumen_venta">VENTA ACTUAL</td>
+							<td colspan="2" class="celda_resumen_venta"> {{pago.entrega_inicial}}</td>
+							<td class="celda_resumen_venta">{{pago.precio_final}}</td>
 						
 					</tr>
 				
 				{% endif %}
 			<tr>
-				<th colspan="1">Fecha de Pago</th><!--<th>Fraccion</th><th>Manzana</th><th>Cliente</th>--><th colspan="1">Cuota Nº</th><th colspan="1">Vencimiento</th><th colspan="2">Mes</th><th>Tipo Cuota</th><th>Saldo Anterior</th><th>Monto</th><th>Saldo</th><th></th><th></th>	
+				<th colspan="1">Fecha de Pago</th><!--<th>Fraccion</th><th>Manzana</th><th>Cliente</th>--><th colspan="1">Cuota Nº</th><th colspan="1">Vencimiento</th><th colspan="3">Mes</th><!--<th>Tipo Cuota</th>--><th>Saldo Anterior</th><th colspan="2">Monto</th><th>Saldo</th>	
 			</tr>
 				
 			{% else %}
@@ -212,9 +237,9 @@
 					<td colspan="2">{{pago.mes}}</td>
 					<td></td>
 					<td>{{pago.saldo_anterior}}</td>
-					<td>{{pago.monto}}</td>
+					<td colspan="2">{{pago.monto}}</td>
 					<td>{{pago.saldo}}</td>
-					<td colspan="2"><a href="/movimientos/modificar_pagocuota/{{pago.id}}"><img src="/static/custom/img/black_edit.png" /></a></td>
+					<!--<td colspan="2"><a href="/movimientos/modificar_pagocuota/{{pago.id}}"><img src="/static/custom/img/black_edit.png" /></a></td>-->
 					<!--<td><a href="/movimientos/eliminar_pagocuota/{{pago.id}}">Holis</a></td>-->
 				</tr>
 				{% else %}
@@ -225,21 +250,23 @@
 					<td colspan="2">{{pago.mes}}</td>
 					<td></td>
 					<td>{{pago.saldo_anterior}}</td>
-					<td>{{pago.monto}}</td>
+					<td colspan="2">{{pago.monto}}</td>
 					<td>{{pago.saldo}}</td>
-					<td colspan="2"><a href="/movimientos/modificar_pagocuota/{{pago.id}}"><img src="/static/custom/img/black_edit.png" /></a></td>
+					<!--<td colspan="2"><a href="/movimientos/modificar_pagocuota/{{pago.id}}"><img src="/static/custom/img/black_edit.png" /></a></td>-->
 					<!--<td><a href="/movimientos/eliminar_pagocuota/{{pago.id}}">Holis</a></td>-->
 				</tr>
 				{% endif %}
 			{% endif %}
 			{%endfor%}
 		{%endfor%}
+		<!--
 		<div class="pagination">
 			<span class="step-links"> Mostrando {{ lista_movimientos.start_index }}-{{ lista_movimientos.end_index }} de {{ lista_movimientos.paginator.count }} Resultados
 				{%if lista_movimientos.has_previous%} <a href="?page={{ lista_movimientos.first_index}}{{ultimo}}"> Primera </a> <a href="?page={{ lista_movimientos.previous_page_number }}{{ultimo}}"> Anterior</a> {%endif%}
 				P&aacute;gina |{{lista_movimientos.number}}|
 				{%if lista_movimientos.has_next%} <a href="?page={{ lista_movimientos.next_page_number }}{{ultimo}}"> Siguiente </a> <a href="?page={{ lista_movimientos.end_index}}{{ultimo}}"> Ultima </a> {%endif%} </span>
 		</div>
+		-->
 	</table>
 </div>
 

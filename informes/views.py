@@ -1536,6 +1536,8 @@ def informe_movimientos(request):
                     fecha_fin=request.GET['fecha_fin']
                     lote_ini_parsed = unicode(lote_ini_orig)
                     lote_fin_parsed = unicode(lote_fin_orig)
+                    fecha_ini_parsed = None
+                    fecha_fin_parsed = None
                     lotes=[]
                     lotes.append(lote_ini_parsed)
                     lotes.append(lote_fin_parsed)
@@ -1561,7 +1563,7 @@ def informe_movimientos(request):
                         fecha_ini_parsed = datetime.datetime.strptime(fecha_ini, "%d/%m/%Y").date()
                         fecha_fin_parsed = datetime.datetime.strptime(fecha_fin, "%d/%m/%Y").date()
                         try:
-                            lista_ventas = Venta.objects.filter(lote_id__range=(lote_ini,lote_fin), fecha_de_venta__range=(fecha_ini_parsed, fecha_fin_parsed)).order_by('-fecha_de_venta')
+                            lista_ventas = Venta.objects.filter(lote_id__range=(lote_ini, lote_fin)).order_by('lote__nro_lote')
                             lista_reservas = Reserva.objects.filter(lote_id__range=(lote_ini,lote_fin), fecha_de_reserva__range=(fecha_ini_parsed, fecha_fin_parsed))
                             lista_cambios = CambioDeLotes.objects.filter(Q(lote_nuevo_id__range=(lote_ini,lote_fin)) |Q(lote_a_cambiar__range=(lote_ini,lote_fin)), fecha_de_cambio__range=(fecha_ini_parsed, fecha_fin_parsed))
                             lista_transferencias = TransferenciaDeLotes.objects.filter(lote_id__range=(lote_ini,lote_fin), fecha_de_transferencia__range=(fecha_ini_parsed, fecha_fin_parsed))
@@ -1574,7 +1576,7 @@ def informe_movimientos(request):
                             pass 
                     else:                  
                         try:
-                            lista_ventas = Venta.objects.filter(lote_id__range=(lote_ini, lote_fin)).order_by('-fecha_de_venta','-id')
+                            lista_ventas = Venta.objects.filter(lote_id__range=(lote_ini, lote_fin)).order_by('lote__nro_lote')
                             lista_cambios = CambioDeLotes.objects.filter(Q(lote_nuevo_id__range=(lote_ini,lote_fin)) |Q(lote_a_cambiar__range=(lote_ini,lote_fin)))
                             lista_reservas = Reserva.objects.filter(lote_id__range=(lote_ini, lote_fin))
                             lista_transferencias = TransferenciaDeLotes.objects.filter(lote_id__range=(lote_ini, lote_fin))
@@ -1601,16 +1603,17 @@ def informe_movimientos(request):
                                     resumen_venta['cantidad_de_cuotas'] = item_venta.plan_de_pago.cantidad_de_cuotas
                                     resumen_venta['precio_final'] = unicode('{:,}'.format(item_venta.precio_final_de_venta)).replace(",",".")
                                     resumen_venta['entrega_inicial'] = unicode('{:,}'.format(item_venta.entrega_inicial)).replace(",",".")
+                                    resumen_venta['tipo_de_venta'] = item_venta.plan_de_pago.tipo_de_plan
                                     RecuperacionDeLotes.objects.get(venta=item_venta.id)
                                     try:
-                                        venta_pagos_query_set = get_pago_cuotas_2(item_venta,None,None)
+                                        venta_pagos_query_set = get_pago_cuotas_2(item_venta,fecha_ini_parsed, fecha_fin_parsed)
                                         resumen_venta['recuperacion'] = True
                                     except PagoDeCuotas.DoesNotExist:
                                         venta_pagos_query_set = []
                                 except RecuperacionDeLotes.DoesNotExist:
                                     print 'se encontro la venta no recuperada, la venta actual'
                                     try:
-                                        venta_pagos_query_set = get_pago_cuotas_2(item_venta,None,None)
+                                        venta_pagos_query_set = get_pago_cuotas_2(item_venta,fecha_ini_parsed, fecha_fin_parsed)
                                         resumen_venta['recuperacion'] = False
                                     except PagoDeCuotas.DoesNotExist:
                                         venta_pagos_query_set = []
@@ -1620,12 +1623,14 @@ def informe_movimientos(request):
                                 saldo_anterior=item_venta.precio_final_de_venta
                                 monto=item_venta.entrega_inicial
                                 saldo=saldo_anterior-monto
+                                tipo_de_venta = item_venta.plan_de_pago.tipo_de_plan
                                 for pago in venta_pagos_query_set:
                                     saldo_anterior=saldo
                                     monto= long(pago['monto'])
                                     saldo=saldo_anterior-monto
                                     cuota ={}
                                     cuota['vencimiento'] = ""
+                                    cuota['tipo_de_venta'] = tipo_de_venta
                                     fecha_pago_str = unicode(pago['fecha_de_pago'])
                                     cuota['fecha_de_pago'] = unicode(datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
                                     cuota['id'] = pago['id']
@@ -1667,14 +1672,17 @@ def informe_movimientos(request):
     
                         
                     ultimo="&lote_ini="+lote_ini_orig+"&lote_fin="+lote_fin_orig+"&fecha_ini="+fecha_ini+"&fecha_fin="+fecha_fin
-                    paginator = Paginator(lista_movimientos, 25)
-                    page = request.GET.get('page')
-                    try:
-                        lista = paginator.page(page)
-                    except PageNotAnInteger:
-                        lista = paginator.page(1)
-                    except EmptyPage:
-                        lista = paginator.page(paginator.num_pages) 
+                    
+                    lista = lista_movimientos
+#                     paginator = Paginator(lista_movimientos, 25)
+#                     page = request.GET.get('page')
+#                     try:
+#                         lista = paginator.page(page)
+#                     except PageNotAnInteger:
+#                         lista = paginator.page(1)
+#                     except EmptyPage:
+#                         lista = paginator.page(paginator.num_pages)
+                         
                     c = RequestContext(request, {
                         'lista_ventas': lista,
                         'lista_cambios': lista_cambios,
@@ -3357,37 +3365,56 @@ def liquidacion_gerentes_reporte_excel(request):
 
 def informe_movimientos_reporte_excel(request):
     lista_movimientos = []
-    lote= request.GET['lote_id']
-    fecha_ini = request.GET['fecha_ini']
-    fecha_fin = request.GET['fecha_fin']  
-    x = unicode(lote)
-    fraccion_int = int(x[0:3])
-    manzana_int = int(x[4:7])
-    lote_int = int(x[8:])
-    manzana = Manzana.objects.get(fraccion_id=fraccion_int, nro_manzana=manzana_int)
-    lote = Lote.objects.get(manzana=manzana.id, nro_lote=lote_int)
-    print 'lote->'+unicode(lote.id)
-    if fecha_ini != '' and fecha_fin != "":    
+    lote_ini_orig=request.GET['lote_ini']
+    lote_fin_orig=request.GET['lote_fin']
+    fecha_ini=request.GET['fecha_ini']
+    fecha_fin=request.GET['fecha_fin']
+    lote_ini_parsed = unicode(lote_ini_orig)
+    lote_fin_parsed = unicode(lote_fin_orig)
+    fecha_ini_parsed = None
+    fecha_fin_parsed = None
+    lotes=[]
+    lotes.append(lote_ini_parsed)
+    lotes.append(lote_fin_parsed)
+    #print lotes
+    rango_lotes_id=[]
+    try:
+        for l in lotes:
+            fraccion_int = int(l[0:3])
+            manzana_int = int(l[4:7])
+            lote_int = int(l[8:])
+            manzana = Manzana.objects.get(fraccion_id=fraccion_int, nro_manzana=manzana_int)
+            lote = Lote.objects.get(manzana=manzana.id, nro_lote=lote_int)
+            rango_lotes_id.append(lote.id)
+        print rango_lotes_id
+    except Exception, error:
+        print error
+    lote_ini=str(rango_lotes_id[0])
+    lote_fin=str(rango_lotes_id[1])
+    lista_movimientos=[]
+    print 'lote inicial->'+unicode(lote_ini)
+    print 'lote final->'+unicode(lote_fin)
+    if fecha_ini != '' and fecha_fin != '':    
         fecha_ini_parsed = datetime.datetime.strptime(fecha_ini, "%d/%m/%Y").date()
         fecha_fin_parsed = datetime.datetime.strptime(fecha_fin, "%d/%m/%Y").date()
         try:
-            lista_ventas = Venta.objects.filter(lote_id=lote.id, fecha_de_venta__range=(fecha_ini_parsed, fecha_fin_parsed)).order_by('-fecha_de_venta')
-            lista_reservas = Reserva.objects.filter(lote_id=lote.id, fecha_de_reserva__range=(fecha_ini_parsed, fecha_fin_parsed))
-            lista_cambios = CambioDeLotes.objects.filter(Q(lote_nuevo_id=lote.id) |Q(lote_a_cambiar=lote.id), fecha_de_cambio__range=(fecha_ini_parsed, fecha_fin_parsed))
-            lista_transferencias = TransferenciaDeLotes.objects.filter(lote_id=lote.id, fecha_de_transferencia__range=(fecha_ini_parsed, fecha_fin_parsed))
+            lista_ventas = Venta.objects.filter(lote_id__range=(lote_ini, lote_fin)).order_by('lote__nro_lote')
+            lista_reservas = Reserva.objects.filter(lote_id__range=(lote_ini,lote_fin), fecha_de_reserva__range=(fecha_ini_parsed, fecha_fin_parsed))
+            lista_cambios = CambioDeLotes.objects.filter(Q(lote_nuevo_id__range=(lote_ini,lote_fin)) |Q(lote_a_cambiar__range=(lote_ini,lote_fin)), fecha_de_cambio__range=(fecha_ini_parsed, fecha_fin_parsed))
+            lista_transferencias = TransferenciaDeLotes.objects.filter(lote_id__range=(lote_ini,lote_fin), fecha_de_transferencia__range=(fecha_ini_parsed, fecha_fin_parsed))
         except Exception, error:
             print error
             lista_ventas = []
             lista_reservas = []
             lista_cambios = []
             lista_transferencias = []
-            pass
-    else:
+            pass 
+    else:                  
         try:
-            lista_ventas = Venta.objects.filter(lote_id=lote.id).order_by('-fecha_de_venta')
-            lista_cambios = CambioDeLotes.objects.filter(Q(lote_nuevo_id=lote.id) |Q(lote_a_cambiar=lote.id))
-            lista_reservas = Reserva.objects.filter(lote_id=lote.id)                        
-            lista_transferencias = TransferenciaDeLotes.objects.filter(lote_id=lote.id)
+            lista_ventas = Venta.objects.filter(lote_id__range=(lote_ini, lote_fin)).order_by('lote__nro_lote')
+            lista_cambios = CambioDeLotes.objects.filter(Q(lote_nuevo_id__range=(lote_ini,lote_fin)) |Q(lote_a_cambiar__range=(lote_ini,lote_fin)))
+            lista_reservas = Reserva.objects.filter(lote_id__range=(lote_ini, lote_fin))
+            lista_transferencias = TransferenciaDeLotes.objects.filter(lote_id__range=(lote_ini, lote_fin))
         except Exception, error:
             print error
             lista_ventas =[] 
@@ -3395,72 +3422,265 @@ def informe_movimientos_reporte_excel(request):
             lista_cambios = []
             lista_transferencias = []
             pass
+
     if lista_ventas:
         print('Hay ventas asociadas a este lote')
         lista_movimientos = []
         # En este punto tenemos ventas asociadas a este lote
-        for item_venta in lista_ventas:
-            try: 
-                venta = []
-                venta.append(item_venta.fecha_de_venta)
-                venta.append(item_venta.cliente)
-                venta.append(unicode(0) + '/' + unicode(item_venta.plan_de_pago.cantidad_de_cuotas))
-                venta.append("Entrega inicial")
-                venta.append(unicode('{:,}'.format(item_venta.precio_final_de_venta)).replace(",","."))
-                venta.append(unicode('{:,}'.format(item_venta.entrega_inicial)).replace(",","."))
-                venta.append(unicode('{:,}'.format(item_venta.precio_final_de_venta-item_venta.entrega_inicial)).replace(",","."))
-                lista_movimientos.append(venta)
-                RecuperacionDeLotes.objects.get(venta=item_venta.id)
+        try:
+            for item_venta in lista_ventas:
                 try:
-                    venta_pagos_query_set = get_pago_cuotas(item_venta,None,None)
-                except PagoDeCuotas.DoesNotExist:
-                    venta_pagos_query_set = []
-            except RecuperacionDeLotes.DoesNotExist:
-                print 'se encontro la venta no recuperada, la venta actual'                            
-                try:
-                    venta_pagos_query_set = get_pago_cuotas(item_venta,None,None)
-                except PagoDeCuotas.DoesNotExist:
-                    venta_pagos_query_set = [] 
-            saldo_anterior=item_venta.precio_final_de_venta
-            monto=item_venta.entrega_inicial
-            saldo=saldo_anterior-monto
-            for pago in venta_pagos_query_set:
-                saldo_anterior=saldo                             
-                monto= long(pago['monto'])
+                    resumen_venta = {}
+                    fecha_venta_str = unicode(item_venta.fecha_de_venta)
+                    resumen_venta['fecha_de_venta'] = unicode(datetime.datetime.strptime(fecha_venta_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
+                    resumen_venta['lote']=item_venta.lote
+                    resumen_venta['cliente'] = item_venta.cliente
+                    resumen_venta['cantidad_de_cuotas'] = item_venta.plan_de_pago.cantidad_de_cuotas
+                    resumen_venta['precio_final'] = unicode('{:,}'.format(item_venta.precio_final_de_venta)).replace(",",".")
+                    resumen_venta['entrega_inicial'] = unicode('{:,}'.format(item_venta.entrega_inicial)).replace(",",".")
+                    resumen_venta['tipo_de_venta'] = item_venta.plan_de_pago.tipo_de_plan
+                    RecuperacionDeLotes.objects.get(venta=item_venta.id)
+                    try:
+                        venta_pagos_query_set = get_pago_cuotas_2(item_venta,fecha_ini_parsed, fecha_fin_parsed)
+                        resumen_venta['recuperacion'] = True
+                    except PagoDeCuotas.DoesNotExist:
+                        venta_pagos_query_set = []
+                except RecuperacionDeLotes.DoesNotExist:
+                    print 'se encontro la venta no recuperada, la venta actual'
+                    try:
+                        venta_pagos_query_set = get_pago_cuotas_2(item_venta,fecha_ini_parsed, fecha_fin_parsed)
+                        resumen_venta['recuperacion'] = False
+                    except PagoDeCuotas.DoesNotExist:
+                        venta_pagos_query_set = []
+
+                ventas_pagos_list = []
+                ventas_pagos_list.insert(0,resumen_venta) #El primer elemento de la lista de pagos es el resumen de la venta
+                saldo_anterior=item_venta.precio_final_de_venta
+                monto=item_venta.entrega_inicial
                 saldo=saldo_anterior-monto
-                cuota =[]
-                cuota.append(pago['fecha_de_pago'])
-                cuota.append(item_venta.cliente)
-                cuota.append(pago['nro_cuota_y_total'])
-                cuota.append("Pago de Cuota")
-                cuota.append(unicode('{:,}'.format(saldo_anterior)).replace(",","."))
-                cuota.append(unicode('{:,}'.format(monto)).replace(",","."))
-                cuota.append(unicode('{:,}'.format(saldo)).replace(",","."))
-                lista_movimientos.append(cuota)
+                tipo_de_venta = item_venta.plan_de_pago.tipo_de_plan
+                for pago in venta_pagos_query_set:
+                    saldo_anterior=saldo
+                    monto= long(pago['monto'])
+                    saldo=saldo_anterior-monto
+                    cuota ={}
+                    cuota['vencimiento'] = ""
+                    cuota['tipo_de_venta'] = tipo_de_venta
+                    fecha_pago_str = unicode(pago['fecha_de_pago'])
+                    cuota['fecha_de_pago'] = unicode(datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
+                    cuota['id'] = pago['id']
+                    cuota['nro_cuota'] = pago['nro_cuota_y_total']
+                                    
+                    cuotas_detalles = []
+                    cuotas_detalles = get_cuota_information_by_lote(pago['lote'].id, int(pago['nro_cuota']), True, True, item_venta)
+                    cuota['vencimiento'] = cuota['vencimiento']+ unicode(cuotas_detalles[0]['fecha'])+' '
+                                    
+                    monthNames = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+                    fecha_1 = cuota['vencimiento']
+                    parts_1 = fecha_1.split("/")
+                    year_1 = parts_1[2];
+                    mes_1 = int(parts_1[1]) - 1;
+                    mes_year = monthNames[mes_1]+"/"+year_1;
+                    cuota['mes'] = mes_year 
+                    cuota['saldo_anterior'] = unicode('{:,}'.format(int(saldo_anterior))).replace(",",".")
+                    cuota['monto'] =  unicode('{:,}'.format(int(pago['monto']))).replace(",",".")
+                    cuota['saldo'] =  unicode('{:,}'.format(int(saldo))).replace(",",".")
+                    ventas_pagos_list.append(cuota)
+                lista_movimientos.append(ventas_pagos_list)
+        except Exception, error:
+            print error
+
+    mostrar_transferencias = False
+    mostrar_mvtos = False
+    mostrar_reservas = False
+    mostrar_cambios = False
+                    
+    if lista_movimientos:
+        mostrar_mvtos = True
+    if lista_cambios:
+        mostrar_cambios = True
+    if lista_reservas:
+        mostrar_reservas = True
+    if lista_transferencias:
+        mostrar_transferencias = True
+    
+                        
+    ultimo="&lote_ini="+lote_ini_orig+"&lote_fin="+lote_fin_orig+"&fecha_ini="+fecha_ini+"&fecha_fin="+fecha_fin
+    
+    lista = lista_movimientos
             
     wb = xlwt.Workbook(encoding='utf-8')
     sheet = wb.add_sheet('test', cell_overwrite_ok=True)
-    style = xlwt.easyxf('pattern: pattern solid, fore_colour green;'
-                              'font: name Arial, bold True;')   
-    style2 = xlwt.easyxf('font: name Arial, bold True;')
-    # cabeceras
-    sheet.write(0, 0, "Fecha de Pago", style)
-    sheet.write(0, 1, "Cliente", style) 
-    sheet.write(0, 2, "Cuota Nro.", style)
-    sheet.write(0, 3, "Tipo Cuota", style)    
-    sheet.write(0, 4, "Saldo Anterior", style)        
-    sheet.write(0, 5, "Monto", style)
-    sheet.write(0, 6, "Saldo", style)
-    c = 1
-    for i in range(len(lista_movimientos)):
-        sheet.write(c, 0, unicode(lista_movimientos[i][0]))
-        sheet.write(c, 1, unicode(lista_movimientos[i][1]))
-        sheet.write(c, 2, unicode(lista_movimientos[i][2]))
-        sheet.write(c, 3, unicode(lista_movimientos[i][3]))
-        sheet.write(c, 4, unicode(lista_movimientos[i][4]))
-        sheet.write(c, 5, unicode(lista_movimientos[i][5]))
-        sheet.write(c, 6, unicode(lista_movimientos[i][6]))
-        c+=1
+    style = xlwt.easyxf('pattern: pattern solid, fore_colour white;'
+                              'font: name Gill Sans MT Condensed, bold True, height 160; align: horiz center')
+    style2 = xlwt.easyxf('font: name Gill Sans MT Condensed, height 160;')
+        
+    style3 = xlwt.easyxf('font: name Gill Sans MT Condensed, height 160 ; align: horiz right')
+        
+    style4 = xlwt.easyxf('font: name Gill Sans MT Condensed, height 160 ; align: horiz center')
+        
+    usuario = unicode(request.user)
+    
+    if fecha_ini != '' and fecha_fin != '':
+        sheet.header_str = (
+                            u"&LFecha: &D Hora: &T \nUsuario: "+usuario+" "
+                            u"&CPROPAR S.R.L.\n MOVIMIENTOS DE LOTES "
+                            u"&RPeriodo del : "+fecha_ini+" al "+fecha_fin+" \nPage &P of &N"
+                            )
+    else:
+        sheet.header_str = (
+                            u"&LFecha: &D Hora: &T \nUsuario: "+usuario+" "
+                            u"&CPROPAR S.R.L.\n MOVIMIENTOS DE LOTES "
+                            u"&RPage &P of &N"
+                            )    
+    
+    
+    c = 0
+    
+    
+    if mostrar_mvtos == True:
+        for venta in lista:
+            for i, pago in enumerate(venta):
+                if i == 0: 
+                    if pago['recuperacion']:
+                        # cabeceras
+                        sheet.write_merge(c,c,0,6, "Venta lote: "+unicode(pago['lote'])+" a "+unicode(pago['cliente']), style)
+                        c=c+1
+                        sheet.write(c, 0, "Lote", style)
+                        sheet.write(c, 1, "Fecha", style)
+                        sheet.write(c, 2, "Cliente", style) 
+                        sheet.write(c, 3, "Tipo", style)
+                        sheet.write(c, 4, "Estado", style)        
+                        sheet.write(c, 5, "Entrega Inicial", style)
+                        sheet.write(c, 6, "Precio Venta", style)
+                        
+                        c=c+1
+                        
+                        sheet.write(c, 0, unicode(pago['lote']), style4)
+                        sheet.write(c, 1, pago['fecha_de_venta'], style4)
+                        sheet.write(c, 2, unicode(pago['cliente']), style2) 
+                        sheet.write(c, 3, pago['tipo_de_venta'], style2)
+                        sheet.write(c, 4, "VENTA RECUPERADA", style2)    
+                        sheet.write(c, 5, pago['entrega_inicial'], style3)        
+                        sheet.write(c, 6, pago['precio_final'], style3)
+                        
+                        if pago['tipo_de_venta'] == 'credito':
+                            c=c+1
+                            sheet.write_merge(c,c,0,6, "Pagos de la Venta: "+unicode(pago['lote'])+" a "+unicode(pago['cliente']), style)
+                            c=c+1
+                            sheet.write(c, 0, "Fecha", style)
+                            sheet.write(c, 1, "Cuota", style)
+                            sheet.write(c, 2, "Vencimiento", style) 
+                            sheet.write(c, 3, "Mes", style)
+                            sheet.write(c, 4, "Saldo Anterior", style)        
+                            sheet.write(c, 5, "Monto", style)
+                            sheet.write(c, 6, "Saldo", style)
+                        
+                        c=c+1
+                        
+                    else:
+                        
+                        # cabeceras
+                        sheet.write_merge(c,c,0,6, "Venta lote: "+unicode(pago['lote'])+" a "+unicode(pago['cliente']), style)
+                        c=c+1
+                        sheet.write(c, 0, "Lote", style)
+                        sheet.write(c, 1, "Fecha", style)
+                        sheet.write(c, 2, "Cliente", style) 
+                        sheet.write(c, 3, "Tipo", style)
+                        sheet.write(c, 4, "Estado", style)        
+                        sheet.write(c, 5, "Entrega Inicial", style)
+                        sheet.write(c, 6, "Precio Venta", style)
+                        
+                        c=c+1
+                        
+                        sheet.write(c, 0, unicode(pago['lote']), style4)
+                        sheet.write(c, 1, pago['fecha_de_venta'], style4)
+                        sheet.write(c, 2, unicode(pago['cliente']), style2) 
+                        sheet.write(c, 3, pago['tipo_de_venta'], style4)
+                        sheet.write(c, 4, "VENTA ACTUAL", style2)    
+                        sheet.write(c, 5, pago['entrega_inicial'], style3)        
+                        sheet.write(c, 6, pago['precio_final'], style3)
+                        
+                        if pago['tipo_de_venta'] == 'credito':
+                            c=c+1
+                            sheet.write_merge(c,c,0,6, "Pagos de la Venta: "+unicode(pago['lote'])+" a "+unicode(pago['cliente']), style)
+                            c=c+1
+                            sheet.write(c, 0, "Fecha", style)
+                            sheet.write(c, 1, "Cuota", style)
+                            sheet.write(c, 2, "Vencimiento", style) 
+                            sheet.write(c, 3, "Mes", style)
+                            sheet.write(c, 4, "Saldo Anterior", style)        
+                            sheet.write(c, 5, "Monto", style)
+                            sheet.write(c, 6, "Saldo", style)
+                        
+                        c=c+1
+                else:
+                    
+                    sheet.write(c, 0, pago['fecha_de_pago'], style4)
+                    sheet.write(c, 1, pago['nro_cuota'], style4)
+                    sheet.write(c, 2, pago['vencimiento'], style4) 
+                    sheet.write(c, 3, pago['mes'], style4)
+                    sheet.write(c, 4, pago['saldo_anterior'], style3)        
+                    sheet.write(c, 5, pago['monto'], style3)
+                    sheet.write(c, 6, pago['saldo'], style3)
+                    
+                    c=c+1
+
+    if mostrar_cambios == True:
+        #poner titulo de cambio
+        sheet.write_merge(c,c,0,3, "Cambio de Lote", style)
+        c=c+1
+        sheet.write(c, 0, "Fecha", style)
+        sheet.write(c, 1, "Cliente", style)
+        sheet.write(c, 2, "Lote a Cambiar", style) 
+        sheet.write(c, 3, "Lote Nuevo", style)
+        
+        c=c+1
+        
+        for cambio in lista_cambios:                        
+            sheet.write(c, 0, unicode(datetime.datetime.strptime(unicode(cambio.fecha_de_cambio), "%Y-%m-%d").strftime("%d/%m/%Y")), style4)
+            sheet.write(c, 1, unicode(cambio.cliente), style2)
+            sheet.write(c, 2, unicode(cambio.lote_a_cambiar), style4)
+            sheet.write(c, 3, unicode(cambio.lote_nuevo), style4)
+            
+            c=c+1
+        
+    if mostrar_reservas == True:
+        #poner titulo de reserva y lote reservado
+        sheet.write_merge(c,c,0,3, "Reserva de Lote", style)
+        c=c+1
+        sheet.write(c, 0, "Fecha", style)
+        sheet.write(c, 1, "Cliente", style)
+        sheet.write(c, 2, "Lote", style)
+        c=c+1
+        
+        for reserva in lista_reservas:                        
+            sheet.write(c, 0, unicode(datetime.datetime.strptime(unicode(reserva.fecha_de_reserva), "%Y-%m-%d").strftime("%d/%m/%Y")), style4)
+            sheet.write(c, 1, unicode(reserva.cliente), style2)
+            sheet.write(c, 2, unicode(reserva.lote), style4)
+            c=c+1
+        
+    if mostrar_transferencias == True:
+        #poner titulo de transferencia 
+        sheet.write_merge(c,c,0,3, "Transferencia de Lote", style)
+        c=c+1
+        sheet.write(c, 0, "Fecha", style)
+        sheet.write(c, 1, "Cliente Orig.", style) 
+        sheet.write(c, 2, "Cliente Trans.", style)
+        sheet.write(c, 3, "Vendedor", style)        
+        sheet.write(c, 4, "Plan de Pago", style)
+        
+        c=c+1
+        
+        for transferencia in lista_transferencias:                        
+            sheet.write(c, 0, unicode(datetime.datetime.strptime(unicode(transferencia.fecha_de_transferencia), "%Y-%m-%d").strftime("%d/%m/%Y")), style4)
+            sheet.write(c, 1, unicode(transferencia.cliente_original), style2)
+            sheet.write(c, 2, unicode(transferencia.cliente), style2)
+            sheet.write(c, 3, unicode(transferencia.vendedor), style2)
+            sheet.write(c, 4, unicode(transferencia.plan_de_pago), style2)
+            
+            c=c+1               
+    
     response = HttpResponse(content_type='application/vnd.ms-excel')
     # Crear un nombre intuitivo         
     response['Content-Disposition'] = 'attachment; filename=' + 'informe_movimientos.xls'
