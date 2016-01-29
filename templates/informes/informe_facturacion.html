@@ -25,11 +25,14 @@
 		$.datepicker.setDefaults($.datepicker.regional['es']);
 		var fecha_ini = "{{fecha_ini}}";
 		var fecha_fin = "{{fecha_fin}}";
+		var busqueda = '{{busqueda}}';
+		var busqueda_label = '{{busqueda_label}}';
 		
 
 		$('#fecha_ini').val(fecha_ini);
 		$('#fecha_fin').val(fecha_fin);
-		
+		$('#busqueda_label').val(busqueda_label);
+		$('#busqueda').val(busqueda);
 
 		$('#fecha_ini').mask('##/##/####');
 		$("#fecha_ini").datepicker({
@@ -47,7 +50,34 @@
 			$('.listado-pagos').show();
 			$('.pagination').show();
 		}
-		setup_inputs();
+		
+		base_url= base_context + "/ajax/get_usuario_by_username/";
+		params="value";
+		$("#busqueda_label").autocomplete({
+			source : base_url,
+			minLenght : 1,
+			create : function(){
+			$(this).data('ui-autocomplete')._renderItem = function(ul,item){
+				return $('<li>').append('<a>' +item.fields.username+'</a>').appendTo(ul);
+				};
+			},
+			select : function(event, ui) {
+				event.preventDefault();
+				id_usuario = ui.item.pk;
+				nombre_usuario= ui.item.fields.username;
+				ui.item.value = ui.item.fields.username;
+				$("#busqueda_label").val(nombre_usuario);
+				$("#busqueda").val(id_usuario);			
+			}
+		});
+		
+		$('#busqueda_label').change(function() {
+			if ( $('#busqueda_label').val()=='' ){
+				$('#busqueda').val("");
+			} 
+		});
+			
+		
 	});
 </script>
 <script type="text/javascript" src="{{ STATIC_URL }}informes/informe_facturacion.js"></script>
@@ -79,6 +109,30 @@
 				<input name="fecha_fin" id="fecha_fin" type="text" value="" />
 				</td>
 			</tr>
+			</tr>
+			{%if grupo == 1%}
+				<tr>
+					<td>
+						Usuario:
+					</td>
+					<td>
+						<input type="text" id="busqueda_label" name="busqueda_label" placeholder="Todos los Usuarios" />
+						<input type="hidden" id="busqueda" name="busqueda"/>
+					</td>
+					<td></td>
+				</tr>
+			{%else%}	
+				<tr style="display: none">
+					<td>
+						Usuario:
+					</td>
+					<td>
+						<input type="text" id="busqueda_label" name="busqueda_label" placeholder="Todos los Usuarios" />
+						<input type="hidden" id="busqueda" name="busqueda"/>
+					</td>
+					<td></td>
+				</tr>
+			{%endif%}
 			<tr>
 				<td>
 				<input id="boton_buscar" type="button" value="Buscar" onclick="validar();" class="historico" style="cursor: pointer"/>
@@ -97,7 +151,7 @@
 </div>
 <div id="listado-item-lote">
 	<table border="1" cellpadding="0" cellspacing="0" class="listado-pagos" align="center">
-		<th>Fecha</th><th>Numero</th><th>Lote</th><th>Cliente</th><th>Tipo</th><th>Total Exentas</th><th>Total IVA 5%</th><th>Total IVA 10%</th><th>Total Facturado</th>
+		<th>Fecha</th><th>Numero</th><th>Lote</th><th>Cliente</th><th>Tipo</th><th>Usuario</th><th>Total Exentas</th><th>Total IVA 5%</th><th>Total IVA 10%</th><th>Total Facturado</th>
 		{% for hw in object_list %}
 			
 		{% if forloop.counter|divisibleby:2 %}
@@ -111,10 +165,12 @@
 			{% else %}
 				<td>Credito</td>
 			{% endif %}
+			<td>{{hw.usuario}}</td>
 			<td>{{hw.total_exentas}}</td>
 			<td>{{hw.total_iva5}}</td>
 			<td>{{hw.total_iva10}}</td>
 			<td>{{hw.total_facturado}}</td>
+			
 		</tr>
 		{% else %}
 		<tr class="bkg_gris">
@@ -127,16 +183,18 @@
 			{% else %}
 				<td>Credito</td>
 			{% endif %}
+			<td>{{hw.usuario}}</td>
 			<td>{{hw.total_exentas}}</td>
 			<td>{{hw.total_iva5}}</td>
 			<td>{{hw.total_iva10}}</td>
 			<td>{{hw.total_facturado}}</td>
+			
 		</tr>
 		{% endif %}
 		
 		{% if hw.total_general_facturado %}
 		<tr>
-			<th colspan="5" class="celda_resumen_fraccion">Totales Generales</th>
+			<th colspan="6" class="celda_resumen_fraccion">Totales Generales</th>
 			<td class="celda_resumen_fraccion">{{hw.total_general_exentas}}</td>
 			<td class="celda_resumen_fraccion">{{hw.total_general_iva5}}</td>
 			<td class="celda_resumen_fraccion">{{hw.total_general_iva10}}</td>
@@ -147,12 +205,14 @@
 		
 		{% endfor %}
 		<tr id='fila_totales' style="display: none;"></tr>
+		<!--
 		<div class="pagination">
 			<span class="step-links"> Mostrando {{ object_list.start_index }}-{{ object_list.end_index }} de {{ object_list.paginator.count }} Resultados
 				{%if object_list.has_previous%} <a href="?page={{ object_list.first_index}}{{ultimo}}"> Primera </a> <a href="?page={{ object_list.previous_page_number }}{{ultimo}}"> Anterior</a> {%endif%}
 				P&aacute;gina |{{object_list.number}}|
 				{%if object_list.has_next%} <a href="?page={{ object_list.next_page_number }}{{ultimo}}"> Siguiente </a> <a href="?page={{ object_list.end_index}}{{ultimo}}"> Ultima </a> {%endif%} </span>
 		</div>
+		-->
 	</table>
 </div>
 

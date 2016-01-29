@@ -3560,7 +3560,7 @@ def informe_movimientos_reporte_excel(request):
                         sheet.write(c, 1, pago['fecha_de_venta'], style4)
                         sheet.write(c, 2, unicode(pago['cliente']), style2) 
                         sheet.write(c, 3, pago['tipo_de_venta'], style2)
-                        sheet.write(c, 4, "VENTA RECUPERADA", style2)    
+                        sheet.write(c, 4, "VENTA RECUPERADA", style4)    
                         sheet.write(c, 5, pago['entrega_inicial'], style3)        
                         sheet.write(c, 6, pago['precio_final'], style3)
                         
@@ -3597,7 +3597,7 @@ def informe_movimientos_reporte_excel(request):
                         sheet.write(c, 1, pago['fecha_de_venta'], style4)
                         sheet.write(c, 2, unicode(pago['cliente']), style2) 
                         sheet.write(c, 3, pago['tipo_de_venta'], style4)
-                        sheet.write(c, 4, "VENTA ACTUAL", style2)    
+                        sheet.write(c, 4, "VENTA ACTUAL", style4)    
                         sheet.write(c, 5, pago['entrega_inicial'], style3)        
                         sheet.write(c, 6, pago['precio_final'], style3)
                         
@@ -3946,9 +3946,11 @@ def informe_facturacion(request):
         if request.user.is_authenticated():
             if verificar_permisos(request.user.id, permisos.VER_INFORMES):
                 if (filtros_establecidos(request.GET,'informe_facturacion') == False):
-                    t = loader.get_template('informes/informe_facturacion.html')                
+                    t = loader.get_template('informes/informe_facturacion.html')
+                    grupo= request.user.groups.get().id                
                     c = RequestContext(request, {
                         'object_list': [],
+                        'grupo': grupo
                     })
                     return HttpResponse(t.render(c))
                 else: # Parametros SETEADOS
@@ -3956,6 +3958,10 @@ def informe_facturacion(request):
                     try:             
                         fecha_ini = request.GET['fecha_ini']
                         fecha_fin = request.GET['fecha_fin']
+                        
+                        busqueda = request.GET.get('busqueda','')
+                        busqueda_label = request.GET.get('busqueda_label','')
+                        
                         fecha_ini_parsed = datetime.datetime.strptime(fecha_ini, "%d/%m/%Y").strftime("%Y-%m-%d")
                         fecha_fin_parsed = datetime.datetime.strptime(fecha_fin, "%d/%m/%Y").strftime("%Y-%m-%d")
                         
@@ -3973,7 +3979,14 @@ def informe_facturacion(request):
                         
                         try:
                             fila={}
-                            facturas = Factura.objects.filter(anulado=False, fecha__range=(fecha_ini_parsed, fecha_fin_parsed))
+                            grupo= request.user.groups.get().id
+                            if grupo == 1:
+                                if busqueda =='':
+                                    facturas = Factura.objects.filter(anulado=False, fecha__range=(fecha_ini_parsed, fecha_fin_parsed))
+                                else:
+                                    facturas = Factura.objects.filter(anulado=False, fecha__range=(fecha_ini_parsed, fecha_fin_parsed), usuario = busqueda)
+                            else:
+                                facturas = Factura.objects.filter(anulado=False, fecha__range=(fecha_ini_parsed, fecha_fin_parsed), usuario = request.user)
                             
                             for factura in facturas:
                                 
@@ -3994,6 +4007,8 @@ def informe_facturacion(request):
                                 fila['cliente']=unicode(factura.cliente)
                                 fila['lote']=unicode(factura.lote.codigo_paralot)
                                 fila['tipo']=unicode(factura.tipo)
+                                if factura.usuario_id != None:
+                                    fila['usuario']=unicode(factura.usuario)
                                 
                                 lista_detalles=json.loads(factura.detalle)
                                 for key, value in lista_detalles.iteritems():
@@ -4024,21 +4039,27 @@ def informe_facturacion(request):
                         except Exception, error:
                             print error                                                                                       
                                                     
-                        ultimo="&fecha_ini="+fecha_ini+"&fecha_fin="+fecha_fin
-                        paginator = Paginator(filas, 25)
-                        page = request.GET.get('page')
-                        try:
-                            lista = paginator.page(page)
-                        except PageNotAnInteger:
-                            lista = paginator.page(1)
-                        except EmptyPage:
-                            lista = paginator.page(paginator.num_pages)          
+                        ultimo="&fecha_ini="+fecha_ini+"&fecha_fin="+fecha_fin+"&busqueda="+busqueda+"&busqueda_label"
+                        lista = filas
+                        
+#                         paginator = Paginator(filas, 25)
+#                         page = request.GET.get('page')
+#                         try:
+#                             lista = paginator.page(page)
+#                         except PageNotAnInteger:
+#                             lista = paginator.page(1)
+#                         except EmptyPage:
+#                             lista = paginator.page(paginator.num_pages)
+                                      
                         c = RequestContext(request, {
                             'object_list': lista,
                             'lista_totales' : lista_totales,
                             'fecha_ini':fecha_ini,
                             'fecha_fin':fecha_fin,
-                            'ultimo': ultimo
+                            'grupo': grupo,
+                            'ultimo': ultimo,
+                            'busqueda_label':busqueda_label,
+                            'busqueda': busqueda,
                         })
                         return HttpResponse(t.render(c))    
                     except Exception, error:
@@ -4068,10 +4089,16 @@ def informe_facturacion_reporte_excel(request):
                     try:             
                         fecha_ini = request.GET['fecha_ini']
                         fecha_fin = request.GET['fecha_fin']
+                        
+                        busqueda = request.GET.get('busqueda','')
+                        busqueda_label = request.GET.get('busqueda_label','')
+                        
                         fecha_ini_parsed = datetime.datetime.strptime(fecha_ini, "%d/%m/%Y").strftime("%Y-%m-%d")
                         fecha_fin_parsed = datetime.datetime.strptime(fecha_fin, "%d/%m/%Y").strftime("%Y-%m-%d")
+                        
                         filas = []
                         lista_totales = []
+                        
                         #Totales GENERALES
                         total_general_facturado = 0
                         total_general_exentas = 0
@@ -4080,14 +4107,23 @@ def informe_facturacion_reporte_excel(request):
                         
                         try:
                             fila={}
-                            facturas = Factura.objects.filter(anulado=False, fecha__range=(fecha_ini_parsed, fecha_fin_parsed))
+                            grupo= request.user.groups.get().id
+                            if grupo == 1:
+                                if busqueda =='':
+                                    facturas = Factura.objects.filter(anulado=False, fecha__range=(fecha_ini_parsed, fecha_fin_parsed))
+                                else:
+                                    facturas = Factura.objects.filter(anulado=False, fecha__range=(fecha_ini_parsed, fecha_fin_parsed), usuario = busqueda)
+                            else:
+                                facturas = Factura.objects.filter(anulado=False, fecha__range=(fecha_ini_parsed, fecha_fin_parsed), usuario = request.user)
                             
                             for factura in facturas:
+                                
                                 #Totales Factura
                                 total_facturado = 0
                                 total_exentas = 0
                                 total_iva5 = 0
                                 total_iva10 = 0
+                                
                                 fecha_str = unicode(factura.fecha)
                                 fecha = unicode(datetime.datetime.strptime(fecha_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
                                 
@@ -4099,67 +4135,159 @@ def informe_facturacion_reporte_excel(request):
                                 fila['cliente']=unicode(factura.cliente)
                                 fila['lote']=unicode(factura.lote.codigo_paralot)
                                 fila['tipo']=unicode(factura.tipo)
-                                lista_detalles=json.loads(factura.detalle)
+                                if factura.usuario_id != None:
+                                    fila['usuario']=unicode(factura.usuario)
                                 
+                                lista_detalles=json.loads(factura.detalle)
                                 for key, value in lista_detalles.iteritems():
                                     total_exentas+=int(value['exentas'])
                                     total_iva5+=int(value['iva_5'])
                                     total_iva10+=int(value['iva_10'])
                                     total_facturado+=int(int(value['cantidad'])*int(value['precio_unitario'])) 
-                                fila['total_exentas']=unicode(total_exentas)
-                                fila['total_iva5']=unicode(total_iva5)
-                                fila['total_iva10']=unicode(total_iva10)
-                                fila['total_facturado']=unicode(total_facturado)
+                                
+                                fila['total_exentas']=unicode('{:,}'.format(total_exentas)).replace(",", ".")
+                                fila['total_iva5']=unicode('{:,}'.format(total_iva5)).replace(",", ".")
+                                fila['total_iva10']=unicode('{:,}'.format(total_iva10)).replace(",", ".")
+                                fila['total_facturado']=unicode('{:,}'.format(total_facturado)).replace(",", ".")
+                                
                                 filas.append(fila)
+                                
                                 #Acumulamos para los TOTALES GENERALES
                                 total_general_exentas += int(total_exentas)
                                 total_general_iva5 += int(total_iva5)
                                 total_general_iva10 += int(total_iva10)
                                 total_general_facturado += int(total_facturado)
+                                
                             #Totales GENERALES
-                            fila['total_general_facturado']=unicode(total_general_facturado)
-                            fila['total_general_exentas']=unicode(total_general_exentas)
-                            fila['total_general_iva5']=unicode(total_general_iva5)
-                            fila['total_general_iva10']=unicode(total_general_iva10)
+                            fila['total_general_facturado']=unicode('{:,}'.format(total_general_facturado)).replace(",", ".")
+                            fila['total_general_exentas']=unicode('{:,}'.format(total_general_exentas)).replace(",", ".")
+                            fila['total_general_iva5']=unicode('{:,}'.format(total_general_iva5)).replace(",", ".")
+                            fila['total_general_iva10']=unicode('{:,}'.format(total_general_iva10)).replace(",", ".")
+                                
                         except Exception, error:
                             print error                                                                                       
+                                                    
+                        ultimo="&fecha_ini="+fecha_ini+"&fecha_fin="+fecha_fin+"&busqueda="+busqueda+"&busqueda_label"
+                        lista = filas
+                                                                                                              
                         wb = xlwt.Workbook(encoding='utf-8')
                         sheet = wb.add_sheet('test', cell_overwrite_ok=True)
-                        style = xlwt.easyxf('pattern: pattern solid, fore_colour green; font: name Arial, bold True;')   
-                        style2 = xlwt.easyxf('font: name Arial, bold True;')
-                        style3 = xlwt.easyxf('font: name Arial, bold True;align: horiz center')
-                        sheet.write(0, 0, "Fecha", style)
-                        sheet.write(0, 1, "Numero.", style)
-                        sheet.write(0, 2, "Lote", style)
-                        sheet.write(0, 3, "Cliente.", style)
-                        sheet.write(0, 4, "Tipo", style)
-                        sheet.write(0, 5, "Total Exentas", style)
-                        sheet.write(0, 6, "Total IVA 5", style)
-                        sheet.write(0, 7, "Total IVA 10", style)
-                        sheet.write(0, 8, "Total Facturado", style)
-                        c=0
-                        for fila in filas: 
+                        style_titulo = xlwt.easyxf('pattern: pattern solid, fore_colour white;'
+                                                  'font: name Gill Sans MT Condensed, bold True, height 160; align: horiz center')
+                        style_normal = xlwt.easyxf('font: name Gill Sans MT Condensed, height 160;')
+                            
+                        style_derecha = xlwt.easyxf('font: name Gill Sans MT Condensed, height 160 ; align: horiz right')
+                            
+                        style_centrado = xlwt.easyxf('font: name Gill Sans MT Condensed, height 160 ; align: horiz center')
+                        
+                        style_titulo_derecha = xlwt.easyxf('pattern: pattern solid, fore_colour white;'
+                                                  'font: name Gill Sans MT Condensed, bold True, height 160; align: horiz right')
+                            
+                        usuario = unicode(request.user)
+                        
+                        if busqueda != '':
+                            sheet.header_str = (
+                                                u"&LFecha: &D Hora: &T \nUsuario: "+usuario+" "
+                                                u"&CPROPAR S.R.L.\n INFORME DE FACTURACION "
+                                                u"&RPeriodo del : "+fecha_ini+" al "+fecha_fin+" \nPage &P of &N"
+                                                )
+                            
+                            c = 0
+                            sheet.write_merge(c,c,0,8, "Facturacion del Usuario: "+busqueda_label, style_titulo)
+                            c=c+1
+                            sheet.write(c, 0, 'Fecha',style_titulo)
+                            sheet.write(c, 1, 'Numero',style_titulo)
+                            sheet.write(c, 2, 'Lote',style_titulo)
+                            sheet.write(c, 3, 'Cliente',style_titulo)
+                            sheet.write(c, 4, 'Tipo',style_titulo)
+                            sheet.write(c, 5, 'Exentas',style_titulo)
+                            sheet.write(c, 6, 'IVA 5',style_titulo)
+                            sheet.write(c, 7, 'IVA 10',style_titulo)
+                            sheet.write(c, 8, 'Monto',style_titulo)
+                            
+                        else:
+                            sheet.header_str = (
+                                                u"&LFecha: &D Hora: &T \nUsuario: "+usuario+" "
+                                                u"&CPROPAR S.R.L.\n INFORME DE FACTURACION "
+                                                u"&RPeriodo del : "+fecha_ini+" al "+fecha_fin+" \nPage &P of &N"
+                                                )
+                        
+                            c = 0
+                            sheet.write_merge(c,c,0,8, "Facturacion de todos los Usuarios", style_titulo)
+                            c=c+1
+                            sheet.write(c, 0, 'Fecha',style_titulo)
+                            sheet.write(c, 1, 'Numero',style_titulo)
+                            sheet.write(c, 2, 'Lote',style_titulo)
+                            sheet.write(c, 3, 'Cliente',style_titulo)
+                            sheet.write(c, 4, 'Tipo',style_titulo)
+                            sheet.write(c, 5, 'Exentas',style_titulo)
+                            sheet.write(c, 6, 'IVA 5',style_titulo)
+                            sheet.write(c, 7, 'IVA 10',style_titulo)
+                            sheet.write(c, 8, 'Monto',style_titulo)
+                        
+                        for fila in filas:
+                            
                             c += 1
-                            sheet.write(c, 0, fila['fecha'])
-                            sheet.write(c, 1, fila['numero'])
-                            sheet.write(c, 2, fila['lote'])
-                            sheet.write(c, 3, fila['cliente'])
-                            sheet.write(c, 4, fila['tipo'])
-                            sheet.write(c, 5, fila['total_exentas'])
-                            sheet.write(c, 6, fila['total_iva5'])
-                            sheet.write(c, 7, fila['total_iva10'])
-                            sheet.write(c, 8, fila['total_facturado'])
+                            sheet.write(c, 0, fila['fecha'],style_centrado)
+                            sheet.write(c, 1, fila['numero'],style_centrado)
+                            sheet.write(c, 2, fila['lote'],style_centrado)
+                            sheet.write(c, 3, fila['cliente'],style_normal)
+                            if fila['tipo'] == 'co':
+                                sheet.write(c, 4, 'contado' ,style_centrado)
+                            else:
+                                sheet.write(c, 4, 'credito' ,style_centrado)
+                            sheet.write(c, 5, fila['total_exentas'],style_derecha)
+                            sheet.write(c, 6, fila['total_iva5'],style_derecha)
+                            sheet.write(c, 7, fila['total_iva10'],style_derecha)
+                            sheet.write(c, 8, fila['total_facturado'],style_derecha)
                             try:
                                 if (fila['total_general_facturado']): 
                                     c+=1            
-                                    sheet.write(c, 0, "Totales Facturados", style2)
-                                    sheet.write(c, 5, fila['total_general_exentas'],style2)
-                                    sheet.write(c, 6, fila['total_general_iva5'], style2)
-                                    sheet.write(c, 7, fila['total_general_iva10'], style2)
-                                    sheet.write(c, 8, fila['total_general_facturado'], style2)
+                                    sheet.write_merge(c,c,0,5, "Totales Facturados", style_titulo)
+                                    sheet.write(c, 5, fila['total_general_exentas'],style_titulo_derecha)
+                                    sheet.write(c, 6, fila['total_general_iva5'], style_titulo_derecha)
+                                    sheet.write(c, 7, fila['total_general_iva10'], style_titulo_derecha)
+                                    sheet.write(c, 8, fila['total_general_facturado'], style_titulo_derecha)
                             except Exception, error:
                                 print error 
                                 pass
+                        #Ancho de la columna Lote
+                        col_lote = sheet.col(2)
+                        col_lote.width = 256 * 10   # 12 characters wide
+                            
+                        #Ancho de la columna Fecha
+                        col_fecha = sheet.col(0)
+                        col_fecha.width = 256 * 8   # 10 characters wide
+                            
+                        #Ancho de la columna Nombre
+                        col_nombre = sheet.col(3)
+                        col_nombre.width = 256 * 18   # 25 characters wide 
+                        
+                        #Ancho de la columna Nro cuota
+                        col_nro_cuota = sheet.col(1)
+                        col_nro_cuota.width = 256 * 10   # 6 characters wide
+                            
+                        #Ancho de la columna Nro cuota
+                        col_nro_cuota = sheet.col(4)
+                        col_nro_cuota.width = 256 * 5   # 6 characters wide
+                            
+                        #Ancho de la columna mes
+                        col_mes = sheet.col(5)
+                        col_mes.width = 256 * 11   # 8 characters wide
+                            
+                        #Ancho de la columna monto pagado
+                        col_monto_pagado = sheet.col(6)
+                        col_monto_pagado.width = 256 * 11   # 11 characters wide
+                            
+                        #Ancho de la columna monto inmobiliarioa
+                        col_monto_inmo = sheet.col(7)
+                        col_monto_inmo.width = 256 * 11   # 11 characters wide
+                            
+                        #Ancho de la columna monto propietario
+                        col_nombre = sheet.col(8)
+                        col_nombre.width = 256 * 11   # 11 characters wide
+                        
+                        
                       
                         response = HttpResponse(content_type='application/vnd.ms-excel')
                         # Crear un nombre intuitivo         

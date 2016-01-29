@@ -138,6 +138,7 @@ def facturar_operacion(request, tipo_operacion, operacion_id):
             nueva_factura.lote = lote_id
             nueva_factura.anulado = False
             nueva_factura.observacion = observacion
+            nueva_factura.usuario = request.user
             nueva_factura.save()
             
             
@@ -235,7 +236,8 @@ def facturar(request):
             nueva_factura.detalle = detalle
             nueva_factura.lote = lote_id
             nueva_factura.anulado = False
-            nueva_factura.observacion = observacion  
+            nueva_factura.observacion = observacion
+            nueva_factura.usuario = request.user  
             nueva_factura.save()
             
             #Se loggea la accion del usuario
