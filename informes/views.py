@@ -4071,7 +4071,7 @@ def informe_ventas_reporte_excel(request):
                 if pago['factura'] == None:
                     sheet.write(c, 4, "Sin Factura" , style4)        
                 else:
-                    sheet.write(c, 4, unicode(pago['factura']) , style2)
+                    sheet.write(c, 4, unicode(pago['factura'].numero) , style2)
                 if pago['id_transaccion'] == None:
                     sheet.write(c, 5, "Interna" , style4)        
                 else:
