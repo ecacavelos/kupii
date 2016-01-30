@@ -118,6 +118,10 @@
 		}
 		$("#frm_busqueda").submit();
 	}
+	
+	function retrieve_informe_ventas() {
+    	window.location.href = base_context + "/informes/informe_ventas_reporte_excel?busqueda="+$('#busqueda').val()+"&busqueda_label="+$('#busqueda_label').val();
+	}
 
 </script>
 {% endblock %}
@@ -149,6 +153,7 @@
 				<td>
 				<input type="button" value="Buscar" onclick="validar();" class="historico" style="cursor: pointer"/>
 				</td>
+				<td><a class="boton-verde" id="id_boton" onclick="retrieve_informe_ventas();">Descargar Excel</a></td>
 			</tr>
 		</table>
 	</form>
@@ -218,12 +223,14 @@
 			{% endif %}
 			{%endfor%}
 		{%endfor%}
+		<!--
 		<div class="pagination">
 			<span class="step-links"> Mostrando {{ lista_movimientos.start_index }}-{{ lista_movimientos.end_index }} de {{ lista_movimientos.paginator.count }} Resultados
 				{%if lista_movimientos.has_previous%} <a href="?page={{ lista_movimientos.first_index}}{{ultimo}}"> Primera </a> <a href="?page={{ lista_movimientos.previous_page_number }}{{ultimo}}"> Anterior</a> {%endif%}
 				P&aacute;gina |{{lista_movimientos.number}}|
 				{%if lista_movimientos.has_next%} <a href="?page={{ lista_movimientos.next_page_number }}{{ultimo}}"> Siguiente </a> <a href="?page={{ lista_movimientos.end_index}}{{ultimo}}"> Ultima </a> {%endif%} </span>
 		</div>
+		-->
 	</table>
 </div>
 

@@ -21,4 +21,5 @@ urlpatterns = patterns('informes.views',
     url(r'^liquidacion_gerentes_reporte_excel/$', 'liquidacion_gerentes_reporte_excel'),
     url(r'^informe_movimientos_reporte_excel/$', 'informe_movimientos_reporte_excel'),
     url(r'^informe_ventas/$', 'informe_ventas', name='frontend_informe_ventas'),
+    url(r'^informe_ventas_reporte_excel/$', 'informe_ventas_reporte_excel'),
 )
