@@ -266,6 +266,8 @@ def get_lotes_a_cargar_by_manzana(request):
                 object_list = Manzana.objects.filter(pk= id_manzana, fraccion=id_fraccion)
                 id_manzana = object_list[0].id
                 total_lotes = object_list[0].cantidad_lotes
+                nro_manzana = object_list[0].nro_manzana
+                nro_manzana = unicode(nro_manzana).zfill(3)
                 object_list2= Lote.objects.filter(manzana_id = id_manzana)
                 cantidad_encontrada = len(object_list2)
                 print("cantidad_encontrada ->" + unicode(cantidad_encontrada));
@@ -276,7 +278,7 @@ def get_lotes_a_cargar_by_manzana(request):
                 else:
                     if (cantidad_encontrada == 0):
                         for i in range(1, total_lotes+1):
-                            record = {"id": i, "label": i}
+                            record = {"id": i, "label": i, "nro_manzana": nro_manzana, "nro_lote": unicode(i).zfill(4)}
                             results.append(record)
                     else:
                         encontrados = []
@@ -291,7 +293,7 @@ def get_lotes_a_cargar_by_manzana(request):
                             
                         for i in range(1, total_lotes+1):
                             if (i != encontrados[i]):
-                                record = {"id": i, "label": i}
+                                record = {"id": i, "label": i, "nro_manzana": nro_manzana, "nro_lote": unicode(i).zfill(4)}
                                 results.append(record)                 
                 
                 return HttpResponse(json.dumps(results), content_type="application/json")

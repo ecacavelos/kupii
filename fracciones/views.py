@@ -1,12 +1,18 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext, loader
-from principal.models import Propietario,Fraccion, Manzana, Lote
+from principal.models import Propietario,Fraccion, Manzana, Lote, Factura, PagoDeCuotas, RecuperacionDeLotes, CambioDeLotes, TransferenciaDeLotes, Reserva
 from fracciones.forms import FraccionForm, FraccionFormAdd
 from django.db import reset_queries, close_connection
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.urlresolvers import reverse, resolve
 from principal.common_functions import *
 from principal import permisos
+from django.views.generic.edit import DeleteView
+from django.core.urlresolvers import reverse_lazy
+
+class FraccionDelete(DeleteView):
+    model = Fraccion
+    success_url = reverse_lazy('frontend_listado_fracciones')
 
 # Funcion principal del modulo de fracciones.
 def fracciones(request):
@@ -104,30 +110,41 @@ def detalle_fraccion(request, fraccion_id):
                 message = "No se pudo actualizar los datos."
                     
         elif data.get('boton_borrar'):
-            f = Fraccion.objects.get(pk=fraccion_id)
-            cantidad_manzanas = f.cantidad_manzanas
-            cantidad_lotes = f.cantidad_lotes
-            
-            
-      
-            for i in range(1, cantidad_manzanas + 1):
-                #m = Manzana.objects.get(nro_manzana=i, fraccion=fraccion_id)
-                m = Manzana.objects.filter(nro_manzana=i, fraccion=fraccion_id)
-                m_list= list(m)
-                #m = Manzana.objects.raw('SELECT id FROM principal_lote WHERE (nro_manzana = '+unicode(i)+' AND fraccion_id = '+unicode(f.id)+')')
-                manzana_id = m[0].id
-                
-                for j in range(1, cantidad_lotes + 1):
-                    l = Lote.objects.filter(manzana_id=manzana_id, nro_lote=j)
-                    l.delete()                
-                m.delete()
-            f.delete()
+            fraccion = Fraccion.objects.get(pk=fraccion_id)
+            manzanas = Manzana.objects.filter(fraccion = fraccion)
+            for manzana in manzanas:
+                lotes = Lote.objects.filter(manzana = manzana)
+                for lote in lotes:
+                    ventas = Venta.objects.filter(lote = lote)
+                    for venta in ventas:
+                        pagos = PagoDeCuotas.objects.filter(venta = venta)
+                        for pago in pagos:
+                            pago.delete()
+                        recuperaciones = RecuperacionDeLotes.objects.filter(venta = venta)
+                        for recuperacion in recuperaciones:
+                            recuperacion.delete()
+                        venta.delete()
+                    cambios = CambioDeLotes.objects.filter(lote_a_cambiar = lote)
+                    for cambio in cambios:
+                        cambio.delete()
+                    cambios = CambioDeLotes.objects.filter(lote_nuevo = lote)
+                    for cambio in cambios:
+                        cambio.delete()
+                    facturas = Factura.objects.filter(lote = lote)
+                    for factura in facturas:
+                        factura.delete()
+                    reservas = Reserva.objects.filter(lote = lote)
+                    for reserva in reservas:
+                        reserva.delete()
+                    lote.delete()
+                manzana.delete()
+            fraccion.delete()
             
             #Se loggea la accion del usuario
             id_objeto = fraccion_id
             codigo_lote = ''
-            loggear_accion(request.user, "Borrar", "Fraccion", id_objeto, codigo_lote)
-            
+            loggear_accion(request.user, "Borrar(con todos sus lotes y movimientos)", "Fraccion", id_objeto, codigo_lote)
+            message = "Se borro la Fraccion y todos sus lotes y movimientos asociados."
             #return HttpResponseRedirect('/fracciones/listado')
             return HttpResponseRedirect(reverse('frontend_listado_fracciones'))
                 

@@ -12,11 +12,18 @@ $(document).ready(function() {
 		$("#id_name_propietario").autocomplete({
 			source : base_url,
 			minLength : 1,
+			create : function(){
+			$(this).data('ui-autocomplete')._renderItem = function(ul,item){
+				return $('<li>').append('<a>'+item.cedula +" - "+item.nombres + " "+ item.apellidos+'</a>').appendTo(ul);
+				};
+			},
 			select : function(event, ui) {
+				event.preventDefault();
 				id_propietario = ui.item.id;
 				cedula_propietario= ui.item.cedula;
 				$("#id_propietario").val(id_propietario);
 				$("#id_cedula_propietario").val(cedula_propietario);
+				$("#id_name_propietario").val(ui.item.nombres+" "+ui.item.apellidos);
 
 			}
 		});
@@ -156,3 +163,4 @@ $(document).ready(function() {
 	 solo_numeros_comas();
 	 });
 	 */
+

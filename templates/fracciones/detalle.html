@@ -18,6 +18,13 @@
 	  	$('#id_superficie_total').val($('#id_superficie_total').val().replace(/[^\d,.]+/g, ''));
 	}
 	
+	function deleteItem() {
+    if (confirm("¿Seguro que desea borrar esta fraccion y todos los datos asociados a ella?")) {
+        $("#boton_borrar").click();
+    }
+    return false;
+}
+	
 	//Separador de miles y comas en escritura
 	function format(comma, period) {
 		
@@ -165,7 +172,8 @@
 	</table>
 		{%if grupo == 1%}
 			<input class="lote-form-button" type="button" name="boton_guardar" value="Guardar Cambios" onclick="_enviar()" />
-			<input class="lote-form-button" type="submit" name="boton_borrar" value="Borrar este Registro" />
+			<input class="lote-form-button" type="button" name="boton_borrar" value="Borrar este Registro" onclick="deleteItem()"/>
+			<input id="boton_borrar" class="lote-form-button" type="submit" name="boton_borrar" value="Borrar este Registro" style="display: none"/>
 		{%endif%}
 		
 	</form>

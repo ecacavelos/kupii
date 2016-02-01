@@ -229,7 +229,7 @@ def agregar_lotes(request):
             # Redireccionamos al listado de lotes luego de agregar el nuevo lote.
             loggear_accion(request.user, "Agregar", "Lote", id_objeto, codigo_lote)
             #return HttpResponseRedirect('/lotes/listado')
-            return HttpResponseRedirect(reverse('frontend_listado_lotes'))
+            return HttpResponseRedirect(reverse('frontend_listado_lote'))
         else:
             form = LoteForm()
             form2 = FraccionManzana()

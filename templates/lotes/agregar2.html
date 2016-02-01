@@ -157,6 +157,7 @@ $(document).ready(function() {
 				$.each(data, function (index,value) {
 					//$("#id_manzana").append('<option value="'+ value.id +'">' + 'Manzana ' + value.label + '</option>') ;
 					$("#id_manzana").append('<option value="'+ value.pk +'">' + 'Manzana ' + value.fields.nro_manzana + '</option>') ;
+					$("#id_codigo_paralot").val(value.fields.fraccion);
 				});
 			});
       }
@@ -178,11 +179,30 @@ $(document).ready(function() {
 			request_manzanas.done(function (data){
 				$.each(data, function (index,value) {
 					$("#id_nro_lote").append('<option value="'+ value.id +'">' +value.label + '</option>') ;
+					nro_manzana = value.nro_manzana;		
 				});
+					codigo_paralot = $("#id_codigo_paralot").val();
+					codigo_paralot = codigo_paralot.substr(0,3);
+					$("#id_codigo_paralot").val(codigo_paralot+"/"+nro_manzana);
 			});
+});
+
+$( "#id_nro_lote" ).change(function() {
+	codigo_paralot = $("#id_codigo_paralot").val();
+	codigo_paralot = codigo_paralot.substr(0,7);
+	numero_lote = $("#id_nro_lote").val();
+	size = numero_lote.length;
+	$("#id_codigo_paralot").val(codigo_paralot+"/"+pad( numero_lote, size ));
 });
     
 });
+
+function pad(num, size) {
+	size = size+3;
+    var s = "000" + num;
+    return s.substr(s.length-size);
+}
+
 </script>
 {% endblock %}
 
