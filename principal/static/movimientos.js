@@ -190,6 +190,9 @@ function retrievePlanPago() {
 
 				$("#tipo_pago_contado").removeAttr("checked").attr("disabled", "disabled");
 				$("#tipo_pago_credito").prop("checked", true).removeAttr("disabled");
+				
+				$("#enviar_venta").show();
+				$("#enviar_venta_factura").hide();
 
 				$("#cantidad_cuotas_venta").html(msg.cantidad_cuotas + " cuotas.");
 
@@ -204,6 +207,9 @@ function retrievePlanPago() {
 
 				$("#tipo_pago_credito").removeAttr("checked").attr("disabled", "disabled");
 				$("#tipo_pago_contado").prop("checked", true).removeAttr("disabled");
+				
+				$("#enviar_venta").hide();
+				$("#enviar_venta_factura").show();
 				
 				//$("#id_monto_cuota_refuerzo").prop("readonly", true);
 				$("#id_monto_cuota_refuerzo").val(0).attr("disabled", "disabled");

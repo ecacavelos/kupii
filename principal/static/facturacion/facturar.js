@@ -288,6 +288,26 @@
 		});
 		//traer datos para los detalles de la factura
 		
+		if (tipo_venta != ''){
+			$("#id_detalle_cantidad_1").val("1");
+			$("#id_detalle_concepto_1").val(descripcion);
+			$("#id_detalle_precio_unitario_1").val(precio_venta);
+			
+			var iva_5_contado = parseInt( ( (1 * precio_venta) * 31.5) / 101.5);
+            var exentas_contado = parseInt( (1 * precio_venta) - iva_5_contado);
+            
+            //var iva_5_contado = Math.floor( ( (1 * precio_venta) * 31.5) / 101.5);
+            //var exentas_contado = Math.floor( (1 * precio_venta) - iva_5_contado);
+			
+			$("#id_detalle_exentas_1").val(exentas_contado);
+			$("#id_detalle_iva5_1").val(iva_5_contado);
+			$("#id_detalle_iva10_1").val("0");
+			
+			ponerPuntos();
+			aplicarFuncionesDetalles();
+			validarDetalle();
+		}
+		
     	// Control del SUBMIT del FORM
     	$("#agregar-factura-form").submit(function(){
 			

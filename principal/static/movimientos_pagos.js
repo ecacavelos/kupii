@@ -30,6 +30,15 @@ $(document).ready(function() {
 	}else{
 		$(".fecha_pago").prop('readonly', true);
 	}
+	
+	if (codigo_lote != ""){
+		$("#id_lote").focus();
+		$("#id_lote").val(codigo_lote);
+		$("#lote_seleccionado_detalles").focus();
+		$("#id_lote").trigger( "blur" );
+		
+	}
+	
 	$("#id_fecha_venta2").datepicker({
 		dateFormat : 'dd/mm/yy'
 	});

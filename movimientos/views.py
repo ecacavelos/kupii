@@ -122,14 +122,18 @@ def ventas_de_lotes(request):
                     venta_cli = Venta.objects.get(pk=nueva_venta.id)
                 else:
                     return HttpResponseServerError("La sumatoria de las cuotas es menor al precio final de venta.")
-                c = RequestContext(request, {
-                     'sumatoria_cuotas': sumatoria_cuotas,
-                     'ventas': venta_cli
-                })
-                return HttpResponse(t.render(c))
-#                 data = json.dumps({
-#                     'ventas': venta_cli})
-#                 return HttpResponse(data,content_type="application/json")
+                
+                #c = RequestContext(request, {
+                #     'sumatoria_cuotas': sumatoria_cuotas,
+                #     'ventas': venta_cli
+                #})
+                
+                #return HttpResponse(t.render(c))
+                labels=["venta"]
+                venta_cli = Venta.objects.filter(id=nueva_venta.id)
+                labels=["lote"]
+                return HttpResponse(json.dumps(custom_json(venta_cli,labels), cls=DjangoJSONEncoder), content_type="application/json")
+            
             else:
                 object_list = Lote.objects.none()
             c = RequestContext(request, {
@@ -341,6 +345,113 @@ def pago_de_cuotas(request):
             return HttpResponse(t.render(c))
     else:
         return HttpResponseRedirect("/login")
+    
+
+def pago_de_cuotas_venta(request, id_venta):        
+    if request.user.is_authenticated():
+        if verificar_permisos(request.user.id, permisos.ADD_PAGODECUOTAS):
+            t = loader.get_template('movimientos/pago_cuotas.html')
+            grupo= request.user.groups.get().id
+            if request.method == 'POST':
+                data = request.POST    
+                lote_id = data.get('pago_lote_id', '')
+                nro_cuotas_a_pagar = data.get('pago_nro_cuotas_a_pagar')
+
+                #############################################################
+                #Codigo agregado: contemplar el caso de los lotes recuperados
+                venta = get_ultima_venta(lote_id)
+                #############################################################
+
+                venta.pagos_realizados = int(nro_cuotas_a_pagar) + int(venta.pagos_realizados)
+                cliente_id = data.get('pago_cliente_id')
+                vendedor_id = data.get('pago_vendedor_id')
+                plan_pago_id = data.get('pago_plan_de_pago_id')
+                plan_pago_vendedor_id=data.get('pago_plan_de_pago_vendedor_id')
+                total_de_cuotas = data.get('pago_total_de_cuotas')
+                total_de_mora = data.get('pago_total_de_mora')
+                total_de_pago = data.get('pago_total_de_pago')
+                date_parse_error = False
+                fecha_pago=data.get('pago_fecha_de_pago', '')
+                fecha_pago_parsed = datetime.datetime.strptime(fecha_pago, "%d/%m/%Y").date()
+                detalle = data.get('detalle', '')
+                if detalle == '':
+                    detalle =None
+    #             try:
+    #                 fecha_pago_parsed = datetime.strptime(data.get('pago_fecha_de_pago', ''), "%d/%m/%Y")
+    #             except:
+    #                 date_parse_error = True
+    #       
+    #             if date_parse_error == True:
+    #                 try:
+    #                     fecha_pago_parsed = datetime.strptime(data.get('pago_fecha_de_pago', ''), "%Y-%m-%d")
+    #                 except:
+    #                     date_parse_error = True
+                #print fecha_pago
+                #print fecha_pago_parsed
+                cantidad_cuotas = PlanDePago.objects.get(pk=plan_pago_id)
+                cuotas_pagadas = Venta.objects.get(pk=venta.id)        
+                cuotas_restantes = int(cantidad_cuotas.cantidad_de_cuotas) - int(cuotas_pagadas.pagos_realizados)        
+                if cuotas_restantes >= int(nro_cuotas_a_pagar):
+                    try:
+                        nuevo_pago = PagoDeCuotas()
+                        nuevo_pago.venta = Venta.objects.get(pk=venta.id)
+                        nuevo_pago.lote = Lote.objects.get(pk=lote_id)
+                        nuevo_pago.fecha_de_pago = fecha_pago_parsed
+                        nuevo_pago.nro_cuotas_a_pagar = nro_cuotas_a_pagar
+                        nuevo_pago.cliente = Cliente.objects.get(pk=cliente_id)
+                        nuevo_pago.plan_de_pago = PlanDePago.objects.get(pk=plan_pago_id)
+                        nuevo_pago.plan_de_pago_vendedores= PlanDePagoVendedor.objects.get(pk=plan_pago_vendedor_id)
+                        nuevo_pago.vendedor = Vendedor.objects.get(pk=vendedor_id)
+                        nuevo_pago.total_de_cuotas = total_de_cuotas
+                        nuevo_pago.total_de_mora = total_de_mora
+                        nuevo_pago.total_de_pago = total_de_pago
+                        nuevo_pago.detalle = detalle
+                        nuevo_pago.save()
+                        
+                        #Se loggea la accion del usuario
+                        id_objeto = nuevo_pago.id
+                        codigo_lote = nuevo_pago.lote.codigo_paralot
+                        loggear_accion(request.user, "Agregar", "Pago de cuota", id_objeto, codigo_lote)
+                        
+                        
+                    except Exception, error:
+                        print error
+                        pass
+                    venta.save()
+                    
+                    #Vuelve al template
+                    #c = RequestContext(request, {})
+                    #return HttpResponse(t.render(c))
+                    
+                    #Redirecciona a facturacion (al final hace esto en movimientos_pagos.js
+                    #return HttpResponseRedirect("/facturacion/facturar")
+                
+                    #retorna el objeto como json
+                    object_list = PagoDeCuotas.objects.filter(id = nuevo_pago.id)
+                    labels=["id"]
+                    return HttpResponse(json.dumps(custom_json(object_list,labels), cls=DjangoJSONEncoder), content_type="application/json")
+                            
+                else:
+                    return HttpResponseServerError("La cantidad de cuotas a pagar, es mayor a la cantidad de cuotas restantes.")  
+        
+            elif request.method == 'GET':
+                venta = Venta.objects.get(pk=id_venta)
+                codigo_lote = venta.lote.codigo_paralot
+                c = RequestContext(request, {
+                   'codigo_lote': codigo_lote,
+                   'grupo': grupo   
+                })
+                return HttpResponse(t.render(c))
+        else:
+            t = loader.get_template('index2.html')
+            grupo= request.user.groups.get().id
+            c = RequestContext(request, {
+                'grupo': grupo  
+                })
+            return HttpResponse(t.render(c))
+    else:
+        return HttpResponseRedirect("/login")
+
 
 def calcular_interes(request):
     if request.user.is_authenticated():

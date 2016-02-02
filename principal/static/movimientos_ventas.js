@@ -17,6 +17,9 @@ $(document).ready(function() {
 		dateFormat : 'dd/mm/yy'
 	});
 	
+	$("#enviar_venta").hide();
+	$("#enviar_venta_factura").hide();
+	
 	$(function($){
 		    $.datepicker.regional['es'] = {
 		        closeText: 'Cerrar',
@@ -243,9 +246,9 @@ function validateVenta() {
 
 		}).done(function (data) {
 			if ( $("#facturar").val() == '' ){
-				top.location.href = "/movimientos/listado_ventas/";	
+				top.location.href = "/movimientos/pago_cuotas_venta/"+data[0].id;	
 			} else if ( $("#facturar").val() == 'SI'  ){
-			top.location.href = "/facturacion/facturar_operacion/2/"+msg[0].id;	
+				top.location.href = "/facturacion/facturar_operacion/2/"+data[0].id;	
 			}
 		});
 		/*request2.done(function(msg) {

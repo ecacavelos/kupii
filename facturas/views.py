@@ -61,8 +61,10 @@ def facturar_operacion(request, tipo_operacion, operacion_id):
                 
             if tipo_operacion == '2': # VENTA
                 venta = Venta.objects.get(pk=operacion_id)
-                tipo_venta = venta.planDePago.tipo_de_plan
+                tipo_venta = "Contado"
                 precio_venta = venta.precio_final_de_venta
+                entrega_inicial = venta.entrega_inicial
+                descripcion = "Venta al Contado de Lote: "+venta.lote.codigo_paralot
             
             ultimo_timbrado = Timbrado.objects.latest('id')
             trfu = TimbradoRangoFacturaUsuario.objects.get(usuario_id=request.user, timbrado_id = ultimo_timbrado.id)
@@ -75,19 +77,33 @@ def facturar_operacion(request, tipo_operacion, operacion_id):
             
             
             
-            
-            c = RequestContext(request, {
-                'cliente': pago.cliente,
-                'lote': pago.lote.codigo_paralot,
-                'cuota_desde': cuota_desde,
-                'cuota_hasta': cuota_hasta,
-                'ultima_factura': ultima_factura,
-                'ultimo_timbrado_numero': trfu.timbrado.numero,
-                'ultimo_timbrado_id': ultimo_timbrado.id,
-                'tipo_venta': tipo_venta,
-                'precio_venta': precio_venta,
-
-            })
+            if tipo_operacion == '1': # PAGO DE CUOTA
+                c = RequestContext(request, {
+                    'cliente': pago.cliente,
+                    'lote': pago.lote.codigo_paralot,
+                    'cuota_desde': cuota_desde,
+                    'cuota_hasta': cuota_hasta,
+                    'ultima_factura': ultima_factura,
+                    'ultimo_timbrado_numero': trfu.timbrado.numero,
+                    'ultimo_timbrado_id': ultimo_timbrado.id,
+                    'tipo_venta': tipo_venta,
+                    'precio_venta': precio_venta,
+    
+                })
+            if tipo_operacion == '2': # VENTA
+                c = RequestContext(request, {
+                    'cliente': venta.cliente,
+                    'lote': venta.lote.codigo_paralot,
+                    'cuota_desde': '',
+                    'cuota_hasta': '',
+                    'entrega_inicial': entrega_inicial,
+                    'ultima_factura': ultima_factura,
+                    'ultimo_timbrado_numero': trfu.timbrado.numero,
+                    'ultimo_timbrado_id': ultimo_timbrado.id,
+                    'tipo_venta': tipo_venta,
+                    'precio_venta': precio_venta,
+                    'descripcion': descripcion,
+    })
             return HttpResponse(t.render(c))
             
         else: #POST se envia el formulario.  
