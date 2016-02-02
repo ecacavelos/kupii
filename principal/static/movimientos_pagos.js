@@ -375,7 +375,7 @@ function calcularInteres() {
 					var f2 = (detalle[i]['vencimiento_gracia']).split("/");
 					var fecha_vencimiento_pago = new Date(f2[2], f2[1] - 1, f2[0]);
 					//alert(fecha_vencimiento_pago);
-					if (fecha_pago >= fecha_vencimiento_pago) {
+					if (fecha_pago > fecha_vencimiento_pago) {
 						console.log("Sumando intereses");
 						intereses = intereses + detalle[i]['intereses'];
 					}
