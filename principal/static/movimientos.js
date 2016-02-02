@@ -156,10 +156,14 @@ function retrieveFraccion() {
 				manzana : splitted_id[1],
 				lote : splitted_id[2]
 			},
-			dataType : "json"
+			dataType : "json",
+			async: false
 		});
-		request.done(function(msg) {
+		request.success(function(msg) {
 			$("#lote_seleccionado_fraccion").html(msg.nombre);
+		});
+		request.error(function(msg) {
+			window.location.href = base_context + "/login/";
 		});	
 	}
 }

@@ -357,7 +357,7 @@ function calcularInteres() {
 			dataType : "json"
 		});
 		// Actualizamos el formulario con los datos obtenidos.
-		request.done(function(msg) {
+		request.success(function(msg) {
 			detalle=msg;
 			console.log(detalle);
 			var intereses=0;
@@ -395,6 +395,9 @@ function calcularInteres() {
             //alert(global_intereses);
 			calculateTotalPago();		
 		});
+		request.error(function(msg) {
+			window.location.href = base_context + "/login/";
+		});	
 }
 
 

@@ -76,15 +76,18 @@ def retrieve_lote(request):
     return HttpResponseServerError("No valido.")
 
 def retrieve_fraccion(request):
-    if request.method == 'GET':
-        data = request.GET
-        fraccion_int = int(data.get('fraccion', ''))
-        myfraccion = Fraccion.objects.get(id=fraccion_int)
-        response_data = {}
-        response_data['fraccion_id']=myfraccion.id
-        response_data['nombre']=myfraccion.nombre
-        
-        return HttpResponse(json.dumps(response_data), content_type="application/json")
+    if request.user.is_authenticated():
+        if request.method == 'GET':
+            data = request.GET
+            fraccion_int = int(data.get('fraccion', ''))
+            myfraccion = Fraccion.objects.get(id=fraccion_int)
+            response_data = {}
+            response_data['fraccion_id']=myfraccion.id
+            response_data['nombre']=myfraccion.nombre
+            
+            return HttpResponse(json.dumps(response_data), content_type="application/json")
+    else:
+        return HttpResponseRedirect(reverse('login'))
         
 def retrieve_lote_venta(request):
     if request.method == 'GET':
