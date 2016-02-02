@@ -370,20 +370,9 @@ def obtener_detalle_interes_lote(lote_id,fecha_pago_parsed,proximo_vencimiento_p
                         else:
                             monto_cuota=venta.precio_de_cuota
                     else:
-                        monto_cuota=venta.precio_de_cuota             
-                    intereses=math.ceil(total_intereses*dias_atraso*monto_cuota)
-                    redondeado=roundup(intereses)
-                    detalle['interes']=interes
-                    #detalle['interes_punitorio']=interes_punitorio
-                    detalle['interes_iva']=interes_iva
-                    detalle['nro_cuota']=nro_cuota
-                    detalle['dias_atraso']=dias_atraso
-                    detalle['intereses']=redondeado
-                    detalle['vencimiento']=fecha_vencimiento.strftime('%d/%m/%Y')
-                    detalle['tipo']='normal';
-
-                    sumatoria_intereses += redondeado
-
+                        monto_cuota=venta.precio_de_cuota
+                    
+                    detalle['vencimiento']=fecha_vencimiento.strftime('%d/%m/%Y')                 
                     fecha_ultimo_vencimiento = datetime.datetime.strptime(detalle['vencimiento'], "%d/%m/%Y").date()
                     fecha_dias_gracia = fecha_ultimo_vencimiento + datetime.timedelta(days=5)
                     dias_habiles = calcular_dias_habiles(fecha_ultimo_vencimiento,fecha_dias_gracia)
@@ -391,7 +380,25 @@ def obtener_detalle_interes_lote(lote_id,fecha_pago_parsed,proximo_vencimiento_p
                     if dias_habiles<5:
                         fecha_ultimo_vencimiento = fecha_dias_gracia+datetime.timedelta(days=5-dias_habiles)
                     detalle['vencimiento_gracia']=fecha_ultimo_vencimiento.strftime('%d/%m/%Y')
+                    
+                    if fecha_pago_parsed > fecha_ultimo_vencimiento:
+                        intereses=math.ceil(total_intereses*dias_atraso*monto_cuota)
+                        redondeado=roundup(intereses)
+                    else:
+                        intereses = 0
+                        redondeado=roundup(intereses)
+                        
+                    detalle['interes']=interes
+                    #detalle['interes_punitorio']=interes_punitorio
+                    detalle['interes_iva']=interes_iva
+                    detalle['nro_cuota']=nro_cuota
+                    detalle['dias_atraso']=dias_atraso
+                    detalle['intereses']=redondeado
+                    
+                    detalle['tipo']='normal';
 
+                    sumatoria_intereses += redondeado
+                    
                     detalles.append(detalle)
 
                 #Calculamos en base al primer vencimiento, cuantas cuotas debieron haberse pagado hasta la fecha
