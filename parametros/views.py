@@ -1363,14 +1363,14 @@ def listar_busqueda_log_usuario(request):
     else:
         return HttpResponseRedirect(reverse('login')) 
     
-    data = request.POST 
+    data = request.GET 
     fecha_ini = data.get('fecha_ini', '')
     fecha_fin = data.get('fecha_fin', '')
     fecha_ini_parsed = unicode(datetime.datetime.combine(datetime.datetime.strptime(fecha_ini, "%d/%m/%Y").date(), datetime.datetime.min.time()))
     fecha_fin_parsed = unicode(datetime.datetime.combine(datetime.datetime.strptime(fecha_fin, "%d/%m/%Y").date(), datetime.datetime.max.time()))
     object_list = LogUsuario.objects.filter(fecha_hora__range=(fecha_ini_parsed,fecha_fin_parsed)).order_by('fecha_hora')
     
-    
+    ultimo = "&fecha_ini="+fecha_ini+"&fecha_fin="+fecha_fin
     paginator=Paginator(object_list,15)
     page=request.GET.get('page')
     try:
@@ -1382,6 +1382,7 @@ def listar_busqueda_log_usuario(request):
         
     c = RequestContext(request, {
         'object_list': lista,
+        'ultimo': ultimo
     })
     return HttpResponse(t.render(c))
 
