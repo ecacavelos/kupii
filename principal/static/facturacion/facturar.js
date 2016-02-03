@@ -333,7 +333,7 @@
 			}
     	});
     	
-    	$("#ajax-print").click(function(){
+    	$("#crear_factura").click(function(){
 			
 			//1. TODO: Hacer chequeo de que todos los valores esten correctos. 
 			if (formOk()){
@@ -343,7 +343,7 @@
 				
 				var request = $.ajax({
 					type : "POST",
-					url : "/ajax/facturar/",
+					url : base_context+"/ajax/facturar/",
 					async: false,
 					data : {
 						csrfmiddlewaretoken : $('input[name=csrfmiddlewaretoken]').val(),
@@ -359,47 +359,71 @@
 						observacion: $("#observacion").val(),
 						
 					},
-					dataType : "aplication/pdf"
+					dataType : "json"
 				});
 				// devuelve el pdf
 				request.done(function(msg) {
-					pdf = msg;
-				// Must start with "data:application/pdf;base64,XXXXXXXXXX"
-				   //qz.appendPDF("data:application/pdf;base64,"+pdf);
-					
-				   qz.append("Hola Mundo");
-				   // Tell the applet to print.
-				   function qzDoneAppending() {
-				      // Very important for PDFs, use "printPS()" instead of "print()"
-				      //qz.printPS();
-				      // Print normal
-				      qz.print();
-				   }
-				 				   
+					$("#id_factura").val(msg.id_factura);
+					$("#imprimir_factura").trigger("click");			   
 				});
-				useDefaultPrinter();
-				//pdf = window.btoa(utf8_encode(request.responseText));
-				pdf = request.responseText;
-				//pdf = utf8_encode(pdf);
-				//pdf = utf8_decode(pdf);
-				//pdf = window.btoa(pdf);
-				qz.setPaperSize("210mm", "297mm");
-				//qz.setAutoSize(true);               // Preserve proportions 
-				qz.appendPDF("data:application/pdf;base64,"+pdf);
-				//qz.appendPDF(pdf);
-				qz.printPS();
-				//qz.append("A37,503,0,1,2,3,N,QZ-Hola Mundo!!!\n");
-  				//qz.print();
-				//pdf = "HOLA MUNDO";
-				//alert("Factura Creada");
-				//window.location.href = "https://sistema.propar.com.py/facturacion/facturar/";						
-				return true;		    						
+				
+    			return true;		    						
 			}
 			else{
 				return false;
 			}
     	});
     	
+    	$("#imprimir_factura").click(function(){
+    		//el ajax
+    		var request = $.ajax({
+			type : "POST",
+			url : base_context+"/ajax/imprimir_factura/",
+			async: false,
+			data : {
+				csrfmiddlewaretoken : $('input[name=csrfmiddlewaretoken]').val(),
+				lote: $("#lote").val(),
+				id_factura: $("#id_factura").val(),
+				},
+					dataType : "aplication/pdf"
+				});
+				// devuelve el pdf
+				request.done(function(msg) {
+					pdf = msg;
+				});
+				useDefaultPrinter();
+				pdf = request.responseText;
+				qz.setPaperSize("210mm", "297mm");
+				qz.appendPDF("data:application/pdf;base64,"+pdf);
+				qz.printPS();
+				timeoutID = window.setTimeout(pregunta, 5000);
+				function pregunta(){
+					if (confirm("¿Volver a Imprimir?")) {
+	        			//alert("Apretó aceptar");
+	        			//volver a hacer click en este boton
+	        			$("#imprimir_factura").trigger("click");
+	    			} else {
+	    				//ajax de marcar como impreso
+	    				var request = $.ajax({
+	    					type : "POST",
+							url : base_context+"/ajax/marcar_impresa/",
+							async: false,
+							data : {
+								csrfmiddlewaretoken : $('input[name=csrfmiddlewaretoken]').val(),
+								id_factura: $("#id_factura").val(),
+								},
+								dataType : "json"
+						});
+						request.done(function(msg) {
+							hola = msg;
+							console.log(msg);
+						});
+	    				
+	    			}	
+				}
+				
+    			
+    	});
     	
     	detalles();
     	

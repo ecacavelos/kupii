@@ -765,6 +765,7 @@ def facturar(request):
             nueva_factura.lote = lote_id
             nueva_factura.anulado = False
             nueva_factura.observacion = observacion 
+            nueva_factura.usuario = request.user
             nueva_factura.save()
             
             #Se logea la accion del usuario
@@ -789,9 +790,53 @@ def facturar(request):
                         pago.factura = nueva_factura
                         pago.save()
                          
-            response = crear_pdf_factura(nueva_factura, request, manzana, lote_id, request.user)
+            #response = crear_pdf_factura(nueva_factura, request, manzana, lote_id, request.user)
+            #response = base64.b64encode(response.content)
+            
+            response = {"id_factura": id_objeto}
+            
+            return HttpResponse(json.dumps(response));
+    else:
+        return HttpResponseRedirect(reverse('login')) 
+    
+def marcar_impresa(request):
+    if request.method == 'POST':
+        if request.user.is_authenticated():
+            try:            
+                id_factura = request.POST['id_factura']
+                factura = Factura.objects.get(pk=id_factura)
+                factura.impresa = True
+                factura.save()
+                data={"impreso": "true"}
+                return HttpResponse(json.dumps(data),content_type="application/json")
+            except Exception, error:
+                print error
+                return HttpResponseServerError('No se pudo procesar el pedido')
+        else:
+            return HttpResponseRedirect(reverse('login'))
+        
+def imprimir_factura(request):    
+    if request.user.is_authenticated():
+        if request.method == 'POST': 
+            print 'POST'          
+            #Obtener el cliente
+            id_factura = request.POST.get('id_factura','')
+            factura = Factura.objects.get(pk=id_factura)
+            #Obtener el Lote
+            lote = request.POST.get('lote','')
+            
+            x = unicode(lote)
+            fraccion_int = int(x[0:3])
+            manzana_int = int(x[4:7])
+            lote_int = int(x[8:])
+            
+            manzana = Manzana.objects.get(fraccion_id=fraccion_int, nro_manzana=manzana_int)
+            lote_id = Lote.objects.get(manzana=manzana.id, nro_lote=lote_int)
+            
+            response = crear_pdf_factura(factura, request, manzana, lote_id, request.user)
             response = base64.b64encode(response.content)
             
             return HttpResponse(response);
     else:
-        return HttpResponseRedirect(reverse('login')) 
+        return HttpResponseRedirect(reverse('login'))  
+        

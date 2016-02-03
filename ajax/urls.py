@@ -35,7 +35,11 @@ urlpatterns = patterns('ajax.views',
     
     url(r'^get_lote_by_codigo_paralot/$', 'get_lote_by_codigo_paralot', name='get_lote_by_codigo_paralot'), 
     
-    url(r'^get_factura_by_numero/$', 'get_factura_by_numero', name='get_factura_by_numero'), 
+    url(r'^get_factura_by_numero/$', 'get_factura_by_numero', name='get_factura_by_numero'),
+    
+    url(r'^marcar_impresa/$', 'marcar_impresa', name='marcar_impresa'),
+    
+    url(r'^imprimir_factura/$', 'imprimir_factura', name='imprimir_factura'),
     
 #     url(r'^get_lista_pagos/$', 'get_lista_pagos', name='get_lista_pagos'), 
 #     url(r'^get_lista_pagos_gerentes/$', 'get_lista_pagos_gerentes', name='get_lista_pagos_gerentes'), 

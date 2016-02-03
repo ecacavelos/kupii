@@ -414,6 +414,7 @@ class Factura(models.Model):
     anulado = models.BooleanField()
     observacion = models.TextField()
     usuario = models.ForeignKey(User,on_delete=models.PROTECT)
+    impresa = models.BooleanField()
     
 class CoordenadasFactura(models.Model):
     #FACTURA 1
