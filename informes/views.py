@@ -1237,7 +1237,18 @@ def liquidacion_vendedores(request):
                     '''
                     )                    
             
-                    object_list=list(PagoDeCuotas.objects.raw(query))
+                    #object_list=list(PagoDeCuotas.objects.raw(query))
+                    ventas = Venta.objects.filter(vendedor_id = vendedor_id)
+                    
+                    for venta in ventas:
+                        if venta.fecha_de_venta >= fecha_ini_parsed and venta.fecha_de_venta <= fecha_fin_parsed:  
+                            #preguntar por el plan de pago de la venta con el vendedor, si el vendedor lleva un % de la venta total, un % de la entrega inicial
+                            print "hola"
+                        pagos = PagoDeCuotas.objects.filter(fecha_de_pago__range=(fecha_ini_parsed, fecha_fin_parsed))
+                        for pago in pagos:
+                            #preguntar por el plan de pago de la venta con el vendedor, si el vendedor lleva un % del pago de acuerdo al nro de cuota que se está pagando 
+                            print "hola"
+                    
                     cuotas=[]
                     #totales por fraccion
                     total_importe=0
@@ -1246,6 +1257,7 @@ def liquidacion_vendedores(request):
                     total_general_importe=0
                     total_general_comision=0
                     k=0 #variable de control
+                    ultimo={}
                     #Seteamos los datos de las filas
                     for i, cuota_item in enumerate (object_list):                
                         nro_cuota=get_nro_cuota(cuota_item)
@@ -2321,7 +2333,8 @@ def liquidacion_propietarios_reporte_excel(request):
     descripcion = request.GET.get('descripcion_otros_descuentos', '')
     monto_descuento = request.GET.get('monto_otros_descuentos', '')
     total_a_cobrar = request.GET['total_a_cobrar']
-    
+    b_fraccion = False
+    b_propietario = False
     #busqueda_label = request.GET['busqueda_label']                    
     if tipo_busqueda == "fraccion":
         try:
@@ -2330,6 +2343,8 @@ def liquidacion_propietarios_reporte_excel(request):
             fraccion_id = request.GET['busqueda']
             pagos =[]
             fraccion = Fraccion.objects.get(pk= fraccion_id)
+            b_fraccion = True
+            g_nombre_fraccion = fraccion.nombre
             ventas = Venta.objects.filter(lote__manzana__fraccion =fraccion_id).order_by('id')                                           
                                 
             for venta in ventas:
@@ -2505,6 +2520,9 @@ def liquidacion_propietarios_reporte_excel(request):
         try:
             #fila={} 
             propietario_id = request.GET['busqueda'] #liquidacion_propietario_por_propietario_reporte excel
+            propietario = Propietario.objects.get(pk= propietario_id)
+            b_propietario = True
+            g_nombre_propietario = propietario.nombres+"_"+propietario.apellidos
             # Se CERAN  los TOTALES por FRACCION
             total_monto_pagado = 0
             total_monto_inm = 0
@@ -3001,8 +3019,17 @@ def liquidacion_propietarios_reporte_excel(request):
             col_nombre.width = 256 * 11   # 11 characters wide
   
     response = HttpResponse(content_type='application/vnd.ms-excel')
-    # Crear un nombre intuitivo         
-    response['Content-Disposition'] = 'attachment; filename=' + 'liquidacion_propietarios.xls'
+    # Crear un nombre intuitivo
+    fecha_actual= datetime.datetime.now().date()
+    fecha_str = unicode(fecha_actual)
+    fecha = unicode(datetime.datetime.strptime(fecha_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
+    
+    if b_fraccion:         
+        response['Content-Disposition'] = 'attachment; filename=' + 'liq_prop_'+g_nombre_fraccion+'_'+fecha+'.xls'
+    elif b_propietario:
+        response['Content-Disposition'] = 'attachment; filename=' + 'liq_prop_'+g_nombre_propietario+'_'+fecha+'.xls'
+    else:
+        response['Content-Disposition'] = 'attachment; filename=' + 'liquidacion_propietario_.xls'
     wb.save(response)
     return response  
 
