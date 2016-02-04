@@ -1,5 +1,5 @@
 function retrieve_liquidacion_vendedores() {
-	window.location.href = base_context + "/informes/liquidacion_vendedores_reporte_excel?fecha_ini=" + $('#fecha_ini').val() + "&fecha_fin=" + $('#fecha_fin').val() + "&busqueda=" + $('#id_busqueda').val() + "&tipo_busqueda=" + $('#id_tipo_busqueda').val();
+	window.location.href = base_context + "/informes/liquidacion_vendedores_reporte_excel?fecha_ini=" + $('#fecha_ini').val() + "&fecha_fin=" + $('#fecha_fin').val() + "&busqueda=" + $('#id_busqueda').val()+"&busqueda_label="+$('#id_busqueda_label').val();
 }
 
 function validar() {
@@ -8,6 +8,40 @@ function validar() {
 		return;
 	}
 	$("#frm_busqueda").submit();
+}
+
+function sacarPuntos(numero){
+	
+	numero =numero.replace(".", "");
+	numero =numero.replace(".", "");
+	numero =numero.replace(".", "");
+	numero =numero.replace(".", "");
+	numero =numero.replace(".", "");
+	
+	return (numero);
+}
+
+function ponerPuntos(negativo, resta){
+	$("#ley").mask('###.###.###',{reverse: true});
+	$("#impuesto_renta").mask('###.###.###',{reverse: true});
+	$("#monto_otros_descuentos").mask('###.###.###',{reverse: true});
+	$("#iva_comision").mask('###.###.###',{reverse: true});
+	valor = Math.abs(resta);
+	$("#total_a_cobrar").html("");
+	$("#total_a_cobrar").unmask();
+	$("#total_a_cobrar").html(valor);
+	$("#total_a_cobrar").mask('###.###.###',{reverse: true});
+	
+	if (negativo){
+		total = "-"+$("#total_a_cobrar").html();
+		$("#total_a_cobrar").unmask('###.###.###',{reverse: true});
+		$("#total_a_cobrar").html(total);
+	} else {
+		total = $("#total_a_cobrar").html();
+		$("#total_a_cobrar").unmask('###.###.###',{reverse: true});
+		$("#total_a_cobrar").html(total);
+	}
+	
 }
 
 function setup_inputs() {

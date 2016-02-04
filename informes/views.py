@@ -1220,141 +1220,326 @@ def liquidacion_vendedores(request):
                     t = loader.get_template('informes/liquidacion_vendedores.html')
                     fecha_ini = request.GET['fecha_ini']
                     fecha_fin = request.GET['fecha_fin']
-                    fecha_ini_parsed = unicode(datetime.datetime.strptime(fecha_ini, "%d/%m/%Y").date())
-                    fecha_fin_parsed = unicode(datetime.datetime.strptime(fecha_fin, "%d/%m/%Y").date())
+                    fecha_ini_parsed = datetime.datetime.strptime(fecha_ini, "%d/%m/%Y").date()
+                    fecha_fin_parsed = datetime.datetime.strptime(fecha_fin, "%d/%m/%Y").date()
                     busqueda_label = request.GET['busqueda_label']
                     vendedor_id=request.GET['busqueda']
                     print("vendedor_id ->" + vendedor_id)
                     
-                    query=(
-                    '''
-                    select pc.* from principal_pagodecuotas pc, principal_lote l, principal_manzana m, principal_fraccion f
-                    where pc.fecha_de_pago >= \''''+ fecha_ini_parsed +               
-                    '''\' and pc.fecha_de_pago <= \'''' + fecha_fin_parsed +
-                    '''\' and pc.vendedor_id=''' + vendedor_id +                
-                    ''' 
-                    and (pc.lote_id = l.id and l.manzana_id=m.id and m.fraccion_id=f.id) order by f.id,pc.fecha_de_pago
-                    '''
-                    )                    
-            
-                    #object_list=list(PagoDeCuotas.objects.raw(query))
-                    ventas = Venta.objects.filter(vendedor_id = vendedor_id)
-                    
+                    ventas = Venta.objects.filter(vendedor_id = vendedor_id).order_by('lote__manzana__fraccion').select_related()
+                    ventas_id = []
+                                
                     for venta in ventas:
+                        ventas_id.append(venta.id)
+                                
+                    pagos_de_cuotas_ventas = PagoDeCuotas.objects.filter(venta__in=ventas_id,fecha_de_pago__range=(fecha_ini_parsed, fecha_fin_parsed)).order_by('fecha_de_pago').prefetch_related('venta', 'venta__plan_de_pago_vendedor','venta__lote__manzana__fraccion')
+                    cant_cuotas_pagadas_ventas = PagoDeCuotas.objects.filter(venta__in=ventas_id, fecha_de_pago__lt=fecha_ini_parsed).values('venta_id').annotate(Sum('nro_cuotas_a_pagar')).prefetch_related('venta_id')
+                    
+                    filas_fraccion = []
+                    filas=[]
+                    
+                    total_fraccion_monto_pagado=0
+                    total_fraccion_monto_vendedor=0
+                    
+                    total_general_monto_pagado=0
+                    total_general_monto_vendedor=0
+                    
+                    g_fraccion = ''
+                    for venta in ventas:
+                        
                         if venta.fecha_de_venta >= fecha_ini_parsed and venta.fecha_de_venta <= fecha_fin_parsed:  
                             #preguntar por el plan de pago de la venta con el vendedor, si el vendedor lleva un % de la venta total, un % de la entrega inicial
-                            print "hola"
-                        pagos = PagoDeCuotas.objects.filter(fecha_de_pago__range=(fecha_ini_parsed, fecha_fin_parsed))
-                        for pago in pagos:
-                            #preguntar por el plan de pago de la venta con el vendedor, si el vendedor lleva un % del pago de acuerdo al nro de cuota que se está pagando 
-                            print "hola"
+                            
+                            if venta.plan_de_pago_vendedor.tipo == 'contado':
+                                
+                                if g_fraccion == '':
+                                    g_fraccion = venta.lote.manzana.fraccion
+                                if venta.lote.manzana.fraccion != g_fraccion:
+                                    #Totales por FRACCION
+                                    try:
+                                        filas_fraccion = sorted(filas_fraccion, key=lambda f: (f['fecha_de_pago_order']))
+                                    except Exception, error:
+                                        print error +": "+ fecha_pago_str
+                                                        
+                                    filas_fraccion[0]['misma_fraccion']= False
+                                    filas.extend(filas_fraccion)
+                                    filas_fraccion = []
+                                    fila = {}
+                                    fila['total_monto_pagado']=unicode('{:,}'.format(total_fraccion_monto_pagado)).replace(",", ".")
+                                    fila['total_monto_vendedor']=unicode('{:,}'.format(total_fraccion_monto_vendedor)).replace(",", ".")
+                                                        
+                                    total_fraccion_monto_pagado=0
+                                    total_fraccion_monto_vendedor=0
+                                                        
+                                    fila['ultimo_pago'] = True
+                                    filas.append(fila)
+                                    g_fraccion = venta.lote.manzana.fraccion.nombre
+                                    ok=True
+                                else:
+                                    montos = calculo_montos_liquidacion_vendedores_contado(venta)
+                                    monto_vendedor = montos['monto_vendedor']
+                                    fecha_pago_str = unicode(venta.fecha_de_venta)
+                                    fecha_pago = unicode(datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
+                                    fecha_pago_order = venta.fecha_de_venta
+                                    
+                                    #Fraccion    Lote    Fecha de Pago    Cliente    Cuota Nº    Mes    Monto Pag Monto Prop.
+                                    fila={}
+                                    fila['fraccion'] = g_fraccion
+                                    fila['plan']=unicode(venta.plan_de_pago_vendedor)
+                                    fila['lote'] = venta.lote.codigo_paralot
+                                    fila['fecha_de_pago'] = fecha_pago
+                                    fila['fecha_de_pago_order'] = fecha_pago_order
+                                    fila['cliente'] = venta.cliente
+                                    fila['nro_cuota'] = 'Venta al Contado'
+                                    fila['monto_pagado']= venta.precio_final_de_venta
+                                    fila['monto_vendedor']= monto_vendedor
+                                    fila['misma_fraccion'] = True
+                                    
+                                    monthNames = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+                                    fecha_1 = unicode(datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
+                                    parts_1 = fecha_1.split("/")
+                                    year_1 = parts_1[2];
+                                    mes_1 = int(parts_1[1]) - 1;
+                                    mes_year = monthNames[mes_1]+"/"+year_1;
+                                    fila['mes'] = mes_year
+                                    
+                                    total_fraccion_monto_pagado+= fila['monto_pagado']
+                                    total_fraccion_monto_vendedor += fila['monto_vendedor']
+                                    
+                                    total_general_monto_pagado+= fila['monto_pagado']
+                                    total_general_monto_vendedor += fila['monto_vendedor']
+                                    
+                                    filas.append(fila)
+                            
+                            if venta.entrega_inicial > 0:
+                                if g_fraccion == '':
+                                    g_fraccion = venta.lote.manzana.fraccion
+                                if venta.lote.manzana.fraccion != g_fraccion:
+                                    #Totales por FRACCION
+                                    try:
+                                        filas_fraccion = sorted(filas_fraccion, key=lambda f: (f['fecha_de_pago_order']))
+                                    except Exception, error:
+                                        print error +": "+ fecha_pago_str
+                                                        
+                                    filas_fraccion[0]['misma_fraccion']= False
+                                    filas.extend(filas_fraccion)
+                                    filas_fraccion = []
+                                    fila = {}
+                                    fila['total_monto_pagado']=unicode('{:,}'.format(total_fraccion_monto_pagado)).replace(",", ".")
+                                    fila['total_monto_vendedor']=unicode('{:,}'.format(total_fraccion_monto_vendedor)).replace(",", ".")
+                                                        
+                                    total_fraccion_monto_pagado=0
+                                    total_fraccion_monto_vendedor=0
+                                                        
+                                    fila['ultimo_pago'] = True
+                                    filas.append(fila)
+                                    g_fraccion = venta.lote.manzana.fraccion
+                                    ok=True
+                                else:
+                                    
+                                    montos = calculo_montos_liquidacion_vendedores_entrega_inicial(venta)
+                                    monto_vendedor = montos['monto_vendedor']
+                                    fecha_pago_str = unicode(venta.fecha_de_venta)
+                                    fecha_pago = unicode(datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
+                                    fecha_pago_order = venta.fecha_de_venta
+                                    
+                                    #Fraccion    Lote    Fecha de Pago    Cliente    Cuota Nº    Mes    Monto Pag Monto Prop.
+                                    fila={}
+                                    fila['fraccion'] = g_fraccion
+                                    fila['plan']=unicode(venta.plan_de_pago_vendedor)
+                                    fila['lote'] = venta.lote.codigo_paralot
+                                    fila['fecha_de_pago'] = fecha_pago
+                                    fila['fecha_de_pago_order'] = fecha_pago_order
+                                    fila['cliente'] = venta.cliente
+                                    fila['nro_cuota'] = 'Entrega Inicial'
+                                    fila['monto_pagado']= venta.entrega_inicial
+                                    fila['monto_vendedor']= monto_vendedor
+                                    fila['misma_fraccion'] = True
+                                    
+                                    monthNames = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+                                    fecha_1 = unicode(datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
+                                    parts_1 = fecha_1.split("/")
+                                    year_1 = parts_1[2];
+                                    mes_1 = int(parts_1[1]) - 1;
+                                    mes_year = monthNames[mes_1]+"/"+year_1;
+                                    fila['mes'] = mes_year
+                                    
+                                    total_fraccion_monto_pagado+= fila['monto_pagado']
+                                    total_fraccion_monto_vendedor += fila['monto_vendedor']
+                                    
+                                    total_general_monto_pagado+= fila['monto_pagado']
+                                    total_general_monto_vendedor += fila['monto_vendedor']
+                                    
+                                    filas.append(fila)
+                                
+                            
+                            pagos = []    
+                            pagos = get_pago_cuotas(venta, fecha_ini_parsed,fecha_fin_parsed, pagos_de_cuotas_ventas, cant_cuotas_pagadas_ventas)                                            
+                            lista_cuotas_ven =[]
+                            lista_cuotas_ven.append(venta.plan_de_pago_vendedor.cuota_inicial)
+                            numero_cuota = venta.plan_de_pago_vendedor.cuota_inicial
+                            for i in range(venta.plan_de_pago_vendedor.cantidad_cuotas -1):
+                                numero_cuota +=  venta.plan_de_pago_vendedor.intervalos
+                                lista_cuotas_ven.append(numero_cuota)
+                                    
+                            for pago in pagos:
+                                #preguntar por el plan de pago de la venta con el vendedor, si el vendedor lleva un % del pago de acuerdo al nro de cuota que se está pagando
+                                try:
+                                                    
+                                    if g_fraccion == "":
+                                        g_fraccion = venta.lote.manzana.fraccion
+                                                    
+                                    if pago['fraccion'] != g_fraccion:
+                                        #Totales por FRACCION
+                                        try:
+                                            filas_fraccion = sorted(filas_fraccion, key=lambda f: (f['fecha_de_pago_order']))
+                                        except Exception, error:
+                                            print error +": "+ fecha_pago_str
+                                                        
+                                        filas_fraccion[0]['misma_fraccion']= False
+                                        filas.extend(filas_fraccion)
+                                        filas_fraccion = []
+                                        fila = {}
+                                        fila['total_monto_pagado']=unicode('{:,}'.format(total_fraccion_monto_pagado)).replace(",", ".")
+                                        fila['total_monto_vendedor']=unicode('{:,}'.format(total_fraccion_monto_vendedor)).replace(",", ".")
+                                                        
+                                        total_fraccion_monto_pagado=0
+                                        total_fraccion_monto_vendedor=0
+                                        
+                                        fila['ultimo_pago'] = True
+                                        filas.append(fila)
+                                        g_fraccion = pago['fraccion']
+                                        ok=True
+                                                        
+                                        montos = calculo_montos_liquidacion_vendedores(pago,venta, lista_cuotas_ven)
+                                        monto_vendedor = montos['monto_vendedor']
+                                        fecha_pago_str = unicode(pago['fecha_de_pago'])
+                                        try:
+                                            fecha_pago = unicode(datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
+                                        except Exception, error:
+                                            print error +": "+ fecha_pago_str
+                                                         
+                                        # Se setean los datos de cada fila
+                                        fila={}
+                                        fila['misma_fraccion'] = True
+                                        fila['fraccion']=unicode(venta.lote.manzana.fraccion)
+                                        fila['plan']=unicode(venta.plan_de_pago_vendedor)
+                                        fila['fecha_de_pago']=fecha_pago
+                                        fila['fecha_de_pago_order']=pago['fecha_de_pago']
+                                        fila['lote']=unicode(pago['lote'])
+                                        fila['cliente']=unicode(venta.cliente)
+                                        fila['nro_cuota']=unicode(pago['nro_cuota_y_total'])
+                                        fila['total_de_cuotas']=unicode('{:,}'.format(int(pago['monto']))).replace(",", ".")
+                                        fila['monto_vendedor']=unicode('{:,}'.format(monto_vendedor)).replace(",", ".")
+                                                         
+                                        cuotas_detalles = get_cuota_information_by_lote(pago['lote'].id, int(pago['nro_cuota']) , True, True, venta)
+                                        monthNames = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+                                        fecha_1 = cuotas_detalles[0]['fecha'] 
+                                        parts_1 = fecha_1.split("/")
+                                        year_1 = parts_1[2];
+                                        mes_1 = int(parts_1[1]) - 1;
+                                        mes_year = monthNames[mes_1]+"/"+year_1;
+                                        fila['mes'] = mes_year
+                                                         
+                                        #if venta.lote.manzana.fraccion != g_fraccion: 
+                                        ok=False
+                                        # Se suman los TOTALES por FRACCION
+                                        total_fraccion_monto_vendedor += int(monto_vendedor)
+                                        total_fraccion_monto_pagado += int(pago['monto'])
+                                                         
+                                        #Acumulamos para los TOTALES GENERALES
+                                        total_general_monto_pagado += int(pago['monto'])
+                                        total_general_monto_vendedor += int(monto_vendedor)
+                                                        
+                                        filas_fraccion.append(fila)
+                                                        
+                                    else:
+                                                        
+                                                    
+                                        montos = calculo_montos_liquidacion_vendedores(pago,venta, lista_cuotas_ven)
+                                        monto_vendedor = montos['monto_vendedor']
+                                        fecha_pago_str = unicode(pago['fecha_de_pago'])
+                                        try:
+                                            fecha_pago = unicode(datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
+                                        except Exception, error:
+                                            print error +": "+ fecha_pago_str
+                                                         
+                                        # Se setean los datos de cada fila
+                                        fila={}
+                                        fila['misma_fraccion'] = True
+                                        fila['fraccion']=unicode(venta.lote.manzana.fraccion)
+                                        fila['plan']=unicode(venta.plan_de_pago_vendedor)
+                                        fila['fecha_de_pago']=fecha_pago
+                                        fila['fecha_de_pago_order']=pago['fecha_de_pago']
+                                        fila['lote']=unicode(pago['lote'])
+                                        fila['cliente']=unicode(venta.cliente)
+                                        fila['nro_cuota']=unicode(pago['nro_cuota_y_total'])
+                                        fila['total_de_cuotas']=unicode('{:,}'.format(int(pago['monto']))).replace(",", ".")
+                                        fila['monto_vendedor']=unicode('{:,}'.format(monto_vendedor)).replace(",", ".")
+                                                         
+                                        cuotas_detalles = get_cuota_information_by_lote(pago['lote'].id, int(pago['nro_cuota']) , True, True, venta)
+                                        monthNames = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+                                        fecha_1 = cuotas_detalles[0]['fecha'] 
+                                        parts_1 = fecha_1.split("/")
+                                        year_1 = parts_1[2];
+                                        mes_1 = int(parts_1[1]) - 1;
+                                        mes_year = monthNames[mes_1]+"/"+year_1;
+                                        fila['mes'] = mes_year
+                                                         
+                                        #if venta.lote.manzana.fraccion != g_fraccion: 
+                                        ok=False
+                                        # Se suman los TOTALES por FRACCION
+                                        total_fraccion_monto_vendedor += int(monto_vendedor)
+                                        total_fraccion_monto_pagado += int(pago['monto'])
+                                                         
+                                        #Acumulamos para los TOTALES GENERALES
+                                        total_general_monto_pagado += int(pago['monto'])
+                                        total_general_monto_vendedor += int(monto_vendedor)
+                                                        
+                                        filas_fraccion.append(fila)
+                                                    
+                                                    
+                                                     
+                                                    
+                                                
+                                except Exception, error:
+                                    print "Error: "+ unicode(error)+ ", Id Pago: "+unicode(pago['id'])+ ", Fraccion: "+unicode(pago['fraccion'])+ ", lote: "+unicode(pago['lote']) +" Nro cuota: "+unicode(unicode(pago['nro_cuota_y_total']))
+                                             
+                #Totales GENERALES
+                #filas = sorted(filas, key=lambda f: f['fecha_de_pago'])
+                if filas_fraccion != []:
+                    filas_fraccion = sorted(filas_fraccion, key=lambda f: (f['fecha_de_pago_order']))
+                    filas_fraccion[0]['misma_fraccion']= False 
+                    filas.extend(filas_fraccion)
+                                    
+                    fila = {}
+                    fila['total_monto_pagado']=unicode('{:,}'.format(total_fraccion_monto_pagado)).replace(",", ".")
+                    fila['total_monto_vendedor']=unicode('{:,}'.format(total_fraccion_monto_vendedor)).replace(",", ".")
+                    total_fraccion_monto_vendedor = 0
+                    total_fraccion_monto_pagado = 0
+                    fila['ultimo_pago'] = True
+                    filas.append(fila)
+                                
+                fila = {}
+                fila['total_general_pagado']=unicode('{:,}'.format(total_general_monto_pagado)).replace(",", ".")
+                fila['total_general_vendedor']=unicode('{:,}'.format(total_general_monto_vendedor)).replace(",", ".")
+                ley = int(total_general_monto_pagado*0.015)
+                filas.append(fila)
+                filas[0]['misma_fraccion']= False
                     
-                    cuotas=[]
-                    #totales por fraccion
-                    total_importe=0
-                    total_comision=0
-                    #totales generales
-                    total_general_importe=0
-                    total_general_comision=0
-                    k=0 #variable de control
-                    ultimo={}
-                    #Seteamos los datos de las filas
-                    for i, cuota_item in enumerate (object_list):                
-                        nro_cuota=get_nro_cuota(cuota_item)
-                        cuota={}
-                        com=0        
-                        #Esta es una regla de negocio, los vendedores cobran comisiones segun el numero de cuota, maximo hasta la cuota Nro 9.
-                        #Si el plan de pago tiene hasta 12 cuotas, los vendedores cobran una comision sobre todas las cuotas.
-                        cuotas_para_vendedor=((cuota_item.plan_de_pago_vendedores.cantidad_cuotas)*(cuota_item.plan_de_pago_vendedores.intervalos))-cuota_item.plan_de_pago_vendedores.cuota_inicial                  
-                        #A los vendedores le corresponde comision por las primeras 4 (maximo 5) cuotas impares.
-                        if( (nro_cuota%2!=0 and nro_cuota<=cuotas_para_vendedor) or (cuota_item.plan_de_pago.cantidad_de_cuotas<=12 and nro_cuota<=12) ):                                                                        
-                            if k==0:
-                                #Guardamos la primera fraccion que cumple con la condicion, para tener algo con que comparar.
-                                fraccion_actual=cuota_item.lote.manzana.fraccion.id
-                            k+=1
-                            print k
-                            if(cuota_item.lote.manzana.fraccion.id==fraccion_actual):                              
-                                #comision de las cuotas
-                                com=int(cuota_item.total_de_cuotas*(float(cuota_item.plan_de_pago_vendedores.porcentaje_de_cuotas)/float(100)))
-                                if(cuota_item.venta.entrega_inicial):
-                                    #comision de la entrega inicial, si la hubiere
-                                    com_inicial=int(cuota_item.venta.entrega_inicial*(float(cuota_item.plan_de_pago_vendedores.porcentaje_cuota_inicial)/float(100)))
-                                    cuota['concepto']="Entrega Inicial"
-                                    cuota['cuota_nro']=unicode(0)+'/'+unicode(cuota_item.plan_de_pago.cantidad_de_cuotas)
-                                    cuota['comision']=unicode('{:,}'.format(com_inicial)).replace(",", ".")
-                                else:
-                                    cuota['concepto']="Pago de Cuota" 
-                                    cuota['cuota_nro']=unicode(nro_cuota)+'/'+unicode(cuota_item.plan_de_pago.cantidad_de_cuotas)
-                                    cuota['comision']=unicode('{:,}'.format(com)).replace(",", ".")
-                                cuota['fraccion']=unicode(cuota_item.lote.manzana.fraccion)
-                                cuota['cliente']=unicode(cuota_item.cliente)
-                                cuota['fraccion_id']=cuota_item.lote.manzana.fraccion.id
-                                cuota['lote']=unicode(cuota_item.lote)
-                                cuota['fecha_pago']=unicode(cuota_item.fecha_de_pago)
-                                cuota['importe']=unicode('{:,}'.format(cuota_item.total_de_cuotas)).replace(",", ".") 
-      
-        
-                                #Sumamos los totales por fraccion
-                                total_importe+=cuota_item.total_de_cuotas
-                                total_comision+=com
-                                print cuota_item  
-                                #Guardamos el ultimo lote que cumple la condicion en dos variables, por si se covnierta en el ultimo lote para cerrar la fraccion
-                                #actual, o por si sea el ultimo lote de la lista.
-                                anterior=cuota                            
-                                ultimo=cuota                       
-                            #Hay cambio de lote pero NO es el ultimo elemento todavia
-                            else:
-                                anterior['total_importe']=unicode('{:,}'.format(total_importe)).replace(",", ".")
-                                anterior['total_comision']=unicode('{:,}'.format(total_comision)).replace(",", ".")
-            
-                                #Se CERAN  los TOTALES por FRACCION                            
-                                total_importe=0
-                                total_comision=0                                                                                
-                                com=int(cuota_item.total_de_cuotas*(float(cuota_item.plan_de_pago_vendedores.porcentaje_de_cuotas)/float(100)))
-                                if(cuota_item.venta.entrega_inicial):
-                                    #comision de la entrega inicial, si la hubiere
-                                    com_inicial=int(cuota_item.venta.entrega_inicial*(float(cuota_item.plan_de_pago_vendedores.porcentaje_cuota_inicial)/float(100)))
-                                    cuota['concepto']="Entrega Inicial"
-                                    cuota['cuota_nro']=unicode(0)+'/'+unicode(cuota_item.plan_de_pago.cantidad_de_cuotas)
-                                    cuota['comision']=unicode('{:,}'.format(com_inicial)).replace(",", ".")
-                                else:
-                                    cuota['concepto']="Pago de Cuota" 
-                                    cuota['cuota_nro']=unicode(nro_cuota)+'/'+unicode(cuota_item.plan_de_pago.cantidad_de_cuotas)
-                                    cuota['comision']=unicode('{:,}'.format(com)).replace(",", ".")
-                                cuota['fraccion']=unicode(cuota_item.lote.manzana.fraccion)
-                                cuota['cliente']=unicode(cuota_item.cliente)
-                                cuota['fraccion_id']=cuota_item.lote.manzana.fraccion.id
-                                cuota['lote']=unicode(cuota_item.lote)
-                                cuota['fecha_pago']=unicode(cuota_item.fecha_de_pago)
-                                cuota['importe']=unicode('{:,}'.format(cuota_item.total_de_cuotas)).replace(",", ".") 
-                                #Sumamos los totales por fraccion
-                                total_importe+=cuota_item.total_de_cuotas
-                                total_comision+=com 
-                                fraccion_actual=cuota_item.lote.manzana.fraccion.id
-                                anterior=cuota
-                                ultimo=cuota
-                            total_general_importe+=cuota_item.total_de_cuotas
-                            total_general_comision+=com
-                            cuotas.append(cuota)                        
-                        #Si es el ultimo lote, cerramos totales de fraccion
-                        if (len(object_list)-1 == i):
-                            try:
-                                ultimo['total_importe']=unicode('{:,}'.format(total_importe)).replace(",", ".") 
-                                ultimo['total_comision']=unicode('{:,}'.format(total_comision)).replace(",", ".")             
-                                ultimo['total_general_importe']=unicode('{:,}'.format(total_general_importe)).replace(",", ".") 
-                                ultimo['total_general_comision']=unicode('{:,}'.format(total_general_comision)).replace(",", ".")          
-                            except Exception, error:
-                                print error 
-                                pass
+                
                 ultimo="&busqueda_label="+busqueda_label+"&busqueda="+vendedor_id+"&fecha_ini="+fecha_ini+"&fecha_fin="+fecha_fin         
-                paginator = Paginator(cuotas, 25)
-                page = request.GET.get('page')
-                try:
-                    lista = paginator.page(page)
-                except PageNotAnInteger:
-                    lista = paginator.page(1)
-                except EmptyPage:
-                    lista = paginator.page(paginator.num_pages) 
+                
+                lista = filas
+                
+#                 paginator = Paginator(cuotas, 25)
+#                 page = request.GET.get('page')
+#                 try:
+#                     lista = paginator.page(page)
+#                 except PageNotAnInteger:
+#                     lista = paginator.page(1)
+#                 except EmptyPage:
+#                     lista = paginator.page(paginator.num_pages) 
                 c = RequestContext(request, {
                     'lista_cuotas': lista,
                     'fecha_ini':fecha_ini,
@@ -1425,7 +1610,7 @@ def liquidacion_gerentes(request):
                         com=0        
                         #Esta es una regla de negocio, los vendedores cobran comisiones segun el numero de cuota, maximo hasta la cuota Nro 9.
                         #Si el plan de pago tiene hasta 12 cuotas, los vendedores cobran una comision sobre todas las cuotas.
-                        cuotas_para_vendedor=((cuota_item.plan_de_pago_vendedores.cantidad_cuotas)*(cuota_item.plan_de_pago_vendedores.intervalos))-cuota_item.plan_de_pago_vendedores.cuota_inicial                  
+                        cuotas_para_vendedor=((cuota_item.plan_de_pago_vendedor.cantidad_cuotas)*(cuota_item.plan_de_pago_vendedor.intervalos))-cuota_item.plan_de_pago_vendedor.cuota_inicial                  
                         #A los vendedores le corresponde comision por las primeras 4 (maximo 5) cuotas impares.
                         if( (nro_cuota%2!=0 and nro_cuota<=cuotas_para_vendedor) or (cuota_item.plan_de_pago.cantidad_de_cuotas<=12 and nro_cuota<=12) ):                                                                        
                             if k==0:
@@ -1436,10 +1621,10 @@ def liquidacion_gerentes(request):
                             #print k
                             if(cuota_item.vendedor.id==vendedor_actual and cuota_item.lote.manzana.fraccion==fraccion_actual):                              
                                 #comision de las cuotas
-                                com=int(cuota_item.total_de_cuotas*(float(cuota_item.plan_de_pago_vendedores.porcentaje_de_cuotas)/float(100)))
+                                com=int(cuota_item.total_de_cuotas*(float(cuota_item.plan_de_pago_vendedor.porcentaje_de_cuotas)/float(100)))
                                 if(cuota_item.venta.entrega_inicial):
                                     #comision de la entrega inicial, si la hubiere
-                                    com_inicial=int(cuota_item.venta.entrega_inicial*(float(cuota_item.plan_de_pago_vendedores.porcentaje_cuota_inicial)/float(100)))
+                                    com_inicial=int(cuota_item.venta.entrega_inicial*(float(cuota_item.plan_de_pago_vendedor.porcentaje_cuota_inicial)/float(100)))
                                     cuota['concepto']="Entrega Inicial"
                                     cuota['cuota_nro']=unicode(0)+'/'+unicode(cuota_item.plan_de_pago.cantidad_de_cuotas)
                                     cuota['comision']=unicode('{:,}'.format(com_inicial)).replace(",", ".")
@@ -1463,10 +1648,10 @@ def liquidacion_gerentes(request):
                                 ultimo=cuota                       
                             #Hay cambio de lote pero NO es el ultimo elemento todavia
                             else:                                                                                              
-                                com=int(cuota_item.total_de_cuotas*(float(cuota_item.plan_de_pago_vendedores.porcentaje_de_cuotas)/float(100)))
+                                com=int(cuota_item.total_de_cuotas*(float(cuota_item.plan_de_pago_vendedor.porcentaje_de_cuotas)/float(100)))
                                 if(cuota_item.venta.entrega_inicial):
                                     #comision de la entrega inicial, si la hubiere
-                                    com_inicial=int(cuota_item.venta.entrega_inicial*(float(cuota_item.plan_de_pago_vendedores.porcentaje_cuota_inicial)/float(100)))
+                                    com_inicial=int(cuota_item.venta.entrega_inicial*(float(cuota_item.plan_de_pago_vendedor.porcentaje_cuota_inicial)/float(100)))
                                     cuota['concepto']="Entrega Inicial"
                                     cuota['cuota_nro']=unicode(0)+'/'+unicode(cuota_item.plan_de_pago.cantidad_de_cuotas)
                                     cuota['comision']=unicode('{:,}'.format(com_inicial)).replace(",", ".")
@@ -3035,172 +3220,466 @@ def liquidacion_propietarios_reporte_excel(request):
 
 def liquidacion_vendedores_reporte_excel(request):   
     
-    vendedor_id = request.GET['busqueda']
-    print("vendedor_id ->" + vendedor_id);
     fecha_ini = request.GET['fecha_ini']
     fecha_fin = request.GET['fecha_fin']
-    fecha_ini_parsed = unicode(datetime.datetime.strptime(fecha_ini, "%d/%m/%Y").date())
-    fecha_fin_parsed = unicode(datetime.datetime.strptime(fecha_fin, "%d/%m/%Y").date())
-    
-    query=(
-    '''
-    select pc.* from principal_pagodecuotas pc, principal_lote l, principal_manzana m, principal_fraccion f
-    where pc.fecha_de_pago >= \''''+ fecha_ini_parsed +               
-    '''\' and pc.fecha_de_pago <= \'''' + fecha_fin_parsed +
-    '''\' and pc.vendedor_id=''' + vendedor_id +                
-    ''' 
-    and (pc.lote_id = l.id and l.manzana_id=m.id and m.fraccion_id=f.id) order by f.id,pc.fecha_de_pago
-    '''
-    )                    
-           
-    object_list=list(PagoDeCuotas.objects.raw(query))
-    cuotas=[]
-    #totales por fraccion
-    total_importe=0
-    total_comision=0
-    #totales generales
-    total_general_importe=0
-    total_general_comision=0
-    k=0 #variable de control
-    #Seteamos los datos de las filas
-    for i, cuota_item in enumerate (object_list):                
-        nro_cuota=get_nro_cuota(cuota_item)
-        cuota={}
-        com=0        
-        #Esta es una regla de negocio, los vendedores cobran comisiones segun el numero de cuota, maximo hasta la cuota Nro 9.
-        cuotas_para_vendedor=((cuota_item.plan_de_pago_vendedores.cantidad_cuotas)*(cuota_item.plan_de_pago_vendedores.intervalos))-cuota_item.plan_de_pago_vendedores.cuota_inicial                  
-        #A los vendedores le corresponde comision por las primeras 4 (maximo 5) cuotas impares.
-        if(nro_cuota%2!=0 and nro_cuota<=cuotas_para_vendedor):                                                                        
-            if k==0:
-                #Guardamos la primera fraccion que cumple con la condicion, para tener algo con que comparar.
-                fraccion_actual=cuota_item.lote.manzana.fraccion.id
-            k+=1
-            if(cuota_item.lote.manzana.fraccion.id==fraccion_actual):                              
-                #comision de las cuotas
-                com=int(cuota_item.total_de_cuotas*(float(cuota_item.plan_de_pago_vendedores.porcentaje_de_cuotas)/float(100)))
-                if(cuota_item.venta.entrega_inicial):
-                    #comision de la entrega inicial, si la hubiere
-                    com_inicial=int(cuota_item.venta.entrega_inicial*(float(cuota_item.plan_de_pago_vendedores.porcentaje_cuota_inicial)/float(100)))
-                    cuota['concepto']="Entrega Inicial"
-                    cuota['cuota_nro']=unicode(0)+'/'+unicode(cuota_item.plan_de_pago.cantidad_de_cuotas)
-                    cuota['comision']=unicode('{:,}'.format(com_inicial)).replace(",", ".")
-                else:
-                    cuota['concepto']="Pago de Cuota" 
-                    cuota['cuota_nro']=unicode(nro_cuota)+'/'+unicode(cuota_item.plan_de_pago.cantidad_de_cuotas)
-                    cuota['comision']=unicode('{:,}'.format(com)).replace(",", ".")
+    fecha_ini_parsed = datetime.datetime.strptime(fecha_ini, "%d/%m/%Y").date()
+    fecha_fin_parsed = datetime.datetime.strptime(fecha_fin, "%d/%m/%Y").date()
+    busqueda_label = request.GET['busqueda_label']
+    vendedor_id=request.GET['busqueda']
+    print("vendedor_id ->" + vendedor_id)
                     
-                cuota['fraccion']=unicode(cuota_item.lote.manzana.fraccion)
-                cuota['cliente']=unicode(cuota_item.cliente)
-                cuota['fraccion_id']=cuota_item.lote.manzana.fraccion.id
-                cuota['lote']=unicode(cuota_item.lote)
-                cuota['fecha_pago']=unicode(cuota_item.fecha_de_pago)
-                cuota['importe']=unicode('{:,}'.format(cuota_item.total_de_cuotas)).replace(",", ".") 
-  
-    
-                #Sumamos los totales por fraccion
-                total_importe+=cuota_item.total_de_cuotas
-                total_comision+=com
-                print cuota_item  
-                #Guardamos el ultimo lote que cumple la condicion en dos variables, por si se covnierta en el ultimo lote para cerrar la fraccion
-                #actual, o por si sea el ultimo lote de la lista.
-                anterior=cuota                            
-                ultimo=cuota                       
-            #Hay cambio de lote pero NO es el ultimo elemento todavia
-            else:
-                anterior['total_importe']=unicode('{:,}'.format(total_importe)).replace(",", ".")
-                anterior['total_comision']=unicode('{:,}'.format(total_comision)).replace(",", ".")
-        
-                #Se CERAN  los TOTALES por FRACCION                            
-                total_importe=0
-                total_comision=0                                                                                
-                com=int(cuota_item.total_de_cuotas*(float(cuota_item.plan_de_pago_vendedores.porcentaje_de_cuotas)/float(100)))
-                if(cuota_item.venta.entrega_inicial):
-                    #comision de la entrega inicial, si la hubiere
-                    com_inicial=int(cuota_item.venta.entrega_inicial*(float(cuota_item.plan_de_pago_vendedores.porcentaje_cuota_inicial)/float(100)))
-                    cuota['concepto']="Entrega Inicial"
-                    cuota['cuota_nro']=unicode(0)+'/'+unicode(cuota_item.plan_de_pago.cantidad_de_cuotas)
-                    cuota['comision']=unicode('{:,}'.format(com_inicial)).replace(",", ".")
-                else:
-                    cuota['concepto']="Pago de Cuota" 
-                    cuota['cuota_nro']=unicode(nro_cuota)+'/'+unicode(cuota_item.plan_de_pago.cantidad_de_cuotas)
-                    cuota['comision']=unicode('{:,}'.format(com)).replace(",", ".")
+    ventas = Venta.objects.filter(vendedor_id = vendedor_id).order_by('lote__manzana__fraccion').select_related()
+    ventas_id = []
+                                
+    for venta in ventas:
+        ventas_id.append(venta.id)
+                                
+    pagos_de_cuotas_ventas = PagoDeCuotas.objects.filter(venta__in=ventas_id,fecha_de_pago__range=(fecha_ini_parsed, fecha_fin_parsed)).order_by('fecha_de_pago').prefetch_related('venta', 'venta__plan_de_pago_vendedor','venta__lote__manzana__fraccion')
+    cant_cuotas_pagadas_ventas = PagoDeCuotas.objects.filter(venta__in=ventas_id, fecha_de_pago__lt=fecha_ini_parsed).values('venta_id').annotate(Sum('nro_cuotas_a_pagar')).prefetch_related('venta_id')
                     
-                cuota['fraccion']=unicode(cuota_item.lote.manzana.fraccion)
-                cuota['cliente']=unicode(cuota_item.cliente)
-                cuota['fraccion_id']=cuota_item.lote.manzana.fraccion.id
-                cuota['lote']=unicode(cuota_item.lote)
-                cuota['fecha_pago']=unicode(cuota_item.fecha_de_pago)
-                cuota['importe']=unicode('{:,}'.format(cuota_item.total_de_cuotas)).replace(",", ".") 
+    filas_fraccion = []
+    filas=[]
+                    
+    total_fraccion_monto_pagado=0
+    total_fraccion_monto_vendedor=0
+                    
+    total_general_monto_pagado=0
+    total_general_monto_vendedor=0
+    
+    b_fraccion = False
+    b_vendedor = True
+    
+    vendedor = Vendedor.objects.get(pk = vendedor_id)
+    
+    g_nombre_fraccion = ''
+    g_nombre_vendedor = vendedor.nombres+"_"+vendedor.apellidos
+                    
+    g_fraccion = ''
+    for venta in ventas:
+                        
+        if venta.fecha_de_venta >= fecha_ini_parsed and venta.fecha_de_venta <= fecha_fin_parsed:  
+                            #preguntar por el plan de pago de la venta con el vendedor, si el vendedor lleva un % de la venta total, un % de la entrega inicial
+                            
+            if venta.plan_de_pago_vendedor.tipo == 'contado':
+                                
+                if g_fraccion == '':
+                    g_fraccion = venta.lote.manzana.fraccion
+                if venta.lote.manzana.fraccion != g_fraccion:
+                    #Totales por FRACCION
+                    try:
+                        filas_fraccion = sorted(filas_fraccion, key=lambda f: (f['fecha_de_pago_order']))
+                    except Exception, error:
+                        print error +": "+ fecha_pago_str
+                                        
+                    filas_fraccion[0]['misma_fraccion']= False
+                    filas.extend(filas_fraccion)
+                    filas_fraccion = []
+                    fila = {}
+                    fila['total_monto_pagado']=unicode('{:,}'.format(total_fraccion_monto_pagado)).replace(",", ".")
+                    fila['total_monto_vendedor']=unicode('{:,}'.format(total_fraccion_monto_vendedor)).replace(",", ".")
+                                                        
+                    total_fraccion_monto_pagado=0
+                    total_fraccion_monto_vendedor=0
+                                                        
+                    fila['ultimo_pago'] = True
+                    filas.append(fila)
+                    g_fraccion = venta.lote.manzana.fraccion.nombre
+                    ok=True
+                else:
+                    montos = calculo_montos_liquidacion_vendedores_contado(venta)
+                    monto_vendedor = montos['monto_vendedor']
+                    fecha_pago_str = unicode(venta.fecha_de_venta)
+                    fecha_pago = unicode(datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
+                    fecha_pago_order = venta.fecha_de_venta
+                                    
+                    #Fraccion    Lote    Fecha de Pago    Cliente    Cuota Nº    Mes    Monto Pag Monto Prop.
+                    fila={}
+                    fila['fraccion'] = g_fraccion
+                    fila['plan']=unicode(venta.plan_de_pago_vendedor)
+                    fila['lote'] = venta.lote.codigo_paralot
+                    fila['fecha_de_pago'] = fecha_pago
+                    fila['fecha_de_pago_order'] = fecha_pago_order
+                    fila['cliente'] = venta.cliente
+                    fila['nro_cuota'] = 'Venta al Contado'
+                    fila['monto_pagado']= venta.precio_final_de_venta
+                    fila['monto_vendedor']= monto_vendedor
+                    fila['misma_fraccion'] = True
+                                    
+                    monthNames = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+                    fecha_1 = unicode(datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
+                    parts_1 = fecha_1.split("/")
+                    year_1 = parts_1[2];
+                    mes_1 = int(parts_1[1]) - 1;
+                    mes_year = monthNames[mes_1]+"/"+year_1;
+                    fila['mes'] = mes_year
+                                    
+                    total_fraccion_monto_pagado+= fila['monto_pagado']
+                    total_fraccion_monto_vendedor += fila['monto_vendedor']
+                    
+                    total_general_monto_pagado+= fila['monto_pagado']
+                    total_general_monto_vendedor += fila['monto_vendedor']
+                                    
+                    filas.append(fila)
+                            
+            if venta.entrega_inicial > 0:
+                if g_fraccion == '':
+                    g_fraccion = venta.lote.manzana.fraccion
+                if venta.lote.manzana.fraccion != g_fraccion:
+                    #Totales por FRACCION
+                    try:
+                        filas_fraccion = sorted(filas_fraccion, key=lambda f: (f['fecha_de_pago_order']))
+                    except Exception, error:
+                        print error +": "+ fecha_pago_str
+                                                        
+                    filas_fraccion[0]['misma_fraccion']= False
+                    filas.extend(filas_fraccion)
+                    filas_fraccion = []
+                    fila = {}
+                    fila['total_monto_pagado']=unicode('{:,}'.format(total_fraccion_monto_pagado)).replace(",", ".")
+                    fila['total_monto_vendedor']=unicode('{:,}'.format(total_fraccion_monto_vendedor)).replace(",", ".")
+                                                        
+                    total_fraccion_monto_pagado=0
+                    total_fraccion_monto_vendedor=0
+                                        
+                    fila['ultimo_pago'] = True
+                    filas.append(fila)
+                    g_fraccion = venta.lote.manzana.fraccion
+                    ok=True
+                else:
+                                    
+                    montos = calculo_montos_liquidacion_vendedores_entrega_inicial(venta)
+                    monto_vendedor = montos['monto_vendedor']
+                    fecha_pago_str = unicode(venta.fecha_de_venta)
+                    fecha_pago = unicode(datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
+                    fecha_pago_order = venta.fecha_de_venta
+                                    
+                    #Fraccion    Lote    Fecha de Pago    Cliente    Cuota Nº    Mes    Monto Pag Monto Prop.
+                    fila={}
+                    fila['fraccion'] = g_fraccion
+                    fila['plan']=unicode(venta.plan_de_pago_vendedor)
+                    fila['lote'] = venta.lote.codigo_paralot
+                    fila['fecha_de_pago'] = fecha_pago
+                    fila['fecha_de_pago_order'] = fecha_pago_order
+                    fila['cliente'] = venta.cliente
+                    fila['nro_cuota'] = 'Entrega Inicial'
+                    fila['monto_pagado']= venta.entrega_inicial
+                    fila['monto_vendedor']= monto_vendedor
+                    fila['misma_fraccion'] = True
+                                    
+                    monthNames = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+                    fecha_1 = unicode(datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
+                    parts_1 = fecha_1.split("/")
+                    year_1 = parts_1[2];
+                    mes_1 = int(parts_1[1]) - 1;
+                    mes_year = monthNames[mes_1]+"/"+year_1;
+                    fila['mes'] = mes_year
+                                    
+                    total_fraccion_monto_pagado+= fila['monto_pagado']
+                    total_fraccion_monto_vendedor += fila['monto_vendedor']
+                                    
+                    total_general_monto_pagado+= fila['monto_pagado']
+                    total_general_monto_vendedor += fila['monto_vendedor']
+                                    
+                    filas.append(fila)
+                                
+                            
+            pagos = []    
+            pagos = get_pago_cuotas(venta, fecha_ini_parsed,fecha_fin_parsed, pagos_de_cuotas_ventas, cant_cuotas_pagadas_ventas)                                            
+            lista_cuotas_ven =[]
+            lista_cuotas_ven.append(venta.plan_de_pago_vendedor.cuota_inicial)
+            numero_cuota = venta.plan_de_pago_vendedor.cuota_inicial
+            for i in range(venta.plan_de_pago_vendedor.cantidad_cuotas -1):
+                numero_cuota +=  venta.plan_de_pago_vendedor.intervalos
+                lista_cuotas_ven.append(numero_cuota)
+                    
+            for pago in pagos:
+                #preguntar por el plan de pago de la venta con el vendedor, si el vendedor lleva un % del pago de acuerdo al nro de cuota que se está pagando
+                try:
+                                    
+                    if g_fraccion == "":
+                        g_fraccion = venta.lote.manzana.fraccion
+                                                    
+                    if pago['fraccion'] != g_fraccion:
+                        #Totales por FRACCION
+                        try:
+                            filas_fraccion = sorted(filas_fraccion, key=lambda f: (f['fecha_de_pago_order']))
+                        except Exception, error:
+                            print error +": "+ fecha_pago_str
+                                                        
+                        filas_fraccion[0]['misma_fraccion']= False
+                        filas.extend(filas_fraccion)
+                        filas_fraccion = []
+                        fila = {}
+                        fila['total_monto_pagado']=unicode('{:,}'.format(total_fraccion_monto_pagado)).replace(",", ".")
+                        fila['total_monto_vendedor']=unicode('{:,}'.format(total_fraccion_monto_vendedor)).replace(",", ".")
+                                        
+                        total_fraccion_monto_pagado=0
+                        total_fraccion_monto_vendedor=0
+                        
+                        fila['ultimo_pago'] = True
+                        filas.append(fila)
+                        g_fraccion = pago['fraccion']
+                        ok=True
+                                                        
+                        montos = calculo_montos_liquidacion_vendedores(pago,venta, lista_cuotas_ven)
+                        monto_vendedor = montos['monto_vendedor']
+                        fecha_pago_str = unicode(pago['fecha_de_pago'])
+                        try:
+                            fecha_pago = unicode(datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
+                        except Exception, error:
+                            print error +": "+ fecha_pago_str
+                                                         
+                        # Se setean los datos de cada fila
+                        fila={}
+                        fila['misma_fraccion'] = True
+                        fila['fraccion']=unicode(venta.lote.manzana.fraccion)
+                        fila['plan']=unicode(venta.plan_de_pago_vendedor)
+                        fila['fecha_de_pago']=fecha_pago
+                        fila['fecha_de_pago_order']=pago['fecha_de_pago']
+                        fila['lote']=unicode(pago['lote'])
+                        fila['cliente']=unicode(venta.cliente)
+                        fila['nro_cuota']=unicode(pago['nro_cuota_y_total'])
+                        fila['total_de_cuotas']=unicode('{:,}'.format(int(pago['monto']))).replace(",", ".")
+                        fila['monto_vendedor']=unicode('{:,}'.format(monto_vendedor)).replace(",", ".")
+                                                         
+                        cuotas_detalles = get_cuota_information_by_lote(pago['lote'].id, int(pago['nro_cuota']) , True, True, venta)
+                        monthNames = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+                        fecha_1 = cuotas_detalles[0]['fecha'] 
+                        parts_1 = fecha_1.split("/")
+                        year_1 = parts_1[2];
+                        mes_1 = int(parts_1[1]) - 1;
+                        mes_year = monthNames[mes_1]+"/"+year_1;
+                        fila['mes'] = mes_year
+                                                         
+                        #if venta.lote.manzana.fraccion != g_fraccion: 
+                        ok=False
+                        # Se suman los TOTALES por FRACCION
+                        total_fraccion_monto_vendedor += int(monto_vendedor)
+                        total_fraccion_monto_pagado += int(pago['monto'])
+                                                         
+                        #Acumulamos para los TOTALES GENERALES
+                        total_general_monto_pagado += int(pago['monto'])
+                        total_general_monto_vendedor += int(monto_vendedor)
+                                        
+                        filas_fraccion.append(fila)
+                                                        
+                    else:
+                                                        
+                                                    
+                        montos = calculo_montos_liquidacion_vendedores(pago,venta, lista_cuotas_ven)
+                        monto_vendedor = montos['monto_vendedor']
+                        fecha_pago_str = unicode(pago['fecha_de_pago'])
+                        try:
+                            fecha_pago = unicode(datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
+                        except Exception, error:
+                            print error +": "+ fecha_pago_str
+                                                         
+                        # Se setean los datos de cada fila
+                        fila={}
+                        fila['misma_fraccion'] = True
+                        fila['fraccion']=unicode(venta.lote.manzana.fraccion)
+                        fila['plan']=unicode(venta.plan_de_pago_vendedor)
+                        fila['fecha_de_pago']=fecha_pago
+                        fila['fecha_de_pago_order']=pago['fecha_de_pago']
+                        fila['lote']=unicode(pago['lote'])
+                        fila['cliente']=unicode(venta.cliente)
+                        fila['nro_cuota']=unicode(pago['nro_cuota_y_total'])
+                        fila['total_de_cuotas']=unicode('{:,}'.format(int(pago['monto']))).replace(",", ".")
+                        fila['monto_vendedor']=unicode('{:,}'.format(monto_vendedor)).replace(",", ".")
+                                                        
+                        cuotas_detalles = get_cuota_information_by_lote(pago['lote'].id, int(pago['nro_cuota']) , True, True, venta)
+                        monthNames = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+                        fecha_1 = cuotas_detalles[0]['fecha'] 
+                        parts_1 = fecha_1.split("/")
+                        year_1 = parts_1[2];
+                        mes_1 = int(parts_1[1]) - 1;
+                        mes_year = monthNames[mes_1]+"/"+year_1;
+                        fila['mes'] = mes_year
+                                                         
+                        #if venta.lote.manzana.fraccion != g_fraccion: 
+                        ok=False
+                        # Se suman los TOTALES por FRACCION
+                        total_fraccion_monto_vendedor += int(monto_vendedor)
+                        total_fraccion_monto_pagado += int(pago['monto'])
+                                                         
+                        #Acumulamos para los TOTALES GENERALES
+                        total_general_monto_pagado += int(pago['monto'])
+                        total_general_monto_vendedor += int(monto_vendedor)
+                                                        
+                        filas_fraccion.append(fila)
+                                                    
+                                                    
+                                                     
+                                                    
+                                                
+                except Exception, error:
+                    print "Error: "+ unicode(error)+ ", Id Pago: "+unicode(pago['id'])+ ", Fraccion: "+unicode(pago['fraccion'])+ ", lote: "+unicode(pago['lote']) +" Nro cuota: "+unicode(unicode(pago['nro_cuota_y_total']))
+                                             
+    #Totales GENERALES
+    #filas = sorted(filas, key=lambda f: f['fecha_de_pago'])
+    if filas_fraccion != []:
+        filas_fraccion = sorted(filas_fraccion, key=lambda f: (f['fecha_de_pago_order']))
+        filas_fraccion[0]['misma_fraccion']= False 
+        filas.extend(filas_fraccion)
+                                    
+        fila = {}
+        fila['total_monto_pagado']=unicode('{:,}'.format(total_fraccion_monto_pagado)).replace(",", ".")
+        fila['total_monto_vendedor']=unicode('{:,}'.format(total_fraccion_monto_vendedor)).replace(",", ".")
+        total_fraccion_monto_vendedor = 0
+        total_fraccion_monto_pagado = 0
+        fila['ultimo_pago'] = True
+        filas.append(fila)
+                                
+    fila = {}
+    fila['total_general_pagado']=unicode('{:,}'.format(total_general_monto_pagado)).replace(",", ".")
+    fila['total_general_vendedor']=unicode('{:,}'.format(total_general_monto_vendedor)).replace(",", ".")
+    ley = int(total_general_monto_pagado*0.015)
+    filas.append(fila)
+    filas[0]['misma_fraccion']= False
+                    
                 
-                #Sumamos los totales por fraccion
-                total_importe+=cuota_item.total_de_cuotas
-                total_comision+=com 
-                fraccion_actual=cuota_item.lote.manzana.fraccion.id
-                ultimo=cuota
-            total_general_importe+=cuota_item.total_de_cuotas
-            total_general_comision+=com
-            cuotas.append(cuota)                        
-                    
-        #Si es el ultimo lote, cerramos totales de fraccion
-        if (len(object_list)-1 == i):
+    ultimo="&busqueda_label="+busqueda_label+"&busqueda="+vendedor_id+"&fecha_ini="+fecha_ini+"&fecha_fin="+fecha_fin         
+                
+    lista = filas
+        
+    wb = xlwt.Workbook(encoding='utf-8')
+    sheet = wb.add_sheet('test', cell_overwrite_ok=True)
+    style = xlwt.easyxf('pattern: pattern solid, fore_colour white;'
+                              'font: name Gill Sans MT Condensed, bold True; align: horiz center')   
+    style2 = xlwt.easyxf('pattern: pattern solid, fore_colour white;'
+                         'font: name Gill Sans MT Condensed, bold True, height 160;')
+    style3 = xlwt.easyxf('font: name Gill Sans MT Condensed, height 160 ; align: horiz center')
+    style4 = xlwt.easyxf('font: name Gill Sans MT Condensed, height 160 ; align: horiz right')
+    style5 = xlwt.easyxf('pattern: pattern solid, fore_colour white;''font: name Gill Sans MT Condensed, bold True, height 160 ; align: horiz right')
+    
+    style_normal = xlwt.easyxf('font: name Gill Sans MT Condensed, height 160;')
+    style_normal_centrado = xlwt.easyxf('font: name Gill Sans MT Condensed, height 160; align: horiz center')
+    
+    style_fraccion = xlwt.easyxf('pattern: pattern solid, fore_colour white;'
+                              'font: name Gill Sans MT Condensed, bold True; align: horiz center')  
+    #Titulo
+    #sheet.write_merge(0,0,0,7, 'PROPAR S.R.L.' ,style3)
+    #sheet.write_merge(1,1,1,7, 'Sistema de Control de Loteamiento' ,style3)
+    
+    #sheet.header_str = 'PROPAR S.R.L.'
+    periodo_1 = fecha_ini
+    periodo_2 = fecha_fin
+    usuario = unicode(request.user)
+    sheet.header_str = (
+     u"&LFecha: &D Hora: &T \nUsuario: "+usuario+" "
+     u"&CPROPAR S.R.L.\n LIQUIDACION DE VENDEDORES "
+     u"&RPeriodo del "+periodo_1+" al "+periodo_2+" \nPage &P of &N"
+     )
+    #sheet.footer_str = 'things'
+    
+    
+    
+    c=0
+    for pago in filas:
             try:
-                ultimo['total_importe']=unicode('{:,}'.format(total_importe)).replace(",", ".") 
-                ultimo['total_comision']=unicode('{:,}'.format(total_comision)).replace(",", ".")             
-                ultimo['total_general_importe']=unicode('{:,}'.format(total_general_importe)).replace(",", ".") 
-                ultimo['total_general_comision']=unicode('{:,}'.format(total_general_comision)).replace(",", ".")          
+                if pago['total_monto_pagado'] == True and pago['ultimo_pago'] == False: 
+                    c+=1            
+                    sheet.write_merge(c,c,0,4, "Liquidacion", style2)
+                    
+                    sheet.write(c, 5, pago['total_monto_pagado'],style5)
+                    sheet.write(c, 6, pago['total_monto_vendedor'], style5)
+            except Exception, error:
+                print error 
+                pass
+             
+            c += 1
+            try:
+                if pago['misma_fraccion'] == False:
+                    #sheet.write(c, 0, "Fraccion: " + pago['fraccion'],style2)                  
+                    sheet.write_merge(c,c,0,7, pago['fraccion'],style_fraccion)
+                    c +=1
+                    sheet.write(c, 0, 'Lote', style)
+                    sheet.write(c, 1, 'Fecha de pago', style)
+                    sheet.write(c, 2, 'Cliente', style)
+                    sheet.write(c, 3, 'Nro cuota', style)
+                    sheet.write(c, 4, 'Mes', style)
+                    sheet.write(c, 5, 'Monto Pagado', style)
+                    sheet.write(c, 6, 'Monto Vendedor', style)
+                    c +=1
+                    
+                sheet.write(c, 0, pago['lote'],style_normal_centrado)
+                sheet.write(c, 1, pago['fecha_de_pago'],style_normal_centrado)
+                sheet.write(c, 2, pago['cliente'],style_normal)
+                sheet.write(c, 3, pago['nro_cuota'],style_normal_centrado)
+                sheet.write(c, 4, pago['mes'],style_normal_centrado)
+                sheet.write(c, 5, pago['total_de_cuotas'],style4)
+                sheet.write(c, 6, pago['monto_vendedor'], style4)
+            except Exception, error:
+                print error
+            
+            try:
+                if (pago['ultimo_pago'] == True): 
+                    c+=1            
+                    sheet.write_merge(c,c,0,4, "Liquidacion", style2)
+                    sheet.write(c, 5, pago['total_monto_pagado'],style5)
+                    sheet.write(c, 6, pago['total_monto_vendedor'], style5)
             except Exception, error:
                 print error 
                 pass
             
-    wb = xlwt.Workbook(encoding='utf-8')
-    sheet = wb.add_sheet('test', cell_overwrite_ok=True)
-    style = xlwt.easyxf('pattern: pattern solid, fore_colour green;'
-                              'font: name Arial, bold True;')   
-    style2 = xlwt.easyxf('font: name Arial, bold True;')
-    # cabeceras
-    sheet.write(0, 0, "Cliente", style)
-    sheet.write(0, 1, "Nombre Fraccion", style)
-    sheet.write(0, 2, "Fraccion", style)
-    sheet.write(0, 3, "Lote Nro.", style)
-    sheet.write(0, 4, "Tipo Cuota", style)
-    sheet.write(0, 5, "Cuota Nro.", style)
-    sheet.write(0, 6, "Fecha de Pago", style)
-    sheet.write(0, 7, "Importe", style)
-    sheet.write(0, 8, "Comision", style)
-     
-    # contador de filas
-    c = 0
-    for cuota in cuotas:
-        c+=1            
-        sheet.write(c, 0, cuota['cliente'])
-        sheet.write(c, 1, cuota['fraccion'])
-        sheet.write(c, 2, cuota['fraccion_id'])
-        sheet.write(c, 3, cuota['lote'])
-        sheet.write(c, 4, cuota['concepto'])
-        sheet.write(c, 5, cuota['cuota_nro'])
-        sheet.write(c, 6, cuota['fecha_pago'])
-        sheet.write(c, 7, cuota['importe']) 
-        sheet.write(c, 8, cuota['comision'])
-        try: 
-            if cuota['total_importe']:
-                c+=1 
-                sheet.write(c, 0, "Totales de Fraccion", style2)
-                sheet.write(c, 7, cuota['total_importe'])
-                sheet.write(c, 8, cuota['total_comision'])           
-                # si es la ultima fila    
-            if (cuota['total_general_importe']):
-                c+=1
-                sheet.write(c, 0, "Totales del Vendedor", style2)
-                sheet.write(c, 7, cuota['total_general_importe'])
-                sheet.write(c, 8, cuota['total_general_comision'])
-        except Exception, error:
-            print error 
-            pass
+            try:
+                if (pago['total_general_pagado']): 
+                    c+=1            
+                    sheet.write_merge(c,c,0,4, "Liquidacion Total", style2)
+                    sheet.write(c, 5, pago['total_general_pagado'],style5)
+                    sheet.write(c, 6, pago['total_general_vendedor'], style5)
+                    
+                    
+            except Exception, error:
+                print error 
+                pass
+            
+            #Ancho de la columna Lote
+            col_lote = sheet.col(0)
+            col_lote.width = 256 * 10   # 12 characters wide
+            
+            #Ancho de la columna Fecha
+            col_fecha = sheet.col(1)
+            col_fecha.width = 256 * 12   # 10 characters wide
+            
+            #Ancho de la columna Nombre
+            col_nombre = sheet.col(2)
+            col_nombre.width = 256 * 25   # 25 characters wide 
+            
+            #Ancho de la columna Nro cuota
+            col_nro_cuota = sheet.col(3)
+            col_nro_cuota.width = 256 * 8   # 6 characters wide
+            
+            #Ancho de la columna mes
+            col_mes = sheet.col(4)
+            col_mes.width = 256 * 8   # 8 characters wide
+            
+            #Ancho de la columna monto pagado
+            col_monto_pagado = sheet.col(5)
+            col_monto_pagado.width = 256 * 11   # 11 characters wide
+            
+            #Ancho de la columna monto inmobiliarioa
+            col_monto_inmo = sheet.col(6)
+            col_monto_inmo.width = 256 * 11   # 11 characters wide
+            
+            #Ancho de la columna monto propietario
+            col_nombre = sheet.col(7)
+            col_nombre.width = 256 * 11   # 11 characters wide
+  
     response = HttpResponse(content_type='application/vnd.ms-excel')
-    # Crear un nombre intuitivo         
-    response['Content-Disposition'] = 'attachment; filename=' + 'liquidacion_vendedores.xls'
+    # Crear un nombre intuitivo
+    fecha_actual= datetime.datetime.now().date()
+    fecha_str = unicode(fecha_actual)
+    fecha = unicode(datetime.datetime.strptime(fecha_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
+    
+    if b_fraccion:         
+        response['Content-Disposition'] = 'attachment; filename=' + 'liq_vend_'+g_nombre_fraccion+'_'+fecha+'.xls'
+    elif b_vendedor:
+        response['Content-Disposition'] = 'attachment; filename=' + 'liq_vend_'+g_nombre_vendedor+'_'+fecha+'.xls'
+    else:
+        response['Content-Disposition'] = 'attachment; filename=' + 'liquidacion_vendedores_.xls'
     wb.save(response)
-    return response 
+    return response
 
 def liquidacion_gerentes_reporte_excel(request):      
     tipo_liquidacion = request.GET['tipo_liquidacion']
@@ -3241,7 +3720,7 @@ def liquidacion_gerentes_reporte_excel(request):
         com=0        
         #Esta es una regla de negocio, los vendedores cobran comisiones segun el numero de cuota, maximo hasta la cuota Nro 9.
         #Si el plan de pago tiene hasta 12 cuotas, los vendedores cobran una comision sobre todas las cuotas.
-        cuotas_para_vendedor=((cuota_item.plan_de_pago_vendedores.cantidad_cuotas)*(cuota_item.plan_de_pago_vendedores.intervalos))-cuota_item.plan_de_pago_vendedores.cuota_inicial                  
+        cuotas_para_vendedor=((cuota_item.plan_de_pago_vendedor.cantidad_cuotas)*(cuota_item.plan_de_pago_vendedor.intervalos))-cuota_item.plan_de_pago_vendedor.cuota_inicial                  
         #A los vendedores le corresponde comision por las primeras 4 (maximo 5) cuotas impares.
         if( (nro_cuota%2!=0 and nro_cuota<=cuotas_para_vendedor) or (cuota_item.plan_de_pago.cantidad_de_cuotas<=12 and nro_cuota<=12) ):                                                                        
             if k==0:
@@ -3252,10 +3731,10 @@ def liquidacion_gerentes_reporte_excel(request):
             #print k
             if(cuota_item.vendedor.id==vendedor_actual and cuota_item.lote.manzana.fraccion==fraccion_actual):                              
                 #comision de las cuotas
-                com=int(cuota_item.total_de_cuotas*(float(cuota_item.plan_de_pago_vendedores.porcentaje_de_cuotas)/float(100)))
+                com=int(cuota_item.total_de_cuotas*(float(cuota_item.plan_de_pago_vendedor.porcentaje_de_cuotas)/float(100)))
                 if(cuota_item.venta.entrega_inicial):
                     #comision de la entrega inicial, si la hubiere
-                    com_inicial=int(cuota_item.venta.entrega_inicial*(float(cuota_item.plan_de_pago_vendedores.porcentaje_cuota_inicial)/float(100)))
+                    com_inicial=int(cuota_item.venta.entrega_inicial*(float(cuota_item.plan_de_pago_vendedor.porcentaje_cuota_inicial)/float(100)))
                     cuota['concepto']="Entrega Inicial"
                     cuota['cuota_nro']=unicode(0)+'/'+unicode(cuota_item.plan_de_pago.cantidad_de_cuotas)
                     cuota['comision']=unicode('{:,}'.format(com_inicial)).replace(",", ".")
@@ -3279,10 +3758,10 @@ def liquidacion_gerentes_reporte_excel(request):
                 ultimo=cuota                       
             #Hay cambio de lote pero NO es el ultimo elemento todavia
             else:                                                                                              
-                com=int(cuota_item.total_de_cuotas*(float(cuota_item.plan_de_pago_vendedores.porcentaje_de_cuotas)/float(100)))
+                com=int(cuota_item.total_de_cuotas*(float(cuota_item.plan_de_pago_vendedor.porcentaje_de_cuotas)/float(100)))
                 if(cuota_item.venta.entrega_inicial):
                     #comision de la entrega inicial, si la hubiere
-                    com_inicial=int(cuota_item.venta.entrega_inicial*(float(cuota_item.plan_de_pago_vendedores.porcentaje_cuota_inicial)/float(100)))
+                    com_inicial=int(cuota_item.venta.entrega_inicial*(float(cuota_item.plan_de_pago_vendedor.porcentaje_cuota_inicial)/float(100)))
                     cuota['concepto']="Entrega Inicial"
                     cuota['cuota_nro']=unicode(0)+'/'+unicode(cuota_item.plan_de_pago.cantidad_de_cuotas)
                     cuota['comision']=unicode('{:,}'.format(com_inicial)).replace(",", ".")
@@ -4144,6 +4623,29 @@ def calculo_montos_liquidacion_propietarios(pago,venta, lista_cuotas_inm):
     except Exception, error:
         print error
         
+def calculo_montos_liquidacion_vendedores(pago,venta, lista_cuotas_ven):
+    try:                                                     
+        #cuotas_para_propietario=((venta.plan_de_pago.cantidad_cuotas_inmobiliaria)*(venta.plan_de_pago.intervalos_cuotas_inmobiliaria))-venta.plan_de_pago.inicio_cuotas_inmobiliaria
+        #ultima_cuota_inmb = ((venta.plan_de_pago.cantidad_cuotas_inmobiliaria - 1) * venta.plan_de_pago.intervalos_cuotas_inmobiliaria) + venta.plan_de_pago.inicio_cuotas_inmobiliaria
+        if(int(pago['nro_cuota']) in lista_cuotas_ven):
+            monto_vendedor = int(int(pago['monto']) * (float(venta.plan_de_pago_vendedor.porcentaje_de_cuotas) / float(100)))
+            '''
+            if(int(pago['nro_cuota']) % 2 != 0):    
+                monto_inmobiliaria = pago['monto']
+                monto_propietario = 0
+            else:
+                monto_inmobiliaria = int(int(pago['monto']) * (float(venta.plan_de_pago.porcentaje_cuotas_administracion) / float(100)))
+                monto_propietario = int(pago['monto']) - monto_inmobiliaria
+            '''
+        else:
+            monto_vendedor = int(int(pago['monto']) * (float(venta.plan_de_pago_vendedor.porcentaje_de_cuotas) / float(100)))
+        
+        monto={}
+        monto['monto_vendedor'] = monto_vendedor
+        return monto
+    except Exception, error:
+        print error
+        
 def calculo_montos_liquidacion_propietarios_contado(venta):
     try:                                                     
         monto_inmobiliaria = int(int(venta.precio_final_de_venta) * (float(venta.plan_de_pago.porcentaje_inicial_inmobiliaria) / float(100)))
@@ -4164,6 +4666,25 @@ def calculo_montos_liquidacion_propietarios_entrega_inicial(venta):
         monto={}
         monto['monto_propietario'] = monto_propietario
         monto['monto_inmobiliaria'] = monto_inmobiliaria
+        return monto
+    except Exception, error:
+        print error
+        
+def calculo_montos_liquidacion_vendedores_contado(venta):
+    try:                                                     
+        monto_vendedor = int(int(venta.precio_final_de_venta)*(float(venta.plan_de_pago_vendedor.porcentaje_de_cuotas)/ float(100)))
+        monto={}
+        monto['monto_vendedor'] = monto_vendedor
+        return monto
+    except Exception, error:
+        print error
+        
+def calculo_montos_liquidacion_vendedores_entrega_inicial(venta):
+    try:                                                     
+        monto_vendedor = int(int(venta.entrega_inicial)*(float(venta.plan_de_pago_vendedor.porcentaje_cuota_inicial)/ float(100)))
+        
+        monto={}
+        monto['monto_vendedor'] = monto_vendedor
         return monto
     except Exception, error:
         print error
