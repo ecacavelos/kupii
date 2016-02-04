@@ -921,7 +921,10 @@ def crear_pdf_factura(nueva_factura, request, manzana, lote_id, usuario):
     
     p.drawString(coor.numero_1x * cm, float(coor.numero_1y) * cm, unicode(nueva_factura.numero))
     
-    p.drawString(coor.fecha_1x * cm, float(coor.fecha_1y) * cm, unicode(request.POST.get('fecha', '')))
+    fecha_str = unicode(nueva_factura.fecha)
+    fecha = unicode(datetime.datetime.strptime(fecha_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
+    
+    p.drawString(coor.fecha_1x * cm, float(coor.fecha_1y) * cm, fecha)
     if nueva_factura.tipo == 'co':
         p.drawString(coor.contado_1x * cm, float(coor.contado_1y) * cm, "X")
     else:
