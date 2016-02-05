@@ -591,7 +591,7 @@ def cambio_de_lotes(request):
                     return HttpResponse(t.render(c))
                 
                 #Se obtienen los datos de la venta vieja
-                venta_vieja = Venta.objects.get(lote_id=lote_viejo.id)
+                venta_vieja = get_ultima_venta(lote_viejo.id)
                 
                 #Se obtienen los pagos de la venta vieja
                 pagos_viejos = PagoDeCuotas.objects.filter(venta_id= venta_vieja.id)
