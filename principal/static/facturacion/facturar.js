@@ -15,11 +15,13 @@
 			+ '<a href="#" class="add-btn">+</a>'
 		    + '</div>';
 	$(document).ready(function() {
+		$("#imprimir_factura").hide();
+		$("#submit-btn").hide();
 		$('#lote').mask('###/###/####');
 		$('#nro-factura').mask('###-###-#######');
 		$("#id_name_cliente").focus();
 		
-		$("#ajax-print").prop('disabled',true);
+		$("#crear_factura").prop('disabled',true);
 		$("#submit-btn").prop('disabled',true);
 		
 		
@@ -316,6 +318,9 @@
 				//2. Obtener el JSON del detalle
 				detalle = generarDetalleJSON();			
 				$("#detalle").val(detalle);
+				$("#submit-btn").hide();
+				$("#crear_factura").hide();
+				$("#imprimir_factura").show();
 				
 				/*
 				$('#total-exentas').val( sacarPuntos( $('#total-exentas').val() ) );
@@ -334,7 +339,8 @@
     	});
     	
     	$("#crear_factura").click(function(){
-			
+			$("#crear_factura").hide();
+			$("#submit-btn").hide();
 			//1. TODO: Hacer chequeo de que todos los valores esten correctos. 
 			if (formOk()){
 				//2. Obtener el JSON del detalle
@@ -363,6 +369,7 @@
 				});
 				// devuelve el pdf
 				request.done(function(msg) {
+					$("#imprimir_factura").show();
 					$("#id_factura").val(msg.id_factura);
 					$("#imprimir_factura").trigger("click");			   
 				});
@@ -495,18 +502,18 @@
 					// VALIDO
 					console.log('Detalle VALIDO');
 					indicador_validez = '#1C842D';
-					$("#ajax-print").prop('disabled',false);
+					$("#crear_factura").prop('disabled',false);
 					$("#submit-btn").prop('disabled',false);
 				}
 				else{
 					detalle_valido = false;
-					$("#ajax-print").prop('disabled',true);
+					$("#crear_factura").prop('disabled',true);
 					$("#submit-btn").prop('disabled',true);
 				}		
 			}
 			else{
 				detalle_valido = false;
-				$("#ajax-print").prop('disabled',true);
+				$("#crear_factura").prop('disabled',true);
 				$("#submit-btn").prop('disabled',true);
 			}
 			$(this).css('background',indicador_validez);	
