@@ -349,6 +349,7 @@ def detalle_factura(request, factura_id):
         lista_detalles=json.loads(factura.detalle)
         detalles=[]
         monto = 0
+        grupo= request.user.groups.get().id
         for key, value in lista_detalles.iteritems():
             detalle={}
             #detalle['precio_unitario']=unicode('{:,}'.format(value['precio_unitario']))
@@ -396,13 +397,27 @@ def detalle_factura(request, factura_id):
                 message = "Factura Anulada."
                 #return HttpResponseRedirect('/facturacion/listado')
                 return HttpResponseRedirect(reverse('frontend_listado_facturas'))
+            elif data.get('boton_borrar'):
+                f = Factura.objects.get(pk=factura_id)
+                numero_factura = f.numero
+                f.delete()
+                
+                #Se loggea la accion del usuario
+                id_objeto = factura_id
+                codigo_lote = ''
+                loggear_accion(request.user, "Borrar factura("+numero_factura+")", "Factura", id_objeto, codigo_lote)
+                message = "Factura Borrada."
+                #return HttpResponseRedirect('/facturacion/listado')
+                return HttpResponseRedirect(reverse('frontend_listado_facturas'))
         else:
             form = FacturaForm(instance=factura)
+            grupo= request.user.groups.get().id
     
         c = RequestContext(request, {
             'factura': factura,
             'detalles' : detalles,
             'form': form,
+            'grupo': grupo,
             'message': message,
             'numero_timbrado': numero_timbrado
         })
