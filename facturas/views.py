@@ -374,15 +374,24 @@ def detalle_factura(request, factura_id):
             data = request.POST
             if data.get('boton_guardar'):
                 form = FacturaForm(data, instance=factura)
-                if form.is_valid():
-                    message = "Se actualizaron los datos."
-                    form.save(commit=False)
-                    factura.save()
-                    
-                    #Se loggea la accion del usuario
-                    id_objeto = factura.id
-                    codigo_lote = ''
-                    loggear_accion(request.user, "Actualizar", "Factura", id_objeto, codigo_lote)
+                #if form.is_valid():
+                message = "Se actualizaron los datos."
+                #form.save(commit=False)
+                #factura.save()
+                
+                #fecha = form.data['fecha']
+                numero = form.data['numero']
+                observacion = form.data['observacion']
+                
+                fac = Factura.objects.get(pk=factura_id)
+                #fac.fecha = fecha
+                fac.numero = numero
+                fac.observacion = observacion
+                fac.save()    
+                #Se loggea la accion del usuario
+                id_objeto = factura.id
+                codigo_lote = ''
+                loggear_accion(request.user, "Actualizar", "Factura", id_objeto, codigo_lote)
                     
             elif data.get('boton_anular'):
                 f = Factura.objects.get(pk=factura_id)
