@@ -368,10 +368,10 @@ def listar_busqueda_lotes(request):
             else:
                 print "no tiene venta al contado asociada"
                 lotes_sin_ventas_al_contado.append(lote)
-                 
+        lista_lotes = lotes_sin_ventas_al_contado
                     
     ultima_busqueda = "&tabla=&busqueda="+busqueda+"&tipo_busqueda="+tipo_busqueda+"&busqueda_label="+busqueda_label
-    object_list=lotes_sin_ventas_al_contado
+    object_list=lista_lotes
     
             
     paginator=Paginator(object_list,15)
