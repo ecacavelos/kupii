@@ -4655,7 +4655,8 @@ def calculo_montos_liquidacion_vendedores(pago,venta, lista_cuotas_ven):
                 monto_propietario = int(pago['monto']) - monto_inmobiliaria
             '''
         else:
-            monto_vendedor = int(int(pago['monto']) * (float(venta.plan_de_pago_vendedor.porcentaje_de_cuotas) / float(100)))
+            #monto_vendedor = int(int(pago['monto']) * (float(venta.plan_de_pago_vendedor.porcentaje_de_cuotas) / float(100)))
+            monto_vendedor = 0
         
         monto={}
         monto['monto_vendedor'] = monto_vendedor
