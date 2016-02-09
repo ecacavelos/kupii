@@ -2517,6 +2517,7 @@ def liquidacion_propietarios_reporte_excel(request):
     
     descripcion = request.GET.get('descripcion_otros_descuentos', '')
     monto_descuento = request.GET.get('monto_otros_descuentos', '')
+    total_descuentos = request.GET.get('total_descuentos', '')
     total_a_cobrar = request.GET['total_a_cobrar']
     b_fraccion = False
     b_propietario = False
@@ -3145,26 +3146,42 @@ def liquidacion_propietarios_reporte_excel(request):
                     sheet.write(c, 5, pago['total_general_pagado'],style5)
                     sheet.write(c, 6, pago['total_general_inmobiliaria'], style5)
                     sheet.write(c, 7, pago['total_general_propietario'], style5)
+                    c+=1
+                    sheet.write(c, 5, 'Comisión+IVA',style2)
+                    n1 = int(unicode(pago['iva_comision']).replace(".", ""))
+                    n2 = int(unicode(pago['total_general_inmobiliaria']).replace(".", ""))
+                    general_inmobiliario_con_comision = n1 + n2
+                    general_inmobiliario_con_comision = unicode('{:,}'.format(general_inmobiliario_con_comision)).replace(",", ".")
+                    sheet.write(c, 6, general_inmobiliario_con_comision, style5)
                     
                     c+=2
                     
-                    sheet.write_merge(c,c,0,7, "RESUMEN IMPOSITIVO",style_fraccion)
+                    sheet.write_merge(c,c,0,7, "RESUMEN IMPOSITIVO Y OTROS DESCUENTOS",style_fraccion)
+                    c+=1
+                    sheet.write(c, 2, "IVA Comisión", style_normal)
+                    sheet.write_merge(c,c,3,4, pago['iva_comision'], style4)
+                    c+=1
+                    sheet.write(c, 2, "Ley 1421/05",style_normal)
+                    sheet.write_merge(c,c,3,4, pago['ley'], style4)
                     c+=1 
-                    sheet.write(c, 0, "Ley 1421/05",style)
-                    sheet.write(c, 1, "Imp Renta 4.5%", style)
-                    sheet.write(c, 2, "IVA Comisión", style)
-                    sheet.write_merge(c,c,3,5, "Descripcion Otros Descuentos", style)
-                    sheet.write(c, 6, "Monto Descuento", style)
-                    sheet.write(c, 7, "Total", style)
-                    
+                    sheet.write(c, 2, "Imp Renta 4.5%", style_normal)
+                    sheet.write_merge(c,c,3,4, pago['impuesto_renta'], style4)
+                    c+=1
+                    sheet.write(c,2, "Otros Descuentos", style2)
+                    c+=1
+                    if descripcion !='':
+                        sheet.write(c,2, descripcion, style_normal)
+                        sheet.write_merge(c,c,3,4, monto_descuento, style4)
+                        c+=1
+                    else:
+                        sheet.write(c,2, "Sin otros descuentos", style_normal)
+                        sheet.write_merge(c,c,3,4, "0", style4)
+                        c+=1
+                    sheet.write(c, 2, "Total descuento", style2)
+                    sheet.write_merge(c,c,3,4, total_descuentos, style5)
                     c+=1  
-                    
-                    sheet.write(c, 0, pago['ley'],style4)
-                    sheet.write(c, 1, pago['impuesto_renta'], style4)
-                    sheet.write(c, 2, pago['iva_comision'], style4)
-                    sheet.write_merge(c,c,3,5, descripcion, style_normal_centrado)
-                    sheet.write(c, 6, monto_descuento, style4)
-                    sheet.write(c, 7, total_a_cobrar, style4)
+                    sheet.write_merge(c,c,2,4, "Total a cobrar por el propietario: ", style2)
+                    sheet.write(c, 7, total_a_cobrar, style5)
                     
                     
             except Exception, error:

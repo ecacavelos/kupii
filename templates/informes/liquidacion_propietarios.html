@@ -202,7 +202,10 @@
 				<td><input type="text" id="impuesto_renta" name="impuesto_renta" style="text-align: center" value="{{hw.impuesto_renta}}" /></td>
 				<td id="iva_comision">{{hw.iva_comision}}</td>
 				<td colspan="4"><input type="text" id="descripcion_otros_descuentos" name="descripcion_otros_descuentos" style="width: 300px; text-align: center" /></td>
-				<td><input type="text" id="monto_otros_descuentos" name="monto_otros_descuentos" style="text-align: center" /></td>
+				<td>
+					<input type="text" id="monto_otros_descuentos" name="monto_otros_descuentos" style="text-align: center" />
+					<input type="hidden" id="total_descuentos" name="total_descuentos" />
+				</td>
 				<td id="total_a_cobrar">{{hw.total_a_cobrar}}</td>
 			</tr>
 		{% endif %}
