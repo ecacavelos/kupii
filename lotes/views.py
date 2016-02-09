@@ -355,10 +355,23 @@ def listar_busqueda_lotes(request):
                         print "El lote vendido no esta asociado a una venta."
                         
     if(tipo_busqueda==''):
+        lotes_con_ventas_al_contado = []
+        lotes_sin_ventas_al_contado = []
         lista_lotes = Lote.objects.filter(estado ='4')
+        for lote in lista_lotes:
+            ventas = Venta.objects.filter(lote_id = lote.id, plan_de_pago__tipo_de_plan = 'contado')
+            if ventas:
+                #se cambia a vendido para corregir 
+                lote.estado = '3'
+                lote.save()
+                lotes_con_ventas_al_contado.append(lote)
+            else:
+                print "no tiene venta al contado asociada"
+                lotes_sin_ventas_al_contado.append(lote)
+                 
                     
     ultima_busqueda = "&tabla=&busqueda="+busqueda+"&tipo_busqueda="+tipo_busqueda+"&busqueda_label="+busqueda_label
-    object_list=lista_lotes
+    object_list=lotes_sin_ventas_al_contado
     
             
     paginator=Paginator(object_list,15)
