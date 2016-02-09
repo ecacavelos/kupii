@@ -67,7 +67,7 @@ function autocompletePropietarioRucONombre(input_id, cedula_input_id, id_propiet
 			event.preventDefault();
 			propietario_id = ui.item.id;
 			cedula_cliente= ui.item.cedula;
-			$(input_id).val(ui.item.fields.nombres+" "+ui.item.apellidos);
+			$(input_id).val(ui.item.item.nombres+" "+ui.item.apellidos);
 			//name_cliente=ui.item.fields.nombres+" "+ui.item.fields.apellidos;
 			//$("#id_name_cliente").val(name_cliente);
 			$(id_propietario_input_id).val(propietario_id);
