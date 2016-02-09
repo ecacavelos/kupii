@@ -8,6 +8,12 @@
 			$("#frm_busqueda").submit();
 		}
 	}
+	
+	function listar_lotes_reservados() {
+		$("#frm_busqueda").submit();
+		
+	}
+	
 	$(document).ready(function() {
 		$("#busqueda_label").focus();
 		$("#busqueda_label").autocomplete();
@@ -140,10 +146,11 @@
 					
 				</td>
 				
+				
 			</tr>
 			<tr>
-				<td></td>
 				<td><input type="button" value="Buscar" onclick="buscar();" class="historico" style="cursor: pointer"/></td>
+				<td><input type="button" value="Listar Todos los Lotes de estado Recuperado" onclick="listar_lotes_reservados();" class="historico" style="cursor: pointer"/></td>
 			</tr>
 		</table>
 	</form>

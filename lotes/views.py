@@ -268,6 +268,9 @@ def listar_busqueda_lotes(request):
     tipo_busqueda=request.GET.get('tipo_busqueda','')
     busqueda_label = request.GET.get('busqueda_label','')
     
+    if busqueda == '' and busqueda_label == '':
+        tipo_busqueda = ''
+    
     
     #se busca un lote
     
@@ -350,6 +353,9 @@ def listar_busqueda_lotes(request):
                     except Exception, error:
                         lote.cliente = 'Lote de estado "vendido" sin venta asociada'
                         print "El lote vendido no esta asociado a una venta."
+                        
+    if(tipo_busqueda==''):
+        lista_lotes = Lote.objects.filter(estado ='4')
                     
     ultima_busqueda = "&tabla=&busqueda="+busqueda+"&tipo_busqueda="+tipo_busqueda+"&busqueda_label="+busqueda_label
     object_list=lista_lotes
