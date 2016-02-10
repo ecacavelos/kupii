@@ -132,7 +132,7 @@
 			<td>{{hw.cliente}}</td>
 			<td>{{hw.nro_cuota}}</td>
 			<td>{{hw.mes}}</td>
-			<td>{{hw.total_de_cuotas}}</td>
+			<td>{{hw.total_de_cuotas}}{{hw.monto_pagado}}</td>
 			<td>{{hw.monto_vendedor}}</td>
 		</tr>
 		{% else %}
@@ -144,7 +144,7 @@
 			<td>{{hw.cliente}}</td>
 			<td>{{hw.nro_cuota}}</td>
 			<td>{{hw.mes}}</td>
-			<td>{{hw.total_de_cuotas}}</td>
+			<td>{{hw.total_de_cuotas}}{{hw.monto_pagado}}</td>
 			<td>{{hw.monto_vendedor}}</td>
 		</tr>
 		{% endif %}
@@ -182,5 +182,6 @@
 
 <div id="footer">
 	<a href="{% url 'frontend_home' %}informes" class="boton-verde">Volver al módulo de Informes</a>
+	<a class="boton-verde" id="id_boton_2" onclick="retrieve_liquidacion_vendedores();">Descargar como Excel</a>
 </div>
 {% endblock %}
