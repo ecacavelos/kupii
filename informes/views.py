@@ -2532,10 +2532,14 @@ def liquidacion_propietarios_reporte_excel(request):
     monto_propietario = 0
     busqueda = request.GET['busqueda']
     
+    ley = request.GET['ley']
+    impuesto_renta  = request.GET['impuesto_renta']
+    iva_comision = request.GET['iva_comision']
     descripcion = request.GET.get('descripcion_otros_descuentos', '')
     monto_descuento = request.GET.get('monto_otros_descuentos', '')
     total_descuentos = request.GET.get('total_descuentos', '')
     total_a_cobrar = request.GET['total_a_cobrar']
+    
     b_fraccion = False
     b_propietario = False
     #busqueda_label = request.GET['busqueda_label']                    
@@ -2706,13 +2710,12 @@ def liquidacion_propietarios_reporte_excel(request):
             fila['total_general_pagado']=unicode('{:,}'.format(total_general_pagado)).replace(",", ".")
             fila['total_general_inmobiliaria']=unicode('{:,}'.format(total_general_inm)).replace(",", ".")
             fila['total_general_propietario']=unicode('{:,}'.format(total_general_prop)).replace(",", ".")
-            ley = int(total_general_pagado*0.015)
-            fila['ley'] = unicode('{:,}'.format(ley)).replace(",", ".")
-            impuesto_renta = int ((total_general_pagado-ley)*0.045)
-            fila['impuesto_renta'] = unicode('{:,}'.format( impuesto_renta )).replace(",", ".")
-            iva_comision = int(total_general_inm*0.1)
-            fila['iva_comision'] = unicode('{:,}'.format( iva_comision )).replace(",", ".")
-            fila['total_a_cobrar'] = unicode('{:,}'.format( total_general_prop - (ley + impuesto_renta + iva_comision) )).replace(",", ".")
+            
+            fila['ley'] = ley
+            fila['impuesto_renta'] = impuesto_renta
+            fila['iva_comision'] = iva_comision
+            fila['total_a_cobrar'] = total_a_cobrar
+            
             filas.append(fila)
                                 
         except Exception, error:
@@ -3055,13 +3058,12 @@ def liquidacion_propietarios_reporte_excel(request):
             fila['total_general_pagado']=unicode('{:,}'.format(total_general_pagado)).replace(",", ".")
             fila['total_general_inmobiliaria']=unicode('{:,}'.format(total_general_inm)).replace(",", ".")
             fila['total_general_propietario']=unicode('{:,}'.format(total_general_prop)).replace(",", ".")
-            ley = int(total_general_pagado*0.015)
-            fila['ley'] = unicode('{:,}'.format(ley)).replace(",", ".")
-            impuesto_renta = int ((total_general_pagado-ley)*0.045)
-            fila['impuesto_renta'] = unicode('{:,}'.format( impuesto_renta )).replace(",", ".")
-            iva_comision = int(total_general_inm*0.1)
-            fila['iva_comision'] = unicode('{:,}'.format( iva_comision )).replace(",", ".")
-            fila['total_a_cobrar'] = unicode('{:,}'.format( total_general_prop - (ley + impuesto_renta + iva_comision) )).replace(",", ".")
+            
+            fila['ley'] = ley
+            fila['impuesto_renta'] = impuesto_renta
+            fila['iva_comision'] = iva_comision
+            fila['total_a_cobrar'] = total_a_cobrar
+            
             filas.append(fila)
             filas[0]['misma_fraccion']= False
                                 
@@ -3165,7 +3167,7 @@ def liquidacion_propietarios_reporte_excel(request):
                     sheet.write(c, 7, pago['total_general_propietario'], style5)
                     c+=1
                     sheet.write(c, 5, 'Comisión+IVA',style2)
-                    n1 = int(unicode(pago['iva_comision']).replace(".", ""))
+                    n1 = int(pago['iva_comision'].replace(".", ""))
                     n2 = int(unicode(pago['total_general_inmobiliaria']).replace(".", ""))
                     general_inmobiliario_con_comision = n1 + n2
                     general_inmobiliario_con_comision = unicode('{:,}'.format(general_inmobiliario_con_comision)).replace(",", ".")

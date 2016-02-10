@@ -1,6 +1,6 @@
 function retrieve_liquidacion_propietarios() {
 	calcular_total_a_cobrar();
-    window.location.href = base_context + "/informes/liquidacion_propietarios_reporte_excel?fecha_ini=" + $('#fecha_ini').val() + "&fecha_fin=" + $('#fecha_fin').val() + "&tipo_busqueda=" + $('#id_tipo_busqueda').val() + "&busqueda=" + $('#id_busqueda').val()+"&descripcion_otros_descuentos="+$('#descripcion_otros_descuentos').val()+"&monto_otros_descuentos="+$('#monto_otros_descuentos').val()+"&total_a_cobrar="+$('#total_a_cobrar').html()+"&total_descuentos="+$('#total_descuentos').val();
+    window.location.href = base_context + "/informes/liquidacion_propietarios_reporte_excel?fecha_ini=" + $('#fecha_ini').val() + "&fecha_fin=" + $('#fecha_fin').val() + "&tipo_busqueda=" + $('#id_tipo_busqueda').val() + "&busqueda=" + $('#id_busqueda').val()+"&ley="+$('#ley').val()+"&impuesto_renta="+$('#impuesto_renta').val()+"&iva_comision="+$('#iva_comision').html()+"&descripcion_otros_descuentos="+$('#descripcion_otros_descuentos').val()+"&monto_otros_descuentos="+$('#monto_otros_descuentos').val()+"&total_a_cobrar="+$('#total_a_cobrar').html()+"&total_descuentos="+$('#total_descuentos').val();
 }
 
 function calcular_total_a_cobrar(){
