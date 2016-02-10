@@ -1441,17 +1441,18 @@ def liquidacion_vendedores(request):
                                         mes_year = monthNames[mes_1]+"/"+year_1;
                                         fila['mes'] = mes_year
                                                          
-                                        #if venta.lote.manzana.fraccion != g_fraccion: 
-                                        ok=False
-                                        # Se suman los TOTALES por FRACCION
-                                        total_fraccion_monto_vendedor += int(monto_vendedor)
-                                        total_fraccion_monto_pagado += int(pago['monto'])
-                                                         
-                                        #Acumulamos para los TOTALES GENERALES
-                                        total_general_monto_pagado += int(pago['monto'])
-                                        total_general_monto_vendedor += int(monto_vendedor)
-                                                        
-                                        filas_fraccion.append(fila)
+                                        #if venta.lote.manzana.fraccion != g_fraccion:
+                                        if monto_vendedor != 0: 
+                                            ok=False
+                                            # Se suman los TOTALES por FRACCION
+                                            total_fraccion_monto_vendedor += int(monto_vendedor)
+                                            total_fraccion_monto_pagado += int(pago['monto'])
+                                                             
+                                            #Acumulamos para los TOTALES GENERALES
+                                            total_general_monto_pagado += int(pago['monto'])
+                                            total_general_monto_vendedor += int(monto_vendedor)
+                                                            
+                                            filas_fraccion.append(fila)
                                                         
                                     else:
                                                         
@@ -1486,17 +1487,18 @@ def liquidacion_vendedores(request):
                                         mes_year = monthNames[mes_1]+"/"+year_1;
                                         fila['mes'] = mes_year
                                                          
-                                        #if venta.lote.manzana.fraccion != g_fraccion: 
-                                        ok=False
-                                        # Se suman los TOTALES por FRACCION
-                                        total_fraccion_monto_vendedor += int(monto_vendedor)
-                                        total_fraccion_monto_pagado += int(pago['monto'])
-                                                         
-                                        #Acumulamos para los TOTALES GENERALES
-                                        total_general_monto_pagado += int(pago['monto'])
-                                        total_general_monto_vendedor += int(monto_vendedor)
-                                                        
-                                        filas_fraccion.append(fila)
+                                        #if venta.lote.manzana.fraccion != g_fraccion:
+                                        if monto_vendedor != 0: 
+                                            ok=False
+                                            # Se suman los TOTALES por FRACCION
+                                            total_fraccion_monto_vendedor += int(monto_vendedor)
+                                            total_fraccion_monto_pagado += int(pago['monto'])
+                                                             
+                                            #Acumulamos para los TOTALES GENERALES
+                                            total_general_monto_pagado += int(pago['monto'])
+                                            total_general_monto_vendedor += int(monto_vendedor)
+                                                            
+                                            filas_fraccion.append(fila)
                                                     
                                                     
                                                      
@@ -3469,16 +3471,17 @@ def liquidacion_vendedores_reporte_excel(request):
                         fila['mes'] = mes_year
                                                          
                         #if venta.lote.manzana.fraccion != g_fraccion: 
-                        ok=False
-                        # Se suman los TOTALES por FRACCION
-                        total_fraccion_monto_vendedor += int(monto_vendedor)
-                        total_fraccion_monto_pagado += int(pago['monto'])
-                                                         
-                        #Acumulamos para los TOTALES GENERALES
-                        total_general_monto_pagado += int(pago['monto'])
-                        total_general_monto_vendedor += int(monto_vendedor)
-                                        
-                        filas_fraccion.append(fila)
+                        if monto_vendedor != 0: 
+                            ok=False
+                            # Se suman los TOTALES por FRACCION
+                            total_fraccion_monto_vendedor += int(monto_vendedor)
+                            total_fraccion_monto_pagado += int(pago['monto'])
+                                                             
+                            #Acumulamos para los TOTALES GENERALES
+                            total_general_monto_pagado += int(pago['monto'])
+                            total_general_monto_vendedor += int(monto_vendedor)
+                                                            
+                            filas_fraccion.append(fila)
                                                         
                     else:
                                                         
@@ -3514,16 +3517,17 @@ def liquidacion_vendedores_reporte_excel(request):
                         fila['mes'] = mes_year
                                                          
                         #if venta.lote.manzana.fraccion != g_fraccion: 
-                        ok=False
-                        # Se suman los TOTALES por FRACCION
-                        total_fraccion_monto_vendedor += int(monto_vendedor)
-                        total_fraccion_monto_pagado += int(pago['monto'])
-                                                         
-                        #Acumulamos para los TOTALES GENERALES
-                        total_general_monto_pagado += int(pago['monto'])
-                        total_general_monto_vendedor += int(monto_vendedor)
-                                                        
-                        filas_fraccion.append(fila)
+                        if monto_vendedor != 0: 
+                            ok=False
+                            # Se suman los TOTALES por FRACCION
+                            total_fraccion_monto_vendedor += int(monto_vendedor)
+                            total_fraccion_monto_pagado += int(pago['monto'])
+                                                             
+                            #Acumulamos para los TOTALES GENERALES
+                            total_general_monto_pagado += int(pago['monto'])
+                            total_general_monto_vendedor += int(monto_vendedor)
+                                                            
+                            filas_fraccion.append(fila)
                                                     
                                                     
                                                      
