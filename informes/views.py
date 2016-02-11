@@ -67,7 +67,8 @@ def lotes_libres(request):
                     total_contado_fraccion = 0
                     total_credito_fraccion = 0
                     total_superficie_fraccion = 0
-                    total_lotes = 0
+                    total_lotes_fraccion = 0
+                    total_general_lotes = 0
                     misma_fraccion = True
                     for index, lote_item in enumerate(object_list):
                         lote={}
@@ -84,34 +85,41 @@ def lotes_libres(request):
                         lote['precio_credito']=unicode('{:,}'.format(lote_item.precio_credito)).replace(",", ".")                    
                         lote['importe_cuota']=unicode('{:,}'.format(precio_cuota)).replace(",", ".")
                         lote['id'] = lote_item.id
+                        lote['ultimo_registro'] = False
+                        #ESTEEE
                     # Se suman los TOTALES por FRACCION
                         total_superficie_fraccion += lote_item.superficie 
                         total_contado_fraccion += lote_item.precio_contado
                         total_credito_fraccion += lote_item.precio_credito
                         total_importe_cuotas += precio_cuota
-                        total_lotes += 1
+                        total_lotes_fraccion += 1
+                        total_general_lotes +=1
                     #Es el ultimo lote, cerrar totales de fraccion
                         if (len(object_list)-1 == index):
                             lote['total_importe_cuotas'] = unicode('{:,}'.format(total_importe_cuotas)).replace(",", ".") 
                             lote['total_credito_fraccion'] =  unicode('{:,}'.format(total_credito_fraccion)).replace(",", ".")
                             lote['total_contado_fraccion'] =  unicode('{:,}'.format(total_contado_fraccion)).replace(",", ".")
                             lote['total_superficie_fraccion'] =  unicode('{:,}'.format(total_superficie_fraccion)).replace(",", ".")
-                            lote['total_lotes'] =  unicode('{:,}'.format(total_lotes)).replace(",", ".")
+                            lote['total_lotes'] =  unicode('{:,}'.format(total_lotes_fraccion)).replace(",", ".")
+                            lote['total_general_lotes'] =  unicode('{:,}'.format(total_general_lotes)).replace(",", ".")
+                            lote['ultimo_registro'] = True
                             
-                    #Hay cambio de lote pero NO es el ultimo elemento todavia
+                    #Hay cambio de fraccion pero NO es el ultimo elemento todavia
                         elif (lote_item.manzana.fraccion.id != object_list[index+1].manzana.fraccion.id):
                             lote['total_importe_cuotas'] = unicode('{:,}'.format(total_importe_cuotas)).replace(",", ".") 
                             lote['total_credito_fraccion'] =  unicode('{:,}'.format(total_credito_fraccion)).replace(",", ".")
                             lote['total_contado_fraccion'] =  unicode('{:,}'.format(total_contado_fraccion)).replace(",", ".")
                             lote['total_superficie_fraccion'] =  unicode('{:,}'.format(total_superficie_fraccion)).replace(",", ".")
-                            lote['total_lotes'] =  unicode('{:,}'.format(total_lotes)).replace(",", ".")
+                            lote['total_lotes'] =  unicode('{:,}'.format(total_lotes_fraccion)).replace(",", ".")
                         # Se CERAN  los TOTALES por FRACCION
                             total_importe_cuotas = 0
                             total_contado_fraccion = 0
                             total_credito_fraccion = 0
                             total_superficie_fraccion = 0
-                            total_lotes = 0
+                            total_lotes_fraccion = 0
                             misma_fraccion = True
+                            
+                        
                             
                         lotes.append(lote)
                     #sin paginacion
@@ -1954,6 +1962,8 @@ def lotes_libres_reporte_excel(request):
     total_general_superficie = 0
     total_general_lotes = 0   
     
+    g_fraccion = ''
+    
     lotes = []          
     for index, lote_item in enumerate(object_list):
         lote={}
@@ -1961,17 +1971,25 @@ def lotes_libres_reporte_excel(request):
         precio_cuota=int(math.ceil(lote_item.precio_credito/130))
         lote['fraccion_id']=unicode(lote_item.manzana.fraccion.id)
         lote['fraccion']=unicode(lote_item.manzana.fraccion)
-        lote['lote']=unicode(lote_item.manzana).zfill(3) + "/" + unicode(lote_item.nro_lote).zfill(4)
+        lote['lote']= lote_item.codigo_paralot
         lote['superficie']=lote_item.superficie                                    
         lote['precio_contado']=unicode('{:,}'.format(lote_item.precio_contado)).replace(",", ".")                    
         lote['precio_credito']=unicode('{:,}'.format(lote_item.precio_credito)).replace(",", ".")                    
         lote['importe_cuota']=unicode('{:,}'.format(precio_cuota)).replace(",", ".")
+        lote['misma_fraccion'] = True
+        lote['ultimo_lote'] = False
+        if g_fraccion == '':
+            g_fraccion = lote_item.manzana.fraccion
+
+            
+        
         # Se suman los TOTALES por FRACCION
         total_superficie_fraccion += lote_item.superficie 
         total_contado_fraccion += lote_item.precio_contado
         total_credito_fraccion += lote_item.precio_credito
         total_importe_cuotas += precio_cuota
         total_lotes += 1
+        #Esteee
         
         # Se suman los TOTALES GENERALES
         total_general_cuotas += precio_cuota
@@ -1982,6 +2000,7 @@ def lotes_libres_reporte_excel(request):
         
         #Es el ultimo lote, cerrar totales de fraccion
         if (len(object_list)-1 == index):
+            lote['ultimo_lote'] = True
             lote['total_importe_cuotas'] = unicode('{:,}'.format(total_importe_cuotas)).replace(",", ".") 
             lote['total_credito_fraccion'] =  unicode('{:,}'.format(total_credito_fraccion)).replace(",", ".")
             lote['total_contado_fraccion'] =  unicode('{:,}'.format(total_contado_fraccion)).replace(",", ".")
@@ -1996,6 +2015,7 @@ def lotes_libres_reporte_excel(request):
             
         #Hay cambio de lote pero NO es el ultimo elemento todavia
         elif (lote_item.manzana.fraccion.id != object_list[index+1].manzana.fraccion.id):
+            lote['ultimo_lote'] = True
             lote['total_importe_cuotas'] = unicode('{:,}'.format(total_importe_cuotas)).replace(",", ".") 
             lote['total_credito_fraccion'] =  unicode('{:,}'.format(total_credito_fraccion)).replace(",", ".")
             lote['total_contado_fraccion'] =  unicode('{:,}'.format(total_contado_fraccion)).replace(",", ".")
@@ -2007,50 +2027,103 @@ def lotes_libres_reporte_excel(request):
             total_credito_fraccion = 0
             total_superficie_fraccion = 0
             total_lotes = 0
+            
+        if lote_item.manzana.fraccion != g_fraccion:
+            g_fraccion = lote_item.manzana.fraccion
+            lote['misma_fraccion'] = False
         lotes.append(lote)
-       
+    lotes[0]['misma_fraccion'] = False    
+    #esteee
     wb = xlwt.Workbook(encoding='utf-8')
     sheet = wb.add_sheet('test', cell_overwrite_ok=True)
-    style = xlwt.easyxf('pattern: pattern solid, fore_colour green;'
-                              'font: name Arial, bold True;')   
-    style2 = xlwt.easyxf('font: name Arial, bold True;')
-    # cabeceras
-    sheet.write(0, 0, "Fraccion", style)
-    sheet.write(0, 1, "Fraccion ID", style)    
-    sheet.write(0, 2, "Lote Nro.", style)
-    sheet.write(0, 3, "Superficie", style)    
-    sheet.write(0, 4, "Precio Contado", style)    
-    sheet.write(0, 5, "Precio Crediro", style)
-    sheet.write(0, 6, "Precio Cuota", style)  
+    style = xlwt.easyxf('pattern: pattern solid, fore_colour white;'
+                              'font: name Gill Sans MT Condensed, bold True; align: horiz center')   
+    style2 = xlwt.easyxf('pattern: pattern solid, fore_colour white;'
+                         'font: name Gill Sans MT Condensed, bold True, height 160;')
+    style3 = xlwt.easyxf('font: name Gill Sans MT Condensed, height 160 ; align: horiz center')
+    style4 = xlwt.easyxf('font: name Gill Sans MT Condensed, height 160 ; align: horiz right')
+    style5 = xlwt.easyxf('pattern: pattern solid, fore_colour white;''font: name Gill Sans MT Condensed, bold True, height 160 ; align: horiz right')
+    
+    style_normal = xlwt.easyxf('font: name Gill Sans MT Condensed, height 160;')
+    style_normal_centrado = xlwt.easyxf('font: name Gill Sans MT Condensed, height 160; align: horiz center')
+    
+    style_fraccion = xlwt.easyxf('pattern: pattern solid, fore_colour white;'
+                              'font: name Gill Sans MT Condensed, bold True; align: horiz center')  
+    #Titulo
+    #sheet.write_merge(0,0,0,7, 'PROPAR S.R.L.' ,style3)
+    #sheet.write_merge(1,1,1,7, 'Sistema de Control de Loteamiento' ,style3)
+    
+    #sheet.header_str = 'PROPAR S.R.L.'
+    periodo_1 = fraccion_ini
+    periodo_2 = fraccion_fin
+    usuario = unicode(request.user)
+    sheet.header_str = (
+     u"&LFecha: &D Hora: &T \nUsuario: "+usuario+" "
+     u"&CPROPAR S.R.L.\n LOTES LIBRES "
+     u"&RFraccion del "+periodo_1+" al "+periodo_2+" \nPage &P of &N"
+     )
+    #sheet.footer_str = 'things'
+    
+    
+    
+    c=0
+    sheet.write_merge(c,c,0,4, "Lotes Libres", style) 
     #contador de filas
-    c=0   
+      
     for lote in lotes:
         c+=1
+        '''
         sheet.write(c, 0, lote['fraccion'])
         sheet.write(c, 1, lote['fraccion_id'])
-        sheet.write(c, 2, lote['lote'])
-        sheet.write(c, 3, lote['superficie'])
-        sheet.write(c, 4, lote['precio_contado'])
-        sheet.write(c, 5, lote['precio_credito'])
-        sheet.write(c, 6, lote['importe_cuota'])
+        '''
         try: 
-            if lote['total_importe_cuotas']:
+            if lote['total_importe_cuotas'] and lote['ultimo_lote'] == False:
                 c += 1
-                sheet.write(c, 0, "Totales de Fraccion", style2)  
-                sheet.write(c, 2, lote['total_lotes'], style2)
+                sheet.write_merge(c,c,0,4, "Cantidad de Lotes libres de la fraccion: "+unicode(lote['total_lotes']), style2)
+                '''
                 sheet.write(c, 3, lote['total_superficie_fraccion'], style2)
                 sheet.write(c, 4, lote['total_contado_fraccion'], style2)
                 sheet.write(c, 5, lote['total_credito_fraccion'], style2)
                 sheet.write(c, 6, lote['total_importe_cuotas'], style2)
-            
+                '''
+        except Exception, error:
+            print error 
+            pass
+        
+        if lote['misma_fraccion'] == False:
+            sheet.write_merge(c,c,0,4, "Fraccion: "+unicode(lote['fraccion']), style)
+            c+=1
+            sheet.write(c, 0, "Lote Nro.", style)
+            sheet.write(c, 1, "Superficie", style)    
+            sheet.write(c, 2, "Precio Contado", style)    
+            sheet.write(c, 3, "Precio Credito", style)
+            sheet.write(c, 4, "Precio Cuota", style)
+            c+=1
+             
+        sheet.write(c, 0, lote['lote'], style_normal_centrado)
+        sheet.write(c, 1, unicode(lote['superficie']) + ' mts2', style_normal_centrado)
+        sheet.write(c, 2, lote['precio_contado'], style4)
+        sheet.write(c, 3, lote['precio_credito'], style4)
+        sheet.write(c, 4, lote['importe_cuota'], style4)
+        try: 
+            if lote['ultimo_lote'] == True:
+                c += 1
+                sheet.write_merge(c,c,0,4, "Cantidad de Lotes libres de la fraccion: "+unicode(lote['total_lotes']), style2)
+                '''
+                sheet.write(c, 3, lote['total_superficie_fraccion'], style2)
+                sheet.write(c, 4, lote['total_contado_fraccion'], style2)
+                sheet.write(c, 5, lote['total_credito_fraccion'], style2)
+                sheet.write(c, 6, lote['total_importe_cuotas'], style2)
+                '''
             if lote['total_general_cuotas']:
                 c += 1
-                sheet.write(c, 0, "Totales Generales", style2)  
-                sheet.write(c, 2, lote['total_general_lotes'], style2)
+                sheet.write_merge(c,c,0,4, "Cantidad total de Lotes libres: "+unicode(lote['total_general_lotes']), style2)
+                '''
                 sheet.write(c, 3, lote['total_general_superficie'], style2)
                 sheet.write(c, 4, lote['total_general_contado'], style2)
                 sheet.write(c, 5, lote['total_general_credito'], style2)
-                sheet.write(c, 6, lote['total_general_cuotas'], style2)            
+                sheet.write(c, 6, lote['total_general_cuotas'], style2)
+                '''         
         except Exception, error:
             print error 
             pass
@@ -3588,7 +3661,7 @@ def liquidacion_vendedores_reporte_excel(request):
     ultimo="&busqueda_label="+busqueda_label+"&busqueda="+vendedor_id+"&fecha_ini="+fecha_ini+"&fecha_fin="+fecha_fin         
                 
     lista = filas
-        
+    #aquiiiii   
     wb = xlwt.Workbook(encoding='utf-8')
     sheet = wb.add_sheet('test', cell_overwrite_ok=True)
     style = xlwt.easyxf('pattern: pattern solid, fore_colour white;'

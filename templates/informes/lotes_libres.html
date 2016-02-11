@@ -183,11 +183,25 @@
 				{% if lote.total_importe_cuotas %}
 					<tr>
 						<th colspan="2" class="celda_resumen_fraccion">Resumen de la Fracción</th>
-						<th class="celda_resumen_fraccion">Lotes libres: {{lote.total_lotes}}</th>
+						<th colspan="5" class="celda_resumen_fraccion">Lotes libres: {{lote.total_lotes}}</th>
+						<!--
 						<th class="celda_resumen_fraccion">{{lote.total_superficie_fraccion}}</th>
 						<th class="celda_resumen_fraccion">{{lote.total_contado_fraccion}}</th>
 						<th class="celda_resumen_fraccion">{{lote.total_credito_fraccion}}</th>
-						<th class="celda_resumen_fraccion">{{lote.total_importe_cuotas}}</th>						
+						<th class="celda_resumen_fraccion">{{lote.total_importe_cuotas}}</th>
+						-->						
+					</tr>
+				{% endif %}
+				{% if lote.ultimo_registro == True %}
+					<tr>
+						<th colspan="2" class="celda_resumen_fraccion">Resumen Total</th>
+						<th colspan="5" class="celda_resumen_fraccion">Lotes libres: {{lote.total_general_lotes}}</th>
+						<!--
+						<th class="celda_resumen_fraccion">{{lote.total_superficie_fraccion}}</th>
+						<th class="celda_resumen_fraccion">{{lote.total_contado_fraccion}}</th>
+						<th class="celda_resumen_fraccion">{{lote.total_credito_fraccion}}</th>
+						<th class="celda_resumen_fraccion">{{lote.total_importe_cuotas}}</th>
+						-->						
 					</tr>
 				{% endif %}
 			{% endfor %}
@@ -218,5 +232,6 @@
    -->
 <div id="footer">
 	<a href="{% url 'frontend_home' %}informes" class="boton-verde">Volver al módulo de Informes</a>
+	<a class="boton-verde" id="id_boton_2" onclick="retrieve_lotes_libres();">Descargar Excel</a>
 </div>
 {% endblock %}
