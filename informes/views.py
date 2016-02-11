@@ -2036,6 +2036,7 @@ def lotes_libres_reporte_excel(request):
     #esteee
     wb = xlwt.Workbook(encoding='utf-8')
     sheet = wb.add_sheet('test', cell_overwrite_ok=True)
+    sheet.paper_size_code = 1
     style = xlwt.easyxf('pattern: pattern solid, fore_colour white;'
                               'font: name Gill Sans MT Condensed, bold True; align: horiz center')   
     style2 = xlwt.easyxf('pattern: pattern solid, fore_colour white;'
@@ -2129,7 +2130,7 @@ def lotes_libres_reporte_excel(request):
             pass
     response = HttpResponse(content_type='application/vnd.ms-excel')
     # Crear un nombre intuitivo         
-    response['Content-Disposition'] = 'attachment; filename=' + 'lotes_libres.xls'
+    response['Content-Disposition'] = 'attachment; filename=' + 'lotes_libres_fraccion_de'+periodo_1+'_a_'+periodo_2+'.xls'
     wb.save(response)
     return response
 
