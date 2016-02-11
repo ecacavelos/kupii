@@ -2228,6 +2228,7 @@ def clientes_atrasados_reporte_excel(request):
         
         wb = xlwt.Workbook(encoding='utf-8')
         sheet = wb.add_sheet('test', cell_overwrite_ok=True)
+        sheet.paper_size_code = 1
         style = xlwt.easyxf('pattern: pattern solid, fore_colour white;'
                               'font: name Gill Sans MT Condensed, bold True, height 160; align: horiz center')
         style2 = xlwt.easyxf('font: name Gill Sans MT Condensed, height 160;')
@@ -2452,6 +2453,7 @@ def informe_general_reporte_excel(request):
         
     wb = xlwt.Workbook(encoding='utf-8')
     sheet = wb.add_sheet('test', cell_overwrite_ok=True)
+    sheet.paper_size_code = 1
     style = xlwt.easyxf('pattern: pattern solid, fore_colour white;'
                               'font: name Gill Sans MT Condensed, bold True; align: horiz center')   
     style2 = xlwt.easyxf('pattern: pattern solid, fore_colour white;'
@@ -3153,6 +3155,7 @@ def liquidacion_propietarios_reporte_excel(request):
         
     wb = xlwt.Workbook(encoding='utf-8')
     sheet = wb.add_sheet('test', cell_overwrite_ok=True)
+    sheet.paper_size_code = 1
     style = xlwt.easyxf('pattern: pattern solid, fore_colour white;'
                               'font: name Gill Sans MT Condensed, bold True; align: horiz center')   
     style2 = xlwt.easyxf('pattern: pattern solid, fore_colour white;'
@@ -3668,6 +3671,7 @@ def liquidacion_vendedores_reporte_excel(request):
     #aquiiiii   
     wb = xlwt.Workbook(encoding='utf-8')
     sheet = wb.add_sheet('test', cell_overwrite_ok=True)
+    sheet.paper_size_code = 1
     style = xlwt.easyxf('pattern: pattern solid, fore_colour white;'
                               'font: name Gill Sans MT Condensed, bold True; align: horiz center')   
     style2 = xlwt.easyxf('pattern: pattern solid, fore_colour white;'
@@ -3938,6 +3942,7 @@ def liquidacion_gerentes_reporte_excel(request):
             
     wb = xlwt.Workbook(encoding='utf-8')
     sheet = wb.add_sheet('test', cell_overwrite_ok=True)
+    sheet.paper_size_code = 1
     style = xlwt.easyxf('pattern: pattern solid, fore_colour green;'
                               'font: name Arial, bold True;')   
     style2 = xlwt.easyxf('font: name Arial, bold True;')
@@ -4147,6 +4152,7 @@ def informe_movimientos_reporte_excel(request):
             
     wb = xlwt.Workbook(encoding='utf-8')
     sheet = wb.add_sheet('test', cell_overwrite_ok=True)
+    sheet.paper_size_code = 1
     style = xlwt.easyxf('pattern: pattern solid, fore_colour white;'
                               'font: name Gill Sans MT Condensed, bold True, height 160; align: horiz center')
     style2 = xlwt.easyxf('font: name Gill Sans MT Condensed, height 160;')
@@ -4638,6 +4644,7 @@ def informe_ventas_reporte_excel(request):
             
     wb = xlwt.Workbook(encoding='utf-8')
     sheet = wb.add_sheet('test', cell_overwrite_ok=True)
+    sheet.paper_size_code = 1
     style = xlwt.easyxf('pattern: pattern solid, fore_colour white;'
                                 'font: name Gill Sans MT Condensed, bold True, height 160; align: horiz center')
     style2 = xlwt.easyxf('font: name Gill Sans MT Condensed, height 160;')
@@ -5078,6 +5085,7 @@ def informe_facturacion_reporte_excel(request):
                                                                                                               
                         wb = xlwt.Workbook(encoding='utf-8')
                         sheet = wb.add_sheet('test', cell_overwrite_ok=True)
+                        sheet.paper_size_code = 1
                         style_titulo = xlwt.easyxf('pattern: pattern solid, fore_colour white;'
                                                   'font: name Gill Sans MT Condensed, bold True, height 160; align: horiz center')
                         style_normal = xlwt.easyxf('font: name Gill Sans MT Condensed, height 160;')
