@@ -2129,8 +2129,11 @@ def lotes_libres_reporte_excel(request):
             print error 
             pass
     response = HttpResponse(content_type='application/vnd.ms-excel')
-    # Crear un nombre intuitivo         
-    response['Content-Disposition'] = 'attachment; filename=' + 'lotes_libres_fraccion_de'+periodo_1+'_a_'+periodo_2+'.xls'
+    # Crear un nombre intuitivo
+    fecha_actual= datetime.datetime.now().date()
+    fecha_str = unicode(fecha_actual)
+    fecha = unicode(datetime.datetime.strptime(fecha_str, "%Y-%m-%d").strftime("%d/%m/%Y"))         
+    response['Content-Disposition'] = 'attachment; filename=' + 'lotes_libres_fraccion_del_'+periodo_1+'_a_'+periodo_2+'_'+fecha+'.xls'
     wb.save(response)
     return response
 
