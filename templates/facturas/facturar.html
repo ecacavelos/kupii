@@ -9,6 +9,11 @@
 <script type="text/javascript" src="{{ STATIC_URL }}facturacion/qz-print/js/qz-websocket.js"></script>
 <script type="text/javascript">
 
+var tipo_venta = "{{tipo_venta}}";
+var precio_venta = "{{precio_venta}}";
+var descripcion = "{{descripcion}}";
+
+
 /**
  * Re-use the new WebSockets deployment if available.  If not, fallback on the Oracle deployment
  */
