@@ -133,7 +133,7 @@ def detalle_lote(request, lote_id):
             loggear_accion(request.user, "Borrar lote("+codigo_lote+")", "Factura", id_objeto, codigo_lote)
             
             #return HttpResponseRedirect('/lotes/listado')
-            return HttpResponseRedirect(reverse('frontend_listado_lotes'))
+            return HttpResponseRedirect(reverse('frontend_lotes_index'))
         
         elif data.get('boton_guardar_a_recuperacion'):
             form = LoteForm(data, instance=object_list)

@@ -1,7 +1,7 @@
 from django.conf.urls import patterns, url
 
 urlpatterns = patterns('lotes.views',    
-    url(r'^$', 'lotes'),
+    url(r'^$', 'lotes',name='frontend_lotes_index'),
     url(r'^listado/$', 'consultar_lotes', name='frontend_listado_lote'),
     url(r'^listado/(?P<lote_id>\d+)/$', 'detalle_lote', name='frontend_detalle_lote'),
     url(r'^listado/ventas/(?P<venta_id>\d+)/$', 'detalle_ventas_lote'),
