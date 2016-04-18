@@ -2656,8 +2656,8 @@ def liquidacion_propietarios_reporte_excel(request):
                         fila['total_de_cuotas']=unicode('{:,}'.format(total_de_cuotas)).replace(",", ".")
                         fila['monto_inmobiliaria']=unicode('{:,}'.format(monto_inmobiliaria)).replace(",", ".")
                         fila['monto_propietario']=unicode('{:,}'.format(monto_propietario)).replace(",", ".")
-                                            
-                                            
+
+
                         monthNames = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
                         fecha_1 = unicode(datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
                         parts_1 = fecha_1.split("/")
@@ -2669,13 +2669,13 @@ def liquidacion_propietarios_reporte_excel(request):
                         #total_monto_inm += int(monto_inmobiliaria)
                         #total_monto_prop += int(monto_propietario)
                         #total_monto_pagado += int(venta.precio_final_de_venta)
-                                            
+
                         filas.append(fila)
                         #Acumulamos para los TOTALES GENERALES
                         total_general_pagado += int(venta.precio_final_de_venta)
                         total_general_inm += int(monto_inmobiliaria)
                         total_general_prop += int(monto_propietario)
-                                            
+
                 if venta.entrega_inicial != 0:
                     if venta.fecha_de_venta >= fecha_ini_parsed and venta.fecha_de_venta <= fecha_fin_parsed :
                         montos = calculo_montos_liquidacion_propietarios_entrega_inicial(venta)
@@ -2697,8 +2697,8 @@ def liquidacion_propietarios_reporte_excel(request):
                         fila['total_de_cuotas']=unicode('{:,}'.format(total_de_cuotas)).replace(",", ".")
                         fila['monto_inmobiliaria']=unicode('{:,}'.format(monto_inmobiliaria)).replace(",", ".")
                         fila['monto_propietario']=unicode('{:,}'.format(monto_propietario)).replace(",", ".")
-                                            
-                                            
+
+
                         monthNames = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
                         fecha_1 = unicode(datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
                         parts_1 = fecha_1.split("/")
@@ -2710,23 +2710,23 @@ def liquidacion_propietarios_reporte_excel(request):
                         #total_monto_inm += int(monto_inmobiliaria)
                         #total_monto_prop += int(monto_propietario)
                         #total_monto_pagado += int(venta.precio_final_de_venta)
-                                            
+
                         filas.append(fila)
                         #Acumulamos para los TOTALES GENERALES
                         total_general_pagado += int(venta.entrega_inicial)
                         total_general_inm += int(monto_inmobiliaria)
                         total_general_prop += int(monto_propietario)
-                                        
-                                        
-                                    
-                pagos = get_pago_cuotas(venta, fecha_ini_parsed,fecha_fin_parsed)                                            
+
+
+
+                pagos = get_pago_cuotas(venta, fecha_ini_parsed,fecha_fin_parsed)
                 lista_cuotas_inm =[]
                 lista_cuotas_inm.append(venta.plan_de_pago.inicio_cuotas_inmobiliaria)
                 numero_cuota = venta.plan_de_pago.inicio_cuotas_inmobiliaria
                 for i in range(venta.plan_de_pago.cantidad_cuotas_inmobiliaria -1):
                     numero_cuota +=  venta.plan_de_pago.intervalos_cuotas_inmobiliaria
                     lista_cuotas_inm.append(numero_cuota)
-                                
+
                 for pago in pagos:
                                         #try:
                         montos = calculo_montos_liquidacion_propietarios(pago,venta,lista_cuotas_inm)
@@ -2744,15 +2744,15 @@ def liquidacion_propietarios_reporte_excel(request):
                         fila['fecha_de_pago_order']=fecha_pago_order
                         fila['lote']=unicode(pago['lote'])
                         fila['cliente']=unicode(venta.cliente)
-                                            
+
                         cuotas_detalles = get_cuota_information_by_lote(pago['lote'].id, int(pago['nro_cuota']) , True, True, venta)
                         monthNames = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
-                        fecha_1 = cuotas_detalles[0]['fecha'] 
+                        fecha_1 = cuotas_detalles[0]['fecha']
                         parts_1 = fecha_1.split("/")
                         year_1 = parts_1[2];
                         mes_1 = int(parts_1[1]) - 1;
                         mes_year = monthNames[mes_1]+"/"+year_1;
-                                            
+
                         fila['nro_cuota']=unicode(pago['nro_cuota_y_total'])
                         fila['mes'] = mes_year
                         fila['total_de_cuotas']=unicode('{:,}'.format(total_de_cuotas)).replace(",", ".")
@@ -2770,15 +2770,15 @@ def liquidacion_propietarios_reporte_excel(request):
                         #except Exception, error:
                     #    print error
                     #    print unicode(pago)
-                                            
-                                    
-                #if total_monto_inm != 0 or total_monto_prop !=0 or total_monto_pagado !=0: 
+
+
+                #if total_monto_inm != 0 or total_monto_prop !=0 or total_monto_pagado !=0:
                     #Totales por FRACCION
                     #fila['total_monto_pagado']=unicode('{:,}'.format(total_monto_pagado)).replace(",", ".")
                     #fila['total_monto_inmobiliaria']=unicode('{:,}'.format(total_monto_inm)).replace(",", ".")
                     #fila['total_monto_propietario']=unicode('{:,}'.format(total_monto_prop)).replace(",", ".")
-                                        
-                                            
+
+
             #Totales GENERALES
             filas = sorted(filas, key=lambda f: f['fecha_de_pago_order'])
             #try:
@@ -2789,21 +2789,21 @@ def liquidacion_propietarios_reporte_excel(request):
             fila['total_general_pagado']=unicode('{:,}'.format(total_general_pagado)).replace(",", ".")
             fila['total_general_inmobiliaria']=unicode('{:,}'.format(total_general_inm)).replace(",", ".")
             fila['total_general_propietario']=unicode('{:,}'.format(total_general_prop)).replace(",", ".")
-            
+
             fila['ley'] = ley
             fila['impuesto_renta'] = impuesto_renta
             fila['iva_comision'] = iva_comision
             fila['total_a_cobrar'] = total_a_cobrar
-            
+
             filas.append(fila)
-                                
+
         except Exception, error:
             print error
-                            
-                                                                                                                   
+
+
     else:
         try:
-            #fila={} 
+            #fila={}
             propietario_id = request.GET['busqueda'] #liquidacion_propietario_por_propietario_reporte excel
             propietario = Propietario.objects.get(pk= propietario_id)
             b_propietario = True
@@ -2812,40 +2812,40 @@ def liquidacion_propietarios_reporte_excel(request):
             total_monto_pagado = 0
             total_monto_inm = 0
             total_monto_prop = 0
-                                
+
             #Totales GENERALES
             total_general_pagado = 0
             total_general_inm = 0
             total_general_prop = 0
             ok=True
             filas_fraccion = []
-                
+
             ventas = Venta.objects.filter(lote__manzana__fraccion__propietario=propietario_id).order_by('lote__manzana__fraccion').select_related()
             ventas_id = []
-                                
+
             for venta in ventas:
                 ventas_id.append(venta.id)
-                                
+
             pagos_de_cuotas_ventas = PagoDeCuotas.objects.filter(venta__in=ventas_id,fecha_de_pago__range=(fecha_ini_parsed, fecha_fin_parsed)).order_by('fecha_de_pago').prefetch_related('venta', 'venta__plan_de_pago','venta__lote__manzana__fraccion')
             cant_cuotas_pagadas_ventas = PagoDeCuotas.objects.filter(venta__in=ventas_id, fecha_de_pago__lt=fecha_ini_parsed).values('venta_id').annotate(Sum('nro_cuotas_a_pagar')).prefetch_related('venta_id')
-                                
-                                    
+
+
             no_recu = None
             g_fraccion = ""
-            cambio = 0    
+            cambio = 0
             for venta in ventas:
                     if venta.fecha_de_venta >= fecha_ini_parsed and venta.fecha_de_venta <= fecha_fin_parsed :
                         if venta.plan_de_pago.tipo_de_plan == "contado":
                             if g_fraccion == "":
                                 g_fraccion = venta.lote.manzana.fraccion
-                                                
+
                             if venta.lote.manzana.fraccion != g_fraccion:
                             #Totales por FRACCION
                                 try:
                                     filas_fraccion = sorted(filas_fraccion, key=lambda f: (f['fecha_de_pago_order']))
                                 except Exception, error:
                                     print error +": "+ fecha_pago_str
-                                                        
+
                                 filas_fraccion[0]['misma_fraccion']= False
                                 filas.extend(filas_fraccion)
                                 filas_fraccion = []
@@ -2853,18 +2853,18 @@ def liquidacion_propietarios_reporte_excel(request):
                                 fila['total_monto_pagado']=unicode('{:,}'.format(total_monto_pagado)).replace(",", ".")
                                 fila['total_monto_inmobiliaria']=unicode('{:,}'.format(total_monto_inm)).replace(",", ".")
                                 fila['total_monto_propietario']=unicode('{:,}'.format(total_monto_prop)).replace(",", ".")
-                                                        
+
                                 total_monto_inm = 0
                                 total_monto_prop = 0
                                 total_monto_pagado = 0
-                                                        
+
                                 fila['ultimo_pago'] = True
                                 filas.append(fila)
                                 g_fraccion = venta.lote.manzana.fraccion
                                 ok=True
                             else:
-                                                        
-                
+
+
                                 montos = calculo_montos_liquidacion_propietarios_contado(venta)
                                 monto_inmobiliaria = montos['monto_inmobiliaria']
                                 monto_propietario = montos['monto_propietario']
@@ -2884,8 +2884,8 @@ def liquidacion_propietarios_reporte_excel(request):
                                 fila['total_de_cuotas']=unicode('{:,}'.format(total_de_cuotas)).replace(",", ".")
                                 fila['monto_inmobiliaria']=unicode('{:,}'.format(monto_inmobiliaria)).replace(",", ".")
                                 fila['monto_propietario']=unicode('{:,}'.format(monto_propietario)).replace(",", ".")
-                                                        
-                                                        
+
+
                                 monthNames = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
                                 fecha_1 = unicode(datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
                                 parts_1 = fecha_1.split("/")
@@ -2897,27 +2897,27 @@ def liquidacion_propietarios_reporte_excel(request):
                                 total_monto_inm += int(monto_inmobiliaria)
                                 total_monto_prop += int(monto_propietario)
                                 total_monto_pagado += int(venta.precio_final_de_venta)
-                                                        
+
                                 #filas.append(fila)
                                 #Acumulamos para los TOTALES GENERALES
                                 total_general_pagado += int(venta.precio_final_de_venta)
                                 total_general_inm += int(monto_inmobiliaria)
                                 total_general_prop += int(monto_propietario)
                                 filas_fraccion.append(fila)
-                                                
-                                        
+
+
                         if venta.entrega_inicial != 0:
-                                                
+
                             if g_fraccion == "":
                                 g_fraccion = venta.lote.manzana.fraccion
-                                                
+
                             if venta.lote.manzana.fraccion != g_fraccion:
                             #Totales por FRACCION
                                 try:
                                     filas_fraccion = sorted(filas_fraccion, key=lambda f: (f['fecha_de_pago_order']))
                                 except Exception, error:
                                     print error +": "+ fecha_pago_str
-                                                        
+
                                 filas_fraccion[0]['misma_fraccion']= False
                                 filas.extend(filas_fraccion)
                                 filas_fraccion = []
@@ -2925,18 +2925,18 @@ def liquidacion_propietarios_reporte_excel(request):
                                 fila['total_monto_pagado']=unicode('{:,}'.format(total_monto_pagado)).replace(",", ".")
                                 fila['total_monto_inmobiliaria']=unicode('{:,}'.format(total_monto_inm)).replace(",", ".")
                                 fila['total_monto_propietario']=unicode('{:,}'.format(total_monto_prop)).replace(",", ".")
-                                                        
+
                                 total_monto_inm = 0
                                 total_monto_prop = 0
                                 total_monto_pagado = 0
-                                                        
+
                                 fila['ultimo_pago'] = True
                                 filas.append(fila)
                                 g_fraccion = venta.lote.manzana.fraccion
                                 ok=True
                             else:
-                                                        
-                
+
+
                                 montos = calculo_montos_liquidacion_propietarios_contado(venta)
                                 monto_inmobiliaria = montos['monto_inmobiliaria']
                                 monto_propietario = montos['monto_propietario']
@@ -2956,8 +2956,8 @@ def liquidacion_propietarios_reporte_excel(request):
                                 fila['total_de_cuotas']=unicode('{:,}'.format(total_de_cuotas)).replace(",", ".")
                                 fila['monto_inmobiliaria']=unicode('{:,}'.format(monto_inmobiliaria)).replace(",", ".")
                                 fila['monto_propietario']=unicode('{:,}'.format(monto_propietario)).replace(",", ".")
-                                                        
-                                                        
+
+
                                 monthNames = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
                                 fecha_1 = unicode(datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
                                 parts_1 = fecha_1.split("/")
@@ -2969,17 +2969,17 @@ def liquidacion_propietarios_reporte_excel(request):
                                 total_monto_inm += int(monto_inmobiliaria)
                                 total_monto_prop += int(monto_propietario)
                                 total_monto_pagado += int(venta.entrega_inicial)
-                                                        
+
                                 #filas.append(fila)
                                 #Acumulamos para los TOTALES GENERALES
                                 total_general_pagado += int(venta.entrega_inicial)
                                 total_general_inm += int(monto_inmobiliaria)
                                 total_general_prop += int(monto_propietario)
                                 filas_fraccion.append(fila)
-                                        
+
                     #print 'se encontro la venta no recuperada, la venta actual'
                     pagos =[]
-                    #pagos = get_pago_cuotas(venta, fecha_ini_parsed,fecha_fin_parsed)                                            
+                    #pagos = get_pago_cuotas(venta, fecha_ini_parsed,fecha_fin_parsed)
                     pagos = get_pago_cuotas(venta, fecha_ini_parsed,fecha_fin_parsed, pagos_de_cuotas_ventas, cant_cuotas_pagadas_ventas)
                     lista_cuotas_inm =[]
                     lista_cuotas_inm.append(venta.plan_de_pago.inicio_cuotas_inmobiliaria)
@@ -2992,17 +2992,17 @@ def liquidacion_propietarios_reporte_excel(request):
                             #if pago['id'] == 1842529:
                             #    print "este es"
                             try:
-                                
+
                                 if g_fraccion == "":
                                     g_fraccion = venta.lote.manzana.fraccion
-                                
+
                                 if pago['fraccion'] != g_fraccion:
                                     #Totales por FRACCION
                                     try:
                                         filas_fraccion = sorted(filas_fraccion, key=lambda f: (f['fecha_de_pago_order']))
                                     except Exception, error:
                                         print error +": "+ fecha_pago_str
-                                                        
+
                                     filas_fraccion[0]['misma_fraccion']= False
                                     filas.extend(filas_fraccion)
                                     filas_fraccion = []
@@ -3010,16 +3010,16 @@ def liquidacion_propietarios_reporte_excel(request):
                                     fila['total_monto_pagado']=unicode('{:,}'.format(total_monto_pagado)).replace(",", ".")
                                     fila['total_monto_inmobiliaria']=unicode('{:,}'.format(total_monto_inm)).replace(",", ".")
                                     fila['total_monto_propietario']=unicode('{:,}'.format(total_monto_prop)).replace(",", ".")
-                                                        
+
                                     total_monto_inm = 0
                                     total_monto_prop = 0
                                     total_monto_pagado = 0
-                                    
+
                                     fila['ultimo_pago'] = True
                                     filas.append(fila)
                                     g_fraccion = pago['fraccion']
                                     ok=True
-                                                        
+
                                     montos = calculo_montos_liquidacion_propietarios(pago,venta, lista_cuotas_inm)
                                     monto_inmobiliaria = montos['monto_inmobiliaria']
                                     monto_propietario = montos['monto_propietario']
@@ -3028,7 +3028,7 @@ def liquidacion_propietarios_reporte_excel(request):
                                         fecha_pago = unicode(datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
                                     except Exception, error:
                                         print error +": "+ fecha_pago_str
-                                                         
+
                                     # Se setean los datos de cada fila
                                     fila={}
                                     fila['misma_fraccion'] = True
@@ -3041,33 +3041,33 @@ def liquidacion_propietarios_reporte_excel(request):
                                     fila['total_de_cuotas']=unicode('{:,}'.format(int(pago['monto']))).replace(",", ".")
                                     fila['monto_inmobiliaria'] = unicode('{:,}'.format(monto_inmobiliaria)).replace(",", ".")
                                     fila['monto_propietario']=unicode('{:,}'.format(monto_propietario)).replace(",", ".")
-                                                         
+
                                     cuotas_detalles = get_cuota_information_by_lote(pago['lote'].id, int(pago['nro_cuota']) , True, True, venta)
                                     monthNames = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
-                                    fecha_1 = cuotas_detalles[0]['fecha'] 
+                                    fecha_1 = cuotas_detalles[0]['fecha']
                                     parts_1 = fecha_1.split("/")
                                     year_1 = parts_1[2];
                                     mes_1 = int(parts_1[1]) - 1;
                                     mes_year = monthNames[mes_1]+"/"+year_1;
                                     fila['mes'] = mes_year
-                                                         
-                                    #if venta.lote.manzana.fraccion != g_fraccion: 
+
+                                    #if venta.lote.manzana.fraccion != g_fraccion:
                                     ok=False
                                     # Se suman los TOTALES por FRACCION
                                     total_monto_inm += int(monto_inmobiliaria)
                                     total_monto_prop += int(monto_propietario)
                                     total_monto_pagado += int(pago['monto'])
-                                                         
+
                                     #Acumulamos para los TOTALES GENERALES
                                     total_general_pagado += int(pago['monto'])
                                     total_general_inm += int(monto_inmobiliaria)
                                     total_general_prop += int(monto_propietario)
-                                                        
+
                                     filas_fraccion.append(fila)
-                                                        
+
                                 else:
-                                                        
-                                                    
+
+
                                     montos = calculo_montos_liquidacion_propietarios(pago,venta, lista_cuotas_inm)
                                     monto_inmobiliaria = montos['monto_inmobiliaria']
                                     monto_propietario = montos['monto_propietario']
@@ -3076,7 +3076,7 @@ def liquidacion_propietarios_reporte_excel(request):
                                         fecha_pago = unicode(datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
                                     except Exception, error:
                                         print error +": "+ fecha_pago_str
-                                                         
+
                                     # Se setean los datos de cada fila
                                     fila={}
                                     fila['misma_fraccion'] = True
@@ -3089,33 +3089,33 @@ def liquidacion_propietarios_reporte_excel(request):
                                     fila['total_de_cuotas']=unicode('{:,}'.format(int(pago['monto']))).replace(",", ".")
                                     fila['monto_inmobiliaria'] = unicode('{:,}'.format(monto_inmobiliaria)).replace(",", ".")
                                     fila['monto_propietario']=unicode('{:,}'.format(monto_propietario)).replace(",", ".")
-                                                
+
                                     cuotas_detalles = get_cuota_information_by_lote(pago['lote'].id, int(pago['nro_cuota']) , True, True, venta)
                                     monthNames = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
-                                    fecha_1 = cuotas_detalles[0]['fecha'] 
+                                    fecha_1 = cuotas_detalles[0]['fecha']
                                     parts_1 = fecha_1.split("/")
                                     year_1 = parts_1[2];
                                     mes_1 = int(parts_1[1]) - 1;
                                     mes_year = monthNames[mes_1]+"/"+year_1;
                                     fila['mes'] = mes_year
-                                                         
-                                    #if venta.lote.manzana.fraccion != g_fraccion: 
+
+                                    #if venta.lote.manzana.fraccion != g_fraccion:
                                     ok=False
                                     # Se suman los TOTALES por FRACCION
                                     total_monto_inm += int(monto_inmobiliaria)
                                     total_monto_prop += int(monto_propietario)
                                     total_monto_pagado += int(pago['monto'])
-                                                         
+
                                     #Acumulamos para los TOTALES GENERALES
                                     total_general_pagado += int(pago['monto'])
                                     total_general_inm += int(monto_inmobiliaria)
                                     total_general_prop += int(monto_propietario)
-                                                        
+
                                     filas_fraccion.append(fila)
-                            
+
                             except Exception, error:
                                 print "Error: "+ unicode(error)+ ", Id Pago: "+unicode(pago['id'])+ ", Fraccion: "+unicode(pago['fraccion'])+ ", lote: "+unicode(pago['lote']) +" Nro cuota: "+unicode(unicode(pago['nro_cuota_y_total']))
-                            
+
             #Totales GENERALES
             #filas = sorted(filas, key=lambda f: f['fecha_de_pago'])
             if filas_fraccion != []:
@@ -3154,21 +3154,58 @@ def liquidacion_propietarios_reporte_excel(request):
     lista = filas
         
     wb = xlwt.Workbook(encoding='utf-8')
-    sheet = wb.add_sheet('test', cell_overwrite_ok=True)
+    sheet = wb.add_sheet('Liquidacion', cell_overwrite_ok=True,)
     sheet.paper_size_code = 1
-    style = xlwt.easyxf('pattern: pattern solid, fore_colour white;'
-                              'font: name Gill Sans MT Condensed, bold True; align: horiz center')   
-    style2 = xlwt.easyxf('pattern: pattern solid, fore_colour white;'
-                         'font: name Gill Sans MT Condensed, bold True, height 160;')
-    style3 = xlwt.easyxf('font: name Gill Sans MT Condensed, height 160 ; align: horiz center')
-    style4 = xlwt.easyxf('font: name Gill Sans MT Condensed, height 160 ; align: horiz right')
-    style5 = xlwt.easyxf('pattern: pattern solid, fore_colour white;''font: name Gill Sans MT Condensed, bold True, height 160 ; align: horiz right')
+    style_titulos_columna = xlwt.easyxf('pattern: pattern solid, fore_colour white;'
+                              'font: name Calibri; align: horiz center')
+
+    style_titulos_columna_resaltados_centrados = xlwt.easyxf('pattern: pattern solid, fore_colour white;'
+                              'font: name Calibri; align: horiz center')
+    style_titulos_columna_resaltados= xlwt.easyxf('pattern: pattern solid, fore_colour white;'
+                              'font: name Calibri')
+
+
+    style_titulo_resumen = xlwt.easyxf('pattern: pattern solid, fore_colour white;'
+                         'font: name Calibri, bold True, height 200;')
+
+    style_datos_montos = xlwt.easyxf('font: name Calibri, height 200 ; align: horiz right')
+    style_datos_montos_subrayado = xlwt.easyxf('font: name Calibri, height 200 ; align: horiz right')
+    style_datos_montos_importante = xlwt.easyxf('font: name Calibri, bold True, height 200 ; align: horiz right')
+    # style_datos = xlwt.easyxf('pattern: pattern solid, fore_colour white;''font: name Calibri, height 200 ; align: horiz right')
     
-    style_normal = xlwt.easyxf('font: name Gill Sans MT Condensed, height 160;')
-    style_normal_centrado = xlwt.easyxf('font: name Gill Sans MT Condensed, height 160; align: horiz center')
+    style_normal = xlwt.easyxf('font: name Calibri, height 200;')
+    style_subrayado_normal = xlwt.easyxf('font: name Calibri, height 200;')
+    style_subrayado_normal_titulo = xlwt.easyxf('font: name Calibri, height 200; align: horiz center')
+    style_doble_subrayado = xlwt.easyxf('font: name Calibri, height 200;')
+    style_datos_texto = xlwt.easyxf('font: name Calibri, height 200; align: horiz center')
     
     style_fraccion = xlwt.easyxf('pattern: pattern solid, fore_colour white;'
-                              'font: name Gill Sans MT Condensed, bold True; align: horiz center')  
+                              'font: name Calibri; align: horiz center')
+
+    style_datos_montos_importante_doble_borde = xlwt.easyxf('font: name Calibri, bold True, height 200 ; align: horiz right')
+
+    # BORDES PARA las columnas de titulos
+    borders = xlwt.Borders()
+    borders.top = xlwt.Borders.THIN
+    borders.bottom = xlwt.Borders.DOUBLE
+    style_titulos_columna_resaltados_centrados.borders = borders
+    style_datos_montos_importante_doble_borde.borders = borders
+    style_titulos_columna_resaltados.borders = borders
+
+    # Subrayado normal
+    border_subrayado = xlwt.Borders()
+    border_subrayado.bottom = xlwt.Borders.THIN
+    style_subrayado_normal.borders = border_subrayado
+    style_datos_montos_subrayado.borders = border_subrayado
+    style_subrayado_normal_titulo.borders = border_subrayado
+
+    # Doble Subrayado negritas
+    border_doble_subrayado = xlwt.Borders()
+    border_doble_subrayado.bottom = xlwt.Borders.THIN
+    style_doble_subrayado.borders = border_doble_subrayado
+
+
+
     #Titulo
     #sheet.write_merge(0,0,0,7, 'PROPAR S.R.L.' ,style3)
     #sheet.write_merge(1,1,1,7, 'Sistema de Control de Loteamiento' ,style3)
@@ -3191,11 +3228,11 @@ def liquidacion_propietarios_reporte_excel(request):
             try:
                 if pago['total_monto_pagado'] == True and pago['ultimo_pago'] == False: 
                     c+=1            
-                    sheet.write_merge(c,c,0,4, "Liquidacion", style2)
+                    sheet.write_merge(c,c,0,4, "Liquidacion", style_titulo_resumen)
                     
-                    sheet.write(c, 5, pago['total_monto_pagado'],style5)
-                    sheet.write(c, 6, pago['total_monto_inmobiliaria'], style5)
-                    sheet.write(c, 7, pago['total_monto_propietario'], style5)
+                    sheet.write(c, 5, pago['total_monto_pagado'],style_datos_montos)
+                    sheet.write(c, 6, pago['total_monto_inmobiliaria'], style_datos_montos)
+                    sheet.write(c, 7, pago['total_monto_propietario'], style_datos_montos)
             except Exception, error:
                 print error 
                 pass
@@ -3206,34 +3243,34 @@ def liquidacion_propietarios_reporte_excel(request):
                     #sheet.write(c, 0, "Fraccion: " + pago['fraccion'],style2)                  
                     sheet.write_merge(c,c,0,7, pago['fraccion'],style_fraccion)
                     c +=1
-                    sheet.write(c, 0, 'Lote', style)
-                    sheet.write(c, 1, 'Fecha de pago', style)
-                    sheet.write(c, 2, 'Cliente', style)
-                    sheet.write(c, 3, 'Nro cuota', style)
-                    sheet.write(c, 4, 'Mes', style)
-                    sheet.write(c, 5, 'Monto Pagado', style)
-                    sheet.write(c, 6, 'Monto Inmob', style)
-                    sheet.write(c, 7, 'Monto Prop', style)
-                    c +=1
+                    sheet.write(c, 0, 'Lote', style_titulos_columna_resaltados_centrados)
+                    sheet.write(c, 1, 'Fecha de pago', style_titulos_columna_resaltados_centrados)
+                    sheet.write(c, 2, 'Cliente', style_titulos_columna_resaltados_centrados)
+                    sheet.write(c, 3, 'Nro cuota', style_titulos_columna_resaltados_centrados)
+                    sheet.write(c, 4, 'Mes', style_titulos_columna_resaltados_centrados)
+                    sheet.write(c, 5, 'Monto Pagado', style_titulos_columna_resaltados_centrados)
+                    sheet.write(c, 6, 'Monto Inmob', style_titulos_columna_resaltados_centrados)
+                    sheet.write(c, 7, 'Monto Prop', style_titulos_columna_resaltados_centrados)
+                    c+=2
                     
-                sheet.write(c, 0, pago['lote'],style_normal_centrado)
-                sheet.write(c, 1, pago['fecha_de_pago'],style_normal_centrado)
+                sheet.write(c, 0, pago['lote'],style_datos_texto)
+                sheet.write(c, 1, pago['fecha_de_pago'],style_datos_texto)
                 sheet.write(c, 2, pago['cliente'],style_normal)
-                sheet.write(c, 3, pago['nro_cuota'],style_normal_centrado)
-                sheet.write(c, 4, pago['mes'],style_normal_centrado)
-                sheet.write(c, 5, pago['total_de_cuotas'],style4)
-                sheet.write(c, 6, pago['monto_inmobiliaria'],style4)
-                sheet.write(c, 7, pago['monto_propietario'], style4)
+                sheet.write(c, 3, pago['nro_cuota'],style_datos_texto)
+                sheet.write(c, 4, pago['mes'],style_datos_texto)
+                sheet.write(c, 5, pago['total_de_cuotas'],style_datos_montos)
+                sheet.write(c, 6, pago['monto_inmobiliaria'],style_datos_montos)
+                sheet.write(c, 7, pago['monto_propietario'], style_datos_montos)
             except Exception, error:
                 print error
             
             try:
                 if (pago['ultimo_pago'] == True): 
                     c+=1            
-                    sheet.write_merge(c,c,0,4, "Liquidacion", style2)
-                    sheet.write(c, 5, pago['total_monto_pagado'],style5)
-                    sheet.write(c, 6, pago['total_monto_inmobiliaria'], style5)
-                    sheet.write(c, 7, pago['total_monto_propietario'], style5)
+                    sheet.write_merge(c,c,0,4, "Liquidacion", style_titulo_resumen)
+                    sheet.write(c, 5, pago['total_monto_pagado'],style_datos_montos)
+                    sheet.write(c, 6, pago['total_monto_inmobiliaria'], style_datos_montos)
+                    sheet.write(c, 7, pago['total_monto_propietario'], style_datos_montos)
             except Exception, error:
                 print error 
                 pass
@@ -3241,46 +3278,74 @@ def liquidacion_propietarios_reporte_excel(request):
             try:
                 if (pago['total_general_pagado']): 
                     c+=1            
-                    sheet.write_merge(c,c,0,4, "Liquidacion Total", style2)
-                    sheet.write(c, 5, pago['total_general_pagado'],style5)
-                    sheet.write(c, 6, pago['total_general_inmobiliaria'], style5)
-                    sheet.write(c, 7, pago['total_general_propietario'], style5)
+                    sheet.write_merge(c,c,0,1, "Totales de la fracción: ", style_titulos_columna)
+                    sheet.write(c, 5, pago['total_general_pagado'],style_datos_montos)
+                    sheet.write(c, 6, pago['total_general_inmobiliaria'], style_datos_montos)
+                    sheet.write(c, 7, pago['total_general_propietario'], style_datos_montos)
                     c+=1
-                    sheet.write(c, 5, 'Comisión+IVA',style2)
-                    n1 = int(pago['iva_comision'].replace(".", ""))
-                    n2 = int(unicode(pago['total_general_inmobiliaria']).replace(".", ""))
-                    general_inmobiliario_con_comision = n1 + n2
-                    general_inmobiliario_con_comision = unicode('{:,}'.format(general_inmobiliario_con_comision)).replace(",", ".")
-                    sheet.write(c, 6, general_inmobiliario_con_comision, style5)
-                    
+                    sheet.write(c, 5, 'IVA',style_titulos_columna)
+                    sheet.write(c, 6, pago['iva_comision'], style_datos_montos_subrayado)
+
+                    iva_comision = int(pago['iva_comision'].replace(".", ""))
+                    total_general_inmobiliaria = int(unicode(pago['total_general_inmobiliaria']).replace(".", ""))
+                    general_inmobiliario_con_comision = iva_comision + total_general_inmobiliaria
+                    general_inmobiliario_con_comision_txt = unicode('{:,}'.format(general_inmobiliario_con_comision)).replace(",", ".")
+
+
+                    c+=1
+                    sheet.write(c,6, general_inmobiliario_con_comision_txt, style_datos_montos)
+
                     c+=2
                     
-                    sheet.write_merge(c,c,0,7, "RESUMEN IMPOSITIVO Y OTROS DESCUENTOS",style_fraccion)
+                    sheet.write_merge(c,c,1,6, "RESUMEN IMPOSITIVO Y OTROS DESCUENTOS",style_subrayado_normal_titulo)
                     c+=1
-                    sheet.write(c, 2, "IVA Comisión", style_normal)
-                    sheet.write_merge(c,c,3,4, pago['iva_comision'], style4)
+                    sheet.write(c, 1, "Liquidacion Total", style_normal)
+                    sheet.write(c, 6, pago['total_general_pagado'], style_datos_montos)
+                    # sheet.write_merge(c,c,4,5, general_inmobiliario_con_comision, style_datos_montos)
+
                     c+=1
-                    sheet.write(c, 2, "Ley 1421/05",style_normal)
-                    sheet.write_merge(c,c,3,4, pago['ley'], style4)
+                    sheet.write(c, 1, "Monto Inmobiliaria", style_normal)
+                    sheet.write(c,5,general_inmobiliario_con_comision_txt, style_datos_montos)
+                    # sheet.write_merge(c,c,3,4, pago['iva_comision'], style_datos_montos)
+                    c+=1
+                    sheet.write(c, 1, "Retención IVA",style_normal)
+                    sheet.write(c, 5, pago['ley'], style_datos_montos)
+                    # sheet.write_merge(c,c,3,4, pago['ley'], style_datos_montos)
                     c+=1 
-                    sheet.write(c, 2, "Imp Renta 4.5%", style_normal)
-                    sheet.write_merge(c,c,3,4, pago['impuesto_renta'], style4)
+                    sheet.write(c, 1, "Imp Renta 4.5%", style_normal)
+                    sheet.write(c, 5, pago['impuesto_renta'], style_datos_montos)
+                    # sheet.write_merge(c,c,3,4, pago['impuesto_renta'], style_datos_montos)
                     c+=1
-                    sheet.write(c,2, "Otros Descuentos", style2)
+                    sheet.write(c,1, "Detalle de Otros Descuentos", style_subrayado_normal)
+                    sheet.write(c,2, "", style_subrayado_normal)
+                    sheet.write(c, 5, '', style_datos_montos)
+                    # sheet.write_merge(c,c,3,4,'', style_datos_montos)
                     c+=1
                     if descripcion !='':
-                        sheet.write(c,2, descripcion, style_normal)
-                        sheet.write_merge(c,c,3,4, monto_descuento, style4)
+                        sheet.write(c,1, descripcion, style_normal)
+                        sheet.write(c, 5, monto_descuento, style_datos_montos)
+                        # sheet.write_merge(c,c,3,4, monto_descuento, style_datos_montos)
                         c+=1
                     else:
-                        sheet.write(c,2, "Sin otros descuentos", style_normal)
-                        sheet.write_merge(c,c,3,4, "0", style4)
+                        sheet.write(c,1, "Sin otros descuentos", style_normal)
+                        sheet.write(c, 5, "0", style_datos_montos_subrayado)
+                        sheet.write(c, 6, "", style_datos_montos_subrayado)
+                        # sheet.write_merge(c,c,3,4, "0", style_datos_montos)
                         c+=1
-                    sheet.write(c, 2, "Total descuento", style2)
-                    sheet.write_merge(c,c,3,4, total_descuentos, style5)
-                    c+=1  
-                    sheet.write_merge(c,c,2,4, "Total a cobrar por el propietario: ", style2)
-                    sheet.write(c, 7, total_a_cobrar, style5)
+
+                    total_descuentos = int(pago['ley'].replace(".", "")) + int(pago['impuesto_renta'].replace(".", ""))+general_inmobiliario_con_comision
+                    total_descuentos_txt= unicode('{:,}'.format(total_descuentos)).replace(",", ".")
+                    sheet.write(c, 1, "Total descuentos", style_normal)
+                    sheet.write(c, 6, total_descuentos_txt, style_datos_montos)
+                    # sheet.write_merge(c,c,3,4, total_descuentos, style_datos_montos)
+                    c+=1
+                    sheet.write(c, 1, "Total a cobrar por el propietario: ", style_titulos_columna_resaltados)
+                    sheet.write(c, 2, "", style_titulos_columna_resaltados)
+                    sheet.write(c, 3, "", style_titulos_columna_resaltados)
+                    sheet.write(c, 4, "", style_titulos_columna_resaltados)
+                    sheet.write(c, 5, "", style_titulos_columna_resaltados)
+                    sheet.write(c, 6, total_a_cobrar, style_datos_montos_importante_doble_borde)
+                    # sheet.write(c, 7, total_a_cobrar, style_datos_montos_importante)
                     
                     
             except Exception, error:
@@ -3673,18 +3738,18 @@ def liquidacion_vendedores_reporte_excel(request):
     sheet = wb.add_sheet('test', cell_overwrite_ok=True)
     sheet.paper_size_code = 1
     style = xlwt.easyxf('pattern: pattern solid, fore_colour white;'
-                              'font: name Gill Sans MT Condensed, bold True; align: horiz center')   
+                              'font: name Calibri, bold True; align: horiz center')
     style2 = xlwt.easyxf('pattern: pattern solid, fore_colour white;'
-                         'font: name Gill Sans MT Condensed, bold True, height 160;')
-    style3 = xlwt.easyxf('font: name Gill Sans MT Condensed, height 160 ; align: horiz center')
-    style4 = xlwt.easyxf('font: name Gill Sans MT Condensed, height 160 ; align: horiz right')
-    style5 = xlwt.easyxf('pattern: pattern solid, fore_colour white;''font: name Gill Sans MT Condensed, bold True, height 160 ; align: horiz right')
+                         'font: name Calibri, bold True, height 200;')
+    style3 = xlwt.easyxf('font: name Calibri, height 200 ; align: horiz center')
+    style4 = xlwt.easyxf('font: name Calibri, height 200 ; align: horiz right')
+    style5 = xlwt.easyxf('pattern: pattern solid, fore_colour white;''font: name Calibri, bold True, height 200 ; align: horiz right')
     
-    style_normal = xlwt.easyxf('font: name Gill Sans MT Condensed, height 160;')
-    style_normal_centrado = xlwt.easyxf('font: name Gill Sans MT Condensed, height 160; align: horiz center')
+    style_normal = xlwt.easyxf('font: name Calibri, height 200;')
+    style_normal_centrado = xlwt.easyxf('font: name Calibri, height 200; align: horiz center')
     
     style_fraccion = xlwt.easyxf('pattern: pattern solid, fore_colour white;'
-                              'font: name Gill Sans MT Condensed, bold True; align: horiz center')  
+                              'font: name Calibri, bold True; align: horiz center')
     #Titulo
     #sheet.write_merge(0,0,0,7, 'PROPAR S.R.L.' ,style3)
     #sheet.write_merge(1,1,1,7, 'Sistema de Control de Loteamiento' ,style3)
@@ -4154,12 +4219,12 @@ def informe_movimientos_reporte_excel(request):
     sheet = wb.add_sheet('test', cell_overwrite_ok=True)
     sheet.paper_size_code = 1
     style = xlwt.easyxf('pattern: pattern solid, fore_colour white;'
-                              'font: name Gill Sans MT Condensed, bold True, height 160; align: horiz center')
-    style2 = xlwt.easyxf('font: name Gill Sans MT Condensed, height 160;')
+                              'font: name Calibri, bold True, height 200; align: horiz center')
+    style2 = xlwt.easyxf('font: name Calibri, height 200;')
         
-    style3 = xlwt.easyxf('font: name Gill Sans MT Condensed, height 160 ; align: horiz right')
+    style3 = xlwt.easyxf('font: name Calibri, height 200 ; align: horiz right')
         
-    style4 = xlwt.easyxf('font: name Gill Sans MT Condensed, height 160 ; align: horiz center')
+    style4 = xlwt.easyxf('font: name Calibri, height 200 ; align: horiz center')
         
     usuario = unicode(request.user)
     
@@ -4646,12 +4711,12 @@ def informe_ventas_reporte_excel(request):
     sheet = wb.add_sheet('test', cell_overwrite_ok=True)
     sheet.paper_size_code = 1
     style = xlwt.easyxf('pattern: pattern solid, fore_colour white;'
-                                'font: name Gill Sans MT Condensed, bold True, height 160; align: horiz center')
-    style2 = xlwt.easyxf('font: name Gill Sans MT Condensed, height 160;')
+                                'font: name Calibri, bold True, height 200; align: horiz center')
+    style2 = xlwt.easyxf('font: name Calibri, height 200;')
                         
-    style3 = xlwt.easyxf('font: name Gill Sans MT Condensed, height 160 ; align: horiz right')
+    style3 = xlwt.easyxf('font: name Calibri, height 200 ; align: horiz right')
                         
-    style4 = xlwt.easyxf('font: name Gill Sans MT Condensed, height 160 ; align: horiz center')
+    style4 = xlwt.easyxf('font: name Calibri, height 200 ; align: horiz center')
                         
     usuario = unicode(request.user)
                     
@@ -5087,15 +5152,15 @@ def informe_facturacion_reporte_excel(request):
                         sheet = wb.add_sheet('test', cell_overwrite_ok=True)
                         sheet.paper_size_code = 1
                         style_titulo = xlwt.easyxf('pattern: pattern solid, fore_colour white;'
-                                                  'font: name Gill Sans MT Condensed, bold True, height 160; align: horiz center')
-                        style_normal = xlwt.easyxf('font: name Gill Sans MT Condensed, height 160;')
+                                                  'font: name Calibri, bold True, height 200; align: horiz center')
+                        style_normal = xlwt.easyxf('font: name Calibri, height 200;')
                             
-                        style_derecha = xlwt.easyxf('font: name Gill Sans MT Condensed, height 160 ; align: horiz right')
+                        style_derecha = xlwt.easyxf('font: name Calibri, height 200 ; align: horiz right')
                             
-                        style_centrado = xlwt.easyxf('font: name Gill Sans MT Condensed, height 160 ; align: horiz center')
+                        style_centrado = xlwt.easyxf('font: name Calibri, height 200 ; align: horiz center')
                         
                         style_titulo_derecha = xlwt.easyxf('pattern: pattern solid, fore_colour white;'
-                                                  'font: name Gill Sans MT Condensed, bold True, height 160; align: horiz right')
+                                                  'font: name Calibri, bold True, height 200; align: horiz right')
                             
                         usuario = unicode(request.user)
                         
