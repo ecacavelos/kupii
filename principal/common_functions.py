@@ -21,17 +21,16 @@ import math
 import json
 
 def get_cuotas_detail_by_lote(lote_id):
+
     print("buscando pagos del lote --> " + lote_id);
     # El query es: select sum(nro_cuotas_a_pagar) from principal_pagodecuotas where lote_id = 16108;
     venta = get_ultima_venta(lote_id)
-    # ventas = Venta.objects.filter(lote_id=lote_id)
-    # for item_venta in ventas:
-    #     print 'Obteniendo la ultima venta'
-    #     try:
-    #         RecuperacionDeLotes.objects.get(venta=item_venta.id)
-    #     except RecuperacionDeLotes.DoesNotExist:
-    #         print 'se encontro la venta no recuperada, la venta actual'
-    #         venta = item_venta
+
+    # Chequeamos si es una venta contado
+    contado = False;
+    if venta.plan_de_pago.tipo_de_plan == 'contado':
+        contado = True;
+
     cant_cuotas_pagadas = PagoDeCuotas.objects.filter(venta=venta).aggregate(Sum('nro_cuotas_a_pagar'))
     plan_de_pago = PlanDePago.objects.get(id=venta.plan_de_pago.id)
     # calcular la fecha de vencimiento.    
@@ -49,6 +48,7 @@ def get_cuotas_detail_by_lote(lote_id):
 
     datos = dict([('cant_cuotas_pagadas', cant_cuotas_pagadas['nro_cuotas_a_pagar__sum']),
                   ('cantidad_total_cuotas', plan_de_pago.cantidad_de_cuotas),
+                  ('contado', contado),
                   ('proximo_vencimiento', proximo_vencimiento)])
     return datos
 
@@ -196,6 +196,18 @@ def get_cuota_information_by_lote(lote_id,cuotas_pag, facturar = False, ver_venc
             cuota_a_pagar= {}
         
     return cuotas_a_pagar
+
+def get_cuota_information_by_pagodecuota(pagodecuota_id):
+
+    cant_cuotas_pagadas = {}
+
+    cant_cuotas_pagadas = PagoDeCuotas.objects.filter(pk=pagodecuota_id).aggregate(Sum('nro_cuotas_a_pagar'))
+
+
+
+    return cant_cuotas_pagadas
+
+
             
 def filtros_establecidos(request, tipo_informe):
     
@@ -299,124 +311,129 @@ def obtener_dias_atraso (fecha_pago_parsed, fecha_vencimiento_parsed):
     return dias_atraso
 
 def obtener_detalle_interes_lote(lote_id,fecha_pago_parsed,proximo_vencimiento_parsed, nro_cuotas_a_pagar):
-    
-            resumen_lote=get_cuotas_detail_by_lote(unicode(lote_id))
-            cuotas_pagadas=resumen_lote['cant_cuotas_pagadas']
-            
-            detalles=[]
-            sumatoria_intereses = 0
-            #El cliente tiene cuotas atrasadas
-            if fecha_pago_parsed>proximo_vencimiento_parsed:
-                
-    #         TODO:
-    #         Se calcula la diferencia en dias de la fecha del pago que se esta realizando, con 
-    #         respecto a la fecha de vencimiento de dicho pago. El porcentaje de interes que se aplica
-    #         sobre las cuotas es constante: 0.001 (0.03/30) -> 3% interes mensual/30
-    #         + interes punitorio (0.00030) + iva = (interes mensual + interes punitorio)* (10%)=(0.00013)
 
-                venta = get_ultima_venta(lote_id)
+            # Si se tienen cuotas en MORA.
+            if (nro_cuotas_a_pagar > 0 ):
 
-                #Calculamos en base al primer vencimiento, cuantas cuotas debieron haberse pagado hasta la fecha
-                fecha_primer_vencimiento=venta.fecha_primer_vencimiento
-                cantidad_ideal_cuotas=monthdelta(fecha_primer_vencimiento, fecha_pago_parsed) +1
-                        #cantidad_ideal_cuotas=monthdelta(fecha_primer_vencimiento, fecha_pago_parsed) +1
-                #Y obtenemos las cuotas atrasadas
-                cuotas_atrasadas=cantidad_ideal_cuotas-cuotas_pagadas
-                
-                if cuotas_atrasadas == 0:
-                    fecha_proximo_vencimiento_dias = proximo_vencimiento_parsed
-                    fecha_pago_dias = fecha_pago_parsed
-                    dias_atraso = fecha_pago_dias - fecha_proximo_vencimiento_dias
-                    if dias_atraso.days > 5:
-                        cuotas_atrasadas = 1
-                
-                monto_cuota=venta.precio_de_cuota
-                
-                #Intereses (valores constantes)
-                #Interes moratorio por dia
-                interes=0.001
-                
-                #Interes
-                #interes_punitorio=0.00030
-                
-                #Intereses IVA
-                #interes_iva=0.00013
-                interes_iva=0.0001
-                #total_intereses=interes+interes_punitorio+interes_iva
-                total_intereses=interes+interes_iva
-                #Verificar si tiene cuotas de refuerzo
-                if venta.plan_de_pago.cuotas_de_refuerzo != 0:
-                    pagos = get_pago_cuotas(venta, None, None)
-                    cantidad_pagos_ref = cant_cuotas_pagadas_ref(pagos)
-                    es_ref= True    
-                else:
-                    cantidad_pagos_ref = 0
-                    es_ref= False
-                    
-                if int(nro_cuotas_a_pagar) < int(cuotas_atrasadas):
-                    rango = int(nro_cuotas_a_pagar)
-                else:
-                    rango = int(cuotas_atrasadas)
-                    
-                for cuota in range(rango):
-                    detalle={}
-                    fecha_vencimiento=proximo_vencimiento_parsed+MonthDelta(cuota)
-                    dias_atraso=(fecha_pago_parsed-fecha_vencimiento).days
-                    nro_cuota = cuotas_pagadas+(cuota+1)
-                    if es_ref == True:
-                        if (nro_cuota % venta.plan_de_pago.intervalo_cuota_refuerzo) == 0 and cantidad_pagos_ref < venta.plan_de_pago.cuotas_de_refuerzo:
-                            monto_cuota = venta.monto_cuota_refuerzo
-                            cantidad_pagos_ref += 1
+                resumen_lote=get_cuotas_detail_by_lote(unicode(lote_id))
+                cuotas_pagadas=resumen_lote['cant_cuotas_pagadas']
+
+                detalles=[]
+                sumatoria_intereses = 0
+                #El cliente tiene cuotas atrasadas
+                if fecha_pago_parsed>proximo_vencimiento_parsed:
+
+        #         TODO:
+        #         Se calcula la diferencia en dias de la fecha del pago que se esta realizando, con
+        #         respecto a la fecha de vencimiento de dicho pago. El porcentaje de interes que se aplica
+        #         sobre las cuotas es constante: 0.001 (0.03/30) -> 3% interes mensual/30
+        #         + interes punitorio (0.00030) + iva = (interes mensual + interes punitorio)* (10%)=(0.00013)
+
+                    venta = get_ultima_venta(lote_id)
+
+                    #Calculamos en base al primer vencimiento, cuantas cuotas debieron haberse pagado hasta la fecha
+                    fecha_primer_vencimiento=venta.fecha_primer_vencimiento
+                    cantidad_ideal_cuotas=monthdelta(fecha_primer_vencimiento, fecha_pago_parsed) +1
+                            #cantidad_ideal_cuotas=monthdelta(fecha_primer_vencimiento, fecha_pago_parsed) +1
+                    #Y obtenemos las cuotas atrasadas
+                    cuotas_atrasadas=cantidad_ideal_cuotas-cuotas_pagadas
+
+                    if cuotas_atrasadas == 0:
+                        fecha_proximo_vencimiento_dias = proximo_vencimiento_parsed
+                        fecha_pago_dias = fecha_pago_parsed
+                        dias_atraso = fecha_pago_dias - fecha_proximo_vencimiento_dias
+                        if dias_atraso.days > 5:
+                            cuotas_atrasadas = 1
+
+                    monto_cuota=venta.precio_de_cuota
+
+                    #Intereses (valores constantes)
+                    #Interes moratorio por dia
+                    interes=0.001
+
+                    #Interes
+                    #interes_punitorio=0.00030
+
+                    #Intereses IVA
+                    #interes_iva=0.00013
+                    interes_iva=0.0001
+                    #total_intereses=interes+interes_punitorio+interes_iva
+                    total_intereses=interes+interes_iva
+                    #Verificar si tiene cuotas de refuerzo
+                    if venta.plan_de_pago.cuotas_de_refuerzo != 0:
+                        pagos = get_pago_cuotas(venta, None, None)
+                        cantidad_pagos_ref = cant_cuotas_pagadas_ref(pagos)
+                        es_ref= True
+                    else:
+                        cantidad_pagos_ref = 0
+                        es_ref= False
+
+                    if int(nro_cuotas_a_pagar) < int(cuotas_atrasadas):
+                        rango = int(nro_cuotas_a_pagar)
+                    else:
+                        rango = int(cuotas_atrasadas)
+
+                    for cuota in range(rango):
+                        detalle={}
+                        fecha_vencimiento=proximo_vencimiento_parsed+MonthDelta(cuota)
+                        dias_atraso=(fecha_pago_parsed-fecha_vencimiento).days
+                        nro_cuota = cuotas_pagadas+(cuota+1)
+                        if es_ref == True:
+                            if (nro_cuota % venta.plan_de_pago.intervalo_cuota_refuerzo) == 0 and cantidad_pagos_ref < venta.plan_de_pago.cuotas_de_refuerzo:
+                                monto_cuota = venta.monto_cuota_refuerzo
+                                cantidad_pagos_ref += 1
+                            else:
+                                monto_cuota=venta.precio_de_cuota
                         else:
                             monto_cuota=venta.precio_de_cuota
-                    else:
-                        monto_cuota=venta.precio_de_cuota
-                    
-                    detalle['vencimiento']=fecha_vencimiento.strftime('%d/%m/%Y')                 
-                    fecha_ultimo_vencimiento = datetime.datetime.strptime(detalle['vencimiento'], "%d/%m/%Y").date()
-                    fecha_dias_gracia = fecha_ultimo_vencimiento + datetime.timedelta(days=5)
-                    dias_habiles = calcular_dias_habiles(fecha_ultimo_vencimiento,fecha_dias_gracia)
 
-                    if dias_habiles<5:
-                        fecha_ultimo_vencimiento = fecha_dias_gracia+datetime.timedelta(days=5-dias_habiles)
-                    detalle['vencimiento_gracia']=fecha_ultimo_vencimiento.strftime('%d/%m/%Y')
-                    
-                    if fecha_pago_parsed > fecha_ultimo_vencimiento:
-                        intereses=math.ceil(total_intereses*dias_atraso*monto_cuota)
-                        redondeado=roundup(intereses)
-                    else:
-                        intereses = 0
-                        redondeado=roundup(intereses)
-                        
-                    detalle['interes']=interes
-                    #detalle['interes_punitorio']=interes_punitorio
-                    detalle['interes_iva']=interes_iva
-                    detalle['nro_cuota']=nro_cuota
-                    detalle['dias_atraso']=dias_atraso
-                    detalle['intereses']=redondeado
-                    
-                    detalle['tipo']='normal';
+                        detalle['vencimiento']=fecha_vencimiento.strftime('%d/%m/%Y')
+                        fecha_ultimo_vencimiento = datetime.datetime.strptime(detalle['vencimiento'], "%d/%m/%Y").date()
+                        fecha_dias_gracia = fecha_ultimo_vencimiento + datetime.timedelta(days=5)
+                        dias_habiles = calcular_dias_habiles(fecha_ultimo_vencimiento,fecha_dias_gracia)
 
-                    sumatoria_intereses += redondeado
-                    
-                    detalles.append(detalle)
+                        if dias_habiles<5:
+                            fecha_ultimo_vencimiento = fecha_dias_gracia+datetime.timedelta(days=5-dias_habiles)
+                        detalle['vencimiento_gracia']=fecha_ultimo_vencimiento.strftime('%d/%m/%Y')
 
-                #Calculamos en base al primer vencimiento, cuantas cuotas debieron haberse pagado hasta la fecha
-                #fecha_vencimiento_mes_pago = fecha_primer_vencimiento + MonthDelta(+cantidad_ideal_cuotas)
-                #fecha_dias_gracia = fecha_vencimiento_mes_pago + datetime.timedelta(days=5)
-                #dias_habiles = calcular_dias_habiles(fecha_vencimiento_mes_pago,fecha_dias_gracia)
-                #if dias_habiles<5:
-                #    fecha_vencimiento_mes_pago = fecha_dias_gracia+datetime.timedelta(days=5-dias_habiles)
-                #cantidad_ideal_cuotas=monthdelta(fecha_primer_vencimiento, fecha_vencimiento_mes_pago)
-                #cuotas_atrasadas=cantidad_ideal_cuotas-cuotas_pagadas
-                
-                if cuotas_atrasadas>=6:
-                    #gestion_cobranza = int(0.1*(math.ceil(float(cuotas_atrasadas*monto_cuota))+sumatoria_intereses))
-                    gestion_cobranza = roundup(0.05*((cuotas_atrasadas*monto_cuota)+sumatoria_intereses) + (0.05*((cuotas_atrasadas*monto_cuota)+sumatoria_intereses))*0.10)
-                    detalles.append({'gestion_cobranza':gestion_cobranza, 'tipo': 'gestion_cobranza'})
-                    
-            print detalles
-            return detalles
+                        if fecha_pago_parsed > fecha_ultimo_vencimiento:
+                            intereses=math.ceil(total_intereses*dias_atraso*monto_cuota)
+                            redondeado=roundup(intereses)
+                        else:
+                            intereses = 0
+                            redondeado=roundup(intereses)
+
+                        detalle['interes']=interes
+                        #detalle['interes_punitorio']=interes_punitorio
+                        detalle['interes_iva']=interes_iva
+                        detalle['nro_cuota']=nro_cuota
+                        detalle['dias_atraso']=dias_atraso
+                        detalle['intereses']=redondeado
+
+                        detalle['tipo']='normal';
+
+                        sumatoria_intereses += redondeado
+
+                        detalles.append(detalle)
+
+                    #Calculamos en base al primer vencimiento, cuantas cuotas debieron haberse pagado hasta la fecha
+                    #fecha_vencimiento_mes_pago = fecha_primer_vencimiento + MonthDelta(+cantidad_ideal_cuotas)
+                    #fecha_dias_gracia = fecha_vencimiento_mes_pago + datetime.timedelta(days=5)
+                    #dias_habiles = calcular_dias_habiles(fecha_vencimiento_mes_pago,fecha_dias_gracia)
+                    #if dias_habiles<5:
+                    #    fecha_vencimiento_mes_pago = fecha_dias_gracia+datetime.timedelta(days=5-dias_habiles)
+                    #cantidad_ideal_cuotas=monthdelta(fecha_primer_vencimiento, fecha_vencimiento_mes_pago)
+                    #cuotas_atrasadas=cantidad_ideal_cuotas-cuotas_pagadas
+
+                    if cuotas_atrasadas>=6:
+                        #gestion_cobranza = int(0.1*(math.ceil(float(cuotas_atrasadas*monto_cuota))+sumatoria_intereses))
+                        gestion_cobranza = roundup(0.05*((cuotas_atrasadas*monto_cuota)+sumatoria_intereses) + (0.05*((cuotas_atrasadas*monto_cuota)+sumatoria_intereses))*0.10)
+                        detalles.append({'gestion_cobranza':gestion_cobranza, 'tipo': 'gestion_cobranza'})
+
+                print detalles
+                return detalles
+            else:
+                return []
         
         
 def obtener_cuotas_a_pagar(venta,fecha_pago,resumen_cuotas_a_pagar):
@@ -490,6 +507,92 @@ def obtener_cuotas_a_pagar(venta,fecha_pago,resumen_cuotas_a_pagar):
                  }
         lista_cuotas.append(cuota)
         
+    return lista_cuotas
+
+
+def obtener_cuotas_a_pagar_full(venta,fecha_pago,resumen_cuotas_a_pagar, maximo_atraso):
+
+    lista_cuotas = []
+    cantidad_cuotas = 0
+    sumatoria_cuotas = 0
+
+    if (resumen_cuotas_a_pagar['contado'] == False):
+
+        if (datetime.datetime.strptime(resumen_cuotas_a_pagar['proximo_vencimiento'], "%d/%m/%Y").date() < fecha_pago):
+
+            print 'Hay al menos 1 cuota en mora'
+
+            # Calculamos en base al primer vencimiento, cuantas cuotas debieron haberse pagado hasta la fecha
+            fecha_primer_vencimiento=venta.fecha_primer_vencimiento
+
+            # Obtenemos las cuotas atrasadas
+            cuotas_atrasadas = int(resumen_cuotas_a_pagar['cantidad_total_cuotas'])-int(resumen_cuotas_a_pagar['cant_cuotas_pagadas'])
+
+            intereses = obtener_detalle_interes_lote(venta.lote.id,fecha_pago,datetime.datetime.strptime(resumen_cuotas_a_pagar['proximo_vencimiento'], "%d/%m/%Y").date(),cuotas_atrasadas)
+            interes_total = 0
+
+            if len(intereses)<=maximo_atraso: # Hasta 300 cuotas (infinito)
+
+                for interes_item in intereses:
+
+                    if interes_item['tipo'] == 'normal':
+
+                        cantidad_cuotas = cantidad_cuotas+1
+                        interes_total+=interes_item['intereses']
+                        sumatoria_cuotas = sumatoria_cuotas + venta.precio_de_cuota + interes_total
+                        cuota = {
+                            'cantidad_sumatoria_cuotas': cantidad_cuotas,
+                            'numero_cuota': interes_item['nro_cuota'],
+                            'monto_cuota':venta.precio_de_cuota,
+                            'interes': interes_item['intereses'],
+                            'interes_total': interes_total,
+                            'monto_total_a_pagar': venta.precio_de_cuota +  interes_total,
+                            'vencimiento': interes_item['vencimiento'],
+                            'fecha_pago' : fecha_pago.strftime("%d/%m/%Y"),
+                            'monto_sumatoria_cuotas': sumatoria_cuotas
+                            }
+                    else:
+                        cuota = {};
+
+                    lista_cuotas.append(cuota)
+                # Ademas de las cuotas con mora se agrega la cuota actual que es posible pagar
+                vencimiento_cuota_acutal = datetime.datetime.strptime(resumen_cuotas_a_pagar['proximo_vencimiento'], "%d/%m/%Y").date() + MonthDelta(len(intereses))
+                cuota = {
+                     'cantidad_sumatoria_cuotas': cantidad_cuotas+1,
+                     'numero_cuota': resumen_cuotas_a_pagar['cant_cuotas_pagadas'] + len(intereses) + 1 ,
+                     'monto_cuota':venta.precio_de_cuota,
+                     'interes': 0,
+                     'interes_total': 0,
+                     'monto_total_a_pagar': venta.precio_de_cuota,
+                     'vencimiento': vencimiento_cuota_acutal.strftime("%d/%m/%Y"),
+                     'fecha_pago' : fecha_pago.strftime("%d/%m/%Y"),
+                     'monto_sumatoria_cuotas': sumatoria_cuotas+venta.precio_de_cuota
+                     }
+                lista_cuotas.append(cuota)
+            else:
+
+                error_item = {}
+                error_item['codigo'] = '33'
+                error_item['mensaje'] = 'Compra con mas de ' + maximo_atraso +  ' meses de atraso'
+                error = {'error': error_item}
+                return error
+        else:
+            print 'Cliente esta al dia, solo debe abonar una cuota'
+            cuota = {'cantidad_sumatoria_cuotas': 1,
+                     'numero_cuota': resumen_cuotas_a_pagar['cant_cuotas_pagadas'] + 1 ,
+                     'monto_cuota':venta.precio_de_cuota,
+                     'interes': 0,
+                     'interes_total': 0,
+                     'monto_total_a_pagar': venta.precio_de_cuota,
+                     'vencimiento': resumen_cuotas_a_pagar['proximo_vencimiento'],
+                     'fecha_pago' : fecha_pago.strftime("%d/%m/%Y"),
+                     'monto_sumatoria_cuotas': sumatoria_cuotas+venta.precio_de_cuota
+                     }
+            lista_cuotas.append(cuota)
+    else:
+        print 'Es una venta al CONTADO'
+        lista_cuotas = []
+
     return lista_cuotas
 
 def verificar_permisos(user_id, permiso):

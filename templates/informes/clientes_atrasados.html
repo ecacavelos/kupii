@@ -123,7 +123,7 @@
 	<table border="1.5"cellpadding="0" cellspacing="0" class="listado-clientes-atrasados" align="center">
 		<th>Cliente</th><th>Telefono</th><th>Direccion</th><th>Cod. Lote</th><th>Cuotas Atras.</th>
 		<th>Cuotas Pag.</th><th>Importe Cuota</th><th>Total Atras.</th><th>Total Pag.</th>
-		<th>Valor Total Lote</th><th>%Pag</th><th>Fec. Ultimo. Pago</th>		
+		<th>%Pag</th><th>Fec. Ultimo. Pago</th>
 		{% for hw in object_list %}
 			{% if forloop.counter|divisibleby:2 %}
 		<tr>
@@ -163,7 +163,6 @@
 			<td>{{hw.importe_cuota}}</td>
 			<td>{{hw.total_atrasado}}</td>
 			<td>{{hw.total_pagado}}</td>
-			<td>{{hw.valor_total_lote}}</td>
 			<td>{{hw.porc_pagado}}</td>
 			<td>{{hw.fecha_ultimo_pago}}</td>
 		</tr>
@@ -206,7 +205,6 @@
 			<td>{{hw.importe_cuota}}</td>
 			<td>{{hw.total_atrasado}}</td>
 			<td>{{hw.total_pagado}}</td>
-			<td>{{hw.valor_total_lote}}</td>
 			<td>{{hw.porc_pagado}}</td>
 			<td>{{hw.fecha_ultimo_pago}}</td>
 		</tr>
