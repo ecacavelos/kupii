@@ -279,7 +279,7 @@ def clientes_atrasados(request):
                 clientes_atrasados= []
 
                 # PARAMETROS
-                meses_peticion = 0
+                meses_peticion = 1
                 fraccion =''
 
 
@@ -288,21 +288,30 @@ def clientes_atrasados(request):
                 '''
                 select lote.* from principal_fraccion fraccion, principal_manzana manzana, principal_lote lote WHERE manzana.id = lote.manzana_id AND manzana.fraccion_id = fraccion.id
                 '''
-                )      
+                )
+
+                # FILTROS:
+                #     NI FRACCION NI MESES DE ATRASO SETEADOS
+                #          RETURN 0
+                #     FRACCION SETEADA PERO MESES DE ATRASO NO
+                #         RETURN 1
+                #     FRACCION NO SETEADA PERO SI MESES DE ATRASO
+                #         return 2
+                #     AMBOS SETEADOS
+                #         RETURN 3
+
                 if filtros == 0:
-                    meses_peticion = 0
                     c = RequestContext(request, {
                         'object_list': [],
                     })
                     return HttpResponse(t.render(c))            
                 elif filtros == 1:
-                    # fraccion = request.GET['fraccion']
-                    # query += "AND  fraccion.fraccion_id =  %s"
+                    fraccion = request.GET['fraccion']
+                    query += " AND  fraccion.id =  %s "
                     cursor = connection.cursor()
                     cursor.execute(query, [fraccion])              
                 elif filtros == 2:
-                    # meses_peticion = int(request.GET['meses_atraso'])
-                    # query += "AND (pp.cantidad_de_cuotas - pv.pagos_realizados) = %s"
+                    meses_peticion = int(request.GET['meses_atraso'])
                     cursor = connection.cursor()
                     cursor.execute(query, [meses_peticion])  
                 else:
@@ -805,10 +814,39 @@ def liquidacion_propietarios(request):
                                 fraccion_id = request.GET['busqueda']
                                 pagos =[]
                                 fraccion = Fraccion.objects.get(pk= fraccion_id)
-                                ventas = Venta.objects.filter(lote__manzana__fraccion =fraccion_id).order_by('id')                                           
-                                
-                                for venta in ventas:
-                                    
+                                # ventas = Venta.objects.filter(lote__manzana__fraccion =fraccion_id).order_by('lote_id')
+                                query = ('''
+                                    SELECT
+                                      "principal_lote"."codigo_paralot",
+                                      "principal_venta"."id",
+                                      "principal_venta"."lote_id",
+                                      "principal_venta"."fecha_de_venta",
+                                      "principal_venta"."cliente_id",
+                                      "principal_venta"."vendedor_id",
+                                      "principal_venta"."plan_de_pago_id",
+                                      "principal_venta"."entrega_inicial",
+                                      "principal_venta"."precio_de_cuota",
+                                      "principal_venta"."precio_final_de_venta",
+                                      "principal_venta"."fecha_primer_vencimiento",
+                                      "principal_venta"."pagos_realizados",
+                                      "principal_venta"."importacion_paralot",
+                                      "principal_venta"."plan_de_pago_vendedor_id",
+                                      "principal_venta"."monto_cuota_refuerzo",
+                                      "principal_venta"."recuperado"
+                                    FROM "principal_venta"
+                                      INNER JOIN "principal_lote" ON ("principal_venta"."lote_id" = "principal_lote"."id")
+                                      INNER JOIN "principal_manzana" ON ("principal_lote"."manzana_id" = "principal_manzana"."id")
+                                    WHERE "principal_manzana"."fraccion_id" = %s
+                                    ORDER BY "principal_lote"."codigo_paralot" ASC
+                                ''')
+                                cursor = connection.cursor()
+                                cursor.execute(query, [fraccion_id])
+                                ventas = cursor.fetchall()
+
+                                for venta_obtenida in ventas:
+
+                                    venta = Venta.objects.get(pk=venta_obtenida[1])
+
                                     if venta.plan_de_pago.tipo_de_plan == "contado":
                                         if venta.fecha_de_venta >= fecha_ini_parsed and venta.fecha_de_venta <= fecha_fin_parsed :
                                             montos = calculo_montos_liquidacion_propietarios_contado(venta)
@@ -954,7 +992,7 @@ def liquidacion_propietarios(request):
                                         
                                             
                                 #Totales GENERALES
-                                filas = sorted(filas, key=lambda f: f['fecha_de_pago_order'])
+                                # filas = sorted(filas, key=lambda f: f['fecha_de_pago_order'])
                                 #try:
                                 filas[0]['misma_fraccion']= False
                                 #except Exception, error:
