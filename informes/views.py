@@ -331,11 +331,17 @@ def clientes_atrasados(request):
                 for r in results: #RECORREMOS TODOS LOS LOTES DE LA FRACCION
 
                     cliente_atrasado = {}
+
                     # OBTENER LA ULTIMA VENTA Y SU DETALLE
                     ultima_venta = get_ultima_venta(r[0])
-                    detalle_cuotas = get_cuotas_detail_by_lote(unicode(str(r[0])))
-                    hoy = date.today()
-                    cuotas_a_pagar = obtener_cuotas_a_pagar_full(ultima_venta, hoy, detalle_cuotas,500) #Maximo atraso = 500 para tener un parametro maximo de atraso en las cuotas.
+
+                    # SE TRATAN LOS CASOS EN DONDE NO SE ENCUENTRA VENTA PARA ALGUN LOTE.
+                    if ultima_venta != None:
+                        detalle_cuotas = get_cuotas_detail_by_lote(unicode(str(r[0])))
+                        hoy = date.today()
+                        cuotas_a_pagar = obtener_cuotas_a_pagar_full(ultima_venta, hoy, detalle_cuotas,500) #Maximo atraso = 500 para tener un parametro maximo de atraso en las cuotas.
+                    else:
+                        cuotas_a_pagar = []
 
 
                     if (len(cuotas_a_pagar) >= meses_peticion+1):
@@ -3372,6 +3378,7 @@ def liquidacion_propietarios_reporte_excel(request):
         # style_datos = xlwt.easyxf('pattern: pattern solid, fore_colour white;''font: name Calibri, height 200 ; align: horiz right')
 
         style_normal = xlwt.easyxf('font: name Calibri, height 200;')
+        style_normal_subrayado_palabra = xlwt.easyxf('font: name Calibri, height 200;')
         style_subrayado_normal = xlwt.easyxf('font: name Calibri, height 200;')
         style_subrayado_normal_titulo = xlwt.easyxf('font: name Calibri, height 200; align: horiz center')
         style_doble_subrayado = xlwt.easyxf('font: name Calibri, height 200;')
@@ -3402,6 +3409,11 @@ def liquidacion_propietarios_reporte_excel(request):
         border_doble_subrayado.bottom = xlwt.Borders.THIN
         style_doble_subrayado.borders = border_doble_subrayado
 
+        # font
+        font = xlwt.Font()
+        font.underline = True
+        style_normal_subrayado_palabra.font = font
+
 
 
         #Titulo
@@ -3417,7 +3429,7 @@ def liquidacion_propietarios_reporte_excel(request):
          u"&C&8PROPAR S.R.L.\n LIQUIDACION DE PROPIETARIOS "
          u"&R&8Periodo del "+periodo_1+" al "+periodo_2+" \nPage &P of &N"
          )
-        #sheet.footer_str = 'things'
+        sheet.footer_str = ''
 
 
 
@@ -3439,7 +3451,7 @@ def liquidacion_propietarios_reporte_excel(request):
                 try:
                     if pago['misma_fraccion'] == False:
                         #sheet.write(c, 0, "Fraccion: " + pago['fraccion'],style2)
-                        sheet.write_merge(c,c,0,7, pago['fraccion'],style_fraccion)
+                        sheet.write_merge(c,c,0,7, pago['fraccion'] + ' (' + propietario.nombres + ' ' + propietario.apellidos + ')',style_fraccion)
                         c +=1
                         sheet.write(c, 0, 'Lote', style_titulos_columna_resaltados_centrados)
                         sheet.write(c, 1, 'Fecha de pago', style_titulos_columna_resaltados_centrados)
@@ -3514,8 +3526,8 @@ def liquidacion_propietarios_reporte_excel(request):
                         sheet.write(c, 5, pago['impuesto_renta'], style_datos_montos)
                         # sheet.write_merge(c,c,3,4, pago['impuesto_renta'], style_datos_montos)
                         c+=1
-                        sheet.write(c,1, "Detalle de Otros Descuentos", style_subrayado_normal)
-                        sheet.write(c,2, "", style_subrayado_normal)
+                        sheet.write(c,1, "Detalle de Otros Descuentos", style_normal_subrayado_palabra)
+                        # sheet.write(c,2, "", style_subrayado_normal)
                         sheet.write(c, 5, '', style_datos_montos)
                         # sheet.write_merge(c,c,3,4,'', style_datos_montos)
                         c+=1

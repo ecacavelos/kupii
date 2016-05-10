@@ -991,6 +991,7 @@ def roundup(interes):
 
 #Funcion que encuentra todas las ventas de un lote y retorna la ultima
 def get_ultima_venta(lote_id):
+
     ventas = Venta.objects.filter(lote_id=lote_id).order_by('fecha_de_venta')
     for item_venta in ventas:
         print 'Obteniendo la ultima venta'
@@ -1000,6 +1001,14 @@ def get_ultima_venta(lote_id):
         except RecuperacionDeLotes.DoesNotExist:
             print 'se encontro la venta no recuperada, la venta actual'
             venta = item_venta
+
+    if 'venta' in locals():
+        print 'SE ENCONTRO LA VENTA'
+    else:
+        print 'NO SE ENCONTRO LA VENTA'
+        venta = None
+
+
 
     return venta
 
