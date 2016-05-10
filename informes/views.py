@@ -3451,7 +3451,11 @@ def liquidacion_propietarios_reporte_excel(request):
                 try:
                     if pago['misma_fraccion'] == False:
                         #sheet.write(c, 0, "Fraccion: " + pago['fraccion'],style2)
-                        sheet.write_merge(c,c,0,7, pago['fraccion'] + ' (' + propietario.nombres + ' ' + propietario.apellidos + ')',style_fraccion)
+                        if 'propietario' in locals():
+                            fraccion_str = pago['fraccion'] + ' (' + propietario.nombres + ' ' + propietario.apellidos + ')'
+                        else:
+                            fraccion_str = pago['fraccion'] + ' (' + fraccion.propietario.nombres + ' ' + fraccion.propietario.apellidos + ')'
+                        sheet.write_merge(c,c,0,7, fraccion_str ,style_fraccion)
                         c +=1
                         sheet.write(c, 0, 'Lote', style_titulos_columna_resaltados_centrados)
                         sheet.write(c, 1, 'Fecha de pago', style_titulos_columna_resaltados_centrados)
@@ -3527,7 +3531,7 @@ def liquidacion_propietarios_reporte_excel(request):
                         # sheet.write_merge(c,c,3,4, pago['impuesto_renta'], style_datos_montos)
                         c+=1
                         sheet.write(c,1, "Detalle de Otros Descuentos", style_normal_subrayado_palabra)
-                        # sheet.write(c,2, "", style_subrayado_normal)
+                        sheet.write(c,2, "", style_normal)
                         sheet.write(c, 5, '', style_datos_montos)
                         # sheet.write_merge(c,c,3,4,'', style_datos_montos)
                         c+=1
