@@ -224,7 +224,7 @@ function autocompletePlandePagoVendedor(input_id,  id_plandepago_vendedor_input_
 			alert("Al modificar el plan de pago esto modificara a todos los pagos relacionados a la venta");
 			planpago_vendedor_id = ui.item.id;
 			$(input_id).val(ui.item.nombre);
-			$(id_plandepago_input_id).val(planpago_vendedor_id);
+			$("#id_plan_de_pago_vendedor").val(planpago_vendedor_id);
 			$(this).trigger('change'); 
     		return false; 
 		}
