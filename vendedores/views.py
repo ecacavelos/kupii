@@ -132,7 +132,7 @@ def agregar_vendedores(request):
             form.save()
             # Redireccionamos al listado de lotes luego de agregar el nuevo lote.
             #return HttpResponseRedirect('/vendedores/listado')
-            return HttpResponseRedirect(reverse('frontend_listado_lotes'))
+            return HttpResponseRedirect(reverse('frontend_listado_vendedores'))
     else:
         form = VendedorForm()
 
