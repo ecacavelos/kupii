@@ -110,15 +110,15 @@ function autocompleteClienteRucONombre(input_id, cedula_input_id, id_cliente_inp
 		minLength : 1,
 		create : function(){
 			$(this).data('ui-autocomplete')._renderItem = function(ul,item){
-				return $('<li>').append('<a>' +item.fields.nombres + " "+ item.fields.apellidos+'</a>').appendTo(ul);
+				return $('<li>').append('<a>' +item.nombres + " "+ item.apellidos+'</a>').appendTo(ul);
 				};
 		},
 		select : function(event, ui) {
 			event.preventDefault();
 			alert("Al modificar el cliente esto modificara a todos los pagos relacionados a la venta");
-			cliente_id = ui.item.pk;
-			cedula_cliente= ui.item.fields.cedula;
-			$(input_id).val(ui.item.fields.nombres+" "+ui.item.fields.apellidos);
+			cliente_id = ui.item.id;
+			cedula_cliente= ui.item.cedula;
+			$(input_id).val(ui.item.nombres+" "+ui.item.apellidos);
 			//name_cliente=ui.item.fields.nombres+" "+ui.item.fields.apellidos;
 			//$("#id_name_cliente").val(name_cliente);
 			$(id_cliente_input_id).val(cliente_id);
@@ -209,7 +209,7 @@ function autocompletePlandePagoVendedor(input_id,  id_plandepago_vendedor_input_
 	input_id = '#' + input_id;
 	id_plandepago_vendedor_input_id = '#' + id_plandepago_vendedor_input_id;
 	var planpago_vendedor_id;
-	$(input_id).empty();		
+	$(input_id).empty();
 	base_url = base_context + "/ajax/get_plan_pago_vendedor/";
 	params = "value";
 	$(input_id).autocomplete({
