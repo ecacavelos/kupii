@@ -1,3 +1,4 @@
+
 {% extends "lotes/base_lotes.html" %}
 {% block header_scripts %}
 <script type="text/javascript">
@@ -28,12 +29,18 @@
 		var tipo_busqueda = "{{tipo_busqueda}}";
 		var busqueda_label = "{{busqueda_label}}";
 		var busqueda = "{{busqueda}}";
+        var order_by = "{{order_by}}";
 
 		$('#fecha_ini').val(fecha_ini);
 		$('#fecha_fin').val(fecha_fin);
 		$('#id_tipo_busqueda').val(tipo_busqueda);
 		$('#id_busqueda_label').val(busqueda_label);
 		$('#id_busqueda').val(busqueda);
+        if (order_by ==  "codigo")
+            $('#order_by_codigo').prop('checked', true);
+        if (order_by ==  "fecha")
+            $('#order_by_fecha').prop('checked', true);
+
 
 		$('#fecha_ini').mask('##/##/####');
 		$('#monto_otros_descuentos').mask('###.###.###.###',{reverse: true});
@@ -97,6 +104,7 @@
 				<input name="busqueda_label" id="id_busqueda_label" type="text" value=""/>
 				<input name="busqueda" id="id_busqueda" type="hidden" value=""/>
 				</td>
+                <td></td>
 			</tr>
 
 			<th></th><th>Desde:</th><th>Hasta:</th>
@@ -109,12 +117,22 @@
 				<input name="fecha_fin" id="fecha_fin" type="text" value="" />
 				</td>
 			</tr>
+            <tr>
+                <td>Ordenar por: </td>
+                <td>
+                    <input id="order_by_fecha" type="radio"  name="order_by" value="fecha" checked="checked"> Fecha<br>
+                    <input id="order_by_codigo"type="radio" name="order_by" value="codigo"> Codigo<br>
+                </td>
+                <td></td>
+            </tr>
+
 			<tr>
 				<td>
 				<input id="boton_buscar" type="button" value="Buscar" onclick="validar();" class="historico" style="cursor: pointer"/>
 				</td>
 				<td colspan="2"><a class="boton-verde" id="id_boton" onclick="retrieve_liquidacion_propietarios();">Descargar como Excel</a></td>
 			</tr>
+
 		</table>
 	</form>
 </div>
