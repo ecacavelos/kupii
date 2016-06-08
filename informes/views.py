@@ -2973,6 +2973,7 @@ def liquidacion_propietarios_reporte_excel(request):
         style_subrayado_normal = xlwt.easyxf('font: name Calibri, height 200;')
         style_subrayado_normal_titulo = xlwt.easyxf('font: name Calibri, height 200; align: horiz center')
         style_doble_subrayado = xlwt.easyxf('font: name Calibri, height 200;')
+        style_datos_texto_lote = xlwt.easyxf('font: name Calibri, height 200; align: horiz center')
         style_datos_texto = xlwt.easyxf('font: name Calibri, height 200; align: horiz center')
 
         style_fraccion = xlwt.easyxf('pattern: pattern solid, fore_colour white;'
@@ -3060,7 +3061,7 @@ def liquidacion_propietarios_reporte_excel(request):
                         sheet.write(c, 7, 'Monto Prop', style_titulos_columna_resaltados_centrados)
                         c+=2
 
-                    sheet.write(c, 0, pago['lote'],style_datos_texto)
+                    sheet.write(c, 0, pago['lote'],style_datos_texto_lote)
                     sheet.write(c, 1, pago['fecha_de_pago'],style_datos_texto)
                     sheet.write(c, 2, pago['cliente'],style_normal)
                     sheet.write(c, 3, pago['nro_cuota'],style_datos_texto)
@@ -3161,7 +3162,7 @@ def liquidacion_propietarios_reporte_excel(request):
 
                 #Ancho de la columna Lote
                 col_lote = sheet.col(0)
-                col_lote.width = 256 * 10   # 12 characters wide
+                col_lote.width = 256 * 12   # 12 characters wide
 
                 #Ancho de la columna Fecha
                 col_fecha = sheet.col(1)
@@ -3181,7 +3182,7 @@ def liquidacion_propietarios_reporte_excel(request):
 
                 #Ancho de la columna monto pagado
                 col_monto_pagado = sheet.col(5)
-                col_monto_pagado.width = 256 * 11   # 11 characters wide
+                col_monto_pagado.width = 256 * 12   # 11 characters wide
 
                 #Ancho de la columna monto inmobiliarioa
                 col_monto_inmo = sheet.col(6)
@@ -3648,7 +3649,7 @@ def liquidacion_vendedores_reporte_excel(request):
             
             #Ancho de la columna Lote
             col_lote = sheet.col(0)
-            col_lote.width = 256 * 10   # 12 characters wide
+            col_lote.width = 256 * 12   # 12 characters wide
             
             #Ancho de la columna Fecha
             col_fecha = sheet.col(1)
@@ -3668,11 +3669,11 @@ def liquidacion_vendedores_reporte_excel(request):
             
             #Ancho de la columna monto pagado
             col_monto_pagado = sheet.col(5)
-            col_monto_pagado.width = 256 * 11   # 11 characters wide
+            col_monto_pagado.width = 256 * 12   # 12 characters wide
             
-            #Ancho de la columna monto inmobiliarioa
+            #Ancho de la columna monto vendedor
             col_monto_inmo = sheet.col(6)
-            col_monto_inmo.width = 256 * 11   # 11 characters wide
+            col_monto_inmo.width = 256 * 15   # 15 characters wide
             
             #Ancho de la columna monto propietario
             col_nombre = sheet.col(7)
