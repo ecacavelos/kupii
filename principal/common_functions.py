@@ -1007,9 +1007,26 @@ def get_ultima_venta(lote_id):
     else:
         print 'NO SE ENCONTRO LA VENTA'
         venta = None
+    return venta
 
+#Funcion que encuentra todas las ventas de un lote y retorna la ultima siempre que no sea recuperada
+def get_ultima_venta_no_recuperada(lote_id):
 
+    ventas = Venta.objects.filter(lote_id=lote_id).order_by('fecha_de_venta')
+    for item_venta in ventas:
+        print 'Obteniendo la ultima venta'
+        try:
+            venta_recuperada = RecuperacionDeLotes.objects.get(venta=item_venta.id)
+            venta = None
+        except RecuperacionDeLotes.DoesNotExist:
+            print 'se encontro la venta no recuperada, la venta actual'
+            venta = item_venta
 
+    if 'venta' in locals():
+        print 'SE ENCONTRO LA VENTA'
+    else:
+        print 'NO SE ENCONTRO LA VENTA'
+        venta = None
     return venta
 
 def crear_pdf_factura(nueva_factura, request, manzana, lote_id, usuario):

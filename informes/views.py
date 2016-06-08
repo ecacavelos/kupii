@@ -310,10 +310,10 @@ def obtener_clientes_atrasados(filtros,fraccion, meses_peticion):
         cliente_atrasado = {}
 
         # OBTENER LA ULTIMA VENTA Y SU DETALLE
-        ultima_venta = get_ultima_venta(r[0])
+        ultima_venta = get_ultima_venta_no_recuperada(r[0])
 
         # SE TRATAN LOS CASOS EN DONDE NO SE ENCUENTRA VENTA PARA ALGUN LOTE.
-        if ultima_venta != None and ultima_venta.recuperado == None:
+        if ultima_venta != None:
             detalle_cuotas = get_cuotas_detail_by_lote(unicode(str(r[0])))
             hoy = date.today()
             cuotas_a_pagar = obtener_cuotas_a_pagar_full(ultima_venta, hoy, detalle_cuotas,500)  # Maximo atraso = 500 para tener un parametro maximo de atraso en las cuotas.
