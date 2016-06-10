@@ -1,5 +1,6 @@
 from django.contrib.admin.templatetags.admin_list import results
-from django.db.models import Count, Min, Sum, Avg, connection
+from django.db.models import Count, Min, Sum, Avg
+from django.db import connections, connection
 from principal.models import Lote, Cliente, Vendedor, PlanDePago, Fraccion, Manzana, Venta, Propietario, \
     PlanDePagoVendedor, PagoDeCuotas, RecuperacionDeLotes, LogUsuario, CoordenadasFactura
 from principal.monthdelta import MonthDelta
