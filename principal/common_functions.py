@@ -1,4 +1,5 @@
-from django.db.models import Count, Min, Sum, Avg
+from django.contrib.admin.templatetags.admin_list import results
+from django.db.models import Count, Min, Sum, Avg, connection
 from principal.models import Lote, Cliente, Vendedor, PlanDePago, Fraccion, Manzana, Venta, Propietario, \
     PlanDePagoVendedor, PagoDeCuotas, RecuperacionDeLotes, LogUsuario, CoordenadasFactura
 from principal.monthdelta import MonthDelta
@@ -24,7 +25,7 @@ def get_cuotas_detail_by_lote(lote_id):
 
     print("buscando pagos del lote --> " + lote_id);
     # El query es: select sum(nro_cuotas_a_pagar) from principal_pagodecuotas where lote_id = 16108;
-    venta = get_ultima_venta(lote_id)
+    venta = get_ultima_venta_no_recuperada(lote_id)
 
     # Chequeamos si es una venta contado
     contado = False;
@@ -1012,15 +1013,33 @@ def get_ultima_venta(lote_id):
 #Funcion que encuentra todas las ventas de un lote y retorna la ultima siempre que no sea recuperada
 def get_ultima_venta_no_recuperada(lote_id):
 
-    ventas = Venta.objects.filter(lote_id=lote_id).order_by('fecha_de_venta')
-    for item_venta in ventas:
-        print 'Obteniendo la ultima venta'
-        try:
-            venta_recuperada = RecuperacionDeLotes.objects.get(venta=item_venta.id)
-            venta = None
-        except RecuperacionDeLotes.DoesNotExist:
-            print 'se encontro la venta no recuperada, la venta actual'
-            venta = item_venta
+    # ventas = Venta.objects.filter(lote_id=lote_id).order_by('fecha_de_venta')
+
+    # QUERY PARA TRAER LA ULTIMA VENTA QUE NO ES RECUPERADA DEL LOTE EN CUESTION
+    query = (
+        '''
+        SELECT "principal_venta"."id", "principal_venta"."lote_id", "principal_venta"."fecha_de_venta", "principal_venta"."cliente_id", "principal_venta"."vendedor_id", "principal_venta"."plan_de_pago_id", "principal_venta"."entrega_inicial", "principal_venta"."precio_de_cuota", "principal_venta"."precio_final_de_venta", "principal_venta"."fecha_primer_vencimiento", "principal_venta"."pagos_realizados", "principal_venta"."importacion_paralot", "principal_venta"."plan_de_pago_vendedor_id", "principal_venta"."monto_cuota_refuerzo", "principal_venta"."recuperado" FROM "principal_venta" WHERE "principal_venta"."lote_id" = %s AND "principal_venta"."id" not in (select "venta_id" from "principal_recuperaciondelotes")
+        '''
+    )
+    cursor = connection.cursor()
+    cursor.execute(query, [lote_id])
+    results = cursor.fetchall()
+
+    #si el result no encuentra nada retorna una lista vacia y eso contemplamos para que no intente obtener la venta
+    if (len(results) > 0):
+        # Obtenemos la Venta con ese id a partir del result
+        ventas = Venta.objects.filter(id=results[0][0]).order_by('fecha_de_venta')
+
+        # for item_venta in ventas:
+        for item_venta in ventas:
+            print 'Obteniendo la ultima venta'
+            try:
+                venta_recuperada = RecuperacionDeLotes.objects.get(venta=item_venta.id)
+                # venta_recuperada = RecuperacionDeLotes.objects.get(venta=results[0])
+                venta = None
+            except RecuperacionDeLotes.DoesNotExist:
+                print 'se encontro la venta no recuperada, la venta actual'
+                venta = item_venta
 
     if 'venta' in locals():
         print 'SE ENCONTRO LA VENTA'
