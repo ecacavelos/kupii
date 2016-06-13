@@ -4916,11 +4916,11 @@ def informe_facturacion_reporte_excel(request):
                             grupo= request.user.groups.get().id
                             if grupo == 1:
                                 if busqueda =='':
-                                    facturas = Factura.objects.filter(anulado=False, fecha__range=(fecha_ini_parsed, fecha_fin_parsed))
+                                    facturas = Factura.objects.filter(anulado=False, fecha__range=(fecha_ini_parsed, fecha_fin_parsed)).order_by('numero')
                                 else:
-                                    facturas = Factura.objects.filter(anulado=False, fecha__range=(fecha_ini_parsed, fecha_fin_parsed), usuario = busqueda)
+                                    facturas = Factura.objects.filter(anulado=False, fecha__range=(fecha_ini_parsed, fecha_fin_parsed), usuario = busqueda).order_by('numero')
                             else:
-                                facturas = Factura.objects.filter(anulado=False, fecha__range=(fecha_ini_parsed, fecha_fin_parsed), usuario = request.user)
+                                facturas = Factura.objects.filter(anulado=False, fecha__range=(fecha_ini_parsed, fecha_fin_parsed), usuario = request.user).order_by('numero')
                             
                             for factura in facturas:
                                 
@@ -5060,41 +5060,39 @@ def informe_facturacion_reporte_excel(request):
                                 pass
                         #Ancho de la columna Lote
                         col_lote = sheet.col(2)
-                        col_lote.width = 256 * 10   # 12 characters wide
-                            
+                        col_lote.width = 256 * 12   # 12 characters wide
+
                         #Ancho de la columna Fecha
                         col_fecha = sheet.col(0)
-                        col_fecha.width = 256 * 8   # 10 characters wide
+                        col_fecha.width = 256 * 10   # 10 characters wide
                             
                         #Ancho de la columna Nombre
                         col_nombre = sheet.col(3)
-                        col_nombre.width = 256 * 18   # 25 characters wide 
+                        col_nombre.width = 256 * 22   # 22 characters wide
                         
-                        #Ancho de la columna Nro cuota
-                        col_nro_cuota = sheet.col(1)
-                        col_nro_cuota.width = 256 * 10   # 6 characters wide
+                        #Ancho de la columna Nro Factura
+                        col_nro_factura = sheet.col(1)
+                        col_nro_factura.width = 256 * 15   # 15 characters wide
                             
-                        #Ancho de la columna Nro cuota
-                        col_nro_cuota = sheet.col(4)
-                        col_nro_cuota.width = 256 * 5   # 6 characters wide
+                        #Ancho de la columna Tipo
+                        col_tipo = sheet.col(4)
+                        col_tipo.width = 256 * 7   # 7 characters wide
                             
-                        #Ancho de la columna mes
-                        col_mes = sheet.col(5)
-                        col_mes.width = 256 * 11   # 8 characters wide
+                        #Ancho de la columna exentas
+                        col_exenta = sheet.col(5)
+                        col_exenta.width = 256 * 10   # 9 characters wide
                             
-                        #Ancho de la columna monto pagado
-                        col_monto_pagado = sheet.col(6)
-                        col_monto_pagado.width = 256 * 11   # 11 characters wide
+                        #Ancho de la columna iva5
+                        col_iva10 = sheet.col(6)
+                        col_iva10.width = 256 * 10   # 9 characters wide
                             
-                        #Ancho de la columna monto inmobiliarioa
-                        col_monto_inmo = sheet.col(7)
-                        col_monto_inmo.width = 256 * 11   # 11 characters wide
+                        #Ancho de la columna iva10
+                        col_iva10 = sheet.col(7)
+                        col_iva10.width = 256 * 10   # 9 characters wide
                             
-                        #Ancho de la columna monto propietario
-                        col_nombre = sheet.col(8)
-                        col_nombre.width = 256 * 11   # 11 characters wide
-                        
-                        
+                        #Ancho de la columna monto
+                        col_monto = sheet.col(8)
+                        col_monto.width = 256 * 12   # 9 characters wide
                       
                         response = HttpResponse(content_type='application/vnd.ms-excel')
                         # Crear un nombre intuitivo         
