@@ -1,0 +1,333 @@
+{% extends "lotes/base_lotes.html" %}
+{% block header_scripts %}
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		$('#lote_ini').focus();
+		//Cambiar calendario a español
+		$.datepicker.regional['es'] = {
+			closeText : 'Cerrar',
+			prevText : '<Ant',
+			nextText : 'Sig>',
+			currentText : 'Hoy',
+			monthNames : ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+			monthNamesShort : ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+			dayNames : ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
+			dayNamesShort : ['Dom', 'Lun', 'Mar', 'Mié', 'Juv', 'Vie', 'Sáb'],
+			dayNamesMin : ['Do', 'Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sá'],
+			weekHeader : 'Sm',
+			dateFormat : 'dd/mm/yy',
+			firstDay : 1,
+			isRTL : false,
+			showMonthAfterYear : false,
+			yearSuffix : ''
+		};
+		// Setear idioma al calendario
+		$.datepicker.setDefaults($.datepicker.regional['es']);
+		var d = new Date();
+		var curr_date = d.getDate();
+		var curr_month = d.getMonth() + 1;
+		var curr_year = d.getFullYear();
+		if (curr_date < 10) {
+			curr_date = "0" + curr_date.toString();
+		}
+		if (curr_month < 10) {
+			curr_month = "0" + curr_month.toString();
+		}
+		var hoy = (curr_date + "/" + curr_month + "/" + curr_year);
+
+		var fecha_ini = "{{fecha_ini}}";
+		var fecha_fin = "{{fecha_fin}}";
+		var lote_ini = "{{lote_ini}}";
+        var lote_fin = "{{lote_fin}}";
+		mostrar_mvtos = "{{mostrar_mvtos}}";
+		mostrar_transferencias = "{{mostrar_transferencias}}";
+		mostrar_reservas = "{{mostrar_reservas}}";
+		mostrar_cambios = "{{mostrar_cambios}}";
+		$('#lote_ini').val(lote_ini);
+        $('#lote_fin').val(lote_fin);
+		$('#fecha_ini').val(fecha_ini);
+		$('#fecha_fin').val(fecha_fin);
+		$('#lote_ini').mask('###/###/####');
+		$('#lote_fin').mask('###/###/####');
+        $('#fecha_ini').mask('##/##/####');
+		$("#fecha_ini").datepicker({
+			dateFormat : 'dd/mm/yy'
+		});
+		$('#fecha_fin').mask('##/##/####');
+		$("#fecha_fin").datepicker({
+			dateFormat : 'dd/mm/yy'
+		});
+        /*
+		if ($("#lote_id").val() == "") {//parametros no seteados
+			$('#listado-ventas').hide();
+			$("#listado-transferencias").hide();
+			$("#listado-reservas").hide();
+			$("#listado-cambios").hide();
+			$('.pagination').hide();
+		}
+		 else {
+		 */
+			if (mostrar_mvtos == 'True')
+				$('#listado-ventas').show();
+			else
+				$('#listado-ventas').hide();
+			if (mostrar_transferencias == 'True')
+				$('#listado-transferencias').show();
+			else
+				$('#listado-transferencias').hide();
+			if (mostrar_cambios == 'True')
+				$('#listado-cambios').show();
+			else
+				$('#listado-cambios').hide();
+			if (mostrar_reservas == 'True')
+				$('#listado-reservas').show();		
+			else
+				$('#listado-reservas').hide();	
+			$('.pagination').show();
+		//}
+		
+		base_url = base_context + "/ajax/get_lote_by_codigo_paralot/";
+		$("#lote_ini").autocomplete({
+			source : base_url,
+			minLength : 1,
+			select : function(event, ui) {
+				event.preventDefault();
+				id_lote = ui.item.id;
+				$("#busqueda").val(id_lote);
+				$("#lote_ini").val(ui.item.codigo_paralot);
+				//alert(id_cliente);
+			}
+		});
+		
+		$("#lote_fin").autocomplete({
+			source : base_url,
+			minLength : 1,
+			select : function(event, ui) {
+				event.preventDefault();
+				id_lote = ui.item.id;
+				$("#busqueda").val(id_lote);
+				$("#lote_fin").val(ui.item.codigo_paralot);
+				//alert(id_cliente);
+			}
+		});
+
+	});
+
+	function retrieve_informe_movimientos() {
+		if ($('#lote_id').val() == 0 || $('#lote_id').val() == "") {
+			alert("Debe ingresar un lote");
+			return;
+		}
+		window.location.href = base_context+"/informes/informe_movimientos_reporte_excel?fecha_ini=" + $('#fecha_ini').val() + "&fecha_fin=" + $('#fecha_fin').val() + "&lote_ini=" + $('#lote_ini').val()+ "&lote_fin=" + $('#lote_fin').val();
+	}
+
+	function validar() {
+		if ($('#lote_id').val() == 0 || $('#lote_id').val() == "") {
+			alert("Debe ingresar un lote");
+			return;
+		}
+		$("#frm_busqueda").submit();
+	}
+
+</script>
+{% endblock %}
+{% block content %}
+<div class="gri16 text-izquierda" id="breadcumb">
+	<a href="{% url 'frontend_home' %}">Inicio</a><span class="verde-1">></span>
+	<a href="{% url 'frontend_home' %}informes/">Informes</a>
+	<span class="verde-1">> Informe general de movimientos</span>
+</div>
+
+<div class="clear"></div>
+
+<h1>Informe General de Movimientos de lotes </h1>
+
+<div class="grid_6">
+	<form name="frm_busqueda" id="frm_busqueda" method="get" action="{% url 'frontend_home' %}informes/informe_movimientos/">
+		<table id="lista-categoria" frame="box">
+			<tr>
+				<th class="acciones" colspan="3"><strong><a href="#" style="color: white">Filtrar</a></strong></th>
+			</tr>
+			<th></th><th>Lote Inicio:</th><th>Lote Fin:</th>
+            <tr>
+                <td>Rango de Lotes:</td>
+				<td>
+				    <input name="lote_ini" id="lote_ini" type="text" value=""/>
+				</td>
+                <td>
+				    <input name="lote_fin" id="lote_fin" type="text" value=""/>
+				</td>
+			</tr>
+			<th></th><th>Desde:</th><th>Hasta:</th>
+			<tr>
+				<td> Rango de Fecha: </td>
+				<td>
+				<input name="fecha_ini" id="fecha_ini" type="text" value="" />
+				</td>
+				<td>
+				<input name="fecha_fin" id="fecha_fin" type="text" value="" />
+				</td>
+			</tr>
+			<tr>
+				<td>
+				<input type="button" value="Buscar" onclick="validar();" class="historico" style="cursor: pointer"/>
+				</td>
+				<td><a class="boton-verde" id="id_boton" onclick="retrieve_informe_movimientos();">Descargar Excel</a></td>
+			</tr>
+		</table>
+	</form>
+</div>
+<div class="clear"></div>
+<div id="listado-cuadro-busqueda">
+
+	<br>
+	<br>
+</div>
+<div id="listado-ventas">
+	<h2>Historial de cuotas en VENTAS</h2>
+	<table  cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
+		
+		{% for venta in lista_ventas %}
+			
+			{% for pago in venta %}
+			{% if forloop.counter == 1 %}
+				{% if pago.recuperacion %}
+					<tr>
+						<th>Fecha</th><th>Fraccion</th><th>Lote</th><th>Cliente</th><th>Tipo</th><th colspan="2">Estado</th><th colspan="2">Entrega Inicial</th><th colspan="1">Precio de Venta</th>
+					</tr>
+					<tr>
+							<td class="celda_resumen_venta recuperada">{{pago.fecha_de_venta}}</td>
+	                        <td class="celda_resumen_venta recuperada">{{pago.lote.manzana.fraccion.nombre}} ({{pago.lote.manzana.fraccion.id}})</td>
+	                        <td class="celda_resumen_venta recuperada">{{ pago.lote }}</td>
+							<td class="celda_resumen_venta recuperada">{{pago.cliente}}</td>
+							<td class="celda_resumen_venta recuperada">{{pago.tipo_de_venta}}</td>
+							<td colspan="2" class="celda_resumen_venta recuperada">VENTA RECUPERADA</td>
+							<td colspan="2" class="celda_resumen_venta recuperada">{{pago.entrega_inicial}}</td>
+							<td class="celda_resumen_venta recuperada">{{pago.precio_final}}</td>
+					</tr>
+						
+				{% else %}
+					<tr>
+						<th>Fecha</th><th>Fraccion</th><th>Lote</th><th>Cliente</th><th>Tipo</th><th colspan="2">Estado</th><th colspan="2">Entrega Inicial</th><th colspan="1">Precio de Venta</th>
+					</tr>
+					<tr>
+							<td class="celda_resumen_venta">{{pago.fecha_de_venta}}</td>
+	                        <td class="celda_resumen_venta">{{pago.lote.manzana.fraccion.nombre}} ({{pago.lote.manzana.fraccion.id}})</td>
+	                        <td class="celda_resumen_venta">{{pago.lote}}</td>
+							<td class="celda_resumen_venta">{{pago.cliente}}</td>
+							<td class="celda_resumen_venta">{{pago.tipo_de_venta}}</td>
+							<td colspan="2" class="celda_resumen_venta">VENTA ACTUAL</td>
+							<td colspan="2" class="celda_resumen_venta"> {{pago.entrega_inicial}}</td>
+							<td class="celda_resumen_venta">{{pago.precio_final}}</td>
+						
+					</tr>
+				
+				{% endif %}
+			<tr>
+				<th colspan="1">Fecha de Pago</th><!--<th>Fraccion</th><th>Manzana</th><th>Cliente</th>--><th colspan="1">Cuota Nº</th><th colspan="1">Vencimiento</th><th colspan="3">Mes</th><!--<th>Tipo Cuota</th>--><th>Saldo Anterior</th><th colspan="2">Monto</th><th>Saldo</th>	
+			</tr>
+				
+			{% else %}
+				{% if forloop.counter|divisibleby:2 %}				
+				<tr>
+					<td colspan="1">{{pago.fecha_de_pago}}</td>
+					<td colspan="1">{{pago.nro_cuota}}</td>
+					<td colspan="1">{{pago.vencimiento}}</td>
+					<td colspan="2">{{pago.mes}}</td>
+					<td></td>
+					<td>{{pago.saldo_anterior}}</td>
+					<td colspan="2">{{pago.monto}}</td>
+					<td>{{pago.saldo}}</td>
+					<!--<td colspan="2"><a href="/movimientos/modificar_pagocuota/{{pago.id}}"><img src="/static/custom/img/black_edit.png" /></a></td>-->
+					<!--<td><a href="/movimientos/eliminar_pagocuota/{{pago.id}}">Holis</a></td>-->
+				</tr>
+				{% else %}
+				<tr class="bkg_gris">
+					<td colspan="1">{{pago.fecha_de_pago}}</td>
+					<td colspan="1">{{pago.nro_cuota}}</td>
+					<td colspan="1">{{pago.vencimiento}}</td>
+					<td colspan="2">{{pago.mes}}</td>
+					<td></td>
+					<td>{{pago.saldo_anterior}}</td>
+					<td colspan="2">{{pago.monto}}</td>
+					<td>{{pago.saldo}}</td>
+					<!--<td colspan="2"><a href="/movimientos/modificar_pagocuota/{{pago.id}}"><img src="/static/custom/img/black_edit.png" /></a></td>-->
+					<!--<td><a href="/movimientos/eliminar_pagocuota/{{pago.id}}">Holis</a></td>-->
+				</tr>
+				{% endif %}
+			{% endif %}
+			{%endfor%}
+		{%endfor%}
+		<!--
+		<div class="pagination">
+			<span class="step-links"> Mostrando {{ lista_movimientos.start_index }}-{{ lista_movimientos.end_index }} de {{ lista_movimientos.paginator.count }} Resultados
+				{%if lista_movimientos.has_previous%} <a href="?page={{ lista_movimientos.first_index}}{{ultimo}}"> Primera </a> <a href="?page={{ lista_movimientos.previous_page_number }}{{ultimo}}"> Anterior</a> {%endif%}
+				P&aacute;gina |{{lista_movimientos.number}}|
+				{%if lista_movimientos.has_next%} <a href="?page={{ lista_movimientos.next_page_number }}{{ultimo}}"> Siguiente </a> <a href="?page={{ lista_movimientos.end_index}}{{ultimo}}"> Ultima </a> {%endif%} </span>
+		</div>
+		-->
+	</table>
+</div>
+
+<div id="listado-transferencias">
+<h2>Historial TRANSFERENCIAS</h2>
+	<table  cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
+		<th>Fecha</th><th>Cliente</th><th>Cliente Beneficiario</th><th>Vendedor</th><th>Plan de pago</th>
+		{% for transferencia in lista_transferencias %}						
+				{% if forloop.counter|divisibleby:2 %}				
+				<tr>				
+				{% else %}
+				<tr class="bkg_gris">
+				{% endif %}
+					<td>{{transferencia.fecha_de_transferencia}}</td>
+					<td>{{transferencia.cliente_original}}</td>
+					<td>{{transferencia.cliente}}</td>
+					<td>{{transferencia.vendedor}}</td>
+					<td>{{transferencia.plan_de_pago}}</td>
+				</tr>				
+			{%endfor%}
+	</table>
+</div>
+
+<div id="listado-reservas">
+<h2>Historial RESERVAS</h2>
+	<table  cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
+		<th>Fecha</th><th>Cliente</th>
+		{% for reserva in lista_reservas %}						
+				{% if forloop.counter|divisibleby:2 %}				
+				<tr>				
+				{% else %}
+				<tr class="bkg_gris">
+				{% endif %}
+					<td>{{reserva.fecha_de_reserva}}</td>
+					<td>{{reserva.cliente}}</td>
+				</tr>				
+			{%endfor%}
+	</table>
+</div>
+
+<div id="listado-cambios">
+<h2>Historial CAMBIOS</h2>
+	<table  cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
+		<th>Fecha</th><th>Cliente</th><th>Lote a cambiar</th><th>Lote nuevo</th>
+		{% for cambio in lista_cambios %}						
+				{% if forloop.counter|divisibleby:2 %}				
+				<tr>				
+				{% else %}
+				<tr class="bkg_gris">
+				{% endif %}
+					<td>{{cambio.fecha_de_cambio}}</td>
+					<td>{{cambio.cliente}}</td>
+					<td>{{cambio.lote_a_cambiar}}</td>
+					<td>{{cambio.lote_nuevo}}</td>
+				</tr>				
+			{%endfor%}
+	</table>
+</div>
+
+
+<div id="footer">
+	<a href="{% url 'frontend_home' %}informes" class="boton-verde">Volver al módulo de Informes</a>
+</div>
+{% endblock %} 

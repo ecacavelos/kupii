@@ -1,0 +1,27 @@
+{% extends "cobradores/base_cobradores.html" %}
+
+{% block content %}
+<div id="detalle-cobrador">
+	<div id="detalle-cobrador-header">
+		{{ cobrador.id }}
+	</div>
+	<div>
+		{{ message }}
+	</div>
+	<form action="" method="post">
+		{% csrf_token %}
+		{% for field in form %}
+		<div class="fieldWrapper{% if field.field.required %} required{% endif %}">
+			{{ field.errors }}
+			{{ field.label_tag }} {{ field }}
+		</div>
+		{% endfor %}
+		<input class="cobrador-form-button" type="submit" name="boton_guardar" value="Guardar Cambios" />
+		<input class="cobrador-form-button" type="submit" name="boton_borrar" value="Borrar este Registro" />
+	</form>
+</div>
+<br>
+<div id="footer">
+	<a href="{% url 'frontend_home' %}cobradores/listado">Volver al Listado de Cobradores</a>
+</div>
+{% endblock %}

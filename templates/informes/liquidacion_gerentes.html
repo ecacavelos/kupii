@@ -1,0 +1,188 @@
+{% extends "lotes/base_lotes.html" %}
+{% block header_scripts %}
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		$("#fecha").focus();
+		//Cambiar calendario a español
+		$.datepicker.regional['es'] = {
+			closeText : 'Cerrar',
+			prevText : '<Ant',
+			nextText : 'Sig>',
+			currentText : 'Hoy',
+			monthNames : ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+			monthNamesShort : ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+			dayNames : ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
+			dayNamesShort : ['Dom', 'Lun', 'Mar', 'Mié', 'Juv', 'Vie', 'Sáb'],
+			dayNamesMin : ['Do', 'Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sá'],
+			weekHeader : 'Sm',
+			dateFormat : 'dd/mm/yy',
+			firstDay : 1,
+			isRTL : false,
+			showMonthAfterYear : false,
+			yearSuffix : ''
+		};
+		// Setear idioma al calendario
+		$.datepicker.setDefaults($.datepicker.regional['es']);
+		var fecha = "{{fecha}}";
+		var fecha_ini = "{{fecha_ini}}";
+		var fecha_fin = "{{fecha_fin}}";
+		var tipo_liquidacion = "{{tipo_liquidacion}}";
+		var tipo_gerente = "{{tipo_gerente}}";
+		var monto_calculado = "{{monto_calculado}}";
+	
+		$('#fecha').val(fecha);
+		$('#id_monto').val(monto_calculado);
+		$('#id_tipo_gerente').val(tipo_gerente);
+		$('#id_tipo_liquidacion').val(tipo_liquidacion);
+		$('#fecha_ini').val(fecha_ini);
+		$('#fecha_fin').val(fecha_fin);
+
+		$(function() {
+			$('#fecha').datepicker( {
+	    		changeMonth: true,
+	   			changeYear: true,
+	    		showButtonPanel: true,
+	    		dateFormat: 'MM yy',
+	    		onClose: function(dateText, inst) { 
+	        	var month = $("#ui-datepicker-div .ui-datepicker-month :selected").val();
+	        	var year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
+		        $(this).datepicker('setDate', new Date(year, month, 1));
+		        var fecha= new Date(year, month, 1);	        
+		  		fecha_ini=new Date(year,month,1);
+		       	fecha_fin = new Date(year,fecha.getMonth()+1,0);      
+		       	fecha_ini=('0'+fecha_ini.getDate()).slice(-2) + '/' + ('0' + (fecha_ini.getMonth()+1)).slice(-2) + '/'+fecha_ini.getFullYear();
+		       	fecha_fin=('0'+fecha_fin.getDate()).slice(-2) + '/' + ('0' + (fecha_fin.getMonth()+1)).slice(-2) + '/'+fecha_fin.getFullYear();
+		        $('#fecha_ini').val(fecha_ini);
+		        $('#fecha_fin').val(fecha_fin);
+		    	}
+		});
+		});
+		
+		if ($("#fecha").val()=="" && $("#id_tipo_liquidacion").val()=="") {//parametros no seteados
+			$('.listado-pagos').hide();
+		} else {
+			$('.listado-pagos').show();
+		}
+		setup_inputs();
+	});
+
+</script>
+<style>
+.ui-datepicker-calendar {
+    display: none;
+    }
+</style>
+<script type="text/javascript" src="{{ STATIC_URL }}informes/liquidacion_gerentes.js"></script>
+{% endblock %}
+{% block content %}
+<div class="gri16 text-izquierda" id="breadcumb">
+	<a href="{% url 'frontend_home' %}">Inicio</a><span class="verde-1">></span>
+	<a href="{% url 'frontend_home' %}informes/">Informes</a>
+	<span class="verde-1">>Liquidaci&oacute;n de Gerentes</span>
+</div>
+
+<div class="clear"></div>
+
+<h1>Liquidaci&oacute;n de Gerentes</h1>
+
+<div class="grid_6">
+	<form name="frm_busqueda" id="frm_busqueda" method="get" action="{% url 'frontend_home' %}informes/liquidacion_gerentes/">
+		<table id="lista-categoria" frame="box">
+			<tr>
+				<th class="acciones" colspan="3"><strong><a href="#" style="color: white;">Filtrar</a></strong></th>
+			</tr>
+			<tr>
+				<td> Mes: </td>
+				<td>
+				<input name="fecha" id="fecha" type="text" value="" />
+				<input name="fecha_ini" id="fecha_ini" type="hidden" value=""/>
+				<input name="fecha_fin" id="fecha_fin" type="hidden" value=""/>
+				</td>
+			</tr>
+			<th>Tipo de Gerente</th><th></th>
+			<tr>
+				<td>
+				<select id="id_tipo_liquidacion" name="tipo_liquidacion">
+					<!-- <option value="">Elija una opcion</option> -->
+					<option value="gerente_ventas">Gerente de Ventas</option>
+					<option value="gerente_admin">Gerente Administrativo</option>
+				</select>
+				</td>
+			</tr>
+			<tr>
+				<td>
+				<input type="button" value="Buscar" onclick="validar();" class="historico" style="cursor: pointer"/>
+				</td>
+				<td><a class="boton-verde" id="id_boton" onclick="retrieve_liquidacion_gerentes();">Descargar como Excel</a></td>
+			</tr>
+		</table>
+	</form>
+</div>
+
+<div class="clear"></div>
+<div id="listado-cuadro-busqueda">
+	<br>
+	<br>
+</div>
+<div id="listado-item-lote">
+	<table width="50%" cellpadding="0" cellspacing="0" class="listado-pagos" align="center">
+		<th>Fraccion</th><th>Vendedor</th><th>Cuota Nro.</th><th>Importe</th><th>Comisi&oacute;n</th>
+		{% for hw in cuotas %}
+		{% if hw.total_importe and not hw.total_general_importe %}
+		<tr>
+			<th colspan="3" class="celda_resumen_fraccion">Totales de Fraccion</th>
+			<td class="celda_resumen_fraccion">{{hw.total_importe}}</td>
+			<td class="celda_resumen_fraccion">{{hw.total_comision}}</td>
+		</tr>
+		{% endif %}
+		{% if forloop.counter|divisibleby:2 %}
+		<tr>
+			<td>{{hw.fraccion}}</td>
+			<td>{{hw.vendedor}}</td>
+			<td>{{hw.cuota_nro}}</td>
+			<td>{{hw.importe}}</td>
+			<td>{{hw.comision}}</td>
+		</tr>
+		{% else %}
+		<tr class="bkg_gris">
+			<td>{{hw.fraccion}}</td>
+			<td>{{hw.vendedor}}</td>
+			<td>{{hw.cuota_nro}}</td>
+			<td>{{hw.importe}}</td>
+			<td>{{hw.comision}}</td>
+		</tr>
+		{% endif %}
+		{% if hw.total_general_importe %}
+		<tr>
+			<th colspan="3" class="celda_resumen_fraccion">Totales de Fraccion</th>
+			<td class="celda_resumen_fraccion">{{hw.total_importe}}</td>
+			<td class="celda_resumen_fraccion">{{hw.total_comision}}</td>
+		</tr>
+		<tr>
+			<th colspan="3" class="celda_resumen_fraccion">Total General</th>
+			<td class="celda_resumen_fraccion">{{hw.total_general_importe}}</td>
+			<td class="celda_resumen_fraccion">{{hw.total_general_comision}}</td>
+
+		</tr>
+		{% endif %}
+		{% endfor %}
+<div id="listado-item-lote">
+	<table id="tabla_gerentes" width="50%" cellpadding="0" cellspacing="0" class="listado-pagos" align="center">
+		<th>Gerente</th><th>Liquidaci&oacute;n</th>
+		<tr>	
+			<td>
+				<input name="tipo_gerente" id="id_tipo_gerente" type="text" readonly="readonly" />
+			</td>
+			<td>
+				<input name="monto" id="id_monto" type="text" readonly="readonly" />
+			</td>
+		</tr>
+	</table>
+</div>
+
+
+<div id="footer">
+	<a href="{% url 'frontend_home' %}informes" class="boton-verde">Volver al módulo de Informes</a>
+</div>
+{% endblock %}
