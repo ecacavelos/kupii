@@ -4921,9 +4921,25 @@ def informe_facturacion_reporte_excel(request):
                                     facturas = Factura.objects.filter(anulado=False, fecha__range=(fecha_ini_parsed, fecha_fin_parsed), usuario = busqueda).order_by('numero')
                             else:
                                 facturas = Factura.objects.filter(anulado=False, fecha__range=(fecha_ini_parsed, fecha_fin_parsed), usuario = request.user).order_by('numero')
-                            
+
+                            sucursal = facturas[0].numero[:3]
+                            total_facturado_sucursal = 0
+                            total_exentas_sucursal = 0
+                            total_iva5_sucursal = 0
+                            total_iva10_sucursal = 0
+                            totales_sucursales = []
                             for factura in facturas:
-                                
+                                # esta parte es donde tengo que ir sumando los totales por sucursales e ir guardando para luego ubicar en el excel
+                                # haremos una lista donde iremos agregando los totales porque no sabemos cuantas sucursales puede haber en cuestion segun los filtros
+                                sucursal_aux = factura.numero[:3]
+                                if sucursal_aux != sucursal:
+                                    totales_sucursales.append(total_sucursal)
+                                    total_exentas_sucursal = 0
+                                    total_iva5_sucursal = 0
+                                    total_iva10_sucursal = 0
+                                    total_facturado_sucursal = 0
+                                    sucursal = sucursal_aux
+
                                 #Totales Factura
                                 total_facturado = 0
                                 total_exentas = 0
@@ -4963,8 +4979,15 @@ def informe_facturacion_reporte_excel(request):
                                 total_general_iva5 += int(total_iva5)
                                 total_general_iva10 += int(total_iva10)
                                 total_general_facturado += int(total_facturado)
-                                
-                            #Totales GENERALES
+
+                                #Acumulamos para los TOTALES POR SUCURSALES
+                                total_exentas_sucursal += int(total_exentas)
+                                total_iva5_sucursal += int(total_iva5)
+                                total_iva10_sucursal += int(total_iva10)
+                                total_facturado_sucursal += int(total_facturado)
+                                total_sucursal = [total_exentas_sucursal, total_iva5_sucursal, total_iva10_sucursal, total_facturado_sucursal]
+
+                                #Totales GENERALES
                             fila['total_general_facturado']=unicode('{:,}'.format(total_general_facturado)).replace(",", ".")
                             fila['total_general_exentas']=unicode('{:,}'.format(total_general_exentas)).replace(",", ".")
                             fila['total_general_iva5']=unicode('{:,}'.format(total_general_iva5)).replace(",", ".")
@@ -5031,9 +5054,28 @@ def informe_facturacion_reporte_excel(request):
                             sheet.write(c, 6, 'IVA 5',style_titulo)
                             sheet.write(c, 7, 'IVA 10',style_titulo)
                             sheet.write(c, 8, 'Monto',style_titulo)
-                        
+
+                        sucursal = filas[0]['numero'][:3]
+
+                        fil = 0
                         for fila in filas:
-                            
+                            # esta parte usamos para dividir las sucursales de acuerdo a los primeros 3 nros de factura y separar en el excel
+                            sucursal_aux = fila['numero'][:3]
+                            if sucursal_aux != sucursal:
+                                print ("CCP TU PAPA")
+                                sucursal = sucursal_aux
+                                c += 1
+                                # le agregamos el formato decimal a nuestra sumatoria por sucursal
+                                totales_sucursales[fil][0] = unicode('{:,}'.format(totales_sucursales[fil][0])).replace(",", ".")
+                                totales_sucursales[fil][1] = unicode('{:,}'.format(totales_sucursales[fil][1])).replace(",", ".")
+                                totales_sucursales[fil][2] = unicode('{:,}'.format(totales_sucursales[fil][2])).replace(",", ".")
+                                totales_sucursales[fil][3] = unicode('{:,}'.format(totales_sucursales[fil][3])).replace(",", ".")
+                                sheet.write(c, 5, totales_sucursales[fil][0],style_titulo)
+                                sheet.write(c, 6, totales_sucursales[fil][1],style_titulo)
+                                sheet.write(c, 7, totales_sucursales[fil][2],style_titulo)
+                                sheet.write(c, 8, totales_sucursales[fil][3],style_titulo)
+                                fil += 1
+
                             c += 1
                             sheet.write(c, 0, fila['fecha'],style_centrado)
                             sheet.write(c, 1, fila['numero'],style_centrado)
@@ -5050,7 +5092,7 @@ def informe_facturacion_reporte_excel(request):
                             try:
                                 if (fila['total_general_facturado']): 
                                     c+=1            
-                                    sheet.write_merge(c,c,0,5, "Totales Facturados", style_titulo)
+                                    sheet.write_merge(c,c,0,4, "Totales Facturados", style_titulo)
                                     sheet.write(c, 5, fila['total_general_exentas'],style_titulo_derecha)
                                     sheet.write(c, 6, fila['total_general_iva5'], style_titulo_derecha)
                                     sheet.write(c, 7, fila['total_general_iva10'], style_titulo_derecha)
