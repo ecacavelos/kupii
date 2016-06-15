@@ -807,7 +807,7 @@ def informe_general(request):
 
 #Funcion que devuelve la lista de pagos de para liquidacion de propietarios.
 #
-def obtener_pagos_liquidacion(entidad_id, tipo_busqueda, fecha_ini, fecha_fin, order_by, busqueda_laber):
+def obtener_pagos_liquidacion(entidad_id, tipo_busqueda, fecha_ini, fecha_fin, order_by, ley_param = None, impuesto_renta_param = None, iva_comision_param = None):
 
     lista_ordenada = []
     filas = []
@@ -1025,11 +1025,30 @@ def obtener_pagos_liquidacion(entidad_id, tipo_busqueda, fecha_ini, fecha_fin, o
             fila['total_general_pagado'] = unicode('{:,}'.format(total_general_pagado)).replace(",", ".")
             fila['total_general_inmobiliaria'] = unicode('{:,}'.format(total_general_inm)).replace(",", ".")
             fila['total_general_propietario'] = unicode('{:,}'.format(total_general_prop)).replace(",", ".")
-            ley = int(round(total_general_pagado * 0.015))
+
+            #LEY
+            if ley_param == None:
+                ley = int(round(total_general_pagado * 0.015))
+            else:
+                ley = ley_param
+
             fila['ley'] = unicode('{:,}'.format(ley)).replace(",", ".")
-            impuesto_renta = int(round((total_general_pagado - ley) * 0.045))
+
+            #IMPUESTO A LA RENTA
+            if impuesto_renta_param == None:
+                impuesto_renta = int(round((total_general_pagado - ley) * 0.045))
+            else:
+                impuesto_renta = impuesto_renta_param
+
             fila['impuesto_renta'] = unicode('{:,}'.format(impuesto_renta)).replace(",", ".")
-            iva_comision = int(round(total_general_inm * 0.1))
+
+
+            #IVA
+            if iva_comision_param == None:
+                iva_comision = int(round(total_general_inm * 0.1))
+            else:
+                iva_comision = iva_comision_param
+
             fila['iva_comision'] = unicode('{:,}'.format(iva_comision)).replace(",", ".")
             fila['total_a_cobrar'] = unicode(
                 '{:,}'.format(total_general_prop - (ley + impuesto_renta + iva_comision))).replace(",", ".")
@@ -1446,7 +1465,7 @@ def liquidacion_propietarios(request):
                         busqueda_label = request.GET['busqueda_label']
 
                         #BUSQUEDA
-                        lista_ordenada = obtener_pagos_liquidacion(busqueda_id,tipo_busqueda, fecha_ini_parsed, fecha_fin_parsed,order_by,busqueda_label)
+                        lista_ordenada = obtener_pagos_liquidacion(busqueda_id,tipo_busqueda, fecha_ini_parsed, fecha_fin_parsed,order_by)
 
 
                         ultimo="&tipo_busqueda="+tipo_busqueda+"&busqueda="+busqueda_id+"&busqueda_label="+busqueda_label+"&fecha_ini="+fecha_ini+"&fecha_fin="+fecha_fin+"&order_by="+order_by
@@ -2943,9 +2962,18 @@ def liquidacion_propietarios_reporte_excel(request):
         total_descuentos = request.GET.get('total_descuentos', '')
         total_a_cobrar = request.GET['total_a_cobrar']
 
-        #busqueda_label = request.GET['busqueda_label']
+        #CONVERTIMOS TODOS LOS DATOS A INT PARA CHEQUEAR INTEGRIDAD
+        total_descuentos_int = int(total_descuentos.replace(".", ""))
+        iva_comision_int = int(iva_comision.replace(".", ""))
+        impuesto_renta_int = int(impuesto_renta.replace(".", ""))
+        monto_descuento_int = int(monto_descuento.replace(".", ""))
+        ley_int = int(ley.replace(".", ""))
 
-        lista_ordenada = obtener_pagos_liquidacion(busqueda_id, tipo_busqueda, fecha_ini_parsed, fecha_fin_parsed, order_by, None)
+        #CHEQUEAMOS INTEGRIDAD DE LIQUIDACION
+        if total_descuentos_int != (iva_comision_int + monto_descuento_int + ley_int + impuesto_renta_int):
+            raise ValueError('El total de los descuentos no coincide con la sumatoria de descuentos')
+
+        lista_ordenada = obtener_pagos_liquidacion(busqueda_id, tipo_busqueda, fecha_ini_parsed, fecha_fin_parsed, order_by, ley_int, impuesto_renta_int, iva_comision_int)
         lista = lista_ordenada
 
         wb = xlwt.Workbook(encoding='utf-8')
