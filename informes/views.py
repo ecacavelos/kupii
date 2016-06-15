@@ -14,10 +14,14 @@ from django.db import connection
 import xlwt
 import math
 from principal.common_functions import *
+from principal.excel_styles import *
 from principal import permisos
 from operator import itemgetter, attrgetter
 
 # Funcion principal del modulo de lotes.
+from sucursal.models import Sucursal
+
+
 def informes(request):
     
     if request.user.is_authenticated():
@@ -35,127 +39,126 @@ def informes(request):
     else:
         return HttpResponseRedirect(reverse('login')) 
 
-def lotes_libres(request): 
+def lotes_libres(request):
+
     if request.method == 'GET':
-        if request.user.is_authenticated():
-            if verificar_permisos(request.user.id, permisos.VER_INFORMES):
+        if request.user.is_authenticated(): # AUTENTICACION
+            if verificar_permisos(request.user.id, permisos.VER_INFORMES): #PERMISOS DEL USUARIO
+                sucursales = Sucursal.objects.all()
+                t = loader.get_template('informes/lotes_libres.html')
+
                 if (filtros_establecidos(request.GET,'lotes_libres') == False):
-                    t = loader.get_template('informes/lotes_libres.html')
                     c = RequestContext(request, {
                         'object_list': [],
+                        'sucursales': sucursales
                     })
                     return HttpResponse(t.render(c))
-                else: #Parametros seteados
-                    tipo_busqueda=request.GET['tipo_busqueda']
-                    t = loader.get_template('informes/lotes_libres.html')
-                    fraccion_ini=request.GET['frac1']
-                    fraccion_fin=request.GET['frac2']
-                    f1=request.GET['fraccion_ini']
-                    f2=request.GET['fraccion_fin']
-                    ultimo="&tipo_busqueda="+tipo_busqueda+"&fraccion_ini="+f1+"&frac1="+fraccion_ini+"&fraccion_fin="+f2+"&frac2="+fraccion_fin
-                    object_list = []  # lista de lotes
-                    if fraccion_ini and fraccion_fin:
-                        manzanas = Manzana.objects.filter(fraccion_id__range=(fraccion_ini, fraccion_fin)).order_by('fraccion', 'nro_manzana')
-                        for m in manzanas:
-                            lotes = Lote.objects.filter(manzana=m.id, estado="1").order_by('nro_lote')
-                            for l in lotes:
-                                object_list.append(l)                                  
-                    else:       
-                        object_list = Lote.objects.filter(estado="1").order_by('nro_lote')
-                     
-                    lotes=[]
-                    total_importe_cuotas = 0
-                    total_contado_fraccion = 0
-                    total_credito_fraccion = 0
-                    total_superficie_fraccion = 0
-                    total_lotes_fraccion = 0
-                    total_general_lotes = 0
-                    misma_fraccion = True
-                    for index, lote_item in enumerate(object_list):
-                        lote={}
-                    # Se setean los datos de cada fila
-                        if misma_fraccion == True:
-                            misma_fraccion = False
-                            lote['misma_fraccion'] = misma_fraccion 
-                        precio_cuota=int(math.ceil(lote_item.precio_credito/130))
-                        lote['fraccion_id']=unicode(lote_item.manzana.fraccion.id)
-                        lote['fraccion']=unicode(lote_item.manzana.fraccion)
-                        lote['lote']=unicode(lote_item.manzana).zfill(3) + "/" + unicode(lote_item.nro_lote).zfill(4)
-                        lote['superficie']=lote_item.superficie                                    
-                        lote['precio_contado']=unicode('{:,}'.format(lote_item.precio_contado)).replace(",", ".")                    
-                        lote['precio_credito']=unicode('{:,}'.format(lote_item.precio_credito)).replace(",", ".")                    
-                        lote['importe_cuota']=unicode('{:,}'.format(precio_cuota)).replace(",", ".")
-                        lote['id'] = lote_item.id
-                        lote['ultimo_registro'] = False
-                        #ESTEEE
-                    # Se suman los TOTALES por FRACCION
-                        total_superficie_fraccion += lote_item.superficie 
-                        total_contado_fraccion += lote_item.precio_contado
-                        total_credito_fraccion += lote_item.precio_credito
-                        total_importe_cuotas += precio_cuota
-                        total_lotes_fraccion += 1
-                        total_general_lotes +=1
-                    #Es el ultimo lote, cerrar totales de fraccion
-                        if (len(object_list)-1 == index):
-                            lote['total_importe_cuotas'] = unicode('{:,}'.format(total_importe_cuotas)).replace(",", ".") 
-                            lote['total_credito_fraccion'] =  unicode('{:,}'.format(total_credito_fraccion)).replace(",", ".")
-                            lote['total_contado_fraccion'] =  unicode('{:,}'.format(total_contado_fraccion)).replace(",", ".")
-                            lote['total_superficie_fraccion'] =  unicode('{:,}'.format(total_superficie_fraccion)).replace(",", ".")
-                            lote['total_lotes'] =  unicode('{:,}'.format(total_lotes_fraccion)).replace(",", ".")
-                            lote['total_general_lotes'] =  unicode('{:,}'.format(total_general_lotes)).replace(",", ".")
-                            lote['ultimo_registro'] = True
-                            
-                    #Hay cambio de fraccion pero NO es el ultimo elemento todavia
-                        elif (lote_item.manzana.fraccion.id != object_list[index+1].manzana.fraccion.id):
-                            lote['total_importe_cuotas'] = unicode('{:,}'.format(total_importe_cuotas)).replace(",", ".") 
-                            lote['total_credito_fraccion'] =  unicode('{:,}'.format(total_credito_fraccion)).replace(",", ".")
-                            lote['total_contado_fraccion'] =  unicode('{:,}'.format(total_contado_fraccion)).replace(",", ".")
-                            lote['total_superficie_fraccion'] =  unicode('{:,}'.format(total_superficie_fraccion)).replace(",", ".")
-                            lote['total_lotes'] =  unicode('{:,}'.format(total_lotes_fraccion)).replace(",", ".")
-                        # Se CERAN  los TOTALES por FRACCION
-                            total_importe_cuotas = 0
-                            total_contado_fraccion = 0
-                            total_credito_fraccion = 0
-                            total_superficie_fraccion = 0
-                            total_lotes_fraccion = 0
-                            misma_fraccion = True
-                            
-                        
-                            
-                        lotes.append(lote)
-                    #sin paginacion
-                    lista = lotes
-                    #cantidad de registros a mostrar, determinada por el usuario
-#                     try:
-#                         cant_reg = request.GET['cant_reg']
-#                         if cant_reg=='todos':
-#                             paginator = Paginator(lotes, len(lotes))
-#                         else:
-#                             p=range(int(cant_reg))
-#                             paginator = Paginator(lotes, len(p))
-#                     except:
-#                         cant_reg=25
-#                         paginator = Paginator(lotes, 25)
-# 
-#                     page = request.GET.get('page')
-#                     try:
-#                         lista = paginator.page(page)
-#                     except PageNotAnInteger:
-#                         lista = paginator.page(1)
-#                     except EmptyPage:
-#                         lista = paginator.page(paginator.num_pages)
+                else: #PARAMETROS SETEADOS, REALIZAMOS LA BUSQUEDA
 
-                    c = RequestContext(request, {
-                        'tipo_busqueda' : tipo_busqueda,
-                        'fraccion_ini': fraccion_ini,
-                        'fraccion_fin': fraccion_fin,
-                        'ultimo': ultimo,
-                        'lista_lotes': lista,
-                        #'cant_reg':cant_reg,
-                        'frac1' : f1,
-                        'frac2' : f2
-                    })
-                    return HttpResponse(t.render(c))
+                    # SE OBTIENEN LOS PARAMETROS
+                    sucursal_id = request.GET['sucursal']
+                    sucursal = Sucursal.objects.get(pk=sucursal_id) #SUCURSAL A BUSCAR
+
+                    lista_lotes_libres = obtener_lotes_disponbiles(sucursal)
+                    # SE OBTIENE LA LISTA DE OBJETOS A MOSTRAR
+
+                    if (request.GET['formato_reporte'] == "pantalla"):
+
+                        # TODO: Paginacion y ordenamiento
+
+                        c = RequestContext(request, {
+                            'sucursal': sucursal,
+                            'lista_lotes': lista_lotes_libres,
+                            'sucursales': sucursales
+                        })
+                        return HttpResponse(t.render(c))
+
+                    elif request.GET['formato_reporte'] == "excel":
+
+                        wb = xlwt.Workbook(encoding='utf-8')
+                        sheet = wb.add_sheet('Lotes_libres', cell_overwrite_ok=True)
+                        sheet.paper_size_code = 1
+
+                        usuario = unicode(request.user)
+                        sheet.header_str = (
+                            u"&L&8Fecha: &D Hora: &T \nUsuario: " + usuario + " "
+                                                                              u"&C&8PROPAR S.R.L.\n LOTES LIBRES "
+                                                                              u"&R&8Sucursal: " +sucursal.nombre+ " \nPage &P of &N"
+                        )
+                        sheet.footer_str = ''                        # sheet.footer_str = 'things'
+
+
+
+                        c = 0
+                        sheet.write_merge(c, c, 0, 7, "Lotes Libres", style_titulo_resumen_centrado)
+                        # contador de filas
+
+                        for lote in lista_lotes_libres:
+                            c += 1
+                            try:
+                                if lote['total_importe_cuotas'] and lote['ultimo_lote'] == False:
+                                    c += 1
+                                    sheet.write_merge(c, c, 0, 4, "Cantidad de Lotes libres de la fraccion: " + unicode(
+                                        lote['total_lotes']), style_normal)
+                            except Exception, error:
+                                print error
+                                pass
+
+                            try:
+                                lote['misma_fraccion']
+                                if lote['misma_fraccion'] == False:
+                                    sheet.write_merge(c, c, 0, 4, "Fraccion: " + unicode(lote['fraccion']), style_titulos_columna_resaltados_centrados)
+                                    c += 1
+                                    sheet.write(c, 0, "Lote Nro.", style_normal)
+                                    sheet.write(c, 1, "Superficie", style_normal)
+                                    sheet.write(c, 2, "Precio Contado", style_normal)
+                                    sheet.write(c, 3, "Precio Credito", style_normal)
+                                    sheet.write(c, 4, "Precio Cuota", style_normal)
+                                    c += 1
+                            except Exception,error:
+                                print error
+                                pass
+
+                            sheet.write(c, 0, lote['lote'], style_normal)
+                            sheet.write(c, 1, unicode(lote['superficie']) + ' mts2', style_normal)
+                            sheet.write(c, 2, lote['precio_contado'], style_normal)
+                            sheet.write(c, 3, lote['precio_credito'], style_normal)
+                            sheet.write(c, 4, lote['importe_cuota'], style_normal)
+
+                            try:
+                                if lote['ultimo_lote'] == True:
+                                    c += 1
+                                    sheet.write_merge(c, c, 0, 4, "Cantidad de Lotes libres de la fraccion: " + unicode(
+                                        lote['total_lotes']), style_normal)
+                                    '''
+                                    sheet.write(c, 3, lote['total_superficie_fraccion'], style2)
+                                    sheet.write(c, 4, lote['total_contado_fraccion'], style2)
+                                    sheet.write(c, 5, lote['total_credito_fraccion'], style2)
+                                    sheet.write(c, 6, lote['total_importe_cuotas'], style2)
+                                    '''
+                                if lote['total_general_cuotas']:
+                                    c += 1
+                                    sheet.write_merge(c, c, 0, 4, "Cantidad total de Lotes libres: " + unicode(
+                                        lote['total_general_lotes']), style_normal)
+                                    '''
+                                    sheet.write(c, 3, lote['total_general_superficie'], style2)
+                                    sheet.write(c, 4, lote['total_general_contado'], style2)
+                                    sheet.write(c, 5, lote['total_general_credito'], style2)
+                                    sheet.write(c, 6, lote['total_general_cuotas'], style2)
+                                    '''
+                            except Exception, error:
+                                print error
+                                pass
+                        response = HttpResponse(content_type='application/vnd.ms-excel')
+                        # Crear un nombre intuitivo
+                        fecha_actual = datetime.datetime.now().date()
+                        fecha_str = unicode(fecha_actual)
+                        fecha = unicode(datetime.datetime.strptime(fecha_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
+                        response[
+                            'Content-Disposition'] = 'attachment; filename=' + 'lotes_libres_sucursal' + sucursal.nombre + '_' + fecha + '.xls'
+                        wb.save(response)
+                        return response
+                    #
             else:
                 t = loader.get_template('index2.html')
                 grupo= request.user.groups.get().id
@@ -172,7 +175,157 @@ def lotes_libres(request):
             # 'object_list': lista,
             # 'fraccion': f,
         })
-        return HttpResponse(t.render(c))    
+        return HttpResponse(t.render(c))
+
+
+# def lotes_libres(request):
+#     if request.method == 'GET':
+#         if request.user.is_authenticated():
+#             if verificar_permisos(request.user.id, permisos.VER_INFORMES):
+#                 sucursales = Sucursal.objects.all()
+#                 if (filtros_establecidos(request.GET, 'lotes_libres') == False):
+#                     t = loader.get_template('informes/lotes_libres.html')
+#                     c = RequestContext(request, {
+#                         'object_list': [],
+#                         'sucursales': sucursales
+#                     })
+#                     return HttpResponse(t.render(c))
+#                 else:  # Parametros seteados
+#                     tipo_busqueda = request.GET['tipo_busqueda']
+#                     t = loader.get_template('informes/lotes_libres.html')
+#                     fraccion_ini = request.GET['frac1']
+#                     fraccion_fin = request.GET['frac2']
+#                     f1 = request.GET['fraccion_ini']
+#                     f2 = request.GET['fraccion_fin']
+#                     ultimo = "&tipo_busqueda=" + tipo_busqueda + "&fraccion_ini=" + f1 + "&frac1=" + fraccion_ini + "&fraccion_fin=" + f2 + "&frac2=" + fraccion_fin
+#                     object_list = []  # lista de lotes
+#                     if fraccion_ini and fraccion_fin:
+#                         manzanas = Manzana.objects.filter(fraccion_id__range=(fraccion_ini, fraccion_fin)).order_by(
+#                             'fraccion', 'nro_manzana')
+#                         for m in manzanas:
+#                             lotes = Lote.objects.filter(manzana=m.id, estado="1").order_by('nro_lote')
+#                             for l in lotes:
+#                                 object_list.append(l)
+#                     else:
+#                         object_list = Lote.objects.filter(estado="1").order_by('nro_lote')
+#
+#                     lotes = []
+#                     total_importe_cuotas = 0
+#                     total_contado_fraccion = 0
+#                     total_credito_fraccion = 0
+#                     total_superficie_fraccion = 0
+#                     total_lotes_fraccion = 0
+#                     total_general_lotes = 0
+#                     misma_fraccion = True
+#                     for index, lote_item in enumerate(object_list):
+#                         lote = {}
+#                         # Se setean los datos de cada fila
+#                         if misma_fraccion == True:
+#                             misma_fraccion = False
+#                             lote['misma_fraccion'] = misma_fraccion
+#                         precio_cuota = int(math.ceil(lote_item.precio_credito / 130))
+#                         lote['fraccion_id'] = unicode(lote_item.manzana.fraccion.id)
+#                         lote['fraccion'] = unicode(lote_item.manzana.fraccion)
+#                         lote['lote'] = unicode(lote_item.manzana).zfill(3) + "/" + unicode(lote_item.nro_lote).zfill(4)
+#                         lote['superficie'] = lote_item.superficie
+#                         lote['precio_contado'] = unicode('{:,}'.format(lote_item.precio_contado)).replace(",", ".")
+#                         lote['precio_credito'] = unicode('{:,}'.format(lote_item.precio_credito)).replace(",", ".")
+#                         lote['importe_cuota'] = unicode('{:,}'.format(precio_cuota)).replace(",", ".")
+#                         lote['id'] = lote_item.id
+#                         lote['ultimo_registro'] = False
+#                         # ESTEEE
+#                         # Se suman los TOTALES por FRACCION
+#                         total_superficie_fraccion += lote_item.superficie
+#                         total_contado_fraccion += lote_item.precio_contado
+#                         total_credito_fraccion += lote_item.precio_credito
+#                         total_importe_cuotas += precio_cuota
+#                         total_lotes_fraccion += 1
+#                         total_general_lotes += 1
+#                         # Es el ultimo lote, cerrar totales de fraccion
+#                         if (len(object_list) - 1 == index):
+#                             lote['total_importe_cuotas'] = unicode('{:,}'.format(total_importe_cuotas)).replace(",",
+#                                                                                                                 ".")
+#                             lote['total_credito_fraccion'] = unicode('{:,}'.format(total_credito_fraccion)).replace(",",
+#                                                                                                                     ".")
+#                             lote['total_contado_fraccion'] = unicode('{:,}'.format(total_contado_fraccion)).replace(",",
+#                                                                                                                     ".")
+#                             lote['total_superficie_fraccion'] = unicode(
+#                                 '{:,}'.format(total_superficie_fraccion)).replace(",", ".")
+#                             lote['total_lotes'] = unicode('{:,}'.format(total_lotes_fraccion)).replace(",", ".")
+#                             lote['total_general_lotes'] = unicode('{:,}'.format(total_general_lotes)).replace(",", ".")
+#                             lote['ultimo_registro'] = True
+#
+#                             # Hay cambio de fraccion pero NO es el ultimo elemento todavia
+#                         elif (lote_item.manzana.fraccion.id != object_list[index + 1].manzana.fraccion.id):
+#                             lote['total_importe_cuotas'] = unicode('{:,}'.format(total_importe_cuotas)).replace(",",
+#                                                                                                                 ".")
+#                             lote['total_credito_fraccion'] = unicode('{:,}'.format(total_credito_fraccion)).replace(",",
+#                                                                                                                     ".")
+#                             lote['total_contado_fraccion'] = unicode('{:,}'.format(total_contado_fraccion)).replace(",",
+#                                                                                                                     ".")
+#                             lote['total_superficie_fraccion'] = unicode(
+#                                 '{:,}'.format(total_superficie_fraccion)).replace(",", ".")
+#                             lote['total_lotes'] = unicode('{:,}'.format(total_lotes_fraccion)).replace(",", ".")
+#                             # Se CERAN  los TOTALES por FRACCION
+#                             total_importe_cuotas = 0
+#                             total_contado_fraccion = 0
+#                             total_credito_fraccion = 0
+#                             total_superficie_fraccion = 0
+#                             total_lotes_fraccion = 0
+#                             misma_fraccion = True
+#
+#                         lotes.append(lote)
+#                     # sin paginacion
+#                     lista = lotes
+#                     # cantidad de registros a mostrar, determinada por el usuario
+#                     #                     try:
+#                     #                         cant_reg = request.GET['cant_reg']
+#                     #                         if cant_reg=='todos':
+#                     #                             paginator = Paginator(lotes, len(lotes))
+#                     #                         else:
+#                     #                             p=range(int(cant_reg))
+#                     #                             paginator = Paginator(lotes, len(p))
+#                     #                     except:
+#                     #                         cant_reg=25
+#                     #                         paginator = Paginator(lotes, 25)
+#                     #
+#                     #                     page = request.GET.get('page')
+#                     #                     try:
+#                     #                         lista = paginator.page(page)
+#                     #                     except PageNotAnInteger:
+#                     #                         lista = paginator.page(1)
+#                     #                     except EmptyPage:
+#                     #                         lista = paginator.page(paginator.num_pages)
+#
+#                     c = RequestContext(request, {
+#                         'tipo_busqueda': tipo_busqueda,
+#                         'fraccion_ini': fraccion_ini,
+#                         'fraccion_fin': fraccion_fin,
+#                         'ultimo': ultimo,
+#                         'lista_lotes': lista,
+#                         # 'cant_reg':cant_reg,
+#                         'frac1': f1,
+#                         'frac2': f2,
+#                         'sucursales': sucursales
+#                     })
+#                     return HttpResponse(t.render(c))
+#             else:
+#                 t = loader.get_template('index2.html')
+#                 grupo = request.user.groups.get().id
+#                 c = RequestContext(request, {
+#                     'grupo': grupo
+#                 })
+#                 return HttpResponse(t.render(c))
+#         else:
+#             return HttpResponseRedirect(reverse('login'))
+#
+#     else:
+#         t = loader.get_template('informes/lotes_libres.html')
+#         c = RequestContext(request, {
+#             # 'object_list': lista,
+#             # 'fraccion': f,
+#         })
+#         return HttpResponse(t.render(c))
 
 def listar_busqueda_lotes(request):
     
@@ -2204,209 +2357,210 @@ def informe_movimientos(request):
         
         
         
-def lotes_libres_reporte_excel(request):
-    # TODO: Danilo, utiliza este template para poner tu logi
-    fraccion_ini=request.GET['fraccion_ini']
-    fraccion_fin=request.GET['fraccion_fin']
-    object_list = []  
-    if fraccion_ini and fraccion_fin:
-        manzanas = Manzana.objects.filter(fraccion_id__range=(fraccion_ini, fraccion_fin)).order_by('fraccion', 'nro_manzana')
-        for m in manzanas:
-            lotes = Lote.objects.filter(manzana=m.id, estado="1").order_by('nro_lote')
-            for l in lotes:
-                object_list.append(l)                                  
-    else:       
-        object_list = Lote.objects.filter(estado="1").order_by('nro_lote')
-     
-      
-    #Totales por FRACCION
-    total_importe_cuotas = 0
-    total_contado_fraccion = 0
-    total_credito_fraccion = 0
-    total_superficie_fraccion = 0
-    total_lotes = 0 
-    
-    #Totales GENERALES
-    total_general_cuotas = 0
-    total_general_contado = 0
-    total_general_credito = 0
-    total_general_superficie = 0
-    total_general_lotes = 0   
-    
-    g_fraccion = ''
-    
-    lotes = []          
-    for index, lote_item in enumerate(object_list):
-        lote={}
-        # Se setean los datos de cada fila 
-        precio_cuota=int(math.ceil(lote_item.precio_credito/130))
-        lote['fraccion_id']=unicode(lote_item.manzana.fraccion.id)
-        lote['fraccion']=unicode(lote_item.manzana.fraccion)
-        lote['lote']= lote_item.codigo_paralot
-        lote['superficie']=lote_item.superficie                                    
-        lote['precio_contado']=unicode('{:,}'.format(lote_item.precio_contado)).replace(",", ".")                    
-        lote['precio_credito']=unicode('{:,}'.format(lote_item.precio_credito)).replace(",", ".")                    
-        lote['importe_cuota']=unicode('{:,}'.format(precio_cuota)).replace(",", ".")
-        lote['misma_fraccion'] = True
-        lote['ultimo_lote'] = False
-        if g_fraccion == '':
-            g_fraccion = lote_item.manzana.fraccion
+# def lotes_libres_reporte_excel(request):
 
-            
-        
-        # Se suman los TOTALES por FRACCION
-        total_superficie_fraccion += lote_item.superficie 
-        total_contado_fraccion += lote_item.precio_contado
-        total_credito_fraccion += lote_item.precio_credito
-        total_importe_cuotas += precio_cuota
-        total_lotes += 1
-        #Esteee
-        
-        # Se suman los TOTALES GENERALES
-        total_general_cuotas += precio_cuota
-        total_general_contado += lote_item.precio_contado
-        total_general_credito += lote_item.precio_credito
-        total_general_superficie += lote_item.superficie 
-        total_general_lotes += 1
-        
-        #Es el ultimo lote, cerrar totales de fraccion
-        if (len(object_list)-1 == index):
-            lote['ultimo_lote'] = True
-            lote['total_importe_cuotas'] = unicode('{:,}'.format(total_importe_cuotas)).replace(",", ".") 
-            lote['total_credito_fraccion'] =  unicode('{:,}'.format(total_credito_fraccion)).replace(",", ".")
-            lote['total_contado_fraccion'] =  unicode('{:,}'.format(total_contado_fraccion)).replace(",", ".")
-            lote['total_superficie_fraccion'] =  unicode('{:,}'.format(total_superficie_fraccion)).replace(",", ".")
-            lote['total_lotes'] =  unicode('{:,}'.format(total_lotes)).replace(",", ".")
-            
-            lote['total_general_cuotas'] = unicode('{:,}'.format(total_general_cuotas)).replace(",", ".") 
-            lote['total_general_credito'] =  unicode('{:,}'.format(total_general_credito)).replace(",", ".")
-            lote['total_general_contado'] =  unicode('{:,}'.format(total_general_contado)).replace(",", ".")
-            lote['total_general_superficie'] =  unicode('{:,}'.format(total_general_superficie)).replace(",", ".")
-            lote['total_general_lotes'] =  unicode('{:,}'.format(total_general_lotes)).replace(",", ".")
-            
-        #Hay cambio de lote pero NO es el ultimo elemento todavia
-        elif (lote_item.manzana.fraccion.id != object_list[index+1].manzana.fraccion.id):
-            lote['ultimo_lote'] = True
-            lote['total_importe_cuotas'] = unicode('{:,}'.format(total_importe_cuotas)).replace(",", ".") 
-            lote['total_credito_fraccion'] =  unicode('{:,}'.format(total_credito_fraccion)).replace(",", ".")
-            lote['total_contado_fraccion'] =  unicode('{:,}'.format(total_contado_fraccion)).replace(",", ".")
-            lote['total_superficie_fraccion'] =  unicode('{:,}'.format(total_superficie_fraccion)).replace(",", ".")
-            lote['total_lotes'] =  unicode('{:,}'.format(total_lotes)).replace(",", ".")
-        # Se CERAN  los TOTALES por FRACCION
-            total_importe_cuotas = 0
-            total_contado_fraccion = 0
-            total_credito_fraccion = 0
-            total_superficie_fraccion = 0
-            total_lotes = 0
-            
-        if lote_item.manzana.fraccion != g_fraccion:
-            g_fraccion = lote_item.manzana.fraccion
-            lote['misma_fraccion'] = False
-        lotes.append(lote)
-    lotes[0]['misma_fraccion'] = False    
-    #esteee
-    wb = xlwt.Workbook(encoding='utf-8')
-    sheet = wb.add_sheet('test', cell_overwrite_ok=True)
-    sheet.paper_size_code = 1
-    style = xlwt.easyxf('pattern: pattern solid, fore_colour white;'
-                              'font: name Gill Sans MT Condensed, bold True; align: horiz center')   
-    style2 = xlwt.easyxf('pattern: pattern solid, fore_colour white;'
-                         'font: name Gill Sans MT Condensed, bold True, height 160;')
-    style3 = xlwt.easyxf('font: name Gill Sans MT Condensed, height 160 ; align: horiz center')
-    style4 = xlwt.easyxf('font: name Gill Sans MT Condensed, height 160 ; align: horiz right')
-    style5 = xlwt.easyxf('pattern: pattern solid, fore_colour white;''font: name Gill Sans MT Condensed, bold True, height 160 ; align: horiz right')
-    
-    style_normal = xlwt.easyxf('font: name Gill Sans MT Condensed, height 160;')
-    style_normal_centrado = xlwt.easyxf('font: name Gill Sans MT Condensed, height 160; align: horiz center')
-    
-    style_fraccion = xlwt.easyxf('pattern: pattern solid, fore_colour white;'
-                              'font: name Gill Sans MT Condensed, bold True; align: horiz center')  
-    #Titulo
-    #sheet.write_merge(0,0,0,7, 'PROPAR S.R.L.' ,style3)
-    #sheet.write_merge(1,1,1,7, 'Sistema de Control de Loteamiento' ,style3)
-    
-    #sheet.header_str = 'PROPAR S.R.L.'
-    periodo_1 = fraccion_ini
-    periodo_2 = fraccion_fin
-    usuario = unicode(request.user)
-    sheet.header_str = (
-     u"&LFecha: &D Hora: &T \nUsuario: "+usuario+" "
-     u"&CPROPAR S.R.L.\n LOTES LIBRES "
-     u"&RFraccion del "+periodo_1+" al "+periodo_2+" \nPage &P of &N"
-     )
-    #sheet.footer_str = 'things'
-    
-    
-    
-    c=0
-    sheet.write_merge(c,c,0,4, "Lotes Libres", style) 
-    #contador de filas
-      
-    for lote in lotes:
-        c+=1
-        '''
-        sheet.write(c, 0, lote['fraccion'])
-        sheet.write(c, 1, lote['fraccion_id'])
-        '''
-        try: 
-            if lote['total_importe_cuotas'] and lote['ultimo_lote'] == False:
-                c += 1
-                sheet.write_merge(c,c,0,4, "Cantidad de Lotes libres de la fraccion: "+unicode(lote['total_lotes']), style2)
-                '''
-                sheet.write(c, 3, lote['total_superficie_fraccion'], style2)
-                sheet.write(c, 4, lote['total_contado_fraccion'], style2)
-                sheet.write(c, 5, lote['total_credito_fraccion'], style2)
-                sheet.write(c, 6, lote['total_importe_cuotas'], style2)
-                '''
-        except Exception, error:
-            print error 
-            pass
-        
-        if lote['misma_fraccion'] == False:
-            sheet.write_merge(c,c,0,4, "Fraccion: "+unicode(lote['fraccion']), style)
-            c+=1
-            sheet.write(c, 0, "Lote Nro.", style)
-            sheet.write(c, 1, "Superficie", style)    
-            sheet.write(c, 2, "Precio Contado", style)    
-            sheet.write(c, 3, "Precio Credito", style)
-            sheet.write(c, 4, "Precio Cuota", style)
-            c+=1
-             
-        sheet.write(c, 0, lote['lote'], style_normal_centrado)
-        sheet.write(c, 1, unicode(lote['superficie']) + ' mts2', style_normal_centrado)
-        sheet.write(c, 2, lote['precio_contado'], style4)
-        sheet.write(c, 3, lote['precio_credito'], style4)
-        sheet.write(c, 4, lote['importe_cuota'], style4)
-        try: 
-            if lote['ultimo_lote'] == True:
-                c += 1
-                sheet.write_merge(c,c,0,4, "Cantidad de Lotes libres de la fraccion: "+unicode(lote['total_lotes']), style2)
-                '''
-                sheet.write(c, 3, lote['total_superficie_fraccion'], style2)
-                sheet.write(c, 4, lote['total_contado_fraccion'], style2)
-                sheet.write(c, 5, lote['total_credito_fraccion'], style2)
-                sheet.write(c, 6, lote['total_importe_cuotas'], style2)
-                '''
-            if lote['total_general_cuotas']:
-                c += 1
-                sheet.write_merge(c,c,0,4, "Cantidad total de Lotes libres: "+unicode(lote['total_general_lotes']), style2)
-                '''
-                sheet.write(c, 3, lote['total_general_superficie'], style2)
-                sheet.write(c, 4, lote['total_general_contado'], style2)
-                sheet.write(c, 5, lote['total_general_credito'], style2)
-                sheet.write(c, 6, lote['total_general_cuotas'], style2)
-                '''         
-        except Exception, error:
-            print error 
-            pass
-    response = HttpResponse(content_type='application/vnd.ms-excel')
-    # Crear un nombre intuitivo
-    fecha_actual= datetime.datetime.now().date()
-    fecha_str = unicode(fecha_actual)
-    fecha = unicode(datetime.datetime.strptime(fecha_str, "%Y-%m-%d").strftime("%d/%m/%Y"))         
-    response['Content-Disposition'] = 'attachment; filename=' + 'lotes_libres_fraccion_del_'+periodo_1+'_a_'+periodo_2+'_'+fecha+'.xls'
-    wb.save(response)
-    return response
+    # # TODO: Danilo, utiliza este template para poner tu logi
+    # fraccion_ini=request.GET['fraccion_ini']
+    # fraccion_fin=request.GET['fraccion_fin']
+    # object_list = []
+    # if fraccion_ini and fraccion_fin:
+    #     manzanas = Manzana.objects.filter(fraccion_id__range=(fraccion_ini, fraccion_fin)).order_by('fraccion', 'nro_manzana')
+    #     for m in manzanas:
+    #         lotes = Lote.objects.filter(manzana=m.id, estado="1").order_by('nro_lote')
+    #         for l in lotes:
+    #             object_list.append(l)
+    # else:
+    #     object_list = Lote.objects.filter(estado="1").order_by('nro_lote')
+    #
+    #
+    # #Totales por FRACCION
+    # total_importe_cuotas = 0
+    # total_contado_fraccion = 0
+    # total_credito_fraccion = 0
+    # total_superficie_fraccion = 0
+    # total_lotes = 0
+    #
+    # #Totales GENERALES
+    # total_general_cuotas = 0
+    # total_general_contado = 0
+    # total_general_credito = 0
+    # total_general_superficie = 0
+    # total_general_lotes = 0
+    #
+    # g_fraccion = ''
+    #
+    # lotes = []
+    # for index, lote_item in enumerate(object_list):
+    #     lote={}
+    #     # Se setean los datos de cada fila
+    #     precio_cuota=int(math.ceil(lote_item.precio_credito/130))
+    #     lote['fraccion_id']=unicode(lote_item.manzana.fraccion.id)
+    #     lote['fraccion']=unicode(lote_item.manzana.fraccion)
+    #     lote['lote']= lote_item.codigo_paralot
+    #     lote['superficie']=lote_item.superficie
+    #     lote['precio_contado']=unicode('{:,}'.format(lote_item.precio_contado)).replace(",", ".")
+    #     lote['precio_credito']=unicode('{:,}'.format(lote_item.precio_credito)).replace(",", ".")
+    #     lote['importe_cuota']=unicode('{:,}'.format(precio_cuota)).replace(",", ".")
+    #     lote['misma_fraccion'] = True
+    #     lote['ultimo_lote'] = False
+    #     if g_fraccion == '':
+    #         g_fraccion = lote_item.manzana.fraccion
+    #
+    #
+    #
+    #     # Se suman los TOTALES por FRACCION
+    #     total_superficie_fraccion += lote_item.superficie
+    #     total_contado_fraccion += lote_item.precio_contado
+    #     total_credito_fraccion += lote_item.precio_credito
+    #     total_importe_cuotas += precio_cuota
+    #     total_lotes += 1
+    #     #Esteee
+    #
+    #     # Se suman los TOTALES GENERALES
+    #     total_general_cuotas += precio_cuota
+    #     total_general_contado += lote_item.precio_contado
+    #     total_general_credito += lote_item.precio_credito
+    #     total_general_superficie += lote_item.superficie
+    #     total_general_lotes += 1
+    #
+    #     #Es el ultimo lote, cerrar totales de fraccion
+    #     if (len(object_list)-1 == index):
+    #         lote['ultimo_lote'] = True
+    #         lote['total_importe_cuotas'] = unicode('{:,}'.format(total_importe_cuotas)).replace(",", ".")
+    #         lote['total_credito_fraccion'] =  unicode('{:,}'.format(total_credito_fraccion)).replace(",", ".")
+    #         lote['total_contado_fraccion'] =  unicode('{:,}'.format(total_contado_fraccion)).replace(",", ".")
+    #         lote['total_superficie_fraccion'] =  unicode('{:,}'.format(total_superficie_fraccion)).replace(",", ".")
+    #         lote['total_lotes'] =  unicode('{:,}'.format(total_lotes)).replace(",", ".")
+    #
+    #         lote['total_general_cuotas'] = unicode('{:,}'.format(total_general_cuotas)).replace(",", ".")
+    #         lote['total_general_credito'] =  unicode('{:,}'.format(total_general_credito)).replace(",", ".")
+    #         lote['total_general_contado'] =  unicode('{:,}'.format(total_general_contado)).replace(",", ".")
+    #         lote['total_general_superficie'] =  unicode('{:,}'.format(total_general_superficie)).replace(",", ".")
+    #         lote['total_general_lotes'] =  unicode('{:,}'.format(total_general_lotes)).replace(",", ".")
+    #
+    #     #Hay cambio de lote pero NO es el ultimo elemento todavia
+    #     elif (lote_item.manzana.fraccion.id != object_list[index+1].manzana.fraccion.id):
+    #         lote['ultimo_lote'] = True
+    #         lote['total_importe_cuotas'] = unicode('{:,}'.format(total_importe_cuotas)).replace(",", ".")
+    #         lote['total_credito_fraccion'] =  unicode('{:,}'.format(total_credito_fraccion)).replace(",", ".")
+    #         lote['total_contado_fraccion'] =  unicode('{:,}'.format(total_contado_fraccion)).replace(",", ".")
+    #         lote['total_superficie_fraccion'] =  unicode('{:,}'.format(total_superficie_fraccion)).replace(",", ".")
+    #         lote['total_lotes'] =  unicode('{:,}'.format(total_lotes)).replace(",", ".")
+    #     # Se CERAN  los TOTALES por FRACCION
+    #         total_importe_cuotas = 0
+    #         total_contado_fraccion = 0
+    #         total_credito_fraccion = 0
+    #         total_superficie_fraccion = 0
+    #         total_lotes = 0
+    #
+    #     if lote_item.manzana.fraccion != g_fraccion:
+    #         g_fraccion = lote_item.manzana.fraccion
+    #         lote['misma_fraccion'] = False
+    #     lotes.append(lote)
+    # lotes[0]['misma_fraccion'] = False
+    # #esteee
+    # wb = xlwt.Workbook(encoding='utf-8')
+    # sheet = wb.add_sheet('test', cell_overwrite_ok=True)
+    # sheet.paper_size_code = 1
+    # style = xlwt.easyxf('pattern: pattern solid, fore_colour white;'
+    #                           'font: name Gill Sans MT Condensed, bold True; align: horiz center')
+    # style2 = xlwt.easyxf('pattern: pattern solid, fore_colour white;'
+    #                      'font: name Gill Sans MT Condensed, bold True, height 160;')
+    # style3 = xlwt.easyxf('font: name Gill Sans MT Condensed, height 160 ; align: horiz center')
+    # style4 = xlwt.easyxf('font: name Gill Sans MT Condensed, height 160 ; align: horiz right')
+    # style5 = xlwt.easyxf('pattern: pattern solid, fore_colour white;''font: name Gill Sans MT Condensed, bold True, height 160 ; align: horiz right')
+    #
+    # style_normal = xlwt.easyxf('font: name Gill Sans MT Condensed, height 160;')
+    # style_normal_centrado = xlwt.easyxf('font: name Gill Sans MT Condensed, height 160; align: horiz center')
+    #
+    # style_fraccion = xlwt.easyxf('pattern: pattern solid, fore_colour white;'
+    #                           'font: name Gill Sans MT Condensed, bold True; align: horiz center')
+    # #Titulo
+    # #sheet.write_merge(0,0,0,7, 'PROPAR S.R.L.' ,style3)
+    # #sheet.write_merge(1,1,1,7, 'Sistema de Control de Loteamiento' ,style3)
+    #
+    # #sheet.header_str = 'PROPAR S.R.L.'
+    # periodo_1 = fraccion_ini
+    # periodo_2 = fraccion_fin
+    # usuario = unicode(request.user)
+    # sheet.header_str = (
+    #  u"&LFecha: &D Hora: &T \nUsuario: "+usuario+" "
+    #  u"&CPROPAR S.R.L.\n LOTES LIBRES "
+    #  u"&RFraccion del "+periodo_1+" al "+periodo_2+" \nPage &P of &N"
+    #  )
+    # #sheet.footer_str = 'things'
+    #
+    #
+    #
+    # c=0
+    # sheet.write_merge(c,c,0,4, "Lotes Libres", style)
+    # #contador de filas
+    #
+    # for lote in lotes:
+    #     c+=1
+    #     '''
+    #     sheet.write(c, 0, lote['fraccion'])
+    #     sheet.write(c, 1, lote['fraccion_id'])
+    #     '''
+    #     try:
+    #         if lote['total_importe_cuotas'] and lote['ultimo_lote'] == False:
+    #             c += 1
+    #             sheet.write_merge(c,c,0,4, "Cantidad de Lotes libres de la fraccion: "+unicode(lote['total_lotes']), style2)
+    #             '''
+    #             sheet.write(c, 3, lote['total_superficie_fraccion'], style2)
+    #             sheet.write(c, 4, lote['total_contado_fraccion'], style2)
+    #             sheet.write(c, 5, lote['total_credito_fraccion'], style2)
+    #             sheet.write(c, 6, lote['total_importe_cuotas'], style2)
+    #             '''
+    #     except Exception, error:
+    #         print error
+    #         pass
+    #
+    #     if lote['misma_fraccion'] == False:
+    #         sheet.write_merge(c,c,0,4, "Fraccion: "+unicode(lote['fraccion']), style)
+    #         c+=1
+    #         sheet.write(c, 0, "Lote Nro.", style)
+    #         sheet.write(c, 1, "Superficie", style)
+    #         sheet.write(c, 2, "Precio Contado", style)
+    #         sheet.write(c, 3, "Precio Credito", style)
+    #         sheet.write(c, 4, "Precio Cuota", style)
+    #         c+=1
+    #
+    #     sheet.write(c, 0, lote['lote'], style_normal_centrado)
+    #     sheet.write(c, 1, unicode(lote['superficie']) + ' mts2', style_normal_centrado)
+    #     sheet.write(c, 2, lote['precio_contado'], style4)
+    #     sheet.write(c, 3, lote['precio_credito'], style4)
+    #     sheet.write(c, 4, lote['importe_cuota'], style4)
+    #     try:
+    #         if lote['ultimo_lote'] == True:
+    #             c += 1
+    #             sheet.write_merge(c,c,0,4, "Cantidad de Lotes libres de la fraccion: "+unicode(lote['total_lotes']), style2)
+    #             '''
+    #             sheet.write(c, 3, lote['total_superficie_fraccion'], style2)
+    #             sheet.write(c, 4, lote['total_contado_fraccion'], style2)
+    #             sheet.write(c, 5, lote['total_credito_fraccion'], style2)
+    #             sheet.write(c, 6, lote['total_importe_cuotas'], style2)
+    #             '''
+    #         if lote['total_general_cuotas']:
+    #             c += 1
+    #             sheet.write_merge(c,c,0,4, "Cantidad total de Lotes libres: "+unicode(lote['total_general_lotes']), style2)
+    #             '''
+    #             sheet.write(c, 3, lote['total_general_superficie'], style2)
+    #             sheet.write(c, 4, lote['total_general_contado'], style2)
+    #             sheet.write(c, 5, lote['total_general_credito'], style2)
+    #             sheet.write(c, 6, lote['total_general_cuotas'], style2)
+    #             '''
+    #     except Exception, error:
+    #         print error
+    #         pass
+    # response = HttpResponse(content_type='application/vnd.ms-excel')
+    # # Crear un nombre intuitivo
+    # fecha_actual= datetime.datetime.now().date()
+    # fecha_str = unicode(fecha_actual)
+    # fecha = unicode(datetime.datetime.strptime(fecha_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
+    # response['Content-Disposition'] = 'attachment; filename=' + 'lotes_libres_fraccion_del_'+periodo_1+'_a_'+periodo_2+'_'+fecha+'.xls'
+    # wb.save(response)
+    # return response
 
 def clientes_atrasados_reporte_excel(request):
     
@@ -2951,60 +3105,61 @@ def liquidacion_propietarios_reporte_excel(request):
         wb = xlwt.Workbook(encoding='utf-8')
         sheet = wb.add_sheet('Liquidacion', cell_overwrite_ok=True,)
         sheet.paper_size_code = 1
-        style_titulos_columna = xlwt.easyxf('pattern: pattern solid, fore_colour white;'
-                                  'font: name Calibri; align: horiz center')
 
-        style_titulos_columna_resaltados_centrados = xlwt.easyxf('pattern: pattern solid, fore_colour white;'
-                                  'font: name Calibri; align: horiz center')
-        style_titulos_columna_resaltados= xlwt.easyxf('pattern: pattern solid, fore_colour white;'
-                                  'font: name Calibri')
-
-
-        style_titulo_resumen = xlwt.easyxf('pattern: pattern solid, fore_colour white;'
-                             'font: name Calibri, bold True, height 200;')
-
-        style_datos_montos = xlwt.easyxf('font: name Calibri, height 200 ; align: horiz right')
-        style_datos_montos_subrayado = xlwt.easyxf('font: name Calibri, height 200 ; align: horiz right')
-        style_datos_montos_importante = xlwt.easyxf('font: name Calibri, bold True, height 200 ; align: horiz right')
-        # style_datos = xlwt.easyxf('pattern: pattern solid, fore_colour white;''font: name Calibri, height 200 ; align: horiz right')
-
-        style_normal = xlwt.easyxf('font: name Calibri, height 200;')
-        style_normal_subrayado_palabra = xlwt.easyxf('font: name Calibri, height 200;')
-        style_subrayado_normal = xlwt.easyxf('font: name Calibri, height 200;')
-        style_subrayado_normal_titulo = xlwt.easyxf('font: name Calibri, height 200; align: horiz center')
-        style_doble_subrayado = xlwt.easyxf('font: name Calibri, height 200;')
-        style_datos_texto_lote = xlwt.easyxf('font: name Calibri, height 200; align: horiz center')
-        style_datos_texto = xlwt.easyxf('font: name Calibri, height 200; align: horiz center')
-
-        style_fraccion = xlwt.easyxf('pattern: pattern solid, fore_colour white;'
-                                  'font: name Calibri; align: horiz center')
-
-        style_datos_montos_importante_doble_borde = xlwt.easyxf('font: name Calibri, bold True, height 200 ; align: horiz right')
-
-        # BORDES PARA las columnas de titulos
-        borders = xlwt.Borders()
-        borders.top = xlwt.Borders.THIN
-        borders.bottom = xlwt.Borders.DOUBLE
-        style_titulos_columna_resaltados_centrados.borders = borders
-        style_datos_montos_importante_doble_borde.borders = borders
-        style_titulos_columna_resaltados.borders = borders
-
-        # Subrayado normal
-        border_subrayado = xlwt.Borders()
-        border_subrayado.bottom = xlwt.Borders.THIN
-        style_subrayado_normal.borders = border_subrayado
-        style_datos_montos_subrayado.borders = border_subrayado
-        style_subrayado_normal_titulo.borders = border_subrayado
-
-        # Doble Subrayado negritas
-        border_doble_subrayado = xlwt.Borders()
-        border_doble_subrayado.bottom = xlwt.Borders.THIN
-        style_doble_subrayado.borders = border_doble_subrayado
-
-        # font
-        font = xlwt.Font()
-        font.underline = True
-        style_normal_subrayado_palabra.font = font
+        # style_titulos_columna = xlwt.easyxf('pattern: pattern solid, fore_colour white;'
+        #                           'font: name Calibri; align: horiz center')
+        #
+        # style_titulos_columna_resaltados_centrados = xlwt.easyxf('pattern: pattern solid, fore_colour white;'
+        #                           'font: name Calibri; align: horiz center')
+        # style_titulos_columna_resaltados= xlwt.easyxf('pattern: pattern solid, fore_colour white;'
+        #                           'font: name Calibri')
+        #
+        #
+        # style_titulo_resumen = xlwt.easyxf('pattern: pattern solid, fore_colour white;'
+        #                      'font: name Calibri, bold True, height 200;')
+        #
+        # style_datos_montos = xlwt.easyxf('font: name Calibri, height 200 ; align: horiz right')
+        # style_datos_montos_subrayado = xlwt.easyxf('font: name Calibri, height 200 ; align: horiz right')
+        # style_datos_montos_importante = xlwt.easyxf('font: name Calibri, bold True, height 200 ; align: horiz right')
+        # # style_datos = xlwt.easyxf('pattern: pattern solid, fore_colour white;''font: name Calibri, height 200 ; align: horiz right')
+        #
+        # style_normal = xlwt.easyxf('font: name Calibri, height 200;')
+        # style_normal_subrayado_palabra = xlwt.easyxf('font: name Calibri, height 200;')
+        # style_subrayado_normal = xlwt.easyxf('font: name Calibri, height 200;')
+        # style_subrayado_normal_titulo = xlwt.easyxf('font: name Calibri, height 200; align: horiz center')
+        # style_doble_subrayado = xlwt.easyxf('font: name Calibri, height 200;')
+        # style_datos_texto_lote = xlwt.easyxf('font: name Calibri, height 200; align: horiz center')
+        # style_datos_texto = xlwt.easyxf('font: name Calibri, height 200; align: horiz center')
+        #
+        # style_fraccion = xlwt.easyxf('pattern: pattern solid, fore_colour white;'
+        #                           'font: name Calibri; align: horiz center')
+        #
+        # style_datos_montos_importante_doble_borde = xlwt.easyxf('font: name Calibri, bold True, height 200 ; align: horiz right')
+        #
+        # # BORDES PARA las columnas de titulos
+        # borders = xlwt.Borders()
+        # borders.top = xlwt.Borders.THIN
+        # borders.bottom = xlwt.Borders.DOUBLE
+        # style_titulos_columna_resaltados_centrados.borders = borders
+        # style_datos_montos_importante_doble_borde.borders = borders
+        # style_titulos_columna_resaltados.borders = borders
+        #
+        # # Subrayado normal
+        # border_subrayado = xlwt.Borders()
+        # border_subrayado.bottom = xlwt.Borders.THIN
+        # style_subrayado_normal.borders = border_subrayado
+        # style_datos_montos_subrayado.borders = border_subrayado
+        # style_subrayado_normal_titulo.borders = border_subrayado
+        #
+        # # Doble Subrayado negritas
+        # border_doble_subrayado = xlwt.Borders()
+        # border_doble_subrayado.bottom = xlwt.Borders.THIN
+        # style_doble_subrayado.borders = border_doble_subrayado
+        #
+        # # font
+        # font = xlwt.Font()
+        # font.underline = True
+        # style_normal_subrayado_palabra.font = font
 
 
 

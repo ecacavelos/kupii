@@ -88,25 +88,21 @@
 	<form name="frm_busqueda" id="frm_busqueda" method="get" action="{% url 'frontend_home' %}informes/lotes_libres/">		
 		<table id="lista-categoria" frame="box">			
 			<tr>
-				<th class="acciones" ><strong><a href="#" style="color: white;">Filtrar</a></strong></th>
-				<th>Desde:</th>
-				<th>Hasta:</th>
+				<th class="acciones" colspan="3"><strong>Sucursal</strong></th>
 			</tr>
 			<tr>
 			<tr>
-				<td>
-				<select id="id_tipo_busqueda" name="tipo_busqueda">
-					<!-- <option value="">Elija una opcion</option> -->
-					<option value="nombre">Nombre de Fraccion</option>
-					<option value="codigo">Codigo de Fraccion</option>
-				</select></td>
 			<td>
-				<input name="fraccion_ini" id="id_fraccion_ini" type="text" value=""/>
-				<input name="frac1" id="id_frac1" type="hidden" value=""/>
-			</td>
-			<td>	
-				<input name="fraccion_fin" id="id_fraccion_fin" type="text" value=""/>
-				<input name="frac2" id="id_frac2" type="hidden" value=""/>
+				<select id="select_sucursal" name="sucursal">
+                    {% for sucursal_obj in sucursales %}
+                        {% if sucursal.id == sucursal_obj.id %}
+					        <option value="{{sucursal_obj.id}}" selected>{{sucursal_obj.nombre}}</option>
+                        {% else %}
+                            <option value="{{sucursal_obj.id}}" >{{sucursal_obj.nombre}}</option>
+                        {% endif %}
+                    {% endfor %}
+				</select>
+
 			</td>
 			</tr>
 			<tr>
@@ -118,6 +114,7 @@
 				</td>
 			</tr>
 		</table>
+        <input type="hidden" name="formato_reporte" id="formato_reporte" value="pantalla">
 	</form>
 </div>
 <div class="clear"></div>
