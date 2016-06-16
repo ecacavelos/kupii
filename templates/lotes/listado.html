@@ -103,7 +103,18 @@
 			$("#busqueda_label").autocomplete("destroy");
 				autocompleteClientePorNombreOCedula(tipo_busqueda, busqueda_label, busqueda);
 			}
-			
+			if($("#tipo_busqueda").val() == "nombre_fraccion"){
+				$("#label_busqueda").html("Nombre de Fraccion:");
+				console.log("Por nombre de fraccion");
+				$('#busqueda_label').unmask();
+				$("#busqueda_label").attr("placeholder", "Ej: El Manantial");
+				tipo_busqueda=$("#tipo_busqueda").val();
+				busqueda_label=$("#busqueda_label").val();
+				busqueda=$("#busqueda").val();
+			$("#busqueda_label").autocomplete("destroy");
+				autocompleteFraccionPorNombreOId(tipo_busqueda, busqueda_label, busqueda);
+			}
+
 		});
 		
 	});
@@ -142,6 +153,7 @@
 						<option value="codigo">Codigo de Lote</option>
 						<option value="nombre">Nombre de Cliente</option>
 						<option value="cedula">Cedula de Cliente</option>	
+						<option value="nombre_fraccion">Nombre de Fraccion</option>
 					</select>
 					
 				</td>
