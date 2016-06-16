@@ -4795,16 +4795,16 @@ def informe_facturacion(request):
                         
                         busqueda = request.GET.get('busqueda','')
                         busqueda_label = request.GET.get('busqueda_label','')
-                        
+
+                        sucursal = request.GET.get('sucursal','')
+                        sucursal_label = request.GET.get('sucursal_label','')
+
                         fecha_ini_parsed = datetime.datetime.strptime(fecha_ini, "%d/%m/%Y").strftime("%Y-%m-%d")
                         fecha_fin_parsed = datetime.datetime.strptime(fecha_fin, "%d/%m/%Y").strftime("%Y-%m-%d")
                         
                         filas = []
                         lista_totales = []
-                        
-                        
-                        
-                        
+
                         #Totales GENERALES
                         total_general_facturado = 0
                         total_general_exentas = 0
@@ -4816,12 +4816,40 @@ def informe_facturacion(request):
                             grupo= request.user.groups.get().id
                             if grupo == 1:
                                 if busqueda =='':
-                                    facturas = Factura.objects.filter(anulado=False, fecha__range=(fecha_ini_parsed, fecha_fin_parsed))
+                                    if sucursal_label == '':
+                                        facturas = Factura.objects.filter(anulado=False, fecha__range=(fecha_ini_parsed, fecha_fin_parsed))
+                                    else:
+                                        facturas = Factura.objects.raw('''SELECT "principal_factura"."id", "principal_factura"."fecha", "principal_factura"."numero", "principal_factura"."cliente_id", "principal_factura"."lote_id", "principal_factura"."rango_factura_id", "principal_factura"."tipo", "principal_factura"."detalle", "principal_factura"."anulado", "principal_factura"."observacion", "principal_factura"."usuario_id", "principal_factura"."impresa" FROM "principal_factura" WHERE (SUBSTR("principal_factura"."numero", 1, 3) like %s) AND fecha >= %s AND fecha <= %s''',[sucursal_label, fecha_ini_parsed, fecha_fin_parsed])
                                 else:
-                                    facturas = Factura.objects.filter(anulado=False, fecha__range=(fecha_ini_parsed, fecha_fin_parsed), usuario = busqueda)
+                                    if sucursal_label == '':
+                                        facturas = Factura.objects.filter(anulado=False, fecha__range=(fecha_ini_parsed, fecha_fin_parsed), usuario = busqueda)
+                                    else:
+                                        # Esta manera es haciendo el query estatico, en duro, luego por cada rox ir creando un objeto Factura y luego ir agregando
+                                        # a una lista Facturas, pero no es lo mismo el QuerySet que la List, asi que explota el codigo mas abajo
+                                        # facturas = []
+                                        # # QUERY para traer las Facturas con los filtros seleccionados
+                                        # query = ('''SELECT "principal_factura"."id", "principal_factura"."fecha", "principal_factura"."numero", "principal_factura"."cliente_id", "principal_factura"."lote_id", "principal_factura"."rango_factura_id", "principal_factura"."tipo", "principal_factura"."detalle", "principal_factura"."anulado", "principal_factura"."observacion", "principal_factura"."usuario_id", "principal_factura"."impresa" FROM "principal_factura" WHERE (SUBSTR("principal_factura"."numero", 1, 3) like %s) AND fecha >= %s AND fecha <= %s AND usuario_id = %s ''')
+                                        # cursor = connection.cursor()
+                                        # cursor.execute(query, [sucursal_label, fecha_ini_parsed, fecha_fin_parsed, busqueda])
+                                        # results = cursor.fetchall()
+                                        # if (len(results) > 0):
+                                        #     #Obtenemos las factuas con ese id a partir del result
+                                        #     for row in results:
+                                        #         factura = Factura.objects.filter(id=row[0])
+                                        #         facturas.append(factura)
+
+                                        # esta forma seria tratando de utilizar el filter para que retorne un QuerySet pero aca se indica la columna y no se como obtener los 3 primeros caracteres
+                                        # facturas = Factura.objects.filter(anulado=False, fecha__range=(fecha_ini_parsed, fecha_fin_parsed), usuario=busqueda, numero_subtr(1:3)__iexact=sucursal_label)
+
+                                        # y esta forma es obtener RawWuerySet, es decir, los modelos del Django a partir de un query estático y que me sirve para no modificar codigo
+                                        facturas = Factura.objects.raw('''SELECT "principal_factura"."id", "principal_factura"."fecha", "principal_factura"."numero", "principal_factura"."cliente_id", "principal_factura"."lote_id", "principal_factura"."rango_factura_id", "principal_factura"."tipo", "principal_factura"."detalle", "principal_factura"."anulado", "principal_factura"."observacion", "principal_factura"."usuario_id", "principal_factura"."impresa" FROM "principal_factura" WHERE (SUBSTR("principal_factura"."numero", 1, 3) like %s) AND fecha >= %s AND fecha <= %s AND usuario_id = %s ''', [sucursal_label, fecha_ini_parsed, fecha_fin_parsed, busqueda])
+
                             else:
-                                facturas = Factura.objects.filter(anulado=False, fecha__range=(fecha_ini_parsed, fecha_fin_parsed), usuario = request.user)
-                            
+                                if sucursal_label == '':
+                                    print ("CCP Tu Papa")
+                                else:
+                                    facturas = Factura.objects.filter(anulado=False,fecha__range=(fecha_ini_parsed, fecha_fin_parsed),usuario=request.user)
+
                             for factura in facturas:
                                 
                                 #Totales Factura
