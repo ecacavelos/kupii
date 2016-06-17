@@ -353,7 +353,35 @@ def listar_busqueda_lotes(request):
                     except Exception, error:
                         lote.cliente = 'Lote de estado "vendido" sin venta asociada'
                         print "El lote vendido no esta asociado a una venta."
-                        
+
+    if(tipo_busqueda=='nombre_fraccion'):
+        if busqueda != '':
+            fraccion=Fraccion.objects.filter(id=busqueda)
+            # Esta manera es haciendo el query estatico, en duro, luego por cada rox ir creando un objeto Factura y luego ir agregando
+            # a una lista lotes
+            lista_lotes = []
+            # QUERY para traer los lotes de la fraccion en cuestio
+            query = ('''SELECT id, nro_lote, manzana_id, precio_contado, precio_credito, superficie, cuenta_corriente_catastral, boleto_nro,
+                    estado, precio_costo, importacion_paralot, codigo_paralot
+                    FROM principal_lote where manzana_id in (SELECT id FROM principal_manzana where fraccion_id = (SELECT id FROM principal_fraccion WHERE nombre LIKE UPPER (%s)));''')
+            cursor = connection.cursor()
+            cursor.execute(query, [fraccion[0].nombre])
+            results = cursor.fetchall()
+            if (len(results) > 0):
+                #Obtenemos los lotes con ese id a partir del result
+                for row in results:
+                    lote = lote=Lote.objects.get(pk=row[0])
+                    try:
+                        venta = Venta.objects.filter(lote_id=lote.id).order_by('-fecha_de_venta')
+                        venta = venta[0]
+                        cliente = venta.cliente
+                        lote.cliente = cliente
+
+                    except Exception, error:
+                        lote.cliente = 'Lote de estado "vendido" sin venta asociada'
+                        print "El lote vendido no esta asociado a una venta."
+                    lista_lotes.append(lote)
+
     if(tipo_busqueda==''):
         lotes_con_ventas_al_contado = []
         lotes_sin_ventas_al_contado = []
@@ -374,7 +402,7 @@ def listar_busqueda_lotes(request):
     object_list=lista_lotes
     
             
-    paginator=Paginator(object_list,15)
+    paginator=Paginator(object_list,50)
     page=request.GET.get('page')
     try:
         lista=paginator.page(page)
