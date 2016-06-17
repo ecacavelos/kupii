@@ -114,6 +114,17 @@
 			$("#busqueda_label").autocomplete("destroy");
 				autocompleteFraccionPorNombreOId(tipo_busqueda, busqueda_label, busqueda);
 			}
+			if($("#tipo_busqueda").val() == "estado"){
+				$("#label_busqueda").html("Estado del Lote:");
+				console.log("Por estado del lote");
+				$('#busqueda_label').unmask();
+				$("#busqueda_label").attr("placeholder", "Ej: Vendido");
+				tipo_busqueda=$("#tipo_busqueda").val();
+				busqueda_label=$("#busqueda_label").val();
+				busqueda=$("#busqueda").val();
+			$("#busqueda_label").autocomplete("destroy");
+				autocompleteEstadosLotes(tipo_busqueda, busqueda_label, busqueda);
+			}
 
 		});
 		
@@ -154,6 +165,7 @@
 						<option value="nombre">Nombre de Cliente</option>
 						<option value="cedula">Cedula de Cliente</option>	
 						<option value="nombre_fraccion">Nombre de Fraccion</option>
+						<option value="estado">Estado del Lote</option>
 					</select>
 					
 				</td>
