@@ -1268,16 +1268,19 @@ def lote_libre(lote_id):
 
     return esta_libre
 
-def obtener_lotes_disponbiles(sucursal):
+def obtener_lotes_disponbiles(sucursal, fracciones_a_exluir=None):
 
     lotes_list = []
 
+    if fracciones_a_exluir == None:
+        fracciones_a_exluir = []
     # SE OBTIENEN TODOS LOS LOTES DE TODAS LAS FRACCIONES DE LA SUCURSAL
     fracciones = Fraccion.objects.filter(sucursal=sucursal)
     for fraccion in fracciones:
-        lotes_fraccion = Lote.objects.filter(manzana__fraccion=fraccion)
-        for lote in lotes_fraccion:
-            lotes_list.append(lote)
+        if unicode(fraccion.id) not in fracciones_a_exluir:
+            lotes_fraccion = Lote.objects.filter(manzana__fraccion=fraccion)
+            for lote in lotes_fraccion:
+                lotes_list.append(lote)
 
     # RECORTAR LA LISTA DE LOTES A LOS LOTES QUE ESTAN LIBRES
     for lote in lotes_list:

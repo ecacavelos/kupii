@@ -2,7 +2,11 @@
 {% block header_scripts %}
 
 <script type="text/javascript">
-	$(document).ready(function() {
+
+        var fracciones_excluidas_json = '{{ fracciones_excluidas_json|safe }}'
+
+        $(document).ready(function() {
+
 		$('#id_tipo_busqueda').focus();
 		var tipo_busqueda = "{{tipo_busqueda}}";
 		var cant_reg = "{{cant_reg}}";
@@ -92,7 +96,7 @@
 			</tr>
 			<tr>
 			<tr>
-			<td>
+			<td colspan="3">
 				<select id="select_sucursal" name="sucursal">
                     {% for sucursal_obj in sucursales %}
                         {% if sucursal.id == sucursal_obj.id %}
@@ -106,6 +110,11 @@
 			</td>
 			</tr>
 			<tr>
+			<td colspan="3">
+				<div id="fracciones_por_sucursal"></div>
+			</td>
+			</tr>
+			<tr>
 				<td>
 				<input id="boton_buscar" type="button" value="Buscar"  onclick="validar();" class="historico" style="cursor: pointer"/>
 				</td>
@@ -115,7 +124,13 @@
 			</tr>
 		</table>
         <input type="hidden" name="formato_reporte" id="formato_reporte" value="pantalla">
+        <div id="fracciones_excluir">
+            {% for fraccion_id in fracciones_excluidas %}
+                <input type="hidden" name="fracciones_excluir" value="{{ fraccion_id }}">
+            {% endfor %}
+        </div>
 	</form>
+
 </div>
 <div class="clear"></div>
 <!--

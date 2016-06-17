@@ -57,9 +57,10 @@ def lotes_libres(request):
 
                     # SE OBTIENEN LOS PARAMETROS
                     sucursal_id = request.GET['sucursal']
+                    fracciones_a_exluir = request.GET.getlist('fracciones_excluir')
                     sucursal = Sucursal.objects.get(pk=sucursal_id) #SUCURSAL A BUSCAR
 
-                    lista_lotes_libres = obtener_lotes_disponbiles(sucursal)
+                    lista_lotes_libres = obtener_lotes_disponbiles(sucursal, fracciones_a_exluir)
                     # SE OBTIENE LA LISTA DE OBJETOS A MOSTRAR
 
                     if (request.GET['formato_reporte'] == "pantalla"):
@@ -69,7 +70,9 @@ def lotes_libres(request):
                         c = RequestContext(request, {
                             'sucursal': sucursal,
                             'lista_lotes': lista_lotes_libres,
-                            'sucursales': sucursales
+                            'sucursales': sucursales,
+                            'fracciones_excluidas': fracciones_a_exluir,
+                            'fracciones_excluidas_json': json.dumps(fracciones_a_exluir)
                         })
                         return HttpResponse(t.render(c))
 
