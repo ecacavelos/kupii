@@ -250,8 +250,7 @@ def filtros_establecidos(request, tipo_informe):
                 return 0
     elif tipo_informe == 'lotes_libres':
         try:
-            fraccion_ini=request['fraccion_ini']
-            fraccion_fin=request['fraccion_fin']
+            sucursal=request['sucursal']
             return True
         except:
             print('Parametros no seteados')
@@ -1008,7 +1007,7 @@ def get_ultima_venta(lote_id):
         print 'SE ENCONTRO LA VENTA'
     else:
         print 'NO SE ENCONTRO LA VENTA'
-        venta = None
+        venta = Noneventas = Venta.objects.filter(lote_id=lote_id).order_by('fecha_de_venta')
     return venta
 
 #Funcion que encuentra todas las ventas de un lote y retorna la ultima siempre que no sea recuperada
@@ -1019,7 +1018,7 @@ def get_ultima_venta_no_recuperada(lote_id):
     # QUERY PARA TRAER LA ULTIMA VENTA QUE NO ES RECUPERADA DEL LOTE EN CUESTION
     query = (
         '''
-        SELECT "principal_venta"."id", "principal_venta"."lote_id", "principal_venta"."fecha_de_venta", "principal_venta"."cliente_id", "principal_venta"."vendedor_id", "principal_venta"."plan_de_pago_id", "principal_venta"."entrega_inicial", "principal_venta"."precio_de_cuota", "principal_venta"."precio_final_de_venta", "principal_venta"."fecha_primer_vencimiento", "principal_venta"."pagos_realizados", "principal_venta"."importacion_paralot", "principal_venta"."plan_de_pago_vendedor_id", "principal_venta"."monto_cuota_refuerzo", "principal_venta"."recuperado" FROM "principal_venta" WHERE "principal_venta"."lote_id" = %s AND "principal_venta"."id" not in (select "venta_id" from "principal_recuperaciondelotes")
+        SELECT * FROM "principal_venta" WHERE "principal_venta"."lote_id" = %s AND "principal_venta"."id" not in (select "venta_id" from "principal_recuperaciondelotes")
         '''
     )
     cursor = connection.cursor()
@@ -1251,3 +1250,103 @@ def obtener_cantidad_cuotas_pagadas(pago):
     print PagoDeCuotas.objects.filter(venta=id_venta, fecha_de_pago__range=(fecha_venta, fecha_pago)).order_by('fecha_de_pago','id').query
     cantidad_pagos = pagos['nro_cuotas_a_pagar__sum']
     return cantidad_pagos
+
+
+def lote_libre(lote_id):
+
+    esta_libre = True
+    #TODO: Hacer el analisis exaustivo para ver si un lote esta libre o no
+    # Contemplar transferencias, reservas, transferencias y cambios.
+
+    venta = get_ultima_venta_no_recuperada(lote_id)
+
+    if venta != None:
+        # cuotas_detalles = get_cuotas_detail_by_lote(str(lote_id))
+        esta_libre  = False
+    else:
+        esta_libre = True
+
+    return esta_libre
+
+def obtener_lotes_disponbiles(sucursal, fracciones_a_exluir=None):
+
+    lotes_list = []
+
+    if fracciones_a_exluir == None:
+        fracciones_a_exluir = []
+    # SE OBTIENEN TODOS LOS LOTES DE TODAS LAS FRACCIONES DE LA SUCURSAL
+    fracciones = Fraccion.objects.filter(sucursal=sucursal)
+    for fraccion in fracciones:
+        if unicode(fraccion.id) not in fracciones_a_exluir:
+            lotes_fraccion = Lote.objects.filter(manzana__fraccion=fraccion)
+            for lote in lotes_fraccion:
+                lotes_list.append(lote)
+
+    # RECORTAR LA LISTA DE LOTES A LOS LOTES QUE ESTAN LIBRES
+    for lote in lotes_list:
+        if lote_libre(lote.pk) == False:
+            lotes_list.remove(lote)
+
+
+    lotes = []
+    total_importe_cuotas = 0
+    total_contado_fraccion = 0
+    total_credito_fraccion = 0
+    total_superficie_fraccion = 0
+    total_lotes_fraccion = 0
+    total_general_lotes = 0
+
+    misma_fraccion = True
+    for index, lote_item in enumerate(lotes_list):
+        lote = {}
+        # Se setean los datos de cada fila
+        if misma_fraccion == True:
+            misma_fraccion = False
+            lote['misma_fraccion'] = misma_fraccion
+        precio_cuota = int(math.ceil(lote_item.precio_credito / 130))
+        lote['fraccion_id'] = unicode(lote_item.manzana.fraccion.id)
+        lote['fraccion'] = unicode(lote_item.manzana.fraccion)
+        lote['lote'] = unicode(lote_item.manzana).zfill(3) + "/" + unicode(lote_item.nro_lote).zfill(4)
+        lote['superficie'] = lote_item.superficie
+        lote['precio_contado'] = unicode('{:,}'.format(lote_item.precio_contado)).replace(",", ".")
+        lote['precio_credito'] = unicode('{:,}'.format(lote_item.precio_credito)).replace(",", ".")
+        lote['importe_cuota'] = unicode('{:,}'.format(precio_cuota)).replace(",", ".")
+        lote['id'] = lote_item.id
+        lote['ultimo_registro'] = False
+
+        # Se suman los TOTALES por FRACCION
+        total_superficie_fraccion += lote_item.superficie
+        total_contado_fraccion += lote_item.precio_contado
+        total_credito_fraccion += lote_item.precio_credito
+        total_importe_cuotas += precio_cuota
+        total_lotes_fraccion += 1
+        total_general_lotes += 1
+        # Es el ultimo lote, cerrar totales de fraccion
+        if (len(lotes_list) - 1 == index):
+            lote['total_importe_cuotas'] = unicode('{:,}'.format(total_importe_cuotas)).replace(",", ".")
+            lote['total_credito_fraccion'] = unicode('{:,}'.format(total_credito_fraccion)).replace(",", ".")
+            lote['total_contado_fraccion'] = unicode('{:,}'.format(total_contado_fraccion)).replace(",", ".")
+            lote['total_superficie_fraccion'] = unicode('{:,}'.format(total_superficie_fraccion)).replace(",", ".")
+            lote['total_lotes'] = unicode('{:,}'.format(total_lotes_fraccion)).replace(",", ".")
+            lote['total_general_lotes'] = unicode('{:,}'.format(total_general_lotes)).replace(",", ".")
+            lote['ultimo_registro'] = True
+
+            # Hay cambio de fraccion pero NO es el ultimo elemento todavia
+        elif (lote_item.manzana.fraccion.id != lotes_list[index + 1].manzana.fraccion.id):
+            lote['total_importe_cuotas'] = unicode('{:,}'.format(total_importe_cuotas)).replace(",", ".")
+            lote['total_credito_fraccion'] = unicode('{:,}'.format(total_credito_fraccion)).replace(",", ".")
+            lote['total_contado_fraccion'] = unicode('{:,}'.format(total_contado_fraccion)).replace(",", ".")
+            lote['total_superficie_fraccion'] = unicode('{:,}'.format(total_superficie_fraccion)).replace(",", ".")
+            lote['total_lotes'] = unicode('{:,}'.format(total_lotes_fraccion)).replace(",", ".")
+            # Se CERAN  los TOTALES por FRACCION
+            total_importe_cuotas = 0
+            total_contado_fraccion = 0
+            total_credito_fraccion = 0
+            total_superficie_fraccion = 0
+            total_lotes_fraccion = 0
+            misma_fraccion = True
+
+        lotes.append(lote)
+
+
+    return lotes

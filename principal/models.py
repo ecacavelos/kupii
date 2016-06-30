@@ -1,7 +1,10 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-class Cliente(models.Model):    
+from sucursal.models import Sucursal
+
+
+class Cliente(models.Model):
     cedula = models.CharField(unique=True,max_length=10, blank=False, null=False)
     nombres = models.CharField(max_length=255)
     apellidos = models.CharField(max_length=255)
@@ -115,6 +118,7 @@ class Fraccion(models.Model):
     aprobacion_municipal_nro = models.CharField(max_length=255, blank=True,null=True)
     fecha_aprobacion = models.DateField('fecha de aprobacion', blank=True, null=True)
     superficie_total = models.DecimalField(max_digits=8, decimal_places=2, blank=True, null=True)
+    sucursal = models.ForeignKey(Sucursal, on_delete=models.PROTECT)
     def __unicode__(self):
         return u'%s' % (self.nombre)
     class Meta:
@@ -660,7 +664,9 @@ class PermisosAdicionales(models.Model):
             ('ver_informes', 'Ver informes'),
             ('ver_ficha_lote', 'Ver Ficha Lote')
         )
- 
+
+
+
 '''      
 class ConceptosFactura(models.Model):
     descripcion = models.CharField(max_length=255)

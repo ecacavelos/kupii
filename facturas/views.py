@@ -292,7 +292,11 @@ def consultar_facturas(request):
                 monto=0
                 lista_detalles=json.loads(factura.detalle)
                 for key, value in lista_detalles.iteritems():
-                    monto+=int(int(value['cantidad'])*int(value['precio_unitario'])) 
+                    if value['cantidad'] == "" or value['precio_unitario'] == "":
+                        print ('Encontramos detalle invalido')
+                        monto+=0
+                    else:
+                        monto+=int(int(value['cantidad'])*int(value['precio_unitario']))
                 factura.monto=unicode('{:,}'.format(monto)).replace(",", ".") 
         else: #POST se envia el formulario con los parametros de busqueda.  
             data = request.POST     
@@ -309,7 +313,11 @@ def consultar_facturas(request):
                     monto=0
                     lista_detalles=json.loads(factura.detalle)
                     for key, value in lista_detalles.iteritems():
-                        monto+=int(int(value['cantidad'])*int(value['precio_unitario']))
+                        if value['cantidad'] == "" or value['precio_unitario'] == "":
+                            print ('Encontramos detalle invalido')
+                            monto += 0
+                        else:
+                            monto += int(int(value['cantidad']) * int(value['precio_unitario']))
                     factura.monto=unicode('{:,}'.format(monto)).replace(",", ".")
             if tipo_busqueda == 'nro_factura':
                 object_list = Factura.objects.filter(pk=busqueda).order_by('id','fecha')                    
@@ -356,12 +364,31 @@ def detalle_factura(request, factura_id):
             detalle['item']=key
             detalle['cantidad']=value['cantidad']
             detalle['concepto']=value['concepto']
-            detalle['precio_unitario']=unicode('{:,}'.format(int(value['precio_unitario']))).replace(",",".")
-            detalle['iva_10']=unicode('{:,}'.format(int(value['iva_10']))).replace(",",".")
-            detalle['iva_5']=unicode('{:,}'.format(int(value['iva_5']))).replace(",",".")
-            detalle['exentas']=unicode('{:,}'.format(int(value['exentas']))).replace(",",".")
+            if value['precio_unitario'] == "":
+                detalle['precio_unitario'] = "No se puede obtener precio"
+            else:
+                detalle['precio_unitario']=unicode('{:,}'.format(int(value['precio_unitario']))).replace(",",".")
+
+            if value['iva_10'] == "":
+                detalle['iva_10'] = "No se puede obtener iva 10"
+            else:
+                detalle['iva_10'] = unicode('{:,}'.format(int(value['iva_10']))).replace(",", ".")
+
+            if value['iva_5'] == "":
+                detalle['iva_5'] = "No se puede obtener iva 5"
+            else:
+                detalle['iva_5'] = unicode('{:,}'.format(int(value['iva_5']))).replace(",", ".")
+
+            if value['exentas'] == "":
+                detalle['exentas'] = "No se puede obtener exentas"
+            else:
+                detalle['exentas'] = unicode('{:,}'.format(int(value['exentas']))).replace(",", ".")
+
             detalles.append(detalle)
-            monto += int(value['cantidad']) * int(value['precio_unitario'])
+            if value['cantidad'] == "" or value['precio_unitario'] == "":
+                monto += 0
+            else:
+                monto += int(value['cantidad']) * int(value['precio_unitario'])
         if factura.tipo=='co':
             tipo='Contado'
         else:

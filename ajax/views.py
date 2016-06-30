@@ -356,7 +356,24 @@ def get_fracciones_by_name(request):
                 print error
         else:
             return HttpResponseRedirect(reverse('login'))
-  
+
+@require_http_methods(["GET"])
+def get_fracciones_by_sucursal(request):
+    if request.method == 'GET':
+        if request.user.is_authenticated():
+            try:
+                sucursal_id = request.GET['sucursal']
+                print("sucursal ->" + sucursal_id);
+                object_list = Fraccion.objects.filter(sucursal_id=sucursal_id)
+                labels=["sucursal"]
+                json_object_list = custom_json(object_list,labels)
+                return HttpResponse(json.dumps(json_object_list, cls=DjangoJSONEncoder),content_type="application/json")
+            except Exception, error:
+                print error
+        else:
+            return HttpResponseRedirect(reverse('login'))
+
+
 @require_http_methods(["GET"])
 def get_fracciones_by_id(request):
     if request.method == 'GET':
