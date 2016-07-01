@@ -137,7 +137,7 @@ function obtener_fracciones_de_sucursal() {
 		request.done(function(msg) {
 
             for (var i = 0; i < msg.length; i++) {
-                $("#fracciones_por_sucursal").append('<tr> <td> <input type="checkbox" class="checkbox_fraccion_sucursal" value="'+ msg[i].id +'" checked> <span class="label_nombre_fraccion" >' + msg[i].nombre + '</span> </td> </tr>');
+                $("#fracciones_por_sucursal").append('<tr> <td> <input type="checkbox" class="checkbox_fraccion_sucursal" value="'+ msg[i].id +'"> <span class="label_nombre_fraccion" >' + msg[i].nombre + '</span> </td> </tr>');
 
             }
 
