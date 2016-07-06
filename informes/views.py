@@ -5004,10 +5004,7 @@ def informe_facturacion(request):
                                         facturas = Factura.objects.raw('''SELECT "principal_factura"."id", "principal_factura"."fecha", "principal_factura"."numero", "principal_factura"."cliente_id", "principal_factura"."lote_id", "principal_factura"."rango_factura_id", "principal_factura"."tipo", "principal_factura"."detalle", "principal_factura"."anulado", "principal_factura"."observacion", "principal_factura"."usuario_id", "principal_factura"."impresa" FROM "principal_factura" WHERE (SUBSTR("principal_factura"."numero", 1, 3) like %s) AND fecha >= %s AND fecha <= %s AND usuario_id = %s ''', [sucursal_label, fecha_ini_parsed, fecha_fin_parsed, busqueda])
 
                             else:
-                                if sucursal_label == '':
-                                    print ("CCP Tu Papa")
-                                else:
-                                    facturas = Factura.objects.filter(anulado=False,fecha__range=(fecha_ini_parsed, fecha_fin_parsed),usuario=request.user)
+                                facturas = Factura.objects.filter(anulado=False,fecha__range=(fecha_ini_parsed, fecha_fin_parsed),usuario=request.user)
 
                             for factura in facturas:
                                 
