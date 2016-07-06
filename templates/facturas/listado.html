@@ -1,0 +1,267 @@
+{% extends "lotes/base_lotes.html" %}
+{% block header_scripts %}
+<script type="text/javascript">
+	$(document).ready(function() {
+		$("#busqueda_label").mask("###-###-#######");
+		if ($("#tipo_busqueda").val()=="rango_fecha"){
+			$("#busqueda_label").hide();
+			$("#label_busqueda").html("Rango de Fecha");
+			$("#label_desde").show();
+			$("#label_hasta").show();
+			$("#label_relleno").hide();
+			$("#label_relleno2").hide();
+			$("#fecha_ini").focus();
+		} else {
+			$("#busqueda_label").show();
+			$("#busqueda_label").focus();
+			$("#fecha_ini").hide();
+			$("#fecha_fin").hide();
+			$("#label_desde").hide();
+			$("#label_hasta").hide();
+			$("#label_relleno").show();
+			$("#label_relleno2").show();
+			$("#label_busqueda").html("Numero de Factura");
+			$("#busqueda_label").attr("placeholder","001-001-0000001");
+			tipo_busqueda=$("#tipo_busqueda").val();
+			busqueda_label=$("#busqueda_label").val();			
+			busqueda=$("#busqueda").val();	
+			autocompleteFacturaPorNumero(tipo_busqueda, busqueda_label, busqueda);	
+		}
+		
+		$("#tipo_busqueda").change(function(){
+			if ($("#tipo_busqueda").val()=="rango_fecha"){
+				$("#busqueda_label").hide();
+				$("#label_busqueda").html("Rango de Fecha");
+				$("#label_desde").show();
+				$("#label_hasta").show();
+				$("#label_relleno").hide();
+				$("#label_relleno2").hide();
+				$("#fecha_ini").show();
+				$("#fecha_fin").show();
+				$("#fecha_ini").focus();
+			} else {
+				$("#busqueda_label").show();
+				$("#busqueda_label").focus();
+				$("#fecha_ini").hide();
+				$("#fecha_fin").hide();
+				$("#label_desde").hide();
+				$("#label_hasta").hide();
+				$("#label_relleno").show();
+				$("#label_relleno2").show();
+				$("#label_busqueda").html("Numero de Factura");
+				$("#busqueda_label").attr("placeholder","001-001-0000001");
+				tipo_busqueda=$("#tipo_busqueda").val();
+				busqueda_label=$("#busqueda_label").val();			
+				busqueda=$("#busqueda").val();	
+				autocompleteFacturaPorNumero(tipo_busqueda, busqueda_label, busqueda);	
+			}
+		});
+		
+		//Cambiar calendario a español
+		$.datepicker.regional['es'] = {
+			closeText : 'Cerrar',
+			prevText : '<Ant',
+			nextText : 'Sig>',
+			currentText : 'Hoy',
+			monthNames : ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+			monthNamesShort : ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+			dayNames : ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
+			dayNamesShort : ['Dom', 'Lun', 'Mar', 'Mié', 'Juv', 'Vie', 'Sáb'],
+			dayNamesMin : ['Do', 'Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sá'],
+			weekHeader : 'Sm',
+			dateFormat : 'dd/mm/yy',
+			firstDay : 1,
+			isRTL : false,
+			showMonthAfterYear : false,
+			yearSuffix : ''
+		};
+		// Setear idioma al calendario
+		$.datepicker.setDefaults($.datepicker.regional['es']);
+		
+		var fecha_ini = "{{fecha_ini}}";
+		var fecha_fin = "{{fecha_fin}}";
+		
+		$('#fecha_ini').val(fecha_ini);
+		$('#fecha_fin').val(fecha_fin);
+		
+		$('#fecha_ini').mask('##/##/####');
+		$("#fecha_ini").datepicker({
+			dateFormat : 'dd/mm/yy'
+		});
+		$('#fecha_fin').mask('##/##/####');
+		$("#fecha_fin").datepicker({
+			dateFormat : 'dd/mm/yy'
+		});
+	});
+</script>
+
+
+<script type="text/javascript">
+function validar(){
+	if($("#tipo_busqueda").val()=="rango_fecha" && ($("#fecha_ini").val() =="" || $("#fecha_fin").val() =="") ){
+		alert("Debe ingresar un rango de fechas.");
+	}
+	else{
+		if( $("#tipo_busqueda").val()=="nro_factura" && $("#busqueda").val()==""){
+			alert("Debe elegir un numero de factura.");
+		}else{
+			$("#frm_busqueda").submit();
+		}
+	}
+}	
+</script>
+
+{% endblock %}
+{% block content %}
+<div class="gri16 text-izquierda" id="breadcumb">
+	<a href="/">Inicio</a> <span class="verde-1">></span>  
+	<a href="/facturacion/">Facturacion</a> 
+	<span class="verde-1">> Listado de Facturas</span> 
+</div>
+<div class="clear"></div>
+<h1>Listado de Facturas</h1>
+<div class="grid_6">
+	<form name="frm_busqueda" id="frm_busqueda" method="post" action="{% url 'frontend_home' %}facturacion/listado/">
+		{% csrf_token %}
+		<table id="lista-categoria" frame="box">
+			<tr>
+				<th class="acciones" colspan="3"><strong><a href="#" style="color: white;">Filtrar</a></strong></th>
+			</tr>
+			<th></th><th id="label_desde">Desde:</th><th id="label_hasta">Hasta:</th><th id="label_relleno"></th><th id="label_relleno2"></th>
+			<tr>
+				<td id="label_busqueda"> Rango de Fecha: </td>
+				<td>
+				<input name="fecha_ini" id="fecha_ini" type="text" value="" />
+				<input type="text" name="busqueda_label" id="busqueda_label" value="" />
+				<input type="hidden" id="busqueda" name="busqueda" value="" /> 
+				</td>
+				<td>
+				<input name="fecha_fin" id="fecha_fin" type="text" value="" />
+				</td>
+			</tr>
+			<tr>
+				<td> Buscar por: </td>
+				<td>
+					<select id="tipo_busqueda" name="tipo_busqueda">
+						<option value="rango_fecha">Rango de Fechas</option>
+						<option value="nro_factura">Numero de Factura</option>	
+					</select>
+				</td>
+				<td></td>
+				
+			</tr>
+			<tr>
+				<td>
+				<input type="button" value="Buscar" onclick="validar();" class="historico" style="cursor: pointer"/>
+				</td>
+				<td></td>
+				<td></td>				
+			</tr>
+		</table>
+	</form>
+</div>
+
+<div class="clear"></div>
+
+<div id="listado-item-lote">
+	<table width="50%" cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
+		<th>Fecha</th><th>Factura Nro.</th><th>Cliente</th><th>Monto</th><th>Anulada</th><th>Impresa</th>
+{% for hw in object_list %}
+{% if forloop.counter|divisibleby:2 %}
+		<tr>
+			<td>
+				{{hw.fecha}}
+			</td>
+			<td>
+				<a href="{% url 'frontend_home' %}facturacion/listado/{{hw.id}}"><strong>{{hw.numero}}</strong></a>
+			</td>
+			<td>
+				{{hw.cliente.nombres}} {{hw.cliente.apellidos}}
+			</td>
+			<td>
+				{{hw.monto}}
+			</td>
+			{% if hw.anulado == True %}
+				<td>
+					SI  
+				</td>
+			{% else %}
+				<td>
+					NO 
+				</td>
+			{% endif %}
+			{% if hw.impresa == True %}
+				<td>
+					SI 
+				</td>
+			{% else %}
+				<td>
+					NO 
+				</td>
+			{% endif %}
+		</tr>
+		{% else %}
+		<tr class="bkg_gris">
+		<tr>
+			<td>
+				{{hw.fecha}}
+			</td>
+			<td>
+				<a href="{% url 'frontend_home' %}facturacion/listado/{{hw.id}}"><strong>{{hw.numero}}</strong></a>
+			</td>
+			<td>
+				{{hw.cliente.nombres}} {{hw.cliente.apellidos}}
+			</td>
+			<td>
+				{{hw.monto}}
+			</td>
+			{% if hw.anulado == True %}
+				<td>
+					SI 
+				</td>
+			{% else %}
+				<td>
+					NO 
+				</td>
+			{% endif %}
+			{% if hw.impresa == True %}
+				<td>
+					SI 
+				</td>
+			{% else %}
+				<td>
+					NO 
+				</td>
+			{% endif %}
+		</tr>
+		{% endif %}
+{% endfor %}
+<div class="pagination">
+    <span class="step-links">
+{%if object_list.has_previous%}
+<a href="?page={{ object_list.previous_page_number }}{{ultima_busqueda}}"> Anterior</a>
+{%endif%}
+P&aacute;gina
+|{{object_list.number}}|
+
+{%if object_list.has_next%}
+<a href="?page={{ object_list.next_page_number }}{{ultima_busqueda}}"> Siguiente</a>
+{%endif%}
+
+    </span>
+</div>					
+<br><br>
+						</table>
+					</div>
+<br>
+<div id="footer">
+	<div class="pagination">
+			<span class="step-links"> Mostrando {{ object_list.start_index }}-{{ object_list.end_index }} de {{ object_list.paginator.count }} Resultados
+				{%if object_list.has_previous%} <a href="?page={{ object_list.first_index}}{{ultima_busqueda}}"> Primera </a> <a href="?page={{ object_list.previous_page_number }}{{ultima_busqueda}}"> Anterior</a> {%endif%}
+				P&aacute;gina |{{object_list.number}}|
+				{%if object_list.has_next%} <a href="?page={{ object_list.next_page_number }}{{ultima_busqueda}}"> Siguiente </a> <a href="?page={{ object_list.end_index}}{{ultima_busqueda}}"> Ultima </a> {%endif%} </span>
+		</div></br>
+	<a href="{% url 'frontend_home' %}facturacion" class="boton-verde">Volver al módulo de Facturas</a>
+	
+</div>
+{% endblock %}

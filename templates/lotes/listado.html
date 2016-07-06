@@ -1,0 +1,239 @@
+{% extends "lotes/base_lotes.html" %}
+{% block header_scripts %}
+<script type="text/javascript">
+	function buscar() {
+		if ($("#busqueda_label").val() == "" && $("#busqueda").val() == "" ) {
+			alert("Debe seleccionar una busqueda.");
+		} else {
+			$("#frm_busqueda").submit();
+		}
+	}
+	
+	function listar_lotes_reservados() {
+		$("#frm_busqueda").submit();
+		
+	}
+	
+	$(document).ready(function() {
+		$("#busqueda_label").focus();
+		$("#busqueda_label").autocomplete();
+		if ($("#tipo_busqueda").val() == "codigo"){
+			$("#label_busqueda").html("Codigo Lote:");
+			console.log("Por codigo");
+			$('#busqueda_label').mask('###/###/####');
+			$("#busqueda_label").attr("placeholder", "Ej: 001/001/0001");
+			tipo_busqueda=$("#tipo_busqueda").val();
+			busqueda_label=$("#busqueda_label").val();			
+			busqueda=$("#busqueda").val();
+			$("#busqueda_label").autocomplete("destroy");
+			autocompleteLotePorCodigoParalot(tipo_busqueda, busqueda_label, busqueda);
+		}
+		if($("#tipo_busqueda").val() == "nombre"){
+			$("#label_busqueda").html("Nombre de Cliente:");
+			console.log("Por nombre cliente");
+			$('#busqueda_label').unmask();
+			$("#busqueda_label").attr("placeholder", "Ej: Juan Perez");
+			tipo_busqueda=$("#tipo_busqueda").val();
+			busqueda_label=$("#busqueda_label").val();			
+			busqueda=$("#busqueda").val();
+			$("#busqueda_label").autocomplete("destroy");
+			autocompleteClientePorNombreOCedula(tipo_busqueda, busqueda_label, busqueda);
+		}
+		if($("#tipo_busqueda").val() == "cedula"){
+			$("#label_busqueda").html("Cedula de Cliente:");
+			console.log("Por cedula cliente");
+			$('#busqueda_label').unmask();
+			$("#busqueda_label").attr("placeholder", "Ej: 3497322");
+			tipo_busqueda=$("#tipo_busqueda").val();
+			busqueda_label=$("#busqueda_label").val();			
+			busqueda=$("#busqueda").val();
+			$("#busqueda_label").autocomplete("destroy");
+			autocompleteClientePorNombreOCedula(tipo_busqueda, busqueda_label, busqueda);
+		}
+		
+		
+		//autocomplete para concepto factura
+		var id_concepto;
+		$("#id_concepto_factura").empty();
+		base_url= base_context + "/ajax/get_concepto_factura_by_name/";
+		params="value";
+		$("#id_nombre_concepto").autocomplete({
+			source : base_url,
+			minLenght : 1,
+			select : function(event, ui) {
+				id_concepto = ui.item.id;
+				name_concepto= ui.item.descripcion;
+				ui.item.value = ui.item.descripcion;
+				$("#id_nombre_concepto").val(name_concepto);
+				$("#id_concepto_factura").val(id_concepto);			
+			}
+		});
+		
+		$("#tipo_busqueda").change(function(){
+			if ($("#tipo_busqueda").val() == "codigo"){
+				$("#label_busqueda").html("Codigo Lote:");
+				console.log("Por codigo");
+				$('#busqueda_label').mask('###/###/####');
+				$("#busqueda_label").attr("placeholder", "Ej: 001/001/0001");
+				tipo_busqueda=$("#tipo_busqueda").val();
+				busqueda_label=$("#busqueda_label").val();			
+				busqueda=$("#busqueda").val();
+			$("#busqueda_label").autocomplete("destroy");
+				autocompleteLotePorCodigoParalot(tipo_busqueda, busqueda_label, busqueda);
+			}
+			if($("#tipo_busqueda").val() == "nombre"){
+				$("#label_busqueda").html("Nombre de Cliente:");
+				console.log("Por nombre cliente");
+				$('#busqueda_label').unmask();
+				$("#busqueda_label").attr("placeholder", "Ej: Juan Perez");
+				tipo_busqueda=$("#tipo_busqueda").val();
+				busqueda_label=$("#busqueda_label").val();			
+				busqueda=$("#busqueda").val();
+			$("#busqueda_label").autocomplete("destroy");
+				autocompleteClientePorNombreOCedula(tipo_busqueda, busqueda_label, busqueda);
+			}
+			if($("#tipo_busqueda").val() == "cedula"){
+				$("#label_busqueda").html("Cedula de Cliente:");
+				console.log("Por cedula cliente");
+				$('#busqueda_label').unmask();
+				$("#busqueda_label").attr("placeholder", "Ej: 3497322");
+				tipo_busqueda=$("#tipo_busqueda").val();
+				busqueda_label=$("#busqueda_label").val();			
+				busqueda=$("#busqueda").val();
+			$("#busqueda_label").autocomplete("destroy");
+				autocompleteClientePorNombreOCedula(tipo_busqueda, busqueda_label, busqueda);
+			}
+			if($("#tipo_busqueda").val() == "nombre_fraccion"){
+				$("#label_busqueda").html("Nombre de Fraccion:");
+				console.log("Por nombre de fraccion");
+				$('#busqueda_label').unmask();
+				$("#busqueda_label").attr("placeholder", "Ej: El Manantial");
+				tipo_busqueda=$("#tipo_busqueda").val();
+				busqueda_label=$("#busqueda_label").val();
+				busqueda=$("#busqueda").val();
+			$("#busqueda_label").autocomplete("destroy");
+				autocompleteFraccionPorNombreOId(tipo_busqueda, busqueda_label, busqueda);
+			}
+			if($("#tipo_busqueda").val() == "estado"){
+				$("#label_busqueda").html("Estado del Lote:");
+				console.log("Por estado del lote");
+				$('#busqueda_label').unmask();
+				$("#busqueda_label").attr("placeholder", "Ej: Vendido");
+				tipo_busqueda=$("#tipo_busqueda").val();
+				busqueda_label=$("#busqueda_label").val();
+				busqueda=$("#busqueda").val();
+			$("#busqueda_label").autocomplete("destroy");
+				autocompleteEstadosLotes(tipo_busqueda, busqueda_label, busqueda);
+			}
+
+		});
+		
+	});
+
+</script>
+
+{% endblock %}
+{% block content %}
+<div class="gri16 text-izquierda" id="breadcumb">
+	<a href="{% url 'frontend_home' %}">Inicio</a><span class="verde-1">></span>
+	<a href="{% url 'frontend_home' %}lotes/">Lotes</a>
+	<span class="verde-1">> Listado de Lotes</span>
+</div>
+
+<div class="clear"></div>
+<h1>Listado de Lotes</h1>
+
+<div class="grid_6">
+	<form name="frm_busqueda" id="frm_busqueda" method="get" action="/lotes/listado_busqueda_lotes/">
+		{% csrf_token %}
+		<table id="lista-categoria" frame="box">
+			<tr>
+				<th class="acciones"  colspan="3"><strong><a href="#" style="color: white;">Filtrar</a></strong></th>
+			</tr>
+			<tr>
+				<td id="label_busqueda">Nro de Lote:</td>
+				<td>
+					<input id="busqueda_label" type="text" name="busqueda_label"/>
+					<input type="hidden" id="busqueda" name="busqueda"/>
+				</td>
+			</tr>
+			<tr>
+				<td> Lotes por: </td>
+				<td>
+					<select id="tipo_busqueda" name="tipo_busqueda">
+						<option value="codigo">Codigo de Lote</option>
+						<option value="nombre">Nombre de Cliente</option>
+						<option value="cedula">Cedula de Cliente</option>	
+						<option value="nombre_fraccion">Nombre de Fraccion</option>
+						<option value="estado">Estado del Lote</option>
+					</select>
+					
+				</td>
+				
+				
+			</tr>
+			<tr>
+				<td><input type="button" value="Buscar" onclick="buscar();" class="historico" style="cursor: pointer"/></td>
+				<td><input type="button" value="Listar Todos los Lotes de estado Recuperado" onclick="listar_lotes_reservados();" class="historico" style="cursor: pointer"/></td>
+			</tr>
+		</table>
+	</form>
+</div>
+
+<div class="clear"></div>
+<div id="listado-cuadro-busqueda">
+	<a href="{% url 'frontend_home' %}lotes/agregar" class="boton-verde">Agregar Lote</a>
+	<br>
+	<br>
+</div>
+<div id="listado-item-lote">
+	<table border="1" cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
+		<th>ID Fracci&oacute;n</th><th>Manzana Nro</th><th>Lote Nro</th><th>Nombre Fracci&oacute;n</th><th>Cliente</th><th>Estado</th>
+		{% for hw in object_list %}
+		{% if forloop.counter|divisibleby:2 %}
+		<tr>
+			<td> {{hw.manzana.fraccion.id}} </td>
+			<td> {{hw.manzana.nro_manzana}} </td>
+			<td><a href="{{hw.id}}">{{hw.nro_lote}} <strong>(Ver Detalles)</strong></a></td>
+			<td> {{hw.manzana.fraccion}} </td>
+			<td> {{hw.cliente}} </td>
+			<td> {{ hw.get_estado_display }} </td>
+		</tr>
+		{% else %}
+		<tr class="bkg_gris">
+			<td> {{hw.manzana.fraccion.id}} </td>
+			<td> {{hw.manzana.nro_manzana}} </td>
+			<td><a href="{{hw.id}}">{{hw.nro_lote}} <strong>(Ver Detalles)</strong></a></td>
+			<td> {{hw.manzana.fraccion}} </td>
+			<td> {{hw.cliente}} </td>
+			<td> {{ hw.get_estado_display }} </td>
+		</tr>
+		{% endif %}
+		{% endfor %}
+		<div class="pagination">
+			<span class="step-links">
+				Mostrando {{ object_list.start_index }}-{{ object_list.end_index }} de {{ object_list.paginator.count }} Resultados
+				{%if object_list.has_previous%} 
+				<a href="?page={{ object_list.first_index}}{{ultimo}}"> Primera </a> 
+				<a href="?page={{ object_list.previous_page_number }}{{ultimo}}"> Anterior</a> 
+				{%endif%}
+				P&aacute;gina |{{object_list.number}}|		
+				{%if object_list.has_next%} 
+				<a href="?page={{ object_list.next_page_number }}{{ultimo}}"> Siguiente </a> 				
+				<a href="?page={{ object_list.end_index}}{{ultimo}}"> Ultima </a> 
+				{%endif%} 
+			</span>
+		</div>
+	</table>
+</div>
+
+<div id="footer">
+	<div class="pagination">
+			<span class="step-links"> Mostrando {{ object_list.start_index }}-{{ object_list.end_index }} de {{ object_list.paginator.count }} Resultados
+				{%if object_list.has_previous%} <a href="?page={{ object_list.first_index}}{{ultima_busqueda}}"> Primera </a> <a href="?page={{ object_list.previous_page_number }}{{ultima_busqueda}}"> Anterior</a> {%endif%}
+				P&aacute;gina |{{object_list.number}}|
+				{%if object_list.has_next%} <a href="?page={{ object_list.next_page_number }}{{ultima_busqueda}}"> Siguiente </a> <a href="?page={{ object_list.end_index}}{{ultima_busqueda}}"> Ultima </a> {%endif%} </span>
+		</div></br>
+	<a href="{% url 'frontend_home' %}lotes" class="boton-verde">Volver al módulo de Lotes</a>
+</div>
+{% endblock %}

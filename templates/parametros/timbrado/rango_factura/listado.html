@@ -1,0 +1,118 @@
+{% extends "lotes/base_lotes.html" %}
+{% block header_scripts %}
+<script type="text/javascript">
+	function buscar() {
+		if ($("#id_usuario").val() == "") {
+			alert("Debe seleccionar un usuario para buscar.");
+		} else {
+			$("#frm_busqueda").submit();
+		}
+	}
+	$(document).ready(function() {
+		//autocomplete para planes de pago
+		var id_usuario;
+		$("#id_nombre_usuario").empty();
+		base_url= base_context + "/ajax/get_usuario_by_username/";
+		params="value";
+		$("#id_nombre_usuario").focus();
+		$("#id_nombre_usuario").autocomplete({
+			source : base_url,
+			minLenght : 1,
+			create : function(){
+			$(this).data('ui-autocomplete')._renderItem = function(ul,item){
+				return $('<li>').append('<a>' +item.fields.username+'</a>').appendTo(ul);
+				};
+			},
+			select : function(event, ui) {
+				event.preventDefault();
+				id_usuario = ui.item.pk;
+				nombre_usuario= ui.item.fields.username;
+				ui.item.value = ui.item.fields.username;
+				$("#id_nombre_usuario").val(nombre_usuario);
+				$("#id_usuario").val(id_usuario);			
+			}
+		});
+	});
+
+</script>
+{%endblock%}
+{% block content %}
+<div class="gri16 text-izquierda" id="breadcumb">
+	<a href="{% url 'frontend_home' %}">Inicio</a> 
+	<a href="{% url 'frontend_home' %}parametros/">> Parametros</a>  
+	<a href="{% url 'frontend_home' %}parametros/timbrados/">> Timbrados</a>
+	<a href="{% url 'frontend_home' %}parametros/timbrado/rango_factura/">> Rangos de Facturas del Timbrado</a>   
+	<span class="verde-1">> Listado de Rangos de Facturas</span> 
+</div>
+<div class="clear"></div>
+<h1>Listado de Rangos de Facturas de Timbrado: {{timbrado.numero}}</h1>
+<div class="grid_6">
+	<form name="frm_busqueda" id="frm_busqueda" method="post" action="/parametros/timbrado/listado/{{id_timbrado}}/rango_factura/listado_busqueda_rango_factura/">
+		{% csrf_token %}
+		<table id="lista-categoria" frame="box">
+			<tr>
+				<th class="acciones"  colspan="3"><strong><a href="#" style="color: white;">Filtrar</a></strong></th>
+			</tr>
+			<tr>
+				<td>Usuario:</td>
+				<td><input id="id_usuario" name="usuario" type="hidden" maxlength="100"/>
+					<input id="id_nombre_usuario" type="text" name="nombre_usuario" maxlength="100" /><br><br>
+				</td>
+			</tr>
+			<tr>
+				<td></td>
+				<td><input type="button" value="Buscar" onclick="buscar();" class="historico" style="cursor: pointer"/></td>
+			</tr>
+		</table>
+	</form>
+</div>
+<div class="clear"></div>
+<div id="listado-cuadro-busqueda">
+	<a href="{% url 'frontend_home' %}parametros/timbrado/listado/{{id_timbrado}/rango_factura/agregar" class="boton-verde">Agregar Rango de Facturas</a>
+	<br><br>
+</div>
+<div id="listado-item-lote">
+		<table border="1" cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
+				<th>ID</th><!--<th>Timbrado</th>--><th>Nro Sucursal</th><th>Nro Boca</th><th>Nro Desde</th><th>Nro Hasta</th><th>Usuario</th>
+				{% for rango_factura in object_list %}
+				{% if forloop.counter|divisibleby:2 %}
+					<tr>
+						<td><a href="{{rango_factura.id}}/{{rango_factura.usuario.id}}">{{rango_factura.id}} <strong>(Ver Detalles)</strong></a></td>
+						<!--<td>{{rango_factura.timbrado.numero}}</td>-->
+						<td>{{rango_factura.nro_sucursal}}</td>
+						<td>{{rango_factura.nro_boca}}</td>
+						<td>{{rango_factura.nro_desde}}</td>
+						<td>{{rango_factura.nro_hasta}}</td>
+						<td>{{rango_factura.usuario}}</td>
+					</tr>
+					{% else %}
+					<tr class="bkg_gris">
+						<td><a href="{{rango_factura.id}}/{{rango_factura.usuario.id}}">{{rango_factura.id}} <strong>(Ver Detalles)</strong></a></td>
+						<!--<td>{{rango_factura.timbrado.numero}}</td>-->
+						<td>{{rango_factura.nro_sucursal}}</td>
+						<td>{{rango_factura.nro_boca}}</td>
+						<td>{{rango_factura.nro_desde}}</td>
+						<td>{{rango_factura.nro_hasta}}</td>
+						<td>{{rango_factura.usuario}}</td>
+					</tr>
+					{% endif %}				
+				{% endfor %}
+		<div class="pagination">
+			<span class="step-links">
+				Mostrando {{ object_list.start_index }}-{{ object_list.end_index }} de {{ object_list.paginator.count }} Resultados
+				{%if object_list.has_previous%} 
+				<a href="?page={{ object_list.first_index}}{{ultimo}}"> Primera </a> 
+				<a href="?page={{ object_list.previous_page_number }}{{ultimo}}"> Anterior</a> 
+				{%endif%}
+				P&aacute;gina |{{object_list.number}}|		
+				{%if object_list.has_next%} 
+				<a href="?page={{ object_list.next_page_number }}{{ultimo}}"> Siguiente </a> 				
+				<a href="?page={{ object_list.end_index}}{{ultimo}}"> Ultima </a> 
+				{%endif%} 
+			</span>
+		</div>
+	</table>
+</div>
+
+<div id="footer"><a href="{% url 'frontend_home' %}parametros/timbrado/listado/{{id_timbrado}}/rango_factura/" class="boton-verde">Volver al timbrado</a></div>
+{% endblock %}
