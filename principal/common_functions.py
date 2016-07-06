@@ -1486,17 +1486,25 @@ def lote_reservado_segun_estado(lote_id):
     return esta_reservado
 
 
-def obtener_lotes_disponbiles(sucursal, fracciones_a_exluir=None):
+def obtener_lotes_disponbiles(sucursal, order_by, fracciones_a_exluir=None):
 
     lotes_list = []
 
+
+      # FRACCIONES A EXCLUIR
     if fracciones_a_exluir == None:
         fracciones_a_exluir = []
     # SE OBTIENEN TODOS LOS LOTES DE TODAS LAS FRACCIONES DE LA SUCURSAL
     fracciones = Fraccion.objects.filter(sucursal=sucursal)
+
     for fraccion in fracciones:
-        if unicode(fraccion.id) not in fracciones_a_exluir:
-            lotes_fraccion = Lote.objects.filter(manzana__fraccion=fraccion)
+        if unicode(fraccion.id) not in fracciones_a_exluir:  # Se verifica si la fraccion no esta excluida de la busqueda
+            # ORDENAMIENTO POR BASE DE DATOS.
+            if order_by == "codigo":
+                lotes_fraccion = Lote.objects.filter(manzana__fraccion=fraccion).order_by('codigo_paralot')
+            else:
+                lotes_fraccion = Lote.objects.filter(manzana__fraccion=fraccion).order_by('codigo_paralot')
+          # TODO: Hacer una funcionalidad mas completa de ordenamiento
             for lote in lotes_fraccion:
                 lotes_list.append(lote)
 
