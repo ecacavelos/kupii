@@ -2,7 +2,7 @@ from django.contrib.admin.templatetags.admin_list import results
 from django.db.models import Count, Min, Sum, Avg
 from django.db import connections, connection
 from principal.models import Lote, Cliente, Vendedor, PlanDePago, Fraccion, Manzana, Venta, Propietario, \
-    PlanDePagoVendedor, PagoDeCuotas, RecuperacionDeLotes, LogUsuario, CoordenadasFactura
+    PlanDePagoVendedor, PagoDeCuotas, RecuperacionDeLotes, LogUsuario, CoordenadasFactura, Reserva
 from principal.monthdelta import MonthDelta
 from calendar import monthrange
 from datetime import datetime, timedelta
@@ -1458,30 +1458,45 @@ def lote_libre(lote_id):
         # cuotas_detalles = get_cuotas_detail_by_lote(str(lote_id))
         esta_libre  = False
     else:
-        esta_libre = True
+        #sino esta vendida pero esta recuperada, tabla "recuperada" de la nueva version
+        object_list = Reserva.objects.filter(lote_id = lote_id)
+        if object_list:
+            esta_libre = False
+        elif lote_reservado_segun_estado(lote_id) == True:
+            esta_libre = False
+        else:
+            esta_libre = True
 
     return esta_libre
 
-def obtener_lotes_disponbiles(sucursal, order_by ,fracciones_a_exluir=None):
+def lote_reservado_segun_estado(lote_id):
+    esta_reservado = False
+    #Funcion que verifica el estado de un lote por el campo "estado", para los importados del sistema anterior
+
+    # QUERY PARA TRAER EL LOTE EN CUESTION
+    query = ('''SELECT * FROM "principal_lote" where "principal_lote"."id" = %s''')
+    cursor = connection.cursor()
+    cursor.execute(query, [lote_id])
+    results = cursor.fetchall()
+    # si el result no encuentra nada retorna una lista vacia y eso contemplamos para que no intente obtener el estado
+    if (len(results) > 0):
+        # Obtenemos el estado y comparamos con 2 a partir del result
+        if results[0][8] == '2':
+           esta_reservado = True
+    return esta_reservado
+
+
+def obtener_lotes_disponbiles(sucursal, fracciones_a_exluir=None):
 
     lotes_list = []
 
-    # FRACCIONES A EXCLUIR
     if fracciones_a_exluir == None:
         fracciones_a_exluir = []
-
     # SE OBTIENEN TODOS LOS LOTES DE TODAS LAS FRACCIONES DE LA SUCURSAL
     fracciones = Fraccion.objects.filter(sucursal=sucursal)
-
     for fraccion in fracciones:
-        if unicode(fraccion.id) not in fracciones_a_exluir: # Se verifica si la fraccion no esta excluida de la busqueda
-
-            # ORDENAMIENTO POR BASE DE DATOS.
-            if order_by == "codigo":
-                lotes_fraccion = Lote.objects.filter(manzana__fraccion=fraccion).order_by('codigo_paralot')
-            else:
-                lotes_fraccion = Lote.objects.filter(manzana__fraccion=fraccion).order_by('codigo_paralot')
-            #TODO: Hacer una funcionalidad mas completa de ordenamiento
+        if unicode(fraccion.id) not in fracciones_a_exluir:
+            lotes_fraccion = Lote.objects.filter(manzana__fraccion=fraccion)
             for lote in lotes_fraccion:
                 lotes_list.append(lote)
 
