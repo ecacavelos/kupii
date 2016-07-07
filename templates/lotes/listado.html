@@ -13,7 +13,13 @@
 		$("#frm_busqueda").submit();
 		
 	}
-	
+
+    $(document).on('change','#estado_lote_label_value',function(){
+                $("#busqueda_label").val($('#estado_lote').val());
+                //los otros se completa este campo con el autocomplete, este le seteamos al momento
+                $("#busqueda").val($('#estado_lote').val());
+          });
+
 	$(document).ready(function() {
 		$("#busqueda_label").focus();
 		$("#busqueda_label").autocomplete();
@@ -71,6 +77,10 @@
 		
 		$("#tipo_busqueda").change(function(){
 			if ($("#tipo_busqueda").val() == "codigo"){
+                $("#busqueda_label").val('');
+                $("#busqueda").val('');
+   			    $('#estado_lote_label').hide();
+    		    $('#estado_lote_label_value').hide();
 				$("#label_busqueda").html("Codigo Lote:");
 				console.log("Por codigo");
 				$('#busqueda_label').mask('###/###/####');
@@ -82,6 +92,10 @@
 				autocompleteLotePorCodigoParalot(tipo_busqueda, busqueda_label, busqueda);
 			}
 			if($("#tipo_busqueda").val() == "nombre"){
+                $("#busqueda_label").val('');
+                $("#busqueda").val('');
+   			    $('#estado_lote_label').hide();
+    		    $('#estado_lote_label_value').hide();
 				$("#label_busqueda").html("Nombre de Cliente:");
 				console.log("Por nombre cliente");
 				$('#busqueda_label').unmask();
@@ -93,6 +107,10 @@
 				autocompleteClientePorNombreOCedula(tipo_busqueda, busqueda_label, busqueda);
 			}
 			if($("#tipo_busqueda").val() == "cedula"){
+                $("#busqueda_label").val('');
+                $("#busqueda").val('');
+   			    $('#estado_lote_label').hide();
+    		    $('#estado_lote_label_value').hide();
 				$("#label_busqueda").html("Cedula de Cliente:");
 				console.log("Por cedula cliente");
 				$('#busqueda_label').unmask();
@@ -104,6 +122,10 @@
 				autocompleteClientePorNombreOCedula(tipo_busqueda, busqueda_label, busqueda);
 			}
 			if($("#tipo_busqueda").val() == "nombre_fraccion"){
+                $("#busqueda_label").val('');
+                $("#busqueda").val('');
+  			    $('#estado_lote_label').hide();
+    		    $('#estado_lote_label_value').hide();
 				$("#label_busqueda").html("Nombre de Fraccion:");
 				console.log("Por nombre de fraccion");
 				$('#busqueda_label').unmask();
@@ -118,12 +140,18 @@
 				$("#label_busqueda").html("Estado del Lote:");
 				console.log("Por estado del lote");
 				$('#busqueda_label').unmask();
-				$("#busqueda_label").attr("placeholder", "Ej: Vendido");
+{#                $("#busqueda_label").attr("placeholder", "Ej: 1");#}
+                $("#busqueda_label").val($('#estado_lote').val());
+                //los otros se completa este campo con el autocomplete, este le seteamos al momento
+                $("#busqueda").val($('#estado_lote').val());
+			    $('#estado_lote_label').show();
+    		    $('#estado_lote_label_value').show();
+{#                $("#tipo_busqueda").val($('#estado_lote').val());#}
 				tipo_busqueda=$("#tipo_busqueda").val();
 				busqueda_label=$("#busqueda_label").val();
 				busqueda=$("#busqueda").val();
 			$("#busqueda_label").autocomplete("destroy");
-				autocompleteEstadosLotes(tipo_busqueda, busqueda_label, busqueda);
+{#				autocompleteEstadosLotes(tipo_busqueda, busqueda_label, busqueda);#}
 			}
 
 		});
@@ -173,7 +201,19 @@
 				
 			</tr>
 			<tr>
+				<td style="display:none;" id="estado_lote_label"> Estado del Lote:</td>
+				<td style="display:none;" id="estado_lote_label_value">
+					<select id="estado_lote" name="estado_lote">
+						<option value="1">Libre</option>
+						<option value="2">Reservado</option>
+						<option value="3">Vendido</option>
+{#						<option value="4">Recuperado</option>#}
+					</select>
+				</td>
+			</tr>
+			<tr>
 				<td><input type="button" value="Buscar" onclick="buscar();" class="historico" style="cursor: pointer"/></td>
+{#              a pedido de Ivan, se oculta este boton  #}
 				<td><input type="button" value="Listar Todos los Lotes de estado Recuperado" onclick="listar_lotes_reservados();" class="historico" style="cursor: pointer"/></td>
 			</tr>
 		</table>

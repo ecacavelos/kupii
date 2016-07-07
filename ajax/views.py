@@ -373,6 +373,30 @@ def get_fracciones_by_sucursal(request):
         else:
             return HttpResponseRedirect(reverse('login'))
 
+# este autocomplete le falta agregar el concepto al numero de estado, es en cierta forma estatico y no voy a usar al final por ahora
+@require_http_methods(["GET"])
+def get_lotes_by_estado(request):
+    if request.method == 'GET':
+        if request.user.is_authenticated():
+            try:
+                estado_lote = request.GET['term']
+                print("term ->" + estado_lote);
+                object_list = Lote.objects.filter(estado=estado_lote).distinct('estado')
+                if (object_list[0].estado == '1'):
+                    labels = ['estado', " - Libre"]
+                elif (object_list[0].estado == '2'):
+                    labels = ['estado']
+                elif (object_list[0].estado == '3'):
+                    labels = ['estado']
+                else:
+                    labels = ['estado']
+                json_object_list = custom_json(object_list,labels)
+                return HttpResponse(json.dumps(json_object_list, cls=DjangoJSONEncoder),content_type="application/json")
+            except Exception, error:
+                print error
+        else:
+            return HttpResponseRedirect(reverse('login'))
+
 
 @require_http_methods(["GET"])
 def get_fracciones_by_id(request):
