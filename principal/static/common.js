@@ -280,6 +280,28 @@ function autocompleteLotePorCodigoParalot(tipo_busqueda, busqueda_label, busqued
 	}
 }
 
+function autocompleteEstadosLotes(tipo_busqueda, busqueda_label, busqueda){
+	if (tipo_busqueda == 'estado') {
+		//console.log("por estado");
+	$("#busqueda_label").val("");
+	var id_lote;
+	$("#busqueda").empty();
+	base_url = base_context + "/ajax/get_lotes_by_estado/";
+	params = "value";
+	$("#busqueda_label").autocomplete({
+		source : base_url,
+		minLength : 1,
+		select : function(event, ui) {
+			event.preventDefault();
+			id_estado = ui.item.id;
+			$("#busqueda").val(id_estado);
+			// $("#busqueda_label").val(ui.item.id_estado);
+			//alert(id_cliente);
+		}
+	});
+	}
+}
+
 function autocompleteFacturaPorNumero(tipo_busqueda, busqueda_label, busqueda){
 	if (tipo_busqueda == 'nro_factura') {
 		//console.log("por codigo");

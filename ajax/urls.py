@@ -37,8 +37,10 @@ urlpatterns = patterns('ajax.views',
     
     url(r'^get_usuario_by_username/$', 'get_usuario_by_username', name='get_usuario_by_username'), 
     
-    url(r'^get_lote_by_codigo_paralot/$', 'get_lote_by_codigo_paralot', name='get_lote_by_codigo_paralot'), 
-    
+    url(r'^get_lote_by_codigo_paralot/$', 'get_lote_by_codigo_paralot', name='get_lote_by_codigo_paralot'),
+
+    url(r'^get_lotes_by_estado/$', 'get_lotes_by_estado', name='get_lotes_by_estado'),
+
     url(r'^get_factura_by_numero/$', 'get_factura_by_numero', name='get_factura_by_numero'),
     
     url(r'^marcar_impresa/$', 'marcar_impresa', name='marcar_impresa'),

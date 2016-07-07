@@ -1,12 +1,12 @@
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError
 from django.template import RequestContext, loader
-from principal.models import Lote, Venta, Manzana, Fraccion, Propietario, Cliente, RecuperacionDeLotes
+from principal.models import Lote, Venta, Manzana, Fraccion, Propietario, Cliente, RecuperacionDeLotes, Reserva
 from lotes.forms import LoteForm, FraccionManzana
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
 from django.core.urlresolvers import reverse, resolve
 # Funcion principal del modulo de lotes.
-from principal.common_functions import verificar_permisos, loggear_accion
+from principal.common_functions import verificar_permisos, loggear_accion, lote_reservado_segun_estado
 from principal import permisos
 from django.contrib.auth.models import User
 from django.db import connection
@@ -381,6 +381,74 @@ def listar_busqueda_lotes(request):
                         lote.cliente = 'Lote de estado "vendido" sin venta asociada'
                         print "El lote vendido no esta asociado a una venta."
                     lista_lotes.append(lote)
+
+    if (tipo_busqueda == 'estado'):
+        if busqueda != '':
+            # Esta manera es haciendo el query estatico, en duro, luego por cada row ir creando un objeto Factura y luego ir agregando
+            # a una lista lotes
+            lista_lotes = []
+            results = ''
+
+            # QUERY para traer los lotes buscados si le pasamos el id y usamos la columna estado
+            # query = ('''SELECT id, nro_lote, manzana_id, precio_contado, precio_credito, superficie, cuenta_corriente_catastral, boleto_nro,
+            #         estado, precio_costo, importacion_paralot, codigo_paralot
+            #         FROM principal_lote where estado =(%s);''')
+            # cursor = connection.cursor()
+            # cursor.execute(query, busqueda)
+
+            # QUERY para traer los lotes libres que no se encuentran relacionados con la tabla ventas
+            if (busqueda == '1'):
+                query = ('''SELECT * FROM principal_lote where (id not in
+                        (SELECT lote_id FROM principal_venta) or
+                        (id in (SELECT lotesRecuperados.lote_id FROM (SELECT ventasRecuperadas.lote_id FROM
+                        (SELECT * FROM principal_venta WHERE id in (select "venta_id" from "principal_recuperaciondelotes")) as ventasRecuperadas)as lotesRecuperados))) AND (estado not like '2' AND id not in (SELECT lote_id from principal_reserva));''')
+                cursor = connection.cursor()
+                cursor.execute(query)
+                results = cursor.fetchall()
+            elif (busqueda == '3'):
+                query = ('''  SELECT id, nro_lote, manzana_id, precio_contado, precio_credito, superficie,
+                              cuenta_corriente_catastral, boleto_nro, estado, precio_costo, importacion_paralot, codigo_paralot
+                              FROM principal_lote where id in (SELECT ventasNoRecuperadas.lote_id FROM (SELECT * FROM principal_venta WHERE id not in (select "venta_id" from "principal_recuperaciondelotes")) as ventasNoRecuperadas);''')
+                cursor = connection.cursor()
+                cursor.execute(query)
+                results = cursor.fetchall()
+            else:
+                query = ('''SELECT id, nro_lote, manzana_id, precio_contado, precio_credito, superficie, cuenta_corriente_catastral, boleto_nro,
+                      estado, precio_costo, importacion_paralot, codigo_paralot
+                      FROM principal_lote where estado =(%s) or id in (SELECT lote_id FROM principal_reserva);''')
+                cursor = connection.cursor()
+                cursor.execute(query, busqueda)
+                results = cursor.fetchall()
+
+            if (len(results) > 0):
+                # Obtenemos los lotes con ese numero de estado a partir del result
+                for row in results:
+                    lote = Lote.objects.get(pk=row[0])
+                    try:
+                        venta = Venta.objects.filter(lote_id=lote.id).order_by('-fecha_de_venta')
+                        venta = venta[0]
+                        cliente = venta.cliente
+                        lote.cliente = cliente
+
+                    except Exception, error:
+                        lote.cliente = 'Lote de estado "vendido" sin venta asociada'
+                        print "El lote vendido no esta asociado a una venta."
+
+                    try:
+                        object_list = Reserva.objects.filter(lote_id=lote.id)
+                        if object_list:
+                            cliente = object_list.cliente
+                            lote.cliente = cliente
+                        elif lote_reservado_segun_estado(lote.id) == True:
+                            cliente = object_list.cliente
+                            lote.cliente = cliente
+
+                    except Exception, error:
+                        lote.cliente = 'Lote de estado Reservado'
+                        print "El lote esta reservado"
+
+                    lista_lotes.append(lote)
+
 
     if(tipo_busqueda==''):
         lotes_con_ventas_al_contado = []
