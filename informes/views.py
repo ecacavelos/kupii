@@ -446,18 +446,21 @@ def obtener_clientes_atrasados(filtros,fraccion, meses_peticion):
         return []
     elif filtros == 1:
         query += " AND  fraccion.id =  %s "
+        query += " ORDER BY codigo_paralot "
         cursor = connection.cursor()
         cursor.execute(query, [fraccion])
     elif filtros == 2:
+        query += " ORDER BY codigo_paralot "
         cursor = connection.cursor()
         cursor.execute(query, [meses_peticion])
     else:
         query += " AND fraccion.id =  %s"
+        query += " ORDER BY codigo_paralot "
         cursor = connection.cursor()
         cursor.execute(query, [fraccion])
 
         # Por ultimo, traemos ordenados los registros por el CODIGO DE LOTE
-    query += " ORDER BY codigo_paralot "
+#    query += " ORDER BY codigo_paralot "
 
     # try:
     results = cursor.fetchall()  # LOTES
@@ -2691,13 +2694,14 @@ def clientes_atrasados_reporte_excel(request):
                 # style4 = xlwt.easyxf('pattern: pattern solid, fore_colour white; font: name Calibri')
                 style4 = xlwt.easyxf('font: name Calibri, height 200; align: horiz center')
 
+                nombre_fraccion = Fraccion.objects.get(id=fraccion)
                 usuario = unicode(request.user)
                 sheet.header_str = (
                                 u"&LFecha: &D Hora: &T \nUsuario: "+usuario+" "
-                                u"&CPROPAR S.R.L.\n CLIENTES ATRASADOS "
+                                u"&CPROPAR S.R.L.\n CLIENTES ATRASADOS DE LA FRACCION "+unicode(nombre_fraccion)+" "
                                 u"&RMeses de Atraso: "+unicode(meses_peticion)+" \nPage &P of &N"
                                 )
-
+                sheet.write_merge(0, 0, 0, 10, "CLIENTES ATRASADOS DE LA FRACCION "+unicode(nombre_fraccion), style)
                 # BORDES PARA las columnas de titulos
                 borders = xlwt.Borders()
                 borders.top = xlwt.Borders.THIN
@@ -2715,17 +2719,17 @@ def clientes_atrasados_reporte_excel(request):
                 # sheet.write(0, 8, "% P.", style)
                 # sheet.write(0, 9, "Fecha U.P.", style)
 
-                sheet.write(0, 0, "Cliente", style)
-                sheet.write(0, 1, "Telefono", style)
-                sheet.write(0, 2, "Direccion", style)
-                sheet.write(0, 3, "Cod Lote", style)
-                sheet.write(0, 4, "Cuotas Atras.", style)
-                sheet.write(0, 5, "Cuotas Pag.", style)
-                sheet.write(0, 6, "Importe Cuota", style)
-                sheet.write(0, 7, "Total Atras.", style)
-                sheet.write(0, 8, "Total Pag.", style)
-                sheet.write(0, 9, "% Pag.", style)
-                sheet.write(0, 10, "Fec Ult.Pago.", style)
+                sheet.write(1, 0, "Cliente", style)
+                sheet.write(1, 1, "Telefono", style)
+                sheet.write(1, 2, "Direccion", style)
+                sheet.write(1, 3, "Cod Lote", style)
+                sheet.write(1, 4, "Cuotas Atras.", style)
+                sheet.write(1, 5, "Cuotas Pag.", style)
+                sheet.write(1, 6, "Importe Cuota", style)
+                sheet.write(1, 7, "Total Atras.", style)
+                sheet.write(1, 8, "Total Pag.", style)
+                sheet.write(1, 9, "% Pag.", style)
+                sheet.write(1, 10, "Fec Ult.Pago.", style)
 
                 #Ancho de la columna Nombre
                 col_nombre = sheet.col(0)
@@ -2772,7 +2776,7 @@ def clientes_atrasados_reporte_excel(request):
                 col_fecha.width = 256 * 20  # 12 characters wide
 
                 i = 0
-                c = 1
+                c = 2
                 # for i in range(len(clientes_atrasados)):
                     # sheet.write(c, 0, clientes_atrasados[i]['cliente'],style2)
                     # sheet.write(c, 1, unicode(clientes_atrasados[i]['lote']),style4)
@@ -2802,7 +2806,7 @@ def clientes_atrasados_reporte_excel(request):
 
             response = HttpResponse(content_type='application/vnd.ms-excel')
             # Crear un nombre intuitivo
-            response['Content-Disposition'] = 'attachment; filename=' + 'clientes_atrasados.xls'
+            response['Content-Disposition'] = 'attachment; filename=' + 'clientes_atrasados_' + unicode(nombre_fraccion) + '.xls'
             wb.save(response)
             return response
 
