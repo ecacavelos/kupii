@@ -38,6 +38,11 @@
             window.location.replace("/informes/clientes_atrasados/?page="+page+"&tipo_busqueda="+tipo_busqueda+"&fraccion_nombre="+fraccion_nombre+"&fraccion="+fraccion+"194&meses_atraso="+meses_atraso+"&cant_reg="+cant_reg+"&tabla=lote");
         });
 
+{#  		$("#tipo_busqueda").change(function(){#}
+{#			if ($("#tipo_busqueda").val() == "fecha"){#}
+{#                alert ("CCp");#}
+{#            }#}
+{#		});#}
 
 		setup_inputs();
 	});
@@ -67,6 +72,7 @@
 					<!--<option value="">Elija una opcion</option> -->
 					<option value="nombre">Nombre de Fraccion</option>
 					<option value="codigo">Codigo de Fraccion</option>
+					<option value="fecha">Fecha Actual</option>
 				</select></td>
 				<td>
 				<input name="fraccion_nombre" id="fraccion" type="text" value="" placeholder="Fraccion"/>

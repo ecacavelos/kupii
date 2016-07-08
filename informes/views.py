@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError
 from django.template import RequestContext, loader
-from principal.models import Propietario, Fraccion, Lote, Manzana, PagoDeCuotas, Venta, Reserva, CambioDeLotes, RecuperacionDeLotes, TransferenciaDeLotes, Factura 
+from principal.models import Propietario, Fraccion, Lote, Manzana, PagoDeCuotas, Venta, Reserva, CambioDeLotes, RecuperacionDeLotes, TransferenciaDeLotes, Factura
 from operator import itemgetter
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
@@ -17,7 +17,7 @@ from principal.common_functions import *
 from principal.excel_styles import *
 from principal import permisos
 from operator import itemgetter, attrgetter
-
+from django.utils.datastructures import MultiValueDictKeyError
 # Funcion principal del modulo de lotes.
 from sucursal.models import Sucursal
 
@@ -529,6 +529,94 @@ def obtener_clientes_atrasados(filtros,fraccion, meses_peticion):
     return clientes_atrasados
 
 
+def obtener_clientes_atrasados_del_dia():
+
+    # OBJETO QUE SE UTILIZA PARA CARGAR TODOS LOS CLIENTES ATRASADOS EN LA FECHA ACTUAL A MOSTRAR
+    clientes_atrasados = []
+
+    # QUERY PARA TRAER TODOS LOS LOTES DE LA FRACCION EN CUESTION
+    query = (
+        '''
+        select lote.* from principal_fraccion fraccion, principal_manzana manzana, principal_lote lote WHERE manzana.id = lote.manzana_id AND manzana.fraccion_id = fraccion.id
+        '''
+    )
+
+    query += " ORDER BY codigo_paralot "
+    cursor = connection.cursor()
+    cursor.execute(query)
+
+    # try:
+    results = cursor.fetchall()  # LOTES
+
+    for r in results:  # RECORREMOS TODOS LOS LOTES DE LA FRACCION
+
+        cliente_atrasado = {}
+
+        # OBTENER LA ULTIMA VENTA Y SU DETALLE
+        ultima_venta = get_ultima_venta_no_recuperada(r[0])
+
+        # SE TRATAN LOS CASOS EN DONDE NO SE ENCUENTRA VENTA PARA ALGUN LOTE.
+        if ultima_venta != None:
+            detalle_cuotas = get_cuotas_detail_by_lote(unicode(str(r[0])))
+            hoy = date.today()
+            cuotas_a_pagar = obtener_cuotas_a_pagar_full(ultima_venta, hoy, detalle_cuotas,500)  # Maximo atraso = 500 para tener un parametro maximo de atraso en las cuotas.
+        else:
+            cuotas_a_pagar = []
+
+        if (len(cuotas_a_pagar) >= 0 + 1):
+
+            cuotas_atrasadas = len(cuotas_a_pagar);  # CUOTAS ATRASADAS
+            cantidad_cuotas_pagadas = detalle_cuotas['cant_cuotas_pagadas'];  # CUOTAS PAGADAS
+
+            fecha_actual = datetime.datetime.now().date()
+            fecha_str = unicode(fecha_actual)
+            fecha = unicode(datetime.datetime.strptime(fecha_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
+
+            if detalle_cuotas['proximo_vencimiento'] == fecha:
+                # DATOS DEL CLIENTE
+                cliente_atrasado['cliente'] = ultima_venta.cliente.nombres + ' ' + ultima_venta.cliente.apellidos
+                cliente_atrasado['direccion_particular'] = ultima_venta.cliente.direccion_particular
+                cliente_atrasado['direccion_cobro'] = ultima_venta.cliente.direccion_cobro
+                cliente_atrasado['telefono_particular'] = ultima_venta.cliente.telefono_particular
+                cliente_atrasado['celular_1'] = ultima_venta.cliente.celular_1
+
+                # FECHA ULTIMO PAGO
+                if (len(PagoDeCuotas.objects.filter(venta_id=ultima_venta.id).order_by('-fecha_de_pago')) > 0):
+                    cliente_atrasado['fecha_ultimo_pago'] = \
+                    PagoDeCuotas.objects.filter(venta_id=ultima_venta.id).order_by('-fecha_de_pago')[0].fecha_de_pago
+                else:
+                    cliente_atrasado['fecha_ultimo_pago'] = 'Dato no disponible'
+
+                cliente_atrasado['lote'] = ultima_venta.lote.codigo_paralot
+
+                # IMPORTE CUOTA
+                cliente_atrasado['importe_cuota'] = unicode('{:,}'.format(ultima_venta.precio_de_cuota)).replace(",", ".")
+
+                # CUOTAS ATRASADAS
+                cliente_atrasado['cuotas_atrasadas'] = unicode('{:,}'.format(cuotas_atrasadas)).replace(",", ".")
+
+                # TOTAL ATRASO
+                total_atrasado = cuotas_atrasadas * ultima_venta.precio_de_cuota;
+                cliente_atrasado['total_atrasado'] = unicode('{:,}'.format(total_atrasado)).replace(",", ".")
+
+                # CUOTAS PAGADAS
+                cuotas_pagadas = unicode('{:,}'.format(cantidad_cuotas_pagadas)).replace(",", ".") + '/' + unicode(
+                    '{:,}'.format(detalle_cuotas['cantidad_total_cuotas'])).replace(",", ".")
+                cliente_atrasado['cuotas_pagadas'] = cuotas_pagadas
+
+                # TOTAL PAGADO
+                total_pagado = cantidad_cuotas_pagadas * ultima_venta.precio_de_cuota;
+                cliente_atrasado['total_pagado'] = unicode('{:,}'.format(total_pagado)).replace(",", ".")
+
+                porcentaje_pagado = round(
+                    (float(cantidad_cuotas_pagadas) / float(detalle_cuotas['cantidad_total_cuotas'])) * 100);
+                cliente_atrasado['porc_pagado'] = unicode('{:,}'.format(int(porcentaje_pagado))).replace(",", ".") + '%'
+
+                clientes_atrasados.append(cliente_atrasado)
+
+    return clientes_atrasados
+
+
 def clientes_atrasados(request):
 
     if request.method == 'GET':
@@ -549,6 +637,11 @@ def clientes_atrasados(request):
                 meses_peticion = 1
                 fraccion =''
 
+                try:
+                    if request.GET['tipo_busqueda'] == 'fecha':
+                        filtros = 5
+                except MultiValueDictKeyError:
+                    fraccion = ''
 
                 # QUERY PARA TRAER TODOS LOS LOTES DE LA FRACCION EN CUESTION
                 query = (
@@ -577,12 +670,19 @@ def clientes_atrasados(request):
                 elif filtros == 2:
                     meses_peticion = int(request.GET['meses_atraso'])
                 else:
-                    fraccion = request.GET['fraccion']
-                    meses_peticion = int(request.GET['meses_atraso'])
+                    if filtros != 5:
+                        fraccion = request.GET['fraccion']
+                        meses_peticion = int(request.GET['meses_atraso'])
 
-                clientes_atrasados = obtener_clientes_atrasados(filtros,fraccion, meses_peticion)
+                if filtros != 5:
+                    clientes_atrasados = obtener_clientes_atrasados(filtros,fraccion, meses_peticion)
+                else:
+                    clientes_atrasados = obtener_clientes_atrasados_del_dia()
+
                 if meses_peticion == 0:
                     meses_peticion =''
+
+
                 a = len(clientes_atrasados)
                 if a > 0:
                     ultimo="&fraccion="+unicode(fraccion)+"&meses_atraso="+unicode(meses_peticion)
