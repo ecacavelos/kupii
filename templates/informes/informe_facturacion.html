@@ -76,11 +76,25 @@
 				$('#busqueda').val("");
 			} 
 		});
-			
-		
+
+        base_url_fraccion = base_context + "/ajax/get_fracciones_by_name/";
+		params="value";
+        var id_fraccion;
+        params = "value";
+        $("#fraccion_label").autocomplete({
+	        source : base_url_fraccion,
+	        minLength : 1,
+	        select : function(event, ui) {
+		        id_fraccion = ui.item.id;
+		        $("#fraccion").val(id_fraccion);
+	        }
+        });
+
 	});
 </script>
 <script type="text/javascript" src="{{ STATIC_URL }}informes/informe_facturacion.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}common.js"></script>
+
 {% endblock %}
 {% block content %}
 <div class="gri16 text-izquierda" id="breadcumb">
@@ -128,6 +142,16 @@
 					<td>
 						<input type="text" id="sucursal_label" name="sucursal_label" placeholder="Todas las sucursales" />
 						<input type="hidden" id="sucursal" name="sucursal"/>
+					</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td>
+						Fraccion:
+					</td>
+					<td>
+						<input type="text" id="fraccion_label" name="fraccion_label" placeholder="Todas las fracciones" />
+						<input type="hidden" id="fraccion" name="fraccion"/>
 					</td>
 					<td></td>
 				</tr>
