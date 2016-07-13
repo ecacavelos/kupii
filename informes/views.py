@@ -3842,6 +3842,8 @@ def liquidacion_vendedores_reporte_excel(request):
     wb = xlwt.Workbook(encoding='utf-8')
     sheet = wb.add_sheet('test', cell_overwrite_ok=True)
     sheet.paper_size_code = 1
+    # sheet.set_portrait(False)
+    sheet.fit_width_to_pages = 1
     style = xlwt.easyxf('pattern: pattern solid, fore_colour white;'
                               'font: name Calibri, bold True; align: horiz center')
     style2 = xlwt.easyxf('pattern: pattern solid, fore_colour white;'
@@ -3884,7 +3886,7 @@ def liquidacion_vendedores_reporte_excel(request):
                     sheet.write(c, 5, unicode(pago['total_monto_pagado']),style5)
                     sheet.write(c, 6, unicode(pago['total_monto_vendedor']), style5)
             except Exception, error:
-                print error 
+                print error
                 pass
              
             c += 1
@@ -3898,8 +3900,8 @@ def liquidacion_vendedores_reporte_excel(request):
                     sheet.write(c, 2, 'Cliente', style)
                     sheet.write(c, 3, 'Nro cuota', style)
                     sheet.write(c, 4, 'Mes', style)
-                    sheet.write(c, 5, 'Monto Pagado', style)
-                    sheet.write(c, 6, 'Monto Vendedor', style)
+                    sheet.write(c, 5, 'Monto Pag.', style)
+                    sheet.write(c, 6, 'Vendedor', style)
                     c +=1
                     
                 sheet.write(c, 0, unicode(pago['lote']),style_normal_centrado)
@@ -3915,7 +3917,7 @@ def liquidacion_vendedores_reporte_excel(request):
                 sheet.write(c, 6, unicode(pago['monto_vendedor']), style4)
             except Exception, error:
                 print error
-            
+
             try:
                 if (pago['ultimo_pago'] == True): 
                     c+=1            
@@ -3923,7 +3925,7 @@ def liquidacion_vendedores_reporte_excel(request):
                     sheet.write(c, 5, unicode(pago['total_monto_pagado']),style5)
                     sheet.write(c, 6, unicode(pago['total_monto_vendedor']), style5)
             except Exception, error:
-                print error 
+                print error
                 pass
             
             try:
@@ -3935,7 +3937,7 @@ def liquidacion_vendedores_reporte_excel(request):
                     
                     
             except Exception, error:
-                print error 
+                print error
                 pass
             
             #Ancho de la columna Lote
@@ -3960,11 +3962,11 @@ def liquidacion_vendedores_reporte_excel(request):
             
             #Ancho de la columna monto pagado
             col_monto_pagado = sheet.col(5)
-            col_monto_pagado.width = 256 * 12   # 12 characters wide
+            col_monto_pagado.width = 256 * 10   # 12 characters wide
             
             #Ancho de la columna monto vendedor
             col_monto_inmo = sheet.col(6)
-            col_monto_inmo.width = 256 * 15   # 15 characters wide
+            col_monto_inmo.width = 256 * 12   # 15 characters wide
             
             #Ancho de la columna monto propietario
             col_nombre = sheet.col(7)
