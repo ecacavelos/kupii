@@ -280,7 +280,14 @@ def filtros_establecidos(request, tipo_informe):
             busqueda=request['busqueda']
             return True
         except:
-            print('Parametros no seteados')      
+            print('Parametros no seteados')
+    elif tipo_informe == "liquidacion_general_vendedores":
+        try:
+            fecha_ini=request['fecha_ini']
+            fecha_fin=request['fecha_fin']
+            return True
+        except:
+            print('Parametros no seteados')
     elif tipo_informe == "liquidacion_gerentes":
         try:
             fecha=request['fecha']
