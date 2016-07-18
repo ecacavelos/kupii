@@ -110,14 +110,14 @@
 		{% for hw in lista_cuotas %}
 			{% if hw.total_monto_pagado and hw.ultimo_pago == False %}
 			<tr>
-				<th colspan="6" class="celda_resumen_fraccion">Resumen de la Fracción</th>
+				<th colspan="6" class="celda_resumen_fraccion">Resumen del Vendedor</th>
 				<td class="celda_resumen_fraccion">{{hw.total_monto_pagado}}</td>
 				<td class="celda_resumen_fraccion">{{hw.total_monto_vendedor}}</td>
 			</tr>
 			{% endif %}
-			{% if hw.misma_fraccion == False%}
+			{% if hw.mismo_vendedor == False%}
 				<tr>
-					<th colspan="10" class="celda_resumen_fraccion">{{hw.fraccion}}</th>
+					<th colspan="10" class="celda_resumen_fraccion">{{hw.vendedor}}</th>
 				</tr>
 				<tr>
 					<!--<th>ID</th>--><th>Lote</th><th>Plan de Pago</th><th>Fecha de Pago</th><th>Cliente</th><th>Cuota Nº</th><th>Mes</th><th>Monto Pag</th><th>Monto Vendedor</th>
@@ -151,7 +151,7 @@
 		
 		{% if hw.ultimo_pago == True %}
 			<tr>
-				<th colspan="6" class="celda_resumen_fraccion">Resumen de la Fracción</th>
+				<th colspan="6" class="celda_resumen_fraccion">Resumen del Vendedor</th>
 				<td class="celda_resumen_fraccion">{{hw.total_monto_pagado}}</td>
 				<td class="celda_resumen_fraccion">{{hw.total_monto_vendedor}}</td>
 			</tr>
