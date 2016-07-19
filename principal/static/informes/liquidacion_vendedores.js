@@ -2,6 +2,10 @@ function retrieve_liquidacion_vendedores() {
 	window.location.href = base_context + "/informes/liquidacion_vendedores_reporte_excel?fecha_ini=" + $('#fecha_ini').val() + "&fecha_fin=" + $('#fecha_fin').val() + "&busqueda=" + $('#id_busqueda').val()+"&busqueda_label="+$('#id_busqueda_label').val();
 }
 
+function retrieve_liquidacion_general_vendedores() {
+	window.location.href = base_context + "/informes/liquidacion_general_vendedores_reporte_excel?fecha_ini=" + $('#fecha_ini').val() + "&fecha_fin=" + $('#fecha_fin').val();
+}
+
 function validar() {
 	if ($('#fecha_ini').val() == "" || $('#fecha_fin').val() == "") {
 		alert("Debe ingresar un rango de fechas");

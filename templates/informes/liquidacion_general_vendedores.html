@@ -92,7 +92,7 @@
 				<td>
 				<input type="button" value="Buscar" onclick="validar();" class="historico" style="cursor: pointer"/>
 				</td>
-				<td colspan="2"><a class="boton-verde" id="id_boton" onclick="retrieve_liquidacion_vendedores();">Descargar como Excel</a></td>
+				<td colspan="2"><a class="boton-verde" id="id_boton" onclick="retrieve_liquidacion_general_vendedores();">Descargar como Excel</a></td>
 			</tr>
 		</table>
 	</form>
@@ -182,6 +182,6 @@
 
 <div id="footer">
 	<a href="{% url 'frontend_home' %}informes" class="boton-verde">Volver al módulo de Informes</a>
-	<a class="boton-verde" id="id_boton_2" onclick="retrieve_liquidacion_vendedores();">Descargar como Excel</a>
+	<a class="boton-verde" id="id_boton_2" onclick="retrieve_liquidacion_general_vendedores();">Descargar como Excel</a>
 </div>
 {% endblock %}
