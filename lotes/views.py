@@ -4,7 +4,11 @@ from principal.models import Lote, Venta, Manzana, Fraccion, Propietario, Client
     PlanDePago, PagoDeCuotas, PlanDePagoVendedor, Vendedor
 from lotes.forms import LoteForm, FraccionManzana
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.db.models import Q, datetime
+from django.db.models import Q
+from django.core.serializers.json import DjangoJSONEncoder
+import json
+import datetime
+from datetime import datetime
 from django.core.urlresolvers import reverse, resolve
 # Funcion principal del modulo de lotes.
 from principal.common_functions import verificar_permisos, loggear_accion, lote_reservado_segun_estado, get_ultima_venta, \
