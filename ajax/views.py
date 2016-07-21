@@ -11,6 +11,7 @@ from django.core.urlresolvers import reverse, resolve
 from principal.common_functions import *
 from django.core.serializers.json import DjangoJSONEncoder
 import json
+import smtplib
 import traceback
 from django.db.models import Count, Min, Sum, Avg
 from principal.monthdelta import MonthDelta
@@ -780,7 +781,8 @@ def facturar(request):
             
             #Obtener el NUMERO
             numero = request.POST.get('nro_factura','')
-            
+            numero_original = request.POST.get('nro_factura_original','')
+
             #Obtener fecha
             #fecha = datetime.datetime.strptime(request.POST.get('fecha', ''), "%Y-%m-%d")
             fecha = datetime.strptime(request.POST.get('fecha', ''), "%d/%m/%Y")
@@ -835,6 +837,22 @@ def facturar(request):
             #response = base64.b64encode(response.content)
             
             response = {"id_factura": id_objeto}
+
+            if numero_original != numero:
+                fromaddr = 'cbiconsultora@gmail.com'
+                toaddrs = 'IvanHoberuk@gmail.com'
+                msg = 'Se detecto un cambio del numero de factura original ' + str(numero_original) + ' por el nro ' + str(numero)
+
+                # Credentials (if needed)
+                username = 'cbiconsultora@gmail.com'
+                password = 'cbicbiconsultora'
+
+                # The actual mail send
+                server = smtplib.SMTP('smtp.gmail.com:587')
+                server.starttls()
+                server.login(username, password)
+                server.sendmail(fromaddr, toaddrs, msg)
+                server.quit()
             
             return HttpResponse(json.dumps(response));
     else:

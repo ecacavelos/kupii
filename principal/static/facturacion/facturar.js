@@ -357,6 +357,7 @@
 						lote: $("#lote").val(),
 						id_timbrado: $("#id-timbrado").val(),
 						nro_factura : $("#nro-factura").val(),
+						nro_factura_original : $("#nro-factura-original").val(),
 						fecha: $("#fecha").val(),
 						tipo : $("#tipo").val(),
 						detalle: $("#detalle").val(),
