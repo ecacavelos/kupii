@@ -4,6 +4,7 @@ from principal.models import Fraccion, Manzana, Cliente,Propietario, Lote, Vende
 from django.core.serializers.json import DjangoJSONEncoder
 import json
 import datetime
+import smtplib
 from datetime import datetime
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.urlresolvers import reverse, resolve
@@ -267,6 +268,9 @@ def pago_de_cuotas(request):
                 total_de_cuotas = data.get('pago_total_de_cuotas')
                 total_de_mora = data.get('pago_total_de_mora')
                 total_de_pago = data.get('pago_total_de_pago')
+                interes_original = data.get('interes_original')
+                resumen_cuotas = data.get('resumen_cuotas')
+                resumen_cuotas = int (resumen_cuotas) + 1
                 date_parse_error = False
                 fecha_pago=data.get('pago_fecha_de_pago', '')
                 fecha_pago_parsed = datetime.datetime.strptime(fecha_pago, "%d/%m/%Y").date()
@@ -326,6 +330,24 @@ def pago_de_cuotas(request):
                     #retorna el objeto como json
                     object_list = PagoDeCuotas.objects.filter(id = nuevo_pago.id)
                     labels=["id"]
+                    if interes_original != total_de_mora:
+
+                        fromaddr = 'cbiconsultora@gmail.com'
+                        toaddrs = 'IvanHoberuk@gmail.com'
+                        msg = 'Se detecto un cambio del interes del pago de la cuota nro ' + str(resumen_cuotas) + ' de la fraccion nro ' + str(nuevo_pago.lote)
+
+                        # Credentials (if needed)
+                        username = 'cbiconsultora@gmail.com'
+                        password = 'cbicbiconsultora'
+
+                        # The actual mail send
+                        server = smtplib.SMTP('smtp.gmail.com:587')
+                        server.starttls()
+                        server.login(username, password)
+                        server.sendmail(fromaddr, toaddrs, msg)
+                        server.quit()
+
+
                     return HttpResponse(json.dumps(custom_json(object_list,labels), cls=DjangoJSONEncoder), content_type="application/json")
                             
                 else:

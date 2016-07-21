@@ -157,7 +157,9 @@ function validatePago() {
 			pago_total_de_cuotas : $("#total_cuotas").val(),
 			pago_total_de_mora : $("#total_mora").val(),
 			pago_total_de_pago : $("#total_pago").val(),
-			detalle : $("#detalle").val() 
+			detalle : $("#detalle").val(),
+			interes_original :	$("#interes_original").val(),
+			resumen_cuotas : $("#resumen_cuotas").text().split("/")[0]
 		}
 	});
 	request4.done(function(msg) {
@@ -402,6 +404,8 @@ function calcularInteres() {
 			$("#detalle").val(detalle_interes);	
 			global_intereses=intereses+gestion_cobranza;
             //alert(global_intereses);
+			$("#interes_original").val(global_intereses);
+
 			calculateTotalPago();		
 		});
 		request.error(function(msg) {
@@ -612,7 +616,7 @@ function calculateTotalPago() {
 	$("#total_mora").val(total_mora);
 	$("#total_mora2").html(String(total_mora));
 	$("#total_mora2").html(String(format.call($("#total_mora2").html().split(' ').join(''),'.',',')));
-	
+
 	total_pago = parseInt(total_pago);
 	$("#total_pago").val(total_pago);
 	$("#total_pago2").html(String(total_pago));
