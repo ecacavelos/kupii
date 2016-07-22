@@ -1,5 +1,6 @@
 var total_filas = 1;
 var total_cuotas = 0;
+var cancelado = false;
 $(document).ready(function() {
 	$("#id_lote").keydown(validateLotePre);
 	$("#id_lote").keyup(validateLotePost);
@@ -616,11 +617,17 @@ function calculateTotalPago() {
 	$("#total_mora").val(total_mora);
 	$("#total_mora2").html(String(total_mora));
 	$("#total_mora2").html(String(format.call($("#total_mora2").html().split(' ').join(''),'.',',')));
+	if(cancelado){
+		$("#total_mora2").html(0);
+	}
 
 	total_pago = parseInt(total_pago);
 	$("#total_pago").val(total_pago);
 	$("#total_pago2").html(String(total_pago));
 	$("#total_pago2").html(String(format.call($("#total_pago2").html().split(' ').join(''),'.',',')));
+	if(cancelado){
+		$("#total_pago2").html(0);
+	}
 	$("#guardar_pago").removeAttr("disabled");
 }
 
@@ -644,15 +651,19 @@ function calculateMesPago() {
 }
 
 function addRow(msg){
-	total_cuotas=0;	
+	cancelado = false;
+	total_cuotas=0;
 	 var table = document.getElementById("id_cuota_pagar");
 	 for(i =0; i < msg.cuotas_a_pagar.length; i++){
         if(msg.cuotas_a_pagar[i].pago_cancelado){
             alert("Error: ya se pagaron todas las cuotas correspondientes a este lote.");
+			cancelado = true;
             $('input[type="submit"]').attr('disabled','disabled');
+
         }
         else if (msg.cuotas_a_pagar[i].contado){
             alert("Error: no se pueden ingresar pagos porque este lote fue vendido al contado.");
+			cancelado = true;
             $('input[type="submit"]').attr('disabled','disabled');
         }
         else{
