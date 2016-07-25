@@ -4,6 +4,7 @@ urlpatterns = patterns('ajax.views',
     # Fracciones
     url(r'^get_fracciones_by_name/$', 'get_fracciones_by_name', name='get_fracciones_by_name'),
     url(r'^get_fracciones_by_sucursal/$', 'get_fracciones_by_sucursal', name='get_fracciones_by_sucursal'),
+    url(r'^get_fracciones_by_id/$', 'get_fracciones_by_id', name='get_fracciones_by_id'),
 
     url(r'^get_manzanas_by_fraccion/$', 'get_manzanas_by_fraccion', name='get_manzanas_by_fraccion'),
     url(r'^get_ventas_by_lote/$', 'get_ventas_by_lote', name='get_ventas_by_lote'),

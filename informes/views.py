@@ -1065,6 +1065,191 @@ def informe_general(request):
             return HttpResponseRedirect(reverse('login'))
 
 
+def informe_cuotas_por_cobrar(request):
+    if request.method == 'GET':
+        if request.user.is_authenticated():
+            if verificar_permisos(request.user.id, permisos.VER_INFORMES):
+                if (filtros_establecidos(request.GET, 'informe_cuotas_por_cobrar') == False):
+                    t = loader.get_template('informes/informe_cuotas_por_cobrar.html')
+                    c = RequestContext(request, {
+                        'object_list': [],
+                    })
+                    return HttpResponse(t.render(c))
+                else:  # Parametros seteados
+                    t = loader.get_template('informes/informe_cuotas_por_cobrar.html')
+                    tipo_busqueda = request.GET['tipo_busqueda']
+                    fecha_ini = request.GET['fecha_ini']
+                    fecha_fin = request.GET['fecha_fin']
+
+                    fraccion_ini = request.GET['frac1']
+                    fraccion_fin = request.GET['frac2']
+                    f1 = request.GET['fraccion_ini']
+                    f2 = request.GET['fraccion_fin']
+                    filas_fraccion = []
+                    ultimo = "&tipo_busqueda=" + tipo_busqueda + "&fraccion_ini=" + f1 + "&frac1=" + fraccion_ini + "&fraccion_fin=" + f2 + "&frac2=" + fraccion_fin + "&fecha_ini=" + fecha_ini + "&fecha_fin=" + fecha_fin
+                    g_fraccion = ''
+                    if fecha_ini == '' and fecha_fin == '':
+                        query = (
+                            '''
+                            select pc.* from principal_pagodecuotas pc, principal_lote l, principal_manzana m, principal_fraccion f
+                            where f.id>=''' + fraccion_ini +
+                            '''
+                            and f.id<=''' + fraccion_fin +
+                            '''
+                            and (pc.lote_id = l.id and l.manzana_id=m.id and m.fraccion_id=f.id) order by f.id
+                            '''
+                        )
+                    else:
+                        fecha_ini_parsed = datetime.datetime.strptime(fecha_ini, "%d/%m/%Y").date()
+                        fecha_fin_parsed = datetime.datetime.strptime(fecha_fin, "%d/%m/%Y").date()
+                        query = (
+                            '''
+                            select pc.* from principal_pagodecuotas pc, principal_lote l, principal_manzana m, principal_fraccion f
+                            where pc.fecha_de_pago >= \'''' + unicode(fecha_ini_parsed) +
+                            '''\' and pc.fecha_de_pago <= \'''' + unicode(fecha_fin_parsed) +
+                            '''\' and f.id >= ''' + fraccion_ini +
+                            '''
+                            and f.id <= ''' + fraccion_fin +
+                            '''
+                            and (pc.lote_id = l.id and l.manzana_id=m.id and m.fraccion_id=f.id) order by f.id,pc.fecha_de_pago
+                            '''
+                        )
+
+                    object_list = list(PagoDeCuotas.objects.raw(query))
+
+                    cuotas = []
+                    total_cuotas = 0
+                    total_mora = 0
+                    total_pagos = 0
+
+                    total_general_cuotas = 0
+                    total_general_mora = 0
+                    total_general_pagos = 0
+                    # ver esto
+                    for i, cuota_item in enumerate(object_list):
+                        # Se setean los datos de cada fila
+                        cuota = {}
+                        cuota['misma_fraccion'] = True
+                        nro_cuota = get_nro_cuota(cuota_item)
+                        if g_fraccion == '':
+                            g_fraccion = cuota_item.lote.manzana.fraccion.id
+                            cuota['misma_fraccion'] = False
+                        if g_fraccion != cuota_item.lote.manzana.fraccion.id:
+
+                            filas_fraccion[0]['misma_fraccion'] = False
+                            cuotas.extend(filas_fraccion)
+                            filas_fraccion = []
+
+                            g_fraccion = cuota_item.lote.manzana.fraccion.id
+
+                            cuota = {}
+                            # cuota['misma_fraccion'] = False
+                            cuota['total_cuotas'] = unicode('{:,}'.format(total_cuotas)).replace(",", ".")
+                            cuota['total_mora'] = unicode('{:,}'.format(total_mora)).replace(",", ".")
+                            cuota['total_pago'] = unicode('{:,}'.format(total_pagos)).replace(",", ".")
+                            cuota['ultimo_pago'] = True
+                            cuotas.append(cuota)
+
+                            total_cuotas = 0
+                            total_mora = 0
+                            total_pagos = 0
+
+                            cuota = {}
+                            cuota['misma_fraccion'] = False
+                            cuota['ultimo_pago'] = False
+                            cuota['fraccion_id'] = unicode(cuota_item.lote.manzana.fraccion.id)
+                            cuota['fraccion'] = unicode(cuota_item.lote.manzana.fraccion)
+                            cuota['lote'] = unicode(cuota_item.lote)
+                            cuota['cliente'] = unicode(cuota_item.cliente)
+                            cuota['cuota_nro'] = unicode(nro_cuota) + '/' + unicode(
+                                cuota_item.plan_de_pago.cantidad_de_cuotas)
+                            cuota['plan_de_pago'] = cuota_item.plan_de_pago.nombre_del_plan
+                            cuota['fecha_pago'] = unicode(cuota_item.fecha_de_pago.strftime("%d/%m/%Y"))
+                            cuota['total_de_cuotas'] = unicode(
+                                '{:,}'.format(cuota_item.total_de_cuotas)).replace(",", ".")
+                            cuota['total_de_mora'] = unicode(
+                                '{:,}'.format(cuota_item.total_de_mora)).replace(",", ".")
+                            cuota['total_de_pago'] = unicode(
+                                '{:,}'.format(cuota_item.total_de_pago)).replace(",", ".")
+                            # Se suman los totales por fraccion
+                            total_cuotas += cuota_item.total_de_cuotas
+                            total_mora += cuota_item.total_de_mora
+                            total_pagos += cuota_item.total_de_pago
+
+                            total_general_cuotas += cuota_item.total_de_cuotas
+                            total_general_mora += cuota_item.total_de_mora
+                            total_general_pagos += cuota_item.total_de_pago
+
+                            filas_fraccion.append(cuota)
+
+                        else:
+                            cuota['ultimo_pago'] = False
+                            cuota['misma_fraccion'] = True
+                            cuota['fraccion_id'] = unicode(cuota_item.lote.manzana.fraccion.id)
+                            cuota['fraccion'] = unicode(cuota_item.lote.manzana.fraccion)
+                            cuota['lote'] = unicode(cuota_item.lote)
+                            cuota['cliente'] = unicode(cuota_item.cliente)
+                            cuota['cuota_nro'] = unicode(nro_cuota) + '/' + unicode(
+                                cuota_item.plan_de_pago.cantidad_de_cuotas)
+                            cuota['plan_de_pago'] = cuota_item.plan_de_pago.nombre_del_plan
+                            cuota['fecha_pago'] = unicode(cuota_item.fecha_de_pago.strftime("%d/%m/%Y"))
+                            cuota['total_de_cuotas'] = unicode(
+                                '{:,}'.format(cuota_item.total_de_cuotas)).replace(",", ".")
+                            cuota['total_de_mora'] = unicode(
+                                '{:,}'.format(cuota_item.total_de_mora)).replace(",", ".")
+                            cuota['total_de_pago'] = unicode(
+                                '{:,}'.format(cuota_item.total_de_pago)).replace(",", ".")
+                            # Se suman los totales por fraccion
+                            total_cuotas += cuota_item.total_de_cuotas
+                            total_mora += cuota_item.total_de_mora
+                            total_pagos += cuota_item.total_de_pago
+
+                            total_general_cuotas += cuota_item.total_de_cuotas
+                            total_general_mora += cuota_item.total_de_mora
+                            total_general_pagos += cuota_item.total_de_pago
+
+                            filas_fraccion.append(cuota)
+
+                    cuotas.extend(filas_fraccion)
+                    cuota = {}
+                    cuota['total_cuotas'] = unicode('{:,}'.format(total_cuotas)).replace(",", ".")
+                    cuota['total_mora'] = unicode('{:,}'.format(total_mora)).replace(",", ".")
+                    cuota['total_pago'] = unicode('{:,}'.format(total_pagos)).replace(",", ".")
+                    cuota['ultimo_pago'] = True
+                    cuotas.append(cuota)
+                    cuota = {}
+                    cuota['total_general_cuotas'] = unicode('{:,}'.format(total_general_cuotas)).replace(
+                        ",", ".")
+                    cuota['total_general_mora'] = unicode('{:,}'.format(total_general_mora)).replace(",",
+                                                                                                     ".")
+                    cuota['total_general_pago'] = unicode('{:,}'.format(total_general_pagos)).replace(",",
+                                                                                                      ".")
+                    cuotas.append(cuota)
+                    lista = cuotas
+                    c = RequestContext(request, {
+                        'tipo_busqueda': tipo_busqueda,
+                        # 'cant_reg': cant_reg,
+                        'fraccion_ini': fraccion_ini,
+                        'fraccion_fin': fraccion_fin,
+                        'fecha_ini': fecha_ini,
+                        'fecha_fin': fecha_fin,
+                        'lista_cuotas': lista,
+                        'ultimo': ultimo,
+                        'frac1': f1,
+                        'frac2': f2
+                    })
+                    return HttpResponse(t.render(c))
+            else:
+                t = loader.get_template('index2.html')
+                grupo = request.user.groups.get().id
+                c = RequestContext(request, {
+                    'grupo': grupo
+                })
+                return HttpResponse(t.render(c))
+        else:
+            return HttpResponseRedirect(reverse('login'))
+
+
 #Funcion que devuelve la lista de pagos de para liquidacion de propietarios.
 #
 def obtener_pagos_liquidacion(entidad_id, tipo_busqueda, fecha_ini, fecha_fin, order_by, ley_param = None, impuesto_renta_param = None, iva_comision_param = None):

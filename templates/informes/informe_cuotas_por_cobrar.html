@@ -1,0 +1,272 @@
+{% extends "lotes/base_lotes.html" %}
+{% block header_scripts %}
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		$('#fecha_ini').focus();
+		$("#listado-item-lote").hide();
+		//Cambiar calendario a español
+		$.datepicker.regional['es'] = {
+			closeText : 'Cerrar',
+			prevText : '<Ant',
+			nextText : 'Sig>',
+			currentText : 'Hoy',
+			monthNames : ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+			monthNamesShort : ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+			dayNames : ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
+			dayNamesShort : ['Dom', 'Lun', 'Mar', 'Mié', 'Juv', 'Vie', 'Sáb'],
+			dayNamesMin : ['Do', 'Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sá'],
+			weekHeader : 'Sm',
+			dateFormat : 'dd/mm/yy',
+			firstDay : 1,
+			isRTL : false,
+			showMonthAfterYear : false,
+			yearSuffix : ''
+		};
+		// Setear idioma al calendario
+		$.datepicker.setDefaults($.datepicker.regional['es']);
+
+		var lista_cuotas = "{{lista_cuotas}}";
+        var cant_reg = "{{ cant_reg }}";
+		var fraccion_ini = "{{fraccion_ini}}";
+		var fraccion_fin = "{{fraccion_fin}}";
+		var fecha_ini = "{{fecha_ini}}";
+		var fecha_fin = "{{fecha_fin}}";
+		var frac1="{{frac1}}";
+		var frac2="{{frac2}}";
+		var tipo_busqueda = "{{tipo_busqueda}}";
+        $('#id_cant_reg').val(cant_reg);
+		if (tipo_busqueda) {
+			$('#id_tipo_busqueda').val(tipo_busqueda);	
+		}
+		$('#id_fraccion_ini').val(frac1);
+		$('#id_fraccion_fin').val(frac2);
+		$('#id_frac1').val(fraccion_ini);
+		$('#id_frac2').val(fraccion_fin);
+		
+		$('#fecha_ini').val(fecha_ini);
+		$('#fecha_fin').val(fecha_fin);
+
+		$('#fecha_ini').mask('##/##/####');
+		$("#fecha_ini").datepicker({
+			dateFormat : 'dd/mm/yy'
+		});
+		$('#fecha_fin').mask('##/##/####');
+		$("#fecha_fin").datepicker({
+			dateFormat : 'dd/mm/yy'
+		});
+
+        $('#id_cant_reg').change(function(){
+            var cant_reg = $("#id_cant_reg").val();
+            var fraccion_ini = $("#id_fraccion_ini").val();
+            var fraccion_fin = $("#id_fraccion_fin").val();
+            var frac1 = $("#id_frac1").val();
+            var frac2 = $("#id_frac2").val();
+            window.location.replace("/informes/informe_cuotas_por_cobrar/?tipo_busqueda="+tipo_busqueda+"&fraccion_ini="+fraccion_ini+"&fraccion_fin="+fraccion_fin+"&frac1="+frac1+"&frac2="+frac2+"&fecha_ini="+fecha_ini+"&fecha_fin="+fecha_fin+"&cant_reg="+cant_reg);
+         });
+
+        $('#boton_pagina').click(function() {
+            var page = $("#id_nro_pagina").val();
+            var cant_reg = $("#id_cant_reg").val();
+            var fraccion_ini = $("#id_fraccion_ini").val();
+            var fraccion_fin = $("#id_fraccion_fin").val();
+            var frac1 = $("#id_frac1").val();
+            var frac2 = $("#id_frac2").val();
+            window.location.replace("/informes/informe_cuotas_por_cobrar/?page="+page+"&tipo_busqueda="+tipo_busqueda+"&fraccion_ini="+fraccion_ini+"&fraccion_fin="+fraccion_fin+"&frac1="+frac1+"&frac2="+frac2+"&fecha_ini="+fecha_ini+"&fecha_fin="+fecha_fin+"&cant_reg="+cant_reg);
+        });
+
+
+		if ($("#id_frac1").val() == "" || $("#id_frac2").val() == "" ) {//parametros no seteados
+			$('.listado-pagos').hide();
+			$('.pagination').hide();
+		} else {
+			$('.listado-pagos').show();
+			$('.pagination').show();
+		}
+
+		if (lista_cuotas){
+			$("#listado-item-lote").show();
+		}
+		setup_inputs();	
+
+	});
+	
+</script>
+<script type="text/javascript" src="{{ STATIC_URL }}informes/informe_cuotas_por_cobrar.js"></script>
+{% endblock %}
+{% block content %}
+<div class="gri16 text-izquierda" id="breadcumb">
+	<a href="{% url 'frontend_home' %}">Inicio</a><span class="verde-1">></span>
+	<a href="{% url 'frontend_home' %}informes/">Informes</a>
+	<span class="verde-1">> Informe de cuotas por cobrar por Fraccion</span>
+</div>
+
+<div class="clear"></div>
+
+<h1>Informe de Cuotas por Cobrar</h1>
+
+<div class="grid_6">
+	<form name="frm_busqueda" id="frm_busqueda" method="get" action="{% url 'frontend_home' %}informes/informe_cuotas_por_cobrar/">
+		<table id="lista-categoria" frame="box">
+			<tr>
+				<th class="acciones" colspan="3"><strong><a href="#" style="color: white;">Filtrar</a></strong></th>
+			</tr>
+{#			<th></th><th>Desde:</th><th>Hasta:</th>#}
+{#			<tr>#}
+{#				<td> Rango de Fecha: </td>#}
+{#				<td>#}
+{#				<input name="fecha_ini" id="fecha_ini" type="text" value="" />#}
+{#				</td>#}
+{#				<td>#}
+{#				<input name="fecha_fin" id="fecha_fin" type="text" value="" />#}
+{#				</td>#}
+{#			</tr>#}
+			<tr>
+				<td>
+				<select id="id_tipo_busqueda" name="tipo_busqueda">
+					<!-- <option value="">Elija una opcion</option> -->
+					<option value="nombre" >Nombre de Fraccion</option>
+					<option value="codigo">Codigo de Fraccion</option>
+				</select></td>
+				<td>
+					<input name="fraccion_ini" id="id_fraccion_ini" type="text" value="" />
+					<input name="frac1" id="id_frac1" type="hidden" value="" />
+				</td>
+{#				<td>#}
+{#					<input name="fraccion_fin" id="id_fraccion_fin" type="text" value="" />#}
+{#					<input name="frac2" id="id_frac2" type="hidden" value="" />#}
+{#				</td>#}
+			</tr>
+			<tr>
+				<td>
+				<input type="button" value="Buscar" onclick="validar();" class="historico" style="cursor: pointer"/>
+				</td>
+				<td><a class="boton-verde" id="id_boton" onclick="retrieve_informe_cuotas_por_cobrar();">Descargar Excel</a></td>
+			</tr>
+		</table>
+	</form>
+</div>
+<div class="clear"></div>
+<!--
+<div class="pagination">
+    <span class="step-links">
+{#                Mostrando {{ object_list.start_index }}-{{ object_list.end_index }} de {{ object_list.paginator.count }} Resultados#}
+        Cantidad de Registros <select name="cant_reg" id="id_cant_reg" style="width:70px">
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="todos">Todos</option>
+        </select>
+        {%if lista_cuotas.has_previous%}
+            <a href="?page={{ lista_cuotas.first_index}}{{ultimo}}"> Primera </a>
+            <a href="?page={{ lista_cuotas.previous_page_number }}{{ultimo}}"> Anterior</a>
+        {%endif%}
+        P&aacute;gina <input name="nro_pagina" id="id_nro_pagina" size="1" type="text" value="{{lista_cuotas.number}}"/>
+        de {{ lista_cuotas.paginator.num_pages }}
+        <input id="boton_pagina" type="button" value="Ir" class="historico" style="cursor: pointer"/>
+        {%if lista_cuotas.has_next%}
+            <a href="?page={{ lista_cuotas.next_page_number }}{{ultimo}}"> Siguiente </a>
+            <a href="?page={{ lista_cuotas.end_index}}{{ultimo}}"> Ultima </a>
+        {%endif%}
+    </span>
+</div>
+-->
+{#<div id="listado-cuadro-busqueda">#}
+{##}
+{#	<br>#}
+{#	<br>#}
+{#</div>#}
+<div id="listado-item-lote">
+	<table border="1.5" id="tabla_pagos" cellpadding="0" cellspacing="0" class="listado-pagos" align="center">
+		{% for cuota in lista_cuotas %}
+			{% if cuota.total_pago and cuota.ultimo_pago == False %}
+			<tr>
+				<th colspan="5" class="celda_resumen_fraccion">Resumen de la Fracción</th>
+				<td class="celda_resumen_fraccion">{{cuota.total_cuotas}}</td>
+				<td class="celda_resumen_fraccion">{{cuota.total_mora}}</td>
+				<td class="celda_resumen_fraccion">{{cuota.total_pago}}</td>
+			</tr>
+			{% endif %}
+			{% if cuota.misma_fraccion == False%}
+				<tr>
+					<th colspan="8" class="celda_resumen_fraccion">{{cuota.fraccion}}</th>
+				</tr>
+				<!--<th>Nombre Fracci&oacute;n</th><th>Fracci&oacute;n</th>--><th>Lote Nro</th><th>Cliente</th><th>Cuota Nº</th><th>Plan de Pago</th><th>Fecha de Pago</th><th>Total de Cuotas</th><th>Total de Mora</th><th>Total de Pago</th>
+			{% endif %}
+		
+		{% if forloop.counter|divisibleby:2 %}
+		<tr>
+			<!--<td>{{cuota.fraccion}}</td>
+			<td>{{cuota.fraccion_id}}</td>-->
+			<td>{{cuota.lote}}</td>
+			<td>{{cuota.cliente}}</td>
+			<td>{{cuota.cuota_nro}}</td>
+			<td>{{cuota.plan_de_pago}}</td>
+			<td>{{cuota.fecha_pago}}</td>
+			<td>{{cuota.total_de_cuotas}}</td>
+			<td>{{cuota.total_de_mora}}</td>
+			<td>{{cuota.total_de_pago}}</td>
+		</tr>
+		{% else %}
+		<tr class="bkg_gris">
+			<!--
+			<td>{{cuota.fraccion}}</td>
+			<td>{{cuota.fraccion_id}}</td>-->
+			<td>{{cuota.lote}}</td>
+			<td>{{cuota.cliente}}</td>
+			<td>{{cuota.cuota_nro}}</td>
+			<td>{{cuota.plan_de_pago}}</td>
+			<td>{{cuota.fecha_pago}}</td>
+			<td>{{cuota.total_de_cuotas}}</td>
+			<td>{{cuota.total_de_mora}}</td>
+			<td>{{cuota.total_de_pago}}</td>
+		</tr>
+		{% endif %}
+		
+		{% if cuota.ultimo_pago == True %}
+			<tr>
+				<th colspan="5" class="celda_resumen_fraccion">Resumen de la Fracción</th>
+				<td class="celda_resumen_fraccion">{{cuota.total_cuotas}}</td>
+				<td class="celda_resumen_fraccion">{{cuota.total_mora}}</td>
+				<td class="celda_resumen_fraccion">{{cuota.total_pago}}</td>
+			</tr>
+		{% endif %}
+		
+		{% if cuota.total_general_cuotas %}
+			<tr>
+				<th colspan="5" class="celda_resumen_fraccion">Totales Generales</th>
+				<td class="celda_resumen_fraccion">{{cuota.total_general_cuotas}}</td>
+				<td class="celda_resumen_fraccion">{{cuota.total_general_mora}}</td>
+				<td class="celda_resumen_fraccion">{{cuota.total_general_pago}}</td>
+			</tr>
+		{% endif %}
+		
+		{% endfor %}
+	</table>
+</div>
+<!--
+<div class="pagination">
+    <span class="step-links">
+{#                Mostrando {{ object_list.start_index }}-{{ object_list.end_index }} de {{ object_list.paginator.count }} Resultados#}
+        Cantidad de Registros <select name="cant_reg" id="id_cant_reg" style="width:70px">
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="todos">Todos</option>
+        </select>
+        {%if lista_cuotas.has_previous%}
+            <a href="?page={{ lista_cuotas.first_index}}{{ultimo}}"> Primera </a>
+            <a href="?page={{ lista_cuotas.previous_page_number }}{{ultimo}}"> Anterior</a>
+        {%endif%}
+        P&aacute;gina <input name="nro_pagina" id="id_nro_pagina" size="1" type="text" value="{{lista_cuotas.number}}"/>
+        de {{ lista_cuotas.paginator.num_pages }}
+        <input id="boton_pagina" type="button" value="Ir" class="historico" style="cursor: pointer"/>
+        {%if lista_cuotas.has_next%}
+            <a href="?page={{ lista_cuotas.next_page_number }}{{ultimo}}"> Siguiente </a>
+            <a href="?page={{ lista_cuotas.end_index}}{{ultimo}}"> Ultima </a>
+        {%endif%}
+    </span>
+</div>
+-->
+<div id="footer">
+	<a href="{% url 'frontend_home' %}informes" class="boton-verde">Volver al módulo de Informes</a>
+</div>
+{% endblock %}
