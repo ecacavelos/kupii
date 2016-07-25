@@ -333,7 +333,7 @@ def pago_de_cuotas(request):
                     if interes_original != total_de_mora:
 
                         fromaddr = 'cbiconsultora@gmail.com'
-                        toaddrs = 'IvanHoberuk@gmail.com'
+                        toaddrs = 'lic.ivan@propar.com.py'
                         msg = 'Se detecto un cambio del interes del pago de la cuota nro ' + str(resumen_cuotas) + ' de la fraccion nro ' + str(nuevo_pago.lote)
 
                         # Credentials (if needed)

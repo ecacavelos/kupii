@@ -840,7 +840,7 @@ def facturar(request):
 
             if numero_original != numero:
                 fromaddr = 'cbiconsultora@gmail.com'
-                toaddrs = 'IvanHoberuk@gmail.com'
+                toaddrs = 'lic.ivan@propar.com.py'
                 msg = 'Se detecto un cambio del numero de factura original ' + str(numero_original) + ' por el nro ' + str(numero)
 
                 # Credentials (if needed)
