@@ -475,9 +475,9 @@ def listar_busqueda_lotes(request):
             # a una lista lotes
             lista_lotes = []
             # QUERY para traer los lotes de la fraccion en cuestio
-            query = ('''SELECT id, nro_lote, manzana_id, precio_contado, precio_credito, superficie, cuenta_corriente_catastral, boleto_nro,
-                    estado, precio_costo, importacion_paralot, codigo_paralot
-                    FROM principal_lote where manzana_id in (SELECT id FROM principal_manzana where fraccion_id = (SELECT id FROM principal_fraccion WHERE nombre LIKE UPPER (%s)));''')
+            query = ('''SELECT principal_lote.id, nro_lote, manzana_id, precio_contado, precio_credito, superficie, cuenta_corriente_catastral, boleto_nro,
+                    estado, precio_costo, principal_lote.importacion_paralot, codigo_paralot
+                    FROM principal_lote JOIN principal_manzana on principal_lote.manzana_id = principal_manzana.id where manzana_id in (SELECT id FROM principal_manzana where fraccion_id = (SELECT id FROM principal_fraccion WHERE nombre LIKE UPPER (%s))) order by nro_manzana, nro_lote;''')
             cursor = connection.cursor()
             cursor.execute(query, [fraccion[0].nombre])
             results = cursor.fetchall()
@@ -512,24 +512,36 @@ def listar_busqueda_lotes(request):
 
             # QUERY para traer los lotes libres que no se encuentran relacionados con la tabla ventas
             if (busqueda == '1'):
-                query = ('''SELECT * FROM principal_lote where (id not in
-                        (SELECT lote_id FROM principal_venta) or
-                        (id in (SELECT lotesRecuperados.lote_id FROM (SELECT ventasRecuperadas.lote_id FROM
-                        (SELECT * FROM principal_venta WHERE id in (select "venta_id" from "principal_recuperaciondelotes")) as ventasRecuperadas)as lotesRecuperados))) AND (estado not like '2' AND id not in (SELECT lote_id from principal_reserva));''')
+                # query = ('''SELECT * FROM principal_lote where (id not in
+                #         (SELECT lote_id FROM principal_venta) or
+                #         (id in (SELECT lotesRecuperados.lote_id FROM (SELECT ventasRecuperadas.lote_id FROM
+                #         (SELECT * FROM principal_venta WHERE id in (select "venta_id" from "principal_recuperaciondelotes")) as ventasRecuperadas)as lotesRecuperados))) AND (estado not like '2' AND id not in (SELECT lote_id from principal_reserva));''')
+                query = (''' SELECT * FROM principal_lote JOIN principal_manzana on principal_lote.manzana_id = principal_manzana.id JOIN principal_fraccion on principal_manzana.fraccion_id = principal_fraccion.id
+                    		where (principal_lote.id not in
+                        (SELECT lote_id FROM principal_venta) or (principal_lote.id in (SELECT lotesRecuperados.lote_id FROM (SELECT ventasRecuperadas.lote_id FROM
+                        (SELECT * FROM principal_venta WHERE principal_lote.id in (select "venta_id" from "principal_recuperaciondelotes")) as ventasRecuperadas)as lotesRecuperados))) AND (estado not like '2' AND principal_lote.id not in (SELECT lote_id from principal_reserva)) order by principal_fraccion.id, nro_manzana, nro_lote;''')
                 cursor = connection.cursor()
                 cursor.execute(query)
                 results = cursor.fetchall()
             elif (busqueda == '3'):
-                query = ('''  SELECT id, nro_lote, manzana_id, precio_contado, precio_credito, superficie,
-                              cuenta_corriente_catastral, boleto_nro, estado, precio_costo, importacion_paralot, codigo_paralot
-                              FROM principal_lote where id in (SELECT ventasNoRecuperadas.lote_id FROM (SELECT * FROM principal_venta WHERE id not in (select "venta_id" from "principal_recuperaciondelotes")) as ventasNoRecuperadas);''')
+                # query = ('''  SELECT id, nro_lote, manzana_id, precio_contado, precio_credito, superficie,
+                #               cuenta_corriente_catastral, boleto_nro, estado, precio_costo, importacion_paralot, codigo_paralot
+                #               FROM principal_lote where id in (SELECT ventasNoRecuperadas.lote_id FROM (SELECT * FROM principal_venta WHERE id not in (select "venta_id" from "principal_recuperaciondelotes")) as ventasNoRecuperadas);''')
+                query = ('''  SELECT principal_lote.id, nro_lote, manzana_id, precio_contado, precio_credito, superficie,
+                              cuenta_corriente_catastral, boleto_nro, estado, precio_costo, principal_lote.importacion_paralot, codigo_paralot
+                              FROM principal_lote JOIN principal_manzana on principal_lote.manzana_id = principal_manzana.id JOIN principal_fraccion on principal_manzana.fraccion_id = principal_fraccion.id
+                              where principal_lote.id in (SELECT ventasNoRecuperadas.lote_id FROM (SELECT * FROM principal_venta WHERE principal_lote.id not in (select "venta_id" from "principal_recuperaciondelotes")) as ventasNoRecuperadas) order by principal_fraccion.id, nro_manzana, nro_lote;''')
                 cursor = connection.cursor()
                 cursor.execute(query)
                 results = cursor.fetchall()
             else:
-                query = ('''SELECT id, nro_lote, manzana_id, precio_contado, precio_credito, superficie, cuenta_corriente_catastral, boleto_nro,
-                      estado, precio_costo, importacion_paralot, codigo_paralot
-                      FROM principal_lote where estado =(%s) or id in (SELECT lote_id FROM principal_reserva);''')
+                # query = ('''SELECT id, nro_lote, manzana_id, precio_contado, precio_credito, superficie, cuenta_corriente_catastral, boleto_nro,
+                #       estado, precio_costo, importacion_paralot, codigo_paralot
+                #       FROM principal_lote where estado =(%s) or id in (SELECT lote_id FROM principal_reserva);''')
+                query = ('''SELECT principal_lote.id, nro_lote, manzana_id, precio_contado, precio_credito, superficie, cuenta_corriente_catastral, boleto_nro,
+                    estado, precio_costo, principal_lote.importacion_paralot, codigo_paralot
+                    FROM principal_lote JOIN principal_manzana on principal_lote.manzana_id = principal_manzana.id JOIN principal_fraccion on principal_manzana.fraccion_id = principal_fraccion.id
+                    where estado =(%s) or principal_lote.id in (SELECT lote_id FROM principal_reserva) order by principal_fraccion.id, nro_manzana, nro_lote;''')
                 cursor = connection.cursor()
                 cursor.execute(query, busqueda)
                 results = cursor.fetchall()
