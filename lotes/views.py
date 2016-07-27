@@ -11,8 +11,7 @@ import datetime
 from datetime import datetime
 from django.core.urlresolvers import reverse, resolve
 # Funcion principal del modulo de lotes.
-from principal.common_functions import verificar_permisos, loggear_accion, lote_reservado_segun_estado, get_ultima_venta, \
-    custom_json
+from principal.common_functions import *
 from principal import permisos
 from django.contrib.auth.models import User
 from django.db import connection
@@ -374,10 +373,9 @@ def listar_busqueda_lotes(request):
             })
             return HttpResponse(t.render(c))
     else:
-        return HttpResponseRedirect(reverse('login')) 
-    
-    
-    
+        return HttpResponseRedirect(reverse('login'))
+
+    # PARAMETROS RECIBIDOS
     busqueda = request.GET.get('busqueda','')
     tipo_busqueda=request.GET.get('tipo_busqueda','')
     busqueda_label = request.GET.get('busqueda_label','')
@@ -490,6 +488,9 @@ def listar_busqueda_lotes(request):
                         venta = venta[0]
                         cliente = venta.cliente
                         lote.cliente = cliente
+                        lote.venta = venta
+                        datos_cuota = get_cuotas_detail_by_lote(str(lote.id))
+                        lote.cant_cuotas_pagadas = str(datos_cuota['cant_cuotas_pagadas']) + "/" + str(datos_cuota['cantidad_total_cuotas'])
 
                     except Exception, error:
                         lote.cliente = 'Lote de estado "vendido" sin venta asociada'

@@ -228,7 +228,16 @@
 </div>
 <div id="listado-item-lote">
 	<table border="1" cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
-		<th>ID Fracci&oacute;n</th><th>Manzana Nro</th><th>Lote Nro</th><th>Nombre Fracci&oacute;n</th><th>Cliente</th><th>Estado</th>
+		<th>ID Fracci&oacute;n</th>
+        <th>Manzana Nro</th>
+        <th>Lote Nro</th>
+        <th>Nombre Fracci&oacute;n</th>
+        <th>Cliente</th>
+        <th>Cedula</th>
+        <th>Fecha Venta</th>
+        <th>Monto cuota</th>
+        <th>Cuotas Pagadas</th>
+        <th>Estado</th>
 		{% for hw in object_list %}
 		{% if forloop.counter|divisibleby:2 %}
 		<tr>
@@ -237,7 +246,12 @@
 			<td><a href="{{hw.id}}">{{hw.nro_lote}} <strong>(Ver Detalles)</strong></a></td>
 			<td> {{hw.manzana.fraccion}} </td>
 			<td> {{hw.cliente}} </td>
+            <td> {{ hw.cliente.cedula }} </td>
+            <td> {{ hw.venta.fecha_de_venta}} </td>
+            <td> {{ hw.venta.precio_de_cuota}} </td>
+            <td> {{ hw.cant_cuotas_pagadas }} </td>
 			<td> {{ hw.get_estado_display }} </td>
+
 		</tr>
 		{% else %}
 		<tr class="bkg_gris">
@@ -246,7 +260,11 @@
 			<td><a href="{{hw.id}}">{{hw.nro_lote}} <strong>(Ver Detalles)</strong></a></td>
 			<td> {{hw.manzana.fraccion}} </td>
 			<td> {{hw.cliente}} </td>
-			<td> {{ hw.get_estado_display }} </td>
+            <td> {{ hw.cliente.cedula }} </td>
+            <td> {{ hw.venta.fecha_de_venta}} </td>
+            <td> {{ hw.venta.precio_de_cuota}} </td>
+            <td> {{ hw.cant_cuotas_pagadas }} </td>
+            <td> {{ hw.get_estado_display }} </td>
 		</tr>
 		{% endif %}
 		{% endfor %}
