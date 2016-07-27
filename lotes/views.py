@@ -390,28 +390,31 @@ def listar_busqueda_lotes(request):
     # BUSQUEDA
     lista_ordenada = obtener_lotes_filtrados(busqueda, tipo_busqueda, busqueda_label,"numero_lote")
 
+    if request.GET.get('formato-reporte','') == 'pantalla':
+        # PAGINACION
+        ultima_busqueda = "&tabla=&busqueda=" + busqueda + "&tipo_busqueda=" + tipo_busqueda + "&busqueda_label=" + busqueda_label
+        object_list = lista_ordenada
+
+        paginator = Paginator(object_list, 50)
+        page = request.GET.get('page')
+        try:
+            lista = paginator.page(page)
+        except PageNotAnInteger:
+            lista = paginator.page(1)
+        except EmptyPage:
+            lista = paginator.page(paginator.num_pages)
+
+        c = RequestContext(request, {
+            'object_list': lista,
+            'ultima_busqueda': ultima_busqueda,
+        })
+        return HttpResponse(t.render(c))
+
+    else:
+        response = listado_lotes_excel(lista_ordenada)
+        return response
 
 
-    #PAGINACION
-    ultima_busqueda = "&tabla=&busqueda="+busqueda+"&tipo_busqueda="+tipo_busqueda+"&busqueda_label="+busqueda_label
-    object_list=lista_ordenada
-    
-            
-    paginator=Paginator(object_list,50)
-    page=request.GET.get('page')
-    try:
-        lista=paginator.page(page)
-    except PageNotAnInteger:
-        lista=paginator.page(1)
-    except EmptyPage:
-        lista=paginator.page(paginator.num_pages)
-    
-        
-    c = RequestContext(request, {
-        'object_list': lista,
-        'ultima_busqueda': ultima_busqueda,
-    })
-    return HttpResponse(t.render(c))
 
 
    

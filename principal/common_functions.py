@@ -21,6 +21,7 @@ from num2words import num2words
 import xlwt
 import math
 import json
+from principal.excel_styles import *
 
 def get_cuotas_detail_by_lote(lote_id):
 
@@ -1814,3 +1815,56 @@ def obtener_lotes_filtrados(busqueda, tipo_busqueda, busqueda_label, order_by):
         lista_lotes = lotes_sin_ventas_al_contado
 
     return lista_lotes
+
+
+
+def listado_lotes_excel(lista_ordenada):
+
+    wb = xlwt.Workbook(encoding='utf-8')
+    sheet = wb.add_sheet('Listado de Lotes', cell_overwrite_ok=True,)
+    sheet.paper_size_code = 1
+
+    usuario = "test"
+    sheet.header_str = (
+     u"&L&8Fecha: &D Hora: &T \nUsuario: "+usuario+" "
+     u"&C&8PROPAR S.R.L.\n LIQUIDACION DE PROPIETARIOS "+" \nPage &P of &N"
+     )
+    sheet.footer_str = ''
+
+
+
+    c=0
+    sheet.write(c, 0, "Fraccion nro", style_normal)
+    sheet.write(c, 1, "Manzana nro", style_normal)
+    sheet.write(c, 2, "Lote nro", style_normal)
+    sheet.write(c, 3, "Nombre Fraccion", style_normal)
+    sheet.write(c, 4, "Cliente", style_normal)
+    sheet.write(c, 5, "Cedula", style_normal)
+    sheet.write(c, 6, "Fecha venta", style_normal)
+    sheet.write(c, 7, "Monto cuota", style_normal)
+    sheet.write(c, 8, "Cuotas pagadas", style_normal)
+    sheet.write(c, 9, "Estado", style_normal)
+    c += 1
+    for lote in lista_ordenada:
+            # escribir linea por linea
+        try:
+            sheet.write(c, 0, lote.manzana.fraccion.id, style_normal)
+            sheet.write(c, 1, lote.manzana.nro_manzana, style_normal)
+            sheet.write(c, 2, lote.nro_lote, style_normal)
+            sheet.write(c, 3, unicode(lote.manzana.fraccion), style_normal)
+            sheet.write(c, 4, unicode(lote.cliente), style_normal)
+            sheet.write(c, 5, unicode(lote.cliente.cedula), style_normal)
+            sheet.write(c, 6, lote.venta.fecha_de_venta, style_normal)
+            sheet.write(c, 7, lote.venta.precio_de_cuota, style_normal)
+            sheet.write(c, 8, lote.cant_cuotas_pagadas, style_normal)
+            sheet.write(c, 9, lote.get_estado_display(), style_normal)
+            c += 1
+        except Exception, error:
+            print error
+            c += 1
+
+
+    response = HttpResponse(content_type='application/vnd.ms-excel')
+    response['Content-Disposition'] = 'attachment; filename=' + 'liquidacion_propietario_.xls'
+    wb.save(response)
+    return response
