@@ -1439,6 +1439,27 @@ def crear_print_object(nueva_factura, request, manzana, lote_id, usuario):
     return response;
 
 
+def crear_JSON_print_object(nueva_factura, request, manzana, lote_id, usuario):
+
+    ejemplo = ''''{
+  "tipoPapel": "A4",
+  "lineas": [
+    {
+      "valor": "001-001-0000192",
+      "coord_x": 349,
+      "coord_y": 71
+    },
+    {
+      "valor": "40.000",
+      "coord_x": 465,
+      "coord_y": 317
+    }
+  ]
+}
+'''
+
+    return ejemplo;
+
 def obtener_cantidad_cuotas_pagadas(pago):
     
     id_pago = pago.id
@@ -1586,3 +1607,210 @@ def obtener_lotes_disponbiles(sucursal, order_by, fracciones_a_exluir=None):
 
 
     return lotes
+
+
+def obtener_lotes_filtrados(busqueda, tipo_busqueda, busqueda_label, order_by):
+    lista_lotes = []
+    if (tipo_busqueda == 'cedula'):
+        if busqueda != '':
+            ventas = Venta.objects.filter(cliente_id=busqueda)
+            for venta in ventas:
+                lote = Lote.objects.get(pk=venta.lote_id)
+                lista_lotes.append(lote)
+        else:
+            clientes = Cliente.objects.filter(cedula__icontains=busqueda_label)
+            for cliente in clientes:
+                ventas = Venta.objects.filter(cliente_id=cliente.id)
+                for venta in ventas:
+                    lote = Lote.objects.get(pk=venta.lote_id)
+                    if lote.estado == '3':
+                        lote.cliente = venta.cliente
+                        lista_lotes.append(lote)
+
+    if (tipo_busqueda == 'nombre'):
+        if busqueda != '':
+            ventas = Venta.objects.filter(cliente_id=busqueda, lote__estado='3')
+            for venta in ventas:
+                lote = Lote.objects.get(pk=venta.lote_id)
+                if lote.estado == '3':
+                    lote.cliente = venta.cliente
+                    lista_lotes.append(lote)
+        else:
+            query = (
+                '''
+                SELECT id
+                FROM principal_cliente
+                WHERE CONCAT (UPPER(nombres), ' ', UPPER(apellidos)) like UPPER('%''' + busqueda_label + '''%')
+                            '''
+            )
+
+            cursor = connection.cursor()
+            cursor.execute(query)
+            results = cursor.fetchall()
+            lista_clientes = []
+            for r in results:
+                ventas = Venta.objects.filter(cliente_id=r[0], lote__estado='3')
+                for venta in ventas:
+                    try:
+                        lote = Lote.objects.get(pk=venta.lote_id)
+                        lote.cliente = venta.cliente
+                        lista_lotes.append(lote)
+                    except Exception, error:
+                        print "No existe el lote " + unicode(venta.lote_id) + " de la venta " + unicode(venta.id)
+
+    if (tipo_busqueda == 'codigo'):
+        if busqueda != '':
+            lote = Lote.objects.get(pk=busqueda)
+            if lote.estado == '3':
+                try:
+                    venta = Venta.objects.filter(lote_id=lote.id).order_by('-fecha_de_venta')
+                    venta = venta[0]
+                    cliente = venta.cliente
+                    lote.cliente = cliente
+                except Exception, error:
+                    lote.cliente = 'Lote de estado "vendido" sin venta asociada'
+                    print "El lote vendido no esta asociado a una venta."
+            lista_lotes.append(lote)
+        else:
+            lista_lotes = Lote.objects.filter(codigo_paralot__icontains=busqueda_label).order_by('manzana__fraccion',
+                                                                                                 'manzana__nro_manzana',
+                                                                                                 'nro_lote')
+            for lote in lista_lotes:
+                if lote.estado == '3':
+                    try:
+                        venta = Venta.objects.filter(lote_id=lote.id).order_by('-fecha_de_venta')
+                        venta = venta[0]
+                        cliente = venta.cliente
+                        lote.cliente = cliente
+                    except Exception, error:
+                        lote.cliente = 'Lote de estado "vendido" sin venta asociada'
+                        print "El lote vendido no esta asociado a una venta."
+
+    if (tipo_busqueda == 'nombre_fraccion'):
+        if busqueda != '':
+            fraccion = Fraccion.objects.filter(id=busqueda)
+            # Esta manera es haciendo el query estatico, en duro, luego por cada rox ir creando un objeto Factura y luego ir agregando
+            # a una lista lotes
+            lista_lotes = []
+            # QUERY para traer los lotes de la fraccion en cuestio
+            query = ('''SELECT principal_lote.id, nro_lote, manzana_id, precio_contado, precio_credito, superficie, cuenta_corriente_catastral, boleto_nro,
+                        estado, precio_costo, principal_lote.importacion_paralot, codigo_paralot
+                        FROM principal_lote JOIN principal_manzana on principal_lote.manzana_id = principal_manzana.id where manzana_id in (SELECT id FROM principal_manzana where fraccion_id = (SELECT id FROM principal_fraccion WHERE nombre LIKE UPPER (%s))) order by nro_manzana, nro_lote;''')
+            cursor = connection.cursor()
+            cursor.execute(query, [fraccion[0].nombre])
+            results = cursor.fetchall()
+            if (len(results) > 0):
+                # Obtenemos los lotes con ese id a partir del result
+                for row in results:
+                    lote = lote = Lote.objects.get(pk=row[0])
+                    try:
+                        venta = Venta.objects.filter(lote_id=lote.id).order_by('-fecha_de_venta')
+                        venta = venta[0]
+                        cliente = venta.cliente
+                        lote.cliente = cliente
+                        lote.venta = venta
+                        datos_cuota = get_cuotas_detail_by_lote(str(lote.id))
+                        lote.cant_cuotas_pagadas = str(datos_cuota['cant_cuotas_pagadas']) + "/" + str(
+                            datos_cuota['cantidad_total_cuotas'])
+
+                    except Exception, error:
+                        lote.cliente = 'Lote de estado "vendido" sin venta asociada'
+                        print "El lote vendido no esta asociado a una venta."
+                    lista_lotes.append(lote)
+
+    if (tipo_busqueda == 'estado'):
+        if busqueda != '':
+            # Esta manera es haciendo el query estatico, en duro, luego por cada row ir creando un objeto Factura y luego ir agregando
+            # a una lista lotes
+            lista_lotes = []
+            results = ''
+
+            # QUERY para traer los lotes buscados si le pasamos el id y usamos la columna estado
+            # query = ('''SELECT id, nro_lote, manzana_id, precio_contado, precio_credito, superficie, cuenta_corriente_catastral, boleto_nro,
+            #         estado, precio_costo, importacion_paralot, codigo_paralot
+            #         FROM principal_lote where estado =(%s);''')
+            # cursor = connection.cursor()
+            # cursor.execute(query, busqueda)
+
+            # QUERY para traer los lotes libres que no se encuentran relacionados con la tabla ventas
+            if (busqueda == '1'):
+                # query = ('''SELECT * FROM principal_lote where (id not in
+                #         (SELECT lote_id FROM principal_venta) or
+                #         (id in (SELECT lotesRecuperados.lote_id FROM (SELECT ventasRecuperadas.lote_id FROM
+                #         (SELECT * FROM principal_venta WHERE id in (select "venta_id" from "principal_recuperaciondelotes")) as ventasRecuperadas)as lotesRecuperados))) AND (estado not like '2' AND id not in (SELECT lote_id from principal_reserva));''')
+                query = (''' SELECT * FROM principal_lote JOIN principal_manzana on principal_lote.manzana_id = principal_manzana.id JOIN principal_fraccion on principal_manzana.fraccion_id = principal_fraccion.id
+                        		where (principal_lote.id not in
+                            (SELECT lote_id FROM principal_venta) or (principal_lote.id in (SELECT lotesRecuperados.lote_id FROM (SELECT ventasRecuperadas.lote_id FROM
+                            (SELECT * FROM principal_venta WHERE principal_lote.id in (select "venta_id" from "principal_recuperaciondelotes")) as ventasRecuperadas)as lotesRecuperados))) AND (estado not like '2' AND principal_lote.id not in (SELECT lote_id from principal_reserva)) order by principal_fraccion.id, nro_manzana, nro_lote;''')
+                cursor = connection.cursor()
+                cursor.execute(query)
+                results = cursor.fetchall()
+            elif (busqueda == '3'):
+                # query = ('''  SELECT id, nro_lote, manzana_id, precio_contado, precio_credito, superficie,
+                #               cuenta_corriente_catastral, boleto_nro, estado, precio_costo, importacion_paralot, codigo_paralot
+                #               FROM principal_lote where id in (SELECT ventasNoRecuperadas.lote_id FROM (SELECT * FROM principal_venta WHERE id not in (select "venta_id" from "principal_recuperaciondelotes")) as ventasNoRecuperadas);''')
+                query = ('''  SELECT principal_lote.id, nro_lote, manzana_id, precio_contado, precio_credito, superficie,
+                                  cuenta_corriente_catastral, boleto_nro, estado, precio_costo, principal_lote.importacion_paralot, codigo_paralot
+                                  FROM principal_lote JOIN principal_manzana on principal_lote.manzana_id = principal_manzana.id JOIN principal_fraccion on principal_manzana.fraccion_id = principal_fraccion.id
+                                  where principal_lote.id in (SELECT ventasNoRecuperadas.lote_id FROM (SELECT * FROM principal_venta WHERE principal_lote.id not in (select "venta_id" from "principal_recuperaciondelotes")) as ventasNoRecuperadas) order by principal_fraccion.id, nro_manzana, nro_lote;''')
+                cursor = connection.cursor()
+                cursor.execute(query)
+                results = cursor.fetchall()
+            else:
+                # query = ('''SELECT id, nro_lote, manzana_id, precio_contado, precio_credito, superficie, cuenta_corriente_catastral, boleto_nro,
+                #       estado, precio_costo, importacion_paralot, codigo_paralot
+                #       FROM principal_lote where estado =(%s) or id in (SELECT lote_id FROM principal_reserva);''')
+                query = ('''SELECT principal_lote.id, nro_lote, manzana_id, precio_contado, precio_credito, superficie, cuenta_corriente_catastral, boleto_nro,
+                        estado, precio_costo, principal_lote.importacion_paralot, codigo_paralot
+                        FROM principal_lote JOIN principal_manzana on principal_lote.manzana_id = principal_manzana.id JOIN principal_fraccion on principal_manzana.fraccion_id = principal_fraccion.id
+                        where estado =(%s) or principal_lote.id in (SELECT lote_id FROM principal_reserva) order by principal_fraccion.id, nro_manzana, nro_lote;''')
+                cursor = connection.cursor()
+                cursor.execute(query, busqueda)
+                results = cursor.fetchall()
+
+            if (len(results) > 0):
+                # Obtenemos los lotes con ese numero de estado a partir del result
+                for row in results:
+                    lote = Lote.objects.get(pk=row[0])
+                    try:
+                        venta = Venta.objects.filter(lote_id=lote.id).order_by('-fecha_de_venta')
+                        venta = venta[0]
+                        cliente = venta.cliente
+                        lote.cliente = cliente
+
+                    except Exception, error:
+                        lote.cliente = 'Lote de estado "vendido" sin venta asociada'
+                        print "El lote vendido no esta asociado a una venta."
+
+                    try:
+                        object_list = Reserva.objects.filter(lote_id=lote.id)
+                        if object_list:
+                            cliente = object_list.cliente
+                            lote.cliente = cliente
+                        elif lote_reservado_segun_estado(lote.id) == True:
+                            cliente = object_list.cliente
+                            lote.cliente = cliente
+
+                    except Exception, error:
+                        lote.cliente = 'Lote de estado Reservado'
+                        print "El lote esta reservado"
+
+                    lista_lotes.append(lote)
+
+    if (tipo_busqueda == ''):
+        lotes_con_ventas_al_contado = []
+        lotes_sin_ventas_al_contado = []
+        lista_lotes = Lote.objects.filter(estado='4')
+        for lote in lista_lotes:
+            ventas = Venta.objects.filter(lote_id=lote.id, plan_de_pago__tipo_de_plan='contado')
+            if ventas:
+                # se cambia a vendido para corregir
+                lote.estado = '3'
+                lote.save()
+                lotes_con_ventas_al_contado.append(lote)
+            else:
+                print "no tiene venta al contado asociada"
+                lotes_sin_ventas_al_contado.append(lote)
+        lista_lotes = lotes_sin_ventas_al_contado
+
+    return lista_lotes
