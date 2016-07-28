@@ -84,6 +84,7 @@
         <th>Monto cuota</th>
         <th>Cuotas Pagadas</th>
         <th>Estado</th>
+        <th>Fecha Ult Pago</th>
 		{% for hw in object_list %}
 		{% if forloop.counter|divisibleby:2 %}
 		<tr>
@@ -97,6 +98,7 @@
             <td> {{ hw.venta.precio_de_cuota}} </td>
             <td> {{ hw.cant_cuotas_pagadas }} </td>
 			<td> {{ hw.get_estado_display }} </td>
+			<td> {{ hw.boleto_nro }} </td>
 
 		</tr>
 		{% else %}
@@ -111,6 +113,7 @@
             <td> {{ hw.venta.precio_de_cuota}} </td>
             <td> {{ hw.cant_cuotas_pagadas }} </td>
             <td> {{ hw.get_estado_display }} </td>
+			<td> {{ hw.boleto_nro }} </td>
 		</tr>
 		{% endif %}
 		{% endfor %}
