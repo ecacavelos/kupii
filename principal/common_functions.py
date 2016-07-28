@@ -274,6 +274,12 @@ def filtros_establecidos(request, tipo_informe):
             return True
         except:
             print('Parametros no seteados')
+    elif tipo_informe == "informe_cuotas_por_cobrar":
+        try:
+            fraccion_ini=request['fraccion_ini']
+            return True
+        except:
+            print('Parametros no seteados')
     elif tipo_informe == "liquidacion_vendedores":
         try:
             fecha_ini=request['fecha_ini']
