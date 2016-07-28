@@ -10,6 +10,7 @@ from django.core import serializers
 from django.contrib.auth.models import User, Permission
 from django.db.models import Q
 import json
+from datetime import datetime, timedelta, date
 import math
 import datetime
 from django.contrib.auth.models import User
@@ -1719,6 +1720,7 @@ def obtener_lotes_filtrados(busqueda, tipo_busqueda, busqueda_label, order_by):
                         datos_cuota = get_cuotas_detail_by_lote(str(lote.id))
                         lote.cant_cuotas_pagadas = str(datos_cuota['cant_cuotas_pagadas']) + "/" + str(
                             datos_cuota['cantidad_total_cuotas'])
+                        lote.boleto_nro = obtener_ultima_fecha_pago_lote(lote.id)
 
                     except Exception, error:
                         lote.cliente = 'Lote de estado "vendido" sin venta asociada'
@@ -1833,7 +1835,7 @@ def listado_lotes_excel(lista_ordenada):
     usuario = "test"
     sheet.header_str = (
      u"&L&8Fecha: &D Hora: &T \nUsuario: "+usuario+" "
-     u"&C&8PROPAR S.R.L.\n LIQUIDACION DE PROPIETARIOS "+" \nPage &P of &N"
+     u"&C&8PROPAR S.R.L.\n Listado de Lotes "+" \nPage &P of &N"
      )
     sheet.footer_str = ''
 
@@ -1850,6 +1852,7 @@ def listado_lotes_excel(lista_ordenada):
     sheet.write(c, 7, "Monto cuota", style_normal)
     sheet.write(c, 8, "Cuotas pagadas", style_normal)
     sheet.write(c, 9, "Estado", style_normal)
+    sheet.write(c, 10, "Fec Ult Pago", style_normal)
     c += 1
     for lote in lista_ordenada:
             # escribir linea por linea
@@ -1864,6 +1867,7 @@ def listado_lotes_excel(lista_ordenada):
             sheet.write(c, 7, lote.venta.precio_de_cuota, style_normal)
             sheet.write(c, 8, lote.cant_cuotas_pagadas, style_normal)
             sheet.write(c, 9, lote.get_estado_display(), style_normal)
+            sheet.write(c, 10, unicode(lote.boleto_nro), style_normal)
             c += 1
         except Exception, error:
             print error
@@ -1871,6 +1875,33 @@ def listado_lotes_excel(lista_ordenada):
 
 
     response = HttpResponse(content_type='application/vnd.ms-excel')
-    response['Content-Disposition'] = 'attachment; filename=' + 'liquidacion_propietario_.xls'
+    response['Content-Disposition'] = 'attachment; filename=' + 'listado_de_lotes_.xls'
     wb.save(response)
     return response
+
+def obtener_ultima_fecha_pago_lote(lote_id):
+    meses_peticion = 1
+    # OBTENER LA ULTIMA VENTA Y SU DETALLE
+    ultima_venta = get_ultima_venta_no_recuperada(lote_id)
+
+    # SE TRATAN LOS CASOS EN DONDE NO SE ENCUENTRA VENTA PARA ALGUN LOTE.
+    if ultima_venta != None:
+        detalle_cuotas = get_cuotas_detail_by_lote(unicode(str(lote_id)))
+        hoy = date.today()
+        cuotas_a_pagar = obtener_cuotas_a_pagar_full(ultima_venta, hoy, detalle_cuotas, 500)  # Maximo atraso = 500 para tener un parametro maximo de atraso en las cuotas.
+    else:
+        cuotas_a_pagar = []
+
+    if (len(cuotas_a_pagar) >= meses_peticion + 1):
+
+        cuotas_atrasadas = len(cuotas_a_pagar);  # CUOTAS ATRASADAS
+        cantidad_cuotas_pagadas = detalle_cuotas['cant_cuotas_pagadas'];  # CUOTAS PAGADAS
+
+        # FECHA ULTIMO PAGO
+        if (len(PagoDeCuotas.objects.filter(venta_id=ultima_venta.id).order_by('-fecha_de_pago')) > 0):
+            fecha_ultimo_pago = \
+                PagoDeCuotas.objects.filter(venta_id=ultima_venta.id).order_by('-fecha_de_pago')[0].fecha_de_pago
+        else:
+            fecha_ultimo_pago= 'Dato no disponible'
+
+    return fecha_ultimo_pago
