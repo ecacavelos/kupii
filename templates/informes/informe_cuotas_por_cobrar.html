@@ -179,18 +179,19 @@
 	<table border="1.5" id="tabla_pagos" cellpadding="0" cellspacing="0" class="listado-pagos" align="center">
 		{% for cuota in lista_cuotas %}
 			{% if cuota.total_pago and cuota.ultimo_pago == False %}
-			<tr>
-				<th colspan="5" class="celda_resumen_fraccion">Resumen de la Fracción</th>
-				<td class="celda_resumen_fraccion">{{cuota.total_cuotas}}</td>
-				<td class="celda_resumen_fraccion">{{cuota.total_mora}}</td>
-				<td class="celda_resumen_fraccion">{{cuota.total_pago}}</td>
-			</tr>
+{#			<tr>#}
+{#				<th colspan="5" class="celda_resumen_fraccion">Resumen del Lote</th>#}
+{#				<td class="celda_resumen_fraccion">{{cuota.total_cuotas}}</td>#}
+{#				<td class="celda_resumen_fraccion">{{cuota.total_mora}}</td>#}
+{#				<td class="celda_resumen_fraccion">{{cuota.total_pago}}</td>#}
+{#			</tr>#}
 			{% endif %}
 			{% if cuota.misma_fraccion == False%}
 				<tr>
 					<th colspan="8" class="celda_resumen_fraccion">{{cuota.fraccion}}</th>
 				</tr>
-				<!--<th>Nombre Fracci&oacute;n</th><th>Fracci&oacute;n</th>--><th>Lote Nro</th><th>Cliente</th><th>Cuota Nº</th><th>Plan de Pago</th><th>Fecha de Pago</th><th>Total de Cuotas</th><th>Total de Mora</th><th>Total de Pago</th>
+{#				<!--<th>Nombre Fracci&oacute;n</th><th>Fracci&oacute;n</th>--><th>Lote Nro</th><th>Cliente</th><th>Cuota Nº</th><th>Plan de Pago</th><th>Fecha de Pago</th><th>Total de Cuotas</th><th>Total de Mora</th><th>Total de Pago</th>#}
+				<!--<th>Nombre Fracci&oacute;n</th><th>Fracci&oacute;n</th>--><th>Lote Nro</th><th>Cliente</th><th>Cuota Nº</th><th>Plan de Pago</th><th>Total de Cuotas</th><th>Total de Mora</th><th>Total de Pago</th>
 			{% endif %}
 		
 		{% if forloop.counter|divisibleby:2 %}
@@ -201,7 +202,7 @@
 			<td>{{cuota.cliente}}</td>
 			<td>{{cuota.cuota_nro}}</td>
 			<td>{{cuota.plan_de_pago}}</td>
-			<td>{{cuota.fecha_pago}}</td>
+{#			<td>{{cuota.fecha_pago}}</td>#}
 			<td>{{cuota.total_de_cuotas}}</td>
 			<td>{{cuota.total_de_mora}}</td>
 			<td>{{cuota.total_de_pago}}</td>
@@ -215,7 +216,7 @@
 			<td>{{cuota.cliente}}</td>
 			<td>{{cuota.cuota_nro}}</td>
 			<td>{{cuota.plan_de_pago}}</td>
-			<td>{{cuota.fecha_pago}}</td>
+{#			<td>{{cuota.fecha_pago}}</td>#}
 			<td>{{cuota.total_de_cuotas}}</td>
 			<td>{{cuota.total_de_mora}}</td>
 			<td>{{cuota.total_de_pago}}</td>
@@ -223,17 +224,17 @@
 		{% endif %}
 		
 		{% if cuota.ultimo_pago == True %}
-			<tr>
-				<th colspan="5" class="celda_resumen_fraccion">Resumen de la Fracción</th>
-				<td class="celda_resumen_fraccion">{{cuota.total_cuotas}}</td>
-				<td class="celda_resumen_fraccion">{{cuota.total_mora}}</td>
-				<td class="celda_resumen_fraccion">{{cuota.total_pago}}</td>
-			</tr>
+{#			<tr>#}
+{#				<th colspan="5" class="celda_resumen_fraccion">Resumen de la Fracción</th>#}
+{#				<td class="celda_resumen_fraccion">{{cuota.total_cuotas}}</td>#}
+{#				<td class="celda_resumen_fraccion">{{cuota.total_mora}}</td>#}
+{#				<td class="celda_resumen_fraccion">{{cuota.total_pago}}</td>#}
+{#			</tr>#}
 		{% endif %}
 		
 		{% if cuota.total_general_cuotas %}
 			<tr>
-				<th colspan="5" class="celda_resumen_fraccion">Totales Generales</th>
+				<th colspan="4" class="celda_resumen_fraccion">Totales Generales</th>
 				<td class="celda_resumen_fraccion">{{cuota.total_general_cuotas}}</td>
 				<td class="celda_resumen_fraccion">{{cuota.total_general_mora}}</td>
 				<td class="celda_resumen_fraccion">{{cuota.total_general_pago}}</td>
