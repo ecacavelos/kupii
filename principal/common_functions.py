@@ -1721,6 +1721,8 @@ def obtener_lotes_filtrados(busqueda, tipo_busqueda, busqueda_label, order_by):
                         lote.cant_cuotas_pagadas = str(datos_cuota['cant_cuotas_pagadas']) + "/" + str(
                             datos_cuota['cantidad_total_cuotas'])
                         lote.boleto_nro = obtener_ultima_fecha_pago_lote(lote.id)
+                        if venta_es_contado(venta.plan_de_pago_id):
+                            lote.boleto_nro = venta.fecha_de_venta
 
                     except Exception, error:
                         lote.cliente = 'Lote de estado "vendido" sin venta asociada'
@@ -1880,7 +1882,7 @@ def listado_lotes_excel(lista_ordenada):
     return response
 
 def obtener_ultima_fecha_pago_lote(lote_id):
-    meses_peticion = 1
+    fecha_ultimo_pago = None
     # OBTENER LA ULTIMA VENTA Y SU DETALLE
     ultima_venta = get_ultima_venta_no_recuperada(lote_id)
 
@@ -1892,7 +1894,7 @@ def obtener_ultima_fecha_pago_lote(lote_id):
     else:
         cuotas_a_pagar = []
 
-    if (len(cuotas_a_pagar) >= meses_peticion + 1):
+    if (len(cuotas_a_pagar) >=  1):
 
         cuotas_atrasadas = len(cuotas_a_pagar);  # CUOTAS ATRASADAS
         cantidad_cuotas_pagadas = detalle_cuotas['cant_cuotas_pagadas'];  # CUOTAS PAGADAS
@@ -1905,3 +1907,14 @@ def obtener_ultima_fecha_pago_lote(lote_id):
             fecha_ultimo_pago= 'Dato no disponible'
 
     return fecha_ultimo_pago
+
+def venta_es_contado(plan_de_pago_id):
+    query = ('''SELECT tipo_de_plan FROM principal_plandepago where id = (%s);''')
+    cursor = connection.cursor()
+    cursor.execute(query, [plan_de_pago_id])
+    results = cursor.fetchall()
+    for row in results:
+        if row[0] == 'contado':
+            return True
+        else:
+            return False
