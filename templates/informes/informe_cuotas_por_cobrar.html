@@ -29,7 +29,7 @@
 		var lista_cuotas = "{{lista_cuotas}}";
         var cant_reg = "{{ cant_reg }}";
 		var fraccion_ini = "{{fraccion_ini}}";
-		var fraccion_fin = "{{fraccion_fin}}";
+{#		var fraccion_fin = "{{fraccion_fin}}";#}
 		var fecha_ini = "{{fecha_ini}}";
 		var fecha_fin = "{{fecha_fin}}";
 		var frac1="{{frac1}}";
@@ -40,9 +40,9 @@
 			$('#id_tipo_busqueda').val(tipo_busqueda);	
 		}
 		$('#id_fraccion_ini').val(frac1);
-		$('#id_fraccion_fin').val(frac2);
+{#		$('#id_fraccion_fin').val(frac2);#}
 		$('#id_frac1').val(fraccion_ini);
-		$('#id_frac2').val(fraccion_fin);
+{#		$('#id_frac2').val(fraccion_fin);#}
 		
 		$('#fecha_ini').val(fecha_ini);
 		$('#fecha_fin').val(fecha_fin);
@@ -59,24 +59,24 @@
         $('#id_cant_reg').change(function(){
             var cant_reg = $("#id_cant_reg").val();
             var fraccion_ini = $("#id_fraccion_ini").val();
-            var fraccion_fin = $("#id_fraccion_fin").val();
+{#            var fraccion_fin = $("#id_fraccion_fin").val();#}
             var frac1 = $("#id_frac1").val();
             var frac2 = $("#id_frac2").val();
-            window.location.replace("/informes/informe_cuotas_por_cobrar/?tipo_busqueda="+tipo_busqueda+"&fraccion_ini="+fraccion_ini+"&fraccion_fin="+fraccion_fin+"&frac1="+frac1+"&frac2="+frac2+"&fecha_ini="+fecha_ini+"&fecha_fin="+fecha_fin+"&cant_reg="+cant_reg);
+            window.location.replace("/informes/informe_cuotas_por_cobrar/?tipo_busqueda="+tipo_busqueda+"&fraccion_ini="+fraccion_ini+"&frac1="+frac1+"&fecha_ini="+fecha_ini+"&fecha_fin="+fecha_fin+"&cant_reg="+cant_reg);
          });
 
         $('#boton_pagina').click(function() {
             var page = $("#id_nro_pagina").val();
             var cant_reg = $("#id_cant_reg").val();
             var fraccion_ini = $("#id_fraccion_ini").val();
-            var fraccion_fin = $("#id_fraccion_fin").val();
+{#            var fraccion_fin = $("#id_fraccion_fin").val();#}
             var frac1 = $("#id_frac1").val();
-            var frac2 = $("#id_frac2").val();
-            window.location.replace("/informes/informe_cuotas_por_cobrar/?page="+page+"&tipo_busqueda="+tipo_busqueda+"&fraccion_ini="+fraccion_ini+"&fraccion_fin="+fraccion_fin+"&frac1="+frac1+"&frac2="+frac2+"&fecha_ini="+fecha_ini+"&fecha_fin="+fecha_fin+"&cant_reg="+cant_reg);
+{#            var frac2 = $("#id_frac2").val();#}
+            window.location.replace("/informes/informe_cuotas_por_cobrar/?page="+page+"&tipo_busqueda="+tipo_busqueda+"&fraccion_ini="+fraccion_ini+"&frac1="+frac1+"&fecha_ini="+fecha_ini+"&cant_reg="+cant_reg);
         });
 
 
-		if ($("#id_frac1").val() == "" || $("#id_frac2").val() == "" ) {//parametros no seteados
+		if ($("#id_frac1").val() == "") {//parametros no seteados
 			$('.listado-pagos').hide();
 			$('.pagination').hide();
 		} else {
