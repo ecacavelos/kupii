@@ -32,28 +32,36 @@ def get_cuotas_detail_by_lote(lote_id):
 
     # Chequeamos si es una venta contado
     contado = False;
-    if venta.plan_de_pago.tipo_de_plan == 'contado':
-        contado = True;
+    if venta != None:
 
-    cant_cuotas_pagadas = PagoDeCuotas.objects.filter(venta=venta).aggregate(Sum('nro_cuotas_a_pagar'))
-    plan_de_pago = PlanDePago.objects.get(id=venta.plan_de_pago.id)
-    # calcular la fecha de vencimiento.    
-    if cant_cuotas_pagadas['nro_cuotas_a_pagar__sum']:
-        proximo_vencimiento = (
-        venta.fecha_primer_vencimiento + MonthDelta(cant_cuotas_pagadas['nro_cuotas_a_pagar__sum'])).strftime(
-            '%d/%m/%Y')
-    else:
-        #cuando no se encuentran cuotas pagadas trae None, seteamos la cantidad de cuotas pagadas a 0
-        #porque la venta es independiente a los pagos de cuotas
-        #cant_cuotas_pagadas['nro_cuotas_a_pagar__sum'] = 1
+        if venta.plan_de_pago.tipo_de_plan == 'contado':
+            contado = True;
 
-        cant_cuotas_pagadas['nro_cuotas_a_pagar__sum'] = 0
-        proximo_vencimiento = venta.fecha_primer_vencimiento.strftime('%d/%m/%Y')
+        cant_cuotas_pagadas = PagoDeCuotas.objects.filter(venta=venta).aggregate(Sum('nro_cuotas_a_pagar'))
+        plan_de_pago = PlanDePago.objects.get(id=venta.plan_de_pago.id)
+        # calcular la fecha de vencimiento.
+        if cant_cuotas_pagadas['nro_cuotas_a_pagar__sum']:
+            proximo_vencimiento = (
+            venta.fecha_primer_vencimiento + MonthDelta(cant_cuotas_pagadas['nro_cuotas_a_pagar__sum'])).strftime(
+                 '%d/%m/%Y')
+        else:
+            #cuando no se encuentran cuotas pagadas trae None, seteamos la cantidad de cuotas pagadas a 0
+            #porque la venta es independiente a los pagos de cuotas
+            #cant_cuotas_pagadas['nro_cuotas_a_pagar__sum'] = 1
 
-    datos = dict([('cant_cuotas_pagadas', cant_cuotas_pagadas['nro_cuotas_a_pagar__sum']),
+            cant_cuotas_pagadas['nro_cuotas_a_pagar__sum'] = 0
+            proximo_vencimiento = venta.fecha_primer_vencimiento.strftime('%d/%m/%Y')
+
+        datos = dict([('cant_cuotas_pagadas', cant_cuotas_pagadas['nro_cuotas_a_pagar__sum']),
                   ('cantidad_total_cuotas', plan_de_pago.cantidad_de_cuotas),
                   ('contado', contado),
                   ('proximo_vencimiento', proximo_vencimiento)])
+
+    else:
+        datos = dict([('cant_cuotas_pagadas', 0),
+                      ('cantidad_total_cuotas', 0),
+                      ('contado', None),
+                      ('proximo_vencimiento', None)])
     return datos
 
 def loggear_accion(usuario, accion, tipo_objeto, id_objeto, codigo_lote = ''):

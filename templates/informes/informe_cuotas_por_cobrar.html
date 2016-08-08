@@ -177,6 +177,8 @@
 {#</div>#}
 <div id="listado-item-lote">
 	<table border="1.5" id="tabla_pagos" cellpadding="0" cellspacing="0" class="listado-pagos" align="center">
+   		<th>Nro Lote</th><th>Cliente</th><th>Cuotas por Cobrar</th><th>Plan de Pago</th><th>Importe Total</th><th>Importe Pagado</th><th>Importe Deuda</th>
+
 		{% for cuota in lista_cuotas %}
 			{% if cuota.total_pago and cuota.ultimo_pago == False %}
 {#			<tr>#}
@@ -204,8 +206,8 @@
 			<td>{{cuota.plan_de_pago}}</td>
 {#			<td>{{cuota.fecha_pago}}</td>#}
 			<td>{{cuota.total_de_cuotas}}</td>
-			<td>{{cuota.total_de_mora}}</td>
 			<td>{{cuota.total_de_pago}}</td>
+			<td>{{cuota.total_de_mora}}</td>
 		</tr>
 		{% else %}
 		<tr class="bkg_gris">
@@ -217,9 +219,9 @@
 			<td>{{cuota.cuota_nro}}</td>
 			<td>{{cuota.plan_de_pago}}</td>
 {#			<td>{{cuota.fecha_pago}}</td>#}
+			<td>{{cuota.total_de_pago}}</td>
 			<td>{{cuota.total_de_cuotas}}</td>
 			<td>{{cuota.total_de_mora}}</td>
-			<td>{{cuota.total_de_pago}}</td>
 		</tr>
 		{% endif %}
 		
@@ -236,8 +238,8 @@
 			<tr>
 				<th colspan="4" class="celda_resumen_fraccion">Totales Generales</th>
 				<td class="celda_resumen_fraccion">{{cuota.total_general_cuotas}}</td>
-				<td class="celda_resumen_fraccion">{{cuota.total_general_mora}}</td>
 				<td class="celda_resumen_fraccion">{{cuota.total_general_pago}}</td>
+				<td class="celda_resumen_fraccion">{{cuota.total_general_mora}}</td>
 			</tr>
 		{% endif %}
 		

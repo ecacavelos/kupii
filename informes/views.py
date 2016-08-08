@@ -1078,48 +1078,17 @@ def informe_cuotas_por_cobrar(request):
                 else:  # Parametros seteados
                     t = loader.get_template('informes/informe_cuotas_por_cobrar.html')
                     tipo_busqueda = request.GET['tipo_busqueda']
-                    fecha_ini = '01/06/2016'
-                    fecha_fin = '30/06/2016'
 
                     fraccion_ini = request.GET['frac1']
                     fraccion_fin = request.GET['frac1']
                     f1 = request.GET['fraccion_ini']
-                    f2 = request.GET['fraccion_ini']
+                    # f2 = request.GET['fraccion_ini']
                     filas_fraccion = []
-                    ultimo = "&tipo_busqueda=" + tipo_busqueda + "&fraccion_ini=" + f1 + "&frac1=" + fraccion_ini + "&fraccion_ini=" + f2 + "&frac1=" + fraccion_fin + "&fecha_ini=" + fecha_ini + "&fecha_fin=" + fecha_fin
+                    ultimo = "&tipo_busqueda=" + tipo_busqueda + "&frac1=" + fraccion_ini + "&fraccion_ini=" + f1
                     g_lote = ''
-                    # if fecha_ini == '' and fecha_fin == '':
-                    #     query = (
-                    #         '''
-                    #         select pc.* from principal_pagodecuotas pc, principal_lote l, principal_manzana m, principal_fraccion f
-                    #         where f.id>=''' + fraccion_ini +
-                    #         '''
-                    #         and f.id<=''' + fraccion_fin +
-                    #         '''
-                    #         and (pc.lote_id = l.id and l.manzana_id=m.id and m.fraccion_id=f.id) order by f.id
-                    #         '''
-                    #     )
-                    # else:
-                    #     fecha_ini_parsed = datetime.datetime.strptime(fecha_ini, "%d/%m/%Y").date()
-                    #     fecha_fin_parsed = datetime.datetime.strptime(fecha_fin, "%d/%m/%Y").date()
-                    #     query = (
-                    #         '''
-                    #         select pc.* from principal_pagodecuotas pc, principal_lote l, principal_manzana m, principal_fraccion f
-                    #         where pc.fecha_de_pago >= \'''' + unicode(fecha_ini_parsed) +
-                    #         '''\' and pc.fecha_de_pago <= \'''' + unicode(fecha_fin_parsed) +
-                    #         '''\' and f.id >= ''' + fraccion_ini +
-                    #         '''
-                    #         and f.id <= ''' + fraccion_fin +
-                    #         '''
-                    #         and (pc.lote_id = l.id and l.manzana_id=m.id and m.fraccion_id=f.id) order by f.id,pc.fecha_de_pago
-                    #         '''
-                    #     )
-                    query = (
-                            '''
-                            select pc.* from principal_pagodecuotas pc, principal_lote l, principal_manzana m, principal_fraccion f
+                    query = (''' select pc.* from principal_pagodecuotas pc, principal_lote l, principal_manzana m, principal_fraccion f
                             where f.id = ''' + fraccion_ini + ''' and (pc.lote_id = l.id and l.manzana_id=m.id and m.fraccion_id=f.id) order by f.id, m.nro_manzana, l.nro_lote, pc.fecha_de_pago
-                            '''
-                        )
+                            ''')
 
                     object_list = list(PagoDeCuotas.objects.raw(query))
 
@@ -1131,91 +1100,10 @@ def informe_cuotas_por_cobrar(request):
                     total_general_cuotas = 0
                     total_general_mora = 0
                     total_general_pagos = 0
+                    total_general_pagos_aux = 0
+                    total_general_mora_aux = 0
                     # ver esto
 
-                    # for i, cuota_item in enumerate(object_list):
-                    #     # Se setean los datos de cada fila
-                    #     cuota = {}
-                    #     cuota['misma_fraccion'] = True
-                    #     nro_cuota = get_nro_cuota(cuota_item)
-                    #     if g_fraccion == '':
-                    #         g_fraccion = cuota_item.lote.manzana.fraccion.id
-                    #         cuota['misma_fraccion'] = False
-                    #     if g_fraccion != cuota_item.lote.manzana.fraccion.id:
-                    #
-                    #         filas_fraccion[0]['misma_fraccion'] = False
-                    #         cuotas.extend(filas_fraccion)
-                    #         filas_fraccion = []
-                    #
-                    #         g_fraccion = cuota_item.lote.manzana.fraccion.id
-                    #
-                    #         cuota = {}
-                    #         # cuota['misma_fraccion'] = False
-                    #         cuota['total_cuotas'] = unicode('{:,}'.format(total_cuotas)).replace(",", ".")
-                    #         cuota['total_mora'] = unicode('{:,}'.format(total_mora)).replace(",", ".")
-                    #         cuota['total_pago'] = unicode('{:,}'.format(total_pagos)).replace(",", ".")
-                    #         cuota['ultimo_pago'] = True
-                    #         cuotas.append(cuota)
-                    #
-                    #         total_cuotas = 0
-                    #         total_mora = 0
-                    #         total_pagos = 0
-                    #
-                    #         cuota = {}
-                    #         cuota['misma_fraccion'] = False
-                    #         cuota['ultimo_pago'] = False
-                    #         cuota['fraccion_id'] = unicode(cuota_item.lote.manzana.fraccion.id)
-                    #         cuota['fraccion'] = unicode(cuota_item.lote.manzana.fraccion)
-                    #         cuota['lote'] = unicode(cuota_item.lote)
-                    #         cuota['cliente'] = unicode(cuota_item.cliente)
-                    #         cuota['cuota_nro'] = unicode(nro_cuota) + '/' + unicode(
-                    #             cuota_item.plan_de_pago.cantidad_de_cuotas)
-                    #         cuota['plan_de_pago'] = cuota_item.plan_de_pago.nombre_del_plan
-                    #         cuota['fecha_pago'] = unicode(cuota_item.fecha_de_pago.strftime("%d/%m/%Y"))
-                    #         cuota['total_de_cuotas'] = unicode(
-                    #             '{:,}'.format(cuota_item.total_de_cuotas)).replace(",", ".")
-                    #         cuota['total_de_mora'] = unicode(
-                    #             '{:,}'.format(cuota_item.total_de_mora)).replace(",", ".")
-                    #         cuota['total_de_pago'] = unicode(
-                    #             '{:,}'.format(cuota_item.total_de_pago)).replace(",", ".")
-                    #         # Se suman los totales por fraccion
-                    #         total_cuotas += cuota_item.total_de_cuotas
-                    #         total_mora += cuota_item.total_de_mora
-                    #         total_pagos += cuota_item.total_de_pago
-                    #
-                    #         total_general_cuotas += cuota_item.total_de_cuotas
-                    #         total_general_mora += cuota_item.total_de_mora
-                    #         total_general_pagos += cuota_item.total_de_pago
-                    #
-                    #         filas_fraccion.append(cuota)
-                    #
-                    #     else:
-                    #         cuota['ultimo_pago'] = False
-                    #         cuota['misma_fraccion'] = True
-                    #         cuota['fraccion_id'] = unicode(cuota_item.lote.manzana.fraccion.id)
-                    #         cuota['fraccion'] = unicode(cuota_item.lote.manzana.fraccion)
-                    #         cuota['lote'] = unicode(cuota_item.lote)
-                    #         cuota['cliente'] = unicode(cuota_item.cliente)
-                    #         cuota['cuota_nro'] = unicode(nro_cuota) + '/' + unicode(
-                    #             cuota_item.plan_de_pago.cantidad_de_cuotas)
-                    #         cuota['plan_de_pago'] = cuota_item.plan_de_pago.nombre_del_plan
-                    #         cuota['fecha_pago'] = unicode(cuota_item.fecha_de_pago.strftime("%d/%m/%Y"))
-                    #         cuota['total_de_cuotas'] = unicode(
-                    #             '{:,}'.format(cuota_item.total_de_cuotas)).replace(",", ".")
-                    #         cuota['total_de_mora'] = unicode(
-                    #             '{:,}'.format(cuota_item.total_de_mora)).replace(",", ".")
-                    #         cuota['total_de_pago'] = unicode(
-                    #             '{:,}'.format(cuota_item.total_de_pago)).replace(",", ".")
-                    #         # Se suman los totales por fraccion
-                    #         total_cuotas += cuota_item.total_de_cuotas
-                    #         total_mora += cuota_item.total_de_mora
-                    #         total_pagos += cuota_item.total_de_pago
-                    #
-                    #         total_general_cuotas += cuota_item.total_de_cuotas
-                    #         total_general_mora += cuota_item.total_de_mora
-                    #         total_general_pagos += cuota_item.total_de_pago
-                    #
-                    #         filas_fraccion.append(cuota)
                     cant_cuotas = 0
                     for i, cuota_item in enumerate(object_list):
                         # Se setean los datos de cada fila
@@ -1231,6 +1119,9 @@ def informe_cuotas_por_cobrar(request):
                         if g_lote != cuota_item.lote.id:
                             # seteamos la cant de cuotas que falta por pagar
                             cuota_aux['cuota_nro'] = resumen_lote['cantidad_total_cuotas'] - resumen_lote['cant_cuotas_pagadas']
+                            total_general_cuotas = total_general_cuotas + venta_aux.precio_final_de_venta
+                            total_general_pagos = total_general_pagos + total_general_pagos_aux
+                            total_general_mora = total_general_cuotas - total_general_pagos
                             filas_fraccion.append(cuota_aux)
                             filas_fraccion[0]['mismo_lote'] = False
                             cuotas.extend(filas_fraccion)
@@ -1261,26 +1152,18 @@ def informe_cuotas_por_cobrar(request):
                             # cuota['cuota_nro'] = get_nro_cuota(cuota_item)
                             cuota['plan_de_pago'] = cuota_item.plan_de_pago.nombre_del_plan
                             cuota['fecha_pago'] = unicode(cuota_item.fecha_de_pago.strftime("%d/%m/%Y"))
-                            # cuota['total_de_cuotas'] = unicode(
-                            #     '{:,}'.format(cuota_item.total_de_cuotas)).replace(",", ".")
-                            # cuota['total_de_mora'] = unicode(
-                            #     '{:,}'.format(cuota_item.total_de_mora)).replace(",", ".")
-                            # cuota['total_de_pago'] = unicode(
-                            #     '{:,}'.format(cuota_item.total_de_pago)).replace(",", ".")
+                            cuota['total_de_cuotas'] = unicode('{:,}'.format(cuota_item.total_de_cuotas)).replace(",", ".")
+                            cuota['total_de_mora'] = unicode('{:,}'.format(cuota_item.total_de_mora)).replace(",", ".")
+                            cuota['total_de_pago'] = unicode('{:,}'.format(cuota_item.total_de_pago)).replace(",", ".")
                             cuota['total_de_cuotas'] = 0
                             cuota['total_de_mora'] = 0
                             cuota['total_de_pago'] = 0
                             # Se suman los totales por fraccion
                             total_cuotas += cuota_item.total_de_cuotas
-                            total_mora += cuota_item.total_de_mora
+                            # total_mora += cuota_item.total_de_mora
                             total_pagos += cuota_item.total_de_pago
 
-                            total_general_cuotas += cuota_item.total_de_cuotas
-                            total_general_mora += cuota_item.total_de_mora
-                            total_general_pagos += cuota_item.total_de_pago
-
                             resumen_lote = get_cuotas_detail_by_lote(unicode(cuota_item.lote.id))
-
 
                         else:
                             cuota['ultimo_pago'] = False
@@ -1293,23 +1176,24 @@ def informe_cuotas_por_cobrar(request):
                             # cuota['cuota_nro'] = get_nro_cuota(cuota_item)
                             cuota['plan_de_pago'] = cuota_item.plan_de_pago.nombre_del_plan
                             cuota['fecha_pago'] = unicode(cuota_item.fecha_de_pago.strftime("%d/%m/%Y"))
-                            cuota['total_de_cuotas'] = total_cuotas + cuota_item.total_de_cuotas
-                            cuota['total_de_cuotas'] = unicode(
-                                '{:,}'.format(cuota_item.total_de_cuotas)).replace(",", ".")
-                            cuota['total_de_mora'] = unicode(
-                                '{:,}'.format(cuota_item.total_de_mora)).replace(",", ".")
-                            cuota['total_de_pago'] = unicode(
-                                '{:,}'.format(cuota_item.total_de_pago)).replace(",", ".")
+                            # cuota['total_de_cuotas'] = total_cuotas + cuota_item.total_de_cuotas
+                            cuota['total_de_cuotas'] = unicode('{:,}'.format(total_cuotas + cuota_item.total_de_cuotas)).replace(",", ".")
+                            # cuota['total_de_mora'] = unicode('{:,}'.format(cuota_item.total_de_mora)).replace(",", ".")
+                            venta = Venta.objects.get(id=cuota_item.venta.id)
+                            # seteamos lo que se debe, el total de la venta menos lo que ya se pago hasta la fecha
+                            cuota['total_de_mora'] = unicode('{:,}'.format(venta.precio_final_de_venta - (total_cuotas + cuota_item.total_de_cuotas))).replace(",", ".")
+                            # seteamoa el importe total de la venta
+                            # cuota['total_de_pago'] = unicode('{:,}'.format(cuota_item.total_de_pago)).replace(",", ".")
+                            cuota['total_de_pago'] = unicode('{:,}'.format(venta.precio_final_de_venta)).replace(",", ".")
                             # Se suman los totales por fraccion
                             total_cuotas += cuota_item.total_de_cuotas
-                            total_mora += cuota_item.total_de_mora
+                            # total_mora += cuota_item.total_de_mora
                             total_pagos += cuota_item.total_de_pago
 
-                            total_general_cuotas += cuota_item.total_de_cuotas
-                            total_general_mora += cuota_item.total_de_mora
-                            total_general_pagos += cuota_item.total_de_pago
-
                             cuota_aux = cuota
+                            venta_aux = venta
+                            total_general_pagos_aux = total_cuotas
+
                             # filas_fraccion.append(cuota)
                             resumen_lote = get_cuotas_detail_by_lote(unicode(cuota_item.lote.id))
 
@@ -1321,12 +1205,9 @@ def informe_cuotas_por_cobrar(request):
                     cuota['ultimo_pago'] = True
                     cuotas.append(cuota)
                     cuota = {}
-                    cuota['total_general_cuotas'] = unicode('{:,}'.format(total_general_cuotas)).replace(
-                        ",", ".")
-                    cuota['total_general_mora'] = unicode('{:,}'.format(total_general_mora)).replace(",",
-                                                                                                     ".")
-                    cuota['total_general_pago'] = unicode('{:,}'.format(total_general_pagos)).replace(",",
-                                                                                                      ".")
+                    cuota['total_general_cuotas'] = unicode('{:,}'.format(total_general_cuotas)).replace(",", ".")
+                    cuota['total_general_mora'] = unicode('{:,}'.format(total_general_mora)).replace(",", ".")
+                    cuota['total_general_pago'] = unicode('{:,}'.format(total_general_pagos)).replace(",", ".")
                     cuotas.append(cuota)
                     lista = cuotas
                     c = RequestContext(request, {
@@ -1334,12 +1215,9 @@ def informe_cuotas_por_cobrar(request):
                         # 'cant_reg': cant_reg,
                         'fraccion_ini': fraccion_ini,
                         'fraccion_fin': fraccion_fin,
-                        'fecha_ini': fecha_ini,
-                        'fecha_fin': fecha_fin,
                         'lista_cuotas': lista,
                         'ultimo': ultimo,
                         'frac1': f1,
-                        'frac2': f2
                     })
                     return HttpResponse(t.render(c))
             else:
