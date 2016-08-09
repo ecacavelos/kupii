@@ -144,6 +144,7 @@
 				<td><a class="boton-verde" id="id_boton" onclick="retrieve_informe_cuotas_por_cobrar();">Descargar Excel</a></td>
 			</tr>
 		</table>
+        <input type="hidden" id="formato-reporte" name="formato-reporte" value="pantalla"/>
 	</form>
 </div>
 <div class="clear"></div>
@@ -205,8 +206,8 @@
 			<td>{{cuota.cuota_nro}}</td>
 			<td>{{cuota.plan_de_pago}}</td>
 {#			<td>{{cuota.fecha_pago}}</td>#}
-			<td>{{cuota.total_de_cuotas}}</td>
 			<td>{{cuota.total_de_pago}}</td>
+			<td>{{cuota.total_de_cuotas}}</td>
 			<td>{{cuota.total_de_mora}}</td>
 		</tr>
 		{% else %}

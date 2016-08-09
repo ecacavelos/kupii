@@ -1849,8 +1849,6 @@ def listado_lotes_excel(lista_ordenada):
      )
     sheet.footer_str = ''
 
-
-
     c=0
     sheet.write(c, 0, "Fraccion nro", style_normal)
     sheet.write(c, 1, "Manzana nro", style_normal)
@@ -1959,8 +1957,7 @@ def obtener_informe_cuotas_por_cobrar(fraccion_ini):
             cuota['total_de_pago'] = 0
         if g_lote != cuota_item.lote.id:
             # seteamos la cant de cuotas que falta por pagar
-            cuota_aux['cuota_nro'] = resumen_lote['cantidad_total_cuotas'] - resumen_lote[
-                'cant_cuotas_pagadas']
+            cuota_aux['cuota_nro'] = resumen_lote['cantidad_total_cuotas'] - resumen_lote['cant_cuotas_pagadas']
             total_general_cuotas = total_general_cuotas + venta_aux.precio_final_de_venta
             total_general_pagos = total_general_pagos + total_general_pagos_aux
             total_general_mora = total_general_cuotas - total_general_pagos
@@ -1970,35 +1967,35 @@ def obtener_informe_cuotas_por_cobrar(fraccion_ini):
             filas_fraccion = []
             g_lote = cuota_item.lote.id
 
-            cuota = {}
+            # cuota = {}
             # cuota['mismo_lote'] = False
-            cuota['total_cuotas'] = unicode('{:,}'.format(total_cuotas)).replace(",", ".")
-            cuota['total_mora'] = unicode('{:,}'.format(total_mora)).replace(",", ".")
-            cuota['total_pago'] = unicode('{:,}'.format(total_pagos)).replace(",", ".")
-            cuota['ultimo_pago'] = True
-            cuotas.append(cuota)
+            # cuota['total_cuotas'] = unicode('{:,}'.format(total_cuotas)).replace(",", ".")
+            # cuota['total_mora'] = unicode('{:,}'.format(total_mora)).replace(",", ".")
+            # cuota['total_pago'] = unicode('{:,}'.format(total_pagos)).replace(",", ".")
+            # cuota['ultimo_pago'] = True
+            # cuotas.append(cuota)
 
             total_cuotas = 0
             total_mora = 0
             total_pagos = 0
 
-            cuota = {}
-            cuota['mismo_lote'] = False
-            cuota['ultimo_pago'] = False
-            cuota['fraccion_id'] = unicode(cuota_item.lote.manzana.fraccion.id)
-            cuota['fraccion'] = unicode(cuota_item.lote.manzana.fraccion)
-            cuota['lote'] = unicode(cuota_item.lote)
-            cuota['cliente'] = unicode(cuota_item.cliente)
-            # cuota['cuota_nro'] = unicode(nro_cuota) + '/' + unicode(cuota_item.plan_de_pago.cantidad_de_cuotas)
-            # cuota['cuota_nro'] = get_nro_cuota(cuota_item)
-            cuota['plan_de_pago'] = cuota_item.plan_de_pago.nombre_del_plan
-            cuota['fecha_pago'] = unicode(cuota_item.fecha_de_pago.strftime("%d/%m/%Y"))
-            cuota['total_de_cuotas'] = unicode('{:,}'.format(cuota_item.total_de_cuotas)).replace(",", ".")
-            cuota['total_de_mora'] = unicode('{:,}'.format(cuota_item.total_de_mora)).replace(",", ".")
-            cuota['total_de_pago'] = unicode('{:,}'.format(cuota_item.total_de_pago)).replace(",", ".")
-            cuota['total_de_cuotas'] = 0
-            cuota['total_de_mora'] = 0
-            cuota['total_de_pago'] = 0
+            # cuota = {}
+            # cuota['mismo_lote'] = False
+            # cuota['ultimo_pago'] = False
+            # cuota['fraccion_id'] = unicode(cuota_item.lote.manzana.fraccion.id)
+            # cuota['fraccion'] = unicode(cuota_item.lote.manzana.fraccion)
+            # cuota['lote'] = unicode(cuota_item.lote)
+            # cuota['cliente'] = unicode(cuota_item.cliente)
+            # # cuota['cuota_nro'] = unicode(nro_cuota) + '/' + unicode(cuota_item.plan_de_pago.cantidad_de_cuotas)
+            # # cuota['cuota_nro'] = get_nro_cuota(cuota_item)
+            # cuota['plan_de_pago'] = cuota_item.plan_de_pago.nombre_del_plan
+            # cuota['fecha_pago'] = unicode(cuota_item.fecha_de_pago.strftime("%d/%m/%Y"))
+            # cuota['total_de_cuotas'] = unicode('{:,}'.format(cuota_item.total_de_cuotas)).replace(",", ".")
+            # cuota['total_de_mora'] = unicode('{:,}'.format(cuota_item.total_de_mora)).replace(",", ".")
+            # cuota['total_de_pago'] = unicode('{:,}'.format(cuota_item.total_de_pago)).replace(",", ".")
+            # cuota['total_de_cuotas'] = 0
+            # cuota['total_de_mora'] = 0
+            # cuota['total_de_pago'] = 0
             # Se suman los totales por fraccion
             total_cuotas += cuota_item.total_de_cuotas
             # total_mora += cuota_item.total_de_mora
@@ -2018,14 +2015,11 @@ def obtener_informe_cuotas_por_cobrar(fraccion_ini):
             cuota['plan_de_pago'] = cuota_item.plan_de_pago.nombre_del_plan
             cuota['fecha_pago'] = unicode(cuota_item.fecha_de_pago.strftime("%d/%m/%Y"))
             # cuota['total_de_cuotas'] = total_cuotas + cuota_item.total_de_cuotas
-            cuota['total_de_cuotas'] = unicode(
-                '{:,}'.format(total_cuotas + cuota_item.total_de_cuotas)).replace(",", ".")
+            cuota['total_de_cuotas'] = unicode('{:,}'.format(total_cuotas + cuota_item.total_de_cuotas)).replace(",", ".")
             # cuota['total_de_mora'] = unicode('{:,}'.format(cuota_item.total_de_mora)).replace(",", ".")
             venta = Venta.objects.get(id=cuota_item.venta.id)
             # seteamos lo que se debe, el total de la venta menos lo que ya se pago hasta la fecha
-            cuota['total_de_mora'] = unicode('{:,}'.format(
-                venta.precio_final_de_venta - (total_cuotas + cuota_item.total_de_cuotas))).replace(",",
-                                                                                                    ".")
+            cuota['total_de_mora'] = unicode('{:,}'.format(venta.precio_final_de_venta - (total_cuotas + cuota_item.total_de_cuotas))).replace(",",".")
             # seteamoa el importe total de la venta
             # cuota['total_de_pago'] = unicode('{:,}'.format(cuota_item.total_de_pago)).replace(",", ".")
             cuota['total_de_pago'] = unicode('{:,}'.format(venta.precio_final_de_venta)).replace(",", ".")
@@ -2042,12 +2036,12 @@ def obtener_informe_cuotas_por_cobrar(fraccion_ini):
             resumen_lote = get_cuotas_detail_by_lote(unicode(cuota_item.lote.id))
 
     cuotas.extend(filas_fraccion)
-    cuota = {}
-    cuota['total_cuotas'] = unicode('{:,}'.format(total_cuotas)).replace(",", ".")
-    cuota['total_mora'] = unicode('{:,}'.format(total_mora)).replace(",", ".")
-    cuota['total_pago'] = unicode('{:,}'.format(total_pagos)).replace(",", ".")
-    cuota['ultimo_pago'] = True
-    cuotas.append(cuota)
+    # cuota = {}
+    # cuota['total_cuotas'] = unicode('{:,}'.format(total_cuotas)).replace(",", ".")
+    # cuota['total_mora'] = unicode('{:,}'.format(total_mora)).replace(",", ".")
+    # cuota['total_pago'] = unicode('{:,}'.format(total_pagos)).replace(",", ".")
+    # cuota['ultimo_pago'] = True
+    # cuotas.append(cuota)
     cuota = {}
     cuota['total_general_cuotas'] = unicode('{:,}'.format(total_general_cuotas)).replace(",", ".")
     cuota['total_general_mora'] = unicode('{:,}'.format(total_general_mora)).replace(",", ".")
@@ -2056,3 +2050,83 @@ def obtener_informe_cuotas_por_cobrar(fraccion_ini):
     lista = cuotas
 
     return lista
+
+def informe_cuotas_por_cobrar_excel(lista_ordenada):
+
+    wb = xlwt.Workbook(encoding='utf-8')
+    sheet = wb.add_sheet('Informe de Cuotas por Cobrar', cell_overwrite_ok=True,)
+    sheet.paper_size_code = 1
+    style = xlwt.easyxf('font: name Calibri, bold True; align: horiz center')
+
+    usuario = "test"
+    sheet.header_str = (
+     u"&L&8Fecha: &D Hora: &T \nUsuario: "+usuario+" "
+     u"&C&8PROPAR S.R.L.\n Informe de Cuotas por Cobrar "+" \nPage &P of &N"
+     )
+    sheet.footer_str = ''
+
+    c=0
+    sheet.write(c, 0, "Nro Lote", style)
+    sheet.write(c, 1, "Cliente", style)
+    sheet.write(c, 2, "Cuotas Rest", style)
+    sheet.write(c, 3, "Plan de Pago", style)
+    sheet.write(c, 4, "Importe Total", style)
+    sheet.write(c, 5, "Imp. Pag.", style)
+    sheet.write(c, 6, "Imp. Deuda", style)
+
+    # Ancho de la columna Nro Lote
+    col_nro_lote = sheet.col(0)
+    col_nro_lote.width = 256 * 12  # 12 characters wide
+
+    # Ancho de la columna Cliente
+    col_cliente = sheet.col(1)
+    col_cliente.width = 256 * 20  # 20 characters wide
+
+    # Ancho de la columna Cuotas Rest
+    col_cuotas_rest = sheet.col(2)
+    col_cuotas_rest.width = 256 * 10  # 10 characters wide
+
+    # Ancho de la columna Plan de Pago
+    col_plan_de_pago = sheet.col(3)
+    col_plan_de_pago.width = 256 * 25  # 25 characters wide
+
+    # Ancho de la columna Importe Total
+    col_importe_total = sheet.col(4)
+    col_importe_total.width = 256 * 12  # 12 characters wide
+
+    # Ancho de la columna Imp Pag.
+    col_importe_pag = sheet.col(5)
+    col_importe_pag.width = 256 * 11  # 8 characters wide
+
+    # Ancho de la columna Imp Deuda"
+    col_importe_deuda = sheet.col(6)
+    col_importe_deuda.width = 256 * 11  # 11 characters wide
+
+    c += 1
+    for lote in lista_ordenada:
+            # escribir linea por linea
+        try:
+            sheet.write(c, 0, lote['lote'], style_normal)
+            sheet.write(c, 1, lote['cliente'], style_normal)
+            sheet.write(c, 2, lote['cuota_nro'], style_normal)
+            sheet.write(c, 3, lote['plan_de_pago'], style_normal)
+            sheet.write(c, 4, lote['total_de_pago'], style_normal)
+            sheet.write(c, 5, lote['total_de_cuotas'], style_normal)
+            sheet.write(c, 6, lote['total_de_mora'], style_normal)
+            c += 1
+        except Exception, error:
+            print error
+            c += 1
+
+        if lote == lista_ordenada[-1]:
+           sheet.write(c, 4, lote['total_general_cuotas'], style)
+           sheet.write(c, 5, lote['total_general_pago'], style)
+           sheet.write(c, 6, lote['total_general_mora'], style)
+           c += 1
+
+
+
+    response = HttpResponse(content_type='application/vnd.ms-excel')
+    response['Content-Disposition'] = 'attachment; filename=' + 'informe_de_cuotas_por_cobrar_.xls'
+    wb.save(response)
+    return response

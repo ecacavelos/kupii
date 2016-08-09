@@ -1,15 +1,18 @@
 function retrieve_informe_cuotas_por_cobrar() {
-	if($('#id_tipo_busqueda').val()=='nombre'){
-		window.location.href = base_context + "/informes/informe_cuotas_por_cobrar_reporte_excel?fecha_ini=" + $('#fecha_ini').val() + "&fecha_fin=" + $('#fecha_fin').val() + "&fraccion_ini=" + $('#id_frac1').val() + "&fraccion_fin=" + $('#id_frac2').val();
-	}
-	
-	if($('#id_tipo_busqueda').val()=='codigo'){
-		window.location.href = base_context + "/informes/informe_cuotas_por_cobrar_reporte_excel?fecha_ini=" + $('#fecha_ini').val() + "&fecha_fin=" + $('#fecha_fin').val() + "&fraccion_ini=" +$('#id_frac1').val() + "&fraccion_fin=" +  $('#id_frac2').val();
-	}		
+	validar();
+	$("#formato-reporte").val("excel");
+	// if($('#id_tipo_busqueda').val()=='nombre'){
+	// 	window.location.href = base_context + "/informes/informe_cuotas_por_cobrar?fraccion_ini=" + $('#id_frac1').val();
+	// }
+	//
+	// if($('#id_tipo_busqueda').val()=='codigo'){
+	// 	window.location.href = base_context + "/informes/informe_cuotas_por_cobrar?fraccion_ini=" +$('#id_frac1').val();
+	// }
+	$("#frm_busqueda").submit();
 }
 
 function validar() {
-	if ($('#fraccion_ini').val() == 0 || $('#fraccion_fin').val() == 0 || $('#fraccion_ini').val() == "" || $('#fraccion_fin').val() == "") {
+	if ($('#fraccion_ini').val() == 0 || $('#fraccion_ini').val() == "") {
 		alert("Debe ingresar un rango de fracciones");
 		return;
 	}

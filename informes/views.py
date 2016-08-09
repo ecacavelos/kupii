@@ -1087,24 +1087,29 @@ def informe_cuotas_por_cobrar(request):
             })
             return HttpResponse(t.render(c))
         else:  # Parametros seteados
-
-            t = loader.get_template('informes/informe_cuotas_por_cobrar.html')
-            tipo_busqueda = request.GET['tipo_busqueda']
             fraccion_ini = request.GET['frac1']
             f1 = request.GET['fraccion_ini']
+            tipo_busqueda = request.GET['tipo_busqueda']
             ultimo = "&tipo_busqueda=" + tipo_busqueda + "&frac1=" + fraccion_ini + "&fraccion_ini=" + f1
+            # obtiene la lista que buscamos
             lista = obtener_informe_cuotas_por_cobrar(fraccion_ini)
-            c = RequestContext(request, {
-                'tipo_busqueda': tipo_busqueda,
-                # 'cant_reg': cant_reg,
-                'fraccion_ini': fraccion_ini,
-                # 'fraccion_fin': fraccion_fin,
-                'lista_cuotas': lista,
-                'ultimo': ultimo,
-                'frac1': f1,
-            })
-            return HttpResponse(t.render(c))
-
+            # si es para visualizar
+            if request.GET['formato-reporte'] == 'pantalla':
+                t = loader.get_template('informes/informe_cuotas_por_cobrar.html')
+                c = RequestContext(request, {
+                    'tipo_busqueda': tipo_busqueda,
+                    # 'cant_reg': cant_reg,
+                    'fraccion_ini': fraccion_ini,
+                    # 'fraccion_fin': fraccion_fin,
+                    'lista_cuotas': lista,
+                    'ultimo': ultimo,
+                    'frac1': f1,
+                })
+                return HttpResponse(t.render(c))
+            # o si es para descargar
+            else:
+                response = informe_cuotas_por_cobrar_excel(lista)
+                return response
 
 #Funcion que devuelve la lista de pagos de para liquidacion de propietarios.
 #
