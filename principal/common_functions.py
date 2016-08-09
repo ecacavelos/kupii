@@ -1980,26 +1980,33 @@ def obtener_informe_cuotas_por_cobrar(fraccion_ini):
             total_pagos = 0
 
             # cuota = {}
-            # cuota['mismo_lote'] = False
-            # cuota['ultimo_pago'] = False
-            # cuota['fraccion_id'] = unicode(cuota_item.lote.manzana.fraccion.id)
-            # cuota['fraccion'] = unicode(cuota_item.lote.manzana.fraccion)
-            # cuota['lote'] = unicode(cuota_item.lote)
-            # cuota['cliente'] = unicode(cuota_item.cliente)
-            # # cuota['cuota_nro'] = unicode(nro_cuota) + '/' + unicode(cuota_item.plan_de_pago.cantidad_de_cuotas)
-            # # cuota['cuota_nro'] = get_nro_cuota(cuota_item)
-            # cuota['plan_de_pago'] = cuota_item.plan_de_pago.nombre_del_plan
-            # cuota['fecha_pago'] = unicode(cuota_item.fecha_de_pago.strftime("%d/%m/%Y"))
-            # cuota['total_de_cuotas'] = unicode('{:,}'.format(cuota_item.total_de_cuotas)).replace(",", ".")
+            cuota['ultimo_pago'] = False
+            cuota['mismo_lote'] = True
+            cuota['fraccion_id'] = unicode(cuota_item.lote.manzana.fraccion.id)
+            cuota['fraccion'] = unicode(cuota_item.lote.manzana.fraccion)
+            cuota['lote'] = unicode(cuota_item.lote)
+            cuota['cliente'] = unicode(cuota_item.cliente)
+            # cuota['cuota_nro'] = unicode(nro_cuota) + '/' + unicode(cuota_item.plan_de_pago.cantidad_de_cuotas)
+            # cuota['cuota_nro'] = get_nro_cuota(cuota_item)
+            cuota['plan_de_pago'] = cuota_item.plan_de_pago.nombre_del_plan
+            cuota['fecha_pago'] = unicode(cuota_item.fecha_de_pago.strftime("%d/%m/%Y"))
+            # cuota['total_de_cuotas'] = total_cuotas + cuota_item.total_de_cuotas
+            cuota['total_de_cuotas'] = unicode('{:,}'.format(total_cuotas + cuota_item.total_de_cuotas)).replace(",", ".")
             # cuota['total_de_mora'] = unicode('{:,}'.format(cuota_item.total_de_mora)).replace(",", ".")
+            venta = Venta.objects.get(id=cuota_item.venta.id)
+            # seteamos lo que se debe, el total de la venta menos lo que ya se pago hasta la fecha
+            cuota['total_de_mora'] = unicode('{:,}'.format(venta.precio_final_de_venta - (total_cuotas + cuota_item.total_de_cuotas))).replace(",",".")
+            # seteamoa el importe total de la venta
             # cuota['total_de_pago'] = unicode('{:,}'.format(cuota_item.total_de_pago)).replace(",", ".")
-            # cuota['total_de_cuotas'] = 0
-            # cuota['total_de_mora'] = 0
-            # cuota['total_de_pago'] = 0
+            cuota['total_de_pago'] = unicode('{:,}'.format(venta.precio_final_de_venta)).replace(",", ".")
             # Se suman los totales por fraccion
             total_cuotas += cuota_item.total_de_cuotas
             # total_mora += cuota_item.total_de_mora
             total_pagos += cuota_item.total_de_pago
+
+            cuota_aux = cuota
+            venta_aux = venta
+            total_general_pagos_aux = total_cuotas
 
             resumen_lote = get_cuotas_detail_by_lote(unicode(cuota_item.lote.id))
 
