@@ -6031,6 +6031,7 @@ def informe_facturacion(request):
                                 fila['fecha']= fecha
                                 fila['numero']= factura.numero
                                 fila['cliente']=unicode(factura.cliente)
+                                fila['ruc']=unicode(factura.cliente.ruc)
                                 fila['lote']=unicode(factura.lote.codigo_paralot)
                                 fila['tipo']=unicode(factura.tipo)
                                 if factura.usuario_id != None:
@@ -6199,6 +6200,7 @@ def informe_facturacion_reporte_excel(request):
                                 fila['fecha']= fecha
                                 fila['numero']= factura.numero
                                 fila['cliente']=unicode(factura.cliente)
+                                fila['ruc']=unicode(factura.cliente.ruc)
                                 fila['lote']=unicode(factura.lote.codigo_paralot)
                                 fila['tipo']=unicode(factura.tipo)
                                 if factura.usuario_id != None:
@@ -6282,12 +6284,13 @@ def informe_facturacion_reporte_excel(request):
                             sheet.write(c, 1, 'Numero',style_titulo)
                             sheet.write(c, 2, 'Lote',style_titulo)
                             sheet.write(c, 3, 'Cliente',style_titulo)
-                            sheet.write(c, 4, 'Tipo',style_titulo)
-                            sheet.write(c, 5, 'Exentas',style_titulo)
-                            sheet.write(c, 6, 'IVA 5',style_titulo)
-                            sheet.write(c, 7, 'Cuota Total',style_titulo)
-                            sheet.write(c, 8, 'IVA 10',style_titulo)
-                            sheet.write(c, 9, 'Monto',style_titulo)
+                            sheet.write(c, 4, 'RUC',style_titulo)
+                            sheet.write(c, 5, 'Tipo',style_titulo)
+                            sheet.write(c, 6, 'Exentas',style_titulo)
+                            sheet.write(c, 7, 'IVA 5',style_titulo)
+                            sheet.write(c, 8, 'Cuota Total',style_titulo)
+                            sheet.write(c, 9, 'IVA 10',style_titulo)
+                            sheet.write(c, 10, 'Monto',style_titulo)
                             
                         else:
                             sheet.header_str = (
@@ -6303,12 +6306,13 @@ def informe_facturacion_reporte_excel(request):
                             sheet.write(c, 1, 'Numero',style_titulo)
                             sheet.write(c, 2, 'Lote',style_titulo)
                             sheet.write(c, 3, 'Cliente',style_titulo)
-                            sheet.write(c, 4, 'Tipo',style_titulo)
-                            sheet.write(c, 5, 'Exentas',style_titulo)
-                            sheet.write(c, 6, 'IVA 5',style_titulo)
-                            sheet.write(c, 7, 'Cuota Total',style_titulo)
-                            sheet.write(c, 8, 'IVA 10',style_titulo)
-                            sheet.write(c, 9, 'Monto',style_titulo)
+                            sheet.write(c, 4, 'RUC',style_titulo)
+                            sheet.write(c, 5, 'Tipo',style_titulo)
+                            sheet.write(c, 6, 'Exentas',style_titulo)
+                            sheet.write(c, 7, 'IVA 5',style_titulo)
+                            sheet.write(c, 8, 'Cuota Total',style_titulo)
+                            sheet.write(c, 9, 'IVA 10',style_titulo)
+                            sheet.write(c, 10, 'Monto',style_titulo)
 
                         sucursal = filas[0]['numero'][:3]
 
@@ -6327,11 +6331,11 @@ def informe_facturacion_reporte_excel(request):
                                 totales_sucursales[fil][2] = unicode('{:,}'.format(totales_sucursales[fil][2])).replace(",", ".")
                                 totales_sucursales[fil][3] = unicode('{:,}'.format(totales_sucursales[fil][3])).replace(",", ".")
                                 totales_sucursales[fil][4] = unicode('{:,}'.format(totales_sucursales[fil][4])).replace(",", ".")
-                                sheet.write(c, 5, totales_sucursales[fil][0],style_titulo)
-                                sheet.write(c, 6, totales_sucursales[fil][1],style_titulo)
-                                sheet.write(c, 7, totales_sucursales[fil][2],style_titulo)
-                                sheet.write(c, 8, totales_sucursales[fil][3],style_titulo)
-                                sheet.write(c, 9, totales_sucursales[fil][4],style_titulo)
+                                sheet.write(c, 6, totales_sucursales[fil][0],style_titulo)
+                                sheet.write(c, 7, totales_sucursales[fil][1],style_titulo)
+                                sheet.write(c, 8, totales_sucursales[fil][2],style_titulo)
+                                sheet.write(c, 9, totales_sucursales[fil][3],style_titulo)
+                                sheet.write(c, 10, totales_sucursales[fil][4],style_titulo)
                                 fil += 1
 
                             c += 1
@@ -6339,23 +6343,24 @@ def informe_facturacion_reporte_excel(request):
                             sheet.write(c, 1, fila['numero'],style_centrado)
                             sheet.write(c, 2, fila['lote'],style_centrado)
                             sheet.write(c, 3, fila['cliente'],style_normal)
+                            sheet.write(c, 4, fila['ruc'],style_normal)
                             if fila['tipo'] == 'co':
-                                sheet.write(c, 4, 'contado' ,style_centrado)
+                                sheet.write(c, 5, 'contado' ,style_centrado)
                             else:
-                                sheet.write(c, 4, 'credito' ,style_centrado)
-                            sheet.write(c, 5, fila['total_exentas'],style_derecha)
-                            sheet.write(c, 6, fila['total_iva5'],style_derecha)
-                            sheet.write(c, 7, fila['total_cuota_total'],style_derecha)
-                            sheet.write(c, 8, fila['total_iva10'],style_derecha)
-                            sheet.write(c, 9, fila['total_facturado'],style_derecha)
+                                sheet.write(c, 5, 'credito' ,style_centrado)
+                            sheet.write(c, 6, fila['total_exentas'],style_derecha)
+                            sheet.write(c, 7, fila['total_iva5'],style_derecha)
+                            sheet.write(c, 8, fila['total_cuota_total'],style_derecha)
+                            sheet.write(c, 9, fila['total_iva10'],style_derecha)
+                            sheet.write(c, 10, fila['total_facturado'],style_derecha)
                             try:
                                 # si se trata de la ultima fila, para el ultimo total de la sucursal debemos de colocar tambien
                                 if (fila['total_general_facturado']):
-                                    sheet.write(c, 5, fila['total_exentas'], style_derecha)
-                                    sheet.write(c, 6, fila['total_iva5'], style_derecha)
-                                    sheet.write(c, 7, fila['total_cuota_total'], style_derecha)
-                                    sheet.write(c, 8, fila['total_iva10'], style_derecha)
-                                    sheet.write(c, 9, fila['total_facturado'], style_derecha)
+                                    sheet.write(c, 6, fila['total_exentas'], style_derecha)
+                                    sheet.write(c, 7, fila['total_iva5'], style_derecha)
+                                    sheet.write(c, 8, fila['total_cuota_total'], style_derecha)
+                                    sheet.write(c, 9, fila['total_iva10'], style_derecha)
+                                    sheet.write(c, 10, fila['total_facturado'], style_derecha)
                                     c += 1
 
                                     totales_sucursales[fil][0] = unicode('{:,}'.format(totales_sucursales[fil][0])).replace(",", ".")
@@ -6363,19 +6368,19 @@ def informe_facturacion_reporte_excel(request):
                                     totales_sucursales[fil][2] = unicode('{:,}'.format(totales_sucursales[fil][2])).replace(",", ".")
                                     totales_sucursales[fil][3] = unicode('{:,}'.format(totales_sucursales[fil][3])).replace(",", ".")
                                     totales_sucursales[fil][4] = unicode('{:,}'.format(totales_sucursales[fil][4])).replace(",", ".")
-                                    sheet.write(c, 5, totales_sucursales[fil][0], style_titulo)
-                                    sheet.write(c, 6, totales_sucursales[fil][1], style_titulo)
-                                    sheet.write(c, 7, totales_sucursales[fil][2], style_titulo)
-                                    sheet.write(c, 8, totales_sucursales[fil][3], style_titulo)
-                                    sheet.write(c, 9, totales_sucursales[fil][4], style_titulo)
+                                    sheet.write(c, 6, totales_sucursales[fil][0], style_titulo)
+                                    sheet.write(c, 7, totales_sucursales[fil][1], style_titulo)
+                                    sheet.write(c, 8, totales_sucursales[fil][2], style_titulo)
+                                    sheet.write(c, 9, totales_sucursales[fil][3], style_titulo)
+                                    sheet.write(c, 10, totales_sucursales[fil][4], style_titulo)
 
                                     c+=1
-                                    sheet.write_merge(c,c,0,4, "Totales Facturados", style_titulo)
-                                    sheet.write(c, 5, fila['total_general_exentas'],style_titulo_derecha)
-                                    sheet.write(c, 6, fila['total_general_iva5'], style_titulo_derecha)
-                                    sheet.write(c, 7, fila['total_general_cuota_total'], style_titulo_derecha)
-                                    sheet.write(c, 8, fila['total_general_iva10'], style_titulo_derecha)
-                                    sheet.write(c, 9, fila['total_general_facturado'], style_titulo_derecha)
+                                    sheet.write_merge(c,c,0,5, "Totales Facturados", style_titulo)
+                                    sheet.write(c, 6, fila['total_general_exentas'],style_titulo_derecha)
+                                    sheet.write(c, 7, fila['total_general_iva5'], style_titulo_derecha)
+                                    sheet.write(c, 8, fila['total_general_cuota_total'], style_titulo_derecha)
+                                    sheet.write(c, 9, fila['total_general_iva10'], style_titulo_derecha)
+                                    sheet.write(c, 10, fila['total_general_facturado'], style_titulo_derecha)
                             except Exception, error:
                                 print error 
                                 pass
@@ -6396,28 +6401,32 @@ def informe_facturacion_reporte_excel(request):
                         col_nro_factura = sheet.col(1)
                         col_nro_factura.width = 256 * 15   # 15 characters wide
                             
-                        #Ancho de la columna Tipo
+                        #Ancho de la columna RUC
                         col_tipo = sheet.col(4)
+                        col_tipo.width = 256 * 9   # 7 characters wide
+
+                        #Ancho de la columna Tipo
+                        col_tipo = sheet.col(5)
                         col_tipo.width = 256 * 7   # 7 characters wide
                             
                         #Ancho de la columna exentas
-                        col_exenta = sheet.col(5)
+                        col_exenta = sheet.col(6)
                         col_exenta.width = 256 * 10   # 9 characters wide
                             
                         #Ancho de la columna iva5
-                        col_iva5 = sheet.col(6)
+                        col_iva5 = sheet.col(7)
                         col_iva5.width = 256 * 10   # 9 characters wide
                             
                         #Ancho de la columna cuota total
-                        col_cuota_total = sheet.col(7)
+                        col_cuota_total = sheet.col(8)
                         col_cuota_total.width = 256 * 10   # 9 characters wide
 
                         #Ancho de la columna iva10
-                        col_iva10 = sheet.col(8)
+                        col_iva10 = sheet.col(9)
                         col_iva10.width = 256 * 10   # 9 characters wide
                             
                         #Ancho de la columna monto
-                        col_monto = sheet.col(8)
+                        col_monto = sheet.col(10)
                         col_monto.width = 256 * 12   # 9 characters wide
                       
                         response = HttpResponse(content_type='application/vnd.ms-excel')
