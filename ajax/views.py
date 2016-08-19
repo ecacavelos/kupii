@@ -892,10 +892,11 @@ def imprimir_factura(request):
             manzana = Manzana.objects.get(fraccion_id=fraccion_int, nro_manzana=manzana_int)
             lote_id = Lote.objects.get(manzana=manzana.id, nro_lote=lote_int)
             
-            response = crear_pdf_factura(factura, request, manzana, lote_id, request.user)
-            response = base64.b64encode(response.content)
-            
-            return HttpResponse(response);
+            # response = crear_pdf_factura(factura, request, manzana, lote_id, request.user)
+            # response = base64.b64encode(response.content)
+
+            response = crear_JSON_print_object(factura, request, manzana, lote_id, request.user)
+            return HttpResponse(response, content_type="application/json")
     else:
         return HttpResponseRedirect(reverse('login'))  
         

@@ -10,6 +10,7 @@ from django.core import serializers
 from django.contrib.auth.models import User, Permission
 from django.db.models import Q
 import json
+from collections import OrderedDict
 from datetime import datetime, timedelta, date
 import math
 import datetime
@@ -1263,139 +1264,192 @@ def crear_pdf_factura(nueva_factura, request, manzana, lote_id, usuario):
     return response;
 
 
-def crear_print_object(nueva_factura, request, manzana, lote_id, usuario):
-    response = HttpResponse(content_type='application/pdf')
-    nombre_factura = "factura-" + nueva_factura.numero + ".pdf"
-    response['Content-Disposition'] = 'attachment; filename=factura' + str(nueva_factura.id) + '.pdf'
-    p = canvas.Canvas(response)
-    p.setPageSize((210 * mm, 297 * mm))
-    p.setFont("Helvetica", 7)
-
-
-    #Obtener las coordenadas de impresion de la factura
+def crear_JSON_print_object(factura, request, manzana, lote_id, usuario):
+    # Obtener las coordenadas de impresion de la factura
     try:
-        coor = CoordenadasFactura.objects.get(usuario = usuario)
+        coor = CoordenadasFactura.objects.get(usuario=usuario)
     except Exception, error:
-        coor = CoordenadasFactura.objects.get(usuario_id = 2)
+        coor = CoordenadasFactura.objects.get(usuario_id=2)
+
+    lineas = []
+
+    #nros de facturas
+    # linea = {}
+    # linea["valor"] = factura.numero
+    # linea["coor_x"] = int(coor.numero_1x * cm)
+    # linea["coor_y"] = int(coor.numero_1y * cm)
+    # lineas.append(linea);
+    #
+    # linea = {}
+    # linea["valor"] = factura.numero
+    # linea["coord_x"] = int(coor.numero_2x * cm)
+    # linea["coord_y"] = int(coor.numero_2y * cm)
+    # lineas.append(linea);
+
+    # fechas
+    linea = {}
+    linea["valor"] = unicode(factura.fecha)
+    linea["coord_x"] = int (coor.fecha_1x * cm)
+    linea["coord_y"] = int (coor.fecha_1y * cm)
+    lineas.append(linea);
+
+    linea = {}
+    linea["valor"] = unicode(factura.fecha)
+    linea["coord_x"] = int(coor.fecha_2x * cm)
+    linea["coord_y"] = int(coor.fecha_2y * cm)
+    lineas.append(linea);
+
+    # nombres clientes
+    linea = {}
+    linea["valor"] = factura.cliente.nombres + " " + factura.cliente.apellidos
+    linea["coord_x"] = int(coor.nombre_1x * cm)
+    linea["coord_y"] = int(coor.nombre_1y * cm)
+    lineas.append(linea);
+
+    linea = {}
+    linea["valor"] = factura.cliente.nombres + " " + factura.cliente.apellidos
+    linea["coord_x"] = int(coor.nombre_2x * cm)
+    linea["coord_y"] = int(coor.nombre_2y * cm)
+    lineas.append(linea);
+
+    # fraccion
+    linea = {}
+    linea["valor"] = manzana.fraccion.nombre
+    linea["coord_x"] = int(coor.fraccion_1x * cm)
+    linea["coord_y"] = int(coor.fraccion_1y * cm)
+    lineas.append(linea);
+
+    linea = {}
+    linea["valor"] = manzana.fraccion.nombre
+    linea["coord_x"] = int(coor.fraccion_2x * cm)
+    linea["coord_y"] = int(coor.fraccion_2y * cm)
+    lineas.append(linea);
+
+    # manzana
+    linea = {}
+    linea["valor"] = manzana.nro_manzana
+    linea["coord_x"] = int(coor.manzana_1x * cm)
+    linea["coord_y"] = int(coor.manzana_1y * cm)
+    lineas.append(linea);
+
+    linea = {}
+    linea["valor"] = manzana.nro_manzana
+    linea["coord_x"] = int(coor.manzana_2x * cm)
+    linea["coord_y"] = int(coor.manzana_2y * cm)
+    lineas.append(linea);
+
+    # lote
+    linea = {}
+    linea["valor"] = lote_id.nro_lote
+    linea["coord_x"] = int(coor.lote_1x * cm)
+    linea["coord_y"] = int(coor.lote_1y * cm)
+    lineas.append(linea);
+
+    linea = {}
+    linea["valor"] = lote_id.nro_lote
+    linea["coord_x"] = int(coor.lote_2x * cm)
+    linea["coord_y"] = int(coor.lote_2y * cm)
+    lineas.append(linea);
+
+    # superficie
+    linea = {}
+    linea["valor"] = unicode(lote_id.superficie) + "  mts2"
+    linea["coord_x"] = int(coor.superficie_1x * cm)
+    linea["coord_y"] = int(coor.superficie_1y * cm)
+    lineas.append(linea);
+
+    linea = {}
+    linea["valor"] = unicode(lote_id.superficie) + "  mts2"
+    linea["coord_x"] = int(coor.superficie_2x * cm)
+    linea["coord_y"] = int(coor.superficie_2y * cm)
+    lineas.append(linea);
+
+    # Cta Cte catastral
+    linea = {}
+    linea["valor"] = lote_id.cuenta_corriente_catastral
+    linea["coord_x"] = int(coor.cta_cte_ctral_1x * cm)
+    linea["coord_y"] = int(coor.cta_cte_ctral_1y * cm)
+    lineas.append(linea);
+
+    linea = {}
+    linea["valor"] = lote_id.cuenta_corriente_catastral
+    linea["coord_x"] = int(coor.cta_cte_ctral_2x * cm)
+    linea["coord_y"] = int(coor.cta_cte_ctral_2y * cm)
+    lineas.append(linea);
 
 
-    # INICIO PRIMERA IMPRESION
-    y_1ra_imp = float(14.05)
+    # if nueva_factura.cliente.ruc == None:
+    #     nueva_factura.cliente.ruc = ""
+    # ruc
+    linea = {}
+    linea["valor"] = factura.cliente.ruc
+    linea["coord_x"] = int(coor.ruc_1x * cm)
+    linea["coord_y"] = int(coor.ruc_1y * cm)
+    lineas.append(linea);
 
-    p.drawString(coor.numero_1x * cm, float(coor.numero_1y) * cm, unicode(nueva_factura.numero))
+    linea = {}
+    linea["valor"] = factura.cliente.ruc
+    linea["coord_x"] = int(coor.ruc_2x * cm)
+    linea["coord_y"] = int(coor.ruc_2y * cm)
+    lineas.append(linea);
 
-    fecha_str = unicode(nueva_factura.fecha)
-    fecha = unicode(datetime.datetime.strptime(fecha_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
+    # direccion
+    linea = {}
+    linea["valor"] = (factura.cliente.direccion_cobro[:56] + '..') if len(factura.cliente.direccion_cobro) > 56 else factura.cliente.direccion_cobro
+    linea["coord_x"] = int(coor.direccion_1x * cm)
+    linea["coord_y"] = int(coor.direccion_1y * cm)
+    lineas.append(linea);
 
-    p.drawString(coor.fecha_1x * cm, float(coor.fecha_1y) * cm, fecha)
-    if nueva_factura.tipo == 'co':
-        p.drawString(coor.contado_1x * cm, float(coor.contado_1y) * cm, "X")
+    linea = {}
+    linea["valor"] = (factura.cliente.direccion_cobro[:56] + '..') if len(factura.cliente.direccion_cobro) > 56 else factura.cliente.direccion_cobro
+    linea["coord_x"] = int(coor.direccion_2x * cm)
+    linea["coord_y"] = int(coor.direccion_2y * cm)
+    lineas.append(linea);
+
+    # CONTADO O CREDITO
+    if (factura.tipo == 'co'):
+        linea = {}
+        linea["valor"] = 'X'
+        linea["coord_x"] = int(coor.contado_1x * cm)
+        linea["coord_y"] = int(coor.contado_1y * cm)
+        lineas.append(linea);
+
+        linea = {}
+        linea["valor"] = 'X'
+        linea["coord_x"] = int(coor.contado_2x * cm)
+        linea["coord_y"] = int(coor.contado_2y * cm)
+        lineas.append(linea);
     else:
-        p.drawString(coor.credito_1x * cm, float(coor.credito_1y) * cm, "X")
+        linea = {}
+        linea["valor"] = 'X'
+        linea["coord_x"] = int(coor.credito_1x * cm)
+        linea["coord_y"] = int(coor.credito_1y * cm)
+        lineas.append(linea);
 
-    p.drawString(coor.fraccion_1x * cm, float(coor.fraccion_1y) * cm, unicode(manzana.fraccion.nombre))
-            # Solo se imprime el primer nombre y apellido-- Faltaaa
-    nombre_ape = nueva_factura.cliente.nombres + " " + nueva_factura.cliente.apellidos
-    p.drawString(coor.nombre_1x * cm, float(coor.nombre_1y) * cm, unicode(nombre_ape))
-    p.drawString(coor.manzana_1x * cm, float(coor.manzana_1y) * cm, unicode(manzana.nro_manzana))
-    p.drawString(coor.lote_1x * cm, float(coor.lote_1y) * cm, unicode(lote_id.nro_lote))
+        linea = {}
+        linea["valor"] = 'X'
+        linea["coord_x"] = int(coor.credito_2x * cm)
+        linea["coord_y"] = int(coor.credito_2y * cm)
+        lineas.append(linea);
 
+    # telefono
+    linea = {}
+    linea["valor"] = factura.cliente.telefono_laboral
+    linea["coord_x"] = int(coor.telefono_1x * cm)
+    linea["coord_y"] = int(coor.telefono_1y * cm)
+    lineas.append(linea);
 
-    if nueva_factura.cliente.ruc == None:
-        nueva_factura.cliente.ruc = ""
-    p.drawString(coor.ruc_1x * cm, float(coor.ruc_1y) * cm, unicode(nueva_factura.cliente.ruc))
-    p.drawString(coor.telefono_1x * cm, float(coor.telefono_1y) * cm, unicode(nueva_factura.cliente.telefono_laboral))
-    direccion_1_str = (nueva_factura.cliente.direccion_cobro[:56] + '..') if len(nueva_factura.cliente.direccion_cobro) > 56 else nueva_factura.cliente.direccion_cobro
-    p.drawString(coor.direccion_1x * cm, float(coor.direccion_1y) * cm, unicode(direccion_1_str))
-    p.drawString(coor.superficie_1x * cm, float(coor.superficie_1y) * cm, unicode(lote_id.superficie) + "  mts2")
-    p.drawString(coor.cta_cte_ctral_1x * cm, float(coor.cta_cte_ctral_1y) * cm, unicode(lote_id.cuenta_corriente_catastral))
+    linea = {}
+    linea["valor"] = factura.cliente.telefono_laboral
+    linea["coord_x"] = int(coor.telefono_2x * cm)
+    linea["coord_y"] = int(coor.telefono_2y * cm)
+    lineas.append(linea);
 
+    #ahora debo setear los detalles, para ello debo de recorrer los mismos,
     # Se obtienen la lista de los detalles
-    lista_detalles = json.loads(nueva_factura.detalle)
+    lista_detalles = json.loads(factura.detalle)
     detalles = []
-    pos_y = float(coor.cantidad_1y+ 0.5)
-    exentas = 0
-    iva10 = 0
-    iva5 = 0
-    total_iva_10 = 0
-    total_iva_5 = 0
-    total_iva = 0
-    total_gral = 0
-    total_venta = 0
-    for key, value in sorted(lista_detalles.iteritems()):
-        detalle = {}
-        detalle['item'] = key
-        detalle['cantidad'] = value['cantidad']
-        p.drawString(coor.cantidad_1x * cm, float(pos_y - 0.5) * cm, unicode(detalle['cantidad']))
-        detalle['concepto'] = value['concepto']
-        p.drawString(coor.descripcion_1x * cm, float(pos_y - 0.5) * cm, unicode(detalle['concepto']))
-        detalle['precio_unitario'] = int(value['precio_unitario'])
-        p.drawString(coor.precio_1x * cm, float(pos_y - 0.5) * cm, unicode('{:,}'.format(detalle['precio_unitario']).replace(",", ".")))
-        total_venta += int(detalle['cantidad']) * int(detalle['precio_unitario'])
-        detalle['exentas'] = int(value['exentas'])
-        p.drawString(coor.exentas_1x * cm, float(pos_y - 0.5) * cm, unicode('{:,}'.format(detalle['exentas']).replace(",", ".")))
-        if detalle['exentas'] != '':
-            exentas += int(detalle['exentas'])
-        detalle['iva_5'] = int(value['iva_5'])
-        p.drawString(coor.iva5_1x * cm, float(pos_y - 0.5) * cm, unicode('{:,}'.format(detalle['iva_5']).replace(",", ".")))
-        if detalle['iva_5'] != '':
-            iva5 += int(detalle['iva_5'])
-        detalle['iva_10'] = int(value['iva_10'])
-        p.drawString(coor.iva10_1x * cm, float(pos_y - 0.5) * cm, unicode('{:,}'.format(detalle['iva_10']).replace(",", ".")))
-        if detalle['iva_10'] != '':
-            iva10 += int(detalle['iva_10'])
-        pos_y -= 0.5
-        detalles.append(detalle)
-    cantidad = 4 - len(detalles)
-    pos_y -= (0.5 * cantidad)
-    p.drawString(coor.sub_exentas_1x * cm, float(coor.sub_exentas_1y) * cm, unicode('{:,}'.format(exentas).replace(",", ".")))
-    p.drawString(coor.sub_iva5_1x * cm, float(coor.sub_iva5_1y) * cm, unicode('{:,}'.format(iva5).replace(",", ".")))
-    p.drawString(coor.sub_iva10_1x * cm, float(coor.sub_iva10_1y) * cm, unicode('{:,}'.format(iva10).replace(",", ".")))
-    pos_y -= 0.5
-    p.drawString(coor.total_a_pagar_exentas_iva5_1x * cm, float(coor.total_a_pagar_exentas_iva5_1y) * cm, unicode('{:,}'.format(exentas+iva5).replace(",", ".")))
-    p.drawString(coor.total_venta_1x * cm, float(coor.total_venta_1y) * cm, unicode('{:,}'.format(total_venta).replace(",", ".")))
-    pos_y -= 1.5
-    numalet = num2words(int(total_venta), lang='es')
-    p.drawString(coor.total_a_pagar_letra_1x * cm, float(coor.total_a_pagar_letra_1y) * cm, unicode(numalet))
-    p.drawString(coor.total_a_pagar_num_1x * cm, float(coor.total_a_pagar_num_1y) * cm, unicode('{:,}'.format(total_venta).replace(",", ".")))
-    total_iva_10 = int(iva10 / 11)
-    total_iva_5 = int(iva5 / 21)
-    total_iva = total_iva_10 + total_iva_5
-    pos_y -= 0.5
-    p.drawString(coor.liq_iva5_1x * cm, float(coor.liq_iva5_1y) * cm, unicode('{:,}'.format(total_iva_5).replace(",", ".")))
-    p.drawString(coor.liq_iva10_1x * cm, float(coor.liq_iva10_1y) * cm, unicode('{:,}'.format(total_iva_10).replace(",", ".")))
-    p.drawString(coor.liq_total_iva_1x * cm, float(coor.liq_total_iva_1y) * cm, unicode('{:,}'.format(total_iva).replace(",", ".")))
-    # FIN PRIMERA IMPRESION
-    ######################################################################################################################################
-    # INICIO SEGUNDA IMPRESION
-    p.drawString(coor.numero_2x * cm, float(coor.numero_2y) * cm, unicode(nueva_factura.numero))
-
-    p.drawString(coor.fecha_2x * cm, float(coor.fecha_2y) * cm, fecha)
-    if nueva_factura.tipo == 'co':
-        p.drawString(coor.contado_2x * cm, float(coor.contado_2y) * cm, "X")
-    else:
-        p.drawString(coor.credito_2x * cm, float(coor.credito_2y) * cm, "X")
-
-    p.drawString(coor.fraccion_2x * cm, float(coor.fraccion_2y) * cm, unicode(manzana.fraccion.nombre))
-            # Solo se imprime el primer nombre y apellido-- Faltaaa
-    nombre_ape = nueva_factura.cliente.nombres + " " + nueva_factura.cliente.apellidos
-    p.drawString(coor.nombre_2x * cm, float(coor.nombre_2y) * cm, unicode(nombre_ape))
-    p.drawString(coor.manzana_2x * cm, float(coor.manzana_2y) * cm, unicode(manzana.nro_manzana))
-    p.drawString(coor.lote_2x * cm, float(coor.lote_2y) * cm, unicode(lote_id.nro_lote))
-
-
-    if nueva_factura.cliente.ruc == None:
-        nueva_factura.cliente.ruc = ""
-    p.drawString(coor.ruc_2x * cm, float(coor.ruc_2y) * cm, unicode(nueva_factura.cliente.ruc))
-    p.drawString(coor.telefono_2x * cm, float(coor.telefono_2y) * cm, unicode(nueva_factura.cliente.telefono_laboral))
-    direccion_2_str = (nueva_factura.cliente.direccion_cobro[:56] + '..') if len(nueva_factura.cliente.direccion_cobro) > 56 else nueva_factura.cliente.direccion_cobro
-    p.drawString(coor.direccion_2x * cm, float(coor.direccion_2y) * cm, unicode(direccion_2_str))
-    p.drawString(coor.superficie_2x * cm, float(coor.superficie_2y) * cm, unicode(lote_id.superficie) + "  mts2")
-    p.drawString(coor.cta_cte_ctral_2x * cm, float(coor.cta_cte_ctral_2y) * cm, unicode(lote_id.cuenta_corriente_catastral))
-
-    # Se obtienen la lista de los detalles
-    lista_detalles = json.loads(nueva_factura.detalle)
-    detalles = []
+    pos_x = float(coor.cantidad_1y+ 0.5)
     pos_y = float(coor.cantidad_2y+ 0.5)
     exentas = 0
     iva10 = 0
@@ -1406,75 +1460,259 @@ def crear_print_object(nueva_factura, request, manzana, lote_id, usuario):
     total_gral = 0
     total_venta = 0
     for key, value in sorted(lista_detalles.iteritems()):
-        detalle = {}
-        detalle['item'] = key
-        detalle['cantidad'] = value['cantidad']
-        p.drawString(coor.cantidad_2x * cm, float(pos_y - 0.5) * cm, unicode(detalle['cantidad']))
-        detalle['concepto'] = value['concepto']
-        p.drawString(coor.descripcion_2x * cm, float(pos_y - 0.5) * cm, unicode(detalle['concepto']))
-        detalle['precio_unitario'] = int(value['precio_unitario'])
-        p.drawString(coor.precio_2x * cm, float(pos_y - 0.5) * cm, unicode('{:,}'.format(detalle['precio_unitario']).replace(",", ".")))
-        total_venta += int(detalle['cantidad']) * int(detalle['precio_unitario'])
-        detalle['exentas'] = int(value['exentas'])
-        p.drawString(coor.exentas_2x * cm, float(pos_y - 0.5) * cm, unicode('{:,}'.format(detalle['exentas']).replace(",", ".")))
-        if detalle['exentas'] != '':
-            exentas += int(detalle['exentas'])
-        detalle['iva_5'] = int(value['iva_5'])
-        p.drawString(coor.iva5_2x * cm, float(pos_y - 0.5) * cm, unicode('{:,}'.format(detalle['iva_5']).replace(",", ".")))
-        if detalle['iva_5'] != '':
-            iva5 += int(detalle['iva_5'])
-        detalle['iva_10'] = int(value['iva_10'])
-        p.drawString(coor.iva10_2x * cm, float(pos_y - 0.5) * cm, unicode('{:,}'.format(detalle['iva_10']).replace(",", ".")))
-        if detalle['iva_10'] != '':
-            iva10 += int(detalle['iva_10'])
-        pos_y -= 0.5
-        detalles.append(detalle)
-    cantidad = 4 - len(detalles)
-    pos_y -= (0.5 * cantidad)
-    p.drawString(coor.sub_exentas_2x * cm, float(coor.sub_exentas_2y) * cm, unicode('{:,}'.format(exentas).replace(",", ".")))
-    p.drawString(coor.sub_iva5_2x * cm, float(coor.sub_iva5_2y) * cm, unicode('{:,}'.format(iva5).replace(",", ".")))
-    p.drawString(coor.sub_iva10_2x * cm, float(coor.sub_iva10_2y) * cm, unicode('{:,}'.format(iva10).replace(",", ".")))
-    pos_y -= 0.5
-    p.drawString(coor.total_a_pagar_exentas_iva5_2x * cm, float(coor.total_a_pagar_exentas_iva5_2y) * cm, unicode('{:,}'.format(exentas+iva5).replace(",", ".")))
-    p.drawString(coor.total_venta_2x * cm, float(coor.total_venta_2y) * cm, unicode('{:,}'.format(total_venta).replace(",", ".")))
-    pos_y -= 1.5
-    numalet = num2words(int(total_venta), lang='es')
-    p.drawString(coor.total_a_pagar_letra_2x * cm, float(coor.total_a_pagar_letra_2y) * cm, unicode(numalet))
-    p.drawString(coor.total_a_pagar_num_2x * cm, float(coor.total_a_pagar_num_2y) * cm, unicode('{:,}'.format(total_venta).replace(",", ".")))
+        # cantidad
+        linea = {}
+        linea["valor"] = unicode(value['cantidad'])
+        linea["coord_x"] = int(coor.cantidad_1x * cm)
+        # linea["coord_y"] = int(coor.cantidad_1y * cm)
+        linea["coord_y"] = int((pos_x - 0.5) * cm)
+        lineas.append(linea);
+
+        linea = {}
+        linea["valor"] = unicode(value['cantidad'])
+        linea["coord_x"] = int(coor.cantidad_2x * cm)
+        # linea["coord_y"] = int(coor.cantidad_2y * cm)
+        linea["coord_y"] = int((pos_y - 0.5) * cm)
+        lineas.append(linea);
+
+        # conceptos, descripcion
+        linea = {}
+        linea["valor"] = unicode(value['concepto'])
+        linea["coord_x"] = int(coor.descripcion_1x * cm)
+        # linea["coord_y"] = int(coor.descripcion_1x * cm)
+        linea["coord_y"] = int((pos_x - 0.5) * cm)
+        lineas.append(linea);
+
+        linea = {}
+        linea["valor"] = unicode(value['concepto'])
+        linea["coord_x"] = int(coor.descripcion_2x * cm)
+        # linea["coord_y"] = int(coor.descripcion_2y * cm)
+        linea["coord_y"] = int((pos_y - 0.5) * cm)
+        lineas.append(linea);
+
+        # precios unitarios
+        linea = {}
+        linea["valor"] = unicode('{:,}'.format(int(value['precio_unitario'])))
+        linea["coord_x"] = int(coor.precio_1x * cm)
+        # linea["coord_y"] = int(coor.precio_1y * cm)
+        linea["coord_y"] = int((pos_x - 0.5) * cm)
+        lineas.append(linea);
+
+        linea = {}
+        linea["valor"] = unicode('{:,}'.format(int(value['precio_unitario'])))
+        linea["coord_x"] = int(coor.precio_2x * cm)
+        # linea["coord_y"] = int(coor.precio_2y * cm)
+        linea["coord_y"] = int((pos_y - 0.5) * cm)
+        lineas.append(linea);
+
+        # exentas
+        linea = {}
+        linea["valor"] = unicode('{:,}'.format(int(value['exentas'])))
+        linea["coord_x"] = int(coor.exentas_1x * cm)
+        # linea["coord_y"] = int(coor.exentas_1y * cm)
+        linea["coord_y"] = int((pos_x - 0.5) * cm)
+        lineas.append(linea);
+
+        linea = {}
+        linea["valor"] = unicode('{:,}'.format(int(value['exentas'])))
+        linea["coord_x"] = int(coor.exentas_2x * cm)
+        # linea["coord_y"] = int(coor.exentas_2y * cm)
+        linea["coord_y"] = int((pos_y - 0.5) * cm)
+        lineas.append(linea);
+
+        # iva 5
+        linea = {}
+        linea["valor"] = unicode('{:,}'.format(int(value['iva_5'])))
+        linea["coord_x"] = int(coor.iva5_1x * cm)
+        # linea["coord_y"] = int(coor.iva5_1y * cm)
+        linea["coord_y"] = int((pos_x - 0.5) * cm)
+        lineas.append(linea);
+
+        linea = {}
+        linea["valor"] = unicode('{:,}'.format(int(value['iva_5'])))
+        linea["coord_x"] = int(coor.iva5_2x * cm)
+        # linea["coord_y"] = int(coor.iva5_2y * cm)
+        linea["coord_y"] = int((pos_y - 0.5) * cm)
+        lineas.append(linea);
+
+        # iva 10
+        linea = {}
+        linea["valor"] = unicode('{:,}'.format(int(value['iva_10'])))
+        linea["coord_x"] = int(coor.iva10_1x * cm)
+        # linea["coord_y"] = int(coor.iva10_1y * cm)
+        linea["coord_y"] = int((pos_x - 0.5) * cm)
+        lineas.append(linea);
+
+        linea = {}
+        linea["valor"] = unicode('{:,}'.format(int(value['iva_10'])))
+        linea["coord_x"] = int(coor.iva10_2x * cm)
+        # linea["coord_y"] = int(coor.iva10_2y * cm)
+        linea["coord_y"] = int((pos_y - 0.5) * cm)
+        lineas.append(linea);
+
+        total_venta += int(value['cantidad']) * int(value['precio_unitario'])
+        if value['exentas'] != '':
+            exentas += int(value['exentas'])
+        value['iva_5'] = int(value['iva_5'])
+        # p.drawString(coor.iva5_2x * cm, float(pos_y - 0.5) * cm, unicode('{:,}'.format(value['iva_5']).replace(",", ".")))
+        if value['iva_5'] != '':
+            iva5 += int(value['iva_5'])
+        value['iva_10'] = int(value['iva_10'])
+        # p.drawString(coor.iva10_2x * cm, float(pos_y - 0.5) * cm, unicode('{:,}'.format(detalle['iva_10']).replace(",", ".")))
+        if value['iva_10'] != '':
+            iva10 += int(value['iva_10'])
+
+        pos_x += 0.5
+        pos_y += 0.5
+
     total_iva_10 = int(iva10 / 11)
     total_iva_5 = int(iva5 / 21)
     total_iva = total_iva_10 + total_iva_5
-    pos_y -= 0.5
-    p.drawString(coor.liq_iva5_2x * cm, float(coor.liq_iva5_2y) * cm, unicode('{:,}'.format(total_iva_5).replace(",", ".")))
-    p.drawString(coor.liq_iva10_2x * cm, float(coor.liq_iva10_2y) * cm, unicode('{:,}'.format(total_iva_10).replace(",", ".")))
-    p.drawString(coor.liq_total_iva_2x * cm, float(coor.liq_total_iva_2y) * cm, unicode('{:,}'.format(total_iva).replace(",", ".")))
-    # FIN SEGUNDA IMPRESION
 
-    p.showPage()
-    p.save()
+    # sub-exentas
+    linea = {}
+    # linea["valor"] = unicode(value['exentas'])
+    linea["valor"] = unicode('{:,}'.format(exentas))
+    linea["coord_x"] = int(coor.sub_exentas_1x * cm)
+    linea["coord_y"] = int(coor.sub_exentas_1y * cm)
+    lineas.append(linea);
+
+    linea = {}
+    # linea["valor"] = unicode(value['exentas'])
+    linea["valor"] = unicode('{:,}'.format(exentas))
+    linea["coord_x"] = int(coor.sub_exentas_2x * cm)
+    linea["coord_y"] = int(coor.sub_exentas_2y * cm)
+    lineas.append(linea);
+
+    # sub-iva 5
+    linea = {}
+    # linea["valor"] = unicode(value['iva_5'])
+    linea["valor"] = unicode('{:,}'.format(iva5))
+    linea["coord_x"] = int(coor.sub_iva5_1x * cm)
+    linea["coord_y"] = int(coor.sub_iva5_1y * cm)
+    lineas.append(linea);
+
+    linea = {}
+    # linea["valor"] = unicode(value['iva_5'])
+    linea["valor"] = unicode('{:,}'.format(iva5))
+    linea["coord_x"] = int(coor.sub_iva5_2x * cm)
+    linea["coord_y"] = int(coor.sub_iva5_2y * cm)
+    lineas.append(linea);
+
+    # sub-iva 10
+    linea = {}
+    # linea["valor"] = unicode(value['iva_10'])
+    linea["valor"] = unicode('{:,}'.format(iva10))
+    linea["coord_x"] = int(coor.sub_iva10_1x * cm)
+    linea["coord_y"] = int(coor.sub_iva10_1y * cm)
+    lineas.append(linea);
+
+    linea = {}
+    # linea["valor"] = unicode(value['iva_10'])
+    linea["valor"] = unicode('{:,}'.format(iva10))
+    linea["coord_x"] = unicode('{:,}'.format(int(coor.sub_iva10_2x * cm)))
+    linea["coord_y"] = unicode('{:,}'.format(int(coor.sub_iva10_2y * cm)))
+    lineas.append(linea);
+
+    # total_venta
+    linea = {}
+    linea["valor"] = unicode('{:,}'.format(iva10))
+    linea["coord_x"] = int(coor.total_venta_1x * cm)
+    linea["coord_y"] = int(coor.total_venta_1y * cm)
+    lineas.append(linea);
+
+    linea = {}
+    linea["valor"] = unicode('{:,}'.format(iva10))
+    linea["coord_x"] = int(coor.total_venta_2x * cm)
+    linea["coord_y"] = int(coor.total_venta_2y * cm)
+    lineas.append(linea);
+
+    # total_a_pagar_letra
+    numalet = num2words(int(total_venta), lang='es')
+    linea = {}
+    linea["valor"] = unicode(numalet)
+    linea["coord_x"] = int(coor.total_a_pagar_letra_1x * cm)
+    linea["coord_y"] = int(coor.total_a_pagar_letra_1y * cm)
+    lineas.append(linea);
+
+    linea = {}
+    linea["valor"] = unicode(numalet)
+    linea["coord_x"] = int(coor.total_a_pagar_letra_2x * cm)
+    linea["coord_y"] = int(coor.total_a_pagar_letra_2y * cm)
+    lineas.append(linea);
+
+    # total_a_pagar_nro
+    linea = {}
+    linea["valor"] = unicode('{:,}'.format(total_venta))
+    linea["coord_x"] = int(coor.total_a_pagar_num_1x * cm)
+    linea["coord_y"] = int(coor.total_a_pagar_num_1y * cm)
+    lineas.append(linea);
+
+    linea = {}
+    linea["valor"] = unicode('{:,}'.format(total_venta))
+    linea["coord_x"] = int(coor.total_a_pagar_num_2x * cm)
+    linea["coord_y"] = int(coor.total_a_pagar_num_2y * cm)
+    lineas.append(linea);
+
+    # total_a_pagar_exentas_iva5
+    linea = {}
+    linea["valor"] = unicode('{:,}'.format(exentas + iva5))
+    linea["coord_x"] = int(coor.total_a_pagar_exentas_iva5_1x * cm)
+    linea["coord_y"] = int(coor.total_a_pagar_exentas_iva5_1y * cm)
+    lineas.append(linea);
+
+    linea = {}
+    linea["valor"] = unicode('{:,}'.format(exentas + iva5))
+    linea["coord_x"] = int(coor.total_a_pagar_exentas_iva5_2x * cm)
+    linea["coord_y"] = int(coor.total_a_pagar_exentas_iva5_2y * cm)
+    lineas.append(linea);
+
+    # total_iva_5
+    linea = {}
+    linea["valor"] = unicode('{:,}'.format(total_iva_5))
+    linea["coord_x"] = int(coor.liq_iva5_1x * cm)
+    linea["coord_y"] = int(coor.liq_iva5_1y * cm)
+    lineas.append(linea);
+
+    linea = {}
+    linea["valor"] = unicode('{:,}'.format(total_iva_5))
+    linea["coord_x"] = int(coor.liq_iva5_2x * cm)
+    linea["coord_y"] = int(coor.liq_iva5_2y * cm)
+    lineas.append(linea);
+
+    # total_iva_10
+    linea = {}
+    linea["valor"] = unicode('{:,}'.format(total_iva_10))
+    linea["coord_x"] = int(coor.liq_iva10_1x * cm)
+    linea["coord_y"] = int(coor.liq_iva10_1y * cm)
+    lineas.append(linea);
+
+    linea = {}
+    linea["valor"] = unicode('{:,}'.format(total_iva_10))
+    linea["coord_x"] = int(coor.liq_iva10_2x * cm)
+    linea["coord_y"] = int(coor.liq_iva10_2y * cm)
+    lineas.append(linea);
+
+    # total_iva
+    linea = {}
+    linea["valor"] = unicode('{:,}'.format(total_iva))
+    linea["coord_x"] = int(coor.liq_total_iva_1x * cm)
+    linea["coord_y"] = int(coor.liq_total_iva_1y * cm)
+    lineas.append(linea);
+
+    linea = {}
+    linea["valor"] = unicode('{:,}'.format(total_iva))
+    linea["coord_x"] = int(coor.liq_total_iva_2x * cm)
+    linea["coord_y"] = int(coor.liq_total_iva_2y * cm)
+    lineas.append(linea);
+
+    response = json.dumps(({"tipoPapel": "A4",
+                           "lineas": lineas
+                           }), separators=(',', ':'))
+
+
     return response;
 
-
-def crear_JSON_print_object(nueva_factura, request, manzana, lote_id, usuario):
-
-    ejemplo = ''''{
-  "tipoPapel": "A4",
-  "lineas": [
-    {
-      "valor": "001-001-0000192",
-      "coord_x": 349,
-      "coord_y": 71
-    },
-    {
-      "valor": "40.000",
-      "coord_x": 465,
-      "coord_y": 317
-    }
-  ]
-}
-'''
-
-    return ejemplo;
 
 def obtener_cantidad_cuotas_pagadas(pago):
     

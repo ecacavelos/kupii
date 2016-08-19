@@ -396,39 +396,63 @@
 					dataType : "aplication/pdf"
 				});
 				// devuelve el pdf
-				request.done(function(msg) {
-					pdf = msg;
+				// request.done(function(msg) {
+				// 	pdf = msg;
+				// });
+				request.always(function(data) {
+					console.log("Enviando json de impresion al print manager")
+					// var string_json = JSON.stringify(data);
+					var string_json = data.responseText;
+					//var string_json = '{"paperType": "A4",  "lineas":  [  {"valor":"valorObjeto1","coord_x": 100,"coord_y": 50},{"valor":"valorObjeto2","coord_x": 200,"coord_y": 100} ]}';
+					var url_print = "";
+					if(window.location.protocol == "http:"){
+						url_print = "http://localhost:8095/TicketService/";
+					}else if(window.location.protocol == "https:"){
+						url_print = "https://localhost:8443/TicketService/";
+					}
+					var request_print = $.ajax(
+							{
+								url: url_print,
+								type: 'GET',
+								data: {
+									json_print_string: string_json,
+								}
+							});
+					request_print.success(function(data2) {
+						window.location.href = BASE_URL + redirect;
+						console.log(data2);
+					});
 				});
-				useDefaultPrinter();
-				pdf = request.responseText;
-				qz.setPaperSize("210mm", "297mm");
-				qz.appendPDF("data:application/pdf;base64,"+pdf);
-				qz.printPS();
-				timeoutID = window.setTimeout(pregunta, 5000);
-				function pregunta(){
-					if (confirm("¿Volver a Imprimir?")) {
-	        			//alert("Apretó aceptar");
-	        			//volver a hacer click en este boton
-	        			$("#imprimir_factura").trigger("click");
-	    			} else {
-	    				//ajax de marcar como impreso
-	    				var request = $.ajax({
-	    					type : "POST",
-							url : base_context+"/ajax/marcar_impresa/",
-							async: false,
-							data : {
-								csrfmiddlewaretoken : $('input[name=csrfmiddlewaretoken]').val(),
-								id_factura: $("#id_factura").val(),
-								},
-								dataType : "json"
-						});
-						request.done(function(msg) {
-							hola = msg;
-							console.log(msg);
-						});
-	    				
-	    			}	
-				}
+				// useDefaultPrinter();
+				// pdf = request.responseText;
+				// qz.setPaperSize("210mm", "297mm");
+				// qz.appendPDF("data:application/pdf;base64,"+pdf);
+				// qz.printPS();
+				// timeoutID = window.setTimeout(pregunta, 5000);
+				// function pregunta(){
+				// 	if (confirm("¿Volver a Imprimir?")) {
+	        		// 	//alert("Apretó aceptar");
+	        		// 	//volver a hacer click en este boton
+	        		// 	$("#imprimir_factura").trigger("click");
+	    			// } else {
+	    			// 	//ajax de marcar como impreso
+	    			// 	var request = $.ajax({
+	    			// 		type : "POST",
+				// 			url : base_context+"/ajax/marcar_impresa/",
+				// 			async: false,
+				// 			data : {
+				// 				csrfmiddlewaretoken : $('input[name=csrfmiddlewaretoken]').val(),
+				// 				id_factura: $("#id_factura").val(),
+				// 				},
+				// 				dataType : "json"
+				// 		});
+				// 		request.done(function(msg) {
+				// 			hola = msg;
+				// 			console.log(msg);
+				// 		});
+	    			//
+	    			// }
+				// }
 				
     			
     	});
