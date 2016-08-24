@@ -365,6 +365,39 @@ function retrieveLoteVenta() {
 	}
 };
 
+function quitarCerosFraccion(fraccion) {
+	centena = fraccion.substr(0,1);
+	decena = fraccion.substr(1,1);
+	//si la centena es cero, quito la decena y unidad
+	if (centena == 0){
+		fraccion = fraccion.substr(1,2)
+		//si la decena tb es cero, dejo solo la unidad, y como ya recorte mi fraccion, los limites de start y lenght tb cambian para la funcion del substr
+		if (decena == 0){
+			fraccion = fraccion.substr(1,1)
+		}
+	}
+	return fraccion;
+}
+
+function quitarCerosLote(lote) {
+	unidadMil = lote.substr(0,1);
+	centena = lote.substr(1,1);
+	decena = lote.substr(2,1);
+	//si la unidad de mil es cero, quito la centena, decena y unidad
+	if (unidadMil == 0){
+		lote = lote.substr(1,3)
+		//si la centena es cero, quito la decena y unida
+		if (centena == 0){
+			lote = lote.substr(1,3)
+			//si la decena tb es cero, dejo solo la unidad, y como ya recorte mi lote, los limites de start y lenght tb cambian para la funcion del substr
+			if (decena == 0){
+				lote = lote.substr(1,1)
+			}
+		}
+	}
+	return lote;
+}
+
 function calculateMontoCuotas() {
 	var res_entrega = $("#id_entrega_inicial").val();
 	var res_cuota = $("#id_monto_cuota").val();

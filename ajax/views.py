@@ -303,7 +303,36 @@ def get_lotes_a_cargar_by_manzana(request):
                 #return HttpResponseServerError('No se pudo procesar el pedido')
         else:
             return HttpResponseRedirect(reverse('login')) 
- 
+
+@require_http_methods(["GET"])
+# esta funcion carga todos los lotes de una manzana indicada, nada mas
+def get_lotes_by_manzana(request):
+    if request.method == 'GET':
+        if request.user.is_authenticated():
+            try:
+                id_manzana = request.GET['id_manzana']
+                id_fraccion = request.GET['id_fraccion']
+                print("id_manzana ->" + id_manzana);
+                print("id_fraccion ->" + id_fraccion);
+                object_list = Manzana.objects.filter(pk= id_manzana, fraccion=id_fraccion)
+                id_manzana = object_list[0].id
+                total_lotes = object_list[0].cantidad_lotes
+                nro_manzana = object_list[0].nro_manzana
+                nro_manzana = unicode(nro_manzana).zfill(3)
+                object_list2= Lote.objects.filter(manzana_id = id_manzana).order_by('codigo_paralot')
+                cantidad_encontrada = len(object_list2)
+                print("cantidad_encontrada ->" + unicode(cantidad_encontrada));
+                results =[]
+                for i in object_list2:
+                    record = {"id": i.nro_lote, "label": i.nro_lote, "nro_manzana": nro_manzana, "nro_lote": unicode(i.nro_lote).zfill(4)}
+                    results.append(record)
+                return HttpResponse(json.dumps(results), content_type="application/json")
+
+            except Exception, error:
+                print error
+                #return HttpResponseServerError('No se pudo procesar el pedido')
+        else:
+            return HttpResponseRedirect(reverse('login'))
 
 @require_http_methods(["GET"])
 def get_propietario_name_by_id(request):
@@ -423,7 +452,7 @@ def get_manzanas_by_fraccion(request):
             try:
                 fraccion_id = request.GET['fraccion_id']
                 print("fraccion_id ->" + fraccion_id);
-                object_list = Manzana.objects.filter(fraccion_id=fraccion_id)
+                object_list = Manzana.objects.filter(fraccion_id=fraccion_id).order_by('nro_manzana')
                 data=serializers.serialize('json',list(object_list)) 
                 return HttpResponse(data,content_type="application/json")
             except Exception, error:

@@ -7,6 +7,203 @@
 {% endblock %}
 
 {% block header_scripts %}
+
+<script type="text/javascript">
+    var manzanaIngresada = 0;
+    var loteIngresado = 0;
+	$(document).ready(function() {
+        base_url_fraccion = base_context + "/ajax/get_fracciones_by_name/";
+		params="value";
+        var fraccion_id;
+        params = "value";
+
+        $("#fraccion_label").change(function() {
+            if ($("#fraccion_label").val() == ''){
+				$("#id_manzana").empty();
+				$("#id_nro_lote").empty();
+				$("#id_lote").empty();
+                $("#id_lote").val('');
+            }
+        });
+
+        $("#fraccion_label").autocomplete({
+	        source : base_url_fraccion,
+	        minLength : 1,
+	        select : function(event, ui) {
+		        fraccion_id = ui.item.id;
+		        $("#fraccion").val(fraccion_id);
+                //una vez que selecciona la fraccion, debo obtener las manzanas para que elija las disponibles
+                cargarManzanas(fraccion_id);
+	        }
+        });
+
+        $( "#id_manzana" ).change(function() {
+            fraccion_id = $("#fraccion").val();
+  		    manzana_id = $( "#id_manzana" ).val();
+            //cargamos los lotes de la manzana correspondiente
+            cargarLotes(fraccion_id, manzana_id);
+        });
+
+        $( "#id_nro_lote" ).change(function() {
+	        codigo_paralot = $("#id_lote").val();
+	        codigo_paralot = codigo_paralot.substr(0,7);
+	        numero_lote = $("#id_nro_lote").val();
+	        size = numero_lote.length;
+            if (numero_lote.length == 1){
+    	        $("#id_lote").val(codigo_paralot+"/"+pad( numero_lote, size ));
+            }else{
+    	        $("#id_lote").val(codigo_paralot+"/"+padLoteDosDigitos( numero_lote, size ));
+            }
+        });
+
+	});
+
+function pad(num, size) {
+	size = size+3;
+    var s = "000" + num;
+    return s.substr(s.length-size);
+}
+
+function padFraccionUnDigito(num, size) {
+	size = size+3;
+    var s = "00" + num;
+    return s.substr(s.length-size);
+}
+function padFraccionDosDigitos(num, size) {
+	size = size+3;
+    var s = "0" + num;
+    return s.substr(s.length-size);
+}
+
+function padLoteDosDigitos(num, size) {
+{#	size = size+3;#}
+    var s = "00" + num;
+{#    return s.substr(s.length-size);#}
+    return s;
+}
+
+//cuando se ingresa el nro de lote, debemos de separar la fraccion, la manzana y el nro de lote
+function setFraccionManzanaLote() {
+    //si esta vacio o borra por ejemplo, borramos todos los demas tambien
+	if ($("#id_lote").val() == ''){
+		$("#fraccion_label").val('');
+		$("#id_manzana").empty();
+		$("#id_nro_lote").empty();
+		$("#id_nro_lote").empty();
+	}else{
+		splitted_id = $("#id_lote").val().split('/');
+		var fraccion = splitted_id[0];
+        fraccion = quitarCerosFraccion(fraccion);
+		$("#fraccion").val(fraccion);
+		var manzana = splitted_id[1];
+		var lote = splitted_id[2];
+        loteIngresado = lote;
+
+		base_url = base_context + "/ajax/get_fracciones_by_id/?term=" + fraccion;
+		params = "value";
+		var request = $.ajax({
+			url: base_url,
+			type: 'GET',
+			// data: fraccion
+		});
+        //como esta funcion ya esta hecha y retorna una lista con los posibles valores del autocomplete, el primero siempre es el correcto
+		request.success(function(data) {
+			$("#fraccion_label").val(data[0].label)
+            //cargamos la manzana correspodiente
+            cargarManzanasSetearSeleccionada(fraccion, splitted_id[1]);
+		});
+	}
+}
+
+function cargarManzanas(fraccion_id) {
+    var request_manzanas = $.ajax({
+	    url : '/ajax/get_manzanas_by_fraccion/',
+	    type : "GET",
+	    data : {
+	    fraccion_id : fraccion_id
+	    },
+	    dataType : "json"
+	});
+	$("#id_manzana").empty();
+	$("#id_manzana").append('<option value="0">Elegir Manzana</option>') ;
+    request_manzanas.done(function (data){
+	    $.each(data, function (index,value) {
+	        //$("#id_manzana").append('<option value="'+ value.id +'">' + 'Manzana ' + value.label + '</option>') ;
+	        $("#id_manzana").append('<option value="'+ value.pk +'">' + 'Manzana ' + value.fields.nro_manzana + '</option>') ;
+            if ($("#id_lote").val().length == 1){
+                $("#id_lote").val(padFraccionUnDigito($("#id_lote").val()))
+            }else if ($("#id_lote").val().length == 2){
+             $("#id_lote").val(padFraccionDosDigitos($("#id_lote").val()))
+            }else{
+                $("#id_lote").val(value.fields.fraccion);
+            }
+	    });
+	});
+}
+
+function cargarManzanasSetearSeleccionada(fraccion_id, manzana) {
+    manzanaIngresada = quitarCerosFraccion(manzana);
+    var request_manzanas = $.ajax({
+	    url : '/ajax/get_manzanas_by_fraccion/',
+	    type : "GET",
+	    data : {
+	    fraccion_id : fraccion_id
+	    },
+	    dataType : "json"
+	});
+	$("#id_manzana").empty();
+    request_manzanas.done(function (data){
+	    $.each(data, function (index,value) {
+	        $("#id_manzana").append('<option value="'+ value.pk +'">' + 'Manzana ' + value.fields.nro_manzana + '</option>') ;
+{#            if ($("#id_lote").val().length == 1){#}
+{#                $("#id_lote").val(padFraccionUnDigito($("#id_lote").val()))#}
+{#            }else if ($("#id_lote").val().length == 2){#}
+{#             $("#id_lote").val(padFraccionDosDigitos($("#id_lote").val()))#}
+{#            }else{#}
+{#                $("#id_lote").val(value.fields.fraccion);#}
+{#            }#}
+	    });
+      	//establecemos para mostrar la manzana que ingreso, buscamos el elemento por su value y le indicamos que seleccione ese
+        var val = parseInt($("#id_manzana")[0][manzanaIngresada - 1].value)
+        $("#id_manzana option[value=" + val + "]").attr('selected', 'selected');
+        //y luego cargamos los lotes de la manzana que habia ingresado e indicamos como seleccionada
+        cargarLotes(fraccion_id, $("#id_manzana").val());
+	});
+}
+
+function cargarLotes(fraccion_id, manzana_id) {
+  	var request_manzanas = $.ajax({
+        url : '/ajax/get_lotes_by_manzana/',
+	    type : "GET",
+	    data : {
+		    id_fraccion : fraccion_id,
+			id_manzana : manzana_id
+			},
+		    dataType : "json"
+        });
+		$("#id_nro_lote").empty();
+		$("#id_nro_lote").append('<option value="0">Lotes disponibles</option>') ;
+		request_manzanas.done(function (data){
+		    $.each(data, function (index,value) {
+			    $("#id_nro_lote").append('<option value="'+ value.id +'">' +value.label + '</option>') ;
+					nro_manzana = value.nro_manzana;
+				});
+            codigo_paralot = $("#id_lote").val();
+        	codigo_paralot = codigo_paralot.substr(0,3);
+            //si la persona cargo el nro de lote directo, tiene una longitud de 12, si cargo por nombre, luego manzana, falta establecer el lote en el codigo
+            if ($("#id_lote").val().length != 12) {
+    		    $("#id_lote").val(codigo_paralot+"/"+nro_manzana);
+            }
+
+       	//establecemos para mostrar la manzana que ingreso, buscamos el elemento por su value y le indicamos que seleccione ese
+            var valorLote = quitarCerosLote(loteIngresado);
+            $("#id_nro_lote option[value=" + valorLote + "]").attr('selected', 'selected');
+		});
+}
+
+</script>
+
+
 <!--
 <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}ajax_config.js"></script>
@@ -47,8 +244,27 @@ var data = [
 	{% csrf_token %}
 	<div class="fieldWrapperMovimientos">
 		<tr>
+			<td><label for="id_fraccion">Fraccion: </label></td>
+			<td class="noimage">
+                <input id="fraccion_label" type="text" name="fraccion_label" maxlength="12"/>
+                <input type="hidden" id="fraccion" name="fraccion"/></td>
+			<td><label for="id_manzana">Manzana: </label></td>
+			<td class="noimage">
+{#                <input id="manzana_label" type="text" name="manzana_label" maxlength="12"/>#}
+  				<select name="manzana" id="id_manzana" readonly="readonly">
+   					<option value="0"> Elegir</option>
+   				</select>{{ field.errors }}
+                <input type="hidden" id="manzana" name="manzana"/>
+    		<td><strong><label for="id_nro_lote">Nro lote:</label></strong></td>
+    			<td class="noimage"><select name="nro_lote" id="id_nro_lote"></select>{{ field.errors }}</td>
+                <input type="hidden" id="lote2" name="lote2"/>
+		</tr>
+
+	</div>
+	<div class="fieldWrapperMovimientos">
+		<tr>
 			<td><label for="id_lote">Lote: </label></td>
-			<td class="noimage"><input id="id_lote" type="text" name="lote" maxlength="12" onblur="retrieveLoteVenta()" />
+			<td class="noimage"><input id="id_lote" type="text" name="lote" maxlength="12" onblur="retrieveLoteVenta();setFraccionManzanaLote()" />
 			<ul class="errorlist"><li id="lote_error"></li></ul></td>
 		</tr>
 		<tr>

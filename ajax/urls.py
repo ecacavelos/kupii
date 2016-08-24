@@ -21,6 +21,7 @@ urlpatterns = patterns('ajax.views',
     
 #     url(r'^create_form_by_number/$', 'create_form_by_number', name='create_form_by_number'),
     url(r'^get_lotes_a_cargar_by_manzana/$', 'get_lotes_a_cargar_by_manzana', name='get_lotes_a_cargar_by_manzana'),
+    url(r'^get_lotes_by_manzana/$', 'get_lotes_by_manzana', name='get_lotes_by_manzana'),
     url(r'^get_cliente_id_by_name/$', 'get_cliente_id_by_name', name='get_cliente_id_by_name'),
     url(r'^get_cliente_id_by_name_or_ruc/$', 'get_cliente_id_by_name_or_ruc', name='get_cliente_id_by_name_or_ruc'), 
     url(r'^get_cliente_name_id_by_cedula/$', 'get_cliente_name_id_by_cedula', name='get_cliente_name_id_by_cedula'),
