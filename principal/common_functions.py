@@ -1273,18 +1273,18 @@ def crear_JSON_print_object(factura, request, manzana, lote_id, usuario):
 
     lineas = []
 
-    #nros de facturas
-    # linea = {}
-    # linea["valor"] = factura.numero
-    # linea["coor_x"] = int(coor.numero_1x * cm)
-    # linea["coor_y"] = int(coor.numero_1y * cm)
-    # lineas.append(linea);
-    #
-    # linea = {}
-    # linea["valor"] = factura.numero
-    # linea["coord_x"] = int(coor.numero_2x * cm)
-    # linea["coord_y"] = int(coor.numero_2y * cm)
-    # lineas.append(linea);
+    # nros de facturas
+    linea = {}
+    linea["valor"] = factura.numero
+    linea["coord_x"] = int(coor.numero_1x * cm)
+    linea["coord_y"] = int(coor.numero_1y * cm)
+    lineas.append(linea);
+
+    linea = {}
+    linea["valor"] = factura.numero
+    linea["coord_x"] = int(coor.numero_2x * cm)
+    linea["coord_y"] = int(coor.numero_2y * cm)
+    lineas.append(linea);
 
     # fechas
     linea = {}
