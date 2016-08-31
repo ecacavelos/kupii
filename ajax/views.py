@@ -824,6 +824,11 @@ def facturar(request):
             
             #Obtener observacion
             observacion = request.POST.get('observacion','')
+
+            # si es que un administrador selecciona el user
+            user = ''
+            if (request.POST.get('user', '') != ''):
+                user = User.objects.get(username=request.POST.get('user', ''))
             
             #Crear un objeto Factura y guardar            
             nueva_factura = Factura()
@@ -836,8 +841,11 @@ def facturar(request):
             nueva_factura.detalle = detalle
             nueva_factura.lote = lote_id
             nueva_factura.anulado = False
-            nueva_factura.observacion = observacion 
-            nueva_factura.usuario = request.user
+            nueva_factura.observacion = observacion
+            if user == '':
+                nueva_factura.usuario = request.user
+            else:
+                nueva_factura.usuario = user
             nueva_factura.save()
             
             #Se logea la accion del usuario

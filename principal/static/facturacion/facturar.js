@@ -22,6 +22,7 @@
 		$("#id_name_cliente").focus();
 		
 		$("#crear_factura").prop('disabled',true);
+		$("#grabar_factura").prop('disabled',true);
 		$("#submit-btn").prop('disabled',true);
 		
 		
@@ -320,6 +321,7 @@
 				$("#detalle").val(detalle);
 				$("#submit-btn").hide();
 				$("#crear_factura").hide();
+				$("#grabar_factura").hide();
 				$("#imprimir_factura").show();
 				
 				/*
@@ -340,6 +342,7 @@
     	
     	$("#crear_factura").click(function(){
 			$("#crear_factura").hide();
+			$("#grabar_factura").hide();
 			$("#submit-btn").hide();
 			//1. TODO: Hacer chequeo de que todos los valores esten correctos. 
 			if (formOk()){
@@ -376,6 +379,47 @@
 				});
 				
     			return true;		    						
+			}
+			else{
+				return false;
+			}
+    	});
+
+		$("#grabar_factura").click(function(){
+			$("#crear_factura").hide();
+			$("#grabar_factura").hide();
+			$("#submit-btn").hide();
+			//1. TODO: Hacer chequeo de que todos los valores esten correctos.
+			if (formOk()){
+				//2. Obtener el JSON del detalle
+				detalle = generarDetalleJSON();
+				$("#detalle").val(detalle);
+
+				var request = $.ajax({
+					type : "POST",
+					url : base_context+"/ajax/facturar/",
+					async: false,
+					data : {
+						csrfmiddlewaretoken : $('input[name=csrfmiddlewaretoken]').val(),
+						cliente: $("#id_cliente").val(),
+						lote: $("#lote").val(),
+						id_timbrado: $("#id-timbrado").val(),
+						nro_factura : $("#nro-factura").val(),
+						nro_factura_original : $("#nro-factura-original").val(),
+						fecha: $("#fecha").val(),
+						tipo : $("#tipo").val(),
+						detalle: $("#detalle").val(),
+						nro_cuota_desde : $("#id_nro_cuota").val(),
+						nro_cuota_hasta : $("#id_nro_cuota_hasta").val(),
+						observacion: $("#observacion").val(),
+						user: $("#user").val(),
+					},
+					dataType : "json"
+				});
+				// devuelve el pdf
+				request.done(function(msg) {
+				});
+    			return true;
 			}
 			else{
 				return false;
@@ -528,17 +572,20 @@
 					console.log('Detalle VALIDO');
 					indicador_validez = '#1C842D';
 					$("#crear_factura").prop('disabled',false);
+					$("#grabar_factura").prop('disabled',false);
 					$("#submit-btn").prop('disabled',false);
 				}
 				else{
 					detalle_valido = false;
 					$("#crear_factura").prop('disabled',true);
+					$("#grabar_factura").prop('disabled',true);
 					$("#submit-btn").prop('disabled',true);
 				}		
 			}
 			else{
 				detalle_valido = false;
 				$("#crear_factura").prop('disabled',true);
+				$("#grabar_factura").prop('disabled',true);
 				$("#submit-btn").prop('disabled',true);
 			}
 			$(this).css('background',indicador_validez);	

@@ -191,7 +191,10 @@ def facturar(request):
         if request.method == 'GET':
             #Mostrar el formulario basico de factura.            
             t = loader.get_template('facturas/facturar.html')
-            
+            # determinamos el grupo al cual pertenece el user en cuestion
+            grupo = request.user.groups.get().id
+            users = User.objects.all()
+
             ultimo_timbrado = Timbrado.objects.latest('id')
             trfu = TimbradoRangoFacturaUsuario.objects.get(usuario_id=request.user, timbrado_id = ultimo_timbrado.id)
             try: 
@@ -205,7 +208,9 @@ def facturar(request):
                 'ultima_factura': ultima_factura,
                 'ultimo_timbrado_numero': trfu.timbrado.numero,
                 'ultimo_timbrado_id': ultimo_timbrado.id,
-                                         })
+                'grupo': grupo,
+                'users': users
+            })
             return HttpResponse(t.render(c))
         else: #POST se envia el formulario.  
             print 'POST'          
