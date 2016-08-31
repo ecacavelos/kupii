@@ -215,9 +215,9 @@
 					{% else %}
 						<td> No Facturado </td>
 					{% endif %}
-					
-					<td></td>
-					<td colspan="1"><a href="/movimientos/modificar_pagocuota/{{pago.id}}"><img src="/static/custom/img/black_edit.png" /></a></td>
+
+					<td style="width: 5px;"><a href="/facturacion/facturar_operacion/1/{{pago.id}}"><img src="/static/custom/img/invoice.png" /></a></td>
+					<td style="width: 5px;"><a href="/movimientos/modificar_pagocuota/{{pago.id}}"><img src="/static/custom/img/black_edit.png" /></a></td>
 					<td><button class="eliminar_pago" value="{{pago.id}}"><img src="/static/custom/img/black_delete.png" /></button></td>
 				</tr>
 			{% endif %}

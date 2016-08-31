@@ -44,7 +44,12 @@ def facturar_operacion(request, tipo_operacion, operacion_id):
         if request.method == 'GET':
             
             t = loader.get_template('facturas/facturar_operacion.html')
-            
+
+            # determinamos el grupo al cual pertenece el user en cuestion
+            grupo = request.user.groups.get().id
+            # retornamos todos los users para que pueda seleccionar
+            users = User.objects.all()
+
             cuota_desde = ''
             cuota_hasta = ''
             
@@ -88,7 +93,9 @@ def facturar_operacion(request, tipo_operacion, operacion_id):
                     'ultimo_timbrado_id': ultimo_timbrado.id,
                     'tipo_venta': tipo_venta,
                     'precio_venta': precio_venta,
-    
+                    'grupo': grupo,
+                    'users': users,
+
                 })
             if tipo_operacion == '2': # VENTA
                 c = RequestContext(request, {
@@ -193,6 +200,7 @@ def facturar(request):
             t = loader.get_template('facturas/facturar.html')
             # determinamos el grupo al cual pertenece el user en cuestion
             grupo = request.user.groups.get().id
+            # retornamos todos los users para que pueda seleccionar
             users = User.objects.all()
 
             ultimo_timbrado = Timbrado.objects.latest('id')

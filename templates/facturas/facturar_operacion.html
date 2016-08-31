@@ -1153,6 +1153,17 @@ var descripcion = "{{descripcion}}";
 				<h5>Nro de Cuota Hasta:</h5>
 				<input id="id_nro_cuota_hasta" type="text" name="nro_cuota_hasta" placeholder="Nro Cuota Hasta" value="{{cuota_hasta}}" />
 			</div>
+            {%if grupo == 1 or grupo == 3%}
+    			<div class="item-factura-cabecera">
+	    			<h5>Usuario</h5>
+		    		<select name="user" id="user">
+                        <option value=""></option>
+                        {% for user in users %}
+							<option value={{ user.username }}>{{ user.username }}{{ field.errors }}</option>
+                        {% endfor %}
+				    </select>
+    			</div>
+            {%endif%}
 	</div>	
 	<div class="detalle_factura">
 		<h2>Detalle</h2>
@@ -1197,6 +1208,9 @@ var descripcion = "{{descripcion}}";
 		</div>
 	</div>
 <div class="clear"></div>
+   {%if grupo == 1 or grupo == 3%}
+       <input id="grabar_factura" type="button" value="Grabar" style=" margin-bottom: 10px; cursor: pointer;" />
+   {%endif%}
 <input id="crear_factura" type="button" value="Grabar e imprimir" style=" margin-bottom: 10px; cursor: pointer;" />
 <input id="submit-btn" type="submit" value="Grabar y mostrar pdf" style=" margin-bottom: 10px; cursor: pointer;" />
 <input id="imprimir_factura" type="button" value="Volver a imprimir"  style=" margin-bottom: 10px; cursor: pointer;" />
