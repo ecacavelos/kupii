@@ -25,6 +25,47 @@
 		$("#id_cedula").keyup(function() {
 			solo_numeros();
 		});
+
+
+        $("#imprimir").click(function(){
+
+            var select = document.getElementById("id_lote");
+            var lote = select.options[select.selectedIndex].text;
+    		//el ajax
+    		var request = $.ajax({
+			type : "POST",
+			url : base_context+"/ajax/imprimir_factura/",
+			async: false,
+			data : {
+				csrfmiddlewaretoken : $('input[name=csrfmiddlewaretoken]').val(),
+				lote: lote,
+				id_factura: $("#id_factura").val(),
+				},
+					dataType : "aplication/pdf"
+				});
+				request.always(function(data) {
+					console.log("Enviando json de impresion al print manager")
+					var string_json = data.responseText;
+					var url_print = "";
+					if(window.location.protocol == "http:"){
+						url_print = "http://localhost:8095/TicketService/";
+					}else if(window.location.protocol == "https:"){
+						url_print = "https://localhost:8443/TicketService/";
+					}
+					var request_print = $.ajax(
+							{
+								url: url_print,
+								type: 'GET',
+								data: {
+									json_print_string: string_json,
+								}
+							});
+					request_print.success(function(data2) {
+						window.location.href = BASE_URL + redirect;
+						console.log(data2);
+					});
+				});
+        });
 	}); 
 </script>
 {% endblock %}
@@ -49,7 +90,8 @@
 <div class="clear"></div>
 <div id="detalle-lote">
 	<div id="detalle-lote-header">
-		<h3 class="detalle-lote-header">Factura {{ factura.id }} </h3>
+		<input type="hidden" id="id_factura" name="id_factura" value="{{ factura.id }}" />
+		<h3 class="detalle-lote-header">Factura {{ factura.id }} <td style="width: 5px;" ><a input name="imprimir" id="imprimir" style="cursor: pointer;"><img src="/static/custom/img/print-icon.png" title="Imprimir Factura" /></a></td> </h3>
 	</div>
 
 	<div id="{{message_id}}">
