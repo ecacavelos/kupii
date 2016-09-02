@@ -117,7 +117,7 @@ function setFraccionManzanaLote() {
 
 function cargarManzanas(fraccion_id) {
     var request_manzanas = $.ajax({
-	    url : '/ajax/get_manzanas_by_fraccion/',
+	    url : base_context + '/ajax/get_manzanas_by_fraccion/',
 	    type : "GET",
 	    data : {
 	    fraccion_id : fraccion_id
@@ -144,7 +144,7 @@ function cargarManzanas(fraccion_id) {
 function cargarManzanasSetearSeleccionada(fraccion_id, manzana) {
     manzanaIngresada = quitarCerosFraccion(manzana);
     var request_manzanas = $.ajax({
-	    url : '/ajax/get_manzanas_by_fraccion/',
+	    url : base_context + '/ajax/get_manzanas_by_fraccion/',
 	    type : "GET",
 	    data : {
 	    fraccion_id : fraccion_id
@@ -173,7 +173,7 @@ function cargarManzanasSetearSeleccionada(fraccion_id, manzana) {
 
 function cargarLotes(fraccion_id, manzana_id) {
   	var request_manzanas = $.ajax({
-        url : '/ajax/get_lotes_by_manzana/',
+        url : base_context + '/ajax/get_lotes_by_manzana/',
 	    type : "GET",
 	    data : {
 		    id_fraccion : fraccion_id,
