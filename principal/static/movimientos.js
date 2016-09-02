@@ -54,7 +54,7 @@ function retrieveLote() {
 		// Hacemos un request POST AJAX para obtener los datos del lote ingresado.
 		var request = $.ajax({
 			type : "GET",			
-			url : "/datos/1/",
+			url : base_context + "/datos/1/",
 			data : {
 				fraccion : splitted_id[0],
 				manzana : splitted_id[1],
@@ -95,7 +95,7 @@ function retrieveCliente() {
 		// Hacemos un request POST AJAX para obtener los datos del cliente ingresado.
 		var request = $.ajax({
 			type : "GET",
-			url : "/datos/2/",
+			url : base_context + "/datos/2/",
 			data : {
 				cliente : $("#id_cliente").val()
 			}
@@ -123,7 +123,7 @@ function retrieveVendedor() {
 		// Hacemos un request POST AJAX para obtener los datos del vendedor ingresado.
 		var request = $.ajax({
 			type : "GET",
-			url : "/datos/3/",
+			url : base_context + "/datos/3/",
 			data : {
 				vendedor : $("#id_vendedor").val()
 			}
@@ -150,7 +150,7 @@ function retrieveFraccion() {
 		// Hacemos un request POST AJAX para obtener los datos del lote ingresado.
 		var request = $.ajax({
 			type : "GET",
-			url : "/datos/15/",
+			url : base_context + "/datos/15/",
 			data : {
 				fraccion : splitted_id[0],
 				manzana : splitted_id[1],
@@ -173,7 +173,7 @@ function retrievePlanPago() {
 		// Hacemos un request POST AJAX para obtener los datos del plan de pagos ingresado.
 		var request = $.ajax({
 			type : "GET",
-			url : "/datos/5/",
+			url : base_context + "/datos/5/",
 			data : {
 				plan_pago : $("#id_plan_pago").val()
 			}
@@ -240,7 +240,7 @@ function retrievePlanPagoVendedor() {
 		// Hacemos un request POST AJAX para obtener los datos del plan de pagos ingresado.
 		var request = $.ajax({
 			type : "GET",
-			url : "/datos/4/",
+			url : base_context + "/datos/4/",
 			data : {
 				plan_pago : $("#id_plan_pago_vendedores").val()
 			}
