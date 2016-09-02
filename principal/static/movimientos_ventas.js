@@ -225,7 +225,7 @@ function validateVenta() {
 		}
 		var request2 = $.ajax({
 			type : "POST",
-			url : "/movimientos/ventas_lotes/",
+			url : base_context + "/movimientos/ventas_lotes/",
 			data : {
 				ingresar_venta : true,
 				venta_lote_id : global_lote_id,
@@ -290,7 +290,7 @@ function calculatePrecioFinalVentaLote() {
 	}
 	var request = $.ajax({
 		type : "GET",
-		url : "/movimientos/ventas_lotes/calcular_cuotas/",
+		url : base_context + "/movimientos/ventas_lotes/calcular_cuotas/",
 		datatype : "json,",
 		data : {
 			calcular_cuotas : true,
@@ -326,7 +326,7 @@ function retrieveLoteVenta() {
 		// Hacemos un request POST AJAX para obtener los datos del lote ingresado.
 		var request = $.ajax({
 			type : "GET",
-			url : "/datos/12/",
+			url : base_context + "/datos/12/",
 			data : {
 				fraccion : splitted_id[0],
 				manzana : splitted_id[1],
