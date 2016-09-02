@@ -143,8 +143,9 @@ $(document).ready(function() {
       select: function( event, ui ) {
       	$("#id_manzana").attr('readonly', false);
       	fraccion_id = ui.item.id;
+        base_url2 = base_context + "/ajax/get_manzanas_by_fraccion/";
       	var request_manzanas = $.ajax({
-					url : '/ajax/get_manzanas_by_fraccion/',
+					url : base_url2,
 					type : "GET",
 					data : {
 						fraccion_id : fraccion_id
@@ -163,11 +164,11 @@ $(document).ready(function() {
       }
     });
 
-    base_url2 = base_context + "/ajax/get_lotes_a_cargar_by_manzana/";
+    base_url3 = base_context + "/ajax/get_lotes_a_cargar_by_manzana/";
     $( "#id_manzana" ).change(function() {
   		manzana_id = $( "#id_manzana" ).val();
       	var request_manzanas = $.ajax({
-					url : base_url2,
+					url : base_url3,
 					type : "GET",
 					data : {
 						id_fraccion : fraccion_id,
