@@ -128,7 +128,7 @@
     	
     	$('#id_nro_cuota').autocomplete({
 			source: function(request, response) {
-				$.getJSON("/ajax/get_pago_cuotas_by_lote_cliente/", 
+				$.getJSON(base_context+"/ajax/get_pago_cuotas_by_lote_cliente/",
 				{
 					lote_id: $("#lote").val(),
 					cliente_id: $("#id_cedula_cliente").val(),
@@ -159,7 +159,7 @@
 		
 		$('#id_nro_cuota_hasta').autocomplete({
 			source: function(request, response) {
-				$.getJSON("/ajax/get_pago_cuotas_by_lote_cliente/", 
+				$.getJSON(base_context+"/ajax/get_pago_cuotas_by_lote_cliente/",
 				{
 					lote_id: $("#lote").val(),
 					cliente_id: $("#id_cedula_cliente").val(),
@@ -215,7 +215,7 @@
 			if($("#id_nro_cuota_hasta").val() != '' && $('#id_nro_cuota').val() != ''){
 				var request = $.ajax({
 					type : "GET",
-					url : "/ajax/get_detalles_factura/",
+					url : base_context+"/ajax/get_detalles_factura/",
 					data : {
 						lote_id: $("#lote").val(),
 						cliente_id: $("#id_cliente").val(),
