@@ -162,11 +162,12 @@ $(document).ready(function() {
 			});
       }
     });
-    
+
+    base_url2 = base_context + "/ajax/get_lotes_a_cargar_by_manzana/";
     $( "#id_manzana" ).change(function() {
   		manzana_id = $( "#id_manzana" ).val();
       	var request_manzanas = $.ajax({
-					url : '/ajax/get_lotes_a_cargar_by_manzana/',
+					url : base_url2,
 					type : "GET",
 					data : {
 						id_fraccion : fraccion_id,
