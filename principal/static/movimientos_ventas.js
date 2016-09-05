@@ -246,9 +246,9 @@ function validateVenta() {
 
 		}).done(function (data) {
 			if ( $("#facturar").val() == '' ){
-				top.location.href = "/movimientos/pago_cuotas_venta/"+data[0].id;	
+				top.location.href = base_context + "/movimientos/pago_cuotas_venta/"+data[0].id;
 			} else if ( $("#facturar").val() == 'SI'  ){
-				top.location.href = "/facturacion/facturar_operacion/2/"+data[0].id;	
+				top.location.href = base_context + "/facturacion/facturar_operacion/2/"+data[0].id;
 			}
 		});
 		/*request2.done(function(msg) {

@@ -144,7 +144,7 @@ function validatePago() {
 
 	var request4 = $.ajax({
 		type : "POST",
-		url : "/movimientos/pago_cuotas/",
+		url : base_context + "/movimientos/pago_cuotas/",
 		data : {
 			ingresar_pago : true,
 			pago_venta_id : venta_id,
@@ -165,9 +165,9 @@ function validatePago() {
 	});
 	request4.done(function(msg) {
 		if ( $("#facturar").val() == 'NO' ){
-			top.location.href = "/movimientos/pago_cuotas";	
+			top.location.href = base_context + "/movimientos/pago_cuotas";
 		} else if ( $("#facturar").val() == 'SI' ){
-			top.location.href = "/facturacion/facturar_operacion/1/"+msg[0].id;	
+			top.location.href = base_context + "/facturacion/facturar_operacion/1/"+msg[0].id;
 		}
 		
 		
@@ -197,7 +197,7 @@ function retrieveLote() {
 		// Hacemos un request POST AJAX para obtener los datos del lote ingresado.
 		var request = $.ajax({
 			type : "GET",
-			url : "/datos/1/",
+			url : base_context + "/datos/1/",
 			data : {
 				fraccion : splitted_id[0],
 				manzana : splitted_id[1],
@@ -246,7 +246,7 @@ function retrieveLotePago() {
 		// Hacemos un request POST AJAX para obtener los datos del lote ingresado.
 		var request = $.ajax({
 			type : "GET",
-			url : "/datos/9/",
+			url : base_context + "/datos/9/",
 			data : {
 				fraccion : splitted_id[0],
 				manzana : splitted_id[1],
@@ -259,7 +259,7 @@ function retrieveLotePago() {
 		request.done(function(msg) {
 			global_lote_id = msg.lote_id;
 			//var s = "<a class='boton-verde' href=\"/lotes/listado/" + msg.lote_id + "\" target=\"_blank\" \">" + msg.lote_tag + "</a>";
-			var s = "<a class='boton-verde' href=\"/informes/informe_movimientos/?lote_ini=" + $("#id_lote").val() +"\&lote_fin="+ $("#id_lote").val() +"\&fecha_ini=&fecha_fin="  + "\" target=\"_blank\" \"> Ver Pagos</a>";
+			var s = "<a class='boton-verde' href= \"/informes/informe_movimientos/?lote_ini=" + $("#id_lote").val() +"\&lote_fin="+ $("#id_lote").val() +"\&fecha_ini=&fecha_fin="  + "\" target=\"_blank\" \"> Ver Pagos</a>";
 			$("#lote_error").html("");
 			$("#lote_superficie").html(msg.superficie);			
 			$("#lote_seleccionado_detalles").html(s);
@@ -295,7 +295,7 @@ function retrieveLotePago() {
 function retrieveVenta() {
 		var request = $.ajax({
 			type : "GET",
-			url : "/ajax/get_ventas_by_lote/",
+			url : base_context + "/ajax/get_ventas_by_lote/",
 			data : {
 				lote_id : lote_id
 			},
@@ -359,7 +359,7 @@ function calcularInteres() {
 	var nro_cuotas_a_pagar = $('#nro_cuotas_a_pagar').val();
 	 	var request = $.ajax({
 			type : "POST",
-			url : "/movimientos/calcular_interes/",
+			url : base_context + "/movimientos/calcular_interes/",
 			data : {
 				lote_id : lote_id,
 				fecha_pago : fecha_pago,
@@ -496,7 +496,7 @@ function retrieveCliente() {
 		var request = $.ajax({
 			type : "GET",
 			
-			url : "/datos/2/",
+			url : base_context + "/datos/2/",
 			data : {
 				cliente : $("#id_cliente").val()
 			}
@@ -520,7 +520,7 @@ function retrieveVendedor() {
 		// Hacemos un request POST AJAX para obtener los datos del vendedor ingresado.
 		var request = $.ajax({
 			type : "GET",
-			url : "/datos/3/",
+			url : base_context + "/datos/3/",
 			data : {
 				vendedor : $("#id_vendedor").val()
 			}
@@ -544,7 +544,7 @@ function retrievePlanPagoVendedor() {
 		// Hacemos un request POST AJAX para obtener los datos del plan de pagos ingresado.
 		var request = $.ajax({
 			type : "GET",
-			url : "/datos/4/",
+			url : base_context + "/datos/4/",
 			data : {
 				plan_pago_vendedor : $("#id_plan_pago_vendedores").val()
 			}
@@ -575,7 +575,7 @@ function retrievePlanPago() {
 		// Hacemos un request POST AJAX para obtener los datos del plan de pagos ingresado.
 		var request = $.ajax({
 			type : "GET",
-			url : "/datos/5/",
+			url : base_context + "/datos/5/",
 			data : {
 				plan_pago : $("#id_plan_pago").val()
 			}
@@ -634,7 +634,7 @@ function calculateTotalPago() {
 function calculateMesPago() {
 	var request = $.ajax({
 			type : "GET",
-			url : "/ajax/get_mes_pagado_by_id_lote/",
+			url : base_context + "/ajax/get_mes_pagado_by_id_lote/",
 			data : {
 				lote_id : lote_id,
 				cant_cuotas : $("#nro_cuotas_a_pagar").val()
