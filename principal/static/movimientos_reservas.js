@@ -69,7 +69,7 @@ function validateReserva() {
 		}
 	});
 	request3.done(function(msg) {
-		top.location.href = "/movimientos/listado_reservas";
+		top.location.href = base_context + "/movimientos/listado_reservas";
 	});
 	request3.fail(function(jqXHR, textStatus) {
 		alert("Se encontró un error en la reserva, favor verifique los datos");
