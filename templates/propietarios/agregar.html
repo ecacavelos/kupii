@@ -54,7 +54,7 @@ $(document).ready(function() {
       	$("#id_manzana").attr('readonly', false);
       	fraccion_id = ui.item.id;
       	var request_manzanas = $.ajax({
-					url : '/ajax/get_manzanas_by_fraccion/',
+					url : base_context + '/ajax/get_manzanas_by_fraccion/',
 					type : "GET",
 					data : {
 						fraccion_id : fraccion_id

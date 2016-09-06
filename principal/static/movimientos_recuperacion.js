@@ -56,7 +56,7 @@ function validateRecuperacion() {
 
 	var request7 = $.ajax({
 		type : "POST",
-		url : "/movimientos/recuperacion_lotes/",
+		url : base_context + "/movimientos/recuperacion_lotes/",
 		data : {
 			recuperar_lote : true,
 			recuperacion_lote_id : global_lote_id,
@@ -68,7 +68,7 @@ function validateRecuperacion() {
 		}
 	});
 	request7.done(function(msg) {
-		top.location.href = "/lotes/listado_busqueda_lotes/"+global_lote_id+"/";
+		top.location.href = base_context + "/lotes/listado_busqueda_lotes/"+global_lote_id+"/";
 	});
 	request7.fail(function(jqXHR, textStatus) {
 		alert("Se encontró un error en la recuperacion, favor verifique los datos");
@@ -143,7 +143,7 @@ function retrieveLote() {
 function retrieveVenta() {
 		var request = $.ajax({
 			type : "GET",
-			url : "/ajax/get_ventas_by_lote/",
+			url : base_context + "/ajax/get_ventas_by_lote/",
 			data : {
 				lote_id : lote_id
 			},
@@ -182,7 +182,7 @@ function retrieveCliente() {
 		// Hacemos un request POST AJAX para obtener los datos del cliente ingresado.
 		var request = $.ajax({
 			type : "GET",
-			url : "/datos/2/",
+			url : base_context + "/datos/2/",
 			data : {
 				cliente : $("#id_cliente").val()
 			}
@@ -208,7 +208,7 @@ function retrieveVendedor() {
 		// Hacemos un request POST AJAX para obtener los datos del vendedor ingresado.
 		var request = $.ajax({
 			type : "GET",
-			url : "/datos/3/",
+			url : base_context + "/datos/3/",
 			data : {
 				vendedor : $("#id_vendedor").val()
 			}
@@ -234,7 +234,7 @@ function retrievePlanPago() {
 		// Hacemos un request POST AJAX para obtener los datos del plan de pagos ingresado.
 		var request = $.ajax({
 			type : "GET",
-			url : "/datos/5/",
+			url : base_context + "/datos/5/",
 			data : {
 				plan_pago : $("#id_plan_pago").val()
 			}
@@ -258,7 +258,7 @@ function retrievePagos() {
 	//if ($("#lote_id").val().toString().length > 0) {
 		var request = $.ajax({
 			type : "GET",
-			url : "/ajax/get_pagos_by_venta/",
+			url : base_context + "/ajax/get_pagos_by_venta/",
 			data : {
 				venta_id : venta_id
 			},

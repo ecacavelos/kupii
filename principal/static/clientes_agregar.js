@@ -9,7 +9,7 @@ $(document).ready(function() {
 function retrieveCedula() {
 	if ($("#id_cedula").val().toString().length > 0) {
 		var request_cliente = $.ajax({
-			url : '/datos/16',
+			url : base_context + '/datos/16',
 			type : "GET",
 			data : {
 				cedula : $("#id_cedula").val()
