@@ -60,7 +60,7 @@ function validateReserva() {
 
 	var request3 = $.ajax({
 		type : "POST",
-		url : "/movimientos/reservas_lotes/",
+		url : base_context + "/movimientos/reservas_lotes/",
 		data : {
 			ingresar_reserva : true,
 			reserva_lote_id : global_lote_id,
@@ -86,7 +86,7 @@ function retrieveLoteReservas() {
 		// Hacemos un request POST AJAX para obtener los datos del lote ingresado.
 		var request = $.ajax({
 			type : "GET",			
-			url : "/datos/1/",
+			url : base_context + "/datos/1/",
 			data : {
 				fraccion : splitted_id[0],
 				manzana : splitted_id[1],
