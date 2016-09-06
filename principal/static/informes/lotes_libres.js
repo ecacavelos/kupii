@@ -126,7 +126,7 @@ function obtener_fracciones_de_sucursal() {
             // Obtenemos por medio de un AJAX la lista de fracciones de una sucursal
 		var request = $.ajax({
 			type : "GET",
-			url : "/ajax/get_fracciones_by_sucursal/",
+			url : base_context + "/ajax/get_fracciones_by_sucursal/",
 			data : {
 				sucursal : $('#select_sucursal').val(),
 			},
@@ -169,7 +169,7 @@ function carga_inicial_de_fracciones_segun_filtros(){
         // Obtenemos por medio de un AJAX la lista de fracciones de una sucursal
 		var request = $.ajax({
 			type : "GET",
-			url : "/ajax/get_fracciones_by_sucursal/",
+			url : base_context + "/ajax/get_fracciones_by_sucursal/",
 			data : {
 				sucursal : $('#select_sucursal').val(),
 			},
