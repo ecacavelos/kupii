@@ -74,7 +74,7 @@ function validateCambio() {
 
 	var request6 = $.ajax({
 		type : "POST",
-		url : "/movimientos/cambio_lotes/",
+		url : base_context + "/movimientos/cambio_lotes/",
 		data : {
 			realizar_cambio : true,
 			cambio_cliente_id : $("#id_cliente").val(),
@@ -85,7 +85,7 @@ function validateCambio() {
 		}
 	});
 	request6.done(function(msg) {
-		top.location.href = "/movimientos/listado_cambios";
+		top.location.href = base_context + "/movimientos/listado_cambios";
 	});
 	request6.fail(function(jqXHR, textStatus) {
 		alert("Se encontró un error en el cambio, favor verifique los datos");
@@ -100,7 +100,7 @@ function retrieveCliente() {
 		// Hacemos un request POST AJAX para obtener los datos del cliente ingresado.
 		var request = $.ajax({
 			type : "GET",
-			url : "/datos/2/",
+			url : base_context + "/datos/2/",
 			data : {
 				cliente : $("#id_cliente").val()
 			}
@@ -133,7 +133,7 @@ function retrieveLoteCambio() {
 		// Hacemos un request POST AJAX para obtener los datos del lote ingresado.
 		var request = $.ajax({
 			type : "GET",			
-			url : "/datos/11/",
+			url : base_context + "/datos/11/",
 			data : {
 				fraccion : splitted_id[0],
 				manzana : splitted_id[1],
@@ -172,7 +172,7 @@ function retrieveLoteCambio() {
 function retrieveVenta() {
 		var request = $.ajax({
 			type : "GET",
-			url : "/ajax/get_ventas_by_lote/",
+			url : base_context + "/ajax/get_ventas_by_lote/",
 			data : {
 				lote_id : lote_id,
 			},
@@ -197,7 +197,7 @@ function retrieveVenta() {
 function retrievePagos() {
 		var request = $.ajax({
 			type : "GET",
-			url : "/ajax/get_pagos_by_venta/",
+			url : base_context + "/ajax/get_pagos_by_venta/",
 			data : {
 				venta_id : venta_id,
 			},
@@ -220,7 +220,7 @@ function retrieveLote2() {
 		// Hacemos un request POST AJAX para obtener los datos del lote ingresado.
 		var request = $.ajax({
 			type : "GET",			
-			url : "/datos/1/",
+			url : base_context + "/datos/1/",
 			data : {
 				fraccion : splitted_id[0],
 				manzana : splitted_id[1],

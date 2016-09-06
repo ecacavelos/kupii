@@ -61,7 +61,7 @@ function validateTransferencia() {
 
 	var request5 = $.ajax({
 		type : "POST",
-		url : "/movimientos/transferencias_lotes/",
+		url : base_context + "/movimientos/transferencias_lotes/",
 		data : {
 			ingresar_transferencia : true,
 			transferencia_lote_id : global_lote_id,
@@ -74,7 +74,7 @@ function validateTransferencia() {
 		}
 	});
 	request5.done(function(msg) {
-		top.location.href = "/movimientos/listado_transferencias";
+		top.location.href = base_context + "/movimientos/listado_transferencias";
 	});
 	request5.fail(function(jqXHR, textStatus) {
 		alert("Se encontró un error en la transferencia, favor verifique los datos");
@@ -91,7 +91,7 @@ function retrieveLote() {
 		// Hacemos un request POST AJAX para obtener los datos del lote ingresado.
 		var request = $.ajax({
 			type : "GET",
-			url : "/datos/11/",
+			url : base_context + "/datos/11/",
 			data : {
 				fraccion : splitted_id[0],
 				manzana : splitted_id[1],
@@ -131,7 +131,7 @@ function retrieveVenta() {
 	//if ($("#lote_id").val().toString().length > 0) {
 		var request = $.ajax({
 			type : "GET",
-			url : "/ajax/get_ventas_by_lote/",
+			url : base_context + "/ajax/get_ventas_by_lote/",
 			data : {
 				lote_id : lote_id,
 			},
@@ -154,7 +154,7 @@ function retrieveCliente() {
 		// Hacemos un request POST AJAX para obtener los datos del cliente ingresado.
 		var request = $.ajax({
 			type : "GET",
-			url : "/datos/2/",
+			url : base_context + "/datos/2/",
 			data : {
 				cliente : $("#id_cliente").val()
 			}
