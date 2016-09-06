@@ -72,7 +72,7 @@
 			var id_venta = this.value;
 			var request = $.ajax({
 				type : "POST",
-				url : "/movimientos/eliminar_venta/",
+				url : base_context + "/movimientos/eliminar_venta/",
 				data : {
 					venta_id : id_venta,
 				},
@@ -92,7 +92,7 @@
 			var id_pago = this.value;
 			var request = $.ajax({
 				type : "POST",
-				url : "/movimientos/eliminar_pagodecuotas/",
+				url : base_context + "/movimientos/eliminar_pagodecuotas/",
 				data : {
 					id_pago : id_pago,
 				},
