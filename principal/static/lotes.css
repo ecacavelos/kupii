@@ -257,19 +257,37 @@ table.listado-lotes tr td.last {
 		text-align: center;
 		color:#006633;
 	}
-	
+	#id_manzana {
+    	font-size: 10px !important;
+    	padding: 2px !important;
+		font-weight:400 !important;
+		background-color:#fff !important;
+		-webkit-box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3) !important;
+        box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3) !important;
+		border:thin #CCC solid !important;
+	}
+
 	#id_manzana {
 		background-color: #FFFFFF;
     	border: thin solid #CCCCCC;
     	box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3) inset;
-    	font-size: 13px;
+    	font-size: 10px;
     	font-weight: 400;
     	padding-left: 60px;
     	padding-top: 5px;
     	padding-bottom: 5px;
-    	
 	}
-	
+
+	/*#id_manzana {*/
+        /*font-size: 10px;*/
+        /*padding: 2px;*/
+        /*font-weight:400;*/
+		/*background-color:#fff;*/
+		/*-webkit-box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3);*/
+        /*box-shadow: inset 0px 0px 5px 0px rgba(0, 0, 0, 0.3);*/
+		/*border:thin #CCC solid;*/
+	/*}*/
+
 	#id_estado {
 		background-color: #FFFFFF;
     	border: thin solid #CCCCCC;
