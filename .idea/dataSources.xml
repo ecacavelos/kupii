@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="DataSourceManagerImpl" format="xml" hash="1225062599">
-    <data-source source="LOCAL" name="Django default" uuid="8983bb82-c9c8-44cb-81f4-7dfc3f8d92b5">
+  <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
+    <data-source source="LOCAL" name="propar_19072016" uuid="8983bb82-c9c8-44cb-81f4-7dfc3f8d92b5">
       <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
       <imported>true</imported>
       <remarks>$PROJECT_DIR$/propar01/settings.py</remarks>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
-      <jdbc-url>jdbc:postgresql://192.168.50.51:5432/propar_prod_02062016</jdbc-url>
+      <jdbc-url>jdbc:postgresql://192.168.50.51:5432/propar_19072016</jdbc-url>
       <explain-plan-config>
         <provider>com.intellij.database.plan.ExplainPlanProvider.NullExplainPlanProvider</provider>
       </explain-plan-config>
