@@ -524,6 +524,17 @@ def obtener_clientes_atrasados(filtros,fraccion, meses_peticion):
                 (float(cantidad_cuotas_pagadas) / float(detalle_cuotas['cantidad_total_cuotas'])) * 100);
             cliente_atrasado['porc_pagado'] = unicode('{:,}'.format(int(porcentaje_pagado))).replace(",", ".") + '%'
 
+            proximo_vencimiento_parsed = datetime.datetime.strptime(detalle_cuotas['proximo_vencimiento'], "%d/%m/%Y").date()
+            detalles = obtener_detalle_interes_lote(unicode(ultima_venta.lote_id),hoy,proximo_vencimiento_parsed, cuotas_atrasadas)
+            total_interes = 0
+            total_cobranza = 0
+            for detalle in detalles:
+                if 'intereses' in detalle:
+                    total_interes += detalle['intereses']
+                if 'gestion_cobranza' in detalle:
+                    total_cobranza =  detalle['gestion_cobranza']
+            cliente_atrasado['intereses'] = unicode('{:,}'.format(total_interes)).replace(",", ".")
+            cliente_atrasado['gestion_cobranza'] = unicode('{:,}'.format(total_cobranza)).replace(",", ".")
             clientes_atrasados.append(cliente_atrasado)
 
     return clientes_atrasados
