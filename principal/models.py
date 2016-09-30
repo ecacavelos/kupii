@@ -106,6 +106,45 @@ class ConceptoFactura(models.Model):
             ('ver_opciones_concepto_factura', 'Ver opciones de conceptos de factura'),
         )
 
+
+class PlanDePago(models.Model):
+    nombre_del_plan = models.CharField(max_length=255)
+    TIPO_CHOICES = (
+        ("contado", "Contado"),
+        ("credito", "Credito"),
+    )
+    tipo_de_plan = models.CharField(max_length=7, choices=TIPO_CHOICES)
+    cantidad_de_cuotas = models.IntegerField(blank=True, null=True)
+    porcentaje_inicial_inmobiliaria = models.FloatField()
+    cantidad_cuotas_inmobiliaria = models.IntegerField()
+    inicio_cuotas_inmobiliaria = models.IntegerField()
+    intervalos_cuotas_inmobiliaria = models.IntegerField()
+    porcentaje_cuotas_inmobiliaria = models.FloatField()
+    porcentaje_cuotas_administracion = models.FloatField()
+    porcentaje_inicial_gerente = models.FloatField()
+    cantidad_cuotas_gerente = models.IntegerField()
+    inicio_cuotas_gerente = models.IntegerField()
+    intervalos_cuotas_gerente = models.IntegerField()
+    porcentaje_cuotas_gerente = models.FloatField()
+    monto_fijo_cuotas_gerente = models.IntegerField()
+    cuotas_de_refuerzo = models.IntegerField()
+    intervalo_cuota_refuerzo = models.IntegerField(blank=True, null=True)
+    def __unicode__(self):
+        return (self.nombre_del_plan)
+
+    def as_json(self):
+        return dict(
+            label=self.nombre_del_plan,
+            id=self.id)
+
+    class Meta:
+        verbose_name_plural = "planes de pago"
+        permissions = (
+            ('ver_listado_plandepago', 'Ver listado de planes de pago'),
+            ('ver_opciones_plandepago', 'Ver opciones de planes de pago'),
+        )
+
+
 class Fraccion(models.Model):
     id=models.IntegerField(primary_key=True)
     nombre = models.CharField(max_length=255)
@@ -119,6 +158,7 @@ class Fraccion(models.Model):
     fecha_aprobacion = models.DateField('fecha de aprobacion', blank=True, null=True)
     superficie_total = models.DecimalField(max_digits=8, decimal_places=2, blank=True, null=True)
     sucursal = models.ForeignKey(Sucursal, on_delete=models.PROTECT)
+    plan_pago = models.ForeignKey(PlanDePago, on_delete=models.PROTECT)
     def __unicode__(self):
         return u'%s' % (self.nombre)
     class Meta:
@@ -153,33 +193,6 @@ class Manzana(models.Model):
             label=self.nro_manzana, 
             id=self.id)
         
-        
-class Vendedor(models.Model):
-    nombres = models.CharField(max_length=255)
-    apellidos = models.CharField(max_length=255)
-    # fecha_nacimiento = models.DateField('fecha de nacimiento')    
-    cedula = models.CharField(unique=True,max_length=10, blank=False, null=False)
-    # ruc = models.CharField(max_length=255)
-    direccion = models.CharField('direccion del vendedor', max_length=255)
-    telefono = models.CharField(max_length=255)
-    celular_1 = models.CharField(max_length=255, blank=True)
-    # celular_2 = models.CharField(max_length=255, blank=True)
-    fecha_ingreso = models.DateField('fecha de ingreso')
-    sucursal = models.CharField(max_length=255)
-    def __unicode__(self):
-        return unicode(u'%s %s' % (self.nombres, self.apellidos))
-    class Meta:
-        verbose_name_plural = "vendedores"
-        permissions = (
-            ('ver_listado_vendedores', 'Ver listado de vendedores'),
-            ('ver_opciones_vendedor', 'Ver opciones de vendedores'),
-        )
-    def as_json(self):
-        return dict(
-            label= self.nombres + ' ' + self.apellidos,
-            cedula = self.cedula,
-            id=self.id)
-
 class PlanDePagoVendedor(models.Model):
     nombre = models.CharField(max_length=255)
     TIPO_CHOICES = (
@@ -201,11 +214,39 @@ class PlanDePagoVendedor(models.Model):
             ('ver_listado_plandepagovendedores', 'Ver listado de plan de pago vendedores'),
             ('ver_opciones_plandepagovendedor', 'Ver opciones de plan de pago vendedores'),
         )
-    
+
     def as_json(self):
         return dict(
             label= self.nombre,
-            id=self.id)        
+            id=self.id)
+
+class Vendedor(models.Model):
+    nombres = models.CharField(max_length=255)
+    apellidos = models.CharField(max_length=255)
+    # fecha_nacimiento = models.DateField('fecha de nacimiento')    
+    cedula = models.CharField(unique=True,max_length=10, blank=False, null=False)
+    # ruc = models.CharField(max_length=255)
+    direccion = models.CharField('direccion del vendedor', max_length=255)
+    telefono = models.CharField(max_length=255)
+    celular_1 = models.CharField(max_length=255, blank=True)
+    # celular_2 = models.CharField(max_length=255, blank=True)
+    fecha_ingreso = models.DateField('fecha de ingreso')
+    sucursal = models.CharField(max_length=255)
+    plan_vendedor = models.ForeignKey(PlanDePagoVendedor, on_delete=models.PROTECT)
+    def __unicode__(self):
+        return unicode(u'%s %s' % (self.nombres, self.apellidos))
+    class Meta:
+        verbose_name_plural = "vendedores"
+        permissions = (
+            ('ver_listado_vendedores', 'Ver listado de vendedores'),
+            ('ver_opciones_vendedor', 'Ver opciones de vendedores'),
+        )
+    def as_json(self):
+        return dict(
+            label= self.nombres + ' ' + self.apellidos,
+            cedula = self.cedula,
+            id=self.id)
+
 
 class Cobrador(models.Model):
     nombres = models.CharField(max_length=255)
@@ -228,43 +269,6 @@ class Cobrador(models.Model):
         )
 
 
-class PlanDePago(models.Model):
-    nombre_del_plan = models.CharField(max_length=255)
-    TIPO_CHOICES = (
-        ("contado", "Contado"),
-        ("credito", "Credito"),
-    )
-    tipo_de_plan = models.CharField(max_length=7, choices=TIPO_CHOICES)
-    cantidad_de_cuotas = models.IntegerField(blank=True, null=True)
-    porcentaje_inicial_inmobiliaria = models.FloatField()
-    cantidad_cuotas_inmobiliaria = models.IntegerField()
-    inicio_cuotas_inmobiliaria = models.IntegerField()
-    intervalos_cuotas_inmobiliaria = models.IntegerField()
-    porcentaje_cuotas_inmobiliaria = models.FloatField()
-    porcentaje_cuotas_administracion = models.FloatField()
-    porcentaje_inicial_gerente = models.FloatField()
-    cantidad_cuotas_gerente = models.IntegerField()
-    inicio_cuotas_gerente = models.IntegerField()
-    intervalos_cuotas_gerente = models.IntegerField()
-    porcentaje_cuotas_gerente = models.FloatField()
-    monto_fijo_cuotas_gerente = models.IntegerField()
-    cuotas_de_refuerzo = models.IntegerField()
-    intervalo_cuota_refuerzo = models.IntegerField(blank=True, null=True)
-    def __unicode__(self):
-        return (self.nombre_del_plan)
-    
-    def as_json(self):
-        return dict(
-            label=self.nombre_del_plan,
-            id=self.id)
-    
-    class Meta:
-        verbose_name_plural = "planes de pago"
-        permissions = (
-            ('ver_listado_plandepago', 'Ver listado de planes de pago'),
-            ('ver_opciones_plandepago', 'Ver opciones de planes de pago'),
-        )
-        
 class Lote(models.Model):
     codigo_paralot = models.CharField(max_length=20,blank=True, null=True)
     nro_lote = models.IntegerField()    

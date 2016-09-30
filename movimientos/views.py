@@ -38,7 +38,8 @@ def ventas_de_lotes(request):
     if request.user.is_authenticated():
         if verificar_permisos(request.user.id, permisos.ADD_VENTA):
             t = loader.get_template('movimientos/ventas_lotes.html')
-        
+            grupo= request.user.groups.get().id
+
             if request.method == 'POST':
                 data = request.POST
                 lote_id = data.get('venta_lote_id', '') 
@@ -139,6 +140,7 @@ def ventas_de_lotes(request):
                 object_list = Lote.objects.none()
             c = RequestContext(request, {
                 'object_list': object_list,
+                'grupo': grupo
             })
             # c.update(csrf(request))
             return HttpResponse(t.render(c))

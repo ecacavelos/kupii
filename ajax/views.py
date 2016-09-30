@@ -937,3 +937,42 @@ def imprimir_factura(request):
     else:
         return HttpResponseRedirect(reverse('login'))  
         
+def get_plan_vendedor(request):
+    if request.method == 'GET':
+        if request.user.is_authenticated():
+            try:
+                id_vendedor = request.GET['id_vendedor']
+                print("id_vendedor ->" + id_vendedor);
+                vendedor = Vendedor.objects.get(id = id_vendedor)
+                if hasattr(vendedor, 'plan_vendedor'):
+                    plan_vendedor = vendedor.plan_vendedor
+                    object_list = PlanDePagoVendedor.objects.filter(id=plan_vendedor.id)
+                    labels = ["nombre"]
+                    return HttpResponse(json.dumps(custom_json(object_list, labels), cls=DjangoJSONEncoder),
+                                        content_type="application/json")
+                else:
+                    return False
+            except Exception, error:
+                print error
+        else:
+            return HttpResponseRedirect(reverse('login'))
+
+def get_plan_pago_fraccion(request):
+    if request.method == 'GET':
+        if request.user.is_authenticated():
+            try:
+                id_fraccion = request.GET['id_fraccion']
+                print("id_fraccion ->" + id_fraccion);
+                fraccion = Fraccion.objects.get(id = id_fraccion)
+                if hasattr(fraccion, 'plan_pago'):
+                    plan_pago = fraccion.plan_pago
+                    object_list = PlanDePago.objects.filter(id=plan_pago.id)
+                    label = ["nombre_del_plan"]
+                    return HttpResponse(json.dumps(custom_json(object_list, label), cls=DjangoJSONEncoder),
+                                        content_type="application/json")
+                else:
+                    return False
+            except Exception, error:
+                print error
+        else:
+            return HttpResponseRedirect(reverse('login'))

@@ -8,10 +8,34 @@ $(document).ready(function() {
 	$("#main_venta_form").submit(validateVenta);
 
 	$('.grid_6').hide();
+	$('#id_fecha').val(getCurrentDate());
 	$('#id_fecha').mask('##/##/####');
-	$("#id_fecha").datepicker({
-		dateFormat : 'dd/mm/yy'
-	});
+	
+	if(grupo != "2"){
+		$("#id_fecha").datepicker({
+			closeText : 'Cerrar',
+			prevText : '<Ant',
+			nextText : 'Sig>',
+			monthNames : ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+			monthNamesShort : ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+			dayNames : ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
+			dayNamesShort : ['Dom', 'Lun', 'Mar', 'Mié', 'Juv', 'Vie', 'Sáb'],
+			dayNamesMin : ['Do', 'Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sá'],
+			weekHeader : 'Sm',
+			dateFormat : 'dd/mm/yy',
+			firstDay : 1,
+			isRTL : false,
+			showMonthAfterYear : false,
+			yearSuffix : ''
+		});
+	}else{
+		$("#id_fecha").prop('readonly', true);
+		$("#id_plan_p").prop('readonly', true);
+		$("#id_plan_pv").prop('readonly', true);
+		$("#id_precio_venta").prop('readonly', true);
+	}
+
+
 	$('#id_fecha_venta2').mask('##/##/####');
 	$("#id_fecha_venta2").datepicker({
 		dateFormat : 'dd/mm/yy'
@@ -63,7 +87,6 @@ $(document).ready(function() {
 			$("#id_cedula_cliente").val(cedula_cliente);
 			name_cliente=ui.item.nombres+" "+ui.item.apellidos;
 			$("#id_name_cliente").val(name_cliente);
-
 		}
 	});
 		
@@ -114,6 +137,7 @@ $(document).ready(function() {
 			$("#id_cedula_vendedor").val(cedula_vendedor);
 			name_vendedor=ui.item.nombres+" "+ui.item.apellidos;
 			$("#id_name_vendedor").val(name_vendedor);
+			setearPlanVendedor(id_vendedor);
 		}
 	});
 		
@@ -138,6 +162,7 @@ $(document).ready(function() {
 			$("#id_cedula_vendedor").val(cedula_vendedor);
 			name_vendedor=ui.item.nombres+" "+ui.item.apellidos;
 			$("#id_name_vendedor").val(name_vendedor);
+			setearPlanVendedor(id_vendedor);
 		}
 	});
 	
@@ -181,6 +206,24 @@ $(document).ready(function() {
 	
 
 });
+
+function getCurrentDate(){
+	var today = new Date();
+	var dd = today.getDate();
+	var mm = today.getMonth()+1; //January is 0!
+	var yyyy = today.getFullYear();
+
+	if(dd<10) {
+	    dd='0'+dd;
+	}
+
+	if(mm<10) {
+	    mm='0'+mm;
+	}
+
+	today = dd+ '/'+mm+'/'+yyyy;
+	return today;
+}
 
 window.onload = function() {
 };
@@ -356,7 +399,8 @@ function retrieveLoteVenta() {
 				$("#lote_error").html("El Lote fue vendido.");
 			}else{
 				$("#lote_error").html("El Lote no existe.");
-			}						
+			}
+			buscar_plan_pago_fraccion();
 		});
 	} else {
 		if ($("#id_lote").val().toString().length > 0) {
@@ -364,6 +408,46 @@ function retrieveLoteVenta() {
 		}
 	}
 };
+
+function setearPlanVendedor(id_vendedor) {
+	var request = $.ajax({
+		type : "GET",
+		url : base_context + "/ajax/get_plan_vendedor/",
+		datatype : "json,",
+		data : {
+				id_vendedor : id_vendedor,
+			}
+		});
+	request.complete(function(msg) {
+		if (msg.status != 500) {
+			$("#id_plan_pv").val(msg.responseJSON[0].nombre);
+			$("#id_plan_pago_vendedores").val(msg.responseJSON[0].id);
+		}
+	});
+}
+
+
+function buscar_plan_pago_fraccion() {
+	var request = $.ajax({
+		type : "GET",
+		url : base_context + "/ajax/get_plan_pago_fraccion/",
+		datatype : "json,",
+		data : {
+			id_fraccion : fraccion.value,
+		}
+	});
+	request.complete(function(plan_pag_frac) {
+		if (plan_pag_frac.status != 500) {
+			$("#id_plan_p").val(plan_pag_frac.responseJSON[0].nombre_del_plan);
+			$("#id_plan_pago").val(plan_pag_frac.responseJSON[0].id);
+			$("#id_cant_cuotas_ref").val(plan_pag_frac.responseJSON[0].cuotas_de_refuerzo);
+			retrievePlanPago();
+			id_name_cliente.focus();
+			verificarPermisosDeUser();
+		}
+	});
+}
+
 
 function quitarCerosFraccion(fraccion) {
 	centena = fraccion.substr(0,1);
@@ -439,34 +523,33 @@ function calculateMontoCuotas() {
 };
 
 function solo_numeros_puntos_precio_venta() {
-		$('#id_precio_venta').val($('#id_precio_venta').val().replace(/[^\d.]+/g, ''));
-	}
+	$('#id_precio_venta').val($('#id_precio_venta').val().replace(/[^\d.]+/g, ''));
+}
 
-	function solo_numeros_puntos_entrega_inicial() {
-		$('#id_entrega_inicial ').val($('#id_entrega_inicial ').val().replace(/[^\d.]+/g, ''));
-	}
+function solo_numeros_puntos_entrega_inicial() {
+	$('#id_entrega_inicial ').val($('#id_entrega_inicial ').val().replace(/[^\d.]+/g, ''));
+}
 
-	function solo_numeros_puntos_monto_cuota() {
-		$('#id_monto_cuota ').val($('#id_monto_cuota ').val().replace(/[^\d.]+/g, ''));
-	}
-	
-	function solo_numeros_puntos_monto_refuerzo() {
-		$('#id_monto_cuota_refuerzo ').val($('#id_monto_cuota_refuerzo ').val().replace(/[^\d.]+/g, ''));
-	}
-	function format(comma, period) {
+function solo_numeros_puntos_monto_cuota() {
+	$('#id_monto_cuota ').val($('#id_monto_cuota ').val().replace(/[^\d.]+/g, ''));
+}
 
-		var comma = comma || ',';
-		var period = period || '.';
-		var split = this.toString().split(',');
-		var numeric = split[0];
-		var decimal = split.length > 1 ? period + split[1] : '';
-		var reg = /(\d+)(\d{3})/;
-		for (var i = 1; i < numeric.length; i++) {
-			numeric = numeric.replace(".", "");
-		}
-		while (reg.test(numeric)) {
+function solo_numeros_puntos_monto_refuerzo() {
+	$('#id_monto_cuota_refuerzo ').val($('#id_monto_cuota_refuerzo ').val().replace(/[^\d.]+/g, ''));
+}
 
-			numeric = numeric.replace(reg, '$1' + comma + '$2');
-		}
-		return numeric + decimal;
+function format(comma, period) {
+	var comma = comma || ',';
+	var period = period || '.';
+	var split = this.toString().split(',');
+	var numeric = split[0];
+	var decimal = split.length > 1 ? period + split[1] : '';
+	var reg = /(\d+)(\d{3})/;
+	for (var i = 1; i < numeric.length; i++) {
+		numeric = numeric.replace(".", "");
 	}
+	while (reg.test(numeric)) {
+		numeric = numeric.replace(reg, '$1' + comma + '$2');
+	}
+	return numeric + decimal;
+}
