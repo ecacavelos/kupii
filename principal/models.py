@@ -143,7 +143,7 @@ class PlanDePago(models.Model):
             ('ver_listado_plandepago', 'Ver listado de planes de pago'),
             ('ver_opciones_plandepago', 'Ver opciones de planes de pago'),
         )
-
+        ordering = ["nombre_del_plan"]
 
 class Fraccion(models.Model):
     id=models.IntegerField(primary_key=True)
