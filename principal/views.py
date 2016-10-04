@@ -84,7 +84,7 @@ def retrieve_fraccion(request):
             response_data = {}
             response_data['fraccion_id']=myfraccion.id
             response_data['nombre']=myfraccion.nombre
-            
+
             return HttpResponse(json.dumps(response_data), content_type="application/json")
     else:
         return HttpResponseRedirect(reverse('login'))
@@ -187,7 +187,8 @@ def retrieve_lote_pago_cuotas(request):
             response_data['lote_tag'] = u'%s' %(r)
             response_data['precio_contado'] = r.precio_contado
             response_data['precio_credito'] = r.precio_credito
-            
+            response_data['obs'] = r.comentarios
+
             return HttpResponse(json.dumps(response_data), content_type="application/json")      
         else:
             return HttpResponseServerError("No se encontraron lotes.")

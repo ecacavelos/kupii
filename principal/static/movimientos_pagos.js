@@ -263,6 +263,7 @@ function retrieveLotePago() {
 			$("#lote_superficie").html(msg.superficie);			
 			$("#lote_seleccionado_detalles").html(s);
 			lote_id = msg.lote_id;
+			$("#id_obs_lote").html(msg.obs);
 			//var d = new Date();
 			//var month = d.getMonth() + 1;
 			//var day = d.getDate();
