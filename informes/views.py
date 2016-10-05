@@ -2758,6 +2758,7 @@ def informe_movimientos(request):
                         print error
                     lote_ini=str(rango_lotes_id[0])
                     lote_fin=str(rango_lotes_id[1])
+                    lote = Lote.objects.get(id=int(lote_ini))
                     lista_movimientos=[]
                     print 'lote inicial->'+unicode(lote_ini)
                     print 'lote final->'+unicode(lote_fin)
@@ -2898,7 +2899,8 @@ def informe_movimientos(request):
                         'lote_fin' : lote_fin_orig,
                         'fecha_ini' : fecha_ini,
                         'fecha_fin' : fecha_fin,
-                        'ultimo': ultimo
+                        'ultimo': ultimo,
+                        'comentarios': lote.comentarios
                     })
                     return HttpResponse(t.render(c))
             else:

@@ -206,7 +206,11 @@
 							<td colspan="2" class="celda_resumen_venta recuperada">{{pago.entrega_inicial}}</td>
 							<td class="celda_resumen_venta recuperada">{{pago.precio_final}}</td>
 					</tr>
-						
+                    {% if comentarios %}
+	    				</tr>
+                            <td colspan="8" class=""> {{comentarios}}</td>
+					    <tr>
+    				{% endif %}
 				{% else %}
 					<tr>
 						<th>Fecha</th><th>Fraccion</th><th>Lote</th><th>Cliente</th><th>Tipo</th><th colspan="2">Estado</th><th colspan="2">Entrega Inicial</th><th colspan="1">Precio de Venta</th>
@@ -221,8 +225,13 @@
 							<td colspan="2" class="celda_resumen_venta"> {{pago.entrega_inicial}}</td>
 							<td class="celda_resumen_venta">{{pago.precio_final}}</td>
 						
+                    {% if comentarios %}
+	    				</tr>
+                            <td colspan="8" class=""> {{comentarios}}</td>
+					    <tr>
+    				{% endif %}
 					</tr>
-				
+
 				{% endif %}
 			<tr>
 				<th colspan="1">Fecha de Pago</th><!--<th>Fraccion</th><th>Manzana</th><th>Cliente</th>--><th colspan="1">Cuota Nº</th><th colspan="1">Vencimiento</th><th colspan="3">Mes</th><!--<th>Tipo Cuota</th>--><th>Saldo Anterior</th><th colspan="2">Monto</th><th>Saldo</th>	
