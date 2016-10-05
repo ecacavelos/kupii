@@ -381,14 +381,15 @@ def listar_busqueda_lotes(request):
     busqueda = request.GET.get('busqueda','')
     tipo_busqueda=request.GET.get('tipo_busqueda','')
     busqueda_label = request.GET.get('busqueda_label','')
-    
+    fraccion_segun_estado =   request.GET.get('nombre_frac2_label_value', '')
+
     if busqueda == '' and busqueda_label == '':
         tipo_busqueda = ''
     
     
     #se busca un lote
     # BUSQUEDA
-    lista_ordenada = obtener_lotes_filtrados(busqueda, tipo_busqueda, busqueda_label,"numero_lote")
+    lista_ordenada = obtener_lotes_filtrados(busqueda, tipo_busqueda, busqueda_label, fraccion_segun_estado, "numero_lote")
 
     if request.GET.get('formato-reporte','') == 'pantalla':
         # PAGINACION

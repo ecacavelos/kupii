@@ -59,6 +59,8 @@
                 $("#busqueda").val('');
    			    $('#estado_lote_label').hide();
     		    $('#estado_lote_label_value').hide();
+			    $('#nombre_frac2').hide();
+    		    $('#nombre_frac2_label_value').hide();
 				$("#label_busqueda").html("Codigo Lote:");
 				console.log("Por codigo");
 				$('#busqueda_label').mask('###/###/####');
@@ -74,6 +76,8 @@
                 $("#busqueda").val('');
    			    $('#estado_lote_label').hide();
     		    $('#estado_lote_label_value').hide();
+			    $('#nombre_frac2').hide();
+    		    $('#nombre_frac2_label_value').hide();
 				$("#label_busqueda").html("Nombre de Cliente:");
 				console.log("Por nombre cliente");
 				$('#busqueda_label').unmask();
@@ -89,6 +93,8 @@
                 $("#busqueda").val('');
    			    $('#estado_lote_label').hide();
     		    $('#estado_lote_label_value').hide();
+				$('#nombre_frac2').hide();
+    		    $('#nombre_frac2_label_value').hide();
 				$("#label_busqueda").html("Cedula de Cliente:");
 				console.log("Por cedula cliente");
 				$('#busqueda_label').unmask();
@@ -104,6 +110,8 @@
                 $("#busqueda").val('');
   			    $('#estado_lote_label').hide();
     		    $('#estado_lote_label_value').hide();
+			    $('#nombre_frac2').hide();
+    		    $('#nombre_frac2_label_value').hide();
 				$("#label_busqueda").html("Nombre de Fraccion:");
 				console.log("Por nombre de fraccion");
 				$('#busqueda_label').unmask();
@@ -124,14 +132,15 @@
                 $("#busqueda").val($('#estado_lote').val());
 			    $('#estado_lote_label').show();
     		    $('#estado_lote_label_value').show();
-// {#                $("#tipo_busqueda").val($('#estado_lote').val());#}
+			    $('#nombre_frac2').show();
+    		    $("#nombre_frac2_label_value").show();
+				$("#nombre_frac2_label_value").attr("placeholder", "Ej: El Manantial");
 				tipo_busqueda=$("#tipo_busqueda").val();
 				busqueda_label=$("#busqueda_label").val();
 				busqueda=$("#busqueda").val();
 			$("#busqueda_label").autocomplete("destroy");
-// {#				autocompleteEstadosLotes(tipo_busqueda, busqueda_label, busqueda);#}
+				autocompleteFraccionPorNombre(tipo_busqueda, busqueda_label, busqueda);
 			}
-
 		});
 		
 		
@@ -143,6 +152,21 @@
 		
 	});
 	
+function autocompleteFraccionPorNombre(tipo_busqueda, busqueda_label, busqueda){
+	$("#nombre_frac2_label_value").val("");
+	var id_fraccion;
+	$("#nombre_frac2_label_value").empty();
+	base_url = base_context + "/ajax/get_fracciones_by_name/";
+	params = "value";
+	$("#nombre_frac2_label_value").autocomplete({
+		source : base_url,
+		minLength : 1,
+		select : function(event, ui) {
+			id_fraccion = ui.item.id;
+			$("#nombre_frac2_label_value").val(id_fraccion);
+		}
+	});
+}
 	
 function buscar() {
 		if ($("#busqueda_label").val() == "" && $("#busqueda").val() == "" ) {
