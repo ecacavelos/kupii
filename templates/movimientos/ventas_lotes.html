@@ -99,7 +99,7 @@ function setFraccionManzanaLote() {
 		var lote = splitted_id[2];
         loteIngresado = lote;
 
-		base_url = base_context + "/ajax/get_fracciones_by_id/?term=" + fraccion;
+		base_url = base_context + "/ajax//?term=" + fraccion;
 		params = "value";
 		var request = $.ajax({
 			url: base_url,

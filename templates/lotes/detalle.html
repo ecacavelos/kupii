@@ -14,7 +14,8 @@
 var data = [
 		{"label" : "Aragorn"}
 		];
-		
+var grupo = "{{grupo}}";
+
 /*
 function solo_numeros () {
 		
@@ -151,7 +152,18 @@ $(document).ready(function() {
 		$('#id_precio_costo').prop('disabled', false);
 		$('#id_codigo_paralot').prop('disabled', false);
 	});
-    
+
+    if (grupo == 2){
+		$('#id_precio_contado').prop('readonly', true);
+		$('#id_precio_credito').prop('readonly', true);
+		$('#id_precio_costo').prop('readonly', true);
+		$('#id_superficie').prop('readonly', true);
+		$('#id_cuenta_corriente_catastral').prop('readonly', true);
+		$('#id_boleto_nro').prop('readonly', true);
+		$('#id_casa_edificada').prop('readonly', true);
+		$('#id_estado').prop('disabled', true);
+    };
+
 });
 </script>
 {% endblock %}
@@ -196,8 +208,8 @@ $(document).ready(function() {
 		
 		
 	</table>
-	{%if grupo == 1%}
 		<input class="lote-form-button" type="submit" name="boton_guardar" value="Guardar Cambios" />
+	{%if grupo == 1%}
 		<input class="lote-form-button" type="submit" name="boton_borrar" value="Borrar este Registro" />
 		<input class="lote-form-button" type="submit" name="boton_guardar_a_recuperacion" value="Guardar Cambios e ir a recuperacion" />
 	{%endif%}	
