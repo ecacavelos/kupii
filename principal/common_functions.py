@@ -1287,14 +1287,16 @@ def crear_JSON_print_object(factura, request, manzana, lote_id, usuario):
     lineas.append(linea);
 
     # fechas
+    fecha_str = unicode(factura.fecha)
+    fecha = unicode(datetime.datetime.strptime(fecha_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
     linea = {}
-    linea["valor"] = unicode(factura.fecha)
+    linea["valor"] = unicode(fecha)
     linea["coord_x"] = int (coor.fecha_1x * cm)
     linea["coord_y"] = int (coor.fecha_1y * cm)
     lineas.append(linea);
 
     linea = {}
-    linea["valor"] = unicode(factura.fecha)
+    linea["valor"] = unicode(fecha)
     linea["coord_x"] = int(coor.fecha_2x * cm)
     linea["coord_y"] = int(coor.fecha_2y * cm)
     lineas.append(linea);

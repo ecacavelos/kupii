@@ -231,7 +231,7 @@
 					inputs[0].value=msg[0].cantidad;
 					ultimo = (msg[0].cuotas_detalles).length - 1;
 					
-					var monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+					var monthNames = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
 					fecha_1 = msg[0].cuotas_detalles[0].fecha;
 					fecha_2 = msg[0].cuotas_detalles[ultimo].fecha;
 					
