@@ -127,7 +127,7 @@
 
 <div id="listado-item-lote">
 	<table border="1.5"cellpadding="0" cellspacing="0" class="listado-clientes-atrasados" align="center">
-		<th>Cliente</th><th>Telefono</th><th>Direccion</th><th>Cod. Lote</th><th>Cuotas Atras.</th>
+		<th>Cliente</th><th>Telefono</th><th>Celular</th><th>Direccion</th><th>Cod. Lote</th><th>Cuotas Atras.</th>
 		<th>Cuotas Pag.</th><th>Importe Cuota</th><th>Total Atras.</th><th>Total Pag.</th>
 		<th>%Pag</th><th>Fec. Ultimo. Pago</th><th>Interes</th><th>Gestion Cobr</th>
 		{% for hw in object_list %}
@@ -140,22 +140,33 @@
 			{% else %}
 				<b>tel1: </b>{{hw.telefono_particular}}
 			{% endif %} 
-			
-			{% if hw.celular_1 == "" or hw.celular1 == None  %} 
+			{% if hw.telefono_laboral == "" or hw.telefono_laboral == None  %}
 				-
 			{% else %}
-				<b>tel2: </b>{{hw.telefono_celular}}
+				<b>tel2: </b>{{hw.telefono_laboral}}
 			{% endif %}
 			
 			</td>
-			
+			<td>
+			{% if hw.celular_1 == "" or hw.celular_1 == None  %}
+				-
+			{% else %}
+				<b>cel1: </b>{{hw.celular_1}}
+			{% endif %}
+			{% if hw.celular_2 == "" or hw.celular_2 == None  %}
+				-
+			{% else %}
+				<b>cel2: </b>{{hw.celular_2}}
+			{% endif %}
+			</td>
+
 			<td>
 			{% if hw.direccion_particular == "" or hw.direccion_particular == None  %} 
 				-
 			{% else %}
-				<b>dir1: </b>{{hw.direccion_particular}}
+				<b>dir1: </b> <br/>{{hw.direccion_particular}}
 			{% endif %} 
-			
+
 			{% if hw.direccion_cobro == "" or hw.direccion_cobro == None  %} 
 				-
 			{% else %}
@@ -183,20 +194,32 @@
 			{% else %}
 				<b>tel1: </b>{{hw.telefono_particular}}
 			{% endif %} 
-			
-			{% if hw.celular_1 == "" or hw.celular1 == None  %} 
+			{% if hw.telefono_laboral == "" or hw.telefono_laboral == None  %}
 				-
 			{% else %}
-				<b>tel2: </b>{{hw.telefono_celular}}
+				<b>tel2: </b>{{hw.telefono_laboral}}
 			{% endif %}
-			
+
+			<td>
+			{% if hw.celular_1 == "" or hw.celular_1 == None  %}
+				-
+			{% else %}
+				<b>cel1: </b>{{hw.celular_1}}
+			{% endif %}
+			{% if hw.celular_2 == "" or hw.celular_2 == None  %}
+				-
+			{% else %}
+				<b>cel2: </b>{{hw.celular_2}}
+			{% endif %}
+			</td>
+
 			</td>
 			
 			<td>
 			{% if hw.direccion_particular == "" or hw.direccion_particular == None  %} 
 				-
 			{% else %}
-				<b>dir1: </b>{{hw.direccion_particular}}
+				<b>dir1: </b> <br/>{{hw.direccion_particular}}
 			{% endif %} 
 			
 			{% if hw.direccion_cobro == "" or hw.direccion_cobro == None  %} 

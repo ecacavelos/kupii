@@ -490,7 +490,9 @@ def obtener_clientes_atrasados(filtros,fraccion, meses_peticion):
             cliente_atrasado['direccion_particular'] = ultima_venta.cliente.direccion_particular
             cliente_atrasado['direccion_cobro'] = ultima_venta.cliente.direccion_cobro
             cliente_atrasado['telefono_particular'] = ultima_venta.cliente.telefono_particular
+            cliente_atrasado['telefono_laboral'] = ultima_venta.cliente.telefono_laboral
             cliente_atrasado['celular_1'] = ultima_venta.cliente.celular_1
+            cliente_atrasado['celular_2'] = ultima_venta.cliente.celular_2
 
             # FECHA ULTIMO PAGO
             if (len(PagoDeCuotas.objects.filter(venta_id=ultima_venta.id).order_by('-fecha_de_pago')) > 0):
@@ -3253,15 +3255,16 @@ def clientes_atrasados_reporte_excel(request):
 
                 sheet.write(1, 0, "Cliente", style)
                 sheet.write(1, 1, "Telefono", style)
-                sheet.write(1, 2, "Direccion", style)
-                sheet.write(1, 3, "Cod Lote", style)
-                sheet.write(1, 4, "Cuotas Atras.", style)
-                sheet.write(1, 5, "Cuotas Pag.", style)
-                sheet.write(1, 6, "Importe Cuota", style)
-                sheet.write(1, 7, "Total Atras.", style)
-                sheet.write(1, 8, "Total Pag.", style)
-                sheet.write(1, 9, "% Pag.", style)
-                sheet.write(1, 10, "Fec Ult.Pago.", style)
+                sheet.write(1, 2, "Celular", style)
+                sheet.write(1, 3, "Direccion", style)
+                sheet.write(1, 4, "Cod Lote", style)
+                sheet.write(1, 5, "Cuotas Atras.", style)
+                sheet.write(1, 6, "Cuotas Pag.", style)
+                sheet.write(1, 7, "Importe Cuota", style)
+                sheet.write(1, 8, "Total Atras.", style)
+                sheet.write(1, 9, "Total Pag.", style)
+                sheet.write(1, 10, "% Pag.", style)
+                sheet.write(1, 11, "Fec Ult.Pago.", style)
 
                 #Ancho de la columna Nombre
                 col_nombre = sheet.col(0)
@@ -3269,42 +3272,46 @@ def clientes_atrasados_reporte_excel(request):
 
                 #Ancho de la columna Telefono
                 col_lote = sheet.col(1)
-                col_lote.width = 256 * 12   # 12 characters wide
+                col_lote.width = 256 * 25   # 12 characters wide
+
+                # Ancho de la columna Celular
+                col_lote = sheet.col(2)
+                col_lote.width = 256 * 26  # 12 characters wide
 
                 #Ancho de la columna Direccion
-                col_nro_cuota = sheet.col(2)
+                col_nro_cuota = sheet.col(3)
                 col_nro_cuota.width = 256 * 40   # 6 characters wide
 
                 #Ancho de la columna Lote
-                col_nro_cuota = sheet.col(3)
+                col_nro_cuota = sheet.col(4)
                 col_nro_cuota.width = 256 * 15   # 6 characters wide
 
                 #Ancho de la columna Cuotas Atras.
-                col_nro_cuota = sheet.col(4)
+                col_nro_cuota = sheet.col(5)
                 col_nro_cuota.width = 256 * 12   # 6 characters wide
 
                 #Ancho de la columna Cuotas Pag.
-                col_mes = sheet.col(5)
+                col_mes = sheet.col(6)
                 col_mes.width = 256 * 12   # 8 characters wide
 
                 #Ancho de la columna Imp. Cuota"
-                col_monto_pagado = sheet.col(6)
+                col_monto_pagado = sheet.col(7)
                 col_monto_pagado.width = 256 * 11   # 11 characters wide
 
                 #Ancho de la columna Total Atras
-                col_monto_inmo = sheet.col(7)
+                col_monto_inmo = sheet.col(8)
                 col_monto_inmo.width = 256 * 14   # 15 characters wide
 
                 #Ancho de la columna Total Pag
-                col_nombre = sheet.col(8)
+                col_nombre = sheet.col(9)
                 col_nombre.width = 256 * 14   # 15 characters wide
 
                 #Ancho de la columna % Pag
-                col_nombre = sheet.col(9)
+                col_nombre = sheet.col(10)
                 col_nombre.width = 256 * 6   # 5 characters wide
 
                 # Ancho de la columna Fecha
-                col_fecha = sheet.col(10)
+                col_fecha = sheet.col(11)
                 col_fecha.width = 256 * 20  # 12 characters wide
 
                 i = 0
@@ -3324,16 +3331,28 @@ def clientes_atrasados_reporte_excel(request):
 
                 for i in range(len(clientes_atrasados)):
                     sheet.write(c, 0, clientes_atrasados[i]['cliente'], style3)
-                    sheet.write(c, 1, unicode(clientes_atrasados[i]['telefono_particular']), style4)
-                    sheet.write(c, 2, unicode('dir1: ' + clientes_atrasados[i]['direccion_particular'] + '  dir2: ' + clientes_atrasados[i]['direccion_cobro']), style4)
-                    sheet.write(c, 3, unicode(clientes_atrasados[i]['lote']), style4)
-                    sheet.write(c, 4, unicode(clientes_atrasados[i]['cuotas_atrasadas']), style4)
-                    sheet.write(c, 5, unicode(clientes_atrasados[i]['cuotas_pagadas']), style4)
-                    sheet.write(c, 6, unicode(clientes_atrasados[i]['importe_cuota']), style4)
-                    sheet.write(c, 7, unicode(clientes_atrasados[i]['total_atrasado']), style4)
-                    sheet.write(c, 8, unicode(clientes_atrasados[i]['total_pagado']),style4)
-                    sheet.write(c, 9, unicode(clientes_atrasados[i]['porc_pagado']), style4)
-                    sheet.write(c, 10, unicode(clientes_atrasados[i]['fecha_ultimo_pago']), style4)
+                    if clientes_atrasados[i]['telefono_laboral'] != '' and clientes_atrasados[i]['telefono_laboral'] != None :
+                       sheet.write(c, 1, unicode('tel1: ' + clientes_atrasados[i]['telefono_particular'] + '  tel2: ' + clientes_atrasados[i]['telefono_laboral']), style4)
+                    else:
+                        sheet.write(c, 1, unicode(clientes_atrasados[i]['telefono_particular']), style4)
+                    if (clientes_atrasados[i]['celular_1'] != '' and clientes_atrasados[i]['celular_1'] != None) or (clientes_atrasados[i]['celular_2'] != '' and clientes_atrasados[i]['celular_2'] != None):
+                        sheet.write(c, 2, unicode('cel1: ' + clientes_atrasados[i]['celular_1'] + '  cel2: ' + clientes_atrasados[i]['celular_2']), style4)
+                    elif clientes_atrasados[i]['celular_1'] != '' and clientes_atrasados[i]['celular_1'] != None :
+                        sheet.write(c, 2, unicode('cel1: ' + clientes_atrasados[i]['celular_1']), style4)
+                    elif clientes_atrasados[i]['celular_2'] != '' and clientes_atrasados[i]['celular_2'] != None :
+                        sheet.write(c, 2, unicode('cel1: ' + clientes_atrasados[i]['celular_2']), style4)
+                    sheet.write(c, 3, unicode('dir1: ' + clientes_atrasados[i]['direccion_particular'] + '  dir2: ' + clientes_atrasados[i]['direccion_cobro']), style4)
+                    sheet.write(c, 4, unicode(clientes_atrasados[i]['lote']), style4)
+                    sheet.write(c, 5, unicode(clientes_atrasados[i]['cuotas_atrasadas']), style4)
+                    sheet.write(c, 6, unicode(clientes_atrasados[i]['cuotas_pagadas']), style4)
+                    sheet.write(c, 7, unicode(clientes_atrasados[i]['importe_cuota']), style4)
+                    sheet.write(c, 8, unicode(clientes_atrasados[i]['total_atrasado']), style4)
+                    sheet.write(c, 9, unicode(clientes_atrasados[i]['total_pagado']),style4)
+                    sheet.write(c, 10, unicode(clientes_atrasados[i]['porc_pagado']), style4)
+                    # formateamos la fecha
+                    fecha_str = unicode(clientes_atrasados[i]['fecha_ultimo_pago'])
+                    fecha = unicode(datetime.datetime.strptime(fecha_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
+                    sheet.write(c, 11, unicode(fecha), style4)
                     c += 1
 
             response = HttpResponse(content_type='application/vnd.ms-excel')
