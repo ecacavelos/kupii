@@ -3667,11 +3667,21 @@ def liquidacion_propietarios_reporte_excel(request):
         monto_inmobiliaria = 0
         monto_propietario = 0
 
-        ley = request.GET['ley']
-        impuesto_renta  = request.GET['impuesto_renta']
+        ley = request.GET['ley1']
+        impuesto_renta  = request.GET['impuesto_renta1']
         iva_comision = request.GET['iva_comision']
-        descripcion = request.GET.get('descripcion_otros_descuentos', '')
-        monto_descuento = request.GET.get('monto_otros_descuentos', '')
+        cont = int(request.GET['cont'])
+        descuentos = []
+        descripcion_monto_descuento = {}
+        monto_total_descuento = 0
+        for i in range(1, cont+1, 1):
+            descripcion_monto_descuento = {}
+            descripcion = request.GET.get('descripcion_otros_descuentos' + unicode(i), '')
+            monto_descuento = request.GET.get('monto_otros_descuentos' + unicode(i), 0)
+            descripcion_monto_descuento['descripcion'] = descripcion
+            descripcion_monto_descuento['monto_descuento'] = monto_descuento
+            descuentos.append(descripcion_monto_descuento)
+            monto_total_descuento = monto_total_descuento + int(request.GET.get('monto_otros_descuentos' + unicode(i), 0))
         total_descuentos = request.GET.get('total_descuentos', '')
         total_a_cobrar = request.GET['total_a_cobrar']
 
@@ -3679,11 +3689,12 @@ def liquidacion_propietarios_reporte_excel(request):
         total_descuentos_int = int(total_descuentos.replace(".", ""))
         iva_comision_int = int(iva_comision.replace(".", ""))
         impuesto_renta_int = int(impuesto_renta.replace(".", ""))
-        monto_descuento_int = int(monto_descuento.replace(".", ""))
+        # monto_descuento_int = int(monto_descuento.replace(".", ""))
+        monto_total_descuento_int = monto_total_descuento
         ley_int = int(ley.replace(".", ""))
 
         #CHEQUEAMOS INTEGRIDAD DE LIQUIDACION
-        if total_descuentos_int != (iva_comision_int + monto_descuento_int + ley_int + impuesto_renta_int):
+        if total_descuentos_int != (iva_comision_int + monto_total_descuento_int + ley_int + impuesto_renta_int):
             raise ValueError('El total de los descuentos no coincide con la sumatoria de descuentos')
 
         lista_ordenada = obtener_pagos_liquidacion(busqueda_id, tipo_busqueda, fecha_ini_parsed, fecha_fin_parsed, order_by, ley_int, impuesto_renta_int, iva_comision_int)
@@ -3871,17 +3882,29 @@ def liquidacion_propietarios_reporte_excel(request):
                         sheet.write(c, 5, '', style_datos_montos)
                         # sheet.write_merge(c,c,3,4,'', style_datos_montos)
                         c+=1
-                        if descripcion !='':
-                            sheet.write(c,1, descripcion, style_normal)
-                            sheet.write(c, 5, monto_descuento, style_datos_montos)
-                            # sheet.write_merge(c,c,3,4, monto_descuento, style_datos_montos)
-                            c+=1
-                        else:
-                            sheet.write(c,1, "Sin otros descuentos", style_normal)
-                            sheet.write(c, 5, "0", style_datos_montos_subrayado)
-                            sheet.write(c, 6, "", style_datos_montos_subrayado)
-                            # sheet.write_merge(c,c,3,4, "0", style_datos_montos)
-                            c+=1
+                        # if descripcion !='':
+                        #     sheet.write(c,1, descripcion, style_normal)
+                        #     sheet.write(c, 5, monto_descuento, style_datos_montos)
+                        #     # sheet.write_merge(c,c,3,4, monto_descuento, style_datos_montos)
+                        #     c+=1
+                        # else:
+                        #     sheet.write(c,1, "Sin otros descuentos", style_normal)
+                        #     sheet.write(c, 5, "0", style_datos_montos_subrayado)
+                        #     sheet.write(c, 6, "", style_datos_montos_subrayado)
+                        #     # sheet.write_merge(c,c,3,4, "0", style_datos_montos)
+                        #     c+=1
+                        for i in range(0, cont, 1):
+                            if descripcion !='':
+                                sheet.write(c,1, descuentos[i]['descripcion'], style_normal)
+                                sheet.write(c, 5, descuentos[i]['monto_descuento'], style_datos_montos)
+                                # sheet.write_merge(c,c,3,4, monto_descuento, style_datos_montos)
+                                c+=1
+                            else:
+                                sheet.write(c,1, "Sin otros descuentos", style_normal)
+                                sheet.write(c, 5, "0", style_datos_montos_subrayado)
+                                sheet.write(c, 6, "", style_datos_montos_subrayado)
+                                # sheet.write_merge(c,c,3,4, "0", style_datos_montos)
+                                c+=1
 
                         total_descuentos = int(pago['ley'].replace(".", "")) + int(pago['impuesto_renta'].replace(".", ""))+general_inmobiliario_con_comision+int(monto_descuento.replace(".", ""))
                         total_descuentos_txt= unicode('{:,}'.format(total_descuentos)).replace(",", ".")
