@@ -3676,12 +3676,21 @@ def liquidacion_propietarios_reporte_excel(request):
         monto_total_descuento = 0
         for i in range(1, cont+1, 1):
             descripcion_monto_descuento = {}
-            descripcion = request.GET.get('descripcion_otros_descuentos' + unicode(i), '')
-            monto_descuento = request.GET.get('monto_otros_descuentos' + unicode(i), 0)
+            if request.GET.get('descripcion_otros_descuentos' + unicode(i)) == '':
+                descripcion = 'Sin otros descuentos'
+            else:
+                descripcion = request.GET.get('descripcion_otros_descuentos' + unicode(i), '')
+            if request.GET.get('monto_otros_descuentos' + unicode(i)) == '':
+                monto_descuento = 0
+            else:
+                monto_descuento = request.GET.get('monto_otros_descuentos' + unicode(i), 0)
             descripcion_monto_descuento['descripcion'] = descripcion
             descripcion_monto_descuento['monto_descuento'] = monto_descuento
             descuentos.append(descripcion_monto_descuento)
-            monto_total_descuento = monto_total_descuento + int(request.GET.get('monto_otros_descuentos' + unicode(i), 0))
+            if request.GET.get('monto_otros_descuentos' + unicode(i)) == '':
+                monto_total_descuento = 0
+            else:
+                monto_total_descuento = monto_total_descuento + int(request.GET.get('monto_otros_descuentos' + unicode(i), 0))
         total_descuentos = request.GET.get('total_descuentos', '')
         total_a_cobrar = request.GET['total_a_cobrar']
 
@@ -3906,7 +3915,8 @@ def liquidacion_propietarios_reporte_excel(request):
                                 # sheet.write_merge(c,c,3,4, "0", style_datos_montos)
                                 c+=1
 
-                        total_descuentos = int(pago['ley'].replace(".", "")) + int(pago['impuesto_renta'].replace(".", ""))+general_inmobiliario_con_comision+int(monto_descuento.replace(".", ""))
+                        # total_descuentos = int(pago['ley'].replace(".", "")) + int(pago['impuesto_renta'].replace(".", ""))+general_inmobiliario_con_comision+int(monto_descuento.replace(".", ""))
+                        total_descuentos = int(pago['ley'].replace(".", "")) + int(pago['impuesto_renta'].replace(".", ""))+general_inmobiliario_con_comision+monto_descuento
                         total_descuentos_txt= unicode('{:,}'.format(total_descuentos)).replace(",", ".")
                         sheet.write(c, 1, "Total descuentos", style_normal)
                         sheet.write(c, 6, total_descuentos_txt, style_datos_montos)
