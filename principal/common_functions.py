@@ -316,7 +316,15 @@ def filtros_establecidos(request, tipo_informe):
             lote=request['busqueda']
             return True
         except:
-            print('Parametros no seteados')  
+            print('Parametros no seteados')
+    elif tipo_informe == "informe_pagos_practipago":
+         try:
+            fecha_ini=request['fecha_ini']
+            fecha_fin=request['fecha_fin']
+            sucursal = request['sucursal']
+            return True
+         except:
+            print('Parametros no seteados')
     elif tipo_informe == 'listado_clientes':
         try:
             tipo_busqueda=request['tipo_busqueda']

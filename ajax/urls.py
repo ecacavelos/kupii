@@ -51,6 +51,8 @@ urlpatterns = patterns('ajax.views',
     url(r'^get_plan_vendedor/$', 'get_plan_vendedor', name='get_plan_vendedor'),
     url(r'^get_plan_pago_fraccion/$', 'get_plan_pago_fraccion', name='get_plan_pago_fraccion'),
 
+    url(r'^get_sucursales_by_name/$', 'get_sucursales_by_name', name='get_sucursales_by_name'),
+
 #     url(r'^get_lista_pagos/$', 'get_lista_pagos', name='get_lista_pagos'),
 #     url(r'^get_lista_pagos_gerentes/$', 'get_lista_pagos_gerentes', name='get_lista_pagos_gerentes'), 
 #     url(r'^get_informe_general/$', 'get_informe_general', name='get_informe_general'),

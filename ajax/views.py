@@ -29,6 +29,8 @@ from django.db import connection
 # all_objects = list(Restaurant.objects.all()) + list(Place.objects.all())
 # data = serializers.serialize('xml', all_objects)
 #data = serializers.serialize('json', list(objectQuerySet), fields=('fileName','id'))
+from sucursal.models import Sucursal
+
 
 @require_http_methods(["GET"])
 def get_propietario_id_by_name(request):
@@ -402,6 +404,23 @@ def get_fracciones_by_sucursal(request):
                 print error
         else:
             return HttpResponseRedirect(reverse('login'))
+
+@require_http_methods(["GET"])
+def get_sucursales_by_name(request):
+    if request.method == 'GET':
+        if request.user.is_authenticated():
+            try:
+                nombre_sucursal = request.GET['term']
+                print("term ->" + nombre_sucursal);
+                object_list = Sucursal.objects.filter(nombre__icontains=nombre_sucursal)
+                labels = ["nombre"]
+                json_object_list = custom_json(object_list, labels)
+                return HttpResponse(json.dumps(json_object_list, cls=DjangoJSONEncoder), content_type="application/json")
+            except Exception, error:
+                print error
+        else:
+            return HttpResponseRedirect(reverse('login'))
+
 
 # este autocomplete le falta agregar el concepto al numero de estado, es en cierta forma estatico y no voy a usar al final por ahora
 @require_http_methods(["GET"])
