@@ -3683,14 +3683,14 @@ def liquidacion_propietarios_reporte_excel(request):
             if request.GET.get('monto_otros_descuentos' + unicode(i)) == '':
                 monto_descuento = 0
             else:
-                monto_descuento = int (request.GET.get('monto_otros_descuentos' + unicode(i), 0))
+                monto_descuento = int(request.GET.get('monto_otros_descuentos' + unicode(i), 0).replace(".", ""))
             descripcion_monto_descuento['descripcion'] = descripcion
             descripcion_monto_descuento['monto_descuento'] = monto_descuento
             descuentos.append(descripcion_monto_descuento)
             if request.GET.get('monto_otros_descuentos' + unicode(i)) == '':
                 monto_total_descuento = 0
             else:
-                monto_total_descuento = monto_total_descuento + int(request.GET.get('monto_otros_descuentos' + unicode(i), 0))
+                monto_total_descuento = monto_total_descuento + int(request.GET.get('monto_otros_descuentos' + unicode(i), 0).replace(".", ""))
         total_descuentos = request.GET.get('total_descuentos', '')
         total_a_cobrar = request.GET['total_a_cobrar']
 
@@ -3905,7 +3905,8 @@ def liquidacion_propietarios_reporte_excel(request):
                         for i in range(0, cont, 1):
                             if descripcion !='':
                                 sheet.write(c,1, descuentos[i]['descripcion'], style_normal)
-                                sheet.write(c, 5, descuentos[i]['monto_descuento'], style_datos_montos)
+                                # sheet.write(c, 5, descuentos[i]['monto_descuento'], style_datos_montos)
+                                sheet.write(c, 5, unicode('{:,}'.format(descuentos[i]['monto_descuento'])).replace(",", "."), style_datos_montos)
                                 # sheet.write_merge(c,c,3,4, monto_descuento, style_datos_montos)
                                 c+=1
                             else:
