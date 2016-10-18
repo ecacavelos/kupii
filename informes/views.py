@@ -3683,7 +3683,7 @@ def liquidacion_propietarios_reporte_excel(request):
             if request.GET.get('monto_otros_descuentos' + unicode(i)) == '':
                 monto_descuento = 0
             else:
-                monto_descuento = request.GET.get('monto_otros_descuentos' + unicode(i), 0)
+                monto_descuento = int (request.GET.get('monto_otros_descuentos' + unicode(i), 0))
             descripcion_monto_descuento['descripcion'] = descripcion
             descripcion_monto_descuento['monto_descuento'] = monto_descuento
             descuentos.append(descripcion_monto_descuento)
@@ -6049,6 +6049,238 @@ def informe_pagos_practipago(request):
         else:
             return HttpResponseRedirect(reverse('login'))
 
+
+def informe_pagos_practipago_reporte_excel(request):
+    lista_movimientos = []
+    sucursal_id=request.GET['sucursal']
+    sucursal_label=request.GET['sucursal_label']
+    fecha_ini = request.GET['fecha_ini']
+    fecha_fin = request.GET['fecha_fin']
+    fecha_ini_parsed = datetime.datetime.strptime(fecha_ini, "%d/%m/%Y").date()
+    fecha_fin_parsed = datetime.datetime.strptime(fecha_fin, "%d/%m/%Y").date()
+    # lista_ventas = Venta.objects.filter(lote_id=lote.id).order_by('-fecha_de_venta')
+    lista_ventas = Venta.objects.raw('''SELECT * FROM principal_venta where lote_id in (SELECT principal_lote.id FROM principal_lote where manzana_id in (SELECT principal_manzana.id FROM principal_manzana where fraccion_id in (SELECT principal_fraccion.id FROM principal_fraccion where sucursal_id = %s))) ORDER BY fecha_de_venta;''',[sucursal_id])
+    try:
+                        for item_venta in lista_ventas:
+                            try:
+                                resumen_venta = {}
+                                resumen_venta['id'] = item_venta.id
+                                resumen_venta['fecha_de_venta'] = datetime.datetime.strptime(unicode(item_venta.fecha_de_venta), "%Y-%m-%d").strftime("%d/%m/%Y")
+                                resumen_venta['lote']=item_venta.lote
+                                resumen_venta['cliente'] = item_venta.cliente
+                                resumen_venta['cantidad_de_cuotas'] = item_venta.plan_de_pago.cantidad_de_cuotas
+                                resumen_venta['precio_final'] = unicode('{:,}'.format(item_venta.precio_final_de_venta)).replace(",",".")
+                                resumen_venta['precio_de_cuota'] = unicode('{:,}'.format(item_venta.precio_de_cuota)).replace(",",".")
+                                resumen_venta['fecha_primer_vencimiento'] = datetime.datetime.strptime(unicode(item_venta.fecha_primer_vencimiento), "%Y-%m-%d").strftime("%d/%m/%Y")
+                                resumen_venta['entrega_inicial'] = unicode('{:,}'.format(item_venta.entrega_inicial)).replace(",",".")
+                                resumen_venta['vendedor'] = item_venta.vendedor
+                                resumen_venta['plan_de_pago'] = item_venta.plan_de_pago
+                                resumen_venta['pagos_realizados'] = item_venta.pagos_realizados
+                                resumen_venta['recuperado'] = item_venta.recuperado
+
+                                #venta_pagos_query_set = get_pago_cuotas(item_venta,None,None)
+                                if fecha_ini != '' and fecha_fin != '':
+                                    venta_pagos_query_set = PagoDeCuotas.objects.filter(venta_id=item_venta.id).exclude(transaccion_id__isnull=True).filter(fecha_de_pago__range=(fecha_ini_parsed, fecha_fin_parsed)).order_by("fecha_de_pago", "id")
+                                else:
+                                    venta_pagos_query_set = PagoDeCuotas.objects.filter(venta_id=item_venta.id).exclude(transaccion_id__isnull=True).order_by("fecha_de_pago", "id")
+                            except Exception, error:
+                                print error
+                            ventas_pagos_list = []
+                            ventas_pagos_list.insert(0,resumen_venta) #El primer elemento de la lista de pagos es el resumen de la venta
+                            contador_cuotas = 0
+
+                            venta_tiene_pagos = False
+                            for pago in venta_pagos_query_set:
+                                venta_tiene_pagos = True
+                                cuota ={}
+                                cuota['fecha_de_pago'] = datetime.datetime.strptime(unicode(pago.fecha_de_pago), "%Y-%m-%d").strftime("%d/%m/%Y")
+                                cuota['id'] = pago.id
+                                detalle_str = ""
+                                cuota['detalle'] = ""
+                                cuota['dias_atraso'] = ""
+                                cuota['vencimiento'] = ""
+                                try:
+                                    cuota['id_transaccion'] = pago.transaccion.id
+                                except:
+                                    cuota['id_transaccion'] = None
+
+                                if pago.factura_id != None:
+                                    cuota['factura'] = pago.factura
+                                else:
+                                    cuota['factura'] = None
+                                #Si se paga mas de una cuota
+                                if pago.nro_cuotas_a_pagar > 1:
+                                    cuota['nro_cuota'] = unicode(contador_cuotas+1) +" al "+ unicode(contador_cuotas + pago.nro_cuotas_a_pagar)
+
+                                    #detalle para fecha de vencimiento
+
+                                    c= 0
+                                    cuota['vencimiento'] = ""
+                                    cuota['dias_atraso'] = ""
+                                    for x in range(0, pago.nro_cuotas_a_pagar):
+                                        contador_cuotas = contador_cuotas + 1
+                                        cuotas_detalles = []
+                                        cuotas_detalles = get_cuota_information_by_lote(pago.lote_id,contador_cuotas, True, True)
+                                        cuota['vencimiento'] = cuota['vencimiento']+ unicode(cuotas_detalles[0]['fecha'])+' '
+
+                                        fecha_pago_parsed = datetime.datetime.strptime(cuota['fecha_de_pago'], "%d/%m/%Y").date()
+                                        proximo_vencimiento_parsed = datetime.datetime.strptime(unicode(cuotas_detalles[0]['fecha']), "%d/%m/%Y").date()
+                                        dias_atraso = obtener_dias_atraso(fecha_pago_parsed,proximo_vencimiento_parsed)
+                                        cuota['dias_atraso'] = cuota['dias_atraso']+ " * "+ unicode(dias_atraso)+ " dias "
+
+                                        c=c+1
+                                        pago_detalle = pago.detalle
+                                        monto_intereses = 0
+                                        if pago_detalle != None and pago_detalle != '':
+                                            #pago_detalle = json.dumps(pago_detalle)
+                                            pago_detalle = json.loads(pago_detalle)
+                                            detalle_str = ""
+                                            for x in range(0, len(pago_detalle)):
+                                                try:
+                                                    detalle_str = detalle_str + " Intereses: "+  unicode('{:,}'.format(pago_detalle['item'+unicode(x)]['intereses'])).replace(",",".")
+                                                    monto_intereses = monto_intereses + int (pago_detalle['item'+unicode(x)]['intereses'])
+                                                except Exception, error:
+                                                    try:
+                                                        detalle_str = detalle_str + " Gestion Cobranza: "+ unicode('{:,}'.format(int(pago_detalle['item'+unicode(x)]['gestion_cobranza']))).replace(",",".")
+                                                    except Exception, error:
+                                                        print error
+
+                                #si se paga solo una cuota
+                                else:
+                                    contador_cuotas = contador_cuotas + pago.nro_cuotas_a_pagar
+                                    #detalle para fecha de vencimiento
+                                    cuotas_detalles = []
+                                    cuotas_detalles = get_cuota_information_by_lote(pago.lote_id,contador_cuotas, True, True, item_venta)
+                                    cuota['vencimiento'] = unicode(cuotas_detalles[0]['fecha'])
+
+                                    fecha_pago_parsed = datetime.datetime.strptime(cuota['fecha_de_pago'], "%d/%m/%Y").date()
+                                    proximo_vencimiento_parsed = datetime.datetime.strptime(cuota['vencimiento'], "%d/%m/%Y").date()
+                                    dias_atraso = obtener_dias_atraso(fecha_pago_parsed,proximo_vencimiento_parsed)
+                                    cuota['dias_atraso'] = cuota['dias_atraso']+ " * "+ unicode(dias_atraso)+ " dias "
+
+                                    cuota['nro_cuota'] = unicode(contador_cuotas)
+                                    pago_detalle = pago.detalle
+                                    monto_intereses = 0
+                                    if pago_detalle != None and pago_detalle != '':
+                                        #pago_detalle = json.dumps(pago_detalle)
+                                        pago_detalle = json.loads(pago_detalle)
+                                        detalle_str = ""
+                                        for x in range(0, len(pago_detalle)):
+                                            try:
+                                                detalle_str = detalle_str + " Intereses: "+  unicode('{:,}'.format(pago_detalle['item'+unicode(x)]['intereses'])).replace(",",".")
+                                                monto_intereses = monto_intereses + int (pago_detalle['item'+unicode(x)]['intereses'])
+                                            except Exception, error:
+                                                try:
+                                                    detalle_str = detalle_str + " Gestion Cobranza: "+ unicode('{:,}'.format(int(pago_detalle['item'+unicode(x)]['gestion_cobranza']))).replace(",",".")
+                                                except Exception, error:
+                                                    print error
+
+                                if pago.nro_cuotas_a_pagar > 1:
+                                    monto_cuota = pago.total_de_pago - monto_intereses
+                                    for x in range(x, pago.nro_cuotas_a_pagar+1):
+                                        cuota['detalle'] = cuota['detalle'] + ' Monto Cuota: '+ unicode('{:,}'.format(monto_cuota/pago.nro_cuotas_a_pagar)).replace(",",".")
+
+                                    cuota['detalle'] = cuota['detalle'] + detalle_str
+                                else:
+                                    monto_cuota = pago.total_de_pago - monto_intereses
+                                    cuota['detalle'] = 'Monto Cuota: '+ unicode('{:,}'.format(monto_cuota)).replace(",",".") + detalle_str
+
+                                cuota['cantidad_cuotas'] = pago.nro_cuotas_a_pagar
+                                cuota['monto'] =  unicode('{:,}'.format(pago.total_de_pago)).replace(",",".")
+                                ventas_pagos_list.append(cuota)
+                            if venta_tiene_pagos:
+                                lista_movimientos.append(ventas_pagos_list)
+    except Exception, error:
+                    print error
+
+    lista = lista_movimientos
+
+    wb = xlwt.Workbook(encoding='utf-8')
+    sheet = wb.add_sheet('test', cell_overwrite_ok=True)
+    sheet.paper_size_code = 1
+    style = xlwt.easyxf('pattern: pattern solid, fore_colour white;'
+                                'font: name Calibri, bold True, height 200; align: horiz center')
+    style2 = xlwt.easyxf('font: name Calibri, height 200;')
+
+    style3 = xlwt.easyxf('font: name Calibri, height 200 ; align: horiz right')
+
+    style4 = xlwt.easyxf('font: name Calibri, height 200 ; align: horiz center')
+
+    usuario = unicode(request.user)
+
+    sheet.header_str = (
+                        u"&LFecha: &D Hora: &T \nUsuario: "+usuario+" "
+                        u"&CPROPAR S.R.L.\n INFORME VENTA DE LOTES "
+                        u"&RPage &P of &N"
+                        )
+    c = 0
+
+
+    for venta in lista:
+        for i, pago in enumerate(venta):
+            if i == 0:
+                    # cabeceras
+                    sheet.write_merge(c,c,0,6, "Venta lote: "+unicode(pago['lote'])+" Vendedor: "+unicode(pago['vendedor'])+" a Cliente: "+unicode(pago['cliente'])+ " el: "+unicode(pago['fecha_de_venta']), style)
+                    c=c+1
+                    sheet.write(c, 0, "Fecha 1er Vto.", style)
+                    sheet.write(c, 1, "Plan de Pago", style)
+                    sheet.write(c, 2, "Entrega Inicial", style)
+                    sheet.write(c, 3, "Precio Cuota", style)
+                    sheet.write(c, 4, "Precio Venta", style)
+                    sheet.write(c, 5, "Cuotas Pagadas", style)
+                    sheet.write(c, 6, "Recuperado", style)
+
+                    c=c+1
+
+                    sheet.write(c, 0, pago['fecha_primer_vencimiento'], style4)
+                    sheet.write(c, 1, unicode(pago['plan_de_pago']), style2)
+                    sheet.write(c, 2, unicode(pago['entrega_inicial']), style3)
+                    sheet.write(c, 3, unicode(pago['precio_de_cuota']), style3)
+                    sheet.write(c, 4, unicode(pago['precio_final']), style3)
+                    sheet.write(c, 5, unicode(pago['pagos_realizados']), style4)
+                    if pago['recuperado']:
+                        sheet.write(c, 6, "SI", style4)
+                    else:
+                        sheet.write(c, 6, "NO", style4)
+
+                    if pago['plan_de_pago'].tipo_de_plan == 'credito':
+                        c=c+1
+                        sheet.write_merge(c,c,0,6, "Pagos de la Venta lote: "+unicode(pago['lote'])+" Vendedor: "+unicode(pago['vendedor'])+" a Cliente: "+unicode(pago['cliente'])+ " el: "+unicode(pago['fecha_de_venta']), style)
+                        c=c+1
+                        sheet.write(c, 0, "Fecha", style)
+                        sheet.write(c, 1, "Cant. Cuotas", style)
+                        sheet.write(c, 2, "Nro. Cuotas", style)
+                        sheet.write(c, 3, "Monto", style)
+                        sheet.write(c, 4, "Factura", style)
+                        sheet.write(c, 5, "Transaccion", style)
+
+                    c=c+1
+
+            else:
+
+                sheet.write(c, 0, pago['fecha_de_pago'], style4)
+                sheet.write(c, 1, unicode(pago['cantidad_cuotas']), style4)
+                sheet.write(c, 2, unicode(pago['nro_cuota']), style4)
+                sheet.write(c, 3, unicode(pago['monto']), style3)
+                if pago['factura'] == None:
+                    sheet.write(c, 4, "Sin Factura" , style4)
+                else:
+                    sheet.write(c, 4, unicode(pago['factura'].numero) , style4)
+                if pago['id_transaccion'] == None:
+                    sheet.write(c, 5, "Interna" , style4)
+                else:
+                    sheet.write(c, 5, unicode(pago['id_transaccion']), style4)
+
+                c=c+1
+
+                col_nombre = sheet.col(1)
+                col_nombre.width = 256 * 25
+
+    response = HttpResponse(content_type='application/vnd.ms-excel')
+                    # Crear un nombre intuitivo
+    response['Content-Disposition'] = 'attachment; filename=' + 'informe_movimientos.xls'
+    wb.save(response)
+    return response
 
 
 def calculo_montos_liquidacion_propietarios(pago,venta, lista_cuotas_inm):
