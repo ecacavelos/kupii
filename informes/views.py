@@ -5898,8 +5898,6 @@ def informe_pagos_practipago(request):
                     sucursal_label=request.GET['sucursal_label']
                     fecha_ini = request.GET['fecha_ini']
                     fecha_fin = request.GET['fecha_fin']
-                    fecha_ini_parsed = datetime.datetime.strptime(fecha_ini, "%d/%m/%Y").date()
-                    fecha_fin_parsed = datetime.datetime.strptime(fecha_fin, "%d/%m/%Y").date()
                     # lista_ventas = Venta.objects.filter(lote_id=lote.id).order_by('-fecha_de_venta')
                     lista_ventas = Venta.objects.raw('''SELECT * FROM principal_venta where lote_id in (SELECT principal_lote.id FROM principal_lote where manzana_id in (SELECT principal_manzana.id FROM principal_manzana where fraccion_id in (SELECT principal_fraccion.id FROM principal_fraccion where sucursal_id = %s))) ORDER BY fecha_de_venta;''', [sucursal_id])
                     try:
@@ -5921,6 +5919,8 @@ def informe_pagos_practipago(request):
                                 resumen_venta['recuperado'] = item_venta.recuperado
                                 # obtenemos todos los pagos de la venta, que tengan la transaccion de referencia al sistema
                                 if fecha_ini != '' and fecha_fin != '':
+                                    fecha_ini_parsed = datetime.datetime.strptime(fecha_ini, "%d/%m/%Y").date()
+                                    fecha_fin_parsed = datetime.datetime.strptime(fecha_fin, "%d/%m/%Y").date()
                                     venta_pagos_query_set = PagoDeCuotas.objects.filter(venta_id=item_venta.id).exclude(transaccion_id__isnull=True).filter(fecha_de_pago__range=(fecha_ini_parsed, fecha_fin_parsed)).order_by("fecha_de_pago", "id")
                                 else:
                                     venta_pagos_query_set = PagoDeCuotas.objects.filter(venta_id=item_venta.id).exclude(transaccion_id__isnull=True).order_by("fecha_de_pago", "id")
@@ -6057,8 +6057,6 @@ def informe_pagos_practipago_reporte_excel(request):
     sucursal_label=request.GET['sucursal_label']
     fecha_ini = request.GET['fecha_ini']
     fecha_fin = request.GET['fecha_fin']
-    fecha_ini_parsed = datetime.datetime.strptime(fecha_ini, "%d/%m/%Y").date()
-    fecha_fin_parsed = datetime.datetime.strptime(fecha_fin, "%d/%m/%Y").date()
     # lista_ventas = Venta.objects.filter(lote_id=lote.id).order_by('-fecha_de_venta')
     lista_ventas = Venta.objects.raw('''SELECT * FROM principal_venta where lote_id in (SELECT principal_lote.id FROM principal_lote where manzana_id in (SELECT principal_manzana.id FROM principal_manzana where fraccion_id in (SELECT principal_fraccion.id FROM principal_fraccion where sucursal_id = %s))) ORDER BY fecha_de_venta;''',[sucursal_id])
     try:
@@ -6081,6 +6079,8 @@ def informe_pagos_practipago_reporte_excel(request):
 
                                 #venta_pagos_query_set = get_pago_cuotas(item_venta,None,None)
                                 if fecha_ini != '' and fecha_fin != '':
+                                    fecha_ini_parsed = datetime.datetime.strptime(fecha_ini, "%d/%m/%Y").date()
+                                    fecha_fin_parsed = datetime.datetime.strptime(fecha_fin, "%d/%m/%Y").date()
                                     venta_pagos_query_set = PagoDeCuotas.objects.filter(venta_id=item_venta.id).exclude(transaccion_id__isnull=True).filter(fecha_de_pago__range=(fecha_ini_parsed, fecha_fin_parsed)).order_by("fecha_de_pago", "id")
                                 else:
                                     venta_pagos_query_set = PagoDeCuotas.objects.filter(venta_id=item_venta.id).exclude(transaccion_id__isnull=True).order_by("fecha_de_pago", "id")
