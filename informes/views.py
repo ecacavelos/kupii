@@ -5354,7 +5354,8 @@ def informe_movimientos_reporte_excel(request):
                         if pago['tipo_de_venta'] == 'credito':
                             c=c+1
                             fraccion = Fraccion.objects.get(id=pago['lote'].codigo_paralot[:3])
-                            sheet.write_merge(c,c,0,6, "Pagos: "+ fraccion.nombre + ' ' + unicode(pago['lote'])+" a "+unicode(pago['cliente'])+"    Estado:  VENTA RECUPERADA ", style4)
+                            lote = Lote.objects.get(codigo_paralot=pago['lote'].codigo_paralot)
+                            sheet.write_merge(c,c,0,6, "Pagos: "+ fraccion.nombre + ' ' + unicode(pago['lote'])+" a "+unicode(pago['cliente'])+"    Estado:  VENTA RECUPERADA " + "Cta Cte Ctral: " + unicode(lote.cuenta_corriente_catastral), style4)
                             c=c+1
                             sheet.write(c, 0, "Fecha", style_titulos_columna_resaltados_centrados)
                             sheet.write(c, 1, "Cuota", style_titulos_columna_resaltados_centrados)
@@ -5393,7 +5394,8 @@ def informe_movimientos_reporte_excel(request):
                             # c=c+1
                             # sheet.write_merge(c,c,0,6, "Pagos de la Venta: "+unicode(pago['lote'])+" a "+unicode(pago['cliente']), style4)
                             fraccion = Fraccion.objects.get(id=pago['lote'].codigo_paralot[:3])
-                            sheet.write_merge(c,c,0,6, "Pagos: "+ fraccion.nombre + ' ' + unicode(pago['lote'])+" a "+unicode(pago['cliente'])+"    Estado: VENTA ACTUAL ", style4)
+                            lote = Lote.objects.get(codigo_paralot=pago['lote'].codigo_paralot)
+                            sheet.write_merge(c,c,0,6, "Pagos: "+ fraccion.nombre + ' ' + unicode(pago['lote'])+" a "+unicode(pago['cliente'])+"    Estado: VENTA ACTUAL " + "Cta Cte Ctral: " + unicode(lote.cuenta_corriente_catastral), style4)
                             c=c+1
                             sheet.write(c, 0, "Fecha", style_titulos_columna_resaltados_centrados)
                             sheet.write(c, 1, "Cuota", style_titulos_columna_resaltados_centrados)
