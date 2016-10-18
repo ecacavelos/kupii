@@ -211,7 +211,8 @@
 					{% endif %}
 					
 					{% if pago.factura %}
-						<td> {{pago.factura.numero}} </td>
+{#						<td> {{pago.factura.numero}} </td>#}
+            			<td><a href="{% url 'frontend_home' %}facturacion/listado/{{pago.factura.id}}" target="_blank"><strong>{{pago.factura.numero}}</strong></a></td>
 					{% else %}
 						<td> No Facturado </td>
 					{% endif %}
