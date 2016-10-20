@@ -6,7 +6,7 @@ $(document).ready(function() {
 	$("#id_lote").keyup(validateLotePost);
 	$("#main_pago_form").submit(validatePago);
 	$("#nro_cuotas_a_pagar").val("1");
-	$(".fecha_pago").val(getCurrentDate());
+	$(".fecha_pago").val(getCurrentDate2());
 	$('.grid_6').hide();
 	$('.fecha_pago').mask('##/##/####');
 	var detalle_interes = "";
@@ -695,6 +695,38 @@ function getCurrentDate(){
 	return today;
 }
 
+function getCurrentDate2(){
+	$.ajax({
+    	dataType: 'jsonp',
+    	// url: 'http://www.timeapi.org/utc/now.json',
+		//reemplazamos el UTC por nuestra zona horaria
+    	url: 'http://www.timeapi.org/-4/now.json',
+    	success: function (result) {
+		    $('.fecha_pago').val(formatearFechaInternacional(result.dateString));
+    	}
+	});
+}
+
+function formatearFechaInternacional(fecha){
+	//recibimos un string separado por comas, vamos a construir en nuestro formato
+	// mes = fecha.dateString.substr(0,fecha.indexOf(' '));
+	var today = new Date(fecha);
+	var dd = today.getDate();
+	var mm = today.getMonth()+1; //January is 0!
+	var yyyy = today.getFullYear();
+
+	if(dd<10) {
+	    dd='0'+dd;
+	}
+
+	if(mm<10) {
+	    mm='0'+mm;
+	}
+
+	today = dd+ '/'+mm+'/'+yyyy;
+	return today;
+}
+
 function generarDetalleJSON(){
 		detalle_json = '';
 		objeto = {};
@@ -715,7 +747,7 @@ function generarDetalleJSON(){
 					objeto[key] = value;
 					JSON.stringify(objeto);
 				}
-				
+
 			}
 			
 			detalle_json = JSON.stringify(objeto);
