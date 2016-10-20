@@ -6,7 +6,7 @@ $(document).ready(function() {
 	$("#id_lote").keyup(validateLotePost);
 	$("#main_pago_form").submit(validatePago);
 	$("#nro_cuotas_a_pagar").val("1");
-	$(".fecha_pago").val(getCurrentDate2());
+	$(".fecha_pago").val(fecha_actual);
 	$('.grid_6').hide();
 	$('.fecha_pago').mask('##/##/####');
 	var detalle_interes = "";

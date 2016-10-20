@@ -247,7 +247,7 @@ def reservas_de_lotes(request):
     else:
         return HttpResponseRedirect(reverse('login'))
 
-def pago_de_cuotas(request):        
+def pago_de_cuotas(request):
     if request.user.is_authenticated():
         if verificar_permisos(request.user.id, permisos.ADD_PAGODECUOTAS):
             t = loader.get_template('movimientos/pago_cuotas.html')
@@ -356,8 +356,19 @@ def pago_de_cuotas(request):
                     return HttpResponseServerError("La cantidad de cuotas a pagar, es mayor a la cantidad de cuotas restantes.")  
         
             elif request.method == 'GET':
+                query = ('''SELECT NOW()''')
+                cursor = connection.cursor()
+                cursor.execute(query)
+                results = cursor.fetchall()
+                if (len(results) > 0):
+                    fecha_actual = results
+                    dia = fecha_actual[0][0].day
+                    mes = fecha_actual[0][0].month
+                    anho = fecha_actual[0][0].year
+                    fecha_actual = unicode(dia) + '/' + unicode(mes) + '/'+ unicode(anho)
                 c = RequestContext(request, {
-                   'grupo': grupo   
+                   'grupo': grupo,
+                   'fecha_actual' : fecha_actual
                 })
                 return HttpResponse(t.render(c))
         else:
