@@ -700,7 +700,7 @@ function getCurrentDate2(){
     	dataType: 'jsonp',
     	// url: 'http://www.timeapi.org/utc/now.json',
 		//reemplazamos el UTC por nuestra zona horaria
-    	url: 'http://www.timeapi.org/-4/now.json',
+    	url: 'https://www.timeapi.org/-4/now.json',
     	success: function (result) {
 		    $('.fecha_pago').val(formatearFechaInternacional(result.dateString));
     	}
