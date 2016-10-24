@@ -1279,6 +1279,10 @@ def crear_JSON_print_object(factura, request, manzana, lote_id, usuario):
     except Exception, error:
         coor = CoordenadasFactura.objects.get(usuario_id=2)
 
+    venta = get_ultima_venta_no_recuperada(lote_id.id)
+    plan_de_pago = PlanDePago.objects.get(id=venta.plan_de_pago_id)
+    plan_cuota_administracion = plan_de_pago.porcentaje_cuotas_administracion
+
     lineas = []
 
     # nros de facturas
@@ -1469,6 +1473,7 @@ def crear_JSON_print_object(factura, request, manzana, lote_id, usuario):
     total_iva = 0
     total_gral = 0
     total_venta = 0
+    tiene_comision_que_imprimir = True
     for key, value in sorted(lista_detalles.iteritems()):
         # cantidad
         linea = {}
@@ -1500,65 +1505,187 @@ def crear_JSON_print_object(factura, request, manzana, lote_id, usuario):
         linea["coord_y"] = int((pos_y - 0.5) * cm)
         lineas.append(linea);
 
-        # precios unitarios
-        linea = {}
-        linea["valor"] = unicode('{:,}'.format(int(value['precio_unitario'])))
-        linea["coord_x"] = int(coor.precio_1x * cm)
-        # linea["coord_y"] = int(coor.precio_1y * cm)
-        linea["coord_y"] = int((pos_x - 0.5) * cm)
-        lineas.append(linea);
+        # aca es donde tenemos que desglosar si es que tiene un plan_cuota_administracion != 100 el plan de pago de la venta del lote en cuestion que se esta pagando
+        if (plan_cuota_administracion != 100 and tiene_comision_que_imprimir):
+            # precios unitarios
+            linea = {}
+            # tenemos que quitarle el porcentaje
+            linea["valor"] = unicode('{:,}'.format(int(int(value['precio_unitario']) * (100 - plan_cuota_administracion)/100)))
+            linea["coord_x"] = int(coor.precio_1x * cm)
+            linea["coord_y"] = int((pos_x - 0.5) * cm)
+            lineas.append(linea);
 
-        linea = {}
-        linea["valor"] = unicode('{:,}'.format(int(value['precio_unitario'])))
-        linea["coord_x"] = int(coor.precio_2x * cm)
-        # linea["coord_y"] = int(coor.precio_2y * cm)
-        linea["coord_y"] = int((pos_y - 0.5) * cm)
-        lineas.append(linea);
+            linea = {}
+            linea["valor"] = unicode('{:,}'.format(int(int(value['precio_unitario']) * (100 - plan_cuota_administracion)/100)))
+            linea["coord_x"] = int(coor.precio_2x * cm)
+            linea["coord_y"] = int((pos_y - 0.5) * cm)
+            lineas.append(linea);
 
-        # exentas
-        linea = {}
-        linea["valor"] = unicode('{:,}'.format(int(value['exentas'])))
-        linea["coord_x"] = int(coor.exentas_1x * cm)
-        # linea["coord_y"] = int(coor.exentas_1y * cm)
-        linea["coord_y"] = int((pos_x - 0.5) * cm)
-        lineas.append(linea);
+            # y abajo el concepto de comision, la diferencia
+            linea = {}
+            linea["valor"] = unicode('Comision')
+            linea["coord_x"] = int(coor.descripcion_1x * cm)
+            linea["coord_y"] = int((pos_x + 0.5 - 0.5) * cm)
+            lineas.append(linea);
 
-        linea = {}
-        linea["valor"] = unicode('{:,}'.format(int(value['exentas'])))
-        linea["coord_x"] = int(coor.exentas_2x * cm)
-        # linea["coord_y"] = int(coor.exentas_2y * cm)
-        linea["coord_y"] = int((pos_y - 0.5) * cm)
-        lineas.append(linea);
+            linea = {}
+            linea["valor"] = unicode('Comision')
+            linea["coord_x"] = int(coor.descripcion_2x * cm)
+            linea["coord_y"] = int((pos_y + 0.5 - 0.5) * cm)
+            lineas.append(linea);
 
-        # iva 5
-        linea = {}
-        linea["valor"] = unicode('{:,}'.format(int(value['iva_5'])))
-        linea["coord_x"] = int(coor.iva5_1x * cm)
-        # linea["coord_y"] = int(coor.iva5_1y * cm)
-        linea["coord_y"] = int((pos_x - 0.5) * cm)
-        lineas.append(linea);
+            # la diferencia
+            linea = {}
+            linea["valor"] = unicode('{:,}'.format(int(int(value['precio_unitario']) * (plan_cuota_administracion) / 100)))
+            linea["coord_x"] = int(coor.precio_1x * cm)
+            linea["coord_y"] = int((pos_x + 0.5 - 0.5) * cm)
+            lineas.append(linea);
 
-        linea = {}
-        linea["valor"] = unicode('{:,}'.format(int(value['iva_5'])))
-        linea["coord_x"] = int(coor.iva5_2x * cm)
-        # linea["coord_y"] = int(coor.iva5_2y * cm)
-        linea["coord_y"] = int((pos_y - 0.5) * cm)
-        lineas.append(linea);
+            linea = {}
+            linea["valor"] = unicode('{:,}'.format(int(int(value['precio_unitario']) * (plan_cuota_administracion) / 100)))
+            linea["coord_x"] = int(coor.precio_2x * cm)
+            linea["coord_y"] = int((pos_y + 0.5 - 0.5) * cm)
+            lineas.append(linea);
 
-        # iva 10
-        linea = {}
-        linea["valor"] = unicode('{:,}'.format(int(value['iva_10'])))
-        linea["coord_x"] = int(coor.iva10_1x * cm)
-        # linea["coord_y"] = int(coor.iva10_1y * cm)
-        linea["coord_y"] = int((pos_x - 0.5) * cm)
-        lineas.append(linea);
+            # la diferencia va al IVA 10 directo
+            linea = {}
+            linea["valor"] = unicode('{:,}'.format(int(int(value['precio_unitario']) * (plan_cuota_administracion) / 100)))
+            linea["coord_x"] = int(coor.iva10_1x * cm)
+            linea["coord_y"] = int((pos_x + 0.5 - 0.5) * cm)
+            lineas.append(linea);
 
-        linea = {}
-        linea["valor"] = unicode('{:,}'.format(int(value['iva_10'])))
-        linea["coord_x"] = int(coor.iva10_2x * cm)
-        # linea["coord_y"] = int(coor.iva10_2y * cm)
-        linea["coord_y"] = int((pos_y - 0.5) * cm)
-        lineas.append(linea);
+            linea = {}
+            linea["valor"] = unicode('{:,}'.format(int(int(value['precio_unitario']) * (plan_cuota_administracion) / 100)))
+            linea["coord_x"] = int(coor.iva10_2x * cm)
+            linea["coord_y"] = int((pos_y + 0.5 - 0.5) * cm)
+            lineas.append(linea);
+
+            iva10 += int(int(value['precio_unitario']) * (plan_cuota_administracion) / 100)
+
+            # exentas
+            linea = {}
+            linea["valor"] = unicode('{:,}'.format(int(value['exentas'])))
+            linea["coord_x"] = int(coor.exentas_1x * cm)
+            # linea["coord_y"] = int(coor.exentas_1y * cm)
+            linea["coord_y"] = int((pos_x - 0.5) * cm)
+            lineas.append(linea);
+
+            linea = {}
+            linea["valor"] = unicode('{:,}'.format(int(value['exentas'])))
+            linea["coord_x"] = int(coor.exentas_2x * cm)
+            # linea["coord_y"] = int(coor.exentas_2y * cm)
+            linea["coord_y"] = int((pos_y - 0.5) * cm)
+            lineas.append(linea);
+
+            # iva 5
+            linea = {}
+            linea["valor"] = unicode('{:,}'.format(int(value['iva_5'])))
+            linea["coord_x"] = int(coor.iva5_1x * cm)
+            # linea["coord_y"] = int(coor.iva5_1y * cm)
+            linea["coord_y"] = int((pos_x - 0.5) * cm)
+            lineas.append(linea);
+
+            linea = {}
+            linea["valor"] = unicode('{:,}'.format(int(value['iva_5'])))
+            linea["coord_x"] = int(coor.iva5_2x * cm)
+            # linea["coord_y"] = int(coor.iva5_2y * cm)
+            linea["coord_y"] = int((pos_y - 0.5) * cm)
+            lineas.append(linea);
+
+            # iva 10
+            linea = {}
+            linea["valor"] = unicode('{:,}'.format(int(value['iva_10'])))
+            linea["coord_x"] = int(coor.iva10_1x * cm)
+            # linea["coord_y"] = int(coor.iva10_1y * cm)
+            linea["coord_y"] = int((pos_x - 0.5) * cm)
+            lineas.append(linea);
+
+            linea = {}
+            linea["valor"] = unicode('{:,}'.format(int(value['iva_10'])))
+            linea["coord_x"] = int(coor.iva10_2x * cm)
+            # linea["coord_y"] = int(coor.iva10_2y * cm)
+            linea["coord_y"] = int((pos_y - 0.5) * cm)
+            lineas.append(linea);
+
+            tiene_comision_que_imprimir = False
+            pos_x += 0.5
+            pos_y += 0.5
+
+            # y mostramos el monto sin el desglose al final, voy a utilizar de referencia la coord_y de los subtotales, inmediatamente arriba de ese vamos a colocar
+            linea = {}
+            linea["valor"] = unicode('Monto de la Cuota: ' + unicode('{:,}'.format(int(value['precio_unitario']))))
+            linea["coord_x"] = int(coor.descripcion_1x * cm)
+            linea["coord_y"] = int((coor.sub_exentas_1y - 0.5) * cm)
+            lineas.append(linea);
+
+            linea = {}
+            linea["valor"] = unicode('Monto de la Cuota: ' + unicode('{:,}'.format(int(value['precio_unitario']))))
+            linea["coord_x"] = int(coor.descripcion_1x * cm)
+            linea["coord_y"] = int((coor.sub_exentas_2y - 0.5) * cm)
+            lineas.append(linea);
+
+        else:
+            linea = {}
+            linea["valor"] = unicode('{:,}'.format(int(value['precio_unitario'])))
+            linea["coord_x"] = int(coor.precio_1x * cm)
+            # linea["coord_y"] = int(coor.precio_1y * cm)
+            linea["coord_y"] = int((pos_x - 0.5) * cm)
+            lineas.append(linea);
+
+            linea = {}
+            linea["valor"] = unicode('{:,}'.format(int(value['precio_unitario'])))
+            linea["coord_x"] = int(coor.precio_2x * cm)
+            # linea["coord_y"] = int(coor.precio_2y * cm)
+            linea["coord_y"] = int((pos_y - 0.5) * cm)
+            lineas.append(linea);
+
+            # exentas
+            linea = {}
+            linea["valor"] = unicode('{:,}'.format(int(value['exentas'])))
+            linea["coord_x"] = int(coor.exentas_1x * cm)
+            # linea["coord_y"] = int(coor.exentas_1y * cm)
+            linea["coord_y"] = int((pos_x - 0.5) * cm)
+            lineas.append(linea);
+
+            linea = {}
+            linea["valor"] = unicode('{:,}'.format(int(value['exentas'])))
+            linea["coord_x"] = int(coor.exentas_2x * cm)
+            # linea["coord_y"] = int(coor.exentas_2y * cm)
+            linea["coord_y"] = int((pos_y - 0.5) * cm)
+            lineas.append(linea);
+
+            # iva 5
+            linea = {}
+            linea["valor"] = unicode('{:,}'.format(int(value['iva_5'])))
+            linea["coord_x"] = int(coor.iva5_1x * cm)
+            # linea["coord_y"] = int(coor.iva5_1y * cm)
+            linea["coord_y"] = int((pos_x - 0.5) * cm)
+            lineas.append(linea);
+
+            linea = {}
+            linea["valor"] = unicode('{:,}'.format(int(value['iva_5'])))
+            linea["coord_x"] = int(coor.iva5_2x * cm)
+            # linea["coord_y"] = int(coor.iva5_2y * cm)
+            linea["coord_y"] = int((pos_y - 0.5) * cm)
+            lineas.append(linea);
+
+            # iva 10
+            linea = {}
+            linea["valor"] = unicode('{:,}'.format(int(value['iva_10'])))
+            linea["coord_x"] = int(coor.iva10_1x * cm)
+            # linea["coord_y"] = int(coor.iva10_1y * cm)
+            linea["coord_y"] = int((pos_x - 0.5) * cm)
+            lineas.append(linea);
+
+            linea = {}
+            linea["valor"] = unicode('{:,}'.format(int(value['iva_10'])))
+            linea["coord_x"] = int(coor.iva10_2x * cm)
+            # linea["coord_y"] = int(coor.iva10_2y * cm)
+            linea["coord_y"] = int((pos_y - 0.5) * cm)
+            lineas.append(linea);
+
+            # pos_x += 0.5
+            # pos_y += 0.5
 
         total_venta += int(value['cantidad']) * int(value['precio_unitario'])
         if value['exentas'] != '':
