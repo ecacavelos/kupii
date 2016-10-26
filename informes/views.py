@@ -6433,6 +6433,13 @@ def informe_facturacion(request):
                         fraccion = request.GET.get('fraccion','')
                         fraccion_label = request.GET.get('fraccion_label','')
 
+                        concepto = request.GET.get('concepto','')
+                        concepto_label = request.GET.get('concepto_label','')
+
+                        todos_excepto_pago_cuota = False
+                        if request.GET.get('todos_excepto_pago_cuota','') == '1':
+                            todos_excepto_pago_cuota = True
+
                         fecha_ini_parsed = datetime.datetime.strptime(fecha_ini, "%d/%m/%Y").strftime("%Y-%m-%d")
                         fecha_fin_parsed = datetime.datetime.strptime(fecha_fin, "%d/%m/%Y").strftime("%Y-%m-%d")
                         
@@ -6452,7 +6459,13 @@ def informe_facturacion(request):
                                 if busqueda =='':
                                     if sucursal_label == '':
                                         if fraccion_label == '':
-                                            facturas = Factura.objects.filter(anulado=False, fecha__range=(fecha_ini_parsed, fecha_fin_parsed))
+                                            if concepto_label == '':
+                                                if (todos_excepto_pago_cuota):
+                                                    facturas = Factura.objects.filter(anulado=False, fecha__range=(fecha_ini_parsed, fecha_fin_parsed)).exclude(detalle__icontains= 'Pago de Cuota')
+                                                else:
+                                                    facturas = Factura.objects.filter(anulado=False, fecha__range=(fecha_ini_parsed, fecha_fin_parsed))
+                                            else:
+                                                facturas = Factura.objects.filter(anulado=False, fecha__range=(fecha_ini_parsed, fecha_fin_parsed), detalle__icontains= concepto_label)
                                         else:
                                             facturas = Factura.objects.raw('''SELECT "principal_factura"."id", "principal_factura"."fecha", "principal_factura"."numero", "principal_factura"."cliente_id", "principal_factura"."lote_id", "principal_factura"."rango_factura_id", "principal_factura"."tipo", "principal_factura"."detalle", "principal_factura"."anulado", "principal_factura"."observacion", "principal_factura"."usuario_id", "principal_factura"."impresa" FROM "principal_factura" WHERE "principal_factura"."lote_id" in (SELECT id FROM "principal_lote" where manzana_id in (SELECT id FROM "principal_manzana" where fraccion_id = %s)) AND fecha >= %s AND fecha <= %s ORDER BY numero''',[fraccion, fecha_ini_parsed, fecha_fin_parsed])
                                     else:
@@ -6557,6 +6570,12 @@ def informe_facturacion(request):
                             'ultimo': ultimo,
                             'busqueda_label':busqueda_label,
                             'busqueda': busqueda,
+                            'sucursal_label': sucursal_label,
+                            'sucursal': sucursal,
+                            'fraccion_label': fraccion_label,
+                            'fraccion': fraccion,
+                            'concepto_label': concepto_label,
+                            'concepto': concepto,
                         })
                         return HttpResponse(t.render(c))    
                     except Exception, error:
@@ -6596,6 +6615,13 @@ def informe_facturacion_reporte_excel(request):
                         fraccion = request.GET.get('fraccion', '')
                         fraccion_label = request.GET.get('fraccion_label', '')
 
+                        concepto = request.GET.get('concepto', '')
+                        concepto_label = request.GET.get('concepto_label', '')
+
+                        todos_excepto_pago_cuota = False
+                        if request.GET.get('todos_excepto_pago_cuota', '') == '1':
+                            todos_excepto_pago_cuota = True
+
                         fecha_ini_parsed = datetime.datetime.strptime(fecha_ini, "%d/%m/%Y").strftime("%Y-%m-%d")
                         fecha_fin_parsed = datetime.datetime.strptime(fecha_fin, "%d/%m/%Y").strftime("%Y-%m-%d")
                         
@@ -6616,7 +6642,13 @@ def informe_facturacion_reporte_excel(request):
                                 if busqueda == '':
                                     if sucursal_label == '':
                                         if fraccion_label == '':
-                                            facturas = Factura.objects.filter(anulado=False, fecha__range=(fecha_ini_parsed, fecha_fin_parsed))
+                                            if concepto_label == '':
+                                                if (todos_excepto_pago_cuota):
+                                                    facturas = Factura.objects.filter(anulado=False, fecha__range=(fecha_ini_parsed, fecha_fin_parsed)).exclude(detalle__icontains= 'Pago de Cuota')
+                                                else:
+                                                    facturas = Factura.objects.filter(anulado=False, fecha__range=(fecha_ini_parsed, fecha_fin_parsed))
+                                            else:
+                                                facturas = Factura.objects.filter(anulado=False, fecha__range=(fecha_ini_parsed, fecha_fin_parsed), detalle__icontains=concepto_label)
                                         else:
                                             facturas = Factura.objects.raw('''SELECT "principal_factura"."id", "principal_factura"."fecha", "principal_factura"."numero", "principal_factura"."cliente_id", "principal_factura"."lote_id", "principal_factura"."rango_factura_id", "principal_factura"."tipo", "principal_factura"."detalle", "principal_factura"."anulado", "principal_factura"."observacion", "principal_factura"."usuario_id", "principal_factura"."impresa" FROM "principal_factura" WHERE "principal_factura"."lote_id" in (SELECT id FROM "principal_lote" where manzana_id in (SELECT id FROM "principal_manzana" where fraccion_id = %s)) AND fecha >= %s AND fecha <= %s ORDER BY numero''',[fraccion, fecha_ini_parsed, fecha_fin_parsed])
                                     else:

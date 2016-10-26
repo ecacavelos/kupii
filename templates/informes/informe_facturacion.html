@@ -27,12 +27,24 @@
 		var fecha_fin = "{{fecha_fin}}";
 		var busqueda = '{{busqueda}}';
 		var busqueda_label = '{{busqueda_label}}';
-		
+		var sucursal = '{{sucursal}}';
+		var sucursal_label = '{{sucursal_label}}';
+		var fraccion = '{{fraccion}}';
+		var fraccion_label = '{{fraccion_label}}';
+		var concepto = '{{concepto}}';
+		var concepto_label = '{{concepto_label}}';
+
 
 		$('#fecha_ini').val(fecha_ini);
 		$('#fecha_fin').val(fecha_fin);
 		$('#busqueda_label').val(busqueda_label);
 		$('#busqueda').val(busqueda);
+		$('#sucursal_label').val(sucursal_label);
+		$('#sucursal').val(sucursal);
+		$('#fraccion_label').val(fraccion_label);
+		$('#fraccion').val(fraccion);
+		$('#concepto_label').val(concepto_label);
+		$('#concepto').val(concepto);
 
 		$('#fecha_ini').mask('##/##/####');
 		$("#fecha_ini").datepicker({
@@ -88,6 +100,26 @@
 		        id_fraccion = ui.item.id;
 		        $("#fraccion").val(id_fraccion);
 	        }
+        });
+
+        base_url_concepto = base_context + "/ajax/get_concepto_factura_by_name/";
+		params="value";
+        var id_concepto;
+        $("#concepto_label").autocomplete({
+	        source : base_url_concepto,
+	        minLength : 1,
+	        select : function(event, ui) {
+		        id_concepto = ui.item.id;
+		        $("#concepto").val(id_concepto);
+	        }
+        });
+
+        $(".checkbox_todos_excepto_pago_cuotas").change(function () {
+            if (document.getElementById("checkbox_todos_excepto_pago_cuotas").checked == true){
+                $("#todos_excepto_pago_cuota").val(1);
+            }else{
+                $("#todos_excepto_pago_cuota").val(0);
+            }
         });
 
 	});
@@ -155,6 +187,21 @@
 					</td>
 					<td></td>
 				</tr>
+				<tr>
+					<td>
+						Concepto:
+					</td>
+					<td>
+						<input type="text" id="concepto_label" name="concepto_label" placeholder="Todos los conceptos" />
+						<input type="hidden" id="concepto" name="concepto"/>
+					</td>
+					<td></td>
+				</tr>
+                <tr>
+                    <td><input type="checkbox" id="checkbox_todos_excepto_pago_cuotas" class="checkbox_todos_excepto_pago_cuotas"></td>
+                    <td colspan="2"><span class="label_nombre_fraccion"> todos excepto pagos de cuotas </span></td>
+                    <input type="hidden" id="todos_excepto_pago_cuota" name="todos_excepto_pago_cuota" value="0">
+                </tr>
 			{%else%}
 				<tr style="display: none">
 					<td>
