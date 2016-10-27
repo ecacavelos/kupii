@@ -272,6 +272,7 @@ def pago_de_cuotas(request):
                 total_de_pago = data.get('pago_total_de_pago')
                 interes_original = data.get('interes_original')
                 resumen_cuotas = data.get('resumen_cuotas')
+                cuota_obsequio = data.get('cuota_obsequio')
                 resumen_cuotas = int (resumen_cuotas) + 1
                 date_parse_error = False
                 fecha_pago=data.get('pago_fecha_de_pago', '')
@@ -309,6 +310,10 @@ def pago_de_cuotas(request):
                         nuevo_pago.total_de_mora = total_de_mora
                         nuevo_pago.total_de_pago = total_de_pago
                         nuevo_pago.detalle = detalle
+                        if cuota_obsequio == '1':
+                            nuevo_pago.cuota_obsequio = True
+                        else:
+                            nuevo_pago.cuota_obsequio =False
                         nuevo_pago.save()
                         
                         #Se loggea la accion del usuario
@@ -497,8 +502,10 @@ def calcular_interes(request):
             print 'lote_id->' + lote_id
             fecha_pago = data.get('fecha_pago', '')
             proximo_vencimiento = data.get('proximo_vencimiento', '')
-            fecha_pago_parsed = datetime.datetime.strptime(fecha_pago, "%d/%m/%Y").date()
-
+            if fecha_pago != '':
+                fecha_pago_parsed = datetime.datetime.strptime(fecha_pago, "%d/%m/%Y").date()
+            else:
+                fecha_pago_parsed = (datetime.date.today())
             proximo_vencimiento_parsed = datetime.datetime.strptime(proximo_vencimiento, "%d/%m/%Y").date()
             
             nro_cuotas_a_pagar = data.get('nro_cuotas_a_pagar')
