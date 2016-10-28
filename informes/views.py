@@ -1286,6 +1286,7 @@ def obtener_pagos_liquidacion(entidad_id, tipo_busqueda, fecha_ini, fecha_fin, o
                     fecha_pago_order = datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d").strftime("%d/%m/%Y")
                     # Se setean los datos de cada fila
                     fila = {}
+                    fila['cuota_obsequio'] = pago['cuota_obsequio']
                     fila['misma_fraccion'] = True
                     fila['fraccion'] = unicode(fraccion)
                     fila['fecha_de_pago'] = fecha_pago
@@ -1301,35 +1302,35 @@ def obtener_pagos_liquidacion(entidad_id, tipo_busqueda, fecha_ini, fecha_fin, o
                     year_1 = parts_1[2];
                     mes_1 = int(parts_1[1]) - 1;
                     mes_year = monthNames[mes_1] + "/" + year_1;
-
                     fila['nro_cuota'] = unicode(pago['nro_cuota_y_total'])
                     fila['mes'] = mes_year
                     fila['total_de_cuotas'] = unicode('{:,}'.format(total_de_cuotas)).replace(",", ".")
-                    fila['monto_inmobiliaria'] = unicode('{:,}'.format(monto_inmobiliaria)).replace(",", ".")
-                    fila['monto_propietario'] = unicode('{:,}'.format(monto_propietario)).replace(",", ".")
-                    # Se suman los TOTALES por FRACCION
-                    total_monto_inm += int(monto_inmobiliaria)
-                    total_monto_prop += int(monto_propietario)
-                    total_monto_pagado += int(pago['monto'])
-                    filas.append(fila)
-                    # Acumulamos para los TOTALES GENERALES
-                    total_general_pagado += int(pago['monto'])
-                    total_general_inm += int(monto_inmobiliaria)
-                    total_general_prop += int(monto_propietario)
-                    # except Exception, error:
-                    #    print error
-                    #    print unicode(pago)
-
-
-                    # if total_monto_inm != 0 or total_monto_prop !=0 or total_monto_pagado !=0:
-                    # Totales por FRACCION
-                    # fila['total_monto_pagado']=unicode('{:,}'.format(total_monto_pagado)).replace(",", ".")
-                    # fila['total_monto_inmobiliaria']=unicode('{:,}'.format(total_monto_inm)).replace(",", ".")
-                    # fila['total_monto_propietario']=unicode('{:,}'.format(total_monto_prop)).replace(",", ".")
-
-            # Totales GENERALES
-            # filas = sorted(filas, key=lambda f: f['fecha_de_pago_order'])
-            # try:
+                    if pago['cuota_obsequio'] == True:
+                        fila['total_de_cuotas'] = unicode('{:,}'.format(0)).replace(",", ".")
+                        fila['monto_inmobiliaria'] = unicode('{:,}'.format(0)).replace(",", ".")
+                        fila['monto_propietario'] = unicode('{:,}'.format(0)).replace(",", ".")
+                        # Se suman los TOTALES por FRACCION
+                        total_monto_inm += int(0)
+                        total_monto_prop += int(0)
+                        total_monto_pagado += int(0)
+                        filas.append(fila)
+                        # Acumulamos para los TOTALES GENERALES
+                        total_general_pagado += int(0)
+                        total_general_inm += int(0)
+                        total_general_prop += int(0)
+                    else:
+                        fila['total_de_cuotas'] = unicode('{:,}'.format(total_de_cuotas)).replace(",", ".")
+                        fila['monto_inmobiliaria'] = unicode('{:,}'.format(monto_inmobiliaria)).replace(",", ".")
+                        fila['monto_propietario'] = unicode('{:,}'.format(monto_propietario)).replace(",", ".")
+                        # Se suman los TOTALES por FRACCION
+                        total_monto_inm += int(monto_inmobiliaria)
+                        total_monto_prop += int(monto_propietario)
+                        total_monto_pagado += int(pago['monto'])
+                        filas.append(fila)
+                        # Acumulamos para los TOTALES GENERALES
+                        total_general_pagado += int(pago['monto'])
+                        total_general_inm += int(monto_inmobiliaria)
+                        total_general_prop += int(monto_propietario)
 
             # ORDENAMIENTO
             if order_by == "fecha":
@@ -1338,8 +1339,6 @@ def obtener_pagos_liquidacion(entidad_id, tipo_busqueda, fecha_ini, fecha_fin, o
                 lista_ordenada = sorted(filas, key=lambda k: k['lote'])
 
             lista_ordenada[0]['misma_fraccion'] = False
-            # except Exception, error:
-            #    print error
             fila = {}
             fila['total_general_pagado'] = unicode('{:,}'.format(total_general_pagado)).replace(",", ".")
             fila['total_general_inmobiliaria'] = unicode('{:,}'.format(total_general_inm)).replace(",", ".")
@@ -1620,6 +1619,7 @@ def obtener_pagos_liquidacion(entidad_id, tipo_busqueda, fecha_ini, fecha_fin, o
 
                                 # Se setean los datos de cada fila
                                 fila = {}
+                                fila['cuota_obsequio'] = pago['cuota_obsequio']
                                 fila['misma_fraccion'] = True
                                 fila['fraccion'] = unicode(venta.lote.manzana.fraccion)
                                 fila['fecha_de_pago'] = fecha_pago
@@ -1627,10 +1627,30 @@ def obtener_pagos_liquidacion(entidad_id, tipo_busqueda, fecha_ini, fecha_fin, o
                                 fila['lote'] = unicode(pago['lote'])
                                 fila['cliente'] = unicode(venta.cliente)
                                 fila['nro_cuota'] = unicode(pago['nro_cuota_y_total'])
-                                fila['total_de_cuotas'] = unicode('{:,}'.format(int(pago['monto']))).replace(",", ".")
-                                fila['monto_inmobiliaria'] = unicode('{:,}'.format(monto_inmobiliaria)).replace(",",
-                                                                                                                ".")
-                                fila['monto_propietario'] = unicode('{:,}'.format(monto_propietario)).replace(",", ".")
+                                if pago['cuota_obsequio'] == True:
+                                    fila['total_de_cuotas'] = unicode('{:,}'.format(0)).replace(",",".")
+                                    fila['monto_inmobiliaria'] = unicode('{:,}'.format(0)).replace(",",".")
+                                    fila['monto_propietario'] = unicode('{:,}'.format(0)).replace(",",".")
+                                    # Se suman los TOTALES por FRACCION
+                                    total_monto_inm += int(0)
+                                    total_monto_prop += int(0)
+                                    total_monto_pagado += int(0)
+                                    # Acumulamos para los TOTALES GENERALES
+                                    total_general_pagado += int(0)
+                                    total_general_inm += int(0)
+                                    total_general_prop += int(0)
+                                else:
+                                    fila['total_de_cuotas'] = unicode('{:,}'.format(int(pago['monto']))).replace(",", ".")
+                                    fila['monto_inmobiliaria'] = unicode('{:,}'.format(monto_inmobiliaria)).replace(",",".")
+                                    fila['monto_propietario'] = unicode('{:,}'.format(monto_propietario)).replace(",", ".")
+                                    # Se suman los TOTALES por FRACCION
+                                    total_monto_inm += int(monto_inmobiliaria)
+                                    total_monto_prop += int(monto_propietario)
+                                    total_monto_pagado += int(pago['monto'])
+                                    # Acumulamos para los TOTALES GENERALES
+                                    total_general_pagado += int(pago['monto'])
+                                    total_general_inm += int(monto_inmobiliaria)
+                                    total_general_prop += int(monto_propietario)
 
                                 cuotas_detalles = get_cuota_information_by_lote(pago['lote'].id, int(pago['nro_cuota']),
                                                                                 True, True, venta)
@@ -1645,15 +1665,6 @@ def obtener_pagos_liquidacion(entidad_id, tipo_busqueda, fecha_ini, fecha_fin, o
 
                                 # if venta.lote.manzana.fraccion != g_fraccion:
                                 ok = False
-                                # Se suman los TOTALES por FRACCION
-                                total_monto_inm += int(monto_inmobiliaria)
-                                total_monto_prop += int(monto_propietario)
-                                total_monto_pagado += int(pago['monto'])
-
-                                # Acumulamos para los TOTALES GENERALES
-                                total_general_pagado += int(pago['monto'])
-                                total_general_inm += int(monto_inmobiliaria)
-                                total_general_prop += int(monto_propietario)
 
                                 filas_fraccion.append(fila)
 
@@ -1671,6 +1682,7 @@ def obtener_pagos_liquidacion(entidad_id, tipo_busqueda, fecha_ini, fecha_fin, o
 
                                 # Se setean los datos de cada fila
                                 fila = {}
+                                fila['cuota_obsequio'] = pago['cuota_obsequio']
                                 fila['misma_fraccion'] = True
                                 fila['fraccion'] = unicode(venta.lote.manzana.fraccion)
                                 fila['fecha_de_pago'] = fecha_pago
@@ -1678,10 +1690,31 @@ def obtener_pagos_liquidacion(entidad_id, tipo_busqueda, fecha_ini, fecha_fin, o
                                 fila['lote'] = unicode(pago['lote'])
                                 fila['cliente'] = unicode(venta.cliente)
                                 fila['nro_cuota'] = unicode(pago['nro_cuota_y_total'])
-                                fila['total_de_cuotas'] = unicode('{:,}'.format(int(pago['monto']))).replace(",", ".")
-                                fila['monto_inmobiliaria'] = unicode('{:,}'.format(monto_inmobiliaria)).replace(",",
-                                                                                                                ".")
-                                fila['monto_propietario'] = unicode('{:,}'.format(monto_propietario)).replace(",", ".")
+                                if pago['cuota_obsequio'] == True:
+                                    fila['total_de_cuotas'] = unicode('{:,}'.format(0)).replace(",",".")
+                                    fila['monto_inmobiliaria'] = unicode('{:,}'.format(0)).replace(",",".")
+                                    fila['monto_propietario'] = unicode('{:,}'.format(0)).replace(",",".")
+                                    # Se suman los TOTALES por FRACCION
+                                    total_monto_inm += int(0)
+                                    total_monto_prop += int(0)
+                                    total_monto_pagado += int(0)
+                                    # Acumulamos para los TOTALES GENERALES
+                                    total_general_pagado += int(0)
+                                    total_general_inm += int(0)
+                                    total_general_prop += int(0)
+
+                                else:
+                                    fila['total_de_cuotas'] = unicode('{:,}'.format(int(pago['monto']))).replace(",", ".")
+                                    fila['monto_inmobiliaria'] = unicode('{:,}'.format(monto_inmobiliaria)).replace(",",".")
+                                    fila['monto_propietario'] = unicode('{:,}'.format(monto_propietario)).replace(",", ".")
+                                    # Se suman los TOTALES por FRACCION
+                                    total_monto_inm += int(monto_inmobiliaria)
+                                    total_monto_prop += int(monto_propietario)
+                                    total_monto_pagado += int(pago['monto'])
+                                    # Acumulamos para los TOTALES GENERALES
+                                    total_general_pagado += int(pago['monto'])
+                                    total_general_inm += int(monto_inmobiliaria)
+                                    total_general_prop += int(monto_propietario)
 
                                 cuotas_detalles = get_cuota_information_by_lote(pago['lote'].id, int(pago['nro_cuota']),
                                                                                 True, True, venta)
@@ -1696,15 +1729,6 @@ def obtener_pagos_liquidacion(entidad_id, tipo_busqueda, fecha_ini, fecha_fin, o
 
                                 # if venta.lote.manzana.fraccion != g_fraccion:
                                 ok = False
-                                # Se suman los TOTALES por FRACCION
-                                total_monto_inm += int(monto_inmobiliaria)
-                                total_monto_prop += int(monto_propietario)
-                                total_monto_pagado += int(pago['monto'])
-
-                                # Acumulamos para los TOTALES GENERALES
-                                total_general_pagado += int(pago['monto'])
-                                total_general_inm += int(monto_inmobiliaria)
-                                total_general_prop += int(monto_propietario)
 
                                 filas_fraccion.append(fila)
 
@@ -3673,6 +3697,7 @@ def liquidacion_propietarios_reporte_excel(request):
         cont = int(request.GET['cont'])
         descuentos = []
         descripcion_monto_descuento = {}
+        cuotas_obsequios = []
         monto_total_descuento = 0
         for i in range(1, cont+1, 1):
             descripcion_monto_descuento = {}
@@ -3785,8 +3810,7 @@ def liquidacion_propietarios_reporte_excel(request):
          )
         sheet.footer_str = ''
 
-
-
+        monto_cuota=0
         c=0
         for pago in lista:
                 try:
@@ -3829,6 +3853,10 @@ def liquidacion_propietarios_reporte_excel(request):
                     sheet.write(c, 3, pago['nro_cuota'],style_datos_texto)
                     sheet.write(c, 4, pago['mes'],style_datos_texto)
                     sheet.write(c, 5, pago['total_de_cuotas'],style_datos_montos)
+                    if pago['total_de_cuotas'] == '0':
+                        cuotas_obsequios.append(pago['nro_cuota'])
+                    else:
+                        monto_cuota = pago['total_de_cuotas']
                     sheet.write(c, 6, pago['monto_inmobiliaria'],style_datos_montos)
                     sheet.write(c, 7, pago['monto_propietario'], style_datos_montos)
                 except Exception, error:
@@ -3866,6 +3894,19 @@ def liquidacion_propietarios_reporte_excel(request):
                         sheet.write(c,6, general_inmobiliario_con_comision_txt, style_datos_montos)
 
                         c+=2
+
+                        if len(cuotas_obsequios)> 0:
+                            sheet.write_merge(c, c, 1, 6, "Cuotas Obsequios", style_subrayado_normal_titulo)
+                            c+=1
+                            total_cuotas_obsequios=0
+                            for cuota in cuotas_obsequios:
+                                sheet.write(c, 1, cuota, style_normal)
+                                sheet.write(c, 6, monto_cuota, style_datos_montos)
+                                total_cuotas_obsequios = total_cuotas_obsequios + int(format(monto_cuota).replace('.', ''))
+                                c += 1
+                            sheet.write(c, 1, "Total descuentos", style_titulos_columna_resaltados)
+                            sheet.write(c, 6, unicode('{:,}'.format(total_cuotas_obsequios).replace(",", ".")), style_datos_montos_importante_doble_borde)
+                            c += 1
 
                         sheet.write_merge(c,c,1,6, "RESUMEN IMPOSITIVO Y OTROS DESCUENTOS",style_subrayado_normal_titulo)
                         c+=1

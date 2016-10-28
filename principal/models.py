@@ -627,6 +627,7 @@ class PagoDeCuotas(models.Model):
     total_de_pago = models.IntegerField()
     factura = models.ForeignKey(Factura,on_delete=models.PROTECT)
     detalle = models.TextField()
+    cuota_obsequio = models.BooleanField()
     def as_json(self):
         return dict(
             lote=unicode(self.lote),

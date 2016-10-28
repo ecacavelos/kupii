@@ -705,6 +705,7 @@ def get_pago_cuotas(venta, fecha_ini,fecha_fin, pagos = None, pagos_anteriores =
                         cuota['refuerzo'] = esRefuerzo
                         cuota['lote'] = pago.lote
                         cuota['fraccion'] = dict(pago.lote.manzana.fraccion)
+                        cuota['cuota_obsequio'] = pago.cuota_obsequio
                         ventas_pagos_list.append(cuota)
                         numero_cuota +=1
                 else:
@@ -717,6 +718,7 @@ def get_pago_cuotas(venta, fecha_ini,fecha_fin, pagos = None, pagos_anteriores =
                     cuota['refuerzo'] = esRefuerzo
                     cuota['lote'] = pago.lote
                     cuota['fraccion'] = pago.lote.manzana.fraccion
+                    cuota['cuota_obsequio'] = pago.cuota_obsequio
                     ventas_pagos_list.append(cuota)
                     numero_cuota +=1
     else:
@@ -734,6 +736,7 @@ def get_pago_cuotas(venta, fecha_ini,fecha_fin, pagos = None, pagos_anteriores =
                         cuota['refuerzo'] = esRefuerzo
                         cuota['lote'] = pago.lote
                         cuota['fraccion'] = pago.lote.manzana.fraccion                    
+                        cuota['cuota_obsequio'] = pago.cuota_obsequio
                         ventas_pagos_list.append(cuota)
                         numero_cuota +=1
                 else:
@@ -746,6 +749,7 @@ def get_pago_cuotas(venta, fecha_ini,fecha_fin, pagos = None, pagos_anteriores =
                     cuota['refuerzo'] = esRefuerzo
                     cuota['lote'] = pago.lote
                     cuota['fraccion'] = pago.lote.manzana.fraccion
+                    cuota['cuota_obsequio'] = pago.cuota_obsequio
                     ventas_pagos_list.append(cuota)
                     numero_cuota +=1
     return ventas_pagos_list

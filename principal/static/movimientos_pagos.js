@@ -60,6 +60,14 @@ $(document).ready(function() {
 		$('#id_modal').modal();
 	});
 
+    $(".checkbox_cuota_obsequio").change(function () {
+        if (document.getElementById("checkbox_cuota_obsequio").checked == true){
+           $("#cuota_obsequio").val(1);
+        }else{
+           $("#cuota_obsequio").val(0);
+        }
+    });
+	
 });
 
 window.onload = function() {
@@ -160,7 +168,8 @@ function validatePago() {
 			pago_total_de_pago : $("#total_pago").val(),
 			detalle : $("#detalle").val(),
 			interes_original :	$("#interes_original").val(),
-			resumen_cuotas : $("#resumen_cuotas").text().split("/")[0]
+			resumen_cuotas : $("#resumen_cuotas").text().split("/")[0],
+			cuota_obsequio : $("#cuota_obsequio").val()
 		}
 	});
 	request4.done(function(msg) {
