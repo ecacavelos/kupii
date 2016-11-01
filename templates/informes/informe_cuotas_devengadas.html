@@ -1,0 +1,179 @@
+{% extends "lotes/base_lotes.html" %}
+{% block header_scripts %}
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		$('#lote_ini').focus();
+		//Cambiar calendario a español
+		$.datepicker.regional['es'] = {
+			closeText : 'Cerrar',
+			prevText : '<Ant',
+			nextText : 'Sig>',
+			currentText : 'Hoy',
+			monthNames : ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+			monthNamesShort : ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+			dayNames : ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
+			dayNamesShort : ['Dom', 'Lun', 'Mar', 'Mié', 'Juv', 'Vie', 'Sáb'],
+			dayNamesMin : ['Do', 'Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sá'],
+			weekHeader : 'Sm',
+			dateFormat : 'dd/mm/yy',
+			firstDay : 1,
+			isRTL : false,
+			showMonthAfterYear : false,
+			yearSuffix : ''
+		};
+		// Setear idioma al calendario
+		$.datepicker.setDefaults($.datepicker.regional['es']);
+		var d = new Date();
+		var curr_date = d.getDate();
+		var curr_month = d.getMonth() + 1;
+		var curr_year = d.getFullYear();
+		if (curr_date < 10) {
+			curr_date = "0" + curr_date.toString();
+		}
+		if (curr_month < 10) {
+			curr_month = "0" + curr_month.toString();
+		}
+		var hoy = (curr_date + "/" + curr_month + "/" + curr_year);
+
+		var fecha_ini = "{{fecha_ini}}";
+		var fecha_fin = "{{fecha_fin}}";
+		mostrar_mvtos = "{{mostrar_mvtos}}";
+		mostrar_transferencias = "{{mostrar_transferencias}}";
+		mostrar_reservas = "{{mostrar_reservas}}";
+		mostrar_cambios = "{{mostrar_cambios}}";
+		$('#fecha_ini').val(fecha_ini);
+		$('#fecha_fin').val(fecha_fin);
+		$('#lote_ini').mask('###/###/####');
+		$('#lote_fin').mask('###/###/####');
+        $('#fecha_ini').mask('##/##/####');
+		$("#fecha_ini").datepicker({
+			dateFormat : 'dd/mm/yy'
+		});
+		$('#fecha_fin').mask('##/##/####');
+		$("#fecha_fin").datepicker({
+			dateFormat : 'dd/mm/yy'
+		});
+
+			if (mostrar_mvtos == 'True')
+				$('#listado-ventas').show();
+			else
+				$('#listado-ventas').hide();
+			if (mostrar_transferencias == 'True')
+				$('#listado-transferencias').show();
+			else
+				$('#listado-transferencias').hide();
+			if (mostrar_cambios == 'True')
+				$('#listado-cambios').show();
+			else
+				$('#listado-cambios').hide();
+			if (mostrar_reservas == 'True')
+				$('#listado-reservas').show();		
+			else
+				$('#listado-reservas').hide();	
+			$('.pagination').show();
+		//}
+		
+	});
+
+	function retrieve_informe_movimientos() {
+		if ($('#fecha_ini').val() == 0 || $('#fecha_fin').val() == "") {
+			alert("Debe ingresar un rango de fechas");
+			return;
+		}
+        $("#formato-reporte").val("excel");
+		window.location.href = base_context+"/informes/informe_movimientos_reporte_excel?fecha_ini=" + $('#fecha_ini').val() + "&fecha_fin=" + $('#fecha_fin').val() + "&lote_ini=" + $('#lote_ini').val()+ "&lote_fin=" + $('#lote_fin').val();
+	}
+
+	function validar() {
+		if ($('#fecha_ini').val() == 0 || $('#fecha_fin').val() == "") {
+			alert("Debe ingresar un rango de fechas");
+			return;
+		}
+		$("#frm_busqueda").submit();
+	}
+
+</script>
+{% endblock %}
+{% block content %}
+<div class="gri16 text-izquierda" id="breadcumb">
+	<a href="{% url 'frontend_home' %}">Inicio</a><span class="verde-1">></span>
+	<a href="{% url 'frontend_home' %}informes/">Informes</a>
+	<span class="verde-1">> Informe de cuotas devengadas </span>
+</div>
+
+<div class="clear"></div>
+
+<h1>Informe de cuotas devengadas </h1>
+
+<div class="grid_6">
+	<form name="frm_busqueda" id="frm_busqueda" method="get" action="{% url 'frontend_home' %}informes/informe_cuotas_devengadas/">
+		<table id="lista-categoria" frame="box">
+			<tr>
+				<th class="acciones" colspan="3"><strong><a href="#" style="color: white">Filtrar</a></strong></th>
+			</tr>
+			<tr>
+				<td> Rango de Fecha: </td>
+				<td>
+				<input name="fecha_ini" id="fecha_ini" type="text" value="" />
+				</td>
+				<td>
+				<input name="fecha_fin" id="fecha_fin" type="text" value="" />
+				</td>
+			</tr>
+			<tr>
+				<td>
+				<input type="button" value="Buscar" onclick="validar();" class="historico" style="cursor: pointer"/>
+				</td>
+				<td><a class="boton-verde" id="id_boton" onclick="retrieve_informe_movimientos();">Descargar Excel</a></td>
+			</tr>
+            <input type="hidden" id="formato-reporte" name="formato-reporte" value="pantalla"/>
+        </table>
+	</form>
+</div>
+<div class="clear"></div>
+<div id="listado-cuadro-busqueda">
+
+	<br>
+	<br>
+</div>
+
+<div id="listado-item-lote">
+	<table border="1" cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
+		<th>ID Fracci&oacute;n</th>
+        <th>Manzana Nro</th>
+        <th>Lote Nro</th>
+        <th>Nombre Fracci&oacute;n</th>
+        <th>Fecha Vto</th>
+        <th>Monto cuota</th>
+        <th>Nro cuota</th>
+		{% for hw in object_list %}
+		{% if forloop.counter|divisibleby:2 %}
+		<tr>
+			<td> {{hw.manzana.fraccion.id}} </td>
+			<td> {{hw.manzana.nro_manzana}} </td>
+			<td><a href="{{hw.id}}">{{hw.nro_lote}} <strong>(Ver Detalles)</strong></a></td>
+			<td> {{hw.manzana.fraccion}} </td>
+            <td> {{ hw.venta.fecha_de_vencimiento}} </td>
+            <td> {{ hw.venta.precio_de_cuota}} </td>
+            <td> {{ hw.nro_cuota }} </td>
+		</tr>
+		{% else %}
+		<tr class="bkg_gris">
+			<td> {{hw.manzana.fraccion.id}} </td>
+			<td> {{hw.manzana.nro_manzana}} </td>
+			<td><a href="{{hw.id}}">{{hw.nro_lote}} <strong>(Ver Detalles)</strong></a></td>
+			<td> {{hw.manzana.fraccion}} </td>
+            <td> {{ hw.venta.fecha_de_vencimiento}} </td>
+            <td> {{ hw.venta.precio_de_cuota}} </td>
+            <td> {{ hw.nro_cuota }} </td>
+		</tr>
+		{% endif %}
+		{% endfor %}
+	</table>
+</div>
+
+<div id="footer">
+	<a href="{% url 'frontend_home' %}informes" class="boton-verde">Volver al módulo de Informes</a>
+</div>
+{% endblock %} 

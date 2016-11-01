@@ -332,6 +332,13 @@ def filtros_establecidos(request, tipo_informe):
             return True
         except:
             print('Parametros no seteados')     
+    elif tipo_informe == 'informe_cuotas_devengadas':
+        try:
+            fecha_ini=request['fecha_ini']
+            fecha_fin=request['fecha_fin']
+            return True
+        except:
+            print('Parametros no seteados')
     return False
 
 
