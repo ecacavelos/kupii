@@ -370,7 +370,9 @@ def pago_de_cuotas(request):
                     dia = fecha_actual[0][0].day
                     mes = fecha_actual[0][0].month
                     anho = fecha_actual[0][0].year
-                    fecha_actual = unicode(dia) + '/' + unicode(mes) + '/'+ unicode(anho)
+                    if dia>=1 and dia<=9:
+                        dia = unicode('0') + unicode(dia)
+                    fecha_actual = unicode(dia) + '/' + unicode(mes) + '/' + unicode(anho)
                 c = RequestContext(request, {
                    'grupo': grupo,
                    'fecha_actual' : fecha_actual
