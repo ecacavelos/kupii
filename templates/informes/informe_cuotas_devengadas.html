@@ -38,14 +38,16 @@
 
 		var fecha_ini = "{{fecha_ini}}";
 		var fecha_fin = "{{fecha_fin}}";
+		var fraccion = '{{fraccion}}';
+		var fraccion_label = '{{fraccion_label}}';
 		mostrar_mvtos = "{{mostrar_mvtos}}";
 		mostrar_transferencias = "{{mostrar_transferencias}}";
 		mostrar_reservas = "{{mostrar_reservas}}";
 		mostrar_cambios = "{{mostrar_cambios}}";
 		$('#fecha_ini').val(fecha_ini);
 		$('#fecha_fin').val(fecha_fin);
-		$('#lote_ini').mask('###/###/####');
-		$('#lote_fin').mask('###/###/####');
+		$('#fraccion').val(fraccion);
+		$('#fraccion_label').val(fraccion_label);
         $('#fecha_ini').mask('##/##/####');
 		$("#fecha_ini").datepicker({
 			dateFormat : 'dd/mm/yy'
@@ -73,16 +75,30 @@
 				$('#listado-reservas').hide();	
 			$('.pagination').show();
 		//}
+
+        base_url_fraccion = base_context + "/ajax/get_fracciones_by_name/";
+		params="value";
+        var id_fraccion;
+        params = "value";
+        $("#fraccion_label").autocomplete({
+	        source : base_url_fraccion,
+	        minLength : 1,
+	        select : function(event, ui) {
+		        id_fraccion = ui.item.id;
+		        $("#fraccion").val(id_fraccion);
+	        }
+        });
+
 		
 	});
 
-	function retrieve_informe_movimientos() {
+	function retrieve_informe_cuotas_devengadas() {
 		if ($('#fecha_ini').val() == 0 || $('#fecha_fin').val() == "") {
 			alert("Debe ingresar un rango de fechas");
 			return;
 		}
         $("#formato-reporte").val("excel");
-		window.location.href = base_context+"/informes/informe_movimientos_reporte_excel?fecha_ini=" + $('#fecha_ini').val() + "&fecha_fin=" + $('#fecha_fin').val() + "&lote_ini=" + $('#lote_ini').val()+ "&lote_fin=" + $('#lote_fin').val();
+		window.location.href = base_context+"/informes/informe_cuotas_devengadas_reporte_excel?fecha_ini=" + $('#fecha_ini').val() + "&fecha_fin=" + $('#fecha_fin').val() + "&fraccion=" + $('#fraccion').val()+ "&fraccion_label=" + $('#fraccion_label').val();
 	}
 
 	function validar() {
@@ -123,9 +139,19 @@
 			</tr>
 			<tr>
 				<td>
+					Fraccion:
+				</td>
+				<td>
+					<input type="text" id="fraccion_label" name="fraccion_label" placeholder="Todas las fracciones" />
+					<input type="hidden" id="fraccion" name="fraccion"/>
+				</td>
+				<td></td>
+			</tr>
+			<tr>
+				<td>
 				<input type="button" value="Buscar" onclick="validar();" class="historico" style="cursor: pointer"/>
 				</td>
-				<td><a class="boton-verde" id="id_boton" onclick="retrieve_informe_movimientos();">Descargar Excel</a></td>
+				<td><a class="boton-verde" id="id_boton" onclick="retrieve_informe_cuotas_devengadas();">Descargar Excel</a></td>
 			</tr>
             <input type="hidden" id="formato-reporte" name="formato-reporte" value="pantalla"/>
         </table>
@@ -140,9 +166,9 @@
 
 <div id="listado-item-lote">
 	<table border="1" cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
-		<th>ID Fracci&oacute;n</th>
-        <th>Manzana Nro</th>
-        <th>Lote Nro</th>
+{#		<th>ID Fracci&oacute;n</th>#}
+{#        <th>Manzana Nro</th>#}
+        <th>Lote</th>
         <th>Nombre Fracci&oacute;n</th>
         <th>Fecha Vto</th>
         <th>Monto cuota</th>
@@ -150,23 +176,22 @@
 		{% for hw in object_list %}
 		{% if forloop.counter|divisibleby:2 %}
 		<tr>
-			<td> {{hw.manzana.fraccion.id}} </td>
-			<td> {{hw.manzana.nro_manzana}} </td>
-			<td><a href="{{hw.id}}">{{hw.nro_lote}} <strong>(Ver Detalles)</strong></a></td>
+{#			<td> {{hw.manzana.fraccion.id}} </td>#}
+{#			<td> {{hw.manzana.nro_manzana}} </td>#}
+{#			<td> {{hw.nro_lote}} </td>#}
+			<td> {{hw.codigo_paralot}} </td>
 			<td> {{hw.manzana.fraccion}} </td>
-            <td> {{ hw.venta.fecha_de_vencimiento}} </td>
-            <td> {{ hw.venta.precio_de_cuota}} </td>
-            <td> {{ hw.nro_cuota }} </td>
+            <td> {{ hw.boleto_nro}} </td>
+            <td> {{ hw.casa_edificada}} </td>
+            <td> {{ hw.comentarios }} </td>
 		</tr>
 		{% else %}
 		<tr class="bkg_gris">
-			<td> {{hw.manzana.fraccion.id}} </td>
-			<td> {{hw.manzana.nro_manzana}} </td>
-			<td><a href="{{hw.id}}">{{hw.nro_lote}} <strong>(Ver Detalles)</strong></a></td>
+			<td> {{hw.codigo_paralot}} </td>
 			<td> {{hw.manzana.fraccion}} </td>
-            <td> {{ hw.venta.fecha_de_vencimiento}} </td>
-            <td> {{ hw.venta.precio_de_cuota}} </td>
-            <td> {{ hw.nro_cuota }} </td>
+            <td> {{ hw.boleto_nro}} </td>
+            <td> {{ hw.casa_edificada}} </td>
+            <td> {{ hw.comentarios }} </td>
 		</tr>
 		{% endif %}
 		{% endfor %}
