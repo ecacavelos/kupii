@@ -477,11 +477,24 @@ def pago_de_cuotas_venta(request, id_venta):
                     return HttpResponseServerError("La cantidad de cuotas a pagar, es mayor a la cantidad de cuotas restantes.")  
         
             elif request.method == 'GET':
+                query = ('''SELECT NOW()''')
+                cursor = connection.cursor()
+                cursor.execute(query)
+                results = cursor.fetchall()
+                if (len(results) > 0):
+                    fecha_actual = results
+                    dia = fecha_actual[0][0].day
+                    mes = fecha_actual[0][0].month
+                    anho = fecha_actual[0][0].year
+                    if dia>=1 and dia<=9:
+                        dia = unicode('0') + unicode(dia)
+                    fecha_actual = unicode(dia) + '/' + unicode(mes) + '/' + unicode(anho)
                 venta = Venta.objects.get(pk=id_venta)
                 codigo_lote = venta.lote.codigo_paralot
                 c = RequestContext(request, {
                    'codigo_lote': codigo_lote,
-                   'grupo': grupo   
+                   'grupo': grupo,
+                   'fecha_actual': fecha_actual
                 })
                 return HttpResponse(t.render(c))
         else:
