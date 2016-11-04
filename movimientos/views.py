@@ -372,6 +372,8 @@ def pago_de_cuotas(request):
                     anho = fecha_actual[0][0].year
                     if dia>=1 and dia<=9:
                         dia = unicode('0') + unicode(dia)
+                    if mes>=1 and mes<=9:
+                        mes = unicode('0') + unicode(mes)
                     fecha_actual = unicode(dia) + '/' + unicode(mes) + '/' + unicode(anho)
                 c = RequestContext(request, {
                    'grupo': grupo,
@@ -488,6 +490,8 @@ def pago_de_cuotas_venta(request, id_venta):
                     anho = fecha_actual[0][0].year
                     if dia>=1 and dia<=9:
                         dia = unicode('0') + unicode(dia)
+                    if mes>=1 and mes<=9:
+                        mes = unicode('0') + unicode(mes)
                     fecha_actual = unicode(dia) + '/' + unicode(mes) + '/' + unicode(anho)
                 venta = Venta.objects.get(pk=id_venta)
                 codigo_lote = venta.lote.codigo_paralot
@@ -527,6 +531,18 @@ def calcular_interes(request):
              
             detalles = obtener_detalle_interes_lote(lote_id,fecha_pago_parsed,proximo_vencimiento_parsed, nro_cuotas_a_pagar)
 
+            ultimo_pago = PagoDeCuotas.objects.filter(lote_id=lote_id).order_by('-fecha_de_pago')
+            if len(ultimo_pago) > 0:
+                query = ('''SELECT NOW()''')
+                cursor = connection.cursor()
+                cursor.execute(query)
+                results = cursor.fetchall()
+                if (len(results) > 0):
+                    fecha_actual = results
+                    mes = fecha_actual[0][0].month
+                #     si la ultima fecha de pago es la del mes actual, le exonera la gestion de cobranza
+                if ultimo_pago[0].fecha_de_pago.month == mes:
+                    detalles[1]['gestion_cobranza'] = 0
             return HttpResponse(json.dumps(detalles),content_type="application/json")
     else:
         return HttpResponseRedirect("/login")
