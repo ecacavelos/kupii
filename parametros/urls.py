@@ -49,4 +49,5 @@ urlpatterns = patterns('parametros.views',
     url(r'^timbrado/listado/(?P<timbrado_id>\d+)/rango_factura/listado_busqueda_rango_factura/$', 'listar_busqueda_rango_factura'),
     url(r'^timbrado/listado/(?P<timbrado_id>\d+)/rango_factura/listado_busqueda_rango_factura/(?P<rango_factura_id>\d+)/(?P<usuario_id>\d+)/$', 'detalle_rango_factura'),
     url(r'^timbrado/listado/(?P<timbrado_id>\d+)/rango_factura/agregar/$', 'agregar_rango_factura'),
+    url(r'^timbrado/listado/(?P<timbrado_id>\d+)/rango_factura/asignar/(?P<rango_factura_id>\d+)/$', 'asignar_rango_factura'),
 )

@@ -73,7 +73,7 @@
 </div>
 <div id="listado-item-lote">
 		<table border="1" cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
-				<th>ID</th><!--<th>Timbrado</th>--><th>Nro Sucursal</th><th>Nro Boca</th><th>Nro Desde</th><th>Nro Hasta</th><th>Usuario</th>
+				<th>ID</th><!--<th>Timbrado</th>--><th>Nro Sucursal</th><th>Nro Boca</th><th>Nro Desde</th><th>Nro Hasta</th><th>Usuario</th><th>Asignar Usuario</th>
 				{% for rango_factura in object_list %}
 				{% if forloop.counter|divisibleby:2 %}
 					<tr>
@@ -84,6 +84,7 @@
 						<td>{{rango_factura.nro_desde}}</td>
 						<td>{{rango_factura.nro_hasta}}</td>
 						<td>{{rango_factura.usuario}}</td>
+                        <td class="recuperada celda_resumen_venta"><a href="/parametros/timbrado/listado/{{id_timbrado}}/rango_factura/asignar/{{rango_factura.id}}"><img src="/static/custom/img/black_edit.png" /></a></td>
 					</tr>
 					{% else %}
 					<tr class="bkg_gris">
@@ -94,6 +95,7 @@
 						<td>{{rango_factura.nro_desde}}</td>
 						<td>{{rango_factura.nro_hasta}}</td>
 						<td>{{rango_factura.usuario}}</td>
+                        <td class="recuperada celda_resumen_venta"><a href="/parametros/timbrado/listado/{{id_timbrado}}/rango_factura/asignar/{{rango_factura.id}}"><img src="/static/custom/img/black_edit.png" /></a></td>
 					</tr>
 					{% endif %}				
 				{% endfor %}

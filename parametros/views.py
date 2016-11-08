@@ -1125,6 +1125,59 @@ def agregar_rango_factura(request, timbrado_id):
     })
     return HttpResponse(t.render(c))
 
+
+#funcion para asignar rangos
+def asignar_rango_factura(request, timbrado_id, rango_factura_id):
+
+    if request.user.is_authenticated():
+        if verificar_permisos(request.user.id, permisos.ADD_RANGO_FACTURA):
+            t = loader.get_template('parametros/timbrado/rango_factura/asignar.html')
+            timbrado = Timbrado.objects.get(id=timbrado_id)
+            rango_factura = RangoFactura.objects.get(id=rango_factura_id)
+        else:
+            t = loader.get_template('index2.html')
+            grupo= request.user.groups.get().id
+            c = RequestContext(request, {
+                 'grupo': grupo,
+                 'id_timbrado': timbrado_id
+            })
+            return HttpResponse(t.render(c))
+    else:
+        return HttpResponseRedirect(reverse('login'))
+
+    if request.method == 'POST':
+        form = RangoFacturaForm(request.POST)
+        if request.POST.get('user','') != '':
+            user = request.POST.get('user','')
+            user = User.objects.get(username=user)
+            trf = TimbradoRangoFacturaUsuario.objects.filter(timbrado=timbrado_id, rango_factura=rango_factura_id)
+            trf = trf[0]
+            timbradoRangoFacturaUsuario = TimbradoRangoFacturaUsuario()
+            timbradoRangoFacturaUsuario.timbrado_id = trf.timbrado_id
+            timbradoRangoFacturaUsuario.rango_factura_id = trf.rango_factura_id
+            timbradoRangoFacturaUsuario.usuario=user
+            timbradoRangoFacturaUsuario.save()
+
+            #Se loggea la accion del usuario
+            loggear_accion(request.user, "Asignar", "Rango Factura", trf)
+
+            return HttpResponseRedirect('/parametros/timbrado/listado/'+unicode(timbrado_id)+'/rango_factura/listado')
+    else:
+        form = RangoFacturaForm()
+        users = User.objects.all()
+        # setattr(form, 'nro_boca', rango_factura.nro_boca)
+        # setattr(form, 'nro_desde', rango_factura.nro_desde)
+        # setattr(form, 'nro_hasta', rango_factura.nro_hasta)
+        # setattr(form, 'nro_sucursal', rango_factura.nro_desde)
+    c = RequestContext(request, {
+        'form': form,
+        'timbrado': timbrado,
+        'rango_factura': rango_factura,
+        'users': users,
+    })
+    return HttpResponse(t.render(c))
+
+
 #funcion para agregar planes de pago de vendedores
 def agregar_plan_de_pago_vendedores(request):
   
