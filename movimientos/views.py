@@ -542,7 +542,7 @@ def calcular_interes(request):
                     mes = fecha_actual[0][0].month
                 #     si la ultima fecha de pago es la del mes actual, le exonera la gestion de cobranza
                 if ultimo_pago[0].fecha_de_pago.month == mes:
-                    if (len(detalles) > 0):
+                    if (len(detalles) > 1):
                         detalles[1]['gestion_cobranza'] = 0
             return HttpResponse(json.dumps(detalles),content_type="application/json")
     else:
