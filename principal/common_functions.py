@@ -339,6 +339,12 @@ def filtros_establecidos(request, tipo_informe):
             return True
         except:
             print('Parametros no seteados')
+    elif tipo_informe == 'deudores_por_venta':
+        try:
+            fraccion=request['fraccion']
+            return True
+        except:
+            print('Parametros no seteados')
     return False
 
 

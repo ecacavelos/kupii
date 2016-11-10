@@ -541,6 +541,97 @@ def obtener_clientes_atrasados(filtros,fraccion, meses_peticion):
 
     return clientes_atrasados
 
+def obtener_deudores_por_venta(filtros,fraccion,meses_peticion):
+
+    # OBJETO QUE SE UTILIZA PARA CARGAR TODOS LOS CLIENTES ATRASADOS A MOSTRAR
+    deudores_por_venta = []
+
+    # QUERY PARA TRAER TODOS LOS LOTES DE LA FRACCION EN CUESTION
+    query = (
+        '''
+        select lote.* from principal_fraccion fraccion, principal_manzana manzana, principal_lote lote WHERE manzana.id = lote.manzana_id AND manzana.fraccion_id = fraccion.id
+        '''
+    )
+
+    query += " AND  fraccion.id =  %s "
+    query += " ORDER BY codigo_paralot "
+    cursor = connection.cursor()
+    cursor.execute(query, [fraccion])
+
+    # Por ultimo, traemos ordenados los registros por el CODIGO DE LOTE
+    # query += " ORDER BY codigo_paralot "
+
+    # try:
+    results = cursor.fetchall()  # LOTES
+
+    for r in results:  # RECORREMOS TODOS LOS LOTES DE LA FRACCION
+
+        cliente_atrasado = {}
+        cliente_atrasado['cuotas_devengadas'] = 0
+
+        # OBTENER LA ULTIMA VENTA Y SU DETALLE
+        ultima_venta = get_ultima_venta_no_recuperada(r[0])
+
+        # SE TRATAN LOS CASOS EN DONDE NO SE ENCUENTRA VENTA PARA ALGUN LOTE.
+        if ultima_venta != None:
+            detalle_cuotas = get_cuotas_detail_by_lote(unicode(str(r[0])))
+            hoy = date.today()
+            cuotas_a_pagar = obtener_cuotas_a_pagar_full(ultima_venta, hoy, detalle_cuotas,500)  # Maximo atraso = 500 para tener un parametro maximo de atraso en las cuotas.
+
+            if detalle_cuotas != None:
+                if detalle_cuotas['cant_cuotas_pagadas'] != detalle_cuotas['cantidad_total_cuotas']:
+                    prox_vto_date_parsed = datetime.datetime.strptime(unicode(detalle_cuotas['proximo_vencimiento']),'%d/%m/%Y').date()
+                    if prox_vto_date_parsed < datetime.datetime.now().date():
+                        cliente_atrasado['cuotas_devengadas'] = cliente_atrasado['cuotas_devengadas'] + ultima_venta.precio_de_cuota
+
+        else:
+            cuotas_a_pagar = []
+
+        if (len(cuotas_a_pagar) >= meses_peticion + 1):
+
+            cuotas_atrasadas = detalle_cuotas['cantidad_total_cuotas'] - detalle_cuotas['cant_cuotas_pagadas'];  # CUOTAS ATRASADAS
+            cantidad_cuotas_pagadas = detalle_cuotas['cant_cuotas_pagadas'];  # CUOTAS PAGADAS
+
+            # DATOS DEL CLIENTE
+            cliente_atrasado['cliente'] = ultima_venta.cliente.nombres + ' ' + ultima_venta.cliente.apellidos
+            cliente_atrasado['direccion_particular'] = ultima_venta.cliente.direccion_particular
+            cliente_atrasado['direccion_cobro'] = ultima_venta.cliente.direccion_cobro
+            cliente_atrasado['telefono_particular'] = ultima_venta.cliente.telefono_particular
+            cliente_atrasado['telefono_laboral'] = ultima_venta.cliente.telefono_laboral
+            cliente_atrasado['celular_1'] = ultima_venta.cliente.celular_1
+            cliente_atrasado['celular_2'] = ultima_venta.cliente.celular_2
+
+            cliente_atrasado['lote'] = ultima_venta.lote.codigo_paralot
+
+            # FECHA VENTA
+            if (ultima_venta.fecha_de_venta != None):
+                cliente_atrasado['fecha_venta'] = ultima_venta.fecha_de_venta
+            else:
+                cliente_atrasado['fecha_venta'] = 'Dato no disponible'
+
+            cliente_atrasado['lote'] = ultima_venta.lote.codigo_paralot
+
+            # IMPORTE CUOTA
+            cliente_atrasado['importe_cuota'] = unicode('{:,}'.format(ultima_venta.precio_de_cuota)).replace(",", ".")
+
+            # CUOTAS ATRASADAS
+            cliente_atrasado['cuotas_atrasadas'] = unicode('{:,}'.format(cuotas_atrasadas)).replace(",", ".")
+
+            # TOTAL ATRASO
+            total_atrasado = cuotas_atrasadas * ultima_venta.precio_de_cuota;
+            cliente_atrasado['total_atrasado'] = unicode('{:,}'.format(total_atrasado)).replace(",", ".")
+
+            # CUOTAS PAGADAS
+            cuotas_pagadas = unicode('{:,}'.format(cantidad_cuotas_pagadas)).replace(",", ".") + '/' + unicode(
+                '{:,}'.format(detalle_cuotas['cantidad_total_cuotas'])).replace(",", ".")
+            cliente_atrasado['cuotas_pagadas'] = cuotas_pagadas
+
+            # TOTAL PAGADO
+            total_pagado = cantidad_cuotas_pagadas * ultima_venta.precio_de_cuota;
+            cliente_atrasado['total_pagado'] = unicode('{:,}'.format(total_pagado)).replace(",", ".")
+            deudores_por_venta.append(cliente_atrasado)
+
+    return deudores_por_venta
 
 def obtener_clientes_atrasados_del_dia():
 
@@ -732,7 +823,6 @@ def clientes_atrasados(request):
             return HttpResponseRedirect(reverse('login'))
         
        
-
 def clientes_atrasados_2(request):
     if request.method == 'GET':
         if request.user.is_authenticated():
@@ -882,6 +972,59 @@ def clientes_atrasados_2(request):
                 return HttpResponse(t.render(c))
         else:
             return HttpResponseRedirect(reverse('login'))
+
+
+
+def deudores_por_venta(request):
+
+    if request.method == 'GET':
+        if request.user.is_authenticated():
+            if verificar_permisos(request.user.id, permisos.VER_INFORMES):
+                # TEMPLATE A CARGAR
+                t = loader.get_template('informes/deudores_por_venta.html')
+                fraccion = ''
+                if (filtros_establecidos(request.GET, 'deudores_por_venta') == False):
+                    c = RequestContext(request, {
+                        'object_list': [],
+                    })
+                    return HttpResponse(t.render(c))
+                else:
+                    fraccion = request.GET['fraccion']
+                    fraccion_label = request.GET.get('fraccion_nombre','')
+
+                    # OBJETO QUE SE UTILIZA PARA CARGAR TODOS LOS CLIENTES ATRASADOS A MOSTRAR
+                    deudores_por_venta = obtener_deudores_por_venta(1,fraccion, 0)
+                    a = len(deudores_por_venta)
+                    if a > 0:
+                        ultimo="&fraccion="+unicode(fraccion)
+                        lista = deudores_por_venta
+                        c = RequestContext(request, {
+                            'fraccion': fraccion,
+                            'fraccion_label': fraccion_label,
+                            'ultimo': ultimo,
+                            'object_list': lista,
+                            'deudores_por_venta' : deudores_por_venta
+                        })
+                        return HttpResponse(t.render(c))
+                    else:
+                        ultimo="&fraccion="+unicode(fraccion)
+                        c = RequestContext(request, {
+                            'fraccion': fraccion,
+                            'fraccion_label': fraccion_label,
+                            'ultimo': ultimo,
+                            'object_list': deudores_por_venta
+                        })
+                        return HttpResponse(t.render(c))
+            else:
+                t = loader.get_template('index2.html')
+                grupo= request.user.groups.get().id
+                c = RequestContext(request, {
+                    'grupo': grupo
+                })
+                return HttpResponse(t.render(c))
+        else:
+            return HttpResponseRedirect(reverse('login'))
+
 
 
 def informe_general(request):    
