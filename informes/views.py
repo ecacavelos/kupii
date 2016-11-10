@@ -566,8 +566,8 @@ def obtener_deudores_por_venta(filtros,fraccion,meses_peticion):
 
     for r in results:  # RECORREMOS TODOS LOS LOTES DE LA FRACCION
 
-        cliente_atrasado = {}
-        cliente_atrasado['cuotas_devengadas'] = 0
+        deudor_por_venta = {}
+        deudor_por_venta['cuotas_devengadas'] = 0
 
         # OBTENER LA ULTIMA VENTA Y SU DETALLE
         ultima_venta = get_ultima_venta_no_recuperada(r[0])
@@ -582,7 +582,8 @@ def obtener_deudores_por_venta(filtros,fraccion,meses_peticion):
                 if detalle_cuotas['cant_cuotas_pagadas'] != detalle_cuotas['cantidad_total_cuotas']:
                     prox_vto_date_parsed = datetime.datetime.strptime(unicode(detalle_cuotas['proximo_vencimiento']),'%d/%m/%Y').date()
                     if prox_vto_date_parsed < datetime.datetime.now().date():
-                        cliente_atrasado['cuotas_devengadas'] = cliente_atrasado['cuotas_devengadas'] + ultima_venta.precio_de_cuota
+                        deudor_por_venta['cuotas_devengadas'] = deudor_por_venta['cuotas_devengadas'] + ultima_venta.precio_de_cuota
+                        deudor_por_venta['cuotas_devengadas'] = unicode('{:,}'.format(deudor_por_venta['cuotas_devengadas'])).replace(",", ".")
 
         else:
             cuotas_a_pagar = []
@@ -593,43 +594,43 @@ def obtener_deudores_por_venta(filtros,fraccion,meses_peticion):
             cantidad_cuotas_pagadas = detalle_cuotas['cant_cuotas_pagadas'];  # CUOTAS PAGADAS
 
             # DATOS DEL CLIENTE
-            cliente_atrasado['cliente'] = ultima_venta.cliente.nombres + ' ' + ultima_venta.cliente.apellidos
-            cliente_atrasado['direccion_particular'] = ultima_venta.cliente.direccion_particular
-            cliente_atrasado['direccion_cobro'] = ultima_venta.cliente.direccion_cobro
-            cliente_atrasado['telefono_particular'] = ultima_venta.cliente.telefono_particular
-            cliente_atrasado['telefono_laboral'] = ultima_venta.cliente.telefono_laboral
-            cliente_atrasado['celular_1'] = ultima_venta.cliente.celular_1
-            cliente_atrasado['celular_2'] = ultima_venta.cliente.celular_2
+            deudor_por_venta['cliente'] = ultima_venta.cliente.nombres + ' ' + ultima_venta.cliente.apellidos
+            deudor_por_venta['direccion_particular'] = ultima_venta.cliente.direccion_particular
+            deudor_por_venta['direccion_cobro'] = ultima_venta.cliente.direccion_cobro
+            deudor_por_venta['telefono_particular'] = ultima_venta.cliente.telefono_particular
+            deudor_por_venta['telefono_laboral'] = ultima_venta.cliente.telefono_laboral
+            deudor_por_venta['celular_1'] = ultima_venta.cliente.celular_1
+            deudor_por_venta['celular_2'] = ultima_venta.cliente.celular_2
 
-            cliente_atrasado['lote'] = ultima_venta.lote.codigo_paralot
+            deudor_por_venta['lote'] = ultima_venta.lote.codigo_paralot
 
             # FECHA VENTA
             if (ultima_venta.fecha_de_venta != None):
-                cliente_atrasado['fecha_venta'] = ultima_venta.fecha_de_venta
+                deudor_por_venta['fecha_venta'] = ultima_venta.fecha_de_venta
             else:
-                cliente_atrasado['fecha_venta'] = 'Dato no disponible'
+                deudor_por_venta['fecha_venta'] = 'Dato no disponible'
 
-            cliente_atrasado['lote'] = ultima_venta.lote.codigo_paralot
+            deudor_por_venta['lote'] = ultima_venta.lote.codigo_paralot
 
             # IMPORTE CUOTA
-            cliente_atrasado['importe_cuota'] = unicode('{:,}'.format(ultima_venta.precio_de_cuota)).replace(",", ".")
+            deudor_por_venta['importe_cuota'] = unicode('{:,}'.format(ultima_venta.precio_de_cuota)).replace(",", ".")
 
             # CUOTAS ATRASADAS
-            cliente_atrasado['cuotas_atrasadas'] = unicode('{:,}'.format(cuotas_atrasadas)).replace(",", ".")
+            deudor_por_venta['cuotas_atrasadas'] = unicode('{:,}'.format(cuotas_atrasadas)).replace(",", ".")
 
             # TOTAL ATRASO
             total_atrasado = cuotas_atrasadas * ultima_venta.precio_de_cuota;
-            cliente_atrasado['total_atrasado'] = unicode('{:,}'.format(total_atrasado)).replace(",", ".")
+            deudor_por_venta['total_atrasado'] = unicode('{:,}'.format(total_atrasado)).replace(",", ".")
 
             # CUOTAS PAGADAS
             cuotas_pagadas = unicode('{:,}'.format(cantidad_cuotas_pagadas)).replace(",", ".") + '/' + unicode(
                 '{:,}'.format(detalle_cuotas['cantidad_total_cuotas'])).replace(",", ".")
-            cliente_atrasado['cuotas_pagadas'] = cuotas_pagadas
+            deudor_por_venta['cuotas_pagadas'] = cuotas_pagadas
 
             # TOTAL PAGADO
             total_pagado = cantidad_cuotas_pagadas * ultima_venta.precio_de_cuota;
-            cliente_atrasado['total_pagado'] = unicode('{:,}'.format(total_pagado)).replace(",", ".")
-            deudores_por_venta.append(cliente_atrasado)
+            deudor_por_venta['total_pagado'] = unicode('{:,}'.format(total_pagado)).replace(",", ".")
+            deudores_por_venta.append(deudor_por_venta)
 
     return deudores_por_venta
 
@@ -824,6 +825,7 @@ def clientes_atrasados(request):
         
        
 def clientes_atrasados_2(request):
+
     if request.method == 'GET':
         if request.user.is_authenticated():
             if verificar_permisos(request.user.id, permisos.VER_INFORMES):
@@ -3359,7 +3361,6 @@ def informe_cuotas_devengadas(request):
             return HttpResponseRedirect(reverse('login'))
 
 
-
 def informe_cuotas_devengadas_reporte_excel(request):
     fecha_ini=request.GET['fecha_ini']
     fecha_fin=request.GET['fecha_fin']
@@ -3462,6 +3463,7 @@ def informe_cuotas_devengadas_reporte_excel(request):
         response['Content-Disposition'] = 'attachment; filename=' + 'informe_cuotas_devengadas' + '_' + fraccion_label + '_del_' + fecha_ini + '_al_' + fecha_fin + '.xls'
     wb.save(response)
     return response
+
 
 def clientes_atrasados_reporte_excel(request):
     
@@ -3704,6 +3706,115 @@ def clientes_atrasados_reporte_excel(request):
             response['Content-Disposition'] = 'attachment; filename=' + 'clientes_atrasados_' + unicode(nombre_fraccion) + '.xls'
             wb.save(response)
             return response
+
+
+def deudores_por_venta_reporte_excel(request):
+    if request.method == 'GET':
+        if request.user.is_authenticated():
+            if verificar_permisos(request.user.id, permisos.VER_INFORMES):
+                # FILTROS DISPONIBLES
+                filtros = filtros_establecidos(request.GET, 'deudores_por_venta')
+                # PARAMETROS
+                meses_peticion = 1
+                fraccion = ''
+                if filtros == 0:
+                    meses_peticion = 0
+                elif filtros == 1:
+                    fraccion = request.GET['fraccion']
+                elif filtros == 2:
+                    meses_peticion = int(request.GET['meses_atraso'])
+                else:
+                    fraccion = request.GET['fraccion']
+                    meses_peticion = int(request.GET['meses_atraso'])
+
+            deudores_por_venta = obtener_deudores_por_venta(filtros, fraccion, meses_peticion)
+
+            if deudores_por_venta:
+
+                wb = xlwt.Workbook(encoding='utf-8')
+                sheet = wb.add_sheet('test', cell_overwrite_ok=True)
+                sheet.paper_size_code = 1
+
+                style = xlwt.easyxf('font: name Calibri, bold True; align: horiz center')
+                style2 = xlwt.easyxf('pattern: pattern solid, fore_colour white; font: name Calibri; align: horiz right')
+                style3 = xlwt.easyxf('font: name Calibri, height 200; align: horiz left')
+                style4 = xlwt.easyxf('font: name Calibri, height 200; align: horiz center')
+
+                nombre_fraccion = Fraccion.objects.get(id=fraccion)
+                usuario = unicode(request.user)
+                sheet.header_str = (
+                                u"&LFecha: &D Hora: &T \nUsuario: "+usuario+" "
+                                u"&CPROPAR S.R.L.\n DEUDORES POR VENTA DE LA FRACCION "+unicode(nombre_fraccion)+" "
+                                u"&RMeses de Atraso: "+unicode(meses_peticion)+" \nPage &P of &N"
+                                )
+                sheet.write_merge(0, 0, 0, 10, "DEUDORES POR VENTA DE LA FRACCION "+unicode(nombre_fraccion), style)
+                # BORDES PARA las columnas de titulos
+                borders = xlwt.Borders()
+                borders.top = xlwt.Borders.THIN
+                borders.bottom = xlwt.Borders.DOUBLE
+                style.borders = borders
+
+                sheet.write(1, 0, "Cod Lote", style)
+                sheet.write(1, 1, "Fecha Vta", style)
+                sheet.write(1, 2, "Cuotas Pag.", style)
+                sheet.write(1, 3, "Importe Cuota", style)
+                sheet.write(1, 4, "Total Pag.", style)
+                sheet.write(1, 5, "Total Atras.", style)
+                sheet.write(1, 6, "Cuotas Devengadas", style)
+
+                #Ancho de la columna Lote
+                col_nro_cuota = sheet.col(0)
+                col_nro_cuota.width = 256 * 15   # 6 characters wide
+
+                # Ancho de la columna Fecha Vta
+                col_fecha = sheet.col(1)
+                col_fecha.width = 256 * 15  # 12 characters wide
+
+                #Ancho de la columna Cuotas Pag.
+                col_mes = sheet.col(2)
+                col_mes.width = 256 * 12   # 8 characters wide
+
+                #Ancho de la columna Imp. Cuota"
+                col_monto_pagado = sheet.col(3)
+                col_monto_pagado.width = 256 * 15   # 11 characters wide
+
+                #Ancho de la columna Total Pag
+                col_nombre = sheet.col(4)
+                col_nombre.width = 256 * 14   # 15 characters wide
+
+                #Ancho de la columna Total Atras
+                col_monto_inmo = sheet.col(5)
+                col_monto_inmo.width = 256 * 14   # 15 characters wide
+
+                #Ancho de la columna Cuotas Devengadas
+                col_monto_inmo = sheet.col(6)
+                col_monto_inmo.width = 256 * 16   # 15 characters wide
+
+                i = 0
+                c = 2
+
+                for i in range(len(deudores_por_venta)):
+                    sheet.write(c, 0, unicode(deudores_por_venta[i]['lote']), style3)
+                    if deudores_por_venta[i]['fecha_venta'] != 'Dato no disponible':
+                        fecha_str = unicode(deudores_por_venta[i]['fecha_venta'])
+                        fecha = unicode(datetime.datetime.strptime(fecha_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
+                        sheet.write(c, 1, unicode(fecha), style4)
+                    else:
+                        sheet.write(c, 1, unicode('Dato no disponible'), style4)
+                    sheet.write(c, 2, unicode(deudores_por_venta[i]['cuotas_pagadas']), style4)
+                    sheet.write(c, 3, unicode(deudores_por_venta[i]['importe_cuota']), style4)
+                    sheet.write(c, 4, unicode(deudores_por_venta[i]['total_pagado']),style4)
+                    sheet.write(c, 5, unicode(deudores_por_venta[i]['total_atrasado']), style4)
+                    sheet.write(c, 6, unicode(deudores_por_venta[i]['cuotas_devengadas']), style4)
+                    # formateamos la fecha
+                    c += 1
+
+            response = HttpResponse(content_type='application/vnd.ms-excel')
+            # Crear un nombre intuitivo
+            response['Content-Disposition'] = 'attachment; filename=' + 'deudores_por_venta_' + unicode(nombre_fraccion) + '.xls'
+            wb.save(response)
+            return response
+
 
 
 def informe_general_reporte_excel(request):
