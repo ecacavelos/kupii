@@ -6379,7 +6379,10 @@ def informe_pagos_practipago(request):
                     fecha_ini = request.GET['fecha_ini']
                     fecha_fin = request.GET['fecha_fin']
                     # lista_ventas = Venta.objects.filter(lote_id=lote.id).order_by('-fecha_de_venta')
-                    lista_ventas = Venta.objects.raw('''SELECT * FROM principal_venta where lote_id in (SELECT principal_lote.id FROM principal_lote where manzana_id in (SELECT principal_manzana.id FROM principal_manzana where fraccion_id in (SELECT principal_fraccion.id FROM principal_fraccion where sucursal_id = %s))) ORDER BY fecha_de_venta;''', [sucursal_id])
+                    if sucursal_id != '':
+                        lista_ventas = Venta.objects.raw('''SELECT * FROM principal_venta where lote_id in (SELECT principal_lote.id FROM principal_lote where manzana_id in (SELECT principal_manzana.id FROM principal_manzana where fraccion_id in (SELECT principal_fraccion.id FROM principal_fraccion where sucursal_id = %s))) ORDER BY fecha_de_venta;''', [sucursal_id])
+                    else:
+                        lista_ventas = Venta.objects.raw('''SELECT * FROM principal_venta ORDER BY fecha_de_venta;''')
                     try:
                         for item_venta in lista_ventas:
                             try:
