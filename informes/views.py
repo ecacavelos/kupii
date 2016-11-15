@@ -20,6 +20,7 @@ from operator import itemgetter, attrgetter
 from django.utils.datastructures import MultiValueDictKeyError
 # Funcion principal del modulo de lotes.
 from sucursal.models import Sucursal
+import calendar
 
 
 def informes(request):
@@ -578,12 +579,16 @@ def obtener_deudores_por_venta(filtros,fraccion,meses_peticion):
             hoy = date.today()
             cuotas_a_pagar = obtener_cuotas_a_pagar_full(ultima_venta, hoy, detalle_cuotas,500)  # Maximo atraso = 500 para tener un parametro maximo de atraso en las cuotas.
 
+            # aqui para saber cuanto esta debiendo por cuotas atrasadas, vamos a recorrer las cuotas que faltan por pagar, e ir preguntando si la prox fecha de vto, mes
+            # a mes todavia es menor a la fecha actual, si es asi, vamos aumentado la cuota
             if detalle_cuotas != None:
                 if detalle_cuotas['cant_cuotas_pagadas'] != detalle_cuotas['cantidad_total_cuotas']:
                     prox_vto_date_parsed = datetime.datetime.strptime(unicode(detalle_cuotas['proximo_vencimiento']),'%d/%m/%Y').date()
-                    if prox_vto_date_parsed < datetime.datetime.now().date():
-                        deudor_por_venta['cuotas_devengadas'] = deudor_por_venta['cuotas_devengadas'] + ultima_venta.precio_de_cuota
-                        deudor_por_venta['cuotas_devengadas'] = unicode('{:,}'.format(deudor_por_venta['cuotas_devengadas'])).replace(",", ".")
+                    for x in xrange(detalle_cuotas['cantidad_total_cuotas'] - detalle_cuotas['cant_cuotas_pagadas']):
+                        if prox_vto_date_parsed < datetime.datetime.now().date():
+                            deudor_por_venta['cuotas_devengadas'] = deudor_por_venta['cuotas_devengadas'] + ultima_venta.precio_de_cuota
+                        prox_vto_date_parsed = add_months(prox_vto_date_parsed, 1)
+                    deudor_por_venta['cuotas_devengadas'] = unicode('{:,}'.format(deudor_por_venta['cuotas_devengadas'])).replace(",", ".")
 
         else:
             cuotas_a_pagar = []
@@ -3758,8 +3763,8 @@ def deudores_por_venta_reporte_excel(request):
                 sheet.write(1, 1, "Fecha Vta", style)
                 sheet.write(1, 2, "Cuotas Pag.", style)
                 sheet.write(1, 3, "Importe Cuota", style)
-                sheet.write(1, 4, "Total Pag.", style)
-                sheet.write(1, 5, "Total Atras.", style)
+                sheet.write(1, 4, "Total Cobrado", style)
+                sheet.write(1, 5, "Saldo a Cobrar", style)
                 sheet.write(1, 6, "Cuotas Devengadas", style)
 
                 #Ancho de la columna Lote
@@ -7433,3 +7438,10 @@ def get_cuotas_details_by_lote(lote_id):
         return cuotas_details
     except Exception, error:
         print error
+
+def add_months(sourcedate, months):
+    month = sourcedate.month - 1 + months
+    year = int(sourcedate.year + month / 12)
+    month = month % 12 + 1
+    day = min(sourcedate.day, calendar.monthrange(year, month)[1])
+    return datetime.date(year, month, day)
