@@ -130,6 +130,14 @@ def monthdelta(d1, d2):
             break
     return delta
 
+def get_mes_pagado_by_id_lote_cant_cuotas(lote_id, cuotas_pag):
+    cuotas_detalles = []
+    try:
+        cuotas_detalles = get_cuota_information_by_lote(lote_id,cuotas_pag)
+        return cuotas_detalles
+    except Exception, error:
+        return cuotas_detalles
+
 def get_cuota_information_by_lote(lote_id,cuotas_pag, facturar = False, ver_vencimientos = False, venta_param = None):
     cant_cuotas_pag =0
     cant_cuotas_pagadas = {}

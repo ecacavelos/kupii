@@ -191,7 +191,6 @@ def ventas_de_lotes_calcular_cuotas(request):
         return HttpResponseRedirect(reverse('login'))
 
 def reservas_de_lotes(request):
-    
     if request.user.is_authenticated():
         if verificar_permisos(request.user.id, permisos.ADD_RESERVA):
             t = loader.get_template('movimientos/reservas_lotes.html')
@@ -389,6 +388,221 @@ def pago_de_cuotas(request):
             return HttpResponse(t.render(c))
     else:
         return HttpResponseRedirect("/login")
+
+def get_cuotas_a_pagar_by_cliente_id(request):
+    if request.method == 'GET':
+        if request.user.is_authenticated():
+            try:
+                cliente_id = request.GET['cliente_id']
+                print("Cliente id ->" + cliente_id);
+                ventas = []
+
+                ventas_del_cliente = Venta.objects.filter((Q(recuperado=False) | Q(recuperado=None)), cliente_id=cliente_id, plan_de_pago__tipo_de_plan='credito')
+                total_pago_cuotas = 0
+                total_pago_intereses = 0
+                total_pago = 0
+                cant_cuotas = 0
+                for venta_cliente in ventas_del_cliente:
+                    venta = {}
+                    venta['fraccion'] = venta_cliente.lote.manzana.fraccion
+                    venta['lote'] = venta_cliente.lote
+                    venta['cuotas'] = get_mes_pagado_by_id_lote_cant_cuotas(venta_cliente.lote_id, 1)
+
+                    monto_cuota = venta['cuotas'][0]['monto_cuota']
+                    monto_intereses = 0
+                    monto_total = 0
+                    gestion_cobranza = 0
+                    detalles = calculo_interes(venta_cliente.lote_id, '', venta['cuotas'][0]['fecha'], 1)
+
+                    if detalles != []:
+                        venta['cuotas'][0]['dias_atraso'] =  detalles[0]['dias_atraso']
+                        monto_intereses = detalles[0]['intereses']
+                        venta['cuotas'][0]['intereses'] =  unicode('{:,}'.format(monto_intereses)).replace(",", ".")
+                        venta['cuotas'][0]['vencimiento_gracia'] = detalles[0]['vencimiento_gracia']
+                        try:
+                            gestion_cobranza = detalles[1]['gestion_cobranza']
+                            venta['gestion_cobranza'] = unicode('{:,}'.format(gestion_cobranza)).replace(",", ".")
+                        except:
+                            gestion_cobranza = 0
+                    else:
+                        venta['cuotas'][0]['vencimiento_gracia'] = "-"
+                    monto_total = monto_cuota + monto_intereses + gestion_cobranza
+
+                    total_pago_cuotas = total_pago_cuotas + monto_cuota
+                    total_pago_intereses = total_pago_intereses + (monto_intereses + gestion_cobranza)
+                    total_pago = total_pago + (total_pago_cuotas + total_pago_intereses)
+
+                    venta['totalMontoCuotas'] = unicode('{:,}'.format(monto_cuota)).replace(",", ".")
+                    venta['totalIntereses'] = unicode('{:,}'.format(monto_intereses + gestion_cobranza)).replace(",", ".")
+                    venta['totalPagoLote'] = unicode('{:,}'.format(monto_total)).replace(",", ".")
+                    venta['cuotas'][0]['monto_cuota'] = unicode('{:,}'.format(monto_cuota)).replace(",", ".")
+                    cant_cuotas = cant_cuotas + 1
+                    ventas.append(venta)
+
+
+                total_pago_cuotas = unicode('{:,}'.format(total_pago_cuotas)).replace(",", ".")
+                total_pago_intereses = unicode('{:,}'.format(total_pago_intereses)).replace(",", ".")
+                total_pago = unicode('{:,}'.format(total_pago)).replace(",", ".")
+
+                t = loader.get_template('movimientos/cuotas_por_cliente_frm_table.html')
+                grupo = request.user.groups.get().id
+                c = RequestContext(request, {
+                    'grupo': grupo,
+                    'ventas': ventas,
+                    'total_pago_cuotas': total_pago_cuotas,
+                    'total_pago_intereses': total_pago_intereses,
+                    'total_pago': total_pago,
+                    'cant_cuotas': cant_cuotas,
+                })
+                return HttpResponse(t.render(c))
+            except Exception, error:
+                print error
+        else:
+            return HttpResponseRedirect(reverse('login'))
+
+def pago_de_cuotas_cliente(request):
+    if request.user.is_authenticated():
+        if verificar_permisos(request.user.id, permisos.ADD_PAGODECUOTAS):
+            t = loader.get_template('movimientos/pago_cuotas_clientes.html')
+            grupo = request.user.groups.get().id
+            if request.method == 'POST':
+                data = request.POST
+                lote_id = data.get('pago_lote_id', '')
+                nro_cuotas_a_pagar = data.get('pago_nro_cuotas_a_pagar')
+
+                #############################################################
+                # Codigo agregado: contemplar el caso de los lotes recuperados
+                venta = get_ultima_venta(lote_id)
+                #############################################################
+
+                venta.pagos_realizados = int(nro_cuotas_a_pagar) + int(venta.pagos_realizados)
+                cliente_id = data.get('pago_cliente_id')
+                vendedor_id = data.get('pago_vendedor_id')
+                plan_pago_id = data.get('pago_plan_de_pago_id')
+                plan_pago_vendedor_id = data.get('pago_plan_de_pago_vendedor_id')
+                total_de_cuotas = data.get('pago_total_de_cuotas')
+                total_de_mora = data.get('pago_total_de_mora')
+                total_de_pago = data.get('pago_total_de_pago')
+                interes_original = data.get('interes_original')
+                resumen_cuotas = data.get('resumen_cuotas')
+                cuota_obsequio = data.get('cuota_obsequio')
+                resumen_cuotas = int(resumen_cuotas) + 1
+                date_parse_error = False
+                fecha_pago = data.get('pago_fecha_de_pago', '')
+                fecha_pago_parsed = datetime.datetime.strptime(fecha_pago, "%d/%m/%Y").date()
+                detalle = data.get('detalle', '')
+                if detalle == '':
+                    detalle = None
+                    #             try:
+                    #                 fecha_pago_parsed = datetime.strptime(data.get('pago_fecha_de_pago', ''), "%d/%m/%Y")
+                    #             except:
+                    #                 date_parse_error = True
+                    #
+                    #             if date_parse_error == True:
+                    #                 try:
+                    #                     fecha_pago_parsed = datetime.strptime(data.get('pago_fecha_de_pago', ''), "%Y-%m-%d")
+                    #                 except:
+                    #                     date_parse_error = True
+                # print fecha_pago
+                # print fecha_pago_parsed
+                cantidad_cuotas = PlanDePago.objects.get(pk=plan_pago_id)
+                cuotas_pagadas = Venta.objects.get(pk=venta.id)
+                cuotas_restantes = int(cantidad_cuotas.cantidad_de_cuotas) - int(cuotas_pagadas.pagos_realizados)
+                if cuotas_restantes >= int(nro_cuotas_a_pagar):
+                    try:
+                        nuevo_pago = PagoDeCuotas()
+                        nuevo_pago.venta = Venta.objects.get(pk=venta.id)
+                        nuevo_pago.lote = Lote.objects.get(pk=lote_id)
+                        nuevo_pago.fecha_de_pago = fecha_pago_parsed
+                        nuevo_pago.nro_cuotas_a_pagar = nro_cuotas_a_pagar
+                        nuevo_pago.cliente = Cliente.objects.get(pk=cliente_id)
+                        nuevo_pago.plan_de_pago = PlanDePago.objects.get(pk=plan_pago_id)
+                        nuevo_pago.plan_de_pago_vendedores = PlanDePagoVendedor.objects.get(pk=plan_pago_vendedor_id)
+                        nuevo_pago.vendedor = Vendedor.objects.get(pk=vendedor_id)
+                        nuevo_pago.total_de_cuotas = total_de_cuotas
+                        nuevo_pago.total_de_mora = total_de_mora
+                        nuevo_pago.total_de_pago = total_de_pago
+                        nuevo_pago.detalle = detalle
+                        if cuota_obsequio == '1':
+                            nuevo_pago.cuota_obsequio = True
+                        else:
+                            nuevo_pago.cuota_obsequio = False
+                        nuevo_pago.save()
+
+                        # Se loggea la accion del usuario
+                        id_objeto = nuevo_pago.id
+                        codigo_lote = nuevo_pago.lote.codigo_paralot
+                        loggear_accion(request.user, "Agregar", "Pago de cuota", id_objeto, codigo_lote)
+
+
+                    except Exception, error:
+                        print error
+                        pass
+                    venta.save()
+
+                    # Vuelve al template
+                    # c = RequestContext(request, {})
+                    # return HttpResponse(t.render(c))
+
+                    # Redirecciona a facturacion (al final hace esto en movimientos_pagos.js
+                    # return HttpResponseRedirect("/facturacion/facturar")
+
+                    # retorna el objeto como json
+                    object_list = PagoDeCuotas.objects.filter(id=nuevo_pago.id)
+                    labels = ["id"]
+                    if interes_original != total_de_mora:
+                        fromaddr = 'cbiconsultora@gmail.com'
+                        toaddrs = 'lic.ivan@propar.com.py'
+                        msg = 'Se detecto un cambio del interes del pago de la cuota nro ' + str(
+                            resumen_cuotas) + ' de la fraccion nro ' + str(nuevo_pago.lote)
+
+                        # Credentials (if needed)
+                        username = 'cbiconsultora@gmail.com'
+                        password = 'cbicbiconsultora'
+
+                        # The actual mail send
+                        server = smtplib.SMTP('smtp.gmail.com:587')
+                        server.starttls()
+                        server.login(username, password)
+                        server.sendmail(fromaddr, toaddrs, msg)
+                        server.quit()
+
+                    return HttpResponse(json.dumps(custom_json(object_list, labels), cls=DjangoJSONEncoder),
+                                        content_type="application/json")
+
+                else:
+                    return HttpResponseServerError(
+                        "La cantidad de cuotas a pagar, es mayor a la cantidad de cuotas restantes.")
+
+            elif request.method == 'GET':
+                query = ('''SELECT NOW()''')
+                cursor = connection.cursor()
+                cursor.execute(query)
+                results = cursor.fetchall()
+                if (len(results) > 0):
+                    fecha_actual = results
+                    dia = fecha_actual[0][0].day
+                    mes = fecha_actual[0][0].month
+                    anho = fecha_actual[0][0].year
+                    if dia >= 1 and dia <= 9:
+                        dia = unicode('0') + unicode(dia)
+                    if mes >= 1 and mes <= 9:
+                        mes = unicode('0') + unicode(mes)
+                    fecha_actual = unicode(dia) + '/' + unicode(mes) + '/' + unicode(anho)
+                c = RequestContext(request, {
+                    'grupo': grupo,
+                    'fecha_actual': fecha_actual
+                })
+                return HttpResponse(t.render(c))
+        else:
+            t = loader.get_template('index2.html')
+            grupo = request.user.groups.get().id
+            c = RequestContext(request, {
+                'grupo': grupo
+            })
+            return HttpResponse(t.render(c))
+    else:
+        return HttpResponseRedirect("/login")
     
 
 def pago_de_cuotas_venta(request, id_venta):        
@@ -547,6 +761,33 @@ def calcular_interes(request):
             return HttpResponse(json.dumps(detalles),content_type="application/json")
     else:
         return HttpResponseRedirect("/login")
+
+
+def calculo_interes(lote_id, fecha_pago, proximo_vencimiento, nro_cuotas_a_pagar):
+    if fecha_pago != '':
+        fecha_pago_parsed = datetime.datetime.strptime(fecha_pago, "%d/%m/%Y").date()
+    else:
+        fecha_pago_parsed = (datetime.date.today())
+    proximo_vencimiento_parsed = datetime.datetime.strptime(proximo_vencimiento, "%d/%m/%Y").date()
+
+    detalles = obtener_detalle_interes_lote(lote_id, fecha_pago_parsed, proximo_vencimiento_parsed,
+                                                    nro_cuotas_a_pagar)
+
+    ultimo_pago = PagoDeCuotas.objects.filter(lote_id=lote_id).order_by('-fecha_de_pago')
+    if len(ultimo_pago) > 0:
+        query = ('''SELECT NOW()''')
+        cursor = connection.cursor()
+        cursor.execute(query)
+        results = cursor.fetchall()
+        if (len(results) > 0):
+            fecha_actual = results
+            mes = fecha_actual[0][0].month
+        # si la ultima fecha de pago es la del mes actual, le exonera la gestion de cobranza
+        if ultimo_pago[0].fecha_de_pago.month == mes:
+            if (len(detalles) > 1):
+                detalles[1]['gestion_cobranza'] = 0
+    return detalles
+
 
 def transferencias_de_lotes(request):
     

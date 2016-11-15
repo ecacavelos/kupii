@@ -1,0 +1,95 @@
+{% for venta in ventas %}
+    <table cellpadding="0" cellspacing="0" border="1" class="listado-lotes" align="center">
+        <thead>
+        <tr style="display: none">
+            <input type="hidden" id="venta_id" value="{{ venta.id }}">
+        </tr>
+        <tr>
+            <th colspan="2">
+                <b>Fraccion - Lote: </b> {{ venta.fraccion }} - {{ venta.lote }}
+            </th>
+            <th colspan="2">
+                <b>Cuotas pagadas: </b> {{ venta.fraccion }}
+            </th>
+            <th colspan="2">
+                <b>Cantidad de Cuotas a pagar: </b> <input style="color: black; text-align: center" type="text"
+                                               id="nro_cuotas_a_pagar_{{ venta.id }}" value="1">
+            </th>
+        </tr>
+        <tr>
+            <th>Nro Cuota</th>
+            <th>Fecha Vencimento</th>
+            <th>Fecha Vencimento con 5 días habiles de gracia</th>
+            <th>Días de Atraso</th>
+            <th>Monto Cuota</th>
+            <th>Monto Intereses</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for cuota in venta.cuotas %}
+            <tr>
+                <td>{{ cuota.nro_cuota }}</td>
+                <td>{{ cuota.fecha }}</td>
+                <td>{{ cuota.vencimiento_gracia }}</td>
+                {% if cuota.dias_atraso %}
+                    <td>{{ cuota.dias_atraso }}</td>
+                {% else %}
+                    <td>0</td>
+                {% endif  %}
+                <td style="text-align: right">{{ cuota.monto_cuota }}</td>
+                {% if cuota.intereses %}
+                    <td style="text-align: right">{{ cuota.intereses }}</td>
+                {% else %}
+                    <td style="text-align: right">0</td>
+                {% endif  %}
+            </tr>
+            {% if venta.gestion_cobranza %}
+                <tr>
+                    <td colspan="4" style="text-align: right">Gestion Cobranza</td>
+                    <td colspan="2" style="text-align: right">{{ venta.gestion_cobranza }}</td>
+                </tr>
+            {% endif %}
+        {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="4" style="text-align: right"><b>Totales</b></td>
+                <td style="text-align: right">{{ venta.totalMontoCuotas }}</td>
+                <td style="text-align: right">{{ venta.totalIntereses }}</td>
+            </tr>
+            <tr>
+                <td colspan="4" style="text-align: right"><b>Total a Pagar Lote</b></td>
+                <td colspan="2" style="text-align: right"><b>{{ venta.totalPagoLote }}</b></td>
+            </tr>
+        </tfoot>
+    </table>
+{% endfor %}
+<table  cellpadding="0" cellspacing="0" border="1" class="listado-lotes" align="right" style="width: 100%">
+    <thead>
+        <tr>
+            <th colspan="6">Totales</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+    <tfoot>
+        <!--
+        <tr>
+            <td colspan="2" style="text-align: right"><b>Cantidad Cuotas </b></td>
+            <td style="text-align: right">{{ cant_cuotas }}</td>
+        </tr>
+        -->
+        <tr>
+            <td colspan="5" style="text-align: right; width: 70%"><b>Total Cuotas </b></td>
+            <td style="text-align: right">{{ total_pago_cuotas }}</td>
+        </tr>
+        <tr>
+            <td colspan="5" style="text-align: right"><b>Total Interes y Gestiones</b></td>
+            <td style="text-align: right">{{ total_pago_intereses }}</td>
+        </tr>
+        <tr>
+            <td colspan="5" style="text-align: right"><b>Total a Pagar</b></td>
+            <td style="text-align: right"><b>{{ total_pago }}</b></td>
+        </tr>
+    </tfoot>
+</table>
+

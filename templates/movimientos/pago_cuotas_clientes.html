@@ -1,0 +1,158 @@
+{% extends "lotes/base_lotes.html" %}
+{% block header_scripts %}
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		$("#busqueda_label").focus();
+		var tipo_busqueda=$("#tipo_busqueda").val();
+		var busqueda_label=$("#busqueda_label").val();			
+		var busqueda=$("#busqueda").val();			
+		
+		$("#busqueda_label").focus(); 
+		autocompleteClientePorNombreOCedula(tipo_busqueda, busqueda_label, busqueda);
+		
+		$("#tipo_busqueda").change(function(){
+			//alert("cambió");
+			tipo_busqueda=$("#tipo_busqueda").val();
+			busqueda_label=$("#busqueda_label").val();			
+			busqueda=$("#busqueda").val();	
+			autocompleteClientePorNombreOCedula(tipo_busqueda, busqueda_label, busqueda);
+		});
+	});
+	function buscar() {
+		if ($("#tipo_busqueda").val() == 0) {
+			alert("Debe elegir un tipo de busqueda.");
+		} else {
+			if ($("#busqueda_label").val() == "") {
+				alert("Debe ingresar un nombre para buscar.");
+			} else {
+				$("#frm_busqueda").submit();
+			}
+		}
+	}
+
+	function autocompleteClientePorNombreOCedula(tipo_busqueda, busqueda_label, busqueda){
+        if (tipo_busqueda == 'nombre') {
+            console.log("por nombre");
+            $("#busqueda_label").val("");
+            var id_cliente;
+            $("#busqueda").empty();
+            base_url = base_context + "/ajax/get_cliente_id_by_name/";
+            params = "value";
+            $("#busqueda_label").autocomplete({
+                source : base_url,
+                minLength : 1,
+                dataType: "json",
+                create : function(){
+                    $(this).data('ui-autocomplete')._renderItem = function(ul,item){
+                        return $('<li>').append('<a>'+item.cedula +" - "+item.nombres + " "+ item.apellidos+'</a>').appendTo(ul);
+                        console.log(item);
+                        };
+                },
+                select : function(event, ui) {
+                    event.preventDefault();
+                    id_cliente = ui.item.id;
+                    $("#busqueda").val(id_cliente);
+                    $("#busqueda_label").val(ui.item.nombres+" "+ui.item.apellidos);
+                    getCuotasApagarByClienteId(id_cliente);
+                }
+            });
+        }
+        if (tipo_busqueda == 'cedula') {
+            console.log("por cedula");
+            $("#busqueda_label").val("");
+            var id_cliente;
+            $("#busqueda").empty();
+            base_url = base_context + "/ajax/get_cliente_name_id_by_cedula/";
+            params = "value";
+            $("#busqueda_label").autocomplete({
+                source : base_url,
+                minLength : 1,
+                create : function(){
+                    $(this).data('ui-autocomplete')._renderItem = function(ul,item){
+                        return $('<li>').append('<a>'+item.cedula +" - "+item.nombres + " "+ item.apellidos+'</a>').appendTo(ul);
+                        console.log(item);
+                        };
+                },
+                select : function(event, ui) {
+                    id_cliente = ui.item.id;
+                    event.preventDefault();
+                    $("#busqueda").val(id_cliente);
+                    //alert(id_cliente);
+                    $("#busqueda_label").val(ui.item.cedula);
+                    getCuotasApagarByClienteId(id_cliente);
+                }
+            });
+        }
+    }
+
+    function getCuotasApagarByClienteId(clienteId) {
+        $.ajax({
+            url: base_context + "/movimientos/get_cuotas_a_pagar_by_cliente_id/",
+            type: 'GET',
+            dataType: "html",
+            data: {
+                cliente_id: clienteId
+            },
+            success: function (response) {
+                //borra y arma la tabla
+                $("#lista_lotes_cliente").empty();
+                $("#lista_lotes_cliente").append(response);
+                //console.log(response);
+            },
+            error: function (xhr, errmsg, err) {
+                console.log(err);
+                //mensaje de error ?
+            }
+        });
+    }
+
+</script>
+{% endblock %}
+{% block content %}
+<div class="gri16 text-izquierda" id="breadcumb">
+	<a href="{% url 'frontend_home' %}">Inicio</a><span class="verde-1">></span>
+	<a href="{% url 'frontend_home' %}movimientos/">Movimientos</a>
+	<span class="verde-1">> Pago de Cuotas por Cliente</span>
+</div>
+<div class="clear"></div>
+<h1>Pago de Cuotas por Cliente</h1>
+<div class="grid_6">
+	<!--<form name="frm_busqueda" id="frm_busqueda" method="get" action="{% url 'frontend_home' %}movimientos/listado_busqueda_personas/">-->
+    <form name="frm_busqueda" id="frm_busqueda" method="get" action="{% url 'frontend_home' %}movimientos/get_cuotas_a_pagar_by_cliente/">
+		{% csrf_token %}
+		<table id="lista-categoria" frame="box">
+			<tr>
+				<th class="acciones"  colspan="3"><strong><a href="#" style="color: white;">Filtrar</a></strong></th>
+			</tr>
+			<tr>
+				<td>
+				<select id="tipo_busqueda" name="tipo_busqueda">
+					<!-- <option value="0">Elija una opcion</option> -->
+					<option value="nombre">Nombre</option>
+					<option value="cedula">Cedula</option>
+				</select></td>
+				<td>
+				<input name="busqueda_label" id="busqueda_label" type="text" value=""/>
+				<input id="busqueda" type="hidden" name="busqueda" />
+				<input name="tabla" type="hidden" value="cliente"/>
+				</td>
+				<td>
+				<!--<input type="button" value="Buscar" onclick="buscar();" class="historico" style="cursor: pointer"/>-->
+				</td>
+			</tr>
+		</table>
+	</form>
+</div>
+
+<div class="clear"></div>
+    <div id="listado-item-lote">
+    <div id="lista_lotes_cliente">
+    </div>
+        <!-- se rellena dinamicamente con getCuotasApagarByClienteId -->
+    </div>
+<br>
+<div id="footer">
+	<a href="{% url 'frontend_home' %}movimientos/" class="boton-verde">Volver al m&oacute;dulo de movimientos</a>
+</div>
+{% endblock %}
