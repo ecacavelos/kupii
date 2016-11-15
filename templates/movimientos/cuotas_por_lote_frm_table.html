@@ -1,5 +1,4 @@
 {% for venta in ventas %}
-    <table cellpadding="0" cellspacing="0" border="1" class="listado-lotes"  align="center" id="listado_cuotas_{{ venta.id }}">
         <thead>
         <tr style="display: none">
             <input type="hidden" id="venta_id" value="{{ venta.id }}">
@@ -13,7 +12,7 @@
             </th>
             <th colspan="2">
                 <b>Cantidad de Cuotas a pagar: </b> <input style="color: black; text-align: center" type="number"
-                                               id="cantidad_cuotas_{{ venta.id }}" class="cantidad_cuotas" value="1">
+                                               id="cantidad_cuotas_{{ venta.id }}" class="cantidad_cuotas" value="{{ nro_cuotas }}">
             </th>
         </tr>
         <tr>
@@ -62,34 +61,7 @@
                 <td colspan="2" style="text-align: right"><b id="total_monto_lote_{{ venta.id }}">{{ venta.totalPagoLote }}</b></td>
             </tr>
         </tfoot>
-    </table>
 {% endfor %}
-<table  cellpadding="0" cellspacing="0" border="1" class="listado-lotes" align="right" style="width: 100%">
-    <thead>
-        <tr>
-            <th colspan="6">Totales</th>
-        </tr>
-    </thead>
-    <tbody></tbody>
-    <tfoot>
-        <!--
-        <tr>
-            <td colspan="2" style="text-align: right"><b>Cantidad Cuotas </b></td>
-            <td style="text-align: right">{{ cant_cuotas }}</td>
-        </tr>
-        -->
-        <tr>
-            <td colspan="5" style="text-align: right; width: 70%"><b>Total Cuotas </b></td>
-            <td style="text-align: right" id="total_pago_cuotas_cliente">{{ total_pago_cuotas }}</td>
-        </tr>
-        <tr>
-            <td colspan="5" style="text-align: right"><b>Total Interes y Gestiones</b></td>
-            <td style="text-align: right" id="total_pago_intereses_cliente">{{ total_pago_intereses }}</td>
-        </tr>
-        <tr>
-            <td colspan="5" style="text-align: right"><b>Total a Pagar</b></td>
-            <td style="text-align: right"><b id="total_pago_cliente">{{ total_pago }}</b></td>
-        </tr>
-    </tfoot>
-</table>
+
+
 

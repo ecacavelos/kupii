@@ -2,6 +2,9 @@
 {% block header_scripts %}
 
 <script type="text/javascript">
+var total_pago_cuotas_cliente = 0;
+var total_pago_intereses_cliente = 0;
+var total_pago_cliente = 0;
 	$(document).ready(function() {
 		$("#busqueda_label").focus();
 		var tipo_busqueda=$("#tipo_busqueda").val();
@@ -18,6 +21,7 @@
 			busqueda=$("#busqueda").val();	
 			autocompleteClientePorNombreOCedula(tipo_busqueda, busqueda_label, busqueda);
 		});
+
 	});
 	function buscar() {
 		if ($("#tipo_busqueda").val() == 0) {
@@ -98,6 +102,21 @@
                 //borra y arma la tabla
                 $("#lista_lotes_cliente").empty();
                 $("#lista_lotes_cliente").append(response);
+                $(".gestion_cobranza").mask('###.###.###',{reverse: true});
+                $(".cuota_intereses").mask('###.###.###',{reverse: true});
+
+                total_pago_cuotas_cliente = parseInt( sacarPuntos( $("#total_pago_cuotas_cliente").html() ) );
+                total_pago_intereses_cliente = parseInt( sacarPuntos( $("#total_pago_intereses_cliente").html() ) );
+                total_pago_cliente = parseInt( sacarPuntos( $("#total_pago_cliente").html() ) );
+
+                $(".cantidad_cuotas").change(function () {
+                    var ventaId = this.id;
+                    ventaId = ventaId.split("_");
+                    ventaId = ventaId[2];
+                    var nroCuotas = this.value;
+                    getCuotasByVentaIdNroCuotas(ventaId,nroCuotas);
+                });
+
                 //console.log(response);
             },
             error: function (xhr, errmsg, err) {
@@ -105,6 +124,67 @@
                 //mensaje de error ?
             }
         });
+    }
+
+    function getCuotasByVentaIdNroCuotas(ventaId,nroCuotas){
+        $.ajax({
+            url: base_context + "/movimientos/get_cuotas_a_pagar_by_venta_id_nro_cuotas/",
+            type: 'GET',
+            dataType: "html",
+            data: {
+                venta_id: ventaId,
+                nro_cuotas: nroCuotas,
+            },
+            success: function (response) {
+                //borra y arma la tabla
+                total_pago_cuotas_cliente = total_pago_cuotas_cliente - parseInt( sacarPuntos( $("#total_monto_cuota_lote_"+ventaId).html() ) );
+                total_pago_intereses = total_pago_intereses_cliente - parseInt( sacarPuntos( $("#total_monto_interesses_lote_"+ventaId).html() ) );
+                total_pago_cliente = total_pago_cliente - parseInt( sacarPuntos( $("#total_monto_lote_"+ventaId).html() ) );
+
+                $("#listado_cuotas_"+ventaId).empty();
+                $("#listado_cuotas_"+ventaId).append(response);
+                $("#gestion_cobranza"+ventaId).mask('###.###.###',{reverse: true});
+                $("#cuota_intereses"+ventaId).mask('###.###.###',{reverse: true});
+
+                total_pago_cuotas_cliente = total_pago_cuotas_cliente + parseInt( sacarPuntos( $("#total_monto_cuota_lote_"+ventaId).html() ) );
+                total_pago_intereses_cliente = total_pago_intereses + parseInt( sacarPuntos( $("#total_monto_interesses_lote_"+ventaId).html() ) );
+                total_pago_cliente = total_pago_cliente + parseInt( sacarPuntos( $("#total_monto_lote_"+ventaId).html() ) );
+
+                $(".cantidad_cuotas").change(function () {
+                    var ventaId = this.id;
+                    ventaId = ventaId.split("_");
+                    ventaId = ventaId[2];
+                    var nroCuotas = this.value;
+                    getCuotasByVentaIdNroCuotas(ventaId,nroCuotas);
+                });
+                //console.log(response);
+            },
+            error: function (xhr, errmsg, err) {
+                console.log(err);
+                //mensaje de error ?
+            }
+        });
+    }
+    
+    function recalcularTotales() {
+        console.log("recalculando totales");
+    }
+
+    function ponerPuntos(numero){
+        $("#poner_puntos").val(numero);
+        $("#poner_puntos").mask('###.###.###',{reverse: true});
+        numero = $("#poner_puntos").val();
+        return numero;
+    }
+
+    function sacarPuntos(numero){
+        numero =numero.replace(".", "");
+        numero =numero.replace(".", "");
+        numero =numero.replace(".", "");
+        numero =numero.replace(".", "");
+        numero =numero.replace(".", "");
+
+        return (numero);
     }
 
 </script>
@@ -147,9 +227,9 @@
 
 <div class="clear"></div>
     <div id="listado-item-lote">
-    <div id="lista_lotes_cliente">
-    </div>
-        <!-- se rellena dinamicamente con getCuotasApagarByClienteId -->
+        <div id="lista_lotes_cliente">
+            <!-- se rellena dinamicamente con getCuotasApagarByClienteId -->
+        </div>
     </div>
 <br>
 <div id="footer">

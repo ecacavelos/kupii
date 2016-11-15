@@ -404,6 +404,7 @@ def get_cuotas_a_pagar_by_cliente_id(request):
                 cant_cuotas = 0
                 for venta_cliente in ventas_del_cliente:
                     venta = {}
+                    venta['id'] = venta_cliente.id
                     venta['fraccion'] = venta_cliente.lote.manzana.fraccion
                     venta['lote'] = venta_cliente.lote
                     venta['cuotas'] = get_mes_pagado_by_id_lote_cant_cuotas(venta_cliente.lote_id, 1)
@@ -460,6 +461,78 @@ def get_cuotas_a_pagar_by_cliente_id(request):
         else:
             return HttpResponseRedirect(reverse('login'))
 
+def get_cuotas_a_pagar_by_venta_id_nro_cuotas(request):
+    if request.method == 'GET':
+        if request.user.is_authenticated():
+            try:
+                ventas = []
+                total_pago_cuotas = 0
+                total_pago_intereses = 0
+                total_pago = 0
+
+                venta_id = request.GET['venta_id']
+                nro_cuotas_a_pagar = request.GET['nro_cuotas']
+                print("Cliente id ->" + venta_id);
+
+                venta_del_cliente = Venta.objects.get(pk=venta_id)
+                i = 0
+
+                venta = {}
+                venta['id'] = venta_del_cliente.id
+                venta['fraccion'] = venta_del_cliente.lote.manzana.fraccion
+                venta['lote'] = venta_del_cliente.lote
+                venta['cuotas'] = get_mes_pagado_by_id_lote_cant_cuotas(venta_del_cliente.lote_id, nro_cuotas_a_pagar)
+
+                for cuota in venta['cuotas']:
+                    i= i+1
+                    monto_cuota = cuota['monto_cuota']
+                    monto_intereses = 0
+                    monto_total = 0
+                    gestion_cobranza = 0
+                    detalles = calculo_interes(venta_del_cliente.lote_id, '', cuota['fecha'], nro_cuotas_a_pagar)
+
+                    if detalles != []:
+                        dias_atraso = detalles[i-1]['dias_atraso']
+                        if dias_atraso < 0:
+                            dias_atraso = 0
+                        cuota['dias_atraso'] =  dias_atraso
+                        monto_intereses = detalles[i-1]['intereses']
+                        cuota['intereses'] =  unicode('{:,}'.format(monto_intereses)).replace(",", ".")
+                        cuota['vencimiento_gracia'] = detalles[i-1]['vencimiento_gracia']
+                        try:
+                            gestion_cobranza = detalles[(i-1)+1]['gestion_cobranza']
+                            venta['gestion_cobranza'] = unicode('{:,}'.format(gestion_cobranza)).replace(",", ".")
+                        except:
+                            gestion_cobranza = 0
+                    else:
+                        cuota['vencimiento_gracia'] = "-"
+                    monto_total = monto_cuota + monto_intereses + gestion_cobranza
+
+                    total_pago_cuotas = total_pago_cuotas + monto_cuota
+                    total_pago_intereses = total_pago_intereses + (monto_intereses + gestion_cobranza)
+                    total_pago = total_pago + (monto_cuota + (monto_intereses + gestion_cobranza))
+
+                    cuota['monto_cuota'] = unicode('{:,}'.format(monto_cuota)).replace(",", ".")
+
+                venta['totalMontoCuotas'] = unicode('{:,}'.format(total_pago_cuotas)).replace(",", ".")
+                venta['totalIntereses'] = unicode('{:,}'.format(total_pago_intereses)).replace(",", ".")
+                venta['totalPagoLote'] = unicode('{:,}'.format(total_pago)).replace(",", ".")
+
+                ventas.append(venta)
+
+                t = loader.get_template('movimientos/cuotas_por_lote_frm_table.html')
+                grupo = request.user.groups.get().id
+                c = RequestContext(request, {
+                    'grupo': grupo,
+                    'ventas': ventas,
+                    'nro_cuotas': nro_cuotas_a_pagar,
+                })
+                return HttpResponse(t.render(c))
+            except Exception, error:
+                print error
+        else:
+            return HttpResponseRedirect(reverse('login'))
+#TODO: aca procesar el pago de cuotas del cliente en submit de post
 def pago_de_cuotas_cliente(request):
     if request.user.is_authenticated():
         if verificar_permisos(request.user.id, permisos.ADD_PAGODECUOTAS):

@@ -33,4 +33,5 @@ urlpatterns = patterns('movimientos.views',
     url(r'^listado_busqueda_recuperacion/$', 'listar_busqueda_recuperacion'),
     url(r'^eliminar_pagodecuotas/$', 'eliminar_pagodecuotas'),
     url(r'^get_cuotas_a_pagar_by_cliente_id/$', 'get_cuotas_a_pagar_by_cliente_id'),
-)   
+    url(r'^get_cuotas_a_pagar_by_venta_id_nro_cuotas/$', 'get_cuotas_a_pagar_by_venta_id_nro_cuotas'),
+)
