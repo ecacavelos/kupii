@@ -431,14 +431,19 @@ var total_pago_cliente = 0;
         var total_cuotas_lotes = 0;
 
         //Se obtienen y se suman los intereses de la venta o lote
-        var inputs_intereses_de_venta = $("#lista_cuotas_"+ventaId).find(".cuota_intereses");;
+        var inputs_intereses_de_venta = $("#lista_cuotas_"+ventaId).find(".cuota_intereses");
         inputs_intereses_de_venta.each(function( index ) {
            total_intereses_venta = total_intereses_venta + parseInt( sacarPuntos( $( this ).val() ) );
         });
 
         //Se obtienen y se suma la gestione de cobranza de la venta o lote, a total intereses del mismo, y se asigna a su input
         var input_gestion_cobranza_venta = $("#gestion_cobranza_"+ventaId);
-        total_intereses_venta = total_intereses_venta +  parseInt( sacarPuntos( input_gestion_cobranza_venta.val() ) );
+        if (input_gestion_cobranza_venta == null){
+            total_intereses_venta = total_intereses_venta;
+        } else {
+           total_intereses_venta = total_intereses_venta +  parseInt( sacarPuntos( input_gestion_cobranza_venta.val() ) );
+        }
+
         $("#total_monto_intereses_lote_"+ventaId).html( ponerPuntos(total_intereses_venta) );
 
         //Se obtiene el total del pago de cuotas, se suma al total del lote, y se asigna a su debido input
