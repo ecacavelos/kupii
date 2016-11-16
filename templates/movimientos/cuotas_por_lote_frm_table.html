@@ -24,7 +24,7 @@
             <th>Monto Intereses</th>
         </tr>
         </thead>
-        <tbody>
+        <tbody id="lista_cuotas_{{ venta.id }}">
         {% for cuota in venta.cuotas %}
             <tr>
                 <td>{{ cuota.nro_cuota }}</td>
@@ -54,7 +54,7 @@
             <tr>
                 <td colspan="4" style="text-align: right"><b>Totales</b></td>
                 <td style="text-align: right" id="total_monto_cuota_lote_{{ venta.id }}">{{ venta.totalMontoCuotas }}</td>
-                <td style="text-align: right" id="total_monto_interesses_lote_{{ venta.id }}">{{ venta.totalIntereses }}</td>
+                <td style="text-align: right" id="total_monto_intereses_lote_{{ venta.id }}">{{ venta.totalIntereses }}</td>
             </tr>
             <tr>
                 <td colspan="4" style="text-align: right"><b>Total a Pagar Lote</b></td>

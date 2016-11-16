@@ -3,6 +3,7 @@
         <thead>
         <tr style="display: none">
             <input type="hidden" id="venta_id" value="{{ venta.id }}">
+            <input type="hidden" id="poner_puntos">
         </tr>
         <tr>
             <th colspan="2">
@@ -19,13 +20,13 @@
         <tr>
             <th>Nro Cuota</th>
             <th>Fecha Vencimento</th>
-            <th>Fecha Vencimento con 5 días habiles de gracia</th>
+            <th>Fecha Vencimento con 5 días hábiles de gracia</th>
             <th>Días de Atraso</th>
             <th>Monto Cuota</th>
             <th>Monto Intereses</th>
         </tr>
         </thead>
-        <tbody>
+        <tbody id="lista_cuotas_{{ venta.id }}">
         {% for cuota in venta.cuotas %}
             <tr>
                 <td>{{ cuota.nro_cuota }}</td>
@@ -55,7 +56,7 @@
             <tr>
                 <td colspan="4" style="text-align: right"><b>Totales</b></td>
                 <td style="text-align: right" id="total_monto_cuota_lote_{{ venta.id }}">{{ venta.totalMontoCuotas }}</td>
-                <td style="text-align: right" id="total_monto_interesses_lote_{{ venta.id }}">{{ venta.totalIntereses }}</td>
+                <td style="text-align: right" id="total_monto_intereses_lote_{{ venta.id }}">{{ venta.totalIntereses }}</td>
             </tr>
             <tr>
                 <td colspan="4" style="text-align: right"><b>Total a Pagar Lote</b></td>
@@ -92,4 +93,7 @@
         </tr>
     </tfoot>
 </table>
+<div>
+    <input type="button" class="button_verde" id="procesar_pagos" value="Procesar Pagos">
+</div>
 

@@ -113,7 +113,12 @@
 			<td title="Pago de Cuotas"><a href="{% url 'frontend_home' %}movimientos/pago_cuotas/">Pago de Cuotas</a></td>
 			<td width="25px" title="Agregar Pago"><a href="{% url 'frontend_home' %}movimientos/pago_cuotas/"><span class="glyphicon glyphicon-pencil"></span></a></td>
 	    	<td width="25px" title="Ver Pagos"><a href="{% url 'frontend_home' %}movimientos/listado_pagos/"><span class="glyphicon glyphicon-list-alt"></span></a></td>
-		</tr>		
+		</tr>
+        <tr>
+			<td title="Pago de Cuotas"><a href="{% url 'frontend_home' %}movimientos/pago_cuotas_cliente/">Pago de Cuotas Cliente</a></td>
+			<td width="25px" title="Agregar Pago"><a href="{% url 'frontend_home' %}movimientos/pago_cuotas_cliente/"><span class="glyphicon glyphicon-pencil"></span></a></td>
+	    	<td width="25px" title="Ver Pagos"><a href="{% url 'frontend_home' %}movimientos/listado_pagos/"><span class="glyphicon glyphicon-list-alt"></span></a></td>
+		</tr>
         <tr>
 			<td title="Prox Pago de Cuotas"><a href="{% url 'frontend_home' %}lotes/consultar/">Próx Pago de Cuotas</a></td>
             <td width="25px" ></td>
@@ -144,7 +149,7 @@
 <div class="grid_6">
 	<table width="90%" border="0" cellpadding="0" cellspacing="0" id="lista-categoria" align="center">
 		<tr>
-			<th class="acciones"><a href="{% url 'frontend_home' %}informes/" style="color: white;">Informes</a></strong></th>
+			<th class="acciones"><strong><a href="{% url 'frontend_home' %}informes/" style="color: white;">Informes</a></strong></th>
 		</tr>
 		<tr>
 			<td class="last" title="Lotes Libres">
@@ -240,6 +245,9 @@
 			  </tr>
 			  <tr>
 				<td class="last" title="Pago de Cuotas"><a href="{% url 'frontend_home' %}movimientos/pago_cuotas/">Pago de Cuotas</a></td>
+			  </tr>
+              <tr>
+                  <td class="last" title="Pago de Cuotas por Cliente"><a href="{% url 'frontend_home' %}movimientos/pago_cuotas_cliente/">Pago de Cuotas Clientes</a></td>
 			  </tr>
 			  <tr>
 				<td class="last" title="Prox Pago de Cuotas"><a href="{% url 'frontend_home' %}lotes/consultar/">Próx Pago de Cuotas</a></td>

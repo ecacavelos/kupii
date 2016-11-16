@@ -431,7 +431,7 @@ def get_cuotas_a_pagar_by_cliente_id(request):
 
                     total_pago_cuotas = total_pago_cuotas + monto_cuota
                     total_pago_intereses = total_pago_intereses + (monto_intereses + gestion_cobranza)
-                    total_pago = total_pago + (total_pago_cuotas + total_pago_intereses)
+                    total_pago = total_pago + (monto_cuota + (monto_intereses + gestion_cobranza) )
 
                     venta['totalMontoCuotas'] = unicode('{:,}'.format(monto_cuota)).replace(",", ".")
                     venta['totalIntereses'] = unicode('{:,}'.format(monto_intereses + gestion_cobranza)).replace(",", ".")
