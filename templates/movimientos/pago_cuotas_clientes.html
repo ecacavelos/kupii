@@ -438,7 +438,7 @@ var total_pago_cliente = 0;
 
         //Se obtienen y se suma la gestione de cobranza de la venta o lote, a total intereses del mismo, y se asigna a su input
         var input_gestion_cobranza_venta = $("#gestion_cobranza_"+ventaId);
-        if (input_gestion_cobranza_venta == null){
+        if (input_gestion_cobranza_venta.length == 0){
             total_intereses_venta = total_intereses_venta;
         } else {
            total_intereses_venta = total_intereses_venta +  parseInt( sacarPuntos( input_gestion_cobranza_venta.val() ) );
