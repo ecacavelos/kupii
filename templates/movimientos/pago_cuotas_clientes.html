@@ -191,6 +191,7 @@ var total_pago_cliente = 0;
                         getCuotasByVentaIdNroCuotas(ventaId,nroCuotas);
                     }
                 });
+                /*
                 $(".gestion_cobranza").change(function () {
                     var ventaId = this.id;
                     ventaId = ventaId.split("_");
@@ -200,7 +201,7 @@ var total_pago_cliente = 0;
                     }
                     recalcularTotales(ventaId);
                 });
-
+                */
                 $(".gestion_cobranza").keyup(function () {
                     var ventaId = this.id;
                     ventaId = ventaId.split("_");
@@ -210,7 +211,7 @@ var total_pago_cliente = 0;
                     }
                     recalcularTotales(ventaId);
                 });
-
+                /*
                 $(".cuota_intereses").change(function () {
                     var ventaId = this.id;
                     ventaId = ventaId.split("_");
@@ -220,7 +221,7 @@ var total_pago_cliente = 0;
                     }
                     recalcularTotales(ventaId);
                 });
-
+                */
                 $(".cuota_intereses").keyup(function () {
                     var ventaId = this.id;
                     ventaId = ventaId.split("_");
@@ -360,7 +361,7 @@ var total_pago_cliente = 0;
                         getCuotasByVentaIdNroCuotas(ventaId,nroCuotas);
                     }
                 });
-
+                /*
                 $(".gestion_cobranza").change(function () {
                     var ventaId = this.id;
                     ventaId = ventaId.split("_");
@@ -370,7 +371,7 @@ var total_pago_cliente = 0;
                     }
                     recalcularTotales(ventaId);
                 });
-
+                */
                 $(".gestion_cobranza").keyup(function () {
                     var ventaId = this.id;
                     ventaId = ventaId.split("_");
@@ -380,7 +381,7 @@ var total_pago_cliente = 0;
                     }
                     recalcularTotales(ventaId);
                 });
-
+                /*
                 $(".cuota_intereses").change(function () {
                     var ventaId = this.id;
                     ventaId = ventaId.split("_");
@@ -390,7 +391,7 @@ var total_pago_cliente = 0;
                     }
                     recalcularTotales(ventaId);
                 });
-
+                */
                 $(".cuota_intereses").keyup(function () {
                     var ventaId = this.id;
                     ventaId = ventaId.split("_");
@@ -430,7 +431,7 @@ var total_pago_cliente = 0;
         var total_cuotas_lotes = 0;
 
         //Se obtienen y se suman los intereses de la venta o lote
-        var inputs_intereses_de_venta = $("#cuota_intereses_"+ventaId);
+        var inputs_intereses_de_venta = $("#lista_cuotas_"+ventaId).find(".cuota_intereses");;
         inputs_intereses_de_venta.each(function( index ) {
            total_intereses_venta = total_intereses_venta + parseInt( sacarPuntos( $( this ).val() ) );
         });
