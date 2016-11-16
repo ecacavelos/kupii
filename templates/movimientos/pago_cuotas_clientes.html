@@ -102,8 +102,8 @@ var total_pago_cliente = 0;
                 //borra y arma la tabla
                 $("#lista_lotes_cliente").empty();
                 $("#lista_lotes_cliente").append(response);
-                $(".gestion_cobranza").mask('###.###.###',{reverse: true});
-                $(".cuota_intereses").mask('###.###.###',{reverse: true});
+                $(".gestion_cobranza").mask('###.###.###.###',{reverse: true});
+                $(".cuota_intereses").mask('###.###.###.###',{reverse: true});
 
                 total_pago_cuotas_cliente = parseInt( sacarPuntos( $("#total_pago_cuotas_cliente").html() ) );
                 total_pago_intereses_cliente = parseInt( sacarPuntos( $("#total_pago_intereses_cliente").html() ) );
@@ -191,7 +191,56 @@ var total_pago_cliente = 0;
                         getCuotasByVentaIdNroCuotas(ventaId,nroCuotas);
                     }
                 });
+                $(".gestion_cobranza").change(function () {
+                    var ventaId = this.id;
+                    ventaId = ventaId.split("_");
+                    ventaId = ventaId[2];
+                    if (this.value == ""){
+                        this.value = 0;
+                    }
+                    recalcularTotales(ventaId);
+                });
 
+                $(".gestion_cobranza").keyup(function () {
+                    var ventaId = this.id;
+                    ventaId = ventaId.split("_");
+                    ventaId = ventaId[2];
+                    if (this.value == ""){
+                        this.value = 0;
+                    }
+                    recalcularTotales(ventaId);
+                });
+
+                $(".cuota_intereses").change(function () {
+                    var ventaId = this.id;
+                    ventaId = ventaId.split("_");
+                    ventaId = ventaId[2];
+                    if (this.value == ""){
+                        this.value = 0;
+                    }
+                    recalcularTotales(ventaId);
+                });
+
+                $(".cuota_intereses").keyup(function () {
+                    var ventaId = this.id;
+                    ventaId = ventaId.split("_");
+                    ventaId = ventaId[2];
+                    if (this.value == ""){
+                        this.value = 0;
+                    }
+                    recalcularTotales(ventaId);
+                });
+
+                $(".cuota_intereses").keypress(function () {
+                    if (this.value == "0"){
+                        this.value = "";
+                    }
+                });
+                $(".gestion_cobranza").keypress(function () {
+                    if (this.value == "0"){
+                        this.value = "";
+                    }
+                });
                 //console.log(response);
             },
             error: function (xhr, errmsg, err) {
@@ -218,8 +267,8 @@ var total_pago_cliente = 0;
 
                 $("#listado_cuotas_"+ventaId).empty();
                 $("#listado_cuotas_"+ventaId).append(response);
-                $("#gestion_cobranza"+ventaId).mask('###.###.###',{reverse: true});
-                $("#cuota_intereses"+ventaId).mask('###.###.###',{reverse: true});
+                $(".gestion_cobranza").mask('###.###.###.###',{reverse: true});
+                $(".cuota_intereses").mask('###.###.###.###',{reverse: true});
 
                 total_pago_cuotas_cliente = total_pago_cuotas_cliente + parseInt( sacarPuntos( $("#total_monto_cuota_lote_"+ventaId).html() ) );
                 total_pago_intereses_cliente = total_pago_intereses + parseInt( sacarPuntos( $("#total_monto_intereses_lote_"+ventaId).html() ) );
@@ -312,6 +361,57 @@ var total_pago_cliente = 0;
                     }
                 });
 
+                $(".gestion_cobranza").change(function () {
+                    var ventaId = this.id;
+                    ventaId = ventaId.split("_");
+                    ventaId = ventaId[2];
+                    if (this.value == ""){
+                        this.value = 0;
+                    }
+                    recalcularTotales(ventaId);
+                });
+
+                $(".gestion_cobranza").keyup(function () {
+                    var ventaId = this.id;
+                    ventaId = ventaId.split("_");
+                    ventaId = ventaId[2];
+                    if (this.value == ""){
+                        this.value = 0;
+                    }
+                    recalcularTotales(ventaId);
+                });
+
+                $(".cuota_intereses").change(function () {
+                    var ventaId = this.id;
+                    ventaId = ventaId.split("_");
+                    ventaId = ventaId[2];
+                    if (this.value == ""){
+                        this.value = 0;
+                    }
+                    recalcularTotales(ventaId);
+                });
+
+                $(".cuota_intereses").keyup(function () {
+                    var ventaId = this.id;
+                    ventaId = ventaId.split("_");
+                    ventaId = ventaId[2];
+                    if (this.value == ""){
+                        this.value = 0;
+                    }
+                    recalcularTotales(ventaId);
+                });
+
+                $(".cuota_intereses").keypress(function () {
+                    if (this.value == "0"){
+                        this.value = "";
+                    }
+                });
+                $(".gestion_cobranza").keypress(function () {
+                    if (this.value == "0"){
+                        this.value = "";
+                    }
+                });
+
                 //console.log(response);
             },
             error: function (xhr, errmsg, err) {
@@ -321,23 +421,66 @@ var total_pago_cliente = 0;
         });
     }
     
-    function recalcularTotales() {
-        console.log("recalculando totales");
+    function recalcularTotales(ventaId) {
+
+        var total_intereses_venta = 0;
+        var total_monto_venta = 0;
+
+        var total_intereses_lotes = 0;
+        var total_cuotas_lotes = 0;
+
+        //Se obtienen y se suman los intereses de la venta o lote
+        var inputs_intereses_de_venta = $("#cuota_intereses_"+ventaId);
+        inputs_intereses_de_venta.each(function( index ) {
+           total_intereses_venta = total_intereses_venta + parseInt( sacarPuntos( $( this ).val() ) );
+        });
+
+        //Se obtienen y se suma la gestione de cobranza de la venta o lote, a total intereses del mismo, y se asigna a su input
+        var input_gestion_cobranza_venta = $("#gestion_cobranza_"+ventaId);
+        total_intereses_venta = total_intereses_venta +  parseInt( sacarPuntos( input_gestion_cobranza_venta.val() ) );
+        $("#total_monto_intereses_lote_"+ventaId).html( ponerPuntos(total_intereses_venta) );
+
+        //Se obtiene el total del pago de cuotas, se suma al total del lote, y se asigna a su debido input
+        var input_total_monto_cuota_lote = $("#total_monto_cuota_lote_"+ventaId);
+        total_monto_venta = total_intereses_venta + parseInt( sacarPuntos( input_total_monto_cuota_lote.html() ) );
+        $("#total_monto_lote_"+ventaId).html( ponerPuntos(total_monto_venta) );
+
+        //Se obtienen y se suman todos los totales de cuotas
+        var inputs_totales_cuotas = $(".total_monto_cuota_lote");
+        inputs_totales_cuotas.each(function( index ) {
+           total_cuotas_lotes = total_cuotas_lotes + parseInt( sacarPuntos( $( this ).html() ) );
+        });
+
+        //Se obtienen y se suman todos los totales de intereses
+        var inputs_totales_intereses = $(".total_monto_intereses_lote");
+        inputs_totales_intereses.each(function( index ) {
+           total_intereses_lotes = total_intereses_lotes + parseInt( sacarPuntos( $( this ).html() ) );
+        });
+
+        total_pago_cuotas_cliente = total_cuotas_lotes;
+        total_pago_intereses_cliente = total_intereses_lotes;
+        total_pago_cliente = total_pago_cuotas_cliente + total_pago_intereses_cliente;
+
+        $("#total_pago_cuotas_cliente").html(ponerPuntos(total_pago_cuotas_cliente));
+        $("#total_pago_intereses_cliente").html(ponerPuntos(total_pago_intereses_cliente));
+        $("#total_pago_cliente").html(ponerPuntos(total_pago_cliente));
+
+        console.log("Totales recalculados");
     }
 
     function ponerPuntos(numero){
         $("#poner_puntos").val(numero);
-        $("#poner_puntos").mask('###.###.###',{reverse: true});
+        $("#poner_puntos").mask('###.###.###.###.###',{reverse: true});
         numero = $("#poner_puntos").val();
         return numero;
     }
 
     function sacarPuntos(numero){
-        numero =numero.replace(".", "");
-        numero =numero.replace(".", "");
-        numero =numero.replace(".", "");
-        numero =numero.replace(".", "");
-        numero =numero.replace(".", "");
+        numero = numero.replace(".", "");
+        numero = numero.replace(".", "");
+        numero = numero.replace(".", "");
+        numero = numero.replace(".", "");
+        numero = numero.replace(".", "");
 
         return (numero);
     }

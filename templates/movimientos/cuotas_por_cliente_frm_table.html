@@ -38,7 +38,7 @@
                 {% endif  %}
                 <td style="text-align: right">{{ cuota.monto_cuota }}</td>
                 {% if cuota.intereses %}
-                    <td style="text-align: right"><input type="text" class="cuota_intereses" value="{{ cuota.intereses }}" style="text-align: right; font-size: 13px"/></td>
+                    <td style="text-align: right"><input type="text" id="cuota_intereses_{{ venta.id }}" class="cuota_intereses" value="{{ cuota.intereses }}" style="text-align: right; font-size: 13px"/></td>
                 {% else %}
                     <td style="text-align: right">0</td>
                 {% endif  %}
@@ -47,19 +47,19 @@
         {% if venta.gestion_cobranza %}
                 <tr>
                     <td colspan="4" style="text-align: right">Gestion Cobranza</td>
-                    <td colspan="2" style="text-align: right"><input type="text" class="gestion_cobranza" value="{{ venta.gestion_cobranza }}" style="text-align: right; font-size: 13px"/></td>
+                    <td colspan="2" style="text-align: right"><input type="text" id="gestion_cobranza_{{ venta.id }}" class="gestion_cobranza" value="{{ venta.gestion_cobranza }}" style="text-align: right; font-size: 13px"/></td>
                 </tr>
             {% endif %}
         </tbody>
         <tfoot>
             <tr>
                 <td colspan="4" style="text-align: right"><b>Totales</b></td>
-                <td style="text-align: right" id="total_monto_cuota_lote_{{ venta.id }}">{{ venta.totalMontoCuotas }}</td>
-                <td style="text-align: right" id="total_monto_intereses_lote_{{ venta.id }}">{{ venta.totalIntereses }}</td>
+                <td style="text-align: right" class="total_monto_cuota_lote" id="total_monto_cuota_lote_{{ venta.id }}">{{ venta.totalMontoCuotas }}</td>
+                <td style="text-align: right" class="total_monto_intereses_lote" id="total_monto_intereses_lote_{{ venta.id }}">{{ venta.totalIntereses }}</td>
             </tr>
             <tr>
                 <td colspan="4" style="text-align: right"><b>Total a Pagar Lote</b></td>
-                <td colspan="2" style="text-align: right"><b id="total_monto_lote_{{ venta.id }}">{{ venta.totalPagoLote }}</b></td>
+                <td colspan="2" style="text-align: right"><b class="total_monto_lote" id="total_monto_lote_{{ venta.id }}">{{ venta.totalPagoLote }}</b></td>
             </tr>
         </tfoot>
     </table>
