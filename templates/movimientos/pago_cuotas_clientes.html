@@ -135,6 +135,7 @@ var total_pago_cliente = 0;
                         getCuotasByVentaIdNroCuotas(ventaId,nroCuotas);
                     }
                 });
+                /*
                 $(".cantidad_cuotas").blur(function () {
                     if (this.value == "" || this.value == "0"){
                         var ventaId = this.id;
@@ -162,6 +163,7 @@ var total_pago_cliente = 0;
                         getCuotasByVentaIdNroCuotas(ventaId,nroCuotas);
                     }
                 });
+                */
                 $(".cantidad_cuotas").keyup(function () {
                     if (this.value == "" || this.value == "0"){
                         var ventaId = this.id;
@@ -253,6 +255,7 @@ var total_pago_cliente = 0;
                         getCuotasByVentaIdNroCuotas(ventaId,nroCuotas);
                     }
                 });
+                /*
                 $(".cantidad_cuotas").blur(function () {
                     if (this.value == "" || this.value == "0"){
                         var ventaId = this.id;
@@ -280,6 +283,7 @@ var total_pago_cliente = 0;
                         getCuotasByVentaIdNroCuotas(ventaId,nroCuotas);
                     }
                 });
+                */
                 $(".cantidad_cuotas").keyup(function () {
                     if (this.value == "" || this.value == "0"){
                         var ventaId = this.id;
@@ -307,6 +311,7 @@ var total_pago_cliente = 0;
                         getCuotasByVentaIdNroCuotas(ventaId,nroCuotas);
                     }
                 });
+
                 //console.log(response);
             },
             error: function (xhr, errmsg, err) {
@@ -335,6 +340,10 @@ var total_pago_cliente = 0;
         numero =numero.replace(".", "");
 
         return (numero);
+    }
+
+    function enviarPagos(){
+
     }
 
 </script>
@@ -377,6 +386,7 @@ var total_pago_cliente = 0;
 
 <div class="clear"></div>
     <div id="listado-item-lote">
+        <input type="hidden" id="poner_puntos">
         <div id="lista_lotes_cliente">
             <!-- se rellena dinamicamente con getCuotasApagarByClienteId -->
         </div>
