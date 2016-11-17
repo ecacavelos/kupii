@@ -1725,7 +1725,7 @@ def listar_busqueda_pagos(request):
                     try:
                         manzana_id=Manzana.objects.get(fraccion_id=fraccion_int,nro_manzana=manzana_int)
                         lote_id=Lote.objects.get(manzana_id=manzana_id,nro_lote=lote_int)
-                        object_list = PagoDeCuotas.objects.filter(lote_id=lote_id.id)
+                        object_list = PagoDeCuotas.objects.filter(lote_id=lote_id.id).order_by('-fecha_de_pago')
                         if object_list:
                             for i in object_list:
                                 i.total_de_cuotas=unicode('{:,}'.format(i.total_de_cuotas)).replace(",", ".")
@@ -1737,7 +1737,7 @@ def listar_busqueda_pagos(request):
                 if tipo_busqueda=='cliente':
                     try:
                         cliente_id = request.GET['busqueda']
-                        object_list = PagoDeCuotas.objects.filter(cliente_id=cliente_id)    
+                        object_list = PagoDeCuotas.objects.filter(cliente_id=cliente_id).order_by('-fecha_de_pago')
                         if object_list:
                             for i in object_list:
                                 i.total_de_cuotas=unicode('{:,}'.format(i.total_de_cuotas)).replace(",", ".")
