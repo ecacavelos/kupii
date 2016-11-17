@@ -244,6 +244,7 @@ var total_pago_cliente = 0;
                 });
 
                 $("#procesar_pagos").click(function () {
+                    $("#procesar_pagos").attr("disabled", true);
                     enviarPagos();
                 });
                 //console.log(response);
@@ -515,6 +516,7 @@ var total_pago_cliente = 0;
             error: function (xhr, errmsg, err) {
                 console.log(err);
                 alert("Ocurrio un error al enviar los pagos.")
+                $("#procesar_pagos").removeAttr("disabled");
                 //mensaje de error ?
             }
         });
