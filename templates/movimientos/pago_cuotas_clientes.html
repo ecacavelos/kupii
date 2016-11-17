@@ -242,6 +242,10 @@ var total_pago_cliente = 0;
                         this.value = "";
                     }
                 });
+
+                $("#procesar_pagos").click(function () {
+                    enviarPagos();
+                });
                 //console.log(response);
             },
             error: function (xhr, errmsg, err) {
@@ -413,6 +417,7 @@ var total_pago_cliente = 0;
                     }
                 });
 
+
                 //console.log(response);
             },
             error: function (xhr, errmsg, err) {
@@ -492,7 +497,85 @@ var total_pago_cliente = 0;
     }
 
     function enviarPagos(){
+        var clienteId = $("#busqueda").val();
+        var ventasJson = "";
+        ventasJson = armarJsonDePagos(clienteId);
+        console.log(ventasJson);
+        $.ajax({
+            url: base_context + "/movimientos/pago_cuotas_cliente/",
+            type: 'POST',
+            dataType: "json",
+            data: {
+                cliente_id: clienteId,
+                ventas_json: ventasJson,
+            },
+            success: function (response) {
+                window.location = base_context + "/movimientos/listado_busqueda_pagos/?tipo_busqueda=cliente&busqueda_label=&busqueda="+clienteId+"&fecha_desde=&fecha_hasta=&tabla=venta";
+            },
+            error: function (xhr, errmsg, err) {
+                console.log(err);
+                alert("Ocurrio un error al enviar los pagos.")
+                //mensaje de error ?
+            }
+        });
+    }
 
+    function armarJsonDePagos(clienteId) {
+        var ventasJson = [];
+        $(".listado-lotes").each(function( index ) {
+            var venta = {};
+            var detalle = {};
+            var i = 0;
+            var paso = 0;
+
+            var ventaId = this.id;
+            ventaId = ventaId.split("_");
+            ventaId = ventaId[2];
+            var nro_cuotas = 0;
+
+            venta['pago_total_de_pago'] = parseInt( sacarPuntos($("#total_monto_lote_"+ventaId).html()) );
+
+            if (venta['pago_total_de_pago'] != 0){
+                venta['id'] = ventaId;
+                venta['interes_original'] = parseInt( sacarPuntos($("#interes_original_"+ventaId).val() ) );
+                var inputs_cuota_nro = $(".cuota_nro_"+ventaId);
+                venta['resumen_cuotas'] = parseInt( $(inputs_cuota_nro[0]).html().split("/")[0] ) - 1;
+                if (venta['resumen_cuotas'] == 0){
+                    venta['resumen_cuotas'] = 1;
+                }
+
+                $("#lista_cuotas_"+ventaId).find("input[type=text]").each(function( index ) {
+                    detalle['item'+i] = {};
+                    var item = {};
+                    if (this.className == "cuota_intereses"){
+                        item['nro_cuota'] = parseInt($(this).closest('tr').find('.cuota_nro_'+ventaId).html().split("/")[0]);
+                        item['intereses'] = parseInt( sacarPuntos(this.value) );
+                    } else {
+                        item['gestion_cobranza'] = parseInt( sacarPuntos(this.value) );
+                    }
+                    detalle["item"+i] = item;
+                    i++;
+                    paso = i;
+                });
+
+                $("#lista_cuotas_"+ventaId).find('.cuota_nro_'+ventaId).each(function( index ) {
+                    nro_cuotas ++;
+                });
+
+                if (paso > 0){
+                    venta['detalle'] = detalle;
+                } else {
+                    venta['detalle'] = "";
+                }
+                venta['nro_cuotas'] = nro_cuotas
+                venta['pago_total_de_cuotas'] = parseInt( sacarPuntos($("#total_monto_cuota_lote_"+ventaId).html()) );
+                venta['pago_total_de_mora'] = parseInt( sacarPuntos($("#total_monto_intereses_lote_"+ventaId).html()) );
+
+                ventasJson.push(venta);
+            }
+
+        });
+        return JSON.stringify(ventasJson);
     }
 
 </script>
@@ -537,6 +620,7 @@ var total_pago_cliente = 0;
     <div id="listado-item-lote">
         <input type="hidden" id="poner_puntos">
         <div id="lista_lotes_cliente">
+            {% csrf_token %}
             <!-- se rellena dinamicamente con getCuotasApagarByClienteId -->
         </div>
     </div>

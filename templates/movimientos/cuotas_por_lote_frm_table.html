@@ -2,6 +2,7 @@
         <thead>
         <tr style="display: none">
             <input type="hidden" id="venta_id" value="{{ venta.id }}">
+            <input type="hidden" id="interes_original_{{ venta.id }}" value="{{ venta.totalIntereses }}">
         </tr>
         <tr>
             <th colspan="2">
@@ -27,7 +28,7 @@
         <tbody id="lista_cuotas_{{ venta.id }}">
         {% for cuota in venta.cuotas %}
             <tr>
-                <td>{{ cuota.nro_cuota }}</td>
+                <td class="cuota_nro_{{ venta.id }}">{{ cuota.nro_cuota }}</td>
                 <td>{{ cuota.fecha }}</td>
                 <td>{{ cuota.vencimiento_gracia }}</td>
                 {% if cuota.dias_atraso %}
@@ -44,11 +45,13 @@
             </tr>
         {% endfor %}
         {% if venta.gestion_cobranza %}
+            {% if venta.gestion_cobranza != '0' %}
                 <tr>
                     <td colspan="4" style="text-align: right">Gestion Cobranza</td>
                     <td colspan="2" style="text-align: right"><input type="text" id="gestion_cobranza_{{ venta.id }}" class="gestion_cobranza" value="{{ venta.gestion_cobranza }}" style="text-align: right; font-size: 13px"/></td>
                 </tr>
             {% endif %}
+        {% endif %}
         </tbody>
         <tfoot>
             <tr>

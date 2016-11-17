@@ -55,6 +55,13 @@ table.listado-lotes {
     margin-right:auto;
 }
 
+table.listado-lotes-totales {
+	border: 5px solid #CCC;
+	margin-bottom:15px;
+	margin-left:auto;
+    margin-right:auto;
+}
+
 table.listado-ventas {
 	border: 5px solid #CCC;
 	margin-bottom:15px;
@@ -198,6 +205,15 @@ table.listado-lotes tr th {
 	color:#FFF
 }
 
+table.listado-lotes-totales tr th {
+	padding: 10px 10px 10px 10px;
+	font-size:16px;
+	font-weight:400;
+	text-align:center;
+	background-color:#02B06B;
+	color:#FFF
+}
+
 table.listado-pagos tr th {
 	padding: 7px 7px 7px 7px;
 	font-size: 14px;
@@ -214,6 +230,13 @@ table.listado-lotes tr td {
 	border-bottom:thin solid #CCC
 }
 
+table.listado-lotes-totales tr td {
+	padding:2.9px;
+	font-size:14px;
+	text-align:center;
+	border-bottom:thin solid #CCC
+}
+
 table.listado-pagos tr td {
 	padding:2.9px;
 	font-size:14px;
@@ -222,6 +245,10 @@ table.listado-pagos tr td {
 }
 
 table.listado-lotes tr td.last {
+	border-bottom: none
+}
+
+table.listado-totales tr td.last {
 	border-bottom: none
 }
 

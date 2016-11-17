@@ -483,34 +483,44 @@ def get_cuotas_a_pagar_by_venta_id_nro_cuotas(request):
                 venta['lote'] = venta_del_cliente.lote
                 venta['cuotas'] = get_mes_pagado_by_id_lote_cant_cuotas(venta_del_cliente.lote_id, nro_cuotas_a_pagar)
 
+                if len(venta['cuotas']) > 0:
+                    detalles = calculo_interes(venta_del_cliente.lote_id, '', venta['cuotas'][0]['fecha'], nro_cuotas_a_pagar)
+                else:
+                    detalles = []
                 for cuota in venta['cuotas']:
                     i= i+1
                     monto_cuota = cuota['monto_cuota']
                     monto_intereses = 0
                     monto_total = 0
                     gestion_cobranza = 0
-                    detalles = calculo_interes(venta_del_cliente.lote_id, '', cuota['fecha'], nro_cuotas_a_pagar)
 
                     if detalles != []:
-                        dias_atraso = detalles[i-1]['dias_atraso']
-                        if dias_atraso < 0:
-                            dias_atraso = 0
-                        cuota['dias_atraso'] =  dias_atraso
-                        monto_intereses = detalles[i-1]['intereses']
-                        cuota['intereses'] =  unicode('{:,}'.format(monto_intereses)).replace(",", ".")
-                        cuota['vencimiento_gracia'] = detalles[i-1]['vencimiento_gracia']
                         try:
-                            gestion_cobranza = detalles[(i-1)+1]['gestion_cobranza']
-                            venta['gestion_cobranza'] = unicode('{:,}'.format(gestion_cobranza)).replace(",", ".")
+                            dias_atraso = detalles[i-1]['dias_atraso']
+                            if dias_atraso < 0:
+                                dias_atraso = 0
+                            cuota['dias_atraso'] =  dias_atraso
+                            monto_intereses = detalles[i-1]['intereses']
+                            cuota['intereses'] =  unicode('{:,}'.format(monto_intereses)).replace(",", ".")
+                            cuota['vencimiento_gracia'] = detalles[i-1]['vencimiento_gracia']
+                            try:
+                                gestion_cobranza = detalles[(i-1)+1]['gestion_cobranza']
+                                venta['gestion_cobranza'] = unicode('{:,}'.format(gestion_cobranza)).replace(",", ".")
+                            except:
+                                gestion_cobranza = 0
                         except:
-                            gestion_cobranza = 0
+                            cuota['dias_atraso'] = 0
+                            cuota['intereses'] = 0
+                            cuota['vencimiento_gracia'] = "-"
+
+
                     else:
                         cuota['vencimiento_gracia'] = "-"
                     monto_total = monto_cuota + monto_intereses + gestion_cobranza
 
                     total_pago_cuotas = total_pago_cuotas + monto_cuota
                     total_pago_intereses = total_pago_intereses + (monto_intereses + gestion_cobranza)
-                    total_pago = total_pago + (monto_cuota + (monto_intereses + gestion_cobranza))
+                    total_pago = total_pago + (monto_total)
 
                     cuota['monto_cuota'] = unicode('{:,}'.format(monto_cuota)).replace(",", ".")
 
@@ -540,112 +550,137 @@ def pago_de_cuotas_cliente(request):
             grupo = request.user.groups.get().id
             if request.method == 'POST':
                 data = request.POST
-                lote_id = data.get('pago_lote_id', '')
-                nro_cuotas_a_pagar = data.get('pago_nro_cuotas_a_pagar')
+                ventas_json = data.get('ventas_json')
+                ventas_json_parsed = json.loads(ventas_json)
+                #Aca parsear el Json y recorrerlo n veces y obtener los parametros
+                for venta_json in ventas_json_parsed:
+                    venta_id = venta_json['id']
 
-                #############################################################
-                # Codigo agregado: contemplar el caso de los lotes recuperados
-                venta = get_ultima_venta(lote_id)
-                #############################################################
+                    nro_cuotas_a_pagar = venta_json['nro_cuotas']
 
-                venta.pagos_realizados = int(nro_cuotas_a_pagar) + int(venta.pagos_realizados)
-                cliente_id = data.get('pago_cliente_id')
-                vendedor_id = data.get('pago_vendedor_id')
-                plan_pago_id = data.get('pago_plan_de_pago_id')
-                plan_pago_vendedor_id = data.get('pago_plan_de_pago_vendedor_id')
-                total_de_cuotas = data.get('pago_total_de_cuotas')
-                total_de_mora = data.get('pago_total_de_mora')
-                total_de_pago = data.get('pago_total_de_pago')
-                interes_original = data.get('interes_original')
-                resumen_cuotas = data.get('resumen_cuotas')
-                cuota_obsequio = data.get('cuota_obsequio')
-                resumen_cuotas = int(resumen_cuotas) + 1
-                date_parse_error = False
-                fecha_pago = data.get('pago_fecha_de_pago', '')
-                fecha_pago_parsed = datetime.datetime.strptime(fecha_pago, "%d/%m/%Y").date()
-                detalle = data.get('detalle', '')
-                if detalle == '':
-                    detalle = None
-                    #             try:
-                    #                 fecha_pago_parsed = datetime.strptime(data.get('pago_fecha_de_pago', ''), "%d/%m/%Y")
-                    #             except:
-                    #                 date_parse_error = True
-                    #
-                    #             if date_parse_error == True:
-                    #                 try:
-                    #                     fecha_pago_parsed = datetime.strptime(data.get('pago_fecha_de_pago', ''), "%Y-%m-%d")
-                    #                 except:
-                    #                     date_parse_error = True
-                # print fecha_pago
-                # print fecha_pago_parsed
-                cantidad_cuotas = PlanDePago.objects.get(pk=plan_pago_id)
-                cuotas_pagadas = Venta.objects.get(pk=venta.id)
-                cuotas_restantes = int(cantidad_cuotas.cantidad_de_cuotas) - int(cuotas_pagadas.pagos_realizados)
-                if cuotas_restantes >= int(nro_cuotas_a_pagar):
-                    try:
-                        nuevo_pago = PagoDeCuotas()
-                        nuevo_pago.venta = Venta.objects.get(pk=venta.id)
-                        nuevo_pago.lote = Lote.objects.get(pk=lote_id)
-                        nuevo_pago.fecha_de_pago = fecha_pago_parsed
-                        nuevo_pago.nro_cuotas_a_pagar = nro_cuotas_a_pagar
-                        nuevo_pago.cliente = Cliente.objects.get(pk=cliente_id)
-                        nuevo_pago.plan_de_pago = PlanDePago.objects.get(pk=plan_pago_id)
-                        nuevo_pago.plan_de_pago_vendedores = PlanDePagoVendedor.objects.get(pk=plan_pago_vendedor_id)
-                        nuevo_pago.vendedor = Vendedor.objects.get(pk=vendedor_id)
-                        nuevo_pago.total_de_cuotas = total_de_cuotas
-                        nuevo_pago.total_de_mora = total_de_mora
-                        nuevo_pago.total_de_pago = total_de_pago
-                        nuevo_pago.detalle = detalle
-                        if cuota_obsequio == '1':
-                            nuevo_pago.cuota_obsequio = True
-                        else:
-                            nuevo_pago.cuota_obsequio = False
-                        nuevo_pago.save()
+                    #############################################################
+                    # Codigo agregado: contemplar el caso de los lotes recuperados
+                    venta = Venta.objects.get(pk=venta_id)
+                    #############################################################
+                    lote_id = venta.lote_id
+                    venta.pagos_realizados = int(nro_cuotas_a_pagar) + int(venta.pagos_realizados)
 
-                        # Se loggea la accion del usuario
-                        id_objeto = nuevo_pago.id
-                        codigo_lote = nuevo_pago.lote.codigo_paralot
-                        loggear_accion(request.user, "Agregar", "Pago de cuota", id_objeto, codigo_lote)
+                    cliente_id = venta.cliente_id
+                    vendedor_id = venta.vendedor_id
+                    plan_pago_id = venta.plan_de_pago_id
+                    plan_pago_vendedor_id = venta.plan_de_pago_vendedor_id
+
+                    total_de_cuotas = venta_json['pago_total_de_cuotas']
+                    total_de_mora = venta_json['pago_total_de_mora']
+                    total_de_pago = venta_json['pago_total_de_pago']
+
+                    interes_original = venta_json['interes_original']
+                    resumen_cuotas = venta_json['resumen_cuotas']
+
+                    #TODO: ver lo de cuota obsequio
+                    cuota_obsequio = False
+                    resumen_cuotas = int(resumen_cuotas) + 1
+                    date_parse_error = False
+
+                    query = ('''SELECT NOW()''')
+                    cursor = connection.cursor()
+                    cursor.execute(query)
+                    results = cursor.fetchall()
+                    if (len(results) > 0):
+                        fecha_actual = results
+                        dia = fecha_actual[0][0].day
+                        mes = fecha_actual[0][0].month
+                        anho = fecha_actual[0][0].year
+                        if dia >= 1 and dia <= 9:
+                            dia = unicode('0') + unicode(dia)
+                        if mes >= 1 and mes <= 9:
+                            mes = unicode('0') + unicode(mes)
+                        fecha_actual = unicode(dia) + '/' + unicode(mes) + '/' + unicode(anho)
+                    fecha_pago = fecha_actual
+                    fecha_pago_parsed = datetime.datetime.strptime(fecha_pago, "%d/%m/%Y").date()
+
+                    detalle = json.dumps(venta_json['detalle'])
+                    if detalle == '':
+                        detalle = None
+                        #             try:
+                        #                 fecha_pago_parsed = datetime.strptime(data.get('pago_fecha_de_pago', ''), "%d/%m/%Y")
+                        #             except:
+                        #                 date_parse_error = True
+                        #
+                        #             if date_parse_error == True:
+                        #                 try:
+                        #                     fecha_pago_parsed = datetime.strptime(data.get('pago_fecha_de_pago', ''), "%Y-%m-%d")
+                        #                 except:
+                        #                     date_parse_error = True
+                    # print fecha_pago
+                    # print fecha_pago_parsed
+                    cantidad_cuotas = PlanDePago.objects.get(pk=plan_pago_id)
+                    cuotas_pagadas = Venta.objects.get(pk=venta.id)
+                    cuotas_restantes = int(cantidad_cuotas.cantidad_de_cuotas) - int(cuotas_pagadas.pagos_realizados)
+                    if cuotas_restantes >= int(nro_cuotas_a_pagar):
+                        try:
+                            nuevo_pago = PagoDeCuotas()
+                            nuevo_pago.venta = Venta.objects.get(pk=venta.id)
+                            nuevo_pago.lote = Lote.objects.get(pk=lote_id)
+                            nuevo_pago.fecha_de_pago = fecha_pago_parsed
+                            nuevo_pago.nro_cuotas_a_pagar = nro_cuotas_a_pagar
+                            nuevo_pago.cliente = Cliente.objects.get(pk=cliente_id)
+                            nuevo_pago.plan_de_pago = PlanDePago.objects.get(pk=plan_pago_id)
+                            nuevo_pago.plan_de_pago_vendedores = PlanDePagoVendedor.objects.get(pk=plan_pago_vendedor_id)
+                            nuevo_pago.vendedor = Vendedor.objects.get(pk=vendedor_id)
+                            nuevo_pago.total_de_cuotas = total_de_cuotas
+                            nuevo_pago.total_de_mora = total_de_mora
+                            nuevo_pago.total_de_pago = total_de_pago
+                            nuevo_pago.detalle = detalle
+                            if cuota_obsequio == '1':
+                                nuevo_pago.cuota_obsequio = True
+                            else:
+                                nuevo_pago.cuota_obsequio = False
+                            nuevo_pago.save()
+
+                            # Se loggea la accion del usuario
+                            id_objeto = nuevo_pago.id
+                            codigo_lote = nuevo_pago.lote.codigo_paralot
+                            loggear_accion(request.user, "Agregar", "Pago de cuota", id_objeto, codigo_lote)
 
 
-                    except Exception, error:
-                        print error
-                        pass
-                    venta.save()
+                        except Exception, error:
+                            print error
+                            pass
+                        venta.save()
 
-                    # Vuelve al template
-                    # c = RequestContext(request, {})
-                    # return HttpResponse(t.render(c))
+                        # Vuelve al template
+                        # c = RequestContext(request, {})
+                        # return HttpResponse(t.render(c))
 
-                    # Redirecciona a facturacion (al final hace esto en movimientos_pagos.js
-                    # return HttpResponseRedirect("/facturacion/facturar")
+                        # Redirecciona a facturacion (al final hace esto en movimientos_pagos.js
+                        # return HttpResponseRedirect("/facturacion/facturar")
 
-                    # retorna el objeto como json
-                    object_list = PagoDeCuotas.objects.filter(id=nuevo_pago.id)
-                    labels = ["id"]
-                    if interes_original != total_de_mora:
-                        fromaddr = 'cbiconsultora@gmail.com'
-                        toaddrs = 'lic.ivan@propar.com.py'
-                        msg = 'Se detecto un cambio del interes del pago de la cuota nro ' + str(
-                            resumen_cuotas) + ' de la fraccion nro ' + str(nuevo_pago.lote)
+                        # retorna el objeto como json
+                        object_list = PagoDeCuotas.objects.filter(id=nuevo_pago.id)
+                        labels = ["id"]
+                        if interes_original != total_de_mora:
+                            fromaddr = 'cbiconsultora@gmail.com'
+                            toaddrs = 'lic.ivan@propar.com.py'
+                            msg = 'Se detecto un cambio del interes del pago de la cuota nro ' + str(
+                                resumen_cuotas) + ' de la fraccion nro ' + str(nuevo_pago.lote)
 
-                        # Credentials (if needed)
-                        username = 'cbiconsultora@gmail.com'
-                        password = 'cbicbiconsultora'
+                            # Credentials (if needed)
+                            username = 'cbiconsultora@gmail.com'
+                            password = 'cbicbiconsultora'
 
-                        # The actual mail send
-                        server = smtplib.SMTP('smtp.gmail.com:587')
-                        server.starttls()
-                        server.login(username, password)
-                        server.sendmail(fromaddr, toaddrs, msg)
-                        server.quit()
+                            # The actual mail send
+                            server = smtplib.SMTP('smtp.gmail.com:587')
+                            server.starttls()
+                            server.login(username, password)
+                            server.sendmail(fromaddr, toaddrs, msg)
+                            server.quit()
+                    else:
+                        return HttpResponseServerError(
+                            "La cantidad de cuotas a pagar, es mayor a la cantidad de cuotas restantes.")
 
-                    return HttpResponse(json.dumps(custom_json(object_list, labels), cls=DjangoJSONEncoder),
-                                        content_type="application/json")
-
-                else:
-                    return HttpResponseServerError(
-                        "La cantidad de cuotas a pagar, es mayor a la cantidad de cuotas restantes.")
+                return HttpResponse(json.dumps(custom_json(object_list, labels), cls=DjangoJSONEncoder),
+                                    content_type="application/json")
 
             elif request.method == 'GET':
                 query = ('''SELECT NOW()''')
