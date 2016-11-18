@@ -483,7 +483,7 @@ def obtener_clientes_atrasados(filtros,fraccion, meses_peticion):
 
         if (len(cuotas_a_pagar) >= meses_peticion + 1):
 
-            cuotas_atrasadas = len(cuotas_a_pagar);  # CUOTAS ATRASADAS
+            cuotas_atrasadas = detalle_cuotas['cantidad_total_cuotas'] - detalle_cuotas['cant_cuotas_pagadas'];  # CUOTAS ATRASADAS
             cantidad_cuotas_pagadas = detalle_cuotas['cant_cuotas_pagadas'];  # CUOTAS PAGADAS
 
             # DATOS DEL CLIENTE
@@ -2018,7 +2018,9 @@ def liquidacion_vendedores(request):
                     vendedor_id=request.GET['busqueda']
                     print("vendedor_id ->" + vendedor_id)
 
-                    ventas = Venta.objects.filter(vendedor_id = vendedor_id).order_by('lote__manzana__fraccion').select_related()
+                    # por alguna razon, no encuentra la venta en algunos casos con el select_related()
+                    # ventas = Venta.objects.filter(vendedor_id = vendedor_id).order_by('lote__manzana__fraccion').select_related()
+                    ventas = Venta.objects.filter(vendedor_id = vendedor_id).order_by('lote__manzana__fraccion')
                     ventas_id = []
                                 
                     for venta in ventas:
@@ -2386,8 +2388,9 @@ def liquidacion_general_vendedores(request):
                     fecha_fin_parsed = datetime.datetime.strptime(fecha_fin, "%d/%m/%Y").date()
                     # busqueda_label = request.GET['busqueda_label']
 
+                    # la funcion del select_related() no esta trayendo una venta en particular
                     # ventas = Venta.objects.filter().order_by('lote__manzana__fraccion').select_related()
-                    ventas = Venta.objects.filter().order_by('vendedor').select_related()
+                    ventas = Venta.objects.filter().order_by('vendedor')
                     # ventas.group_by = ['vendedor_id']
                     ventas_id = []
 
@@ -6411,14 +6414,15 @@ def informe_pagos_practipago(request):
                             except Exception, error:
                                 print error
                             ventas_pagos_list = []
-                            ventas_pagos_list.insert(0,resumen_venta) #El primer elemento de la lista de pagos es el resumen de la venta
+                            # ventas_pagos_list.insert(0,resumen_venta) #El primer elemento de la lista de pagos es el resumen de la venta
                             contador_cuotas = 0
 
                             venta_tiene_pagos = False
                             for pago in venta_pagos_query_set:
                                 venta_tiene_pagos = True
                                 cuota ={}
-                                cuota['fecha_de_pago'] = datetime.datetime.strptime(unicode(pago.fecha_de_pago), "%Y-%m-%d").strftime("%d/%m/%Y")
+                                # cuota['fecha_de_pago'] = datetime.datetime.strptime(unicode(pago.fecha_de_pago), "%Y-%m-%d").strftime("%d/%m/%Y")
+                                cuota['fecha_de_pago'] = datetime.datetime.strptime(unicode(pago.fecha_de_pago), "%Y-%m-%d").date()
                                 cuota['id'] = pago.id
                                 detalle_str = ""
                                 cuota['detalle'] = ""
@@ -6447,7 +6451,8 @@ def informe_pagos_practipago(request):
                                         cuotas_detalles = []
                                         cuotas_detalles = get_cuota_information_by_lote(pago.lote_id,contador_cuotas, True, True)
                                         cuota['vencimiento'] = cuota['vencimiento']+ unicode(cuotas_detalles[0]['fecha'])+' '
-                                        fecha_pago_parsed = datetime.datetime.strptime(cuota['fecha_de_pago'], "%d/%m/%Y").date()
+                                        # fecha_pago_parsed = datetime.datetime.strptime(cuota['fecha_de_pago'], "%d/%m/%Y").date()
+                                        fecha_pago_parsed = datetime.datetime.strptime(cuota['fecha_de_pago'].strftime("%d/%m/%Y"), "%d/%m/%Y").date()
                                         proximo_vencimiento_parsed = datetime.datetime.strptime(unicode(cuotas_detalles[0]['fecha']), "%d/%m/%Y").date()
                                         dias_atraso = obtener_dias_atraso(fecha_pago_parsed,proximo_vencimiento_parsed)
                                         cuota['dias_atraso'] = cuota['dias_atraso']+ " * "+ unicode(dias_atraso)+ " dias "
@@ -6475,7 +6480,8 @@ def informe_pagos_practipago(request):
                                     cuotas_detalles = []
                                     cuotas_detalles = get_cuota_information_by_lote(pago.lote_id,contador_cuotas, True, True, item_venta)
                                     cuota['vencimiento'] = unicode(cuotas_detalles[0]['fecha'])
-                                    fecha_pago_parsed = datetime.datetime.strptime(cuota['fecha_de_pago'], "%d/%m/%Y").date()
+                                    # fecha_pago_parsed = datetime.datetime.strptime(cuota['fecha_de_pago'], "%d/%m/%Y").date()
+                                    fecha_pago_parsed = datetime.datetime.strptime(cuota['fecha_de_pago'].strftime("%d/%m/%Y"), "%d/%m/%Y").date()
                                     proximo_vencimiento_parsed = datetime.datetime.strptime(cuota['vencimiento'], "%d/%m/%Y").date()
                                     dias_atraso = obtener_dias_atraso(fecha_pago_parsed,proximo_vencimiento_parsed)
                                     cuota['dias_atraso'] = cuota['dias_atraso']+ " * "+ unicode(dias_atraso)+ " dias "
@@ -6506,12 +6512,17 @@ def informe_pagos_practipago(request):
 
                                 cuota['cantidad_cuotas'] = pago.nro_cuotas_a_pagar
                                 cuota['monto'] =  unicode('{:,}'.format(pago.total_de_pago)).replace(",",".")
-                                ventas_pagos_list.append(cuota)
-                            if venta_tiene_pagos:
-                                lista_movimientos.append(ventas_pagos_list)
+                                # ventas_pagos_list.append(cuota)
+                                lista_movimientos.append(cuota)
+                            # cuando se agrupan los pagos por c/venta se tiene en cuenta
+                            # if venta_tiene_pagos:
+                            #     lista_movimientos.append(ventas_pagos_list)
                     except Exception, error:
                         print error
 
+                    # ordenamos la lista por la fecha de pago
+                    # lista_movimientos = sorted(lista_movimientos, key=lambda k: k['fecha_de_pago'])
+                    lista_movimientos.sort(key=lambda item: item['fecha_de_pago'])
                     lista = lista_movimientos
 
                     ultimo="&sucursal="+sucursal_id+"&sucursal_label="+sucursal_label
@@ -6541,7 +6552,10 @@ def informe_pagos_practipago_reporte_excel(request):
     fecha_ini = request.GET['fecha_ini']
     fecha_fin = request.GET['fecha_fin']
     # lista_ventas = Venta.objects.filter(lote_id=lote.id).order_by('-fecha_de_venta')
-    lista_ventas = Venta.objects.raw('''SELECT * FROM principal_venta where lote_id in (SELECT principal_lote.id FROM principal_lote where manzana_id in (SELECT principal_manzana.id FROM principal_manzana where fraccion_id in (SELECT principal_fraccion.id FROM principal_fraccion where sucursal_id = %s))) ORDER BY fecha_de_venta;''',[sucursal_id])
+    if sucursal_id != '':
+        lista_ventas = Venta.objects.raw('''SELECT * FROM principal_venta where lote_id in (SELECT principal_lote.id FROM principal_lote where manzana_id in (SELECT principal_manzana.id FROM principal_manzana where fraccion_id in (SELECT principal_fraccion.id FROM principal_fraccion where sucursal_id = %s))) ORDER BY fecha_de_venta;''',[sucursal_id])
+    else:
+        lista_ventas = Venta.objects.raw('''SELECT * FROM principal_venta ORDER BY fecha_de_venta;''')
     try:
                         for item_venta in lista_ventas:
                             try:
@@ -6569,15 +6583,17 @@ def informe_pagos_practipago_reporte_excel(request):
                                     venta_pagos_query_set = PagoDeCuotas.objects.filter(venta_id=item_venta.id).exclude(transaccion_id__isnull=True).order_by("fecha_de_pago", "id")
                             except Exception, error:
                                 print error
-                            ventas_pagos_list = []
-                            ventas_pagos_list.insert(0,resumen_venta) #El primer elemento de la lista de pagos es el resumen de la venta
+                            # cuando agrupamos si usamos esta lista
+                            # ventas_pagos_list = []
+                            # ventas_pagos_list.insert(0,resumen_venta) #El primer elemento de la lista de pagos es el resumen de la venta
                             contador_cuotas = 0
 
                             venta_tiene_pagos = False
                             for pago in venta_pagos_query_set:
                                 venta_tiene_pagos = True
                                 cuota ={}
-                                cuota['fecha_de_pago'] = datetime.datetime.strptime(unicode(pago.fecha_de_pago), "%Y-%m-%d").strftime("%d/%m/%Y")
+                                # cuota['fecha_de_pago'] = datetime.datetime.strptime(unicode(pago.fecha_de_pago), "%Y-%m-%d").strftime("%d/%m/%Y")
+                                cuota['fecha_de_pago'] = datetime.datetime.strptime(unicode(pago.fecha_de_pago), "%Y-%m-%d").date()
                                 cuota['id'] = pago.id
                                 detalle_str = ""
                                 cuota['detalle'] = ""
@@ -6607,7 +6623,8 @@ def informe_pagos_practipago_reporte_excel(request):
                                         cuotas_detalles = get_cuota_information_by_lote(pago.lote_id,contador_cuotas, True, True)
                                         cuota['vencimiento'] = cuota['vencimiento']+ unicode(cuotas_detalles[0]['fecha'])+' '
 
-                                        fecha_pago_parsed = datetime.datetime.strptime(cuota['fecha_de_pago'], "%d/%m/%Y").date()
+                                        # fecha_pago_parsed = datetime.datetime.strptime(cuota['fecha_de_pago'], "%d/%m/%Y").date()
+                                        fecha_pago_parsed = datetime.datetime.strptime(cuota['fecha_de_pago'].strftime("%d/%m/%Y"), "%d/%m/%Y").date()
                                         proximo_vencimiento_parsed = datetime.datetime.strptime(unicode(cuotas_detalles[0]['fecha']), "%d/%m/%Y").date()
                                         dias_atraso = obtener_dias_atraso(fecha_pago_parsed,proximo_vencimiento_parsed)
                                         cuota['dias_atraso'] = cuota['dias_atraso']+ " * "+ unicode(dias_atraso)+ " dias "
@@ -6636,8 +6653,8 @@ def informe_pagos_practipago_reporte_excel(request):
                                     cuotas_detalles = []
                                     cuotas_detalles = get_cuota_information_by_lote(pago.lote_id,contador_cuotas, True, True, item_venta)
                                     cuota['vencimiento'] = unicode(cuotas_detalles[0]['fecha'])
-
-                                    fecha_pago_parsed = datetime.datetime.strptime(cuota['fecha_de_pago'], "%d/%m/%Y").date()
+                                    # fecha_pago_parsed = datetime.datetime.strptime(cuota['fecha_de_pago'], "%d/%m/%Y").date()
+                                    fecha_pago_parsed = datetime.datetime.strptime(cuota['fecha_de_pago'].strftime("%d/%m/%Y"), "%d/%m/%Y").date()
                                     proximo_vencimiento_parsed = datetime.datetime.strptime(cuota['vencimiento'], "%d/%m/%Y").date()
                                     dias_atraso = obtener_dias_atraso(fecha_pago_parsed,proximo_vencimiento_parsed)
                                     cuota['dias_atraso'] = cuota['dias_atraso']+ " * "+ unicode(dias_atraso)+ " dias "
@@ -6671,11 +6688,18 @@ def informe_pagos_practipago_reporte_excel(request):
 
                                 cuota['cantidad_cuotas'] = pago.nro_cuotas_a_pagar
                                 cuota['monto'] =  unicode('{:,}'.format(pago.total_de_pago)).replace(",",".")
-                                ventas_pagos_list.append(cuota)
-                            if venta_tiene_pagos:
-                                lista_movimientos.append(ventas_pagos_list)
+                                # ventas_pagos_list.append(cuota)
+                                lista_movimientos.append(cuota)
+                            # si agrupamos si vamos a usar estas lineas
+                            # if venta_tiene_pagos:
+                            #     lista_movimientos.append(ventas_pagos_list)
     except Exception, error:
                     print error
+
+    # ordenamos la lista por la fecha de pago
+    # lista_movimientos = sorted(lista_movimientos, key=lambda k: k['fecha_de_pago'])
+    lista_movimientos.sort(key=lambda item: item['fecha_de_pago'])
+    lista = lista_movimientos
 
     lista = lista_movimientos
 
@@ -6699,50 +6723,58 @@ def informe_pagos_practipago_reporte_excel(request):
                         )
     c = 0
 
+    sheet.write(c, 0, "Fecha de Pago", style)
+    sheet.write(c, 1, "Cant. Cuotas", style)
+    sheet.write(c, 2, "Nro. Cuotas", style)
+    sheet.write(c, 3, "Monto", style)
+    sheet.write(c, 4, "Factura", style)
+    sheet.write(c, 5, "Transaccion", style)
+    c=c+1
 
-    for venta in lista:
-        for i, pago in enumerate(venta):
-            if i == 0:
+    for pago in lista:
+        # for i, pago in enumerate(venta):
+        #     if i == 0:
                     # cabeceras
-                    sheet.write_merge(c,c,0,6, "Venta lote: "+unicode(pago['lote'])+" Vendedor: "+unicode(pago['vendedor'])+" a Cliente: "+unicode(pago['cliente'])+ " el: "+unicode(pago['fecha_de_venta']), style)
-                    c=c+1
-                    sheet.write(c, 0, "Fecha 1er Vto.", style)
-                    sheet.write(c, 1, "Plan de Pago", style)
-                    sheet.write(c, 2, "Entrega Inicial", style)
-                    sheet.write(c, 3, "Precio Cuota", style)
-                    sheet.write(c, 4, "Precio Venta", style)
-                    sheet.write(c, 5, "Cuotas Pagadas", style)
-                    sheet.write(c, 6, "Recuperado", style)
+            #         sheet.write_merge(c,c,0,6, "Venta lote: "+unicode(pago['lote'])+" Vendedor: "+unicode(pago['vendedor'])+" a Cliente: "+unicode(pago['cliente'])+ " el: "+unicode(pago['fecha_de_venta']), style)
+            #         c=c+1
+            #         sheet.write(c, 0, "Fecha 1er Vto.", style)
+            #         sheet.write(c, 1, "Plan de Pago", style)
+            #         sheet.write(c, 2, "Entrega Inicial", style)
+            #         sheet.write(c, 3, "Precio Cuota", style)
+            #         sheet.write(c, 4, "Precio Venta", style)
+            #         sheet.write(c, 5, "Cuotas Pagadas", style)
+            #         sheet.write(c, 6, "Recuperado", style)
+            #
+            #         c=c+1
+            #
+            #         sheet.write(c, 0, pago['fecha_primer_vencimiento'], style4)
+            #         sheet.write(c, 1, unicode(pago['plan_de_pago']), style2)
+            #         sheet.write(c, 2, unicode(pago['entrega_inicial']), style3)
+            #         sheet.write(c, 3, unicode(pago['precio_de_cuota']), style3)
+            #         sheet.write(c, 4, unicode(pago['precio_final']), style3)
+            #         sheet.write(c, 5, unicode(pago['pagos_realizados']), style4)
+            #         if pago['recuperado']:
+            #             sheet.write(c, 6, "SI", style4)
+            #         else:
+            #             sheet.write(c, 6, "NO", style4)
+            #
+            #         if pago['plan_de_pago'].tipo_de_plan == 'credito':
+            #             c=c+1
+            #             sheet.write_merge(c,c,0,6, "Pagos de la Venta lote: "+unicode(pago['lote'])+" Vendedor: "+unicode(pago['vendedor'])+" a Cliente: "+unicode(pago['cliente'])+ " el: "+unicode(pago['fecha_de_venta']), style)
+            #             c=c+1
+            #             sheet.write(c, 0, "Fecha", style)
+            #             sheet.write(c, 1, "Cant. Cuotas", style)
+            #             sheet.write(c, 2, "Nro. Cuotas", style)
+            #             sheet.write(c, 3, "Monto", style)
+            #             sheet.write(c, 4, "Factura", style)
+            #             sheet.write(c, 5, "Transaccion", style)
+            #
+            #         c=c+1
+            #
+            # else:
 
-                    c=c+1
-
-                    sheet.write(c, 0, pago['fecha_primer_vencimiento'], style4)
-                    sheet.write(c, 1, unicode(pago['plan_de_pago']), style2)
-                    sheet.write(c, 2, unicode(pago['entrega_inicial']), style3)
-                    sheet.write(c, 3, unicode(pago['precio_de_cuota']), style3)
-                    sheet.write(c, 4, unicode(pago['precio_final']), style3)
-                    sheet.write(c, 5, unicode(pago['pagos_realizados']), style4)
-                    if pago['recuperado']:
-                        sheet.write(c, 6, "SI", style4)
-                    else:
-                        sheet.write(c, 6, "NO", style4)
-
-                    if pago['plan_de_pago'].tipo_de_plan == 'credito':
-                        c=c+1
-                        sheet.write_merge(c,c,0,6, "Pagos de la Venta lote: "+unicode(pago['lote'])+" Vendedor: "+unicode(pago['vendedor'])+" a Cliente: "+unicode(pago['cliente'])+ " el: "+unicode(pago['fecha_de_venta']), style)
-                        c=c+1
-                        sheet.write(c, 0, "Fecha", style)
-                        sheet.write(c, 1, "Cant. Cuotas", style)
-                        sheet.write(c, 2, "Nro. Cuotas", style)
-                        sheet.write(c, 3, "Monto", style)
-                        sheet.write(c, 4, "Factura", style)
-                        sheet.write(c, 5, "Transaccion", style)
-
-                    c=c+1
-
-            else:
-
-                sheet.write(c, 0, pago['fecha_de_pago'], style4)
+                # sheet.write(c, 0, pago['fecha_de_pago'], style4)
+                sheet.write(c, 0, unicode(pago['fecha_de_pago'].strftime("%d/%m/%Y")), style4)
                 sheet.write(c, 1, unicode(pago['cantidad_cuotas']), style4)
                 sheet.write(c, 2, unicode(pago['nro_cuota']), style4)
                 sheet.write(c, 3, unicode(pago['monto']), style3)

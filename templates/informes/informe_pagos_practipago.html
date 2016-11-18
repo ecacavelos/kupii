@@ -219,35 +219,63 @@
 </div>
 <div id="listado-ventas">
 	<table  cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
-		{% for venta in lista_ventas %}
-			{% for pago in venta %}
+    	<tr>
+	    	<th>Fecha Pago</th><th colspan="2">Cuotas Pagadas</th><th>Fecha Vto.</th><th>Dias Atraso</th><th colspan="1">Nro Cuota</th><th colspan="2">Detalles</th><th colspan="1">Total Pagado</th><th>Transaccion</th><th>Factura</th><th colspan="3">Acciones</th>
+		</tr>
+		{% for pago in lista_ventas %}
+{#			{% for pago in venta %}#}
 			{% if forloop.counter == 1 %}
-			<th>Fecha de Venta</th><th>Fecha 1er Vto.</th><th>Cliente</th><th>Lote</th><th>Vendedor</th><th>Plan de Pago</th><th>Entrega Inicial</th><th>Precio Cuota</th><th>Precio final de venta</th><th>Cuotas Pagadas</th><th>Es Recuperada</th><th colspan="3">Acciones</th>
-				<tr>
-					<td class="recuperada celda_resumen_venta">{{pago.fecha_de_venta}}</td>
-					<td class="recuperada celda_resumen_venta">{{pago.fecha_primer_vencimiento}}</td>
-					<td class="recuperada celda_resumen_venta">{{pago.cliente}}</td>
-                    <td class="recuperada celda_resumen_venta">{{pago.lote}}</td>
-                    <td class="recuperada celda_resumen_venta">{{pago.vendedor}}</td>
-                    <td class="recuperada celda_resumen_venta">{{pago.plan_de_pago}}</td>
-					<td class="recuperada celda_resumen_venta">{{pago.entrega_inicial}}</td>
-					<td class="recuperada celda_resumen_venta">{{pago.precio_de_cuota}}</td>
-					<td class="recuperada celda_resumen_venta">{{pago.precio_final}}</td>
-					<td class="recuperada celda_resumen_venta">{{pago.pagos_realizados}}</td>
-					{% if pago.recuperado == True %}
-						<td class="recuperada celda_resumen_venta">Si</td>
+{#			<th>Fecha de Venta</th><th>Fecha 1er Vto.</th><th>Cliente</th><th>Lote</th><th>Vendedor</th><th>Plan de Pago</th><th>Entrega Inicial</th><th>Precio Cuota</th><th>Precio final de venta</th><th>Cuotas Pagadas</th><th>Es Recuperada</th><th colspan="3">Acciones</th>#}
+{#				<tr>#}
+{#					<td class="recuperada celda_resumen_venta">{{pago.fecha_de_venta}}</td>#}
+{#					<td class="recuperada celda_resumen_venta">{{pago.fecha_primer_vencimiento}}</td>#}
+{#					<td class="recuperada celda_resumen_venta">{{pago.cliente}}</td>#}
+{#                    <td class="recuperada celda_resumen_venta">{{pago.lote}}</td>#}
+{#                    <td class="recuperada celda_resumen_venta">{{pago.vendedor}}</td>#}
+{#                    <td class="recuperada celda_resumen_venta">{{pago.plan_de_pago}}</td>#}
+{#					<td class="recuperada celda_resumen_venta">{{pago.entrega_inicial}}</td>#}
+{#					<td class="recuperada celda_resumen_venta">{{pago.precio_de_cuota}}</td>#}
+{#					<td class="recuperada celda_resumen_venta">{{pago.precio_final}}</td>#}
+{#					<td class="recuperada celda_resumen_venta">{{pago.pagos_realizados}}</td>#}
+{#					{% if pago.recuperado == True %}#}
+{#						<td class="recuperada celda_resumen_venta">Si</td>#}
+{#					{% else %}#}
+{#						<td class="recuperada celda_resumen_venta">No</td>#}
+{#					{% endif %}#}
+{#					#}
+{#					<td class="recuperada celda_resumen_venta"><a href="/movimientos/agregar_pago/{{pago.id}}"><span style="font-size: 35px; color: #CCCCCC; font-weight: bolder" class="glyphicon glyphicon-plus"></span></a></td>#}
+{#					<td class="recuperada celda_resumen_venta"><a href="/movimientos/modificar_venta/{{pago.id}}"><img src="/static/custom/img/black_edit.png" /></a></td>#}
+{#					<td class="recuperada celda_resumen_venta"><button class="eliminar" value="{{pago.id}}"><img src="/static/custom/img/black_delete.png" /></button></td>#}
+{#				</tr>#}
+{#				<tr>#}
+{#					<th>Fecha Pago</th><th colspan="2">Cuotas Pagadas</th><th>Fecha Vto.</th><th>Dias Atraso</th><th colspan="1">Nro Cuota</th><th colspan="2">Detalles</th><th colspan="1">Total Pagado</th><th>Transaccion</th><th>Factura</th><th colspan="3">Acciones</th>#}
+{#				</tr>#}
+				<tr class="bkg_gris">
+					<td>{{pago.fecha_de_pago}}</td>
+					<td colspan="2">{{pago.cantidad_cuotas}} Cuota(s) pagada(s)</td>
+					<td>{{pago.vencimiento}}</td>
+					<td>{{pago.dias_atraso}}</td>
+					<td colspan="1">Cuota Nro: {{pago.nro_cuota}}</td>
+					<td colspan="2" style="text-align: right">{{pago.detalle}}</td>
+					<td colspan="1">Total pagado: {{pago.monto}}</td>
+
+					{% if pago.id_transaccion %}
+						<td> {{pago.id_transaccion}} </td>
 					{% else %}
-						<td class="recuperada celda_resumen_venta">No</td>
+						<td> Interna </td>
 					{% endif %}
-					
-					<td class="recuperada celda_resumen_venta"><a href="/movimientos/agregar_pago/{{pago.id}}"><span style="font-size: 35px; color: #CCCCCC; font-weight: bolder" class="glyphicon glyphicon-plus"></span></a></td>
-					<td class="recuperada celda_resumen_venta"><a href="/movimientos/modificar_venta/{{pago.id}}"><img src="/static/custom/img/black_edit.png" /></a></td>
-					<td class="recuperada celda_resumen_venta"><button class="eliminar" value="{{pago.id}}"><img src="/static/custom/img/black_delete.png" /></button></td>
+
+					{% if pago.factura %}
+						<td> {{pago.factura.numero}} </td>
+					{% else %}
+						<td> No Facturado </td>
+					{% endif %}
+
+					<td style="width: 5px;"><a href="/facturacion/facturar_operacion/1/{{pago.id}}"><img src="/static/custom/img/invoice.png" /></a></td>
+					<td style="width: 5px;"><a href="/movimientos/modificar_pagocuota/{{pago.id}}"><img src="/static/custom/img/black_edit.png" /></a></td>
+					<td><button class="eliminar_pago" value="{{pago.id}}"><img src="/static/custom/img/black_delete.png" /></button></td>
 				</tr>
-				<tr>
-					<th>Fecha Pago</th><th colspan="2">Cuotas Pagadas</th><th>Fecha Vto.</th><th>Dias Atraso</th><th colspan="1">Nro Cuota</th><th colspan="2">Detalles</th><th colspan="1">Total Pagado</th><th>Transaccion</th><th>Factura</th><th colspan="3">Acciones</th>
-				</tr>
-			{% else %}		
+			{% else %}
 				<tr class="bkg_gris">
 					<td>{{pago.fecha_de_pago}}</td>
 					<td colspan="2">{{pago.cantidad_cuotas}} Cuota(s) pagada(s)</td>
@@ -274,7 +302,7 @@
 					<td><button class="eliminar_pago" value="{{pago.id}}"><img src="/static/custom/img/black_delete.png" /></button></td>
 				</tr>
 			{% endif %}
-			{%endfor%}
+{#			{%endfor%}#}
 		{%endfor%}
 		<!--
 		<div class="pagination">
