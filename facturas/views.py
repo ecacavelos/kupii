@@ -424,9 +424,13 @@ def detalle_factura(request, factura_id):
                 observacion = form.data['observacion']
                 
                 fac = Factura.objects.get(pk=factura_id)
+                user = User.objects.get(pk=data.get('usuario'))
                 #fac.fecha = fecha
                 fac.numero = numero
                 fac.observacion = observacion
+                fac.usuario = user
+                if data.get('anulado') == None:
+                    fac.anulado = False
                 fac.save()    
                 #Se loggea la accion del usuario
                 id_objeto = factura.id
