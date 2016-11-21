@@ -300,7 +300,7 @@ def consultar_facturas(request):
     if request.user.is_authenticated():
         if request.method == 'GET':
             #Mostrar la lista de todas las facturas.  
-            object_list = Factura.objects.all().order_by('id','-fecha')
+            object_list = Factura.objects.all().order_by('-id','-fecha')
             for factura in object_list:
                 monto=0
                 lista_detalles=json.loads(factura.detalle)
@@ -333,7 +333,7 @@ def consultar_facturas(request):
                             monto += int(int(value['cantidad']) * int(value['precio_unitario']))
                     factura.monto=unicode('{:,}'.format(monto)).replace(",", ".")
             if tipo_busqueda == 'nro_factura':
-                object_list = Factura.objects.filter(pk=busqueda).order_by('id','fecha')                    
+                object_list = Factura.objects.filter(pk=busqueda).order_by('id','fecha')
                 for factura in object_list:
                     monto=0
                     lista_detalles=json.loads(factura.detalle)
