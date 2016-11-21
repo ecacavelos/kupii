@@ -1984,7 +1984,7 @@ def obtener_lotes_filtrados(busqueda, tipo_busqueda, busqueda_label, fraccion_se
             # QUERY para traer los lotes de la fraccion en cuestio
             query = ('''SELECT principal_lote.id, nro_lote, manzana_id, precio_contado, precio_credito, superficie, cuenta_corriente_catastral, boleto_nro,
                         estado, precio_costo, principal_lote.importacion_paralot, codigo_paralot
-                        FROM principal_lote JOIN principal_manzana on principal_lote.manzana_id = principal_manzana.id where manzana_id in (SELECT id FROM principal_manzana where fraccion_id = (SELECT id FROM principal_fraccion WHERE nombre LIKE UPPER (%s))) order by nro_manzana, nro_lote;''')
+                        FROM principal_lote JOIN principal_manzana on principal_lote.manzana_id = principal_manzana.id where manzana_id in (SELECT id FROM principal_manzana where fraccion_id = (SELECT id FROM principal_fraccion WHERE nombre LIKE (%s))) order by nro_manzana, nro_lote;''')
             cursor = connection.cursor()
             cursor.execute(query, [fraccion[0].nombre])
             results = cursor.fetchall()
