@@ -158,7 +158,7 @@ $(document).ready(function() {
 				$.each(data, function (index,value) {
 					//$("#id_manzana").append('<option value="'+ value.id +'">' + 'Manzana ' + value.label + '</option>') ;
 					$("#id_manzana").append('<option value="'+ value.pk +'">' + 'Manzana ' + value.fields.nro_manzana + '</option>') ;
-					$("#id_codigo_paralot").val(value.fields.fraccion);
+					$("#id_codigo_paralot").val(padFraccion(value.fields.fraccion,3));
 				});
 			});
       }
@@ -203,6 +203,12 @@ function pad(num, size) {
 	size = size+3;
     var s = "000" + num;
     return s.substr(s.length-size);
+}
+
+function padFraccion(n, width, z) {
+  z = z || '0';
+  n = n + '';
+  return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
 }
 
 </script>
