@@ -232,14 +232,14 @@
 </div>
 <div id="listado-item-lote">
 	<table border="1" cellpadding="0" cellspacing="0" class="listado-pagos" align="center">
-		<th>Fecha</th><th>Numero</th><th>Lote</th><th>Cliente</th><th>Ruc</th><th>Tipo</th><th>Usuario</th><th>Total Exentas</th><th>Total IVA 5%</th><th>Total IVA 10%</th><th>Total Facturado</th>
+		<th>Fecha</th><th>Numero</th><!--<th>Lote</th>--><th>Cliente</th><th>Ruc</th><th>Tipo</th><th>Usuario</th><th>Total Exentas</th><th>Total IVA 5%</th><th>Total IVA 10%</th><th>Total Facturado</th>
 		{% for hw in object_list %}
 			
 		{% if forloop.counter|divisibleby:2 %}
 		<tr>
 			<td>{{hw.fecha}}</td>
 			<td><a href="{% url 'frontend_home' %}facturacion/listado/{{hw.id}}" target="_blank"><strong>{{hw.numero}}</strong></a></td>
-			<td>{{hw.lote}}</td>
+			<!--<td>{{hw.lote}}</td>-->
 			<td>{{hw.cliente}}</td>
 			<td>{{hw.ruc}}</td>
 			{% if hw.tipo == 'co' %}
@@ -258,7 +258,7 @@
 		<tr class="bkg_gris">
 			<td>{{hw.fecha}}</td>
 			<td><a href="{% url 'frontend_home' %}facturacion/listado/{{hw.id}}" target="_blank"><strong>{{hw.numero}}</strong></a></td>
-			<td>{{hw.lote}}</td>
+			<!--<td>{{hw.lote}}</td>-->
 			<td>{{hw.cliente}}</td>
 			<td>{{hw.ruc}}</td>
 			{% if hw.tipo == 'co' %}
@@ -277,7 +277,7 @@
 		
 		{% if hw.total_general_facturado %}
 		<tr>
-			<th colspan="7" class="celda_resumen_fraccion">Totales Generales</th>
+			<th colspan="6" class="celda_resumen_fraccion">Totales Generales</th>
 			<td class="celda_resumen_fraccion">{{hw.total_general_exentas}}</td>
 			<td class="celda_resumen_fraccion">{{hw.total_general_iva5}}</td>
 			<td class="celda_resumen_fraccion">{{hw.total_general_iva10}}</td>

@@ -397,7 +397,7 @@ def get_cuotas_a_pagar_by_cliente_id(request):
                 print("Cliente id ->" + cliente_id);
                 ventas = []
 
-                ventas_del_cliente = Venta.objects.filter((Q(recuperado=False) | Q(recuperado=None)), cliente_id=cliente_id, plan_de_pago__tipo_de_plan='credito')
+                ventas_del_cliente = Venta.objects.filter((Q(recuperado=False) | Q(recuperado=None)), cliente_id=cliente_id, plan_de_pago__tipo_de_plan='credito').order_by('lote__codigo_paralot')
                 total_pago_cuotas = 0
                 total_pago_intereses = 0
                 total_pago = 0
@@ -542,7 +542,7 @@ def get_cuotas_a_pagar_by_venta_id_nro_cuotas(request):
                 print error
         else:
             return HttpResponseRedirect(reverse('login'))
-#TODO: aca procesar el pago de cuotas del cliente en submit de post
+
 def pago_de_cuotas_cliente(request):
     if request.user.is_authenticated():
         if verificar_permisos(request.user.id, permisos.ADD_PAGODECUOTAS):
@@ -552,6 +552,7 @@ def pago_de_cuotas_cliente(request):
                 data = request.POST
                 ventas_json = data.get('ventas_json')
                 ventas_json_parsed = json.loads(ventas_json)
+                pagos_id = []
                 #Aca parsear el Json y recorrerlo n veces y obtener los parametros
                 for venta_json in ventas_json_parsed:
                     venta_id = venta_json['id']
@@ -657,8 +658,12 @@ def pago_de_cuotas_cliente(request):
                         # return HttpResponseRedirect("/facturacion/facturar")
 
                         # retorna el objeto como json
-                        object_list = PagoDeCuotas.objects.filter(id=nuevo_pago.id)
+                        pago = {}
+                        pago['id'] = nuevo_pago.id
+                        pagos_id.append( pago )
                         labels = ["id"]
+                        #TODO: sacar esto al comitear
+                        '''
                         if interes_original != total_de_mora:
                             fromaddr = 'cbiconsultora@gmail.com'
                             toaddrs = 'lic.ivan@propar.com.py'
@@ -675,11 +680,12 @@ def pago_de_cuotas_cliente(request):
                             server.login(username, password)
                             server.sendmail(fromaddr, toaddrs, msg)
                             server.quit()
+                        '''
                     else:
                         return HttpResponseServerError(
                             "La cantidad de cuotas a pagar, es mayor a la cantidad de cuotas restantes.")
 
-                return HttpResponse(json.dumps(custom_json(object_list, labels), cls=DjangoJSONEncoder),
+                return HttpResponse(json.dumps(pagos_id, cls=DjangoJSONEncoder),
                                     content_type="application/json")
 
             elif request.method == 'GET':

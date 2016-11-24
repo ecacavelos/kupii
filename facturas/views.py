@@ -21,6 +21,7 @@ import math
 import json
 from principal.common_functions import *
 from principal import permisos
+import ast
 
 def facturacion(request):
     
@@ -158,7 +159,7 @@ def facturar_operacion(request, tipo_operacion, operacion_id):
             nueva_factura.cliente = Cliente.objects.get(pk=cliente_id)
             nueva_factura.tipo = tipo
             nueva_factura.detalle = detalle
-            nueva_factura.lote = lote_id
+            #nueva_factura.lote = lote_id
             nueva_factura.anulado = False
             nueva_factura.observacion = observacion
             nueva_factura.usuario = request.user
@@ -190,7 +191,170 @@ def facturar_operacion(request, tipo_operacion, operacion_id):
                          
             return crear_pdf_factura(nueva_factura, request, manzana, lote_id, request.user)
     else:
-        return HttpResponseRedirect(reverse('login')) 
+        return HttpResponseRedirect(reverse('login'))
+
+def facturar_pagos(request):
+        if request.user.is_authenticated():
+            if request.method == 'GET':
+                params = request.GET
+
+                pagos_id = params.getlist('pagos_id')
+                t = loader.get_template('facturas/facturar_pagos.html')
+
+                # determinamos el grupo al cual pertenece el user en cuestion
+                grupo = request.user.groups.get().id
+                # retornamos todos los users para que pueda seleccionar
+                users = User.objects.all()
+
+                cuota_desde = ''
+                cuota_hasta = ''
+
+                tipo_venta = ''
+                precio_venta = ''
+
+                factura = {}
+                pagos_factura = []
+                detalles = []
+
+                for pago_id in pagos_id:
+                    pago_factura = {}
+                    pago = PagoDeCuotas.objects.get(pk=pago_id)
+                    factura['cliente'] = pago.cliente
+                    pago_factura['lote'] = pago.lote.codigo_paralot
+                    cantidad_pagos_anteriores = obtener_cantidad_cuotas_pagadas(pago)
+                    cuota_desde_num = cantidad_pagos_anteriores - pago.nro_cuotas_a_pagar + 1
+                    # cuota_desde_num = pago.venta.pagos_realizados - pago.nro_cuotas_a_pagar+1
+                    cuota_desde = unicode(cuota_desde_num) + "/" + unicode(pago.plan_de_pago.cantidad_de_cuotas)
+                    pago_factura['cuota_desde'] = cuota_desde
+                    cuota_hasta = unicode(cuota_desde_num + pago.nro_cuotas_a_pagar - 1) + "/" + unicode(
+                        pago.plan_de_pago.cantidad_de_cuotas)
+                    pago_factura['cuota_hasta'] = cuota_hasta
+                    ultimo_timbrado = Timbrado.objects.latest('id')
+                    factura['ultimo_timbrado'] = ultimo_timbrado
+                    trfu = TimbradoRangoFacturaUsuario.objects.get(usuario_id=request.user, timbrado_id=ultimo_timbrado.id)
+                    try:
+                        ultimaFactura = Factura.objects.filter(rango_factura_id=trfu.rango_factura.id).latest('id')
+                        ultimo_numero = ultimaFactura.numero.split("-")
+                        ultima_factura = unicode(trfu.rango_factura.nro_sucursal) + '-' + unicode(
+                            trfu.rango_factura.nro_boca) + '-' + unicode(int(ultimo_numero[2]) + 1).zfill(7)
+                        factura['ultima_factura'] = ultima_factura
+                    except:
+                        ultima_factura = unicode(trfu.rango_factura.nro_sucursal) + '-' + unicode(
+                            trfu.rango_factura.nro_boca) + '-0000001'
+                        factura['ultima_factura'] = ultima_factura
+                    factura['ultimo_timbrado_numero'] = trfu.timbrado.numero
+                    pagos_factura.append(pago_factura)
+
+                    detalles_lote = get_detalles_factura(pago.lote.codigo_paralot, pago.cliente.id, cuota_desde, cuota_hasta)
+                    for detalle_lote in detalles_lote:
+                        detalle = {}
+                        detalle['cantidad'] = detalle_lote['cantidad']
+                        try:
+                            detalle['iva10'] = detalle_lote['iva10']
+                            print "interes o gestion cobranza"
+                        except:
+                            concepto = "Pago de Cuota: "+ cuota_desde +"de "+ detalle_lote['cuotas_detalles'][0]['fecha'] +", al "+cuota_hasta+ "de "+detalle_lote['cuotas_detalles'][-1]['fecha']+". Lote: " + pago.lote.codigo_paralot
+                            detalle['concepto'] = concepto
+                            print "cuotas"
+
+
+                        detalle['precio_unitario'] = detalle_lote['precio_unitario']
+                        detalle['exentas'] = detalle_lote['exentas']
+                        detalle['iva5'] = detalle_lote['iva5']
+                        detalles.append(detalle)
+
+
+                factura['pagos'] = pagos_factura
+                factura['detalles'] = detalles
+                c = RequestContext(request, {
+                    'tipo_venta': tipo_venta,
+                    'precio_venta': precio_venta,
+                    'grupo': grupo,
+                    'users': users,
+                    'factura': factura
+                })
+
+                return HttpResponse(t.render(c))
+
+            else:  # POST se envia el formulario.
+                print 'POST'
+                # Obtener el cliente
+                cliente_id = request.POST.get('cliente', '')
+
+                # Obtener el Lote
+                lotes_id = request.POST.get('lote', '')
+                #ver bien esto
+                for lote_id in lotes_id:
+                    x = unicode(lote_id)
+                    fraccion_int = int(x[0:3])
+                    manzana_int = int(x[4:7])
+                    lote_int = int(x[8:])
+                    manzana = Manzana.objects.get(fraccion_id=fraccion_int, nro_manzana=manzana_int)
+                    lote_id = Lote.objects.get(manzana=manzana.id, nro_lote=lote_int)
+
+                # Obtener el TIMBRADO
+                timbrado_id = request.POST.get('id_timbrado', '')
+
+                # Obtener el NUMERO
+                numero = request.POST.get('nro_factura', '')
+
+                # Obtener fecha
+                # fecha = datetime.datetime.strptime(request.POST.get('fecha', ''), "%Y-%m-%d")
+                fecha = datetime.datetime.strptime(request.POST.get('fecha', ''), "%d/%m/%Y")
+
+                # Obtener Tipo (Contado - Crédito)
+                tipo = request.POST.get('tipo', '')
+
+                # Obtener el detalle
+                detalle = request.POST.get('detalle', '')
+
+                # Obtener observacion
+                observacion = request.POST.get('observacion', '')
+
+                # Crear un objeto Factura y guardar
+                nueva_factura = Factura()
+                nueva_factura.fecha = fecha
+                # nueva_factura.timbrado = Timbrado.objects.get(pk=timbrado_id)
+                trfu = TimbradoRangoFacturaUsuario.objects.get(timbrado_id=timbrado_id, usuario_id=request.user)
+                nueva_factura.rango_factura = trfu.rango_factura
+                nueva_factura.numero = numero
+                nueva_factura.cliente = Cliente.objects.get(pk=cliente_id)
+                nueva_factura.tipo = tipo
+                nueva_factura.detalle = detalle
+                #ver este caso
+                #nueva_factura.lote = lote_id
+                nueva_factura.anulado = False
+                nueva_factura.observacion = observacion
+                nueva_factura.usuario = request.user
+                nueva_factura.save()
+
+                # Se loggea la accion del usuario
+                id_objeto = nueva_factura.id
+                codigo_lote = request.POST.get('lote', '')
+                loggear_accion(request.user, "Agregar", "Factura", id_objeto, codigo_lote)
+
+                # obtener numero de cuotas
+                #ver este caso
+                numero_cuota_desde = request.POST.get('nro_cuota_desde', '')
+                numero_cuota_hasta = request.POST.get('nro_cuota_hasta', '')
+                if numero_cuota_desde != '' and numero_cuota_hasta != '':
+                    numero_cuota_desde = request.POST.get('nro_cuota_desde', '').split("/")
+                    numero_cuota_hasta = request.POST.get('nro_cuota_hasta', '').split("/")
+                    num_desde = int(numero_cuota_desde[0])
+                    num_hasta = int(numero_cuota_hasta[0])
+
+                    #ver este caso
+                    venta = Venta.objects.get(cliente_id=nueva_factura.cliente.id, lote_id=lote_id.id)
+                    object_list = get_pago_cuotas(venta, None, None)
+                    for x in xrange(0, len(object_list)):
+                        if num_desde <= int(object_list[x]['nro_cuota']) <= num_hasta:
+                            pago = PagoDeCuotas.objects.get(pk=object_list[x]['id'])
+                            pago.factura = nueva_factura
+                            pago.save()
+
+                return crear_pdf_factura(nueva_factura, request, manzana, lote_id, request.user)
+        else:
+            return HttpResponseRedirect(reverse('login'))
 
 # Funcion principal del modulo de facturas.
 def facturar(request):    
@@ -263,7 +427,7 @@ def facturar(request):
             nueva_factura.cliente = Cliente.objects.get(pk=cliente_id)
             nueva_factura.tipo = tipo
             nueva_factura.detalle = detalle
-            nueva_factura.lote = lote_id
+            #nueva_factura.lote = lote_id
             nueva_factura.anulado = False
             nueva_factura.observacion = observacion
             nueva_factura.usuario = request.user  
@@ -420,8 +584,8 @@ def detalle_factura(request, factura_id):
                 #factura.save()
                 
                 #fecha = form.data['fecha']
-                numero = form.data['numero']
-                observacion = form.data['observacion']
+                numero = data['numero']
+                observacion = data['observacion']
                 
                 fac = Factura.objects.get(pk=factura_id)
                 #fac.fecha = fecha
@@ -473,5 +637,86 @@ def detalle_factura(request, factura_id):
         return HttpResponse(t.render(c))    
     else:
         return HttpResponseRedirect(reverse('login'))
-    
-    
+
+def get_detalles_factura(codigo, cliente_id, nro_cuota_desde, nro_cuota_hasta):
+    try:
+        nro_cuota_desde = nro_cuota_desde.split("/")
+        nro_cuota_hasta = nro_cuota_hasta.split("/")
+        num_desde = int(nro_cuota_desde[0])
+        num_hasta = int(nro_cuota_hasta[0])
+        lote = Lote.objects.get(codigo_paralot=codigo)
+
+        cuotas_pag = ((num_hasta - num_desde) + 1)
+        cuotas_detalles = get_cuota_information_by_lote(lote.id, cuotas_pag, True)
+
+        cliente = Cliente.objects.get(pk=cliente_id)
+        venta = Venta.objects.get(lote_id=lote.id, cliente_id=cliente.id)
+        object_list = get_pago_cuotas(venta, None, None)
+        # object_list = sorted(object_list, key=lambda k: k['id'])
+        gestion_cobranza = []
+        interes_moratorio = 0
+        suma_gestion = 0
+        detalles = []
+        detalle = {}
+        ok = False
+        cantidad = num_hasta - (num_desde - 1)
+        detalle['cantidad'] = cantidad
+        detalle['precio_unitario'] = venta.precio_de_cuota
+
+        detalle['iva5'] = int(((cantidad * venta.precio_de_cuota) * 31.5) / 101.5)
+
+        detalle['exentas'] = int((cantidad * venta.precio_de_cuota) - detalle['iva5'])
+
+        detalle['cuotas_detalles'] = cuotas_detalles
+
+        detalles.append(detalle)
+        '''
+            Se trae los pagos que se van a facturar y se iteran para traer el interes de cada cuota.
+            Tambien se acumula la gestion de cobranza que hay en las cuotas
+        '''
+        cantidad = 0
+        gestion_procesada = False
+        ultimo_pago = object_list[0]['id']
+        for x in xrange(num_desde - 1, num_hasta):
+            pago = PagoDeCuotas.objects.get(id=object_list[x]['id'])
+            if pago.id != ultimo_pago:
+                ultimo_pago = pago.id
+                gestion_procesada = False
+                cantidad = 0
+            if pago.detalle != None:
+                detalle = ast.literal_eval(pago.detalle)
+                for y in xrange(0, len(detalle)):
+                    try:
+                        interes_moratorio += int(detalle['item' + str(cantidad)]['intereses'])
+                        if detalle['item' + str(cantidad)]['nro_cuota'] == (x + 1):
+                            if gestion_procesada == False and ultimo_pago == pago.id:
+                                try:
+                                    suma_gestion += detalle['item' + str(len(detalle) - 1)]['gestion_cobranza']
+                                    gestion_procesada = True
+                                except Exception, error:
+                                    print "No tiene gestion de cobranza"
+                            cantidad += 1
+                            break
+                    except Exception, error:
+                        print error
+
+        if interes_moratorio != 0:
+            detalle = {}
+            detalle['cantidad'] = 1
+            detalle['precio_unitario'] = interes_moratorio
+            detalle['exentas'] = 0
+            detalle['iva5'] = 0
+            detalle['iva10'] = interes_moratorio
+            detalles.append(detalle)
+
+        if suma_gestion != 0:
+            detalle = {}
+            detalle['cantidad'] = 1
+            detalle['precio_unitario'] = suma_gestion
+            detalle['exentas'] = 0
+            detalle['iva5'] = 0
+            detalle['iva10'] = suma_gestion
+            detalles.append(detalle)
+        return detalles
+    except Exception, error:
+        print error

@@ -790,7 +790,7 @@ def get_detalles_factura(request):
             except Exception, error:
                 print error
         else:
-            return HttpResponse(json.dumps(object_list, cls=DjangoJSONEncoder), content_type="application/json")
+            return HttpResponseRedirect(reverse('login'))
 
 def get_pagos_by_ventas(request):
     if request.method == 'GET':
@@ -858,7 +858,7 @@ def facturar(request):
             nueva_factura.cliente = Cliente.objects.get(pk=cliente_id)
             nueva_factura.tipo = tipo
             nueva_factura.detalle = detalle
-            nueva_factura.lote = lote_id
+            #nueva_factura.lote = lote_id
             nueva_factura.anulado = False
             nueva_factura.observacion = observacion
             if user == '':

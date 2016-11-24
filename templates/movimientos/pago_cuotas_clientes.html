@@ -245,7 +245,13 @@ var total_pago_cliente = 0;
 
                 $("#procesar_pagos").click(function () {
                     $("#procesar_pagos").attr("disabled", true);
+                    $("#facturar_pagos").attr("disabled", true);
                     enviarPagos();
+                });
+                $("#facturar_pagos").click(function () {
+                    $("#facturar_pagos").attr("disabled", true);
+                    $("#procesar_pagos").attr("disabled", true);
+                    facturarPagos();
                 });
                 //console.log(response);
             },
@@ -511,12 +517,51 @@ var total_pago_cliente = 0;
                 ventas_json: ventasJson,
             },
             success: function (response) {
+                console.log(response)
                 window.location = base_context + "/movimientos/listado_busqueda_pagos/?tipo_busqueda=cliente&busqueda_label=&busqueda="+clienteId+"&fecha_desde=&fecha_hasta=&tabla=venta";
+
             },
             error: function (xhr, errmsg, err) {
                 console.log(err);
                 alert("Ocurrio un error al enviar los pagos.")
                 $("#procesar_pagos").removeAttr("disabled");
+                $("#facturar_pagos").removeAttr("disabled");
+                //mensaje de error ?
+            }
+        });
+    }
+
+    function facturarPagos(){
+        var clienteId = $("#busqueda").val();
+        var ventasJson = "";
+        ventasJson = armarJsonDePagos(clienteId);
+        console.log(ventasJson);
+        $.ajax({
+            url: base_context + "/movimientos/pago_cuotas_cliente/",
+            type: 'POST',
+            dataType: "json",
+            data: {
+                cliente_id: clienteId,
+                ventas_json: ventasJson,
+            },
+            success: function (response) {
+                console.log(response)
+                var redirect_url = base_context + "/facturacion/facturar_pagos/?pagos_id=";
+                $.each(response, function(i, item) {
+                    //alert("id de pago: "+item.id);
+                    if (i == 0){
+                        redirect_url = redirect_url + item.id;
+                    }else{
+                        redirect_url = redirect_url + "&pagos_id="+ item.id;
+                    }
+                })
+                window.location = redirect_url;
+            },
+            error: function (xhr, errmsg, err) {
+                console.log(err);
+                alert("Ocurrio un error al enviar los pagos.")
+                $("#procesar_pagos").removeAttr("disabled");
+                $("#facturar_pagos").removeAttr("disabled");
                 //mensaje de error ?
             }
         });

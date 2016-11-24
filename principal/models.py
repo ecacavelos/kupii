@@ -417,7 +417,7 @@ class Factura(models.Model):
     fecha = models.DateField()
     numero = models.CharField(max_length=30)
     cliente = models.ForeignKey(Cliente,on_delete=models.PROTECT)
-    lote = models.ForeignKey(Lote,on_delete=models.PROTECT)
+    #lote = models.ForeignKey(Lote,on_delete=models.PROTECT)
     rango_factura = models.ForeignKey(RangoFactura,on_delete=models.PROTECT)
     tipo = models.CharField(max_length=2)
     detalle = models.TextField()

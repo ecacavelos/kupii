@@ -115,10 +115,11 @@
 			{% endif %}
 			
 			{% if hw.factura %}
-				<td> {{hw.factura.numero}} </td>
+				<td>
+                    <a href="{% url 'frontend_detalle_factura' hw.factura.id %}">{{hw.factura.numero}}</a>
+                </td>
 			{% else %}
 				<td>
-                    No Facturado
                     <a href="{% url 'frontend_facturar_operacion' 1 hw.id %}" class="boton-verde">Facturar</a>
                 </td>
 			{% endif %}
@@ -142,10 +143,11 @@
 			{% endif %}
 			
 			{% if hw.factura %}
-				<td> {{hw.factura.numero}} </td>
+				<td>
+                    <a href="{% url 'frontend_detalle_factura' hw.factura.id %}">{{hw.factura.numero}}</a>
+                </td>
 			{% else %}
 				<td>
-                    No Facturado
                     <a href="{% url 'frontend_facturar_operacion' 1 hw.id %}" class="boton-verde">Facturar</a>
                 </td>
 			{% endif %}

@@ -1,0 +1,166 @@
+{% extends "lotes/base_lotes.html" %}
+{% block header_scripts %}
+
+<script type="text/javascript">
+</script>
+<script type="text/javascript" src="{{ STATIC_URL }}facturacion/facturar_pagos.js"></script>
+
+<script type="text/javascript">
+
+var tipo_venta = "{{tipo_venta}}";
+var precio_venta = "{{precio_venta}}";
+var descripcion = "{{descripcion}}";
+
+
+</script>
+<!-- -->
+{% endblock %}
+{% block content %}
+<div class="gri16 text-izquierda" id="breadcumb">
+	<a href="{% url 'frontend_home' %}">Inicio</a><span class="verde-1">></span>
+	<a href="{% url 'frontend_home' %}facturacion/">Facturación</a>
+	<span class="verde-1">> Facturar </span>
+</div>
+
+<div class="clear" id="qz-status" onload="setear_impresora()"></div>
+
+<h1 id="title" >Facturar</h1>
+	<div class="cabecera_factura">
+		<form action = "" method="post" id="agregar-factura-form">
+			{% csrf_token %}
+			<div class="item-factura-cabecera">
+				<h2>Cliente</h2>
+				<input id="id_cliente" type="hidden" name="cliente"  maxlength="100" value="{{factura.cliente.id}}" />
+				<input id="detalle" type="hidden" name="detalle" />
+				<input id="id_name_cliente" type="text" name="name_cliente" placeholder="Ingrese el Nombre"  maxlength="100" value="{{factura.cliente}}" /> <br><br>
+				<input id="id_cedula_cliente" type="text" name="cedula_cliente" value="{{factura.cliente.cedula}}" />
+				<a href="{% url 'frontend_home' %}clientes/agregar/" class="boton-verde" target="_blank">Agregar Nuevo Cliente</a> {{ field.errors }}<br><br>			
+			</div>
+			<div class="item-factura-cabecera">
+				<h2>Fecha</h2>
+				<input id="fecha" name="fecha" type="text" />
+			</div>
+			<div class="item-factura-cabecera">
+				<h2>Tipo</h2>
+				<select name="tipo" id="tipo">
+					 <option value="co">Contado</option>
+	  				 <option value="cr">Crédito</option>
+				</select>
+			</div>
+            <div class="item-factura-cabecera">
+				<h2>Número</h2>
+				<input id="nro-factura" type="text" name="nro_factura" placeholder="Nro. de factura" value="{{factura.ultima_factura}}"/>
+				<input id="nro-factura-original" type="hidden" name="nro_factura_original" value="{{factura.ultima_factura}}"/>
+			</div>
+			<div class="item-factura-cabecera">
+				<h2>Timbrado</h2>
+				<input id="timbrado" type="text" name="timbrado" placeholder="Timbrado" value="{{factura.ultimo_timbrado_numero}}" />
+				<input id="id-timbrado" type="hidden" name="id_timbrado" value="{{factura.ultimo_timbrado_id}}"  />
+			</div>
+            <!-- lote y nro de cuotas hacerlo por pagos -->
+            {% for pago in factura.pagos %}
+                <div class="item-factura-cabecera">
+                    <h2>Lote</h2>
+                    <input id="lote" name="lote" type="text" value="{{pago.lote}}" />
+                </div>
+                <div class="item-factura-cabecera">
+                    <h5>Nro de Cuota Desde:</h5>
+                    <input id="id_nro_cuota" class = "cuotas" type="text" name="nro_cuota_desde" placeholder="Nro Cuota Desde" value="{{pago.cuota_desde}}" />
+                    <input id="id-nro_cuotap" class = "cuotas" type="hidden" name="id-nro_cuotapago"  />
+                </div>
+                <div class="item-factura-cabecera">
+                    <h5>Nro de Cuota Hasta:</h5>
+                    <input id="id_nro_cuota_hasta" type="text" name="nro_cuota_hasta" placeholder="Nro Cuota Hasta" value="{{pago.cuota_hasta}}" />
+                </div>
+            {% endfor %}
+
+            {%if grupo == 1 or grupo == 3%}
+    			<div class="item-factura-cabecera">
+	    			<h5>Usuario</h5>
+		    		<select name="user" id="user">
+                        <option value=""></option>
+                        {% for user in users %}
+                            {% if factura.usuario == user.username %}
+                                <option value="{{ user.username }}" selected>{{ user.username }}{{ field.errors }}</option>
+                            {% else %}
+                                <option value="{{ user.username }}">{{ user.username }}{{ field.errors }}</option>
+                            {% endif %}
+                        {% endfor %}
+				    </select>
+    			</div>
+            {%endif%}
+	</div>	
+	<div class="detalle_factura">
+		<h2>Detalle</h2>
+		<div style="text-align: left;">
+				<label style="margin-left: 10px;">Cant.&nbsp;</label>
+				<label style="margin-left: 25px;">Concepto&nbsp;</label>
+				<label style="margin-left: 300px;">Precio Un.&nbsp;</label>
+				<label style="margin-left: 40px;">Exentas&nbsp;</label>
+				<label style="margin-left: 60px;">Iva 5&nbsp;</label>
+				<label style="margin-left: 70px;">Iva 10&nbsp;</label>
+		</div>	
+	    {% for detalle in factura.detalles %}
+            <div class="item-detalle">
+                <input type="number" id="id_detalle_cantidad_{{ forloop.counter }}" class="cantidad-item item" placeholder="Cant." size="2" value="{{ factura.detalle.cantidad }}" style="width:50px;">
+                <input type="text" id="id_detalle_concepto_{{ forloop.counter }}" class="concepto-factura item " placeholder="Concepto" value="{{ detalle.concepto }}">
+                <input type="text" id="id_detalle_precio_unitario_{{ forloop.counter }}" value="{{ detalle.precio_unitario }}" class="precio_unitario-item item" placeholder="Precio unitario" maxlength="11" >
+                <input type="text" id="id_detalle_exentas_{{ forloop.counter }}" value="{{ detalle.exentas }}" class="exentas-item item" placeholder="Exentas" maxlength="11">
+                <input type="text" id="id_detalle_iva5_{{ forloop.counter }}" value="{{ detalle.iva5 }}" class="iva_5-item item" placeholder="IVA 5%" maxlength="11">
+                <input type="text" id="id_detalle_iva10_{{ forloop.counter }}" value="{{ detalle.iva10 }}" class="iva_10-item item" placeholder="IVA 10%" maxlength="11">
+                {% if forloop.last %}
+                    <a href="#" class="add-btn">+</a>
+                {% else %}
+                    <a href="#" class="rm-btn">-</a>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+	<div class="liquidacion_factura">
+		<h2>Observacion</h2>
+		<div>
+			<textarea id="observacion" name="observacion" rows="2" cols="140" style="margin-left: 20px; margin-right: 20px;" placeholder="Ingrese aquí su observación"></textarea>
+		</div>
+	</div>
+	<div class="liquidacion_factura">
+		<h2>Liquidación</h2>
+		<div style="text-align: right;">
+				<label style="margin-right: 40px;">Total Exentas&nbsp;</label>
+				<label style="margin-right: 65px;">Total Iva 5&nbsp;</label>
+				<label style="margin-right: 55px;">Total Iva 10&nbsp;</label>
+		</div>	
+		<div id="sub-totales">
+			<input id="total-exentas" type="text" value="{{ factura.total_exentas }}" readonly="readonly" />
+			<input id="total-iva_5" type="text" value="{{ factura.total_iva5 }}" readonly="readonly" />
+			<input id="total-iva_10" type="text" value="{{ factura.total_iva}}" readonly="readonly" />
+		</div>
+		<div id="totales">
+			<label>TOTAL A PAGAR</label>		
+			<input id="total" type="text" readonly="readonly" />
+		</div>
+		<div id="liquidacion-iva-block">
+			<label>IVA 5%</label>
+			<input id="liquidacion-iva_5" value="{{ factura.liq_iva5 }}" type="text" readonly="readonly" />
+			<label>IVA 10%</label>		
+			<input id="liquidacion-iva_10" value="{{ factura.total_iva10 }}" type="text" readonly="readonly" />
+			<label>LIQUIDACION IVA</label>
+			<input id="liquidacion-iva" type="text" value="{{ factura.liq_iva }}" readonly="readonly" />
+		</div>
+	</div>
+<div class="clear"></div>
+   {%if grupo == 1 or grupo == 3%}
+       <input id="grabar_factura" type="button" value="Grabar" style=" margin-bottom: 10px; cursor: pointer;" />
+   {%endif%}
+<input id="crear_factura" type="button" value="Grabar e imprimir" style=" margin-bottom: 10px; cursor: pointer;" />
+<input id="submit-btn" type="submit" value="Grabar y mostrar pdf" style=" margin-bottom: 10px; cursor: pointer;" />
+<input id="imprimir_factura" type="button" value="Volver a imprimir"  style=" margin-bottom: 10px; cursor: pointer;" />
+<input id="id_factura" type="hidden" value=""/>
+<!--<input type="button" value="Imprimir Factura" onclick="print()">-->
+<!--<label>Copias: </label><input id="copies" type="text" value="1" size="8" style="text-align: center;">-->
+<!--<input id="boton-default-printer" type="button" value="Use Default Printer" onclick="useDefaultPrinter()" >-->
+</form>
+<div id="footer">
+	<a href="{% url 'frontend_home' %}facturacion" class="boton-verde">Volver al módulo de Facturación</a>
+	<a href="{% url 'frontend_home' %}" class="boton-verde">Volver al menú Principal</a>
+</div>
+{% endblock %} 

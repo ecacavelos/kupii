@@ -115,21 +115,21 @@
 					{% endif %}
 					{% if field.html_name == 'cliente'  or field.html_name == 'rango_factura' or field.html_name == 'detalle' or field.html_name == 'anulado' %}
 					{%if field.html_name == 'cliente' %}
-					<td colspan="5" class="noimage">{{ factura.cliente }}{{ field.errors }}</td>
+					<td colspan="5" class="noimage">{{ factura.cliente }}<!--{{ field.errors }}--></td>
 					{% endif %}
 					{%if field.html_name == 'lote' %}
-					<td colspan="5" class="noimage">{{ factura.lote }}{{ field.errors }}</td>
+					<td colspan="5" class="noimage">{{ factura.lote }}<!--{{ field.errors }}--></td>
 					{% endif %}
 					{%if field.html_name == 'rango_factura' %}
-						<td colspan="5" class="noimage">{{ numero_timbrado }}{{ field.errors }}</td>
+						<td colspan="5" class="noimage">{{ numero_timbrado }}<!--{{ field.errors }}--></td>
 					{% endif %}
 					{%if field.html_name == 'anulado' %}
 					<td colspan="5" class="noimage"><b>SI&nbsp;</b>
 						{{ field }}
-						{% if field.value == False %} 
+						{% if field.value == False %}
 							<input class="factura-form-button" type="submit" name="boton_anular" value="Anular Factura" />
-						{% endif %}	
-						
+						{% endif %}
+
 					</td>
 					<tr>
 						<td><label for="monto" >Monto:</label></td><td colspan="5">{{ factura.monto }}</td>
@@ -156,24 +156,24 @@
 					</tr>
 					{% endfor %}
 					{% endif %}
-					
+
 					{% else %}
-					
-					<td colspan="5">{{ field }}{{ field.errors }}</td>
-					
+
+					<td colspan="5">{{ field }}<!--{{ field.errors }}--></td>
+
 				</div>
 				{% endif %}
 			</tr>
 			{% endfor %}
-		
-		
+
+
 </div>
 </table>
 {%if grupo == 1%}
 		<input class="factura-form-button" type="submit" name="boton_guardar" value="Guardar Cambios" />
 		<input class="factura-form-button" type="submit" name="boton_borrar" value="Borrar este Registro" />
-	{%endif%}	
-</form>	
+	{%endif%}
+</form>
 <br></br>
 <div id="footer">
 	<a href="{% url 'frontend_home' %}facturacion/listado" class="boton-verde">Volver al Listado de Facturas</a>
