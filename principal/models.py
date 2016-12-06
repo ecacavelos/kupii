@@ -682,3 +682,10 @@ class ConceptosFactura(models.Model):
     iva10 = models.BooleanField(blank=False, null=False)
     precio_unitario = models.IntegerField()
 '''
+
+class ConfiguracionIntereses(models.Model):
+    codigo_empresa = models.CharField(max_length=4)
+    porcentaje_interes_cuota = models.IntegerField()
+    gestion_cobranza = models.BooleanField(blank=False, null=False)
+    dias_de_gracia = models.IntegerField()
+    cuotas_dias_gracia = models.IntegerField()

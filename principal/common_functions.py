@@ -2,7 +2,7 @@ from django.contrib.admin.templatetags.admin_list import results
 from django.db.models import Count, Min, Sum, Avg
 from django.db import connections, connection
 from principal.models import Lote, Cliente, Vendedor, PlanDePago, Fraccion, Manzana, Venta, Propietario, \
-    PlanDePagoVendedor, PagoDeCuotas, RecuperacionDeLotes, LogUsuario, CoordenadasFactura, Reserva
+    PlanDePagoVendedor, PagoDeCuotas, RecuperacionDeLotes, LogUsuario, CoordenadasFactura, Reserva, ConfiguracionIntereses
 from principal.monthdelta import MonthDelta
 from calendar import monthrange
 from datetime import datetime, timedelta
@@ -24,6 +24,8 @@ import xlwt
 import math
 import json
 from principal.excel_styles import *
+from propar01.settings import CODIGO_EMPRESA
+
 
 def get_cuotas_detail_by_lote(lote_id):
 
@@ -403,7 +405,10 @@ def obtener_detalle_interes_lote(lote_id,fecha_pago_parsed,proximo_vencimiento_p
 
                     #Intereses (valores constantes)
                     #Interes moratorio por dia
-                    interes=0.001
+
+                    config_intereses = ConfiguracionIntereses.objects.get(codigo_empresa=CODIGO_EMPRESA)
+
+                    interes = config_intereses.porcentaje_interes_cuota
 
                     #Interes
                     #interes_punitorio=0.00030
@@ -412,7 +417,10 @@ def obtener_detalle_interes_lote(lote_id,fecha_pago_parsed,proximo_vencimiento_p
                     #interes_iva=0.00013
                     interes_iva=0.0001
                     #total_intereses=interes+interes_punitorio+interes_iva
-                    total_intereses=interes+interes_iva
+                    if config_intereses.codigo_empresa == "VIER":
+                        total_intereses = interes
+                    else:
+                        total_intereses=interes+interes_iva
                     #Verificar si tiene cuotas de refuerzo
                     if venta.plan_de_pago.cuotas_de_refuerzo != 0:
                         pagos = get_pago_cuotas(venta, None, None)
@@ -430,7 +438,7 @@ def obtener_detalle_interes_lote(lote_id,fecha_pago_parsed,proximo_vencimiento_p
                     for cuota in range(rango):
                         detalle={}
                         fecha_vencimiento=proximo_vencimiento_parsed+MonthDelta(cuota)
-                        dias_atraso=(fecha_pago_parsed-fecha_vencimiento).days
+                        dias_atraso = (fecha_pago_parsed-fecha_vencimiento).days
                         nro_cuota = cuotas_pagadas+(cuota+1)
                         if es_ref == True:
                             if (nro_cuota % venta.plan_de_pago.intervalo_cuota_refuerzo) == 0 and cantidad_pagos_ref < venta.plan_de_pago.cuotas_de_refuerzo:
@@ -443,19 +451,31 @@ def obtener_detalle_interes_lote(lote_id,fecha_pago_parsed,proximo_vencimiento_p
 
                         detalle['vencimiento']=fecha_vencimiento.strftime('%d/%m/%Y')
                         fecha_ultimo_vencimiento = datetime.datetime.strptime(detalle['vencimiento'], "%d/%m/%Y").date()
-                        fecha_dias_gracia = fecha_ultimo_vencimiento + datetime.timedelta(days=5)
+                        if config_intereses.codigo_empresa == "VIER" and cuotas_atrasadas > config_intereses.cuotas_dias_gracia:
+                            fecha_dias_gracia = fecha_ultimo_vencimiento
+                        else:
+                            fecha_dias_gracia = fecha_ultimo_vencimiento + datetime.timedelta(days=5)
                         dias_habiles = calcular_dias_habiles(fecha_ultimo_vencimiento,fecha_dias_gracia)
 
+
                         if dias_habiles<5:
-                            fecha_ultimo_vencimiento = fecha_dias_gracia+datetime.timedelta(days=5-dias_habiles)
-                        detalle['vencimiento_gracia']=fecha_ultimo_vencimiento.strftime('%d/%m/%Y')
+                            if config_intereses.codigo_empresa == "VIER" and cuotas_atrasadas > config_intereses.cuotas_dias_gracia:
+                                fecha_ultimo_vencimiento = fecha_dias_gracia
+                            else:
+                                fecha_ultimo_vencimiento = fecha_dias_gracia+datetime.timedelta(days=5-dias_habiles)
+
+                        detalle['vencimiento_gracia'] = fecha_ultimo_vencimiento.strftime('%d/%m/%Y')
 
                         if fecha_pago_parsed > fecha_ultimo_vencimiento:
-                            intereses=math.ceil(total_intereses*dias_atraso*monto_cuota)
-                            redondeado=roundup(intereses)
+
+                            if config_intereses.codigo_empresa == "VIER":
+                                intereses=math.ceil(total_intereses * (cuotas_atrasadas - cuota) * monto_cuota)
+                            else:
+                                intereses = math.ceil(total_intereses * dias_atraso * monto_cuota)
+                            redondeado = roundup(intereses)
                         else:
                             intereses = 0
-                            redondeado=roundup(intereses)
+                            redondeado = roundup(intereses)
 
                         detalle['interes']=interes
                         #detalle['interes_punitorio']=interes_punitorio
@@ -481,8 +501,9 @@ def obtener_detalle_interes_lote(lote_id,fecha_pago_parsed,proximo_vencimiento_p
 
                     if cuotas_atrasadas>=6:
                         #gestion_cobranza = int(0.1*(math.ceil(float(cuotas_atrasadas*monto_cuota))+sumatoria_intereses))
-                        gestion_cobranza = roundup(0.05*((cuotas_atrasadas*monto_cuota)+sumatoria_intereses) + (0.05*((cuotas_atrasadas*monto_cuota)+sumatoria_intereses))*0.10)
-                        detalles.append({'gestion_cobranza':gestion_cobranza, 'tipo': 'gestion_cobranza'})
+                        if config_intereses.gestion_cobranza == True:
+                            gestion_cobranza = roundup(0.05*((cuotas_atrasadas*monto_cuota)+sumatoria_intereses) + (0.05*((cuotas_atrasadas*monto_cuota)+sumatoria_intereses))*0.10)
+                            detalles.append({'gestion_cobranza':gestion_cobranza, 'tipo': 'gestion_cobranza'})
 
                 print detalles
                 return detalles
