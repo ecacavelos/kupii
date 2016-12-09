@@ -588,11 +588,12 @@ def obtener_deudores_por_venta(filtros,fraccion,meses_peticion):
                         if prox_vto_date_parsed < datetime.datetime.now().date():
                             deudor_por_venta['cuotas_devengadas'] = deudor_por_venta['cuotas_devengadas'] + ultima_venta.precio_de_cuota
                         prox_vto_date_parsed = add_months(prox_vto_date_parsed, 1)
-                    deudor_por_venta['cuotas_devengadas'] = unicode('{:,}'.format(deudor_por_venta['cuotas_devengadas'])).replace(",", ".")
+
 
         else:
             cuotas_a_pagar = []
 
+        deudor_por_venta['cuotas_devengadas'] = unicode('{:,}'.format(deudor_por_venta['cuotas_devengadas'])).replace(",", ".")
         if (len(cuotas_a_pagar) >= meses_peticion + 1):
 
             cuotas_atrasadas = detalle_cuotas['cantidad_total_cuotas'] - detalle_cuotas['cant_cuotas_pagadas'];  # CUOTAS ATRASADAS
@@ -1002,15 +1003,27 @@ def deudores_por_venta(request):
                     # OBJETO QUE SE UTILIZA PARA CARGAR TODOS LOS CLIENTES ATRASADOS A MOSTRAR
                     deudores_por_venta = obtener_deudores_por_venta(1,fraccion, 0)
                     a = len(deudores_por_venta)
+                    totales_total_pagado = 0
+                    totales_total_atrasado = 0
+                    totales_total_cuotas_devengadas = 0
                     if a > 0:
                         ultimo="&fraccion="+unicode(fraccion)
                         lista = deudores_por_venta
+                        for deudor in lista:
+                            # acumulamos los totales
+                            totales_total_pagado += int(deudor['total_pagado'].replace(".", ""))
+                            totales_total_atrasado += int(deudor['total_atrasado'].replace(".", ""))
+                            totales_total_cuotas_devengadas += int(deudor['cuotas_devengadas'].replace(".", ""))
+
                         c = RequestContext(request, {
                             'fraccion': fraccion,
                             'fraccion_label': fraccion_label,
                             'ultimo': ultimo,
                             'object_list': lista,
-                            'deudores_por_venta' : deudores_por_venta
+                            'deudores_por_venta' : deudores_por_venta,
+                            'totales_total_pagado': unicode('{:,}'.format(totales_total_pagado)).replace(",", "."),
+                            'totales_total_atrasado': unicode('{:,}'.format(totales_total_atrasado)).replace(",", "."),
+                            'totales_total_cuotas_devengadas': unicode('{:,}'.format(totales_total_cuotas_devengadas)).replace(",", ".")
                         })
                         return HttpResponse(t.render(c))
                     else:
@@ -3737,6 +3750,10 @@ def deudores_por_venta_reporte_excel(request):
 
             deudores_por_venta = obtener_deudores_por_venta(filtros, fraccion, meses_peticion)
 
+            totales_total_pagado = 0
+            totales_total_atrasado = 0
+            totales_total_cuotas_devengadas = 0
+
             if deudores_por_venta:
 
                 wb = xlwt.Workbook(encoding='utf-8')
@@ -3747,6 +3764,8 @@ def deudores_por_venta_reporte_excel(request):
                 style2 = xlwt.easyxf('pattern: pattern solid, fore_colour white; font: name Calibri; align: horiz right')
                 style3 = xlwt.easyxf('font: name Calibri, height 200; align: horiz left')
                 style4 = xlwt.easyxf('font: name Calibri, height 200; align: horiz center')
+                style5 = xlwt.easyxf('font: name Calibri, height 200; align: horiz right')
+                style6 = xlwt.easyxf('font: name Calibri, bold True; align: horiz right')
 
                 nombre_fraccion = Fraccion.objects.get(id=fraccion)
                 usuario = unicode(request.user)
@@ -3810,13 +3829,28 @@ def deudores_por_venta_reporte_excel(request):
                     else:
                         sheet.write(c, 1, unicode('Dato no disponible'), style4)
                     sheet.write(c, 2, unicode(deudores_por_venta[i]['cuotas_pagadas']), style4)
-                    sheet.write(c, 3, unicode(deudores_por_venta[i]['importe_cuota']), style4)
-                    sheet.write(c, 4, unicode(deudores_por_venta[i]['total_pagado']),style4)
-                    sheet.write(c, 5, unicode(deudores_por_venta[i]['total_atrasado']), style4)
-                    sheet.write(c, 6, unicode(deudores_por_venta[i]['cuotas_devengadas']), style4)
+                    sheet.write(c, 3, unicode(deudores_por_venta[i]['importe_cuota']), style5)
+                    sheet.write(c, 4, unicode(deudores_por_venta[i]['total_pagado']),style5)
+                    sheet.write(c, 5, unicode(deudores_por_venta[i]['total_atrasado']), style5)
+                    sheet.write(c, 6, unicode(deudores_por_venta[i]['cuotas_devengadas']), style5)
+
+                    #acumulamos los totales
+                    totales_total_pagado += int( deudores_por_venta[i]['total_pagado'].replace(".", "") )
+                    totales_total_atrasado +=  int( deudores_por_venta[i]['total_atrasado'].replace(".", "") )
+                    totales_total_cuotas_devengadas += int( deudores_por_venta[i]['cuotas_devengadas'].replace(".", "") )
+
                     # formateamos la fecha
                     c += 1
 
+            #sheet.write(c, 4, "Total Cobrado", style)
+            #sheet.write(c, 5, "Saldo a Cobrar", style)
+            #sheet.write(c, 6, "Cuotas Devengadas", style)
+
+            c += 1
+            sheet.write_merge(c,c,0,3, 'Totales:', style)
+            sheet.write(c, 4, unicode('{:,}'.format(totales_total_pagado)).replace(",", "."), style6)
+            sheet.write(c, 5, unicode('{:,}'.format(totales_total_atrasado)).replace(",", "."), style6)
+            sheet.write(c, 6, unicode('{:,}'.format(totales_total_cuotas_devengadas)).replace(",", "."), style6)
             response = HttpResponse(content_type='application/vnd.ms-excel')
             # Crear un nombre intuitivo
             response['Content-Disposition'] = 'attachment; filename=' + 'deudores_por_venta_' + unicode(nombre_fraccion) + '.xls'

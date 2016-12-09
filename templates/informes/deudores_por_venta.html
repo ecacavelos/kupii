@@ -96,33 +96,52 @@
         <th>Lote Nro</th><th>Fec Venta</th>
 {#        <th>Cuotas Atras.</th>#}
         <th>Cuotas Pag.</th><th>Importe Cuota</th><th>Total Cobrado</th><th>Saldo a Cobrar</th><th>Cuotas Devengadas</th>
-		{% for hw in object_list %}
-			{% if forloop.counter|divisibleby:2 %}
-		<tr>
-{#			<td>{{hw.manzana}}</td>#}
-			<td>{{hw.lote}}</td>
-			<td>{{hw.fecha_venta}}</td>
-{#			<td>{{hw.cuotas_atrasadas}}</td>#}
-			<td>{{hw.cuotas_pagadas}}</td>
-			<td>{{hw.importe_cuota}}</td>
-			<td>{{hw.total_pagado}}</td>
-			<td>{{hw.total_atrasado}}</td>
-			<td>{{hw.cuotas_devengadas}}</td>
-		</tr>
-			{% else %}
-		<tr class="bkg_gris">
-{#			<td>{{hw.manzana}}</td>#}
-			<td>{{hw.lote}}</td>
-			<td>{{hw.fecha_venta}}</td>
-{#			<td>{{hw.cuotas_atrasadas}}</td>#}
-			<td>{{hw.cuotas_pagadas}}</td>
-			<td>{{hw.importe_cuota}}</td>
-			<td>{{hw.total_pagado}}</td>
-			<td>{{hw.total_atrasado}}</td>
-			<td>{{hw.cuotas_devengadas}}</td>
-		</tr>
-		{% endif %}
-		{% endfor %}
+        {% if object_list %}
+            {% for hw in object_list %}
+                {% if forloop.counter|divisibleby:2 %}
+            <tr>
+    {#			<td>{{hw.manzana}}</td>#}
+                <td>{{hw.lote}}</td>
+                <td>{{hw.fecha_venta}}</td>
+    {#			<td>{{hw.cuotas_atrasadas}}</td>#}
+                <td>{{hw.cuotas_pagadas}}</td>
+                <td style="text-align: right">{{hw.importe_cuota}}</td>
+                <td style="text-align: right">{{hw.total_pagado}}</td>
+                <td style="text-align: right">{{hw.total_atrasado}}</td>
+                <td style="text-align: right">{{hw.cuotas_devengadas}}</td>
+            </tr>
+                {% else %}
+            <tr class="bkg_gris">
+    {#			<td>{{hw.manzana}}</td>#}
+                <td>{{hw.lote}}</td>
+                <td>{{hw.fecha_venta}}</td>
+    {#			<td>{{hw.cuotas_atrasadas}}</td>#}
+                <td>{{hw.cuotas_pagadas}}</td>
+                <td style="text-align: right">{{hw.importe_cuota}}</td>
+                <td style="text-align: right">{{hw.total_pagado}}</td>
+                <td style="text-align: right">{{hw.total_atrasado}}</td>
+                <td style="text-align: right">{{hw.cuotas_devengadas}}</td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+            <tfoot>
+                <tr>
+                    <td colspan="4">
+                        <b>Totales:</b>
+                    </td>
+                    <td style="text-align: right">
+                        <b>{{ totales_total_pagado }}</b>
+                    </td>
+                    <td style="text-align: right">
+                        <b>{{ totales_total_atrasado }}</b>
+                    </td>
+                    <td style="text-align: right">
+                        <b>{{ totales_total_cuotas_devengadas }}</b>
+                    </td>
+                </tr>
+            </tfoot>
+        {% endif %}
+
 	</table>
 </div>
 
