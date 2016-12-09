@@ -26,6 +26,7 @@
 	<form id="main_pago_form" action="" method="post">
 		<table width="94%" border="0" cellpadding="0" cellspacing="0" id="forms" align="center">
 			{% csrf_token %}
+            <div id="{{message_id}}">{{ message }}</div>
 			<div class="fieldWrapperMovimientos">
 				<tr>
 					<td><label for="id_lote">Lote: </label></td>
@@ -60,7 +61,7 @@
 				<tr>
 					<td><label for="nro_cuotas_a_pagar">Cantidad de Cuotas Pagadas: </label></td>
 					<td class="noimage">
-					<input id="nro_cuotas_a_pagar" type"number" name="nro_cuotas_a_pagar" value ="{{pagocuota.nro_cuotas_a_pagar}}" maxlength="4" />
+					<input id="nro_cuotas_a_pagar" type="number" name="nro_cuotas_a_pagar" value ="{{pagocuota.nro_cuotas_a_pagar}}" maxlength="4" />
 					</td>
 				</tr>
 				<tr>
@@ -81,6 +82,18 @@
 					<td><label for="total_pago">Monto Total a Pagar: </label></td>
 					<td class="noimage">
 					<input id="monto_total" type="number" name="monto_total" maxlength="10" value="{{pagocuota.total_de_pago}}"/>
+					</td>
+				</tr>
+			</div>
+            <div class="fieldWrapperMovimientos">
+				<tr>
+					<td><label for="total_pago">Monto Total a Pagar: </label></td>
+					<td class="noimage">
+                        {% if pagocuota.cuota_obsequio == True %}
+					        <input id="cuota_obsequio" type="checkbox" name="cuota_obsequio" checked/>
+                        {% else %}
+                            <input id="cuota_obsequio" type="checkbox" name="cuota_obsequio"/>
+                        {% endif %}
 					</td>
 				</tr>
 			</div>

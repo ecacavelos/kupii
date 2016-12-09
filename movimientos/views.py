@@ -14,6 +14,7 @@ from django.core import serializers
 from principal.common_functions import verificar_permisos
 from principal import permisos
 from django.db import connection
+from django.contrib import messages
  
 # Funcion principal del modulo de lotes.
 def movimientos(request):
@@ -2099,15 +2100,20 @@ def modificar_pago_de_cuotas(request, id):
                 total_de_mora = data.get('total_mora')
                 total_de_pago = data.get('monto_total')
                 date_parse_error = False
-                fecha_pago=data.get('fecha', '')
+                fecha_pago = data.get('fecha', '')
                 fecha_pago_parsed = datetime.datetime.strptime(fecha_pago, "%d/%m/%Y").date()
-    
+                cuota_obsequio = data.get('cuota_obsequio','off')
+                if cuota_obsequio == 'on':
+                    cuota_obsequio = True
+                else:
+                    cuota_obsequio = False
                 try:
                     pago.total_de_cuotas = total_de_cuotas
                     pago.total_de_mora = total_de_mora
                     pago.total_de_pago = total_de_pago
                     pago.nro_cuotas_a_pagar = nro_cuotas_a_pagar
                     pago.fecha_de_pago = fecha_pago_parsed
+                    pago.cuota_obsequio = cuota_obsequio
                     pago.save()
                     
                     #Se loggea la accion del usuario
@@ -2124,12 +2130,14 @@ def modificar_pago_de_cuotas(request, id):
                 id_objeto = venta.id
                 codigo_lote = venta.lote.codigo_paralot
                 loggear_accion(request.user, "Actualizar", "venta", id_objeto, codigo_lote)
+                message = "Pago Modificado Exitosamente"
                 
                 t = loader.get_template('movimientos/modificar_pagocuota.html')
                 fecha = pago.fecha_de_pago.strftime('%d/%m/%Y')
                 c = RequestContext(request, {
                     'pagocuota': pago,
-                    'fecha_pago': fecha
+                    'fecha_pago': fecha,
+                    'message': message
                 })
             return HttpResponse(t.render(c))
         else:
