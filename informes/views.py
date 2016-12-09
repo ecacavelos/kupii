@@ -3723,7 +3723,7 @@ def deudores_por_venta_reporte_excel(request):
                 # FILTROS DISPONIBLES
                 filtros = filtros_establecidos(request.GET, 'deudores_por_venta')
                 # PARAMETROS
-                meses_peticion = 1
+                meses_peticion = 0
                 fraccion = ''
                 if filtros == 0:
                     meses_peticion = 0
@@ -6065,7 +6065,10 @@ def informe_ventas(request):
                                     #detalle para fecha de vencimiento
                                     cuotas_detalles = []
                                     cuotas_detalles = get_cuota_information_by_lote(lote_id,contador_cuotas, True, True, item_venta)
-                                    cuota['vencimiento'] = unicode(cuotas_detalles[0]['fecha'])
+                                    try:
+                                        cuota['vencimiento'] = unicode(cuotas_detalles[0]['fecha'])
+                                    except:
+                                        print "pago cancelado"
                                     
                                     fecha_pago_parsed = datetime.datetime.strptime(cuota['fecha_de_pago'], "%d/%m/%Y").date()
                                     proximo_vencimiento_parsed = datetime.datetime.strptime(cuota['vencimiento'], "%d/%m/%Y").date()
