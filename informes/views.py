@@ -483,7 +483,8 @@ def obtener_clientes_atrasados(filtros,fraccion, meses_peticion):
 
         if (len(cuotas_a_pagar) >= meses_peticion + 1):
 
-            cuotas_atrasadas = detalle_cuotas['cantidad_total_cuotas'] - detalle_cuotas['cant_cuotas_pagadas'];  # CUOTAS ATRASADAS
+            #cuotas_atrasadas = detalle_cuotas['cantidad_total_cuotas'] - detalle_cuotas['cant_cuotas_pagadas'];  # CUOTAS ATRASADAS
+            cuotas_atrasadas = len(cuotas_a_pagar);
             cantidad_cuotas_pagadas = detalle_cuotas['cant_cuotas_pagadas'];  # CUOTAS PAGADAS
 
             # DATOS DEL CLIENTE
