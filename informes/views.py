@@ -558,6 +558,7 @@ def obtener_deudores_por_venta(filtros,fraccion,meses_peticion):
     query += " ORDER BY codigo_paralot "
     cursor = connection.cursor()
     cursor.execute(query, [fraccion])
+    ventas_al_contado = 0
 
     # Por ultimo, traemos ordenados los registros por el CODIGO DE LOTE
     # query += " ORDER BY codigo_paralot "
@@ -578,7 +579,8 @@ def obtener_deudores_por_venta(filtros,fraccion,meses_peticion):
             detalle_cuotas = get_cuotas_detail_by_lote(unicode(str(r[0])))
             hoy = date.today()
             cuotas_a_pagar = obtener_cuotas_a_pagar_full(ultima_venta, hoy, detalle_cuotas,500)  # Maximo atraso = 500 para tener un parametro maximo de atraso en las cuotas.
-
+            if len(cuotas_a_pagar) == 0:
+                ventas_al_contado += 1
             # aqui para saber cuanto esta debiendo por cuotas atrasadas, vamos a recorrer las cuotas que faltan por pagar, e ir preguntando si la prox fecha de vto, mes
             # a mes todavia es menor a la fecha actual, si es asi, vamos aumentado la cuota
             if detalle_cuotas != None:
@@ -637,7 +639,46 @@ def obtener_deudores_por_venta(filtros,fraccion,meses_peticion):
             total_pagado = cantidad_cuotas_pagadas * ultima_venta.precio_de_cuota;
             deudor_por_venta['total_pagado'] = unicode('{:,}'.format(total_pagado)).replace(",", ".")
             deudores_por_venta.append(deudor_por_venta)
+        if ultima_venta != None:
+            if ultima_venta.plan_de_pago.tipo_de_plan == "contado":
 
+                # DATOS DEL CLIENTE
+                deudor_por_venta['cliente'] = ultima_venta.cliente.nombres + ' ' + ultima_venta.cliente.apellidos
+                deudor_por_venta['direccion_particular'] = ultima_venta.cliente.direccion_particular
+                deudor_por_venta['direccion_cobro'] = ultima_venta.cliente.direccion_cobro
+                deudor_por_venta['telefono_particular'] = ultima_venta.cliente.telefono_particular
+                deudor_por_venta['telefono_laboral'] = ultima_venta.cliente.telefono_laboral
+                deudor_por_venta['celular_1'] = ultima_venta.cliente.celular_1
+                deudor_por_venta['celular_2'] = ultima_venta.cliente.celular_2
+
+                deudor_por_venta['lote'] = ultima_venta.lote.codigo_paralot
+
+                # FECHA VENTA
+                if (ultima_venta.fecha_de_venta != None):
+                    deudor_por_venta['fecha_venta'] = ultima_venta.fecha_de_venta
+                else:
+                    deudor_por_venta['fecha_venta'] = 'Dato no disponible'
+
+                deudor_por_venta['lote'] = ultima_venta.lote.codigo_paralot
+
+                # IMPORTE CUOTA
+                deudor_por_venta['importe_cuota'] = "0"
+
+                # CUOTAS ATRASADAS
+                deudor_por_venta['cuotas_atrasadas'] = "0"
+
+                # TOTAL ATRASO
+                deudor_por_venta['total_atrasado'] = "0"
+
+                # CUOTAS PAGADAS
+                deudor_por_venta['cuotas_pagadas'] = "Contado"
+
+                # TOTAL PAGADO
+                total_pagado = ultima_venta.precio_final_de_venta;
+                deudor_por_venta['total_pagado'] = unicode('{:,}'.format(total_pagado)).replace(",", ".")
+                deudores_por_venta.append(deudor_por_venta)
+
+    print "ventas al contado:" + unicode(ventas_al_contado)
     return deudores_por_venta
 
 def obtener_clientes_atrasados_del_dia():
