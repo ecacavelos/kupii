@@ -9,14 +9,19 @@ class LoteForm(ModelForm):
     required_css_class = 'required'
     class Meta:
         model = Lote
-        exclude = ('vendido', 'fecha_de_venta'),        
+        exclude = ('vendido', 'fecha_de_venta'),
+        labels = {
+            'precio_costo': ('Costo'),
+            'codigo_paralot': ('Codigo'),
+        }
         widgets = {
                  'nro_lote': TextInput,
                  'precio_contado': TextInput,
                  'precio_credito': TextInput,
                  'precio_costo': TextInput,
                  'superficie': TextInput,
-                 'boleto_nro': TextInput,                 
+                 'boleto_nro': TextInput,
+                 'cuota': TextInput,
          }
         
 #class LoteIdentifierForm(Form):

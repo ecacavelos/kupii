@@ -273,6 +273,7 @@ class Lote(models.Model):
     codigo_paralot = models.CharField(max_length=20,blank=True, null=True)
     nro_lote = models.IntegerField()    
     manzana = models.ForeignKey(Manzana,on_delete=models.PROTECT)
+    cuota = models.IntegerField()
     precio_contado = models.IntegerField()
     precio_credito = models.IntegerField()
     precio_costo = models.IntegerField()
