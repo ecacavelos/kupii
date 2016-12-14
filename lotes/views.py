@@ -224,7 +224,8 @@ def detalle_lote(request, lote_id):
             data['precio_contado'] = int(data['precio_contado'].replace(".", "")) 
             data['precio_credito'] = int(data['precio_credito'].replace(".", ""))
             data['precio_costo'] = int(data['precio_costo'].replace(".", ""))
-            data['cuota'] = int(data['cuota'].replace(".", ""))
+            if data['cuota'] != "":
+                data['cuota'] = int(data['cuota'].replace(".", ""))
             if form.is_valid():
                 message = "Se actualizaron los datos."
                 message_id = "message-success"
@@ -333,6 +334,7 @@ def agregar_lotes(request):
 
     if request.method == 'POST':
         form = LoteForm(request.POST)
+        form2 = FraccionManzana()
         if form.is_valid():
             form.save()
             id_objeto = form.instance.id
@@ -343,7 +345,10 @@ def agregar_lotes(request):
             # Redireccionamos al listado de lotes luego de agregar el nuevo lote.
             loggear_accion(request.user, "Agregar", "Lote", id_objeto, codigo_lote)
             #return HttpResponseRedirect('/lotes/listado')
-            return HttpResponseRedirect(reverse('frontend_listado_lote'))
+            #return HttpResponseRedirect(reverse('frontend_listado_lote'))
+            message = "Lote Agregado"
+            form = LoteForm()
+            form2 = FraccionManzana()
         else:
             form = LoteForm()
             form2 = FraccionManzana()
