@@ -224,6 +224,7 @@ def detalle_lote(request, lote_id):
             data['precio_contado'] = int(data['precio_contado'].replace(".", "")) 
             data['precio_credito'] = int(data['precio_credito'].replace(".", ""))
             data['precio_costo'] = int(data['precio_costo'].replace(".", ""))
+            data['cuota'] = int(data['cuota'].replace(".", ""))
             if form.is_valid():
                 message = "Se actualizaron los datos."
                 message_id = "message-success"

@@ -63,6 +63,16 @@
             //console.log("\n"+str);
             //console.log("\n"+res);
             $("#id_superficie").val(res);
+
+            var res = $("#id_cuota").val();
+            for (i = 0; i < res.length; i++) {
+                res = res.replace(".", "");
+            }
+            res = res.replace(",", ".");
+            //console.log("\n"+str);
+            //console.log("\n"+res);
+            $("#id_cuota").val(res);
+
             $("#form_add_lote").submit();
         }
 

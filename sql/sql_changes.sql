@@ -1,5 +1,5 @@
 -- DEJAR SIEMPRE ESTO EN LA PARTE DE ARRIBA COMO EJEMPLO PARA REEMPLAZAR!!! ORDEN DESCENDENTE POR FECHA --
-/* INSTANCIAS DE BASES DE DATOS DEL PULPO:
+/* INSTANCIAS DE BASES DE DATOS DE KUPII:
   1- CBI-DEV: Base de datos ubicada en el servidor de desarrollo de CBI.
   2- PROPAR: Base de datos de produccion, del sistema de lotes de PROPAR.
   3- KUPII-DEMO:  Base de datos demo en azure del sistema de lotes KUPII.
