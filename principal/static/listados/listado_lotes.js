@@ -1,6 +1,14 @@
 	$(document).ready(function() {
 		$("#busqueda_label").focus();
 		$("#busqueda_label").autocomplete();
+
+		$("#tipo_busqueda").val(tipo_busqueda);
+		$("#busqueda_label").val(busqueda_label);
+		$("#busqueda").val(busqueda);
+		$("#nombre_frac2_label_value").val(fraccion_segun_estado);
+		$("#formato-reporte").val(formato_reporte);
+
+
 		if ($("#tipo_busqueda").val() == "codigo"){
 			$("#label_busqueda").html("Codigo Lote:");
 			console.log("Por codigo");

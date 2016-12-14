@@ -387,8 +387,8 @@ def listar_busqueda_lotes(request):
     busqueda = request.GET.get('busqueda','')
     tipo_busqueda=request.GET.get('tipo_busqueda','')
     busqueda_label = request.GET.get('busqueda_label','')
-    fraccion_segun_estado =   request.GET.get('nombre_frac2_label_value', '')
-
+    fraccion_segun_estado = request.GET.get('nombre_frac2_label_value', '')
+    formato_reporte = request.GET.get('formato-reporte','')
     if busqueda == '' and busqueda_label == '':
         tipo_busqueda = ''
     
@@ -397,9 +397,9 @@ def listar_busqueda_lotes(request):
     # BUSQUEDA
     lista_ordenada = obtener_lotes_filtrados(busqueda, tipo_busqueda, busqueda_label, fraccion_segun_estado, "numero_lote")
 
-    if request.GET.get('formato-reporte','') == 'pantalla':
+    if formato_reporte == 'pantalla':
         # PAGINACION
-        ultima_busqueda = "&tabla=&busqueda=" + busqueda + "&tipo_busqueda=" + tipo_busqueda + "&busqueda_label=" + busqueda_label
+        ultima_busqueda = "&tabla=&busqueda=" + busqueda + "&tipo_busqueda=" + tipo_busqueda + "&busqueda_label=" + busqueda_label +"&formato-reporte=" + formato_reporte + "&nombre_frac2_label_value=" + fraccion_segun_estado
         object_list = lista_ordenada
 
         paginator = Paginator(object_list, 50)
@@ -414,6 +414,11 @@ def listar_busqueda_lotes(request):
         c = RequestContext(request, {
             'object_list': lista,
             'ultima_busqueda': ultima_busqueda,
+            'busqueda': busqueda,
+            'tipo_busqueda': tipo_busqueda,
+            'busqueda_label': busqueda_label,
+            'formato_reporte': formato_reporte,
+            'fraccion_segun_estado': fraccion_segun_estado,
         })
         return HttpResponse(t.render(c))
 

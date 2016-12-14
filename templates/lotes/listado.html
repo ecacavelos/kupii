@@ -1,5 +1,13 @@
 {% extends "lotes/base_lotes.html" %}
 {% block header_scripts %}
+<script type="text/javascript">
+    var ultima_busqueda = "{{ ultima_busqueda }}";
+    var busqueda = "{{ busqueda }}";
+    var tipo_busqueda = "{{ tipo_busqueda }}";
+    var busqueda_label = "{{ busqueda_label }}";
+    var formato_reporte = "{{ formato_reporte }}";
+    var fraccion_segun_estado = "{{ fraccion_segun_estado }}";
+</script>
 <script type="text/javascript" src="{{ STATIC_URL }}listados/listado_lotes.js"></script>
 {% endblock %}
 {% block content %}
@@ -14,7 +22,7 @@
 
 <div class="grid_6">
 	<form name="frm_busqueda" id="frm_busqueda" method="get" action="/lotes/listado_busqueda_lotes/">
-		{% csrf_token %}
+		<!--{% csrf_token %}-->
 		<table id="lista-categoria" frame="box">
 			<tr>
 				<th class="acciones"  colspan="3"><strong><a href="#" style="color: white;">Filtrar</a></strong></th>
@@ -30,6 +38,7 @@
 				<td> Lotes por: </td>
 				<td>
 					<select id="tipo_busqueda" name="tipo_busqueda">
+                        <option value="">Elije un tipo de busqueda</option>
 						<option value="codigo">Codigo de Lote</option>
 						<option value="nombre">Nombre de Cliente</option>
 						<option value="cedula">Cedula de Cliente</option>	
@@ -127,13 +136,13 @@
 			<span class="step-links">
 				Mostrando {{ object_list.start_index }}-{{ object_list.end_index }} de {{ object_list.paginator.count }} Resultados
 				{%if object_list.has_previous%} 
-				<a href="?page={{ object_list.first_index}}{{ultimo}}"> Primera </a> 
-				<a href="?page={{ object_list.previous_page_number }}{{ultimo}}"> Anterior</a> 
+				<a href="?page={{ object_list.first_index}}{{ultima_busqueda}}"> Primera </a>
+				<a href="?page={{ object_list.previous_page_number }}{{ultima_busqueda}}"> Anterior</a>
 				{%endif%}
 				P&aacute;gina |{{object_list.number}}|		
 				{%if object_list.has_next%} 
-				<a href="?page={{ object_list.next_page_number }}{{ultimo}}"> Siguiente </a> 				
-				<a href="?page={{ object_list.end_index}}{{ultimo}}"> Ultima </a> 
+				<a href="?page={{ object_list.next_page_number }}{{ultima_busqueda}}"> Siguiente </a>
+				<a href="?page={{ object_list.end_index}}{{ultima_busqueda}}"> Ultima </a>
 				{%endif%} 
 			</span>
 		</div>
