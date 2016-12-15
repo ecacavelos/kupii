@@ -12,6 +12,6 @@
 -- query en cuestion --
 -- agregar siempre despues de este ejemplo el siguiente cambio --
 
--- 13/12/2016 16:0 - Franco Albertini - CBI-DEV: NO EJECUTADO - PROPAR: EJECUTADO  - KUPII-DEMO: NO EJECUTADO
+-- 13/12/2016 16:0 - Franco Albertini - CBI-DEV: EJECUTADO - PROPAR: EJECUTADO  - KUPII-DEMO: NO EJECUTADO
 /* Se agrega la columna Cuota a la tabla Lotes */
  ALTER TABLE principal_lote ADD COLUMN cuota integer;

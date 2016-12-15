@@ -1,12 +1,18 @@
 	$(document).ready(function() {
 		$("#busqueda_label").focus();
 		$("#busqueda_label").autocomplete();
+		var busqueda_label_text = busqueda_label;
 
 		$("#tipo_busqueda").val(tipo_busqueda);
-		$("#busqueda_label").val(busqueda_label);
+		// se pone busqueda label mas abajo porque se borra al inicializarse
 		$("#busqueda").val(busqueda);
 		$("#nombre_frac2_label_value").val(fraccion_segun_estado);
-		$("#formato-reporte").val(formato_reporte);
+		if(formato_reporte == ""){
+			$("#formato-reporte").val("pantalla");
+		} else {
+			$("#formato-reporte").val(formato_reporte);
+		}
+
 
 
 		if ($("#tipo_busqueda").val() == "codigo"){
@@ -149,6 +155,8 @@
 			$("#busqueda_label").autocomplete("destroy");
 				autocompleteFraccionPorNombre(tipo_busqueda, busqueda_label, busqueda);
 			}
+
+
 		});
 		
 		
@@ -157,7 +165,7 @@
 			//los otros se completa este campo con el autocomplete, este le seteamos al momento
 			$("#busqueda").val($('#estado_lote').val());
 		});
-		
+		$("#busqueda_label").val(busqueda_label_text);
 	});
 	
 function autocompleteFraccionPorNombre(tipo_busqueda, busqueda_label, busqueda){
