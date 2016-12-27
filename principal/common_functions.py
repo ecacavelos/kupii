@@ -1,7 +1,7 @@
 from django.db.models import Sum
 from django.db import connection
 from principal.models import Lote, Cliente, PlanDePago, Fraccion, Venta, \
-    PagoDeCuotas, RecuperacionDeLotes, LogUsuario, CoordenadasFactura, Reserva
+    PagoDeCuotas, RecuperacionDeLotes, LogUsuario, CoordenadasFactura, Reserva, ConfiguracionIntereses
 from principal.monthdelta import MonthDelta
 from calendar import monthrange
 from django.core import serializers
@@ -17,6 +17,8 @@ import math
 import json
 from principal.excel_styles import *
 import logging
+from propar01.settings import CODIGO_DE_EMPRESA
+from django.utils import timezone
 
 
 def get_cuotas_detail_by_lote(lote_id):
@@ -61,7 +63,8 @@ def get_cuotas_detail_by_lote(lote_id):
 
 def loggear_accion(usuario, accion, tipo_objeto, id_objeto, codigo_lote=''):
     log = LogUsuario()
-    log.fecha_hora = datetime.datetime.now()
+    # log.fecha_hora = datetime.datetime.now()
+    log.fecha_hora = timezone.now()
     log.usuario = usuario
     log.accion = accion
     log.tipo_objeto = tipo_objeto
@@ -275,9 +278,9 @@ def filtros_establecidos(request, tipo_informe):
     elif tipo_informe == 'informe_movimientos':
         try:
             objeto = {
-                'lote_ini': request['lote_ini'], 
+                'lote_ini': request['lote_ini'],
                 'lote_fin': request['lote_fin'],
-                'fecha_ini': request['fecha_ini'], 
+                'fecha_ini': request['fecha_ini'],
                 'fecha_fin': request['fecha_fin']
             }
             print "Filtros: " + unicode(objeto)
@@ -288,9 +291,9 @@ def filtros_establecidos(request, tipo_informe):
     elif tipo_informe == "informe_general":
         try:
             objeto = {
-                'fraccion_ini': request['fraccion_ini'], 
+                'fraccion_ini': request['fraccion_ini'],
                 'fraccion_fin': request['fraccion_fin'],
-                'fecha_ini': request['fecha_ini'], 
+                'fecha_ini': request['fecha_ini'],
                 'fecha_fin': request['fecha_fin']
             }
             print "Filtros: " + unicode(objeto)
@@ -309,7 +312,7 @@ def filtros_establecidos(request, tipo_informe):
     elif tipo_informe == "liquidacion_vendedores":
         try:
             objeto = {
-                'fecha_ini': request['fecha_ini'], 
+                'fecha_ini': request['fecha_ini'],
                 'fecha_fin': request['fecha_fin'],
                 'busqueda': request['busqueda']
             }
@@ -321,7 +324,7 @@ def filtros_establecidos(request, tipo_informe):
     elif tipo_informe == "liquidacion_general_vendedores":
         try:
             objeto = {
-                'fecha_ini': request['fecha_ini'], 
+                'fecha_ini': request['fecha_ini'],
                 'fecha_fin': request['fecha_fin']
             }
             print "Filtros: " + unicode(objeto)
@@ -348,7 +351,7 @@ def filtros_establecidos(request, tipo_informe):
     elif tipo_informe == "informe_pagos_practipago":
         try:
             objeto = {
-                'fecha_ini': request['fecha_ini'], 
+                'fecha_ini': request['fecha_ini'],
                 'fecha_fin': request['fecha_fin'],
                 'sucursal': request['sucursal']
             }
@@ -360,7 +363,7 @@ def filtros_establecidos(request, tipo_informe):
     elif tipo_informe == 'listado_clientes':
         try:
             objeto = {
-                'tipo_busqueda': request['tipo_busqueda'], 
+                'tipo_busqueda': request['tipo_busqueda'],
                 'busqueda_label': request['busqueda_label']
             }
             print "Filtros: " + unicode(objeto)
@@ -371,7 +374,7 @@ def filtros_establecidos(request, tipo_informe):
     elif tipo_informe == 'informe_cuotas_devengadas':
         try:
             objeto = {
-                'fecha_ini': request['fecha_ini'], 
+                'fecha_ini': request['fecha_ini'],
                 'fecha_fin': request['fecha_fin']
             }
             print "Filtros: " + unicode(objeto)
@@ -408,6 +411,10 @@ def obtener_detalle_interes_lote(lote_id, fecha_pago_parsed, proximo_vencimiento
 
         detalles = []
         sumatoria_intereses = 0
+        es_ref = False
+        cantidad_pagos_ref = 0
+        fecha_dias_gracia = ""
+        gestion_cobranza = {}
         # El cliente tiene cuotas atrasadas
         if fecha_pago_parsed > proximo_vencimiento_parsed:
 
@@ -434,27 +441,29 @@ def obtener_detalle_interes_lote(lote_id, fecha_pago_parsed, proximo_vencimiento
                     cuotas_atrasadas = 1
 
             monto_cuota = venta.precio_de_cuota
-
             # Intereses (valores constantes)
             # Interes moratorio por dia
-            interes = 0.001
+            config_intereses = ConfiguracionIntereses.objects.get(codigo_empresa=CODIGO_DE_EMPRESA)
+            interes = config_intereses.porcentaje_interes_cuota
 
             # Interes
             # interes_punitorio=0.00030
-
             # Intereses IVA
             # interes_iva=0.00013
             interes_iva = 0.0001
             # total_intereses=interes+interes_punitorio+interes_iva
-            total_intereses = interes + interes_iva
-            # Verificar si tiene cuotas de refuerzo
-            if venta.plan_de_pago.cuotas_de_refuerzo != 0:
-                pagos = get_pago_cuotas(venta, None, None)
-                cantidad_pagos_ref = cant_cuotas_pagadas_ref(pagos)
-                es_ref = True
+            if config_intereses.codigo_empresa == "VIER":
+                total_intereses = interes
             else:
-                cantidad_pagos_ref = 0
-                es_ref = False
+                total_intereses = interes + interes_iva
+                # Verificar si tiene cuotas de refuerzo
+                if venta.plan_de_pago.cuotas_de_refuerzo != 0:
+                    pagos = get_pago_cuotas(venta, None, None)
+                    cantidad_pagos_ref = cant_cuotas_pagadas_ref(pagos)
+                    es_ref = True
+                else:
+                    cantidad_pagos_ref = 0
+                    es_ref = False
 
             if int(nro_cuotas_a_pagar) < int(cuotas_atrasadas):
                 rango = int(nro_cuotas_a_pagar)
@@ -475,24 +484,30 @@ def obtener_detalle_interes_lote(lote_id, fecha_pago_parsed, proximo_vencimiento
                         monto_cuota = venta.precio_de_cuota
                 else:
                     monto_cuota = venta.precio_de_cuota
-
-                detalle['vencimiento'] = fecha_vencimiento.strftime('%d/%m/%Y')
-                fecha_ultimo_vencimiento = datetime.datetime.strptime(detalle['vencimiento'], "%d/%m/%Y").date()
-                fecha_dias_gracia = fecha_ultimo_vencimiento + datetime.timedelta(days=5)
-                dias_habiles = calcular_dias_habiles(fecha_ultimo_vencimiento, fecha_dias_gracia)
+                    detalle['vencimiento'] = fecha_vencimiento.strftime('%d/%m/%Y')
+                    fecha_ultimo_vencimiento = datetime.datetime.strptime(detalle['vencimiento'], "%d/%m/%Y").date()
+                    if config_intereses.codigo_empresa == "VIER" \
+                            and cuotas_atrasadas > config_intereses.cuotas_dias_gracia:
+                        fecha_dias_gracia = fecha_ultimo_vencimiento
+                    else:
+                        fecha_dias_gracia = fecha_ultimo_vencimiento + datetime.timedelta(days=5)
+                        dias_habiles = calcular_dias_habiles(fecha_ultimo_vencimiento, fecha_dias_gracia)
 
                 if dias_habiles < 5:
                     fecha_ultimo_vencimiento = fecha_dias_gracia + datetime.timedelta(days=5 - dias_habiles)
                 detalle['vencimiento_gracia'] = fecha_ultimo_vencimiento.strftime('%d/%m/%Y')
-
                 if fecha_pago_parsed > fecha_ultimo_vencimiento:
-                    intereses = math.ceil(total_intereses * dias_atraso * monto_cuota)
-                    redondeado = roundup(intereses)
+                    if config_intereses.codigo_empresa == "VIER":
+                        intereses = math.ceil(total_intereses * (cuotas_atrasadas - cuota) * monto_cuota)
+                        redondeado = roundup(intereses)
+                    else:
+                        intereses = math.ceil(total_intereses * dias_atraso * monto_cuota)
+                        redondeado = roundup(intereses)
                 else:
                     intereses = 0
                     redondeado = roundup(intereses)
 
-                detalle['interes'] = interes
+                # detalle['interes'] = interes
                 # detalle['interes_punitorio']=interes_punitorio
                 detalle['interes_iva'] = interes_iva
                 detalle['nro_cuota'] = nro_cuota
@@ -515,14 +530,15 @@ def obtener_detalle_interes_lote(lote_id, fecha_pago_parsed, proximo_vencimiento
 
             if cuotas_atrasadas >= 6:
                 # gestion_cobranza = int(0.1*(math.ceil(float(cuotas_atrasadas*monto_cuota))+sumatoria_intereses))
-                gestion_cobranza = roundup(0.05 * ((cuotas_atrasadas * monto_cuota) + sumatoria_intereses) + (
-                    0.05 * ((cuotas_atrasadas * monto_cuota) + sumatoria_intereses)) * 0.10)
+                if config_intereses.gestion_cobranza:
+                    gestion_cobranza = roundup(0.05*(
+                        (cuotas_atrasadas*monto_cuota)+sumatoria_intereses) +
+                                               (0.05*((cuotas_atrasadas*monto_cuota)+sumatoria_intereses))*0.10)
                 detalles.append({'gestion_cobranza': gestion_cobranza, 'tipo': 'gestion_cobranza'})
-
-        print detalles
-        return detalles
-    else:
-        return []
+                print detalles
+            return detalles
+        else:
+            return []
 
 
 def obtener_cuotas_a_pagar(venta, fecha_pago, resumen_cuotas_a_pagar):
@@ -868,26 +884,26 @@ def get_pago_cuotas_2(venta, fecha_ini, fecha_fin):
                         monto_cuota = venta.precio_de_cuota
                         es_refuerzo = False
                     cuota = {
-                        'fecha_de_pago': pago.fecha_de_pago, 
+                        'fecha_de_pago': pago.fecha_de_pago,
                         'id': pago.id,
                         'nro_cuota_y_total': unicode(numero_cuota) + '/' + unicode(
-                                 pago.plan_de_pago.cantidad_de_cuotas), 
+                                 pago.plan_de_pago.cantidad_de_cuotas),
                         'nro_cuota': unicode(numero_cuota),
-                        'monto': unicode(monto_cuota), 
-                        'refuerzo': es_refuerzo, 
+                        'monto': unicode(monto_cuota),
+                        'refuerzo': es_refuerzo,
                         'lote': pago.lote}
                     # cuota['fraccion'] = dict(pago.lote.manzana.fraccion)
                     ventas_pagos_list.append(cuota)
                     numero_cuota += 1
             else:
                 cuota = {
-                    'fecha_de_pago': pago.fecha_de_pago, 
+                    'fecha_de_pago': pago.fecha_de_pago,
                     'id': pago.id,
                     'nro_cuota_y_total': unicode(numero_cuota) + '/' + unicode(
-                             pago.plan_de_pago.cantidad_de_cuotas), 
+                             pago.plan_de_pago.cantidad_de_cuotas),
                     'nro_cuota': unicode(numero_cuota),
-                    'monto': unicode(monto_cuota), 
-                    'refuerzo': es_refuerzo, 
+                    'monto': unicode(monto_cuota),
+                    'refuerzo': es_refuerzo,
                     'lote': pago.lote
                 }
                 # cuota['fraccion'] = pago.lote.manzana.fraccion
@@ -899,26 +915,26 @@ def get_pago_cuotas_2(venta, fecha_ini, fecha_fin):
             if pago.nro_cuotas_a_pagar > 1:
                 for x in xrange(1, pago.nro_cuotas_a_pagar + 1):
                     cuota = {
-                        'fecha_de_pago': pago.fecha_de_pago, 
+                        'fecha_de_pago': pago.fecha_de_pago,
                         'id': pago.id,
                         'nro_cuota_y_total': unicode(numero_cuota) + '/' + unicode(
-                                 pago.plan_de_pago.cantidad_de_cuotas), 
+                                 pago.plan_de_pago.cantidad_de_cuotas),
                         'nro_cuota': unicode(numero_cuota),
-                        'monto': unicode(monto_cuota), 
-                        'refuerzo': es_refuerzo, 
+                        'monto': unicode(monto_cuota),
+                        'refuerzo': es_refuerzo,
                         'lote': pago.lote}
                     # cuota['fraccion'] = pago.lote.manzana.fraccion
                     ventas_pagos_list.append(cuota)
                     numero_cuota += 1
             else:
                 cuota = {
-                    'fecha_de_pago': pago.fecha_de_pago, 
+                    'fecha_de_pago': pago.fecha_de_pago,
                     'id': pago.id,
                     'nro_cuota_y_total': unicode(numero_cuota) + '/' + unicode(
-                             pago.plan_de_pago.cantidad_de_cuotas), 
+                             pago.plan_de_pago.cantidad_de_cuotas),
                     'nro_cuota': unicode(numero_cuota),
-                    'monto': unicode(monto_cuota), 
-                    'refuerzo': es_refuerzo, 
+                    'monto': unicode(monto_cuota),
+                    'refuerzo': es_refuerzo,
                     'lote': pago.lote
                 }
                 # cuota['fraccion'] = pago.lote.manzana.fraccion
@@ -967,12 +983,12 @@ def get_pago_cuotas_3(venta, fecha_ini, fecha_fin):
                         monto_cuota = venta.precio_de_cuota
                         es_refuerzo = False
                     cuota = {
-                        'fecha_de_pago': pago.fecha_de_pago, 
+                        'fecha_de_pago': pago.fecha_de_pago,
                         'id': pago.id,
                         'nro_cuota_y_total': unicode(numero_cuota) + '/' + unicode(
-                                 pago.plan_de_pago.cantidad_de_cuotas), 
+                                 pago.plan_de_pago.cantidad_de_cuotas),
                         'nro_cuota': unicode(numero_cuota),
-                        'monto': unicode(monto_cuota), 
+                        'monto': unicode(monto_cuota),
                         'refuerzo': es_refuerzo}
                     # cuota['lote'] = pago.lote
                     # cuota['fraccion'] = dict(pago.lote.manzana.fraccion)
@@ -980,12 +996,12 @@ def get_pago_cuotas_3(venta, fecha_ini, fecha_fin):
                     numero_cuota += 1
             else:
                 cuota = {
-                    'fecha_de_pago': pago.fecha_de_pago, 
+                    'fecha_de_pago': pago.fecha_de_pago,
                     'id': pago.id,
                     'nro_cuota_y_total': unicode(numero_cuota) + '/' + unicode(
-                             pago.plan_de_pago.cantidad_de_cuotas), 
+                             pago.plan_de_pago.cantidad_de_cuotas),
                     'nro_cuota': unicode(numero_cuota),
-                    'monto': unicode(monto_cuota), 
+                    'monto': unicode(monto_cuota),
                     'refuerzo': es_refuerzo
                 }
                 # cuota['lote'] = pago.lote
@@ -998,12 +1014,12 @@ def get_pago_cuotas_3(venta, fecha_ini, fecha_fin):
             if pago.nro_cuotas_a_pagar > 1:
                 for x in xrange(1, pago.nro_cuotas_a_pagar + 1):
                     cuota = {
-                        'fecha_de_pago': pago.fecha_de_pago, 
+                        'fecha_de_pago': pago.fecha_de_pago,
                         'id': pago.id,
                         'nro_cuota_y_total': unicode(numero_cuota) + '/' + unicode(
-                                 pago.plan_de_pago.cantidad_de_cuotas), 
+                                 pago.plan_de_pago.cantidad_de_cuotas),
                         'nro_cuota': unicode(numero_cuota),
-                        'monto': unicode(monto_cuota), 
+                        'monto': unicode(monto_cuota),
                         'refuerzo': es_refuerzo
                     }
                     # cuota['lote'] = pago.lote
@@ -1012,12 +1028,12 @@ def get_pago_cuotas_3(venta, fecha_ini, fecha_fin):
                     numero_cuota += 1
             else:
                 cuota = {
-                    'fecha_de_pago': pago.fecha_de_pago, 
+                    'fecha_de_pago': pago.fecha_de_pago,
                     'id': pago.id,
                     'nro_cuota_y_total': unicode(numero_cuota) + '/' + unicode(
-                             pago.plan_de_pago.cantidad_de_cuotas), 
+                             pago.plan_de_pago.cantidad_de_cuotas),
                     'nro_cuota': unicode(numero_cuota),
-                    'monto': unicode(monto_cuota), 
+                    'monto': unicode(monto_cuota),
                     'refuerzo': es_refuerzo
                 }
                 # cuota['lote'] = pago.lote
@@ -1196,7 +1212,7 @@ def crear_pdf_factura(nueva_factura, manzana, lote_id, usuario):
         coor = CoordenadasFactura.objects.get(usuario=usuario)
     except Exception as e:
         logging.error('Failed.', exc_info=e)
-        
+
         coor = CoordenadasFactura.objects.get(usuario_id=2)
 
     # INICIO PRIMERA IMPRESION
@@ -1245,7 +1261,7 @@ def crear_pdf_factura(nueva_factura, manzana, lote_id, usuario):
     total_venta = 0
     for key, value in sorted(lista_detalles.iteritems()):
         detalle = {
-            'item': key, 
+            'item': key,
             'cantidad': value['cantidad']
         }
         p.drawString(coor.cantidad_1x * cm, float(pos_y - 0.5) * cm, unicode(detalle['cantidad']))
@@ -1341,7 +1357,7 @@ def crear_pdf_factura(nueva_factura, manzana, lote_id, usuario):
     total_venta = 0
     for key, value in sorted(lista_detalles.iteritems()):
         detalle = {
-            'item': key, 
+            'item': key,
             'cantidad': value['cantidad']
         }
         p.drawString(coor.cantidad_2x * cm, float(pos_y - 0.5) * cm, unicode(detalle['cantidad']))
@@ -1413,15 +1429,15 @@ def crear_json_print_object(factura, manzana, lote_id, usuario):
 
     # nros de facturas
     linea = {
-        "valor": factura.numero, 
-        "coord_x": int(coor.numero_1x * cm), 
+        "valor": factura.numero,
+        "coord_x": int(coor.numero_1x * cm),
         "coord_y": int(coor.numero_1y * cm)
     }
     lineas.append(linea)
 
     linea = {
-        "valor": factura.numero, 
-        "coord_x": int(coor.numero_2x * cm), 
+        "valor": factura.numero,
+        "coord_x": int(coor.numero_2x * cm),
         "coord_y": int(coor.numero_2y * cm)
     }
     lineas.append(linea)
@@ -1437,15 +1453,15 @@ def crear_json_print_object(factura, manzana, lote_id, usuario):
     lineas.append(linea)
 
     linea = {
-        "valor": unicode(fecha), 
-        "coord_x": int(coor.fecha_2x * cm), 
+        "valor": unicode(fecha),
+        "coord_x": int(coor.fecha_2x * cm),
         "coord_y": int(coor.fecha_2y * cm)
     }
     lineas.append(linea)
 
     # nombres clientes
     linea = {
-        "valor": factura.cliente.nombres + " " + factura.cliente.apellidos, 
+        "valor": factura.cliente.nombres + " " + factura.cliente.apellidos,
         "coord_x": int(coor.nombre_1x * cm),
         "coord_y": int(coor.nombre_1y * cm)
     }
@@ -2649,3 +2665,13 @@ def informe_cuotas_por_cobrar_excel(lista_ordenada):
     response['Content-Disposition'] = 'attachment filename=' + 'informe_de_cuotas_por_cobrar_.xls'
     wb.save(response)
     return response
+
+
+def get_mes_pagado_by_id_lote_cant_cuotas(lote_id, cuotas_pag):
+    cuotas_detalles = []
+    try:
+        cuotas_detalles = get_cuota_information_by_lote(lote_id, cuotas_pag)
+        return cuotas_detalles
+    except Exception, error:
+        print error
+        return cuotas_detalles

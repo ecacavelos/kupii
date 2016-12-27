@@ -147,7 +147,7 @@ def consulta(request, codigo_consulta):
                                     item['fecha_vencimiento'] = detalle_cuotas['proximo_vencimiento']
                                     hoy = date.today()
                                     # Esta linea comentada sirve para probar la consulta en una fecha (anho, mes, dia)
-                                    # hoy = datetime.date(2016, 12, 14)
+                                    #hoy = datetime.date(2016, 12, 14)
                                     cuotas_a_pagar_detalle = obtener_cuotas_a_pagar_full(
                                         venta, hoy, detalle_cuotas, 500
                                     )

@@ -2,7 +2,7 @@
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
-from configuraciones import CONFGURACION_BASE_DE_DATOS, TIEMPO_LOGOUT, PATH_ESTATICO
+from configuraciones import CONFIGURACION_BASE_DE_DATOS, TIEMPO_LOGOUT, PATH_ESTATICO, CODIGO_DE_EMPRESA
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
@@ -15,7 +15,7 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
-DATABASES = CONFGURACION_BASE_DE_DATOS
+DATABASES = CONFIGURACION_BASE_DE_DATOS
 
 TEST_RUNNER = 'django.test.runner.DiscoverRunner'
 

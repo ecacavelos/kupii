@@ -110,10 +110,15 @@
 	    	<td width="25px" title="Ver Ventas"><a href="{% url 'frontend_home' %}movimientos/listado_ventas/"><span class="glyphicon glyphicon-list-alt"></span></a></td> 
 		</tr>
 		<tr>
-			<td title="Pago de Cuotas"><a href="{% url 'frontend_home' %}movimientos/pago_cuotas/">Pago de Cuotas</a></td>
+			<td title="Pago de Cuotas por Lote"><a href="{% url 'frontend_home' %}movimientos/pago_cuotas/">Pago de Cuotas por Lote</a></td>
 			<td width="25px" title="Agregar Pago"><a href="{% url 'frontend_home' %}movimientos/pago_cuotas/"><span class="glyphicon glyphicon-pencil"></span></a></td>
 	    	<td width="25px" title="Ver Pagos"><a href="{% url 'frontend_home' %}movimientos/listado_pagos/"><span class="glyphicon glyphicon-list-alt"></span></a></td>
-		</tr>		
+		</tr>
+        <tr>
+			<td title="Pago de Cuotas por Cliente"><a href="{% url 'frontend_home' %}movimientos/pago_cuotas_cliente/">Pago de Cuotas por Cliente</a></td>
+			<td width="25px" title="Agregar Pago"><a href="{% url 'frontend_home' %}movimientos/pago_cuotas_cliente/"><span class="glyphicon glyphicon-pencil"></span></a></td>
+	    	<td width="25px" title="Ver Pagos"><a href="{% url 'frontend_home' %}movimientos/listado_pagos/"><span class="glyphicon glyphicon-list-alt"></span></a></td>
+		</tr>
         <tr>
 			<td title="Prox Pago de Cuotas"><a href="{% url 'frontend_home' %}lotes/consultar/">Próx Pago de Cuotas</a></td>
             <td width="25px" ></td>
@@ -144,7 +149,7 @@
 <div class="grid_6">
 	<table width="90%" border="0" cellpadding="0" cellspacing="0" id="lista-categoria" align="center">
 		<tr>
-			<th class="acciones"><a href="{% url 'frontend_home' %}informes/" style="color: white;">Informes</a></strong></th>
+			<th class="acciones"><strong><a href="{% url 'frontend_home' %}informes/" style="color: white;">Informes</a></strong></th>
 		</tr>
 		<tr>
 			<td class="last" title="Lotes Libres">
@@ -239,7 +244,10 @@
 				<td class="last" title="Vender Lote"><a href="{% url 'frontend_home' %}movimientos/ventas_lotes/">Vender Lote</a></td>
 			  </tr>
 			  <tr>
-				<td class="last" title="Pago de Cuotas"><a href="{% url 'frontend_home' %}movimientos/pago_cuotas/">Pago de Cuotas</a></td>
+				<td class="last" title="Pago de Cuotas por Lote"><a href="{% url 'frontend_home' %}movimientos/pago_cuotas/">Pago de Cuotas por Lote</a></td>
+			  </tr>
+              <tr>
+                  <td class="last" title="Pago de Cuotas por Cliente"><a href="{% url 'frontend_home' %}movimientos/pago_cuotas_cliente/">Pago de Cuotas por Cliente</a></td>
 			  </tr>
 			  <tr>
 				<td class="last" title="Prox Pago de Cuotas"><a href="{% url 'frontend_home' %}lotes/consultar/">Próx Pago de Cuotas</a></td>

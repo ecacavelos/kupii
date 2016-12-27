@@ -418,6 +418,8 @@
 				});
 				// devuelve el pdf
 				request.done(function(msg) {
+					alert("Factura guardada.");
+					window.location = base_context + "/facturacion/listado/";
 				});
     			return true;
 			}

@@ -6,6 +6,7 @@ urlpatterns = patterns('movimientos.views',
     url(r'^ventas_lotes/$', 'ventas_de_lotes'),
     url(r'^ventas_lotes/calcular_cuotas/$', 'ventas_de_lotes_calcular_cuotas'),
     url(r'^pago_cuotas/$', 'pago_de_cuotas'),
+    url(r'^pago_cuotas_cliente/$', 'pago_de_cuotas_cliente'),
     url(r'^pago_cuotas_venta/(?P<id_venta>\d+)/$', 'pago_de_cuotas_venta'),
     url(r'^calcular_interes/$', 'calcular_interes'),
     url(r'^reservas_lotes/$', 'reservas_de_lotes'),
@@ -31,5 +32,6 @@ urlpatterns = patterns('movimientos.views',
     url(r'^listado_busqueda_cambios/$', 'listar_busqueda_cambios'),
     url(r'^listado_busqueda_recuperacion/$', 'listar_busqueda_recuperacion'),
     url(r'^eliminar_pagodecuotas/$', 'eliminar_pagodecuotas'),
-
-)   
+    url(r'^get_cuotas_a_pagar_by_cliente_id/$', 'get_cuotas_a_pagar_by_cliente_id'),
+    url(r'^get_cuotas_a_pagar_by_venta_id_nro_cuotas/$', 'get_cuotas_a_pagar_by_venta_id_nro_cuotas'),
+)

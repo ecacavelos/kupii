@@ -586,7 +586,7 @@ class CoordenadasFactura(models.Model):
     # Credito
     credito_2x = models.FloatField()
     credito_2y = models.FloatField()
-    # Fraccion
+    #Fraccion
     fraccion_2x = models.FloatField()
     fraccion_2y = models.FloatField()
     # Nombre
@@ -728,3 +728,11 @@ class PermisosAdicionales(models.Model):
             ('ver_informes', 'Ver informes'),
             ('ver_ficha_lote', 'Ver Ficha Lote')
         )
+
+
+class ConfiguracionIntereses(models.Model):
+    codigo_empresa = models.CharField(max_length=4)
+    porcentaje_interes_cuota = models.IntegerField()
+    gestion_cobranza = models.BooleanField(blank=False, null=False, default=False)
+    dias_de_gracia = models.IntegerField()
+    cuotas_dias_gracia = models.IntegerField()
