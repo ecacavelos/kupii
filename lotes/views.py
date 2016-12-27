@@ -395,7 +395,7 @@ def listar_busqueda_lotes(request):
     
     #se busca un lote
     # BUSQUEDA
-    lista_ordenada = obtener_lotes_filtrados(busqueda, tipo_busqueda, busqueda_label, fraccion_segun_estado, "numero_lote")
+    lista_ordenada = obtener_lotes_filtrados(busqueda, tipo_busqueda, busqueda_label, fraccion_segun_estado)
 
     if formato_reporte == 'pantalla':
         # PAGINACION

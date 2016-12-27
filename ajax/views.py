@@ -453,7 +453,7 @@ def get_fracciones_by_id(request):
         if request.user.is_authenticated():
             try:    
                 id_fraccion = request.GET['term']
-                print("term ->" + id_fraccion);
+                print("term ->" + id_fraccion)
                 object_list = Fraccion.objects.filter(id__icontains=id_fraccion).order_by('id')
                 labels=["nombre"]         
                 json_object_list = custom_json(object_list,labels)       
@@ -486,7 +486,7 @@ def get_ventas_by_lote(request):
             try:
                 lote_id = request.GET['lote_id']
                 print("lote_id ->" + lote_id)
-                #venta = Venta.objects.filter(lote=lote_id).order_by('-id')[:1]
+                # venta = Venta.objects.filter(lote=lote_id).order_by('-id')[:1]
                 venta = [get_ultima_venta(lote_id)]
                 print venta
                 object_list = [ob.as_json() for ob in venta]
@@ -951,7 +951,7 @@ def imprimir_factura(request):
             # response = crear_pdf_factura(factura, request, manzana, lote_id, request.user)
             # response = base64.b64encode(response.content)
 
-            response = crear_JSON_print_object(factura, request, manzana, lote_id, request.user)
+            response = crear_json_print_object(factura, request, manzana, lote_id, request.user)
             return HttpResponse(response, content_type="application/json")
     else:
         return HttpResponseRedirect(reverse('login'))  

@@ -9,5 +9,5 @@ urlpatterns = patterns('lotes.views',
     url(r'^agregar/$', 'agregar_lotes'),
     url(r'^listado_busqueda_lotes/$', 'listar_busqueda_lotes'),
     url(r'^listado_busqueda_lotes/(?P<lote_id>\d+)/$', 'detalle_lote'),
-#     url(r'^prueba/$', 'prueba'),
+    #url(r'^prueba/$', 'prueba'),
 )

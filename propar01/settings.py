@@ -1,8 +1,9 @@
-
 # Django settings for propar01 project.
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+from configuraciones import CONFGURACION_BASE_DE_DATOS, TIEMPO_LOGOUT, PATH_ESTATICO
+
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 DEBUG = True
@@ -13,29 +14,10 @@ ADMINS = (
 )
 
 MANAGERS = ADMINS
-'''
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',     # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'propar_db',                                     # Or path to database file if using sqlite3.
-        'USER': 'propar_db_owner',                                     # Not used with sqlite3.
-        'PASSWORD': 'elpaipatinero',                                   # Not used with sqlite3.
-        'HOST': '192.168.50.51',                                             # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '5432',                                         # Set to empty string for default. Not used with sqlite3.
-    }
-}
-'''
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',     # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'propar_prod_02062016',                                     # Or path to database file if using sqlite3.
-        'USER': 'postgres',                                     # Not used with sqlite3.
-        'PASSWORD': 'elpaipatinero',                                   # Not used with sqlite3.
-        'HOST': '192.168.50.51',                                             # Set to empty string for localhost. Not used with sqlite3.# Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '5432',                                         # Set to empty string for default. Not used with sqlite3.
-    }
-}
+DATABASES = CONFGURACION_BASE_DE_DATOS
+
+TEST_RUNNER = 'django.test.runner.DiscoverRunner'
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -73,7 +55,7 @@ MEDIA_URL = ''
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
-STATIC_ROOT = ''
+STATIC_ROOT = PATH_ESTATICO
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
@@ -84,7 +66,7 @@ STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    
+
 )
 
 # List of finder classes that know how to find static files in
@@ -92,7 +74,7 @@ STATICFILES_DIRS = (
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-#    'django.contrib.staticfiles.finders.DefaultStorageFinder',
+    # 'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
 # Make this unique, and don't share it with anybody.
@@ -102,7 +84,7 @@ SECRET_KEY = '#$r!i=dy9wcye0(b5s@bmi_-sqt=iy+92*3o5s&amp;)+$s)gbx1qx'
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
-#     'django.template.loaders.eggs.Loader',
+    # 'django.template.loaders.eggs.Loader',
 )
 
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
@@ -118,8 +100,7 @@ MIDDLEWARE_CLASSES = (
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-
-AUTO_LOGOUT_DELAY = 15 #equivale a 15 minutos de tiempo idle
+AUTO_LOGOUT_DELAY = TIEMPO_LOGOUT  # equivale a 15 minutos de tiempo idle
 
 ROOT_URLCONF = 'propar01.urls'
 
@@ -136,9 +117,9 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 )
 
 # TEMPLATE_DIRS = (
-    # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
-    # Always use forward slashes, even on Windows.
-    # Don't forget to use absolute paths, not relative paths.
+# Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
+# Always use forward slashes, even on Windows.
+# Don't forget to use absolute paths, not relative paths.
 #     '/Users/esteban/Projects/Propar/templates'
 
 # )
@@ -161,7 +142,7 @@ INSTALLED_APPS = (
     'movimientos',
     'propietarios',
     'manzanas',
-    'facturas',    
+    'facturas',
     'timbrados',
     'api',
     'sucursal',
