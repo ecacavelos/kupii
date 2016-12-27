@@ -154,7 +154,9 @@ def consulta(request, codigo_consulta):
                                             item['numero_cuota_a_pagar'] = cuota_detalle[0]['nro_cuota'].split('/')[0]                    
                                             item['fecha_vencimiento'] = detalle_cuotas['proximo_vencimiento']
                                             hoy = date.today()
-                                            cuotas_a_pagar_detalle = obtener_cuotas_a_pagar(venta,hoy,detalle_cuotas)
+                                            cuotas_a_pagar_detalle = obtener_cuotas_a_pagar_full(
+                                                venta, hoy, detalle_cuotas, 500
+                                            )
     #                                         cuotas_a_pagar_detalle = obtener_cuotas_a_pagar(venta,date(2015,4,12),detalle_cuotas)                                        
                                             item['detalle_cuotas'] = cuotas_a_pagar_detalle
                                             
