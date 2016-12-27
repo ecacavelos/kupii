@@ -951,18 +951,19 @@ def imprimir_factura(request):
             # response = crear_pdf_factura(factura, request, manzana, lote_id, request.user)
             # response = base64.b64encode(response.content)
 
-            response = crear_json_print_object(factura, request, manzana, lote_id, request.user)
+            response = crear_json_print_object(factura, manzana, lote_id, request.user)
             return HttpResponse(response, content_type="application/json")
     else:
         return HttpResponseRedirect(reverse('login'))  
-        
+
+
 def get_plan_vendedor(request):
     if request.method == 'GET':
         if request.user.is_authenticated():
             try:
                 id_vendedor = request.GET['id_vendedor']
-                print("id_vendedor ->" + id_vendedor);
-                vendedor = Vendedor.objects.get(id = id_vendedor)
+                print("id_vendedor ->" + id_vendedor)
+                vendedor = Vendedor.objects.get(id=id_vendedor)
                 if hasattr(vendedor, 'plan_vendedor'):
                     plan_vendedor = vendedor.plan_vendedor
                     object_list = PlanDePagoVendedor.objects.filter(id=plan_vendedor.id)
