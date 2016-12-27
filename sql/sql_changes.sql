@@ -12,7 +12,7 @@
 -- query en cuestion --
 -- agregar siempre despues de este ejemplo el siguiente cambio --
 
--- 27/12/2016 16:0 - Franco Albertini - CBI-DEV: EJECUTADO - PROPAR: EJECUTADO  - KUPII-DEMO: NO EJECUTADO
+-- 27/12/2016 16:0 - Franco Albertini - CBI-DEV: NO EJECUTADO - PROPAR: EJECUTADO  - KUPII-DEMO: EJECUTADO
 /* Se crea la tabla de configuraciones de intereses */
   CREATE TABLE principal_configuracionintereses
 (
@@ -29,11 +29,15 @@ WITH (
   OIDS=FALSE
 );
 ALTER TABLE principal_configuracionintereses
-  OWNER TO kupii_user; -- cambiar el owner de acuerdo a la BD --
+  OWNER TO propar_db_user; -- cambiar el owner de acuerdo a la BD  ej: kupii_user --
 
 INSERT INTO principal_configuracionintereses
 (porcentaje_interes_cuota, codigo_empresa, gestion_cobranza, cuotas_dias_gracia, dias_de_gracia)
-VALUES (0.001, 'PROP', false, 1, 5); -- cambiar de acuerdo a la BD --
+VALUES (0.001, 'PROP', true, 1, 5); -- Insertar de acuerdo a la base de dato del cliente
+
+INSERT INTO principal_configuracionintereses
+(porcentaje_interes_cuota, codigo_empresa, gestion_cobranza, cuotas_dias_gracia, dias_de_gracia)
+VALUES (0.03, 'VIER', false, 1, 5); -- Insertar de acuerdo a la base de dato del cliente
 
 -- 13/12/2016 16:0 - Franco Albertini - CBI-DEV: EJECUTADO - PROPAR: EJECUTADO  - KUPII-DEMO: NO EJECUTADO
 /* Se agrega la columna Cuota a la tabla Lotes */
