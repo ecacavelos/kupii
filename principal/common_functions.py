@@ -622,7 +622,7 @@ def obtener_cuotas_a_pagar_full(venta, fecha_pago, resumen_cuotas_a_pagar, maxim
     cantidad_cuotas = 0
     sumatoria_cuotas = 0
 
-    if not resumen_cuotas_a_pagar['contado']:
+    if not resumen_cuotas_a_pagar['contado'] and resumen_cuotas_a_pagar['cant_cuotas_pagadas'] != resumen_cuotas_a_pagar['cantidad_total_cuotas']:
         proximo_vencimiento = datetime.datetime.strptime(
             resumen_cuotas_a_pagar['proximo_vencimiento'], "%d/%m/%Y"
         ).date()

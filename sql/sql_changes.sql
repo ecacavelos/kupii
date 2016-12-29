@@ -12,7 +12,7 @@
 -- query en cuestion --
 -- agregar siempre despues de este ejemplo el siguiente cambio --
 
--- 27/12/2016 16:0 - Franco Albertini - CBI-DEV: NO EJECUTADO - PROPAR: EJECUTADO  - KUPII-DEMO: EJECUTADO
+-- 27/12/2016 16:0 - Franco Albertini - CBI-DEV: EJECUTADO - PROPAR: EJECUTADO  - KUPII-DEMO: EJECUTADO
 /* Se crea la tabla de configuraciones de intereses */
   CREATE TABLE principal_configuracionintereses
 (

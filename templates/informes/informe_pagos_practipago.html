@@ -259,14 +259,17 @@
 					<td colspan="2" style="text-align: right">{{pago.detalle}}</td>
 					<td colspan="1">Total pagado: {{pago.monto}}</td>
 
-					{% if pago.id_transaccion %}
-						<td> {{pago.id_transaccion}} </td>
+					{% if pago.transaccion_id %}
+						<td> {{pago.transaccion_id}} </td>
 					{% else %}
 						<td> Interna </td>
 					{% endif %}
 
 					{% if pago.factura %}
-						<td> {{pago.factura.numero}} </td>
+                        <td>
+                            <a href="{% url 'frontend_home' %}facturacion/listado/{{pago.factura.id}}"><strong>{{pago.factura.numero}}</strong></a>
+                        </td>
+
 					{% else %}
 						<td> No Facturado </td>
 					{% endif %}
@@ -285,14 +288,16 @@
 					<td colspan="2" style="text-align: right">{{pago.detalle}}</td>
 					<td colspan="1">Total pagado: {{pago.monto}}</td>
 					
-					{% if pago.id_transaccion %}
-						<td> {{pago.id_transaccion}} </td>
+					{% if pago.transaccion_id %}
+						<td> {{pago.transaccion_id}} </td>
 					{% else %}
 						<td> Interna </td>
 					{% endif %}
 					
 					{% if pago.factura %}
-						<td> {{pago.factura.numero}} </td>
+						<td>
+                            <a href="{% url 'frontend_home' %}facturacion/listado/{{pago.factura.id}}"><strong>{{pago.factura.numero}}</strong></a>
+                        </td>
 					{% else %}
 						<td> No Facturado </td>
 					{% endif %}
