@@ -6740,96 +6740,124 @@ def informe_pagos_practipago(request):
                     for transaccion in lista_transacciones:
                         try:
                             if sucursal_id is None or sucursal_id == '':
+                                detalle = ""
                                 pago = PagoDeCuotas.objects.get(transaccion_id=transaccion.id)
 
                                 # Si se paga mas de una cuota
                                 if pago.nro_cuotas_a_pagar > 1:
-                                    nro_cuota = unicode(contador_cuotas + 1) + " al " + unicode(
-                                        contador_cuotas + pago.nro_cuotas_a_pagar)
+                                    cuotas_detalles = get_cuota_information_by_lote(
+                                        pago.lote_id, pago.nro_cuotas_a_pagar, False, True
+                                    )
+
                                     c = 0
                                     vencimiento = ""
                                     dias_de_atraso = ""
                                     for x in range(0, pago.nro_cuotas_a_pagar):
-                                        contador_cuotas = contador_cuotas + 1
-                                        cuotas_detalles = get_cuota_information_by_lote(pago.lote_id, contador_cuotas,
-                                                                                        True, True)
-                                        vencimiento = vencimiento + unicode(
-                                            cuotas_detalles[0]['fecha']) + ' '
+                                        contador_cuotas += 1
+
+                                        vencimiento = vencimiento + unicode(cuotas_detalles[x]['fecha']) + ' '
+
                                         fecha_pago_parsed = datetime.datetime.strptime(
-                                            pago.fecha_de_pago.strftime("%d/%m/%Y"), "%d/%m/%Y").date()
+                                            pago.fecha_de_pago.strftime("%d/%m/%Y"), "%d/%m/%Y"
+                                        ).date()
+
                                         proximo_vencimiento_parsed = datetime.datetime.strptime(
-                                            unicode(cuotas_detalles[0]['fecha']), "%d/%m/%Y").date()
-                                        dias_atraso = obtener_dias_atraso(fecha_pago_parsed, proximo_vencimiento_parsed)
-                                        dias_de_atraso += " * " + unicode(
-                                            dias_atraso) + " dias "
+                                            unicode(cuotas_detalles[x]['fecha']), "%d/%m/%Y"
+                                        ).date()
+
+                                        dias_atraso = obtener_dias_atraso(
+                                            fecha_pago_parsed, proximo_vencimiento_parsed
+                                        )
+
+                                        dias_de_atraso += " * " + unicode(dias_atraso) + "  "
 
                                         c += 1
                                         pago_detalle = pago.detalle
                                         monto_intereses = 0
-                                        if pago_detalle != None and pago_detalle != '':
+
+                                        if pago_detalle is not None and pago_detalle != '':
                                             pago_detalle = json.loads(pago_detalle)
+                                            cuota_ini = ""
+                                            cuota_fin = ""
                                             detalle_str = ""
-                                            for x in range(0, len(pago_detalle)):
+                                            try:
+                                                cuota_ini = pago_detalle['item' + unicode(0)]['nro_cuota']
+                                                cuota_fin = pago_detalle['item' + unicode(x)]['nro_cuota']
+
+                                                monto_intereses += int(
+                                                    pago_detalle['item' + unicode(x)]['intereses']
+                                                )
+
+                                                monto_cuota = cuotas_detalles[x]['monto_cuota']
+                                                detalle_str = ' Cuota: ' + unicode(
+                                                    '{:,}'.format(monto_cuota)).replace(
+                                                    ",", ".") + " Intereses: " + unicode('{:,}'.format(
+                                                    pago_detalle['item' + unicode(x)]['intereses']
+                                                )).replace(",", ".")
+
+                                            except Exception, error:
+                                                print error
                                                 try:
-                                                    detalle_str = detalle_str + " Intereses: " + unicode('{:,}'.format(
-                                                        pago_detalle['item' + unicode(x)]['intereses'])).replace(",",
-                                                                                                                 ".")
-                                                    monto_intereses = monto_intereses + int(
-                                                        pago_detalle['item' + unicode(x)]['intereses'])
+                                                    detalle_str = detalle_str + " Gestion Cobranza: " + unicode(
+                                                        '{:,}'.format(int(pago_detalle['item' + unicode(x)][
+                                                                'gestion_cobranza']))).replace(",",".")
                                                 except Exception, error:
-                                                    try:
-                                                        detalle_str = detalle_str + " Gestion Cobranza: " + unicode(
-                                                            '{:,}'.format(int(pago_detalle['item' + unicode(x)][
-                                                                                  'gestion_cobranza']))).replace(",",
-                                                                                                                 ".")
-                                                    except Exception, error:
-                                                        print error
+                                                    print error
+                                            detalle += detalle_str
+                                    nro_cuota = unicode(cuota_ini) + " al " + unicode(cuota_fin)
+
+
+
                                 # si se paga solo una cuota
                                 else:
-                                    contador_cuotas += pago.nro_cuotas_a_pagar
+                                    detalle = ""
+                                    dias_de_atraso = ""
                                     # detalle para fecha de vencimiento
-                                    cuotas_detalles = get_cuota_information_by_lote(pago.lote_id, contador_cuotas, True,
+                                    cuotas_detalles = get_cuota_information_by_lote(pago.lote_id, 1, True,
                                                                                     True, pago.venta)
                                     vencimiento = unicode(cuotas_detalles[0]['fecha'])
-                                    # fecha_pago_parsed = datetime.datetime.strptime(cuota['fecha_de_pago'], "%d/%m/%Y").date()
+                                    # fecha_pago_parsed = datetime.datetime.strptime(
+                                    # cuota['fecha_de_pago'], "%d/%m/%Y").date()
                                     fecha_pago_parsed = datetime.datetime.strptime(
                                         pago.fecha_de_pago.strftime("%d/%m/%Y"), "%d/%m/%Y").date()
                                     proximo_vencimiento_parsed = datetime.datetime.strptime(vencimiento,
                                                                                             "%d/%m/%Y").date()
                                     dias_atraso = obtener_dias_atraso(fecha_pago_parsed, proximo_vencimiento_parsed)
                                     dias_de_atraso += " * " + unicode(
-                                        dias_atraso) + " dias "
-                                    nro_cuota = unicode(contador_cuotas)
+                                        dias_atraso) + " "
+
                                     pago_detalle = pago.detalle
                                     monto_intereses = 0
-                                    if pago_detalle != None and pago_detalle != '':
+                                    if pago_detalle is not None and pago_detalle != '' or pago_detalle != '{}':
                                         # pago_detalle = json.dumps(pago_detalle)
                                         pago_detalle = json.loads(pago_detalle)
                                         detalle_str = ""
-                                        for x in range(0, len(pago_detalle)):
+                                        cuota_ini = ""
+                                        try:
+                                            cuota_ini = pago_detalle['item' + unicode(0)]['nro_cuota']
+                                            detalle_str = " Intereses: " + unicode('{:,}'.format(
+                                                pago_detalle['item' + unicode(x)]['intereses']
+                                            )).replace(",", ".")
+                                            monto_intereses += int(
+                                                pago_detalle['item' + unicode(x)]['intereses']
+                                            )
+
+                                            monto_cuota = cuotas_detalles[x]['monto_cuota']
+                                            detalle = 'Cuota: ' + unicode(
+                                                '{:,}'.format(monto_cuota)).replace(
+                                                ",", ".") + detalle_str
+                                        except Exception, error:
+                                            print error
                                             try:
-                                                detalle_str = detalle_str + " Intereses: " + unicode('{:,}'.format(
-                                                    pago_detalle['item' + unicode(x)]['intereses'])).replace(",", ".")
-                                                monto_intereses = monto_intereses + int(
-                                                    pago_detalle['item' + unicode(x)]['intereses'])
+                                                detalle = detalle_str + " Gestion Cobranza: " + unicode(
+                                                    '{:,}'.format(int(pago_detalle['item' + unicode(x)][
+                                                                          'gestion_cobranza']))).replace(",", ".")
+
                                             except Exception, error:
                                                 print error
-                                                try:
-                                                    detalle_str = detalle_str + " Gestion Cobranza: " + unicode(
-                                                        '{:,}'.format(int(pago_detalle['item' + unicode(x)][
-                                                                              'gestion_cobranza']))).replace(",", ".")
-                                                except Exception, error:
-                                                    print error
-                                if pago.nro_cuotas_a_pagar > 1:
-                                    monto_cuota = pago.total_de_pago - monto_intereses
-                                    for x in range(x, pago.nro_cuotas_a_pagar + 1):
-                                        detalle = detalle + ' Cuota: ' + unicode(
-                                            '{:,}'.format(monto_cuota / pago.nro_cuotas_a_pagar)).replace(",", ".")
-                                        detalle = detalle + detalle_str
-                                else:
-                                    monto_cuota = pago.total_de_pago - monto_intereses
-                                    detalle = 'Cuota: ' + unicode('{:,}'.format(monto_cuota)).replace(
-                                        ",", ".") + detalle_str
+                                        nro_cuota = unicode(cuota_ini)
+                                    else:
+                                        nro_cuota = unicode(obtener_cantidad_cuotas_pagadas(pago))
 
                                 monto = unicode('{:,}'.format(pago.total_de_pago)).replace(",", ".")
 
@@ -6843,10 +6871,16 @@ def informe_pagos_practipago(request):
                                     'detalle': detalle,
                                     'monto': monto,
                                     'transaccion_id': transaccion.id,
-                                    'factura': pago.factura
+                                    'lote': pago.lote
                                 }
+                                try:
+                                    pago_item['factura'] = pago.factura
+                                except Exception, error:
+                                    print error
+                                    pago_item['factura'] = None
                                 lista_pagos.append(pago_item)
-                            else:
+
+                            else: # ----------------------- por sucursal ----------------------------------------------
                                 sucursal = Sucursal.objects.get(pk=sucursal_id)
                                 pago = PagoDeCuotas.objects.get(transaccion_id=transaccion.id)
                                 if pago.lote.manzana.fraccion.sucursal_id == sucursal.id:
@@ -6905,7 +6939,7 @@ def informe_pagos_practipago(request):
                                         proximo_vencimiento_parsed = datetime.datetime.strptime(vencimiento,
                                                                                                 "%d/%m/%Y").date()
                                         dias_atraso = obtener_dias_atraso(fecha_pago_parsed, proximo_vencimiento_parsed)
-                                        dias_atraso = dias_atraso + " * " + unicode(
+                                        dias_de_atraso = dias_atraso + " * " + unicode(
                                             dias_atraso) + " dias "
                                         nro_cuota = unicode(contador_cuotas)
                                         pago_detalle = pago.detalle
@@ -6928,16 +6962,6 @@ def informe_pagos_practipago(request):
                                                                                                                  ".")
                                                     except Exception, error:
                                                         print error
-                                    if pago.nro_cuotas_a_pagar > 1:
-                                        monto_cuota = pago.total_de_pago - monto_intereses
-                                        for x in range(x, pago.nro_cuotas_a_pagar + 1):
-                                            detalle = detalle + ' Cuota: ' + unicode(
-                                                '{:,}'.format(monto_cuota / pago.nro_cuotas_a_pagar)).replace(",", ".")
-                                            detalle = detalle + detalle_str
-                                    else:
-                                        monto_cuota = pago.total_de_pago - monto_intereses
-                                        detalle = 'Cuota: ' + unicode(
-                                            '{:,}'.format(monto_cuota)).replace(",", ".") + detalle_str
 
                                     monto = unicode('{:,}'.format(pago.total_de_pago)).replace(",", ".")
 
@@ -6951,8 +6975,13 @@ def informe_pagos_practipago(request):
                                         'detalle': detalle,
                                         'monto': monto,
                                         'transaccion_id': transaccion.id,
-                                        'factura': pago.factura
+                                        'lote': pago.lote
                                     }
+                                    try:
+                                        pago_item['factura'] = pago.factura
+                                    except Exception, error:
+                                        print error
+                                        pago_item['factura'] = None
                                     lista_pagos.append(pago_item)
                         except Exception, error:
                             print error
