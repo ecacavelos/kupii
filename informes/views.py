@@ -2158,6 +2158,53 @@ def liquidacion_vendedores(request):
 
                                         fila['ultimo_pago'] = True
                                         filas.append(fila)
+                                    else:
+                                        montos = calculo_montos_liquidacion_vendedores_contado(venta)
+                                        monto_vendedor = montos['monto_vendedor']
+                                        fecha_pago_str = unicode(venta.fecha_de_venta)
+                                        fecha_pago = unicode(
+                                            datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
+                                        fecha_pago_order = venta.fecha_de_venta
+
+                                        # Fraccion    Lote    Fecha de Pago    Cliente    Cuota Nº    Mes    Monto Pag Monto Prop.
+                                        fila = {}
+                                        fila['fraccion'] = venta.lote.manzana.fraccion
+                                        fila['plan'] = unicode(venta.plan_de_pago_vendedor)
+                                        fila['lote'] = venta.lote.codigo_paralot
+                                        fila['fecha_de_pago'] = fecha_pago
+                                        fila['fecha_de_pago_order'] = fecha_pago_order
+                                        fila['cliente'] = venta.cliente
+                                        fila['nro_cuota'] = 'Venta al Contado'
+                                        fila['monto_pagado'] = venta.precio_final_de_venta
+                                        fila['monto_vendedor'] = monto_vendedor
+                                        fila['misma_fraccion'] = True
+
+                                        monthNames = ["Ene", "Feb", "Mar", "Abr", "May", "Jun",
+                                                      "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"]
+                                        fecha_1 = unicode(
+                                            datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
+                                        parts_1 = fecha_1.split("/")
+                                        year_1 = parts_1[2]
+                                        mes_1 = int(parts_1[1]) - 1
+                                        mes_year = monthNames[mes_1] + "/" + year_1
+                                        fila['mes'] = "1/1"
+
+                                        total_fraccion_monto_pagado += fila['monto_pagado']
+                                        total_fraccion_monto_vendedor += fila['monto_vendedor']
+
+                                        total_general_monto_pagado += fila['monto_pagado']
+                                        total_general_monto_vendedor += fila['monto_vendedor']
+
+                                        fila['monto_pagado'] = unicode(
+                                            '{:,}'.format(fila['monto_pagado'])
+                                        ).replace(",", ".")
+
+                                        fila['monto_vendedor'] = unicode(
+                                            '{:,}'.format(fila['monto_vendedor'])
+                                        ).replace(",", ".")
+
+                                        filas_fraccion.append(fila)
+
                                     g_fraccion = venta.lote.manzana.fraccion.nombre
                                     ok = True
                                 else:
@@ -2182,7 +2229,7 @@ def liquidacion_vendedores(request):
                                     fila['misma_fraccion'] = True
 
                                     monthNames = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct",
-                                                  "Nov", "Dic"];
+                                                  "Nov", "Dic"]
                                     fecha_1 = unicode(
                                         datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
                                     parts_1 = fecha_1.split("/")
@@ -2258,8 +2305,8 @@ def liquidacion_vendedores(request):
                                     fecha_1 = unicode(
                                         datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
                                     parts_1 = fecha_1.split("/")
-                                    year_1 = parts_1[2];
-                                    mes_1 = int(parts_1[1]) - 1;
+                                    year_1 = parts_1[2]
+                                    mes_1 = int(parts_1[1]) - 1
                                     mes_year = monthNames[mes_1] + "/" + year_1;
                                     fila['mes'] = mes_year
 

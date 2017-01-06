@@ -586,7 +586,7 @@ class CoordenadasFactura(models.Model):
     # Credito
     credito_2x = models.FloatField()
     credito_2y = models.FloatField()
-    #Fraccion
+    # Fraccion
     fraccion_2x = models.FloatField()
     fraccion_2y = models.FloatField()
     # Nombre

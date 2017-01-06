@@ -622,7 +622,8 @@ def obtener_cuotas_a_pagar_full(venta, fecha_pago, resumen_cuotas_a_pagar, maxim
     cantidad_cuotas = 0
     sumatoria_cuotas = 0
 
-    if not resumen_cuotas_a_pagar['contado'] and resumen_cuotas_a_pagar['cant_cuotas_pagadas'] != resumen_cuotas_a_pagar['cantidad_total_cuotas']:
+    if not resumen_cuotas_a_pagar['contado'] and resumen_cuotas_a_pagar['cant_cuotas_pagadas'] \
+            != resumen_cuotas_a_pagar['cantidad_total_cuotas']:
         proximo_vencimiento = datetime.datetime.strptime(
             resumen_cuotas_a_pagar['proximo_vencimiento'], "%d/%m/%Y"
         ).date()
@@ -2480,7 +2481,7 @@ def obtener_informe_cuotas_por_cobrar(fraccion_ini):
         if g_lote != cuota_item.lote.id:
             # seteamos la cant de cuotas que falta por pagar
             cuota_aux['cuota_nro'] = resumen_lote['cantidad_total_cuotas'] - resumen_lote['cant_cuotas_pagadas']
-            total_general_cuotas = total_general_cuotas + venta_aux.precio_final_de_venta
+            total_general_cuotas += venta_aux.precio_final_de_venta
             total_general_pagos = total_general_pagos + total_general_pagos_aux
             total_general_mora = total_general_cuotas - total_general_pagos
             filas_fraccion.append(cuota_aux)
