@@ -1,0 +1,423 @@
+{% extends "lotes/base_lotes.html" %}
+
+{% block header_scripts %}
+
+    <script type="text/javascript">
+    var manzanaIngresada = 0;
+    var loteIngresado = 0;
+	$(document).ready(function() {
+        base_url_fraccion = base_context + "/ajax/get_fracciones_by_name/";
+		params="value";
+        var fraccion_id;
+        params = "value";
+
+        $("#fraccion_label").change(function() {
+            if ($("#fraccion_label").val() == ''){
+				$("#id_manzana").empty();
+				$("#id_nro_lote").empty();
+				$("#id_lote").empty();
+                $("#id_lote").val('');
+            }
+        });
+
+        $("#fraccion_label").autocomplete({
+	        source : base_url_fraccion,
+	        minLength : 1,
+	        select : function(event, ui) {
+		        fraccion_id = ui.item.id;
+		        $("#fraccion").val(fraccion_id);
+                //una vez que selecciona la fraccion, debo obtener las manzanas para que elija las disponibles
+                cargarManzanas(fraccion_id);
+	        }
+        });
+
+        $( "#id_manzana" ).change(function() {
+            fraccion_id = $("#fraccion").val();
+  		    manzana_id = $( "#id_manzana" ).val();
+            //cargamos los lotes de la manzana correspondiente
+            cargarLotes(fraccion_id, manzana_id);
+        });
+
+        $( "#id_nro_lote" ).change(function() {
+	        codigo_paralot = $("#id_lote").val();
+	        codigo_paralot = codigo_paralot.substr(0,7);
+	        numero_lote = $("#id_nro_lote").val();
+	        size = numero_lote.length;
+            if (numero_lote.length == 1){
+    	        $("#id_lote").val(codigo_paralot+"/"+pad( numero_lote, size ));
+            }else{
+    	        $("#id_lote").val(codigo_paralot+"/"+padLoteDosDigitos( numero_lote, size ));
+            }
+        });
+
+	});
+
+function pad(num, size) {
+	size = size+3;
+    var s = "000" + num;
+    return s.substr(s.length-size);
+}
+
+function padFraccionUnDigito(num, size) {
+	size = size+3;
+    var s = "00" + num;
+    return s.substr(s.length-size);
+}
+function padFraccionDosDigitos(num, size) {
+	size = size+3;
+    var s = "0" + num;
+    return s.substr(s.length-size);
+}
+
+function padLoteDosDigitos(num, size) {
+{#	size = size+3;#}
+    var s = "00" + num;
+{#    return s.substr(s.length-size);#}
+    return s;
+}
+
+//cuando se ingresa el nro de lote, debemos de separar la fraccion, la manzana y el nro de lote
+function setFraccionManzanaLote() {
+    //si esta vacio o borra por ejemplo, borramos todos los demas tambien
+	if ($("#id_lote").val() == ''){
+		$("#fraccion_label").val('');
+		$("#id_manzana").empty();
+		$("#id_nro_lote").empty();
+		$("#id_nro_lote").empty();
+	}else{
+		splitted_id = $("#id_lote").val().split('/');
+		var fraccion = splitted_id[0];
+        fraccion = quitarCerosFraccion(fraccion);
+		$("#fraccion").val(fraccion);
+		var manzana = splitted_id[1];
+		var lote = splitted_id[2];
+        loteIngresado = lote;
+
+		base_url = base_context + "/ajax/get_fracciones_by_id/?term=" + fraccion;
+		params = "value";
+		var request = $.ajax({
+			url: base_url,
+			type: 'GET',
+			// data: fraccion
+		});
+        //como esta funcion ya esta hecha y retorna una lista con los posibles valores del autocomplete, el primero siempre es el correcto
+		request.success(function(data) {
+			$("#fraccion_label").val(data[0].label)
+            //cargamos la manzana correspodiente
+            cargarManzanasSetearSeleccionada(fraccion, splitted_id[1]);
+		});
+	}
+}
+
+function cargarManzanas(fraccion_id) {
+    var request_manzanas = $.ajax({
+	    url : base_context + '/ajax/get_manzanas_by_fraccion/',
+	    type : "GET",
+	    data : {
+	    fraccion_id : fraccion_id
+	    },
+	    dataType : "json"
+	});
+	$("#id_manzana").empty();
+	$("#id_manzana").append('<option value="0">Elegir Manzana</option>') ;
+    request_manzanas.done(function (data){
+	    $.each(data, function (index,value) {
+	        //$("#id_manzana").append('<option value="'+ value.id +'">' + 'Manzana ' + value.label + '</option>') ;
+	        $("#id_manzana").append('<option value="'+ value.pk +'">' + 'Manzana ' + value.fields.nro_manzana + '</option>') ;
+            if ($("#id_lote").val().length == 1){
+                $("#id_lote").val(padFraccionUnDigito($("#id_lote").val()))
+            }else if ($("#id_lote").val().length == 2){
+             $("#id_lote").val(padFraccionDosDigitos($("#id_lote").val()))
+            }else{
+                $("#id_lote").val(value.fields.fraccion);
+            }
+	    });
+	});
+}
+
+function cargarManzanasSetearSeleccionada(fraccion_id, manzana) {
+    manzanaIngresada = quitarCerosFraccion(manzana);
+    var request_manzanas = $.ajax({
+	    url : base_context + '/ajax/get_manzanas_by_fraccion/',
+	    type : "GET",
+	    data : {
+	    fraccion_id : fraccion_id
+	    },
+	    dataType : "json"
+	});
+	$("#id_manzana").empty();
+    request_manzanas.done(function (data){
+	    $.each(data, function (index,value) {
+	        $("#id_manzana").append('<option value="'+ value.pk +'">' + 'Manzana ' + value.fields.nro_manzana + '</option>') ;
+{#            if ($("#id_lote").val().length == 1){#}
+{#                $("#id_lote").val(padFraccionUnDigito($("#id_lote").val()))#}
+{#            }else if ($("#id_lote").val().length == 2){#}
+{#             $("#id_lote").val(padFraccionDosDigitos($("#id_lote").val()))#}
+{#            }else{#}
+{#                $("#id_lote").val(value.fields.fraccion);#}
+{#            }#}
+	    });
+      	//establecemos para mostrar la manzana que ingreso, buscamos el elemento por su value y le indicamos que seleccione ese
+        var val = parseInt($("#id_manzana")[0][manzanaIngresada - 1].value)
+        $("#id_manzana option[value=" + val + "]").attr('selected', 'selected');
+        //y luego cargamos los lotes de la manzana que habia ingresado e indicamos como seleccionada
+        cargarLotes(fraccion_id, $("#id_manzana").val());
+	});
+}
+
+function cargarLotes(fraccion_id, manzana_id) {
+  	var request_manzanas = $.ajax({
+        url : base_context + '/ajax/get_lotes_by_manzana/',
+	    type : "GET",
+	    data : {
+		    id_fraccion : fraccion_id,
+			id_manzana : manzana_id
+			},
+		    dataType : "json"
+        });
+		$("#id_nro_lote").empty();
+		$("#id_nro_lote").append('<option value="0">Lotes disponibles</option>') ;
+		request_manzanas.done(function (data){
+		    $.each(data, function (index,value) {
+			    $("#id_nro_lote").append('<option value="'+ value.id +'">' +value.label + '</option>') ;
+					nro_manzana = value.nro_manzana;
+				});
+            codigo_paralot = $("#id_lote").val();
+        	codigo_paralot = codigo_paralot.substr(0,3);
+            //si la persona cargo el nro de lote directo, tiene una longitud de 12, si cargo por nombre, luego manzana, falta establecer el lote en el codigo
+            if ($("#id_lote").val().length != 12) {
+    		    $("#id_lote").val(codigo_paralot+"/"+nro_manzana);
+            }
+
+       	//establecemos para mostrar la manzana que ingreso, buscamos el elemento por su value y le indicamos que seleccione ese
+            var valorLote = quitarCerosLote(loteIngresado);
+            $("#id_nro_lote option[value=" + valorLote + "]").attr('selected', 'selected');
+		});
+}
+
+</script>
+<!--
+<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}ajax_config.js"></script>
+-->
+<script type="text/javascript" src="{{ STATIC_URL }}movimientos.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}movimientos_ventas.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}movimientos_pagos.js"></script>
+<script>
+	var grupo = "{{grupo}}";
+	var codigo_lote = "{{codigo_lote}}";
+	var fecha_actual = "{{fecha_actual}}";
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="gri16 text-izquierda" id="breadcumb">
+	<a href="{% url 'frontend_home' %}">Inicio</a><span class="verde-1">></span>
+	<a href="{% url 'frontend_home' %}movimientos/">Movimientos</a>
+	<span class="verde-1">> Pago de Cuotas</span>
+</div>
+<div class="clear"></div>
+
+<div class="grid_10">
+	<h1>Pagar Cuotas</h1>
+</div>
+
+<div class="grid_6">
+	<a href="#" class="historico">Buscar</a>
+</div>
+<div class="clear"></div>
+<div class="grid_16" align="center">
+	<form id="main_pago_form" action="" method="post">
+		<table width="94%" border="0" cellpadding="0" cellspacing="0" id="forms" align="center">
+			{% csrf_token %}
+
+        <div class="fieldWrapperMovimientos">
+	    	<tr>
+		    	<td><label for="id_fraccion">Fraccion: </label></td>
+		    	<td class="noimage">
+                 <input id="fraccion_label" type="text" name="fraccion_label" maxlength="12"/>
+                  <input type="hidden" id="fraccion" name="fraccion"/></td>
+			    <td><label for="id_manzana">Manzana: </label></td>
+			    <td class="noimage">
+  				    <select name="manzana" id="id_manzana" readonly="readonly">
+   					    <option value="0"> Elegir</option>
+   				    </select>{{ field.errors }}
+                    <input type="hidden" id="manzana" name="manzana"/>
+    		    <td><strong><label for="id_nro_lote">Nro lote:</label></strong></td>
+    		    	<td class="noimage"><select name="nro_lote" id="id_nro_lote"></select>{{ field.errors }}</td>
+                    <input type="hidden" id="lote2" name="lote2"/>
+	    	</tr>
+    	</div>
+			<div class="fieldWrapperMovimientos">
+				<tr>
+					<td><label for="id_lote">Lote: </label></td>
+					<td class="noimage">
+					<input id="id_lote" type="text" name="lote" maxlength="12" onblur="retrievePlanes();setFraccionManzanaLote()" />
+					<input id="detalle" type="hidden" name="detalle" />
+					<!--<input id="id_lote" type="text" name="lote" maxlength="12" onblur="retrieveData();" />-->
+					<input id="id_venta_pagos" type="hidden" name="id_venta" />
+					<ul class="errorlist">
+						<li id="lote_error"></li>
+					</ul></td>
+				</tr>
+				<tr>
+					<td><label>Obs del Lote: </label></td>
+					<td class="noimage"><div id="id_obs_lote" name="obs_lote"></td>
+				</tr>
+				<tr>
+					<td><label>Ficha del Lote: </label></td>
+					<td class="noimage"><div id="lote_seleccionado_detalles"></td>
+				</tr>
+			</div>
+				<div class="fieldWrapperMovimientos">
+				<!--<input id="id_cliente" type="hidden" name="cliente"  maxlength="100" onchange="retrieveLotePago();" />-->
+				<input id="id_cliente" type="hidden" name="cliente"  maxlength="100"/>
+				<tr>
+					<td><label>Cliente: </label></td>
+					<td class="noimage"><div id="cliente_seleccionado"></div>
+					<ul class="errorlist">
+						<li id="cliente_error"></li>
+					</ul></td>
+				</tr>
+			</div>
+			<div class="fieldWrapperMovimientos">
+				<tr>
+					<td><label for="lote_seleccionado_fraccion">Fraccion: </label></td>
+					<td class="noimage" id="lote_seleccionado_fraccion"></td>
+				</tr>
+				<tr>
+					<td><label for="resumen_cuotas">Cuotas Pagadas/Total: </label></td>
+					<td class="noimage" id="resumen_cuotas"></td>
+				</tr>
+			</div>
+			<div class="fieldWrapperMovimientos">
+				<tr>
+					<input type="hidden" id="proximo_vencimiento">
+					<td><label for="cuota_a_pagar">Cuota a Pagar: </label></td>
+					<td id="cuotas_a_pagar">
+					<table border="1" cellpadding="0" cellspacing="0"  id="id_cuota_pagar" class="listado-cuotas-estado">
+						<tr>
+							<th>Nro Cuota</th>
+							<th>Fecha de Vencimiento</th>
+							<th>Monto Cuota</th>
+						</tr>
+					</table>
+					</td>
+				</tr>
+			</div>
+			<div class="fieldWrapperMovimientos">
+				<tr>
+					<td><label for="id_fecha">Fecha de Pago: </label></td>
+					<td class="noimage">
+						<input class="fecha_pago" type="text" name="fecha" maxlength="10"/>
+					</td>
+				</tr>
+			</div>
+			<div class="fieldWrapperMovimientos">
+				<tr>
+					<td><label for="nro_cuotas_a_pagar">Cantidad de Cuotas a Pagar: </label></td>
+					<td class="noimage">
+					<input id="nro_cuotas_a_pagar" type="number" name="nro_cuotas_a_pagar" maxlength="4"  />
+					</td>
+				</tr>
+			</div>
+			<div class="fieldWrapperMovimientos">
+				<tr>
+					<td><label for="total_cuotas">Total monto Cuotas: </label></td>
+					<td class="noimage">
+					<input id="total_cuotas" type="hidden" name="total_cuotas" readonly maxlength="100" />
+					<div id="total_cuotas2"></div></td>
+				</tr>
+				<tr>
+					<td><label for="total_mora">Total Intereres y Gestiones: </label></td>
+					<td class="noimage">
+   					<input id="interes_original" type="hidden" name="interes_original" />
+					<input id="total_mora" type="hidden" name="total_mora" readonly maxlength="100" />
+					<br><div id="total_mora2"></div><br>
+					<input type="button" class="historico" data-toggle="modal" value="Ver detalles" data-target=".bs-example-modal-sm" onclick="dibujarDetalle()"/>
+					<!--<div id="total_mora2"></div>-->
+					<!-- Small modal -->
+					
+					<div class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+						<div class="modal-dialog modal-sm">
+							<div class="modal-content">
+							<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					        <h4 class="modal-title">Detalles de Intereses y Gestiones</h4>
+					        </div>
+					      	<div id="contenido_modal" class="modal-body"></div>							
+							</div>
+						</div>
+					</div>
+					</td>
+				</tr>
+				<tr>
+					<td><label for="total_pago">Monto Total a Pagar: </label></td>
+					<td class="noimage">
+					<input id="total_pago" type="hidden" name="total_pago" readonly maxlength="100" />
+					<div id="total_pago2"></div></td>
+				</tr>
+				<tr>
+					<td><label for="fecha_vencimiento">Fecha de &Uacute;ltima Venta: </label></td>
+					<td class="noimage">
+					<input id="id_fecha_venta" type="hidden" name="fecha_venta" maxlength="10" />
+					<input id="id_fecha_venta2" type="text" name="fecha_venta2" maxlength="10" />
+					</td>
+				</tr>
+			</div>
+						<div class="fieldWrapperMovimientos">
+				<!--<input id="id_vendedor" type="hidden" name="vendedor" readonly maxlength="100" onchange="retrieveCliente()" />-->
+				<input id="id_vendedor" type="hidden" name="vendedor" readonly maxlength="100" onchange="calcularInteres();"/>
+				<tr>
+					<td><label>Vendedor: </label></td>
+					<td class="noimage"><div id="vendedor_seleccionado"></div>
+					<br>
+					<ul class="errorlist">
+						<li id="vendedor_error"></li>
+					</ul></td>
+				</tr>
+			</div>
+			<div class="fieldWrapperMovimientos">
+				<!--<input id="id_plan_pago" type="hidden" name="plan_pago" readonly maxlength="100" onchange="retrievePlanPago()" />-->
+				<input id="id_plan_pago" type="hidden" name="plan_pago" readonly maxlength="100"/>
+				<tr>
+					<td><label>Plan de pago: </label><td class="noimage"><div id="plan_pago_seleccionado"></div>
+					<br>
+					<ul class="errorlist">
+						<li id="plan_pago_error"></li>
+					</ul></td>
+				</tr>
+				<!--<input id="id_plan_pago_vendedores" type="hidden" name="plan_pago_vendedores" readonly maxlength="100" onchange="retrievePlanPagoVendedor()"/>-->
+				<input id="id_plan_pago_vendedores" type="hidden" name="plan_pago_vendedores" readonly maxlength="100"/>
+				<tr>
+					<td><label>Plan de pago Vendedor: </label><td class="noimage"><div id="plan_pago_vendedor_seleccionado"></div>
+					<br>
+					<ul class="errorlist">
+						<li id="plan_pago_vendedor_error"></li>
+					</ul></td>
+				</tr>
+                <tr>
+                    <td><input type="checkbox" id="checkbox_cuota_obsequio" class="checkbox_cuota_obsequio"></td>
+                    <td colspan="2"><span class="label_cuota_obsequio"> Cuota Obsequio </span></td>
+                    <input type="hidden" id="cuota_obsequio" name="cuota_obsequio" value="0">
+                </tr>
+			</div>
+
+		</table>
+        {%if grupo == 1 or  grupo == 3  %}
+		    <input id="enviar_pago" name="boton_pagar" style="cursor: pointer;" type="button" value="Guardar Pago" onclick="this.disabled=true; $('#facturar').val('NO');validatePago()"/>
+        {% endif %}
+		<input id="enviar_pago_factura" name="boton_pagar" style="cursor: pointer;" type="button" value="Guardar Pago y Facturar" onclick="this.disabled=true; $('#facturar').val('SI');validatePago()"/>
+		<input type="hidden" id="facturar" value="" name="facurar">
+		<br>
+		<br>
+		<br>
+	</form>
+	<input type="hidden" id="poner_puntos" />
+	<div class="clear"></div>
+</div>
+<div id="footer">
+	<a href="{% url 'frontend_home' %}movimientos/" class="boton-verde">Volver al m&oacute;dulo de movimientos</a>
+</div>
+
+{% endblock %}

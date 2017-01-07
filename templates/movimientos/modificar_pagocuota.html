@@ -1,0 +1,113 @@
+{% extends "lotes/base_lotes.html" %}
+
+{% block header_scripts %}
+
+<script type="text/javascript" src="{{ STATIC_URL }}modificar_pago.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="gri16 text-izquierda" id="breadcumb">
+	<a href="{% url 'frontend_home' %}">Inicio</a><span class="verde-1">></span>
+	<a href="{% url 'frontend_home' %}movimientos/">Movimientos</a>
+	<span class="verde-1">> Modificar Cuota</span>
+</div>
+<div class="clear"></div>
+
+<div class="grid_10">
+	<h1>Modificar Cuota</h1>
+</div>
+
+<div class="grid_6">
+	<a href="#" class="historico">Buscar</a>
+</div>
+
+<div class="clear"></div>
+<div class="grid_16" align="center">
+	<form id="main_pago_form" action="" method="post">
+		<table width="94%" border="0" cellpadding="0" cellspacing="0" id="forms" align="center">
+			{% csrf_token %}
+            <div id="{{message_id}}">{{ message }}</div>
+			<div class="fieldWrapperMovimientos">
+				<tr>
+					<td><label for="id_lote">Lote: </label></td>
+					<td class="noimage">{{pagocuota.lote.codigo_paralot}}</td>
+				</tr>
+			</div>
+			<div class="fieldWrapperMovimientos">
+				<tr>
+					<td><label for="lote_seleccionado_fraccion">Fraccion: </label></td>
+					<td class="noimage" id="lote_seleccionado_fraccion">{{pagocuota.lote.manzana.fraccion.nombre}}</td>
+				</tr>
+			</div>
+			<div class="fieldWrapperMovimientos">
+				<input id="id_cliente" type="hidden" name="cliente"  maxlength="100"/>
+				<tr>
+					<td><label>Cliente: </label></td>
+					<td class="noimage"><div id="cliente_seleccionado"></div>
+					<ul class="errorlist">
+						<li id="cliente_error"></li>
+					</ul>{{pagocuota.cliente.apellidos}}  {{pagocuota.cliente.nombres}} </td>
+				</tr>
+			</div>
+			<div class="fieldWrapperMovimientos">
+				<tr>
+					<td><label for="id_fecha">Fecha de Pago: </label></td>
+					<td class="noimage">
+					<input id="id_fecha" type="text" name="fecha" maxlength="10" value="{{fecha_pago}}"/>
+					</td>
+				</tr>
+			</div>
+			<div class="fieldWrapperMovimientos">
+				<tr>
+					<td><label for="nro_cuotas_a_pagar">Cantidad de Cuotas Pagadas: </label></td>
+					<td class="noimage">
+					<input id="nro_cuotas_a_pagar" type="number" name="nro_cuotas_a_pagar" value ="{{pagocuota.nro_cuotas_a_pagar}}" maxlength="4" />
+					</td>
+				</tr>
+				<tr>
+					<td><label for="monto_cuota">Monto de cada Cuota: </label></td>
+					<td class="noimage">
+					<input id="monto_cuota" type="text" name="monto_cuota" maxlength="10" value="{{pagocuota.venta.precio_de_cuota}}"/>
+					</td>
+				</tr>
+				<tr>
+					<td><label for="total_mora">Total de Mora: </label> </td>
+					<td class="noimage">
+					<input id="total_mora" type="number" name="total_mora" maxlength="10" value="{{pagocuota.total_de_mora}}"/>
+					</td>
+				</tr>
+			</div>
+			<div class="fieldWrapperMovimientos">				
+				<tr>
+					<td><label for="total_pago">Monto Total a Pagar: </label></td>
+					<td class="noimage">
+					<input id="monto_total" type="number" name="monto_total" maxlength="10" value="{{pagocuota.total_de_pago}}"/>
+					</td>
+				</tr>
+			</div>
+            <div class="fieldWrapperMovimientos">
+				<tr>
+					<td><label for="total_pago">Cuota Obsequio: </label></td>
+					<td class="noimage">
+                        {% if pagocuota.cuota_obsequio == True %}
+					        <input id="cuota_obsequio" type="checkbox" name="cuota_obsequio" checked/>
+                        {% else %}
+                            <input id="cuota_obsequio" type="checkbox" name="cuota_obsequio"/>
+                        {% endif %}
+					</td>
+				</tr>
+			</div>
+		</table>
+		<input id="enviar_pago" style="cursor: pointer;" type="submit" value="Modificar Pago" />
+		<br>
+		<br>
+		<br>
+	</form>
+	<div class="clear"></div>
+</div>
+
+<div id="footer">
+	<a href="{% url 'frontend_home' %}movimientos/" class="boton-verde">Volver al m&oacute;dulo de movimientos</a>
+</div>
+
+{% endblock %}

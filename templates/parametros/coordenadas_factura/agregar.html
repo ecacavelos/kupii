@@ -1,0 +1,228 @@
+{% extends "lotes/base_lotes.html" %}
+
+{% block header_resources %}
+<!--
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+-->
+{% endblock %}
+
+{% block header_scripts %}
+<!--
+<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+-->
+<script type="text/javascript">
+$(document).ready(function(){
+	$( ".grid_6" ).hide();
+	$("#id_numero_1x").focus();
+});
+var data = [
+		{"label" : "Aragorn"}
+		];
+
+function solo_numeros_cantidad_de_cuotas () {
+		
+	  	$('#id_cantidad_de_cuotas').val($('#id_cantidad_de_cuotas').val().replace(/\D/g,''));
+}
+	
+function solo_numeros_porcentaje_inicial_inmobiliaria () {
+		
+	  	$('#id_porcentaje_inicial_inmobiliaria').val($('#id_porcentaje_inicial_inmobiliaria').val().replace(/\D/g,''));
+}
+
+function solo_numeros_cantidad_cuotas_inmobiliaria () {
+		
+	  	$('#id_cantidad_cuotas_inmobiliaria').val($('#id_cantidad_cuotas_inmobiliaria').val().replace(/\D/g,''));
+}	
+
+function solo_numeros_inicio_cuotas_inmobiliaria () {
+		
+	  	$('#id_inicio_cuotas_inmobiliaria').val($('#id_inicio_cuotas_inmobiliaria').val().replace(/\D/g,''));
+}
+
+function solo_numeros_intervalos_cuotas_inmobiliaria () {
+		
+	  	$('#id_intervalos_cuotas_inmobiliaria').val($('#id_intervalos_cuotas_inmobiliaria').val().replace(/\D/g,''));
+}
+
+function solo_numeros_porcentaje_cuotas_inmobiliaria () {
+		
+	  	$('#id_porcentaje_cuotas_inmobiliaria').val($('#id_porcentaje_cuotas_inmobiliaria').val().replace(/\D/g,''));
+}
+
+function solo_numeros_porcentaje_cuotas_administracion () {
+		
+	  	$('#id_porcentaje_cuotas_administracion').val($('#id_porcentaje_cuotas_administracion').val().replace(/\D/g,''));
+}
+
+function solo_numeros_porcentaje_inicial_gerente () {
+		
+	  	$('#id_porcentaje_inicial_gerente').val($('#id_porcentaje_inicial_gerente').val().replace(/\D/g,''));
+}
+
+function solo_numeros_cantidad_cuotas_gerente () {
+		
+	  	$('#id_cantidad_cuotas_gerente').val($('#id_cantidad_cuotas_gerente').val().replace(/\D/g,''));
+}
+
+function solo_numeros_inicio_cuotas_gerente () {
+		
+	  	$('#id_inicio_cuotas_gerente').val($('#id_inicio_cuotas_gerente').val().replace(/\D/g,''));
+}
+
+function solo_numeros_intervalos_cuotas_gerente () {
+		
+	  	$('#id_intervalos_cuotas_gerente').val($('#id_intervalos_cuotas_gerente').val().replace(/\D/g,''));
+}
+
+function solo_numeros_porcentaje_cuotas_gerente () {
+		
+	  	$('#id_porcentaje_cuotas_gerente').val($('#id_porcentaje_cuotas_gerente').val().replace(/\D/g,''));
+}
+
+/////////////////////////
+function solo_numeros_monto_fijo_cuotas_gerente () {
+		
+	  	$('#id_monto_fijo_cuotas_gerente').val($('#id_monto_fijo_cuotas_gerente').val().replace(/[^\d,.]+/g, ''));
+}
+
+	//Separador de miles y comas en escritura
+	function format(comma, period) {
+		
+		var comma = comma || ',';
+		var period = period || '.';
+		var split = this.toString().split(',');
+		var numeric = split[0];
+		var decimal = split.length > 1 ? period + split[1] : '';
+		var reg = /(\d+)(\d{3})/;
+		for (var i = 1; i < numeric.length; i++) {
+			numeric = numeric.replace(".", "");
+		}
+		while (reg.test(numeric)) {
+
+			numeric = numeric.replace(reg, '$1' + comma + '$2');
+		}
+		//} else {
+		//	numeric = numeric.substr(0,numeric.length-1);
+		//}
+		
+		return numeric + decimal;
+	}
+
+function _validar(){
+	var res = $("#id_monto_fijo_cuotas_gerente").val();
+	for ( i = 0; i < res.length; i++) {
+		res = res.replace(".", "");
+	}
+	res = res.replace(",", ".");
+	//console.log("\n"+str);
+	//console.log("\n"+res);
+	$("#id_monto_fijo_cuotas_gerente").val(res);
+}
+
+$(document).ready(function() {
+	
+	$("label[for='id_porcentaje_inicial_inmobiliaria']").text("Porcentaje entrega inicial inmoviliaria:");
+	$("label[for='id_porcentaje_inicial_gerente']").text("Porcentaje inicial gerente sucursal:");
+	$("label[for='id_cantidad_cuotas_gerente']").text("Cantidad cuotas gerente sucursal:");
+	$("label[for='id_inicio_cuotas_gerente']").text("Inicio cuotas gerente sucursal:");
+	$("label[for='id_intervalos_cuotas_gerente']").text("Intervalos cuotas gerente sucursal:");
+	$("label[for='id_porcentaje_cuotas_gerente']").text("Porcentaje cuotas gerente sucursal:");
+	
+	$( "#id_cantidad_de_cuotas" ).keyup(function() {
+  		solo_numeros_cantidad_de_cuotas();
+	});
+	$( "#id_porcentaje_inicial_inmobiliaria" ).keyup(function() {
+  		solo_numeros_porcentaje_inicial_inmobiliaria();
+	});
+	$( "#id_cantidad_cuotas_inmobiliaria" ).keyup(function() {
+  		solo_numeros_cantidad_cuotas_inmobiliaria();
+	});
+	$( "#id_inicio_cuotas_inmobiliaria" ).keyup(function() {
+  		solo_numeros_inicio_cuotas_inmobiliaria();
+	});
+	$( "#id_intervalos_cuotas_inmobiliaria" ).keyup(function() {
+  		solo_numeros_intervalos_cuotas_inmobiliaria();
+	});
+	$( "#id_porcentaje_cuotas_inmobiliaria" ).keyup(function() {
+  		solo_numeros_porcentaje_cuotas_inmobiliaria();
+	});
+	$( "#id_porcentaje_cuotas_administracion" ).keyup(function() {
+  		solo_numeros_porcentaje_cuotas_administracion();
+	});
+	$( "#id_porcentaje_inicial_gerente" ).keyup(function() {
+  		solo_numeros_porcentaje_inicial_gerente();
+	});
+	$( "#id_cantidad_cuotas_gerente" ).keyup(function() {
+  		solo_numeros_cantidad_cuotas_gerente();
+	});
+	$( "#id_inicio_cuotas_gerente" ).keyup(function() {
+  		solo_numeros_inicio_cuotas_gerente();
+	});
+	$( "#id_intervalos_cuotas_gerente" ).keyup(function() {
+  		solo_numeros_intervalos_cuotas_gerente();
+  	});
+	$( "#id_porcentaje_cuotas_gerente" ).keyup(function() {
+  		solo_numeros_porcentaje_cuotas_gerente();
+  		
+	});//////////
+	$( "#id_monto_fijo_cuotas_gerente" ).keyup(function() {
+  		$("#id_monto_fijo_cuotas_gerente").val(format.call($("#id_monto_fijo_cuotas_gerente").val().split(' ').join(''),'.',','));solo_numeros_monto_fijo_cuotas_gerente();
+	});
+	
+	
+});
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="gri16 text-izquierda" id="breadcumb">
+	<a href="{% url 'frontend_home' %}">Inicio</a> 
+	<a href="{% url 'frontend_home' %}parametros/">> Parametros</a> 
+	<a href="{% url 'frontend_home' %}parametros/coordenadas_factura/">> Coordenadas de Impresion de Facturas</a> 
+	<span class="verde-1">> Agregar Coordenadas de Impresion de Facturas</span> 
+</div>
+
+<div class="clear"></div>
+
+<div class="grid_10">
+  <h1>Agregar Coordenadas de Impresion de Facturas</h1>
+</div>
+
+<div class="grid_6">
+  <a href="#" class="historico">Buscar</a>
+</div>
+
+<div class="clear"></div>
+
+<div class="grid_16" align="center">
+	
+	  <form action="" method="post" onsubmit="_validar();">
+	  	<div id="{{message_id}}">{{ message }}</div>
+	  	<table width="94%" border="0" cellpadding="0" cellspacing="0" id="forms" align="center">
+		{% csrf_token %}
+		{% for field in form2 %}
+			
+			<tr>
+	    		<td><strong>{{ field.label_tag }}</strong></td>
+	    		<td class="noimage">{{ field }}{{ field.errors }}</td>
+	    	</tr>		
+		{% endfor %}
+		{% for field in form %}
+			
+			<tr>
+	    		<td><strong>{{ field.label_tag }}</strong></td>
+	    		<td class="noimage">{{ field }}{{ field.errors }}</td>
+	    	</tr>		
+		{% endfor %}
+		
+	    </table>
+	    <input name="" type="submit" value="Grabar" style="margin-bottom: 10px; cursor: pointer;" />
+	  </form>
+	  <a class="boton-verde" href="{% url 'frontend_home' %}parametros/coordenadas_factura/">Volver al menú de Coordenadas de Impresion de Facturas</a>
+	<br><br><br>
+	
+	
+<div class="clear"></div>
+</div>
+{% endblock %}

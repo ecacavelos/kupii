@@ -1,0 +1,141 @@
+{% extends "lotes/base_lotes.html" %}
+{% block header_scripts %}
+<script type="text/javascript">
+	function buscar() {
+		if ($("#fecha_ini").val() == "" || $("#fecha_ini").val() == "") {
+			alert("Debe ingresar un rango de fecha.");
+		} else {
+			$("#frm_busqueda").submit();
+		}
+	}
+	$(document).ready(function() {
+		$("#fecha_ini").focus(); 
+		
+//Cambiar calendario a español
+		$.datepicker.regional['es'] = {
+			closeText : 'Cerrar',
+			prevText : '<Ant',
+			nextText : 'Sig>',
+			currentText : 'Hoy',
+			monthNames : ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+			monthNamesShort : ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+			dayNames : ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
+			dayNamesShort : ['Dom', 'Lun', 'Mar', 'Mié', 'Juv', 'Vie', 'Sáb'],
+			dayNamesMin : ['Do', 'Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sá'],
+			weekHeader : 'Sm',
+			dateFormat : 'dd/mm/yy',
+			firstDay : 1,
+			isRTL : false,
+			showMonthAfterYear : false,
+			yearSuffix : ''
+		};
+		// Setear idioma al calendario
+		$.datepicker.setDefaults($.datepicker.regional['es']);
+		
+		var fecha_ini = "{{fecha_ini}}";
+		var fecha_fin = "{{fecha_fin}}";
+		
+		$('#fecha_ini').val(fecha_ini);
+		$('#fecha_fin').val(fecha_fin);
+		
+		$('#fecha_ini').mask('##/##/####');
+		$("#fecha_ini").datepicker({
+			dateFormat : 'dd/mm/yy'
+		});
+		$('#fecha_fin').mask('##/##/####');
+		$("#fecha_fin").datepicker({
+			dateFormat : 'dd/mm/yy'
+		});
+	});
+</script>
+{%endblock%}
+{% block content %}
+<div class="gri16 text-izquierda" id="breadcumb">
+	<a href="{% url 'frontend_home' %}">Inicio</a> 
+	<a href="{% url 'frontend_home' %}parametros/">> Parametros</a>  
+	<a href="{% url 'frontend_home' %}parametros/log_usuario/">> Logs de Usuarios</a> 
+	<span class="verde-1">> Listado de Logs de Usuarios</span> 
+</div>
+<div class="clear"></div>
+<h1>Listado de Logs de Usuarios</h1>
+<div class="grid_6">
+	<form name="frm_busqueda" id="frm_busqueda" method="get" action="/parametros/log_usuario/listado_busqueda_log_usuario/">
+		{% csrf_token %}
+		<table id="lista-categoria" frame="box">
+			<tr>
+				<th class="acciones" colspan="3"><strong><a href="#" style="color: white;">Filtrar</a></strong></th>
+			</tr>
+			<th></th><th id="label_desde">Desde:</th><th id="label_hasta">Hasta:</th>
+			<tr>
+				<td id="label_busqueda"> Rango de Fecha: </td>
+				<td>
+				<input name="fecha_ini" id="fecha_ini" type="text" value="" />
+				</td>
+				<td>
+				<input name="fecha_fin" id="fecha_fin" type="text" value="" />
+				</td>
+			</tr>
+			<tr>
+				<td></td>
+				<td><input type="button" value="Buscar" onclick="buscar();" class="historico" style="cursor: pointer"/></td>
+			</tr>
+		</table>
+	</form>
+</div>
+<div class="clear"></div>
+<div id="listado-cuadro-busqueda">
+	
+</div>
+<div id="listado-item-lote">
+		<table border="1" cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
+				<th>ID</th><th>Fecha y Hora</th><th>Usuario</th><th>Accion</th><th>Tipo Entidad</th><th>ID Entidad</th><th>Codigo Lote</th>
+				{% for log in object_list %}
+				{% if forloop.counter|divisibleby:2 %}
+					<tr>
+						<td>{{log.id}}</td>
+						<td>{{log.fecha_hora}}</td>
+						<td>{{log.usuario}}</td>
+						<td>{{log.accion}}</td>
+						<td>{{log.tipo_objeto}}</td>
+						<td>{{log.id_objeto}}</td>
+						<td>{{log.codigo_lote}}</td>
+					</tr>
+					{% else %}
+					<tr class="bkg_gris">
+						<td>{{log.id}}</td>
+						<td>{{log.fecha_hora}}</td>
+						<td>{{log.usuario}}</td>
+						<td>{{log.accion}}</td>
+						<td>{{log.tipo_objeto}}</td>
+						<td>{{log.id_objeto}}</td>
+						<td>{{log.codigo_lote}}</td>
+					</tr>
+					{% endif %}				
+				{% endfor %}
+		<div class="pagination">
+			<span class="step-links">
+				Mostrando {{ object_list.start_index }}-{{ object_list.end_index }} de {{ object_list.paginator.count }} Resultados
+				{%if object_list.has_previous%} 
+				<a href="?page={{ object_list.first_index}}{{ultimo}}"> Primera </a> 
+				<a href="?page={{ object_list.previous_page_number }}{{ultimo}}"> Anterior</a> 
+				{%endif%}
+				P&aacute;gina |{{object_list.number}}|		
+				{%if object_list.has_next%} 
+				<a href="?page={{ object_list.next_page_number }}{{ultimo}}"> Siguiente </a> 				
+				<a href="?page={{ object_list.end_index}}{{ultimo}}"> Ultima </a> 
+				{%endif%} 
+			</span>
+		</div>
+	</table>
+</div>
+
+<div id="footer">
+	<div class="pagination">
+			<span class="step-links"> Mostrando {{ object_list.start_index }}-{{ object_list.end_index }} de {{ object_list.paginator.count }} Resultados
+				{%if object_list.has_previous%} <a href="?page={{ object_list.first_index}}{{ultimo}}"> Primera </a> <a href="?page={{ object_list.previous_page_number }}{{ultimo}}"> Anterior</a> {%endif%}
+				P&aacute;gina |{{object_list.number}}|
+				{%if object_list.has_next%} <a href="?page={{ object_list.next_page_number }}{{ultimo}}"> Siguiente </a> <a href="?page={{ object_list.end_index}}{{ultimo}}"> Ultima </a> {%endif%} </span>
+		</div></br>
+	<a href="{% url 'frontend_home' %}parametros/log_usuario/" class="boton-verde">Volver al módulo de Logs de Usuarios</a>
+	</div>
+{% endblock %}

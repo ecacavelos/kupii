@@ -1,0 +1,141 @@
+{% extends "lotes/base_lotes.html" %}
+{% block header_scripts %}
+<script type="text/javascript">
+	function buscar() {
+		if ($("#id_nombre_concepto").val() == "" || $("#id_concepto_factura").val() == "" ) {
+			alert("Debe seleccionar el nombre del concepto para buscar.");
+		} else {
+			$("#frm_busqueda").submit();
+		}
+	}
+	$(document).ready(function() {
+		$("#id_nombre_concepto").focus();
+		//autocomplete para concepto factura
+		var id_concepto;
+		$("#id_concepto_factura").empty();
+		base_url= base_context + "/ajax/get_concepto_factura_by_name/";
+		params="value";
+		$("#id_nombre_concepto").autocomplete({
+			source : base_url,
+			minLenght : 1,
+			select : function(event, ui) {
+				id_concepto = ui.item.id;
+				name_concepto= ui.item.descripcion;
+				ui.item.value = ui.item.descripcion;
+				$("#id_nombre_concepto").val(name_concepto);
+				$("#id_concepto_factura").val(id_concepto);			
+			}
+		});
+	});
+
+</script>
+{%endblock%}
+{% block content %}
+<div class="gri16 text-izquierda" id="breadcumb">
+	<a href="{% url 'frontend_home' %}">Inicio</a> 
+	<a href="{% url 'frontend_home' %}parametros/">> Parametros</a>  
+	<a href="{% url 'frontend_home' %}parametros/concepto_factura/">> Conceptos de Facturas</a> 
+	<span class="verde-1">> Listado de Conceptos de Facturas</span> 
+</div>
+<div class="clear"></div>
+<h1>Listado de Conceptos de Facturas</h1>
+<div class="grid_6">
+	<form name="frm_busqueda" id="frm_busqueda" method="post" action="/parametros/concepto_factura/listado_busqueda_concepto_factura/">
+		{% csrf_token %}
+		<table id="lista-categoria" frame="box">
+			<tr>
+				<th class="acciones"  colspan="3"><strong><a href="#" style="color: white;">Filtrar</a></strong></th>
+			</tr>
+			<tr>
+				<td>Conceptos de Facturas:</td>
+				<td><input id="id_concepto_factura" name="concepto_factura" type="hidden" maxlength="100"/>
+					<input id="id_nombre_concepto" type="text" name="nombre_concepto" maxlength="100" /><br><br>
+				</td>
+			</tr>
+			<tr>
+				<td></td>
+				<td><input type="button" value="Buscar" onclick="buscar();" class="historico" style="cursor: pointer"/></td>
+			</tr>
+		</table>
+	</form>
+</div>
+<div class="clear"></div>
+<div id="listado-cuadro-busqueda">
+	<a href="{% url 'frontend_home' %}parametros/concepto_factura/agregar" class="boton-verde">Agregar Conceptos de Facturas</a>
+	<br><br>
+</div>
+<div id="listado-item-lote">
+		<table border="1" cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
+				<th>id</th><th>Descripcion</th><th>Precio Unitario</th><th>Exentas</th><th>IVA 5</th><th>IVA 10</th>
+				{% for hw in object_list %}
+				{% if forloop.counter|divisibleby:2 %}
+					<tr>
+						<td><a href="{{hw.id}}">{{hw.id}} <strong>(Ver Detalles)</strong></a></td>
+						<td>{{hw.descripcion}}</td>
+						<td>{{hw.precio_unitario}}</td>
+						{% if hw.exentas == True %} 
+							<td> X </td>
+						{% else %}
+							<td> - </td>
+						{% endif %}
+						{% if hw.iva5 == True %} 
+							<td> X </td>
+						{% else %}
+							<td> - </td>
+						{% endif %}
+						{% if hw.iva10 == True %} 
+							<td> X </td>
+						{% else %}
+							<td> - </td>
+						{% endif %}
+					</tr>
+					{% else %}
+					<tr class="bkg_gris">
+						<td><a href="{{hw.id}}">{{hw.id}} <strong>(Ver Detalles)</strong></a></td>
+						<td>{{hw.descripcion}}</td>
+						<td>{{hw.precio_unitario}}</td>
+						{% if hw.exentas == True %} 
+							<td> X </td>
+						{% else %}
+							<td> - </td>
+						{% endif %}
+						{% if hw.iva5 == True %} 
+							<td> X </td>
+						{% else %}
+							<td> - </td>
+						{% endif %}
+						{% if hw.iva10 == True %} 
+							<td> X </td>
+						{% else %}
+							<td> - </td>
+						{% endif %}
+					</tr>
+					{% endif %}				
+				{% endfor %}
+		<div class="pagination">
+			<span class="step-links">
+				Mostrando {{ object_list.start_index }}-{{ object_list.end_index }} de {{ object_list.paginator.count }} Resultados
+				{%if object_list.has_previous%} 
+				<a href="?page={{ object_list.first_index}}{{ultimo}}"> Primera </a> 
+				<a href="?page={{ object_list.previous_page_number }}{{ultimo}}"> Anterior</a> 
+				{%endif%}
+				P&aacute;gina |{{object_list.number}}|		
+				{%if object_list.has_next%} 
+				<a href="?page={{ object_list.next_page_number }}{{ultimo}}"> Siguiente </a> 				
+				<a href="?page={{ object_list.end_index}}{{ultimo}}"> Ultima </a> 
+				{%endif%} 
+			</span>
+		</div>
+	</table>
+</div>
+
+<div id="footer">
+	<div class="pagination">
+			<span class="step-links"> Mostrando {{ object_list.start_index }}-{{ object_list.end_index }} de {{ object_list.paginator.count }} Resultados
+				{%if object_list.has_previous%} <a href="?page={{ object_list.first_index}}{{ultima_busqueda}}"> Primera </a> <a href="?page={{ object_list.previous_page_number }}{{ultima_busqueda}}"> Anterior</a> {%endif%}
+				P&aacute;gina |{{object_list.number}}|
+				{%if object_list.has_next%} <a href="?page={{ object_list.next_page_number }}{{ultima_busqueda}}"> Siguiente </a> <a href="?page={{ object_list.end_index}}{{ultima_busqueda}}"> Ultima </a> {%endif%} </span>
+		</div></br>
+	<a href="{% url 'frontend_home' %}parametros/concepto_factura" class="boton-verde">Volver al módulo de Conceptos de Facturas</a>
+	</div>
+{% endblock %}

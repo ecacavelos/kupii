@@ -1,0 +1,13 @@
+syntax: glob
+*.pyc
+*.orig
+.metadata/
+principal\static\facturacion\qz-print\assets\signing\sign-message.asp
+.idea\.name
+.idea\misc.xml
+.idea\modules.xml
+.idea\propar.iml
+.idea\vcs.xml
+.idea\workspace.xml
+.idea/
+propar01\configuraciones.py

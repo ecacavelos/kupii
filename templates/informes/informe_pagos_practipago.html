@@ -1,0 +1,314 @@
+{% extends "lotes/base_lotes.html" %}
+{% block header_scripts %}
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		$('#busqueda_label').focus();
+		item_detalle = '<table border="1" cellpadding="0" cellspacing="0"  id="id_cuota_pagar" class="listado-cuotas">'
+			+ '<tr><th>Nro Cuota</th><th>Fechas</th><th>Monto Cuota</th></tr>';	
+		//Cambiar calendario a español
+		$.datepicker.regional['es'] = {
+			closeText : 'Cerrar',
+			prevText : '<Ant',
+			nextText : 'Sig>',
+			currentText : 'Hoy',
+			monthNames : ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+			monthNamesShort : ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+			dayNames : ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
+			dayNamesShort : ['Dom', 'Lun', 'Mar', 'Mié', 'Juv', 'Vie', 'Sáb'],
+			dayNamesMin : ['Do', 'Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sá'],
+			weekHeader : 'Sm',
+			dateFormat : 'dd/mm/yy',
+			firstDay : 1,
+			isRTL : false,
+			showMonthAfterYear : false,
+			yearSuffix : ''
+		};
+		
+		var tipo_busqueda="codigo";
+		var busqueda_label="";			
+		var busqueda= "";
+		$("#busqueda_label").attr("placeholder","Ej: 001/001/0001");	
+		autocompleteLotePorCodigoParalot(tipo_busqueda, busqueda_label, busqueda);
+		
+		busqueda_label= "{{busqueda_label}}";
+		$("#busqueda_label").val(busqueda_label);			
+		busqueda= "{{busqueda}}";
+		$("#busqueda").val(busqueda);
+		
+	// Setear idioma al calendario
+		$.datepicker.setDefaults($.datepicker.regional['es']);
+		var fecha_ini = "{{fecha_ini}}";
+		var fecha_fin = "{{fecha_fin}}";
+		var busqueda = '{{busqueda}}';
+		var busqueda_label = '{{busqueda_label}}';
+
+
+		$('#fecha_ini').val(fecha_ini);
+		$('#fecha_fin').val(fecha_fin);
+		$('#busqueda_label').val(busqueda_label);
+		$('#busqueda').val(busqueda);
+
+		$('#fecha_ini').mask('##/##/####');
+		$("#fecha_ini").datepicker({
+			dateFormat : 'dd/mm/yy'
+		});
+		$('#fecha_fin').mask('##/##/####');
+		$("#fecha_fin").datepicker({
+			dateFormat : 'dd/mm/yy'
+		});
+
+		if ($("#fecha_ini").val() == "" && $("#fecha_fin").val() == "") {//parametros no seteados
+			$('.listado-pagos').hide();
+			$('.pagination').hide();
+		} else {
+			$('.listado-pagos').show();
+			$('.pagination').show();
+		}
+
+		// Setear idioma al calendario
+		$.datepicker.setDefaults($.datepicker.regional['es']);
+		var d = new Date();
+		var curr_date = d.getDate();
+		var curr_month = d.getMonth() + 1;
+		var curr_year = d.getFullYear();
+		if (curr_date < 10) {
+			curr_date = "0" + curr_date.toString();
+		}
+		if (curr_month < 10) {
+			curr_month = "0" + curr_month.toString();
+		}
+		var hoy = (curr_date + "/" + curr_month + "/" + curr_year);
+
+		var fecha_ini = "{{fecha_ini}}";
+		var fecha_fin = "{{fecha_fin}}";
+		var lote_id = "{{lote_id}}";
+		$('#busqueda').val(lote_id);
+		$('#fecha_ini').val(fecha_ini);
+		$('#fecha_fin').val(fecha_fin);
+		$('#busqueda_label').mask('###/###/####');
+		$('#fecha_ini').mask('##/##/####');
+		$("#fecha_ini").datepicker({
+			dateFormat : 'dd/mm/yy'
+		});
+		$('#fecha_fin').mask('##/##/####');
+		$("#fecha_fin").datepicker({
+			dateFormat : 'dd/mm/yy'
+		});
+
+		$('.pagination').show();
+		$( ".eliminar" ).click(function() {
+			var id_venta = this.value;
+			var request = $.ajax({
+				type : "POST",
+				url : base_context + "/movimientos/eliminar_venta/",
+				data : {
+					venta_id : id_venta,
+				},
+				dataType : "json"
+			});
+			// Actualizamos el formulario con los datos obtenidos.
+			request.done(function(msg) {
+				if(msg.ok == false){
+					alert("Favor eliminar los pagos asociados a dicha venta");
+				}else{
+					window.location.reload();
+				}
+			});
+		});
+		
+		$( ".eliminar_pago" ).click(function() {
+			var id_pago = this.value;
+			var request = $.ajax({
+				type : "POST",
+				url : base_context + "/movimientos/eliminar_pagodecuotas/",
+				data : {
+					id_pago : id_pago,
+				},
+				dataType : "json"
+			});
+			// Actualizamos el formulario con los datos obtenidos.
+			request.done(function(msg) {
+				if(msg.ok == false){
+					alert("Ha ocurrido un error.");
+				}else{
+					window.location.reload();
+				}
+			});
+		});
+		
+		base_url_sucursal = base_context + "/ajax/get_sucursales_by_name/";
+		params="value";
+        var id_sucursal;
+        params = "value";
+        $("#sucursal_label").autocomplete({
+	        source : base_url_sucursal,
+	        minLength : 1,
+	        select : function(event, ui) {
+		        id_sucursal = ui.item.id;
+		        $("#sucursal").val(id_sucursal);
+	        }
+        });
+	});
+
+	function validar() {
+{#		if ($('#sucursal').val() == 0 || $('#sucursal_label').val() == "") {#}
+{#			alert("Debe seleccionar una sucursal");#}
+{#			return;#}
+{#		}#}
+		$("#frm_busqueda").submit();
+	}
+	
+	function retrieve_informe_pagos_practiPago() {
+    	window.location.href = base_context + "/informes/informe_pagos_practipago_reporte_excel?sucursal="+$('#sucursal').val()+"&sucursal_label="+$('#sucursal_label').val()+"&fecha_ini="+$('#fecha_ini').val()+"&fecha_fin="+$('#fecha_fin').val();
+	}
+
+</script>
+{% endblock %}
+{% block content %}
+<div class="gri16 text-izquierda" id="breadcumb">
+	<a href="{% url 'frontend_home' %}">Inicio</a><span class="verde-1">></span>
+	<a href="{% url 'frontend_home' %}informes/">Informes</a>
+	<span class="verde-1">> Informe de Pagos Practipago</span>
+</div>
+
+<div class="clear"></div>
+
+<h1>Informe Pagos Practipago </h1>
+
+<div class="grid_6">
+	<form name="frm_busqueda" id="frm_busqueda" method="get" action="{% url 'frontend_home' %}informes/informe_pagos_practipago/">
+		<table id="lista-categoria" frame="box">
+			<tr>
+				<th class="acciones" colspan="3"><strong><a href="#" style="color: white;">Filtrar</a></strong></th>
+			</tr>
+			<th></th><th>Desde:</th><th>Hasta:</th>
+			<tr>
+				<td> Rango de Fecha: </td>
+				<td>
+				<input name="fecha_ini" id="fecha_ini" type="text" value="" />
+				</td>
+				<td>
+				<input name="fecha_fin" id="fecha_fin" type="text" value="" />
+				</td>
+			</tr>
+			<tr>
+				<td>
+					Sucursal:
+				</td>
+				<td>
+					<input type="text" id="sucursal_label" name="sucursal_label" placeholder="Todas las sucursales" />
+					<input type="hidden" id="sucursal" name="sucursal"/>
+				</td>
+	    		<td></td>
+            </tr>
+    	    <tr>
+				<td>
+				<input type="button" value="Buscar" onclick="validar();" class="historico" style="cursor: pointer"/>
+				</td>
+				<td><a class="boton-verde" id="id_boton" onclick="retrieve_informe_pagos_practiPago();">Descargar Excel</a></td>
+			</tr>
+		</table>
+	</form>
+</div>
+<div class="clear"></div>
+<div id="listado-cuadro-busqueda">
+
+	<br>
+	<br>
+</div>
+<div id="listado-ventas">
+	<table  cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
+    	<tr>
+	    	<th>Trans.</th><th>Fecha Pago</th><th colspan="1">Lote</th><th colspan="1">Cuotas Pagadas</th><th>Fecha Vto.</th><th>Dias Atraso</th><th colspan="4">Detalles</th><th colspan="1">Total Pagado</th><th>Factura</th><th colspan="2">Acciones</th>
+		</tr>
+		{% for pago in lista_pagos %}
+{#			{% for pago in venta %}#}
+			{% if forloop.counter == 1 %}
+{#			<th>Fecha de Venta</th><th>Fecha 1er Vto.</th><th>Cliente</th><th>Lote</th><th>Vendedor</th><th>Plan de Pago</th><th>Entrega Inicial</th><th>Precio Cuota</th><th>Precio final de venta</th><th>Cuotas Pagadas</th><th>Es Recuperada</th><th colspan="3">Acciones</th>#}
+{#				<tr>#}
+{#					<td class="recuperada celda_resumen_venta">{{pago.fecha_de_venta}}</td>#}
+{#					<td class="recuperada celda_resumen_venta">{{pago.fecha_primer_vencimiento}}</td>#}
+{#					<td class="recuperada celda_resumen_venta">{{pago.cliente}}</td>#}
+{#                    <td class="recuperada celda_resumen_venta">{{pago.lote}}</td>#}
+{#                    <td class="recuperada celda_resumen_venta">{{pago.vendedor}}</td>#}
+{#                    <td class="recuperada celda_resumen_venta">{{pago.plan_de_pago}}</td>#}
+{#					<td class="recuperada celda_resumen_venta">{{pago.entrega_inicial}}</td>#}
+{#					<td class="recuperada celda_resumen_venta">{{pago.precio_de_cuota}}</td>#}
+{#					<td class="recuperada celda_resumen_venta">{{pago.precio_final}}</td>#}
+{#					<td class="recuperada celda_resumen_venta">{{pago.pagos_realizados}}</td>#}
+{#					{% if pago.recuperado == True %}#}
+{#						<td class="recuperada celda_resumen_venta">Si</td>#}
+{#					{% else %}#}
+{#						<td class="recuperada celda_resumen_venta">No</td>#}
+{#					{% endif %}#}
+{#					#}
+{#					<td class="recuperada celda_resumen_venta"><a href="/movimientos/agregar_pago/{{pago.id}}"><span style="font-size: 35px; color: #CCCCCC; font-weight: bolder" class="glyphicon glyphicon-plus"></span></a></td>#}
+{#					<td class="recuperada celda_resumen_venta"><a href="/movimientos/modificar_venta/{{pago.id}}"><img src="/static/custom/img/black_edit.png" /></a></td>#}
+{#					<td class="recuperada celda_resumen_venta"><button class="eliminar" value="{{pago.id}}"><img src="/static/custom/img/black_delete.png" /></button></td>#}
+{#				</tr>#}
+{#				<tr>#}
+{#					<th>Fecha Pago</th><th colspan="2">Cuotas Pagadas</th><th>Fecha Vto.</th><th>Dias Atraso</th><th colspan="1">Nro Cuota</th><th colspan="2">Detalles</th><th colspan="1">Total Pagado</th><th>Transaccion</th><th>Factura</th><th colspan="3">Acciones</th>#}
+{#				</tr>#}
+				<tr class="bkg_gris">
+                    <td> {{pago.transaccion_id}} </td>
+					<td>{{pago.fecha_de_pago}}</td>
+                    <td colspan="1"> {{ pago.lote.codigo_paralot }}</td>
+					<td colspan="1">{{pago.cantidad_cuotas}} cuotas, Nro: {{pago.nro_cuota}}</td>
+					<td>{{pago.vencimiento}}</td>
+					<td>{{pago.dias_atraso}}</td>
+					<td colspan="4" style="text-align: right">{{pago.detalle}}</td>
+					<td colspan="1">Total pagado: {{pago.monto}}</td>
+
+					{% if pago.factura or pago.factura != None %}
+                        <td>
+                            <a href="{% url 'frontend_home' %}facturacion/listado/{{pago.factura.id}}"><strong>{{pago.factura.numero}}</strong></a>
+                        </td>
+					{% else %}
+						<td> No Facturado <a href="/facturacion/facturar_operacion/1/{{pago.id}}"><img src="/static/custom/img/invoice.png" /></a> </td>
+					{% endif %}
+
+					<td style="width: 5px;"><a href="/movimientos/modificar_pagocuota/{{pago.id}}"><img src="/static/custom/img/black_edit.png" /></a></td>
+					<td><button class="eliminar_pago" value="{{pago.id}}"><img src="/static/custom/img/black_delete.png" /></button></td>
+				</tr>
+			{% else %}
+				<tr class="bkg_gris">
+                <td> {{pago.transaccion_id}} </td>
+					<td>{{pago.fecha_de_pago}}</td>
+                    <td colspan="1"> {{ pago.lote.codigo_paralot }}</td>
+					<td colspan="1">{{pago.cantidad_cuotas}} cuotas, Nro: {{pago.nro_cuota}}</td>
+					<td>{{pago.vencimiento}}</td>
+					<td>{{pago.dias_atraso}}</td>
+					<td colspan="4" style="text-align: right">{{pago.detalle}}</td>
+					<td colspan="1">Total pagado: {{pago.monto}}</td>
+
+					
+					{% if pago.factura %}
+						<td>
+                            <a href="{% url 'frontend_home' %}facturacion/listado/{{pago.factura.id}}"><strong>{{pago.factura.numero}}</strong></a>
+                        </td>
+					{% else %}
+						<td> No Facturado <a href="/facturacion/facturar_operacion/1/{{pago.id}}"><img src="/static/custom/img/invoice.png" /></a> </td>
+					{% endif %}
+
+					<td style="width: 5px;"><a href="/movimientos/modificar_pagocuota/{{pago.id}}"><img src="/static/custom/img/black_edit.png" /></a></td>
+					<td><button class="eliminar_pago" value="{{pago.id}}"><img src="/static/custom/img/black_delete.png" /></button></td>
+				</tr>
+			{% endif %}
+{#			{%endfor%}#}
+		{%endfor%}
+		<!--
+		<div class="pagination">
+			<span class="step-links"> Mostrando {{ lista_movimientos.start_index }}-{{ lista_movimientos.end_index }} de {{ lista_movimientos.paginator.count }} Resultados
+				{%if lista_movimientos.has_previous%} <a href="?page={{ lista_movimientos.first_index}}{{ultimo}}"> Primera </a> <a href="?page={{ lista_movimientos.previous_page_number }}{{ultimo}}"> Anterior</a> {%endif%}
+				P&aacute;gina |{{lista_movimientos.number}}|
+				{%if lista_movimientos.has_next%} <a href="?page={{ lista_movimientos.next_page_number }}{{ultimo}}"> Siguiente </a> <a href="?page={{ lista_movimientos.end_index}}{{ultimo}}"> Ultima </a> {%endif%} </span>
+		</div>
+		-->
+	</table>
+</div>
+
+<div id="footer">
+	<a href="{% url 'frontend_home' %}informes" class="boton-verde">Volver al módulo de Informes</a>
+</div>
+{% endblock %} 

@@ -1,0 +1,84 @@
+{% extends "lotes/base_lotes.html" %}
+
+{% block header_scripts %}
+<!--
+<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+-->
+<script type="text/javascript">
+
+function solo_numeros () {
+		
+	  	$('#id_cedula').val($('#id_cedula').val().replace(/\D/g,''));
+	}
+
+
+var data = [
+		{"label" : "Aragorn"}
+		];
+$(document).ready(function() {
+	$('.grid_6').hide();
+	$("#id_cedula").focus();
+	$("#id_fecha_nacimiento").addClass("date");
+	$("#id_fecha_nacimiento").datepicker({ dateFormat: 'dd/mm/yy' });
+	$('.date').mask('##/##/####');
+	$( "#id_cedula" ).keyup(function() {
+{#  		solo_numeros();#}
+	});
+});
+</script>
+{% endblock %}
+{% block content %}
+<div class="gri16 text-izquierda" id="breadcumb">
+						<a href="{% url 'frontend_home' %}">Inicio</a> <span class="verde-1">></span>  
+						<a href="{% url 'frontend_home' %}clientes/">Clientes</a> <span class="verde-1">></span>  
+						<a href="{% url 'frontend_home' %}clientes/listado/">Listado de Clientes</a>  
+						<span class="verde-1">> Detalles de Cliente</span> 
+					</div>
+
+					<div class="clear"></div>
+
+					<div class="grid_10">
+  						<h1>Detalles de Clientes</h1>
+					</div>
+
+					<div class="grid_6">
+  						<a href="#" class="historico">Buscar</a>
+					</div>
+
+					<div class="clear"></div>
+<div id="detalle-lote">
+	<div id="detalle-lote-header">
+		<h3 class="detalle-lote-header">Cliente {{ cliente.id }} </h3>
+	</div>
+			
+		<div id="{{message_id}}">{{ message }}</div>
+	
+	<table width="50%" border="1" cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
+	<form action="" method="post">
+		{% csrf_token %}
+		{% for field in form %}
+		<tr>
+		<div class="fieldWrapper{% if field.field.required %} required{% endif %}">
+			
+			<td>{{ field.label_tag }}</td><td>{{ field }}{{ field.errors }}</td>
+		</div>
+		</tr>		
+		{% endfor %}
+	</table>
+		<div id="lote-ventas">
+			{% for venta in ventas_relacionadas %}
+				<a href="{% url 'frontend_home' %}clientes/listado/ventas/{{ venta.id }}" target="_blank">{{ venta }}</a>
+			{% endfor %}
+		</div>
+		{%if grupo == 1%}
+			<input class="lote-form-button" type="submit" name="boton_guardar" value="Guardar Cambios" />
+			<input class="lote-form-button" type="submit" name="boton_borrar" value="Borrar este Registro" />
+		{%endif%}
+	</form>
+</div>
+<br>
+<div id="footer">
+	<a href="{% url 'frontend_home' %}clientes/listado" class="boton-verde">Volver al Listado de Clientes</a>
+</div>
+{% endblock %}
