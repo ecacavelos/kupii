@@ -7571,26 +7571,51 @@ def informe_facturacion(request):
                                                 if (todos_excepto_pago_cuota):
                                                     facturas = Factura.objects.filter(anulado=False, fecha__range=(
                                                         fecha_ini_parsed, fecha_fin_parsed)).exclude(
-                                                        detalle__icontains='Pago de Cuota')
+                                                        detalle__icontains='Pago de Cuota').order_by('numero')
                                                 else:
                                                     facturas = Factura.objects.filter(anulado=False, fecha__range=(
-                                                        fecha_ini_parsed, fecha_fin_parsed))
+                                                        fecha_ini_parsed, fecha_fin_parsed)).order_by('numero')
                                             else:
                                                 facturas = Factura.objects.filter(anulado=False, fecha__range=(
                                                     fecha_ini_parsed, fecha_fin_parsed),
-                                                                                  detalle__icontains=concepto_label)
+                                                                                  detalle__icontains=concepto_label).order_by('numero')
                                         else:
                                             facturas = Factura.objects.raw(
-                                                '''SELECT "principal_factura"."id", "principal_factura"."fecha", "principal_factura"."numero", "principal_factura"."cliente_id", "principal_factura"."lote_id", "principal_factura"."rango_factura_id", "principal_factura"."tipo", "principal_factura"."detalle", "principal_factura"."anulado", "principal_factura"."observacion", "principal_factura"."usuario_id", "principal_factura"."impresa" FROM "principal_factura" WHERE "principal_factura"."lote_id" IN (SELECT id FROM "principal_lote" WHERE manzana_id IN (SELECT id FROM "principal_manzana" WHERE fraccion_id = %s)) AND fecha >= %s AND fecha <= %s ORDER BY numero''',
+                                                '''SELECT "principal_factura"."id", "principal_factura"."fecha",
+                                                          "principal_factura"."numero",
+                                                          "principal_factura"."cliente_id",
+                                                          "principal_factura"."lote_id",
+                                                          "principal_factura"."rango_factura_id",
+                                                          "principal_factura"."tipo",
+                                                          "principal_factura"."detalle",
+                                                          "principal_factura"."anulado",
+                                                          "principal_factura"."observacion",
+                                                          "principal_factura"."usuario_id",
+                                                          "principal_factura"."impresa"
+                                                          FROM "principal_factura"
+                                                WHERE "principal_factura"."lote_id" IN (
+                                                SELECT id FROM "principal_lote" WHERE manzana_id IN (
+                                                SELECT id FROM "principal_manzana" WHERE fraccion_id = %s))
+                                                AND fecha >= %s AND fecha <= %s ORDER BY numero''',
                                                 [fraccion, fecha_ini_parsed, fecha_fin_parsed])
                                     else:
                                         facturas = Factura.objects.raw(
-                                            '''SELECT "principal_factura"."id", "principal_factura"."fecha", "principal_factura"."numero", "principal_factura"."cliente_id", "principal_factura"."lote_id", "principal_factura"."rango_factura_id", "principal_factura"."tipo", "principal_factura"."detalle", "principal_factura"."anulado", "principal_factura"."observacion", "principal_factura"."usuario_id", "principal_factura"."impresa" FROM "principal_factura" WHERE (SUBSTR("principal_factura"."numero", 1, 3) LIKE %s) AND fecha >= %s AND fecha <= %s ORDER BY numero''',
+                                            '''SELECT "principal_factura"."id", "principal_factura"."fecha",
+                                                        "principal_factura"."numero", "principal_factura"."cliente_id",
+                                                        "principal_factura"."lote_id",
+                                                        "principal_factura"."rango_factura_id",
+                                                        "principal_factura"."tipo", "principal_factura"."detalle",
+                                                        "principal_factura"."anulado",
+                                                        "principal_factura"."observacion",
+                                                        "principal_factura"."usuario_id", "principal_factura"."impresa"
+                                                        FROM "principal_factura"
+                                            WHERE (SUBSTR("principal_factura"."numero", 1, 3) LIKE %s) AND fecha >= %s
+                                            AND fecha <= %s ORDER BY numero''',
                                             [sucursal_label, fecha_ini_parsed, fecha_fin_parsed])
                                 else:
                                     if sucursal_label == '':
                                         facturas = Factura.objects.filter(anulado=False, fecha__range=(
-                                            fecha_ini_parsed, fecha_fin_parsed), usuario=busqueda)
+                                            fecha_ini_parsed, fecha_fin_parsed), usuario=busqueda).order_by('numero')
                                     else:
                                         # Esta manera es haciendo el query estatico, en duro, luego por cada rox ir creando un objeto Factura y luego ir agregando
                                         # a una lista Facturas, pero no es lo mismo el QuerySet que la List, asi que explota el codigo mas abajo
@@ -7617,7 +7642,7 @@ def informe_facturacion(request):
                             else:
                                 facturas = Factura.objects.filter(anulado=False,
                                                                   fecha__range=(fecha_ini_parsed, fecha_fin_parsed),
-                                                                  usuario=request.user)
+                                                                  usuario=request.user).order_by('numero')
 
                             for factura in facturas:
 
@@ -7771,36 +7796,70 @@ def informe_facturacion_reporte_excel(request):
                                                 if (todos_excepto_pago_cuota):
                                                     facturas = Factura.objects.filter(anulado=False, fecha__range=(
                                                         fecha_ini_parsed, fecha_fin_parsed)).exclude(
-                                                        detalle__icontains='Pago de Cuota')
+                                                        detalle__icontains='Pago de Cuota').order_by('numero')
                                                 else:
                                                     facturas = Factura.objects.filter(anulado=False, fecha__range=(
-                                                        fecha_ini_parsed, fecha_fin_parsed))
+                                                        fecha_ini_parsed, fecha_fin_parsed)).order_by('numero')
                                             else:
                                                 facturas = Factura.objects.filter(anulado=False, fecha__range=(
                                                     fecha_ini_parsed, fecha_fin_parsed),
-                                                                                  detalle__icontains=concepto_label)
+                                                        detalle__icontains=concepto_label).order_by('numero')
                                         else:
                                             facturas = Factura.objects.raw(
-                                                '''SELECT "principal_factura"."id", "principal_factura"."fecha", "principal_factura"."numero", "principal_factura"."cliente_id", "principal_factura"."lote_id", "principal_factura"."rango_factura_id", "principal_factura"."tipo", "principal_factura"."detalle", "principal_factura"."anulado", "principal_factura"."observacion", "principal_factura"."usuario_id", "principal_factura"."impresa" FROM "principal_factura" WHERE "principal_factura"."lote_id" IN (SELECT id FROM "principal_lote" WHERE manzana_id IN (SELECT id FROM "principal_manzana" WHERE fraccion_id = %s)) AND fecha >= %s AND fecha <= %s ORDER BY numero''',
+                                                '''SELECT "principal_factura"."id", "principal_factura"."fecha",
+                                                          "principal_factura"."numero",
+                                                          "principal_factura"."cliente_id",
+                                                          "principal_factura"."lote_id",
+                                                          "principal_factura"."rango_factura_id",
+                                                          "principal_factura"."tipo", "principal_factura"."detalle",
+                                                          "principal_factura"."anulado",
+                                                          "principal_factura"."observacion",
+                                                          "principal_factura"."usuario_id",
+                                                          "principal_factura"."impresa"
+                                                          FROM "principal_factura"
+                                                WHERE "principal_factura"."lote_id" IN (
+                                                SELECT id FROM "principal_lote" WHERE manzana_id IN (
+                                                SELECT id FROM "principal_manzana" WHERE fraccion_id = %s))
+                                                AND fecha >= %s AND fecha <= %s ORDER BY numero''',
                                                 [fraccion, fecha_ini_parsed, fecha_fin_parsed])
                                     else:
                                         facturas = Factura.objects.raw(
-                                            '''SELECT "principal_factura"."id", "principal_factura"."fecha", "principal_factura"."numero", "principal_factura"."cliente_id", "principal_factura"."lote_id", "principal_factura"."rango_factura_id", "principal_factura"."tipo", "principal_factura"."detalle", "principal_factura"."anulado", "principal_factura"."observacion", "principal_factura"."usuario_id", "principal_factura"."impresa" FROM "principal_factura" WHERE (SUBSTR("principal_factura"."numero", 1, 3) LIKE %s) AND fecha >= %s AND fecha <= %s ORDER BY numero''',
+                                            '''SELECT "principal_factura"."id", "principal_factura"."fecha",
+                                                      "principal_factura"."numero",
+                                                      "principal_factura"."cliente_id", "principal_factura"."lote_id",
+                                                      "principal_factura"."rango_factura_id",
+                                                      "principal_factura"."tipo", "principal_factura"."detalle",
+                                                      "principal_factura"."anulado", "principal_factura"."observacion",
+                                                      "principal_factura"."usuario_id", "principal_factura"."impresa"
+                                                      FROM "principal_factura"
+                                            WHERE (SUBSTR("principal_factura"."numero", 1, 3) LIKE %s)
+                                            AND fecha >= %s AND fecha <= %s ORDER BY numero''',
                                             [sucursal_label, fecha_ini_parsed, fecha_fin_parsed])
                                 else:
                                     if sucursal_label == '':
                                         facturas = Factura.objects.filter(anulado=False, fecha__range=(
-                                            fecha_ini_parsed, fecha_fin_parsed), usuario=busqueda)
+                                            fecha_ini_parsed, fecha_fin_parsed), usuario=busqueda).order_by('numero')
                                     else:
-                                        # esta forma es obtener RawWuerySet, es decir, los modelos del Django a partir de un query estático y que me sirve para no modificar codigo
+                                        # esta forma es obtener RawWuerySet, es decir, los modelos del Django a partir
+                                        # de un query estático y que me sirve para no modificar codigo
                                         facturas = Factura.objects.raw(
-                                            '''SELECT "principal_factura"."id", "principal_factura"."fecha", "principal_factura"."numero", "principal_factura"."cliente_id", "principal_factura"."lote_id", "principal_factura"."rango_factura_id", "principal_factura"."tipo", "principal_factura"."detalle", "principal_factura"."anulado", "principal_factura"."observacion", "principal_factura"."usuario_id", "principal_factura"."impresa" FROM "principal_factura" WHERE (SUBSTR("principal_factura"."numero", 1, 3) LIKE %s) AND fecha >= %s AND fecha <= %s AND usuario_id = %s ORDER BY numero''',
+                                            '''SELECT "principal_factura"."id", "principal_factura"."fecha",
+                                                      "principal_factura"."numero", "principal_factura"."cliente_id",
+                                                      "principal_factura"."lote_id",
+                                                      "principal_factura"."rango_factura_id",
+                                                      "principal_factura"."tipo", "principal_factura"."detalle",
+                                                      "principal_factura"."anulado", "principal_factura"."observacion",
+                                                      "principal_factura"."usuario_id", "principal_factura"."impresa"
+                                                      FROM "principal_factura"
+                                            WHERE (SUBSTR("principal_factura"."numero", 1, 3) LIKE %s)
+                                            AND fecha >= %s AND fecha <= %s AND usuario_id = %s ORDER BY numero''',
+
                                             [sucursal_label, fecha_ini_parsed, fecha_fin_parsed, busqueda])
 
                             else:
                                 facturas = Factura.objects.filter(anulado=False,
-                                                                  fecha__range=(fecha_ini_parsed, fecha_fin_parsed),
-                                                                  usuario=request.user).order_by('numero')
+                                                fecha__range=(fecha_ini_parsed, fecha_fin_parsed),
+                                                usuario=request.user).order_by('numero')
 
                             sucursal = facturas[0].numero[:3]
                             total_facturado_sucursal = 0
@@ -7813,8 +7872,10 @@ def informe_facturacion_reporte_excel(request):
                             cont = 0
                             for factura in facturas:
                                 cont += 1
-                                # esta parte es donde tengo que ir sumando los totales por sucursales e ir guardando para luego ubicar en el excel
-                                # haremos una lista donde iremos agregando los totales porque no sabemos cuantas sucursales puede haber en cuestion segun los filtros
+                                # esta parte es donde tengo que ir sumando los totales por sucursales e ir guardando
+                                # para luego ubicar en el excel
+                                # haremos una lista donde iremos agregando los totales porque no sabemos cuantas
+                                # sucursales puede haber en cuestion segun los filtros
                                 sucursal_aux = factura.numero[:3]
                                 if sucursal_aux != sucursal:
                                     totales_sucursales.append(total_sucursal)
@@ -7966,7 +8027,8 @@ def informe_facturacion_reporte_excel(request):
                         cant_filas = len(filas)
                         cont_filas = 0
                         for fila in filas:
-                            # esta parte usamos para dividir las sucursales de acuerdo a los primeros 3 nros de factura y separar en el excel
+                            # esta parte usamos para dividir las sucursales de acuerdo a los primeros 3 nros de factura
+                            # y separar en el excel
                             sucursal_aux = fila['numero'][:3]
                             if sucursal_aux != sucursal:
                                 sucursal = sucursal_aux
