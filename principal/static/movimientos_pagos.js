@@ -259,7 +259,8 @@ function retrieveLotePago() {
 			data : {
 				fraccion : splitted_id[0],
 				manzana : splitted_id[1],
-				lote : splitted_id[2]
+				lote : splitted_id[2],
+
 			},
 			dataType : "json"		
 		});
@@ -267,7 +268,9 @@ function retrieveLotePago() {
 		// Actualizamos el formulario con los datos obtenidos del lote.
 		request.done(function(msg) {
 			global_lote_id = msg.lote_id;
-			var s = "<a class='boton-verde' href= "+base_context+ "/informes/informe_movimientos/?lote_ini=" + $("#id_lote").val() +"\&lote_fin="+ $("#id_lote").val() +"\&fecha_ini=&fecha_fin="  + "\" target=\"_blank\" \"> Ver Pagos</a>";
+			var s = "<a class='boton-verde' href= "+base_context+ "/informes/informe_movimientos/?lote_ini="
+				+ $("#id_lote").val() +"\&lote_fin="+ $("#id_lote").val() +"\&fecha_ini=&fecha_fin="
+				+ "\" target=\"_blank\" \"> Ver Pagos</a>";
 			$("#lote_error").html("");
 			$("#lote_superficie").html(msg.superficie);			
 			$("#lote_seleccionado_detalles").html(s);
@@ -276,9 +279,38 @@ function retrieveLotePago() {
 			//var d = new Date();
 			//var month = d.getMonth() + 1;
 			//var day = d.getDate();
-			retrieveVenta();			
+			//alert(msg.obs);
+			console.log('Contenido msg: '+msg.obs);
+
+
+			// Get the modal
+			var modal = $("#myModal");
+			$("#mensaje_obs_lote").html(msg.obs);
+			if (msg.obs != "" && msg.obs != null){
+				modal.show();
+			}
+
+			// Get the <span> element that closes the modal
+			var span = $(".close")[0];
+
+
+			// When the user clicks on <span> (x), close the modal
+			span.onclick = function() {
+			    modal.hide();
+			}
+
+			// When the user clicks anywhere outside of the modal, close it
+			window.onclick = function(event) {
+			    if (event.target == modal) {
+    			    modal.hide();
+   				 }
+			}
+
+
+			retrieveVenta();
 			//fecha_actual = new Date().toJSON().substring(0, 10);
-			
+
+
 			$("#id_cliente").removeAttr("disabled");
 			$("#id_vendedor").removeAttr("disabled");
 			$("#id_plan_pago").removeAttr("disabled");

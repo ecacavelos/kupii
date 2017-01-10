@@ -166,7 +166,7 @@ def retrieve_lote_pago_cuotas(request):
         fraccion_int = int(data.get('fraccion', ''))
         manzana_int = int(data.get('manzana', ''))
         lote_int = int(data.get('lote', ''))
-
+        #obs_int = str(data.get('obs', ''))
         #object_list = Lote.objects.get(fraccion=fraccion_int, manzana=manzana_int, nro_lote=lote_int)
         myfraccion = Fraccion.objects.get(id=fraccion_int)
         fraccion_manzanas = Manzana.objects.filter(fraccion=myfraccion)
@@ -175,7 +175,7 @@ def retrieve_lote_pago_cuotas(request):
                 mymanzana = manzana
         #object_list = Lote.objects.get(manzana_nro_manzana=mymanzana.nro_manzana, nro_lote=lote_int)
         
-        object_list = Lote.objects.get(manzana_id=mymanzana.id, nro_lote=lote_int, estado="3")
+        object_list = Lote.objects.get(manzana_id=mymanzana.id, nro_lote=lote_int, estado="3", )
         #object_list_venta = Venta.objects.latest('fecha_de_venta')       
         r = object_list
         if r:

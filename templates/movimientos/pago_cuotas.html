@@ -2,6 +2,7 @@
 
 {% block header_scripts %}
 
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}jquery.modal.css">
     <script type="text/javascript">
     var manzanaIngresada = 0;
     var loteIngresado = 0;
@@ -50,6 +51,7 @@
             }
         });
 
+        $("#myModal").hide();
 	});
 
 function pad(num, size) {
@@ -203,6 +205,7 @@ function cargarLotes(fraccion_id, manzana_id) {
 <script type="text/javascript" src="{{ STATIC_URL }}movimientos.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}movimientos_ventas.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}movimientos_pagos.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}jquery.modal.js"></script>
 <script>
 	var grupo = "{{grupo}}";
 	var codigo_lote = "{{codigo_lote}}";
@@ -252,7 +255,9 @@ function cargarLotes(fraccion_id, manzana_id) {
 				<tr>
 					<td><label for="id_lote">Lote: </label></td>
 					<td class="noimage">
-					<input id="id_lote" type="text" name="lote" maxlength="12" onblur="retrievePlanes();setFraccionManzanaLote()" />
+					<input id="id_lote" type="text" name="lote" maxlength="12"
+                           onblur="retrievePlanes();setFraccionManzanaLote()" />
+
 					<input id="detalle" type="hidden" name="detalle" />
 					<!--<input id="id_lote" type="text" name="lote" maxlength="12" onblur="retrieveData();" />-->
 					<input id="id_venta_pagos" type="hidden" name="id_venta" />
@@ -268,6 +273,16 @@ function cargarLotes(fraccion_id, manzana_id) {
 					<td><label>Ficha del Lote: </label></td>
 					<td class="noimage"><div id="lote_seleccionado_detalles"></td>
 				</tr>
+
+
+                <div id="myModal" class="modal">
+                  <!-- Modal content -->
+                  <div class="modal-content">
+                     <span class="close">&times;</span>
+                     <p id="mensaje_obs_lote"></p>
+                  </div>
+                </div>
+
 			</div>
 				<div class="fieldWrapperMovimientos">
 				<!--<input id="id_cliente" type="hidden" name="cliente"  maxlength="100" onchange="retrieveLotePago();" />-->
