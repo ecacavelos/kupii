@@ -2,7 +2,8 @@
 
 {% block header_scripts %}
 
-    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}jquery.modal.css">
+
+     <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}jquery.modal.css">
     <script type="text/javascript">
     var manzanaIngresada = 0;
     var loteIngresado = 0;
@@ -205,7 +206,7 @@ function cargarLotes(fraccion_id, manzana_id) {
 <script type="text/javascript" src="{{ STATIC_URL }}movimientos.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}movimientos_ventas.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}movimientos_pagos.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}jquery.modal.js"></script>
+
 <script>
 	var grupo = "{{grupo}}";
 	var codigo_lote = "{{codigo_lote}}";
@@ -274,11 +275,11 @@ function cargarLotes(fraccion_id, manzana_id) {
 					<td class="noimage"><div id="lote_seleccionado_detalles"></td>
 				</tr>
 
-
+<!--Modal para ventana emergente mostrando comentario del lote-->
                 <div id="myModal" class="modal">
                   <!-- Modal content -->
-                  <div class="modal-content">
-                     <span class="close">&times;</span>
+                  <div id="modal_content_1" class="modal-content">
+                     <span id="modal_close" class="close">&times;</span>
                      <p id="mensaje_obs_lote"></p>
                   </div>
                 </div>
@@ -352,10 +353,11 @@ function cargarLotes(fraccion_id, manzana_id) {
 					<input type="button" class="historico" data-toggle="modal" value="Ver detalles" data-target=".bs-example-modal-sm" onclick="dibujarDetalle()"/>
 					<!--<div id="total_mora2"></div>-->
 					<!-- Small modal -->
-					
+
+<!--Modal donde se muestra los detalles del total Intereses y Gestiones-->
 					<div class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
 						<div class="modal-dialog modal-sm">
-							<div class="modal-content">
+							<div id="modal-content-2" class="modal-content">
 							<div class="modal-header">
 							<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 					        <h4 class="modal-title">Detalles de Intereses y Gestiones</h4>
