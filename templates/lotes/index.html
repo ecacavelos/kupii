@@ -1,0 +1,15 @@
+{% extends "lotes/base_lotes.html" %}
+
+{% block content %}
+<div class="gri16 text-izquierda" id="breadcumb">
+	<a href="{% url 'frontend_home' %}">Inicio</a> 
+	<span class="verde-1">> Lotes</span> 
+</div>
+<a href="listado" class="boton-verde">Consultar Lotes</a>
+<br><br><br>
+<a href="consultar" class="boton-verde">Consultar Próximo Pago Lote</a>
+<br><br><br>
+<a href="agregar" class="boton-verde">Agregar Lote</a><br>
+<br><br><br>
+<a href="{% url 'frontend_home' %}" class="boton-verde">Volver a la Pagina Inicial</a>
+{% endblock %}

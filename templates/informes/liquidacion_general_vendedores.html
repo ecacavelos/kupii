@@ -1,0 +1,187 @@
+{% extends "lotes/base_lotes.html" %}
+{% block header_scripts %}
+<script type="text/javascript" >
+	$(document).ready(function() {
+		$('#id_busqueda_label').focus();
+		//Cambiar calendario a español
+		$.datepicker.regional['es'] = {
+			closeText : 'Cerrar',
+			prevText : '<Ant',
+			nextText : 'Sig>',
+			currentText : 'Hoy',
+			monthNames : ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+			monthNamesShort : ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+			dayNames : ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
+			dayNamesShort : ['Dom', 'Lun', 'Mar', 'Mié', 'Juv', 'Vie', 'Sáb'],
+			dayNamesMin : ['Do', 'Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sá'],
+			weekHeader : 'Sm',
+			dateFormat : 'dd/mm/yy',
+			firstDay : 1,
+			isRTL : false,
+			showMonthAfterYear : false,
+			yearSuffix : ''
+		};
+		// Setear idioma al calendario
+		$.datepicker.setDefaults($.datepicker.regional['es']);
+		var fecha_ini = "{{fecha_ini}}";
+		var fecha_fin = "{{fecha_fin}}";
+		var busqueda = "{{busqueda}}";
+		var busqueda_label = "{{busqueda_label}}";
+
+		$('#fecha_ini').val(fecha_ini);
+		$('#fecha_fin').val(fecha_fin);
+		$('#id_busqueda').val(busqueda);
+		$('#id_busqueda_label').val(busqueda_label);
+
+		$('#fecha_ini').mask('##/##/####');
+		$("#fecha_ini").datepicker({
+			dateFormat : 'dd/mm/yy'
+		});
+		$('#fecha_fin').mask('##/##/####');
+		$("#fecha_fin").datepicker({
+			dateFormat : 'dd/mm/yy'
+		});
+
+		if ($("#fecha_ini").val() == "" && $("#fecha_fin").val() == "") {//parametros no seteados
+			$('.listado-pagos').hide();
+			$('.pagination').hide();
+		} else {
+			$('.listado-pagos').show();
+			$('.pagination').show();
+		}
+		setup_inputs();
+	}); 
+</script>
+<script type="text/javascript" src="{{ STATIC_URL }}informes/liquidacion_vendedores.js"></script>
+{% endblock %}
+{% block content %}
+<div class="gri16 text-izquierda" id="breadcumb">
+	<a href="{% url 'frontend_home' %}">Inicio</a><span class="verde-1">></span>
+	<a href="{% url 'frontend_home' %}informes/">Informes</a>
+	<span class="verde-1">>Liquidaci&oacute;n General de Vendedores</span>
+</div>
+
+<div class="clear"></div>
+
+<h1>Liquidaci&oacute;n General de Vendedores</h1>
+
+<div class="grid_6">
+	<form name="frm_busqueda" id="frm_busqueda" method="get" action="{% url 'frontend_home' %}informes/liquidacion_general_vendedores/">
+		<table id="lista-categoria" frame="box">
+			<tr>
+				<th class="acciones" colspan="3"><strong><a href="#" style="color: white;">Filtrar</a></strong></th>
+			</tr>
+{#			<tr>#}
+{#				<td> Vendedor: </td>#}
+{#				<td>#}
+{#				<input name="busqueda_label" id="id_busqueda_label" type="text" value=""/>#}
+{#				<input name="busqueda" id="id_busqueda" type="hidden" value=""/>#}
+{#				</td>#}
+{#			</tr>#}
+			<th></th><th>Desde:</th><th>Hasta:</th>
+			<tr>
+				<td> Rango de Fecha: </td>
+				<td>
+				<input name="fecha_ini" id="fecha_ini" type="text" value="" />
+				</td>
+				<td>
+				<input name="fecha_fin" id="fecha_fin" type="text" value="" />
+				</td>
+			</tr>
+			<tr>
+				<td>
+				<input type="button" value="Buscar" onclick="validar();" class="historico" style="cursor: pointer"/>
+				</td>
+				<td colspan="2"><a class="boton-verde" id="id_boton" onclick="retrieve_liquidacion_general_vendedores();">Descargar como Excel</a></td>
+			</tr>
+		</table>
+	</form>
+</div>
+
+<div class="clear"></div>
+<div id="listado-cuadro-busqueda">
+
+	<br>
+	<br>
+</div>
+<div id="listado-item-lote">
+	<table border="1" cellpadding="0" cellspacing="0" class="listado-pagos" align="center">
+		<!--<th>ID</th></thd><th>Fraccion</th><th>Lote</th><th>Fecha</th><th>Cliente</th><th>Cuota Nº</th><th>Monto Pag</th><th>Monto Inmobiliaria</th><th>Monto Prop.</th>-->
+		{% for hw in lista_cuotas %}
+			{% if hw.total_monto_pagado and hw.ultimo_pago == False %}
+			<tr>
+				<th colspan="6" class="celda_resumen_fraccion">Resumen del Vendedor</th>
+				<td class="celda_resumen_fraccion">{{hw.total_monto_pagado}}</td>
+				<td class="celda_resumen_fraccion">{{hw.total_monto_vendedor}}</td>
+			</tr>
+			{% endif %}
+			{% if hw.mismo_vendedor == False%}
+				<tr>
+					<th colspan="10" class="celda_resumen_fraccion">{{hw.vendedor}}</th>
+				</tr>
+				<tr>
+					<!--<th>ID</th>--><th>Lote</th><th>Plan de Pago</th><th>Fecha de Pago</th><th>Cliente</th><th>Cuota Nº</th><th>Mes</th><th>Monto Pag</th><th>Monto Vendedor</th>
+				</tr>
+			{% endif %}
+		{% if forloop.counter|divisibleby:2 %}
+		<tr>
+			<!--<td>{{hw.id}}</td>-->
+			<td>{{hw.lote}}</td>
+			<td>{{hw.plan}}</td>
+			<td>{{hw.fecha_de_pago}}</td>
+			<td>{{hw.cliente}}</td>
+			<td>{{hw.nro_cuota}}</td>
+			<td>{{hw.mes}}</td>
+			<td>{{hw.total_de_cuotas}}{{hw.monto_pagado}}</td>
+			<td>{{hw.monto_vendedor}}</td>
+		</tr>
+		{% else %}
+		<tr class="bkg_gris">
+			<!--<td>{{hw.id}}</td>-->
+			<td>{{hw.lote}}</td>
+			<td>{{hw.plan}}</td>
+			<td>{{hw.fecha_de_pago}}</td>
+			<td>{{hw.cliente}}</td>
+			<td>{{hw.nro_cuota}}</td>
+			<td>{{hw.mes}}</td>
+			<td>{{hw.total_de_cuotas}}{{hw.monto_pagado}}</td>
+			<td>{{hw.monto_vendedor}}</td>
+		</tr>
+		{% endif %}
+		
+		{% if hw.ultimo_pago == True %}
+			<tr>
+				<th colspan="6" class="celda_resumen_fraccion">Resumen del Vendedor</th>
+				<td class="celda_resumen_fraccion">{{hw.total_monto_pagado}}</td>
+				<td class="celda_resumen_fraccion">{{hw.total_monto_vendedor}}</td>
+			</tr>
+			{% endif %}
+		
+		{% if hw.total_general_pagado %}
+		
+			<tr>
+				<th colspan="6" class="celda_resumen_fraccion">Totales Generales</th>
+				<td class="celda_resumen_fraccion">{{hw.total_general_pagado}}</td>
+				<td id="total_general_propietario" class="celda_resumen_fraccion">{{hw.total_general_vendedor}}</td>
+	
+			</tr>
+			
+		{% endif %}
+		
+		{% endfor %}
+		<!--
+		<div class="pagination">
+			<span class="step-links"> Mostrando {{ lista_cuotas.start_index }}-{{ lista_cuotas.end_index }} de {{ lista_cuotas.paginator.count }} Resultados
+				{%if lista_cuotas.has_previous%} <a href="?page={{ lista_cuotas.first_index}}{{ultimo}}"> Primera </a> <a href="?page={{ lista_cuotas.previous_page_number }}{{ultimo}}"> Anterior</a> {%endif%}
+				P&aacute;gina |{{lista_cuotas.number}}|
+				{%if lista_cuotas.has_next%} <a href="?page={{ lista_cuotas.next_page_number }}{{ultimo}}"> Siguiente </a> <a href="?page={{ lista_cuotas.end_index}}{{ultimo}}"> Ultima </a> {%endif%} </span>
+		</div>
+		-->
+	</table>
+</div>
+
+<div id="footer">
+	<a href="{% url 'frontend_home' %}informes" class="boton-verde">Volver al módulo de Informes</a>
+	<a class="boton-verde" id="id_boton_2" onclick="retrieve_liquidacion_general_vendedores();">Descargar como Excel</a>
+</div>
+{% endblock %}

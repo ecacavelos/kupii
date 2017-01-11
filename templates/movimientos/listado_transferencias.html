@@ -1,0 +1,232 @@
+{% extends "lotes/base_lotes.html" %}
+{% block header_scripts %}
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+        $('#tipo_busqueda').focus();	
+        //Cambiar calendario a español
+		$.datepicker.regional['es'] = {
+			closeText : 'Cerrar',
+			prevText : '<Ant',
+			nextText : 'Sig>',
+			currentText : 'Hoy',
+			monthNames : ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+			monthNamesShort : ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+			dayNames : ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
+			dayNamesShort : ['Dom', 'Lun', 'Mar', 'Mié', 'Juv', 'Vie', 'Sáb'],
+			dayNamesMin : ['Do', 'Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sá'],
+			weekHeader : 'Sm',
+			dateFormat : 'dd/mm/yy',
+			firstDay : 1,
+			isRTL : false,
+			showMonthAfterYear : false,
+			yearSuffix : ''
+		};
+		// Setear idioma al calendario
+		$.datepicker.setDefaults($.datepicker.regional['es']);
+		var busqueda_label = "{{busqueda_label}}";
+		var busqueda = "{{busqueda}}";
+		var fecha_desde = "{{fecha_desde}}";
+		var fecha_hasta = "{{fecha_hasta}}";
+		var tipo_busqueda = "{{tipo_busqueda}}";
+		
+		
+		
+		 $('#tipo_busqueda').val(tipo_busqueda);
+		 $('#busqueda_label').val(busqueda_label);
+		 $('#fecha_desde').val(fecha_desde);
+		 $('#fecha_hasta').val(fecha_hasta);
+		 $('#busqueda').val(busqueda);
+		 
+		 if (tipo_busqueda==""){
+		 	$('#tipo_busqueda').val("lote");
+		 }
+        	
+        	$("#fecha_desde").hide();
+            $("#fecha_hasta").hide();
+            $("#busqueda_label").show();
+            $('#busqueda_label').mask('###/###/####');
+            $('#fecha_desde').mask('##/##/####');
+            $("#fecha_desde").datepicker({dateFormat: 'dd/mm/yy'});
+            $('#fecha_hasta').mask('##/##/####');
+            $("#fecha_hasta").datepicker({dateFormat: 'dd/mm/yy'});
+            $("#fecha_desde").attr("placeholder","Ej: 20/08/2015");
+            $("#fecha_hasta").attr("placeholder","Ej: 20/08/2015");
+            $("#busqueda_label").attr("placeholder","Ej: 001/001/0001");
+            
+            if ($("#tipo_busqueda").val() == "lote"){
+            	tipo_busqueda="codigo";
+				busqueda_label=$("#busqueda_label").val();			
+				busqueda=$("#busqueda").val();	
+				autocompleteLotePorCodigoParalot(tipo_busqueda, busqueda_label, busqueda);
+				$("#fecha_desde").hide();
+	            $("#fecha_hasta").hide();
+	            $("#busqueda_label").show();
+            }
+            
+            if ($("#tipo_busqueda").val() == "fecha"){
+            	tipo_busqueda=$("#tipo_busqueda").val();
+				busqueda_label=$("#busqueda_label").val();			
+				busqueda=$("#busqueda").val();
+				$("#fecha_desde").show();
+	            $("#fecha_hasta").show();
+	            $("#busqueda_label").hide();	
+            }
+            
+            
+        });
+        function buscar() {
+            if ($("#tipo_busqueda").val() == 0) {
+                alert("Debe elegir un tipo de busqueda.");
+            }
+            else {
+                if ($("#busqueda").val() == "" && $("#tipo_busqueda").val() == "lote" ) {
+                    alert("Debe elegir una busqueda.");
+                } else {
+                	if (($("#fecha_desde").val() == "" || $("#fecha_desde").val() == "") && $("#tipo_busqueda").val() == "fecha" ) {
+                    	alert("Debe ingresar un rango de fechas.");
+                  	} else {
+                  		$("#frm_busqueda").submit();
+                  	}
+                }
+            }
+        }
+
+        function desplegar_fecha() {
+            if ($("#tipo_busqueda").val() == 'fecha') {
+            	$("#fecha_desde").show();
+                $("#fecha_hasta").show();
+                $("#busqueda_label").hide();
+                $("#fecha_desde").val("");
+                $("#fecha_hasta").val("");
+                $("#busqueda_label").val("");
+                
+            } else {
+                $("#fecha_desde").hide();
+                $("#fecha_hasta").hide();
+                $("#busqueda_label").show();
+                $("#fecha_desde").val("");
+                $("#fecha_hasta").val("");
+                $("#busqueda_label").val("");
+                tipo_busqueda="codigo";
+				busqueda_label=$("#busqueda_label").val();			
+				busqueda=$("#busqueda").val();
+                autocompleteLotePorCodigoParalot(tipo_busqueda, busqueda_label, busqueda);
+            }
+        }
+    </script>
+{% endblock %}
+{% block content %}
+    <div class="gri16 text-izquierda" id="breadcumb">
+        <a href="{% url 'frontend_home' %}">Inicio</a> <span class="verde-1">></span>
+        <a href="{% url 'frontend_home' %}movimientos/">Movimientos</a>
+        <span class="verde-1">> Listado de Transferencias</span>
+    </div>
+    <div class="clear"></div>
+
+    <h1>Listado de Transferencias</h1>
+
+
+    <div class="grid_6">
+        <form name="frm_busqueda" id="frm_busqueda" method="get" action="/movimientos/listado_busqueda_transferencias/">
+            <table id="lista-categoria" frame="box">
+                <tr>
+                    <th class="acciones" colspan="3"><strong><a href="#" style="color: white;">Filtrar</a></strong></th>
+                </tr>
+                <tr>
+                    <td>
+                        <select id="tipo_busqueda" name="tipo_busqueda" onchange="desplegar_fecha();">
+                            <!-- <option value="0">Elija una opcion</option> -->
+                            <option value="lote">Lote</option>
+                            <option value="fecha">Fecha de Transferencia</option>
+
+                        </select></td>
+                </tr>
+                <tr>
+                    <td>
+                    	<input type="text" id="busqueda_label" name="busqueda_label"/>
+                        <input type="hidden" id="busqueda" name="busqueda"/>
+						<input name="fecha_desde" id="fecha_desde" type="text" value=""/>
+                        <input name="fecha_hasta" id="fecha_hasta" type="text" value=""/>
+                        <input name="tabla" type="hidden" value="venta"/>
+                        <input type="button" value="Buscar" onclick="buscar();" class="historico"
+                               style="cursor: pointer"/>
+
+                    </td>
+                </tr>
+                </table>
+        </form>
+    </div>
+
+    <div class="clear"></div>
+    <div id="listado-cuadro-busqueda">
+        <a href="{% url 'frontend_home' %}movimientos/transferencias_lotes" class="boton-verde">Agregar
+            Transferencia</a>
+        <br><br>
+    </div>
+    <div id="listado-item-lote">
+        <table width="50%" cellpadding="0" cellspacing="0" class="listado-transferencias" align="center">
+            <th>Lote</th>
+            <th>Fracci&oacute;n</th>
+            <th>Fecha de Transferencia</th>
+            <th>Cliente</th>
+            <th>Cliente Original</th>
+            <th>Vendedor</th>
+            <th>Plan de Pago</th>
+            {% for hw in object_list %}
+                <tr>
+                    <td>
+                        {{ hw.lote }}
+                    </td>
+                    <td>
+                        {{ hw.lote.manzana.fraccion_id }}
+                    </td>
+                    <td>
+                        {{ hw.fecha_de_transferencia }}
+                    </td>
+                    <td>
+                        {{ hw.cliente }}
+                    </td>
+                    <td>
+                        {{ hw.cliente_original }}
+                    </td>
+                    <td>
+                        {{ hw.vendedor }}
+                    </td>
+                    <td>
+                        <!--{{hw.nombre_del_plan}}-->
+                        {{ hw.plan_de_pago }}
+                    </td>
+
+                </tr>
+
+            {% endfor %}
+            <div class="pagination">
+    <span class="step-links">
+       <div class="pagination">
+    <span class="step-links">
+        {% if object_list.has_previous %}
+            <a href="?page={{ object_list.previous_page_number }}{{ ultima_busqueda }}"> Anterior</a>
+        {% endif %}
+        P&aacute;gina
+    	|{{ object_list.number }}|
+
+        {% if object_list.has_next %}
+            <a href="?page={{ object_list.next_page_number }}{{ ultima_busqueda }}"> Siguiente</a>
+        {% endif %}
+    </span>
+       </div>
+
+        </table>
+    </div>
+
+    <div id="footer">
+    	<div class="pagination">
+			<span class="step-links"> Mostrando {{ object_list.start_index }}-{{ object_list.end_index }} de {{ object_list.paginator.count }} Resultados
+				{%if object_list.has_previous%} <a href="?page={{ object_list.first_index}}{{ultima_busqueda}}"> Primera </a> <a href="?page={{ object_list.previous_page_number }}{{ultima_busqueda}}"> Anterior</a> {%endif%}
+				P&aacute;gina |{{object_list.number}}|
+				{%if object_list.has_next%} <a href="?page={{ object_list.next_page_number }}{{ultima_busqueda}}"> Siguiente </a> <a href="?page={{ object_list.end_index}}{{ultima_busqueda}}"> Ultima </a> {%endif%} </span>
+		</div></br>
+    	<a href="{% url 'frontend_home' %}movimientos" class="boton-verde">Volver al módulo de Movimientos</a>
+    	</div>
+{% endblock %}

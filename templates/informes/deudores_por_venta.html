@@ -1,0 +1,151 @@
+{% extends "lotes/base_lotes.html" %}
+{% block header_scripts %}
+
+<script type="text/javascript">	
+	$(document).ready(function() {
+		$('#id_tipo_busqueda').focus();
+        var cant_reg = "{{cant_reg}}";
+        $('#id_cant_reg').val(cant_reg);
+		var fraccion = "{{fraccion}}";
+		var fraccion_label = "{{fraccion_label}}";
+		$('#id_fraccion').val(fraccion);
+		$('#fraccion').val(fraccion_label);
+
+		if ($("#fraccion").val() == "" && $("#meses_atraso").val() == "") {//parametros no seteados
+			$('.listado-clientes-atrasados').hide();
+			$('.pagination').hide();
+		}else{
+			$('.listado-clientes-atrasados').show();
+			$('.pagination').show();
+		}
+
+        $('#id_cant_reg').change(function(){
+        var cant_reg = $("#id_cant_reg").val();
+        var fraccion_nombre = $("#fraccion").val();
+        var fraccion = $("#id_fraccion").val();
+        var meses_atraso = $("#meses_atraso").val();
+        var tipo_busqueda = $("#id_tipo_busqueda").val();
+        window.location.replace("/informes/deudores_por_venta/?tipo_busqueda="+tipo_busqueda+"&fraccion_nombre="+fraccion_nombre+"&fraccion="+fraccion+"194&meses_atraso="+meses_atraso+"&cant_reg="+cant_reg+"&tabla=lote");
+        });
+
+        $('#boton_pagina').click(function() {
+            var page = $("#id_nro_pagina").val();
+            var cant_reg = $("#id_cant_reg").val();
+            var fraccion_nombre = $("#fraccion").val();
+            var fraccion = $("#id_fraccion").val();
+            var meses_atraso = $("#meses_atraso").val();
+            var tipo_busqueda = $("#id_tipo_busqueda").val();
+            window.location.replace("/informes/deudores_por_venta/?page="+page+"&tipo_busqueda="+tipo_busqueda+"&fraccion_nombre="+fraccion_nombre+"&fraccion="+fraccion+"194&meses_atraso="+meses_atraso+"&cant_reg="+cant_reg+"&tabla=lote");
+        });
+
+		setup_inputs();
+	});
+
+</script>
+<script type="text/javascript" src="{{ STATIC_URL }}informes/deudores_por_venta.js"></script>
+{% endblock %}
+{% block content %}
+<div class="gri16" id="breadcumb">
+	<a href="{% url 'frontend_home' %}">Inicio</a><span class="verde-1">></span>
+	<a href="{% url 'frontend_home' %}informes/">Informes</a>
+	<span class="verde-1">> Deudores por venta</span>
+</div>
+
+<div class="clear"></div>
+<h1>Listado de deudores por venta</h1>
+
+<div class="grid_6">
+	<form name="frm_busqueda" id="frm_busqueda" method="get" action="{% url 'frontend_home' %}informes/deudores_por_venta/">
+		<table id="lista-categoria" frame="box">
+			<tr>
+				<th class="acciones" colspan="3"><strong><a href="#" style="color: white;">Filtrar</a></strong></th>
+			</tr>
+			<tr>
+				<td>
+				<select id="id_tipo_busqueda" name="tipo_busqueda">
+					<!--<option value="">Elija una opcion</option> -->
+					<option value="nombre">Nombre de Fraccion</option>
+					<option value="codigo">Codigo de Fraccion</option>
+				</select></td>
+				<td>
+				<input name="fraccion_nombre" id="fraccion" type="text" value="" placeholder="Fraccion"/>
+				<input name="fraccion" id="id_fraccion" value="" type="hidden"/>
+				</td>
+			</tr>
+			<tr>
+				<td>
+				<input type="button" value="Buscar" onclick="validar();" class="historico" style="cursor: pointer"/>
+				</td>
+				<td>
+				<input name="tabla" type="hidden" value="lote" />
+				<a class="boton-verde" id="id_boton" onclick="retrieve_deudores_por_venta();">Descargar Excel</a></td>
+			</tr>
+		</table>
+	</form>
+</div>
+<div class="clear"></div>
+
+<div id="listado-cuadro-busqueda">
+<br>
+<br>
+</div>
+
+<div id="listado-item-lote">
+	<table border="1.5"cellpadding="0" cellspacing="0" class="listado-clientes-atrasados" align="center">
+{#		<th>Mz</th>#}
+        <th>Lote Nro</th><th>Fec Venta</th>
+{#        <th>Cuotas Atras.</th>#}
+        <th>Cuotas Pag.</th><th>Importe Cuota</th><th>Total Cobrado</th><th>Saldo a Cobrar</th><th>Cuotas Devengadas</th>
+        {% if object_list %}
+            {% for hw in object_list %}
+                {% if forloop.counter|divisibleby:2 %}
+            <tr>
+    {#			<td>{{hw.manzana}}</td>#}
+                <td>{{hw.lote}}</td>
+                <td>{{hw.fecha_venta}}</td>
+    {#			<td>{{hw.cuotas_atrasadas}}</td>#}
+                <td>{{hw.cuotas_pagadas}}</td>
+                <td style="text-align: right">{{hw.importe_cuota}}</td>
+                <td style="text-align: right">{{hw.total_pagado}}</td>
+                <td style="text-align: right">{{hw.total_atrasado}}</td>
+                <td style="text-align: right">{{hw.cuotas_devengadas}}</td>
+            </tr>
+                {% else %}
+            <tr class="bkg_gris">
+    {#			<td>{{hw.manzana}}</td>#}
+                <td>{{hw.lote}}</td>
+                <td>{{hw.fecha_venta}}</td>
+    {#			<td>{{hw.cuotas_atrasadas}}</td>#}
+                <td>{{hw.cuotas_pagadas}}</td>
+                <td style="text-align: right">{{hw.importe_cuota}}</td>
+                <td style="text-align: right">{{hw.total_pagado}}</td>
+                <td style="text-align: right">{{hw.total_atrasado}}</td>
+                <td style="text-align: right">{{hw.cuotas_devengadas}}</td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+            <tfoot>
+                <tr>
+                    <td colspan="4">
+                        <b>Totales:</b>
+                    </td>
+                    <td style="text-align: right">
+                        <b>{{ totales_total_pagado }}</b>
+                    </td>
+                    <td style="text-align: right">
+                        <b>{{ totales_total_atrasado }}</b>
+                    </td>
+                    <td style="text-align: right">
+                        <b>{{ totales_total_cuotas_devengadas }}</b>
+                    </td>
+                </tr>
+            </tfoot>
+        {% endif %}
+
+	</table>
+</div>
+
+<div id="footer">
+	<a href="{% url 'frontend_home' %}informes" class="boton-verde">Volver al módulo de Informes</a>
+</div>
+{% endblock %}

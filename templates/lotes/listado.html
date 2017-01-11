@@ -1,0 +1,161 @@
+{% extends "lotes/base_lotes.html" %}
+{% block header_scripts %}
+<script type="text/javascript">
+    var ultima_busqueda = "{{ ultima_busqueda }}";
+    var busqueda = "{{ busqueda }}";
+    var tipo_busqueda = "{{ tipo_busqueda }}";
+    var busqueda_label = "{{ busqueda_label }}";
+    var formato_reporte = "{{ formato_reporte }}";
+    var fraccion_segun_estado = "{{ fraccion_segun_estado }}";
+</script>
+<script type="text/javascript" src="{{ STATIC_URL }}listados/listado_lotes.js"></script>
+{% endblock %}
+{% block content %}
+<div class="gri16 text-izquierda" id="breadcumb">
+	<a href="{% url 'frontend_home' %}">Inicio</a><span class="verde-1">></span>
+	<a href="{% url 'frontend_home' %}lotes/">Lotes</a>
+	<span class="verde-1">> Listado de Lotes</span>
+</div>
+
+<div class="clear"></div>
+<h1>Listado de Lotes</h1>
+
+<div class="grid_6">
+	<form name="frm_busqueda" id="frm_busqueda" method="get" action="/lotes/listado_busqueda_lotes/">
+		<!--{% csrf_token %}-->
+		<table id="lista-categoria" frame="box">
+			<tr>
+				<th class="acciones"  colspan="3"><strong><a href="#" style="color: white;">Filtrar</a></strong></th>
+			</tr>
+			<tr>
+				<td id="label_busqueda">Nro de Lote:</td>
+				<td>
+					<input id="busqueda_label" type="text" name="busqueda_label"/>
+					<input type="hidden" id="busqueda" name="busqueda"/>
+				</td>
+			</tr>
+			<tr>
+				<td> Lotes por: </td>
+				<td>
+					<select id="tipo_busqueda" name="tipo_busqueda">
+                        <option value="">Elije un tipo de busqueda</option>
+						<option value="codigo">Codigo de Lote</option>
+						<option value="nombre">Nombre de Cliente</option>
+						<option value="cedula">Cedula de Cliente</option>	
+						<option value="nombre_fraccion">Nombre de Fraccion</option>
+						<option value="estado">Estado del Lote</option>
+					</select>
+					
+				</td>
+				
+				
+			</tr>
+			<tr>
+				<td style="display:none;" id="estado_lote_label"> Estado del Lote:</td>
+				<td style="display:none;" id="estado_lote_label_value">
+					<select id="estado_lote" name="estado_lote">
+						<option value="1">Libre</option>
+						<option value="2">Reservado</option>
+						<option value="3">Vendido</option>
+{#						<option value="4">Recuperado</option>#}
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td style="display:none;" id="nombre_frac2"> Nombre Fraccion:</td>
+				<td>
+					<input style="display:none;" id="nombre_frac2_label_value" type="text" name="nombre_frac2_label_value"/>
+				</td>
+            </tr>
+			<tr>
+				<td><input type="button" value="Buscar" onclick="buscar();" class="historico" style="cursor: pointer"/></td>
+{#              a pedido de Ivan, se oculta este boton  #}
+				<td><input type="hidden" value="Listar Todos los Lotes de estado Recuperado" onclick="listar_lotes_reservados();" class="historico" style="cursor: pointer"/></td>
+			</tr>
+			<tr>
+				<td colspan="2"><input type="button" onclick="descargar_excel();" value="Descargar como Excel" id="id_boton_excel" /></td>
+			</tr>
+
+		</table>
+        <input type="hidden" id="formato-reporte" name="formato-reporte" value="pantalla"/>
+	</form>
+</div>
+
+<div class="clear"></div>
+<div id="listado-cuadro-busqueda">
+	<a href="{% url 'frontend_home' %}lotes/agregar" class="boton-verde">Agregar Lote</a>
+	<br>
+	<br>
+</div>
+<div id="listado-item-lote">
+	<table border="1" cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
+		<th>ID Fracci&oacute;n</th>
+        <th>Manzana Nro</th>
+        <th>Lote Nro</th>
+        <th>Nombre Fracci&oacute;n</th>
+        <th>Cliente</th>
+        <th>Cedula</th>
+        <th>Fecha Venta</th>
+        <th>Monto cuota</th>
+        <th>Cuotas Pagadas</th>
+        <th>Estado</th>
+        <th>Boleto / Fecha Ult Pago</th>
+		{% for hw in object_list %}
+		{% if forloop.counter|divisibleby:2 %}
+		<tr>
+			<td> {{hw.manzana.fraccion.id}} </td>
+			<td> {{hw.manzana.nro_manzana}} </td>
+			<td><a href="{{hw.id}}">{{hw.nro_lote}} <strong>(Ver Detalles)</strong></a></td>
+			<td> {{hw.manzana.fraccion}} </td>
+			<td> {{hw.cliente}} </td>
+            <td> {{ hw.cliente.cedula }} </td>
+            <td> {{ hw.venta.fecha_de_venta}} </td>
+            <td> {{ hw.venta.precio_de_cuota}} </td>
+            <td> {{ hw.cant_cuotas_pagadas }} </td>
+			<td> {{ hw.get_estado_display }} </td>
+			<td> {{ hw.boleto_nro }} </td>
+
+		</tr>
+		{% else %}
+		<tr class="bkg_gris">
+			<td> {{hw.manzana.fraccion.id}} </td>
+			<td> {{hw.manzana.nro_manzana}} </td>
+			<td><a href="{{hw.id}}">{{hw.nro_lote}} <strong>(Ver Detalles)</strong></a></td>
+			<td> {{hw.manzana.fraccion}} </td>
+			<td> {{hw.cliente}} </td>
+            <td> {{ hw.cliente.cedula }} </td>
+            <td> {{ hw.venta.fecha_de_venta}} </td>
+            <td> {{ hw.venta.precio_de_cuota}} </td>
+            <td> {{ hw.cant_cuotas_pagadas }} </td>
+            <td> {{ hw.get_estado_display }} </td>
+			<td> {{ hw.boleto_nro }} </td>
+		</tr>
+		{% endif %}
+		{% endfor %}
+		<div class="pagination">
+			<span class="step-links">
+				Mostrando {{ object_list.start_index }}-{{ object_list.end_index }} de {{ object_list.paginator.count }} Resultados
+				{%if object_list.has_previous%} 
+				<a href="?page={{ object_list.first_index}}{{ultima_busqueda}}"> Primera </a>
+				<a href="?page={{ object_list.previous_page_number }}{{ultima_busqueda}}"> Anterior</a>
+				{%endif%}
+				P&aacute;gina |{{object_list.number}}|		
+				{%if object_list.has_next%} 
+				<a href="?page={{ object_list.next_page_number }}{{ultima_busqueda}}"> Siguiente </a>
+				<a href="?page={{ object_list.end_index}}{{ultima_busqueda}}"> Ultima </a>
+				{%endif%} 
+			</span>
+		</div>
+	</table>
+</div>
+
+<div id="footer">
+	<div class="pagination">
+			<span class="step-links"> Mostrando {{ object_list.start_index }}-{{ object_list.end_index }} de {{ object_list.paginator.count }} Resultados
+				{%if object_list.has_previous%} <a href="?page={{ object_list.first_index}}{{ultima_busqueda}}"> Primera </a> <a href="?page={{ object_list.previous_page_number }}{{ultima_busqueda}}"> Anterior</a> {%endif%}
+				P&aacute;gina |{{object_list.number}}|
+				{%if object_list.has_next%} <a href="?page={{ object_list.next_page_number }}{{ultima_busqueda}}"> Siguiente </a> <a href="?page={{ object_list.end_index}}{{ultima_busqueda}}"> Ultima </a> {%endif%} </span>
+		</div></br>
+	<a href="{% url 'frontend_home' %}lotes" class="boton-verde">Volver al módulo de Lotes</a>
+</div>
+{% endblock %}

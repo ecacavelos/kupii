@@ -1,0 +1,117 @@
+{% extends "lotes/base_lotes.html" %}
+
+{% block header_resources %}
+<!--
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+-->
+{% endblock %}
+
+{% block header_scripts %}
+<!--
+<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+-->
+<script type="text/javascript">
+
+$(document).ready(function() {
+	
+	
+	$(function($){
+		    $.datepicker.regional['es'] = {
+		        closeText: 'Cerrar',
+		        prevText: '<Ant',
+		        nextText: 'Sig>',
+		        currentText: 'Hoy',
+		        monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+		        monthNamesShort: ['Ene','Feb','Mar','Abr', 'May','Jun','Jul','Ago','Sep', 'Oct','Nov','Dic'],
+		        dayNames: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
+		        dayNamesShort: ['Dom','Lun','Mar','Mié','Juv','Vie','Sáb'],
+		        dayNamesMin: ['Do','Lu','Ma','Mi','Ju','Vi','Sá'],
+		        weekHeader: 'Sm',
+		        dateFormat: 'dd/mm/yy',
+		        firstDay: 1,
+		        isRTL: false,
+		        showMonthAfterYear: false,
+		        yearSuffix: ''
+		    };
+		    $.datepicker.setDefaults($.datepicker.regional['es']);
+		});
+	
+	//var dbDate = $("#id_desde").val();
+    //var date = new Date(dbDate);
+	//$("#id_desde").datepicker({dateFormat: 'dd/mm/yy'}).datepicker('setDate', date);
+	$('#id_desde').focus();
+	var queryDate1 = $("#id_desde").val();
+	var parsedDate1 = $.datepicker.parseDate('yy-mm-dd', queryDate1);
+	$('#id_desde').datepicker({ dateFormat: 'dd/mm/yy' }); // format to show
+	$('#id_desde').datepicker('setDate', parsedDate1);
+	
+	
+	queryDate2 = $("#id_hasta").val();
+	var parsedDate2 = $.datepicker.parseDate('yy-mm-dd', queryDate2);
+	$('#id_hasta').datepicker({ dateFormat: 'dd/mm/yy' }); // format to show
+	$('#id_hasta').datepicker('setDate', parsedDate2);
+	
+	$("#id_desde").mask('##/##/####');
+	$("#id_hasta").mask('##/##/####');
+	
+});
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="gri16 text-izquierda" id="breadcumb">
+						<a href="{% url 'frontend_home' %}">Inicio</a> <span class="verde-1">></span>  
+						<a href="{% url 'frontend_home' %}parametros/">Parametros</a> <span class="verde-1">></span>  
+						<a href="{% url 'frontend_home' %}parametros/timbrado/listado/">Listado de timbrados</a>  
+						<span class="verde-1">> Detalles de Timbrado</span> 
+					</div>
+
+					<div class="clear"></div>
+
+					<div class="grid_10">
+  						<h1>Detalles de Timbrado</h1>
+					</div>
+					<!--
+					<div class="grid_6">
+  						<a href="#" class="historico">Buscar</a>
+					</div>
+					-->
+					<div class="clear"></div>
+<div id="detalle-lote">
+	<div id="detalle-lote-header">
+		<h3 class="detalle-lote-header">Timbrado {{ timbrado.id }} </h3>
+	</div>
+			
+		<div id="{{message_id}}">{{ message }}</div>
+	
+	<table width="50%" border="1" cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
+	<form action="" method="post" onsubmit="_validar();">
+		{% csrf_token %}
+		{% for field in form %}
+		<tr>
+		<div class="fieldWrapper{% if field.field.required %} required{% endif %}">
+			
+			<td>{{ field.label_tag }}</td><td>{{ field }}{{ field.errors }}</td>
+		</div>
+		</tr>		
+		{% endfor %}
+	</table>
+		<div id="lote-ventas">
+			{% for venta in ventas_relacionadas %}
+				<a href="{% url 'frontend_home' %}lotes/listado/ventas/{{ venta.id }}" target="_blank">{{ venta }}</a>
+			{% endfor %}
+		</div>
+		{%if grupo == 1%}
+			<input class="lote-form-button" type="submit" name="boton_guardar" value="Guardar Cambios" />
+			<input class="lote-form-button" type="submit" name="boton_borrar" value="Borrar este Registro" />
+		{%endif%}
+	</form>
+</div>
+<br>
+<div id="footer">
+	<a href="{% url 'frontend_home' %}parametros/timbrado/listado/{{timbrado.id}}/rango_factura/" class="boton-verde">Rangos de Facturas del timbrado</a><br>
+	<br>
+	<a href="{% url 'frontend_home' %}parametros/timbrado/listado" class="boton-verde">Volver al Listado de Timbrados</a>
+</div>
+{% endblock %}
