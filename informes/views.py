@@ -1516,6 +1516,7 @@ def obtener_pagos_liquidacion(entidad_id, tipo_busqueda, fecha_ini, fecha_fin, o
                     fecha_pago_order = datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d").strftime("%d/%m/%Y")
                     # Se setean los datos de cada fila
                     fila = {}
+                    fila['pago_id'] = pago['id']
                     fila['cuota_obsequio'] = pago['cuota_obsequio']
                     fila['misma_fraccion'] = True
                     fila['fraccion'] = unicode(fraccion)
@@ -4579,7 +4580,8 @@ def liquidacion_propietarios_reporte_excel(request):
                 sheet.write(c, 4, pago['mes'], style_datos_texto)
                 sheet.write(c, 5, pago['total_de_cuotas'], style_datos_montos)
                 if pago['total_de_cuotas'] == '0':
-                    cuotas_obsequios.append(pago['nro_cuota'])
+                    pago['monto_cuota'] = monto_cuota
+                    cuotas_obsequios.append(pago)
                 else:
                     monto_cuota = pago['total_de_cuotas']
                 sheet.write(c, 6, pago['monto_inmobiliaria'], style_datos_montos)
@@ -4621,13 +4623,14 @@ def liquidacion_propietarios_reporte_excel(request):
                     c += 2
 
                     if len(cuotas_obsequios) > 0:
+
                         sheet.write_merge(c, c, 1, 6, "Cuotas Obsequios", style_subrayado_normal_titulo)
                         c += 1
                         total_cuotas_obsequios = 0
                         for cuota in cuotas_obsequios:
-                            sheet.write(c, 1, cuota, style_normal)
-                            sheet.write(c, 6, monto_cuota, style_datos_montos)
-                            total_cuotas_obsequios = total_cuotas_obsequios + int(format(monto_cuota).replace('.', ''))
+                            sheet.write(c, 1, cuota['nro_cuota'], style_normal)
+                            sheet.write(c, 6, cuota['monto_cuota'], style_datos_montos)
+                            total_cuotas_obsequios += int(format(cuota['monto_cuota']).replace('.', ''))
                             c += 1
                         sheet.write(c, 1, "Total descuentos", style_titulos_columna_resaltados)
                         sheet.write(c, 6, unicode('{:,}'.format(total_cuotas_obsequios).replace(",", ".")),
