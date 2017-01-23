@@ -486,6 +486,7 @@ class CoordenadasFactura(models.Model):
     numero_1y = models.FloatField()
     # Fecha
     usuario = models.ForeignKey(User, on_delete=models.PROTECT)
+
     fecha_1x = models.FloatField()
     fecha_1y = models.FloatField()
     # Contado
@@ -662,6 +663,98 @@ class CoordenadasFactura(models.Model):
     liq_total_iva_2x = models.FloatField()
     liq_total_iva_2y = models.FloatField()
 
+    # FACTURA 3
+    # Timbrado
+    # timbrado_3x = models.FloatField()
+    # timbrado_3y = models.FloatField()
+    # Numero
+    numero_3x = models.FloatField()
+    numero_3y = models.FloatField()
+    # Fecha
+    fecha_3x = models.FloatField()
+    fecha_3y = models.FloatField()
+    # Contado
+    contado_3x = models.FloatField()
+    contado_3y = models.FloatField()
+    # Credito
+    credito_3x = models.FloatField()
+    credito_3y = models.FloatField()
+    # Fraccion
+    fraccion_3x = models.FloatField()
+    fraccion_3y = models.FloatField()
+    # Nombre
+    nombre_3x = models.FloatField()
+    nombre_3y = models.FloatField()
+    # Manzana
+    manzana_3x = models.FloatField()
+    manzana_3y = models.FloatField()
+    # Lote
+    lote_3x = models.FloatField()
+    lote_3y = models.FloatField()
+    # RUC
+    ruc_3x = models.FloatField()
+    ruc_3y = models.FloatField()
+    # Telefono
+    telefono_3x = models.FloatField()
+    telefono_3y = models.FloatField()
+    # Direccion
+    direccion_3x = models.FloatField()
+    direccion_3y = models.FloatField()
+    # Superficie
+    superficie_3x = models.FloatField()
+    superficie_3y = models.FloatField()
+    # Cuenta Corriente Catastral
+    cta_cte_ctral_3x = models.FloatField()
+    cta_cte_ctral_3y = models.FloatField()
+    # Cantidad
+    cantidad_3x = models.FloatField()
+    cantidad_3y = models.FloatField()
+    # Descripcion
+    descripcion_3x = models.FloatField()
+    descripcion_3y = models.FloatField()
+    # Precio Unitario
+    precio_3x = models.FloatField()
+    precio_3y = models.FloatField()
+    # Exentas
+    exentas_3x = models.FloatField()
+    exentas_3y = models.FloatField()
+    # IVA5
+    iva5_3x = models.FloatField()
+    iva5_3y = models.FloatField()
+    # IVA10
+    iva10_3x = models.FloatField()
+    iva10_3y = models.FloatField()
+    # Sub Exentas
+    sub_exentas_3x = models.FloatField()
+    sub_exentas_3y = models.FloatField()
+    # Sub IVA5
+    sub_iva5_3x = models.FloatField()
+    sub_iva5_3y = models.FloatField()
+    # Sub IVA 10
+    sub_iva10_3x = models.FloatField()
+    sub_iva10_3y = models.FloatField()
+    # Total Venta
+    total_venta_3x = models.FloatField()
+    total_venta_3y = models.FloatField()
+    # Total a pagar letras
+    total_a_pagar_letra_3x = models.FloatField()
+    total_a_pagar_letra_3y = models.FloatField()
+    # Total a pagar exentas iva5
+    total_a_pagar_exentas_iva5_3x = models.FloatField()
+    total_a_pagar_exentas_iva5_3y = models.FloatField()
+    # Total a pagar numero
+    total_a_pagar_num_3x = models.FloatField()
+    total_a_pagar_num_3y = models.FloatField()
+    # Liquidacion iva5
+    liq_iva5_3x = models.FloatField()
+    liq_iva5_3y = models.FloatField()
+    # Liquidacion iva10
+    liq_iva10_3x = models.FloatField()
+    liq_iva10_3y = models.FloatField()
+    # Liquidacion total iva
+    liq_total_iva_3x = models.FloatField()
+    liq_total_iva_3y = models.FloatField()
+
 
 class PagoDeCuotas(models.Model):
     venta = models.ForeignKey(Venta, on_delete=models.PROTECT)
@@ -736,3 +829,15 @@ class ConfiguracionIntereses(models.Model):
     gestion_cobranza = models.BooleanField(blank=False, null=False, default=False)
     dias_de_gracia = models.IntegerField()
     cuotas_dias_gracia = models.IntegerField()
+
+class Configuraciones(models.Model):
+    id = models.IntegerField(primary_key=True)
+    copias_facturas = models.IntegerField()
+    tipo_numeracion_manzana = models.CharField(max_length=6)
+    codigo_empresa = models.CharField(max_length=4)
+    def as_json(self):
+        return dict(
+            codigo_empresa=self.codigo_empresa,
+            tipo_numeracion_manzana=self.tipo_numeracion_manzana,
+            copias_facturas=self.copias_facturas,
+            id=self.id)

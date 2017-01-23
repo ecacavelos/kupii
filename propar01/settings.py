@@ -146,6 +146,7 @@ INSTALLED_APPS = (
     'timbrados',
     'api',
     'sucursal',
+    'configuraciones',
 )
 
 # A sample logging configuration. The only tangible logging

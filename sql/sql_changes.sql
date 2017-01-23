@@ -12,6 +12,91 @@
 -- query en cuestion --
 -- agregar siempre despues de este ejemplo el siguiente cambio --
 
+-- 23/01/2017 18:08 - Franco Albertini - CBI-DEV: NO EJECUTADO - PROPAR: NO EJECUTADO  - GRUPO-MV: NO EJECUTADO
+/* Este query añade los campos de las coordenadas para la copia nro 3 de la factura */
+ALTER TABLE principal_coordenadasfactura ADD COLUMN fecha_3x double precision ;
+ALTER TABLE principal_coordenadasfactura ADD COLUMN fecha_3y double precision ;
+ALTER TABLE principal_coordenadasfactura ADD COLUMN contado_3x double precision ;
+ALTER TABLE principal_coordenadasfactura ADD COLUMN contado_3y double precision ;
+ALTER TABLE principal_coordenadasfactura ADD COLUMN credito_3x double precision ;
+ALTER TABLE principal_coordenadasfactura ADD COLUMN credito_3y double precision ;
+ALTER TABLE principal_coordenadasfactura ADD COLUMN fraccion_3x double precision ;
+ALTER TABLE principal_coordenadasfactura ADD COLUMN fraccion_3y double precision ;
+ALTER TABLE principal_coordenadasfactura ADD COLUMN nombre_3x double precision ;
+ALTER TABLE principal_coordenadasfactura ADD COLUMN nombre_3y double precision ;
+ALTER TABLE principal_coordenadasfactura ADD COLUMN manzana_3x double precision ;
+ALTER TABLE principal_coordenadasfactura ADD COLUMN manzana_3y double precision ;
+ALTER TABLE principal_coordenadasfactura ADD COLUMN lote_3x double precision ;
+ALTER TABLE principal_coordenadasfactura ADD COLUMN lote_3y double precision ;
+ALTER TABLE principal_coordenadasfactura ADD COLUMN ruc_3x double precision ;
+ALTER TABLE principal_coordenadasfactura ADD COLUMN ruc_3y double precision ;
+ALTER TABLE principal_coordenadasfactura ADD COLUMN telefono_3x double precision ;
+ALTER TABLE principal_coordenadasfactura ADD COLUMN telefono_3y double precision ;
+ALTER TABLE principal_coordenadasfactura ADD COLUMN direccion_3x double precision ;
+ALTER TABLE principal_coordenadasfactura ADD COLUMN direccion_3y double precision ;
+ALTER TABLE principal_coordenadasfactura ADD COLUMN superficie_3x double precision ;
+ALTER TABLE principal_coordenadasfactura ADD COLUMN superficie_3y double precision ;
+ALTER TABLE principal_coordenadasfactura ADD COLUMN cta_cte_ctral_3x double precision ;
+ALTER TABLE principal_coordenadasfactura ADD COLUMN cta_cte_ctral_3y double precision ;
+ALTER TABLE principal_coordenadasfactura ADD COLUMN cantidad_3x double precision ;
+ALTER TABLE principal_coordenadasfactura ADD COLUMN cantidad_3y double precision ;
+ALTER TABLE principal_coordenadasfactura ADD COLUMN descripcion_3x double precision ;
+ALTER TABLE principal_coordenadasfactura ADD COLUMN descripcion_3y double precision ;
+ALTER TABLE principal_coordenadasfactura ADD COLUMN precio_3x double precision ;
+ALTER TABLE principal_coordenadasfactura ADD COLUMN precio_3y double precision ;
+ALTER TABLE principal_coordenadasfactura ADD COLUMN exentas_3x double precision ;
+ALTER TABLE principal_coordenadasfactura ADD COLUMN exentas_3y double precision ;
+ALTER TABLE principal_coordenadasfactura ADD COLUMN iva5_3x double precision ;
+ALTER TABLE principal_coordenadasfactura ADD COLUMN iva5_3y double precision ;
+ALTER TABLE principal_coordenadasfactura ADD COLUMN iva10_3x double precision ;
+ALTER TABLE principal_coordenadasfactura ADD COLUMN iva10_3y double precision ;
+ALTER TABLE principal_coordenadasfactura ADD COLUMN sub_exentas_3x double precision ;
+ALTER TABLE principal_coordenadasfactura ADD COLUMN sub_exentas_3y double precision ;
+ALTER TABLE principal_coordenadasfactura ADD COLUMN sub_iva5_3x double precision ;
+ALTER TABLE principal_coordenadasfactura ADD COLUMN sub_iva5_3y double precision ;
+ALTER TABLE principal_coordenadasfactura ADD COLUMN sub_iva10_3x double precision ;
+ALTER TABLE principal_coordenadasfactura ADD COLUMN sub_iva10_3y double precision ;
+ALTER TABLE principal_coordenadasfactura ADD COLUMN total_venta_3x double precision ;
+ALTER TABLE principal_coordenadasfactura ADD COLUMN total_venta_3y double precision ;
+ALTER TABLE principal_coordenadasfactura ADD COLUMN total_a_pagar_letra_3x double precision ;
+ALTER TABLE principal_coordenadasfactura ADD COLUMN total_a_pagar_letra_3y double precision ;
+ALTER TABLE principal_coordenadasfactura ADD COLUMN total_a_pagar_num_3x double precision ;
+ALTER TABLE principal_coordenadasfactura ADD COLUMN total_a_pagar_num_3y double precision ;
+ALTER TABLE principal_coordenadasfactura ADD COLUMN liq_iva5_3x double precision ;
+ALTER TABLE principal_coordenadasfactura ADD COLUMN liq_iva5_3y double precision ;
+ALTER TABLE principal_coordenadasfactura ADD COLUMN liq_iva10_3x double precision ;
+ALTER TABLE principal_coordenadasfactura ADD COLUMN liq_iva10_3y double precision ;
+ALTER TABLE principal_coordenadasfactura ADD COLUMN liq_total_iva_3x double precision ;
+ALTER TABLE principal_coordenadasfactura ADD COLUMN liq_total_iva_3y double precision ;
+ALTER TABLE principal_coordenadasfactura ADD COLUMN timbrado_3x double precision ;
+ALTER TABLE principal_coordenadasfactura ADD COLUMN timbrado_3y double precision ;
+ALTER TABLE principal_coordenadasfactura ADD COLUMN numero_3x double precision ;
+ALTER TABLE principal_coordenadasfactura ADD COLUMN numero_3y double precision ;
+ALTER TABLE principal_coordenadasfactura ADD COLUMN total_a_pagar_exentas_iva5_3x double precision ;
+ALTER TABLE principal_coordenadasfactura ADD COLUMN total_a_pagar_exentas_iva5_3y double precision ;
+
+/* Este query añade la tabla de configuraciones */
+CREATE TABLE principal_configuraciones
+(
+  id serial NOT NULL,
+  copias_facturas integer,
+  tipo_numeracion_manzana character varying(6),
+  codigo_empresa character varying(4),
+  CONSTRAINT pk_configuraciones PRIMARY KEY (id)
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE principal_configuraciones
+  OWNER TO postgres;
+
+INSERT INTO principal_configuraciones (
+  copias_facturas, tipo_numeracion_manzana, codigo_empresa
+) VALUES (2, 'NORMAL', 'PROP');
+INSERT INTO principal_configuraciones (
+  copias_facturas, tipo_numeracion_manzana, codigo_empresa
+) VALUES (3, 'ROMANA', 'VIER');
+
 --  23/01/2017 08:53 - Andres Romero - CBI-DEV: NO EJECUTADO - PROPAR: NO EJECUTADO  - GRUPO-MV: NO EJECUTADO
 /* Este query  crea la tabla para poder registrar el logo principal del sistema*/
 CREATE TABLE public.principal_logdelogos
