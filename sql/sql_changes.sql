@@ -3,7 +3,7 @@
   1- CBI-DEV: Base de datos ubicada en el servidor de desarrollo de CBI.
   2- PROPAR: Base de datos de produccion, del sistema de lotes de PROPAR.
   3- KUPII-DEMO:  Base de datos demo en azure del sistema de lotes KUPII.
-
+  4- GRUPO-MV: Base de datos en amazon del grupo MV
  IMPORTANTE: El que hace el deploy, debe acualizar los estados, de las cabeceras de los querys a EJECUTADO, de las respectivas instacias de BD
  */
 
@@ -11,6 +11,22 @@
 /* Breve descripcion de lo que hace el query */
 -- query en cuestion --
 -- agregar siempre despues de este ejemplo el siguiente cambio --
+
+--  23/01/2017 08:53 - Andres Romero - CBI-DEV: NO EJECUTADO - PROPAR: NO EJECUTADO  - GRUPO-MV: NO EJECUTADO
+/* Este query  crea la tabla para poder registrar el logo principal del sistema*/
+CREATE TABLE public.principal_logdelogos
+(
+  id serial  NOT NULL,
+  nombre_archivo character varying(80),
+  imagen bytea,
+  CONSTRAINT principal_logdelogos_pkey PRIMARY KEY (id)
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE public.principal_logdelogos
+  OWNER TO postgres;
+
 
 -- 27/12/2016 16:0 - Franco Albertini - CBI-DEV: EJECUTADO - PROPAR: EJECUTADO  - KUPII-DEMO: EJECUTADO
 /* Se crea la tabla de configuraciones de intereses */
