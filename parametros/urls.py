@@ -40,7 +40,7 @@ urlpatterns = patterns('parametros.views',
     url(r'^coordenadas_factura/listado/$', 'consultar_coordenadas_factura', name='frontend_coordenadas_factura_listado' ),
     url(r'^coordenadas_factura/listado/(?P<coordenadas_factura_id>\d+)/$', 'detalle_coordenadas_factura'),
     url(r'^coordenadas_factura/listado_busqueda_coordenadas_factura/$', 'listar_busqueda_coordenadas_factura'),
-     url(r'^coordenadas_factura/listado_busqueda_coordenadas_factura/(?P<coordenadas_factura_id>\d+)/$', 'detalle_coordenadas_factura'),
+    url(r'^coordenadas_factura/listado_busqueda_coordenadas_factura/(?P<coordenadas_factura_id>\d+)/$', 'detalle_coordenadas_factura'),
     url(r'^coordenadas_factura/agregar/$', 'agregar_coordenadas_factura'),
     
     url(r'^timbrado/listado/(?P<timbrado_id>\d+)/rango_factura/$', 'rango_factura'),
@@ -50,4 +50,8 @@ urlpatterns = patterns('parametros.views',
     url(r'^timbrado/listado/(?P<timbrado_id>\d+)/rango_factura/listado_busqueda_rango_factura/(?P<rango_factura_id>\d+)/(?P<usuario_id>\d+)/$', 'detalle_rango_factura'),
     url(r'^timbrado/listado/(?P<timbrado_id>\d+)/rango_factura/agregar/$', 'agregar_rango_factura'),
     url(r'^timbrado/listado/(?P<timbrado_id>\d+)/rango_factura/asignar/(?P<rango_factura_id>\d+)/$', 'asignar_rango_factura'),
+
+    url(r'^cambio_logo/$', 'cambio_logo'),
+    url(r'^agregar_logo/$', 'agregar_logo'),
+
 )

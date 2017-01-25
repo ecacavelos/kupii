@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block header_scripts %}
+    <script type="text/javascript" src="{{ STATIC_URL }}parametros/cambio_logo.js"></script
+{% endblock %}
+{% block content %}
+
+    <link rel="stylesheet" type="text/css" href="../../../principal/static/parametros/cambio_logo.css">
+    <link rel="shortcut icon" href="{{ STATIC_URL }}custom/img/favicon.ico" type="image/x-icon"/>
+    <link rel="icon" href="{{ STATIC_URL }}custom/img/favicon.ico" type="image/x-icon"/>
+    <link href="{{ STATIC_URL }}custom/css/grid.css" rel="stylesheet" type="text/css"/>
+    <link href="{{ STATIC_URL }}custom/css/body-index.css" rel="stylesheet" type="text/css"/>
+    <link href="{{ STATIC_URL }}lotes.css" rel="stylesheet" type="text/css"/>
+    <link href="{{ STATIC_URL }}custom/css/jquery-ui.css" rel="stylesheet" type="text/css"/>
+    <link href="{{ STATIC_URL }}custom/css/fonts.css" rel="stylesheet" type="text/css"/>
+    <link href="{{ STATIC_URL }}bootstrap.min.css" rel="stylesheet" type="text/css"/>
+    <style type="text/css">
+        .ui-autocomplete-loading {
+            background: url('{{ STATIC_URL }}custom/img/progress.gif') no-repeat right center
+        }
+    </style>
+    <div class="gri16 text-izquierda" id="breadcumb">
+        <a href="{% url 'frontend_home' %}">Inicio</a>
+        <a href="{% url 'frontend_home' %}parametros/">> Parametros</a>
+        <span class="verde-1">> Agregar Logo</span>
+    </div>
+
+        <div class="grid_16" align="center">
+        <form enctype="multipart/form-data" name="cambio_logo" id="cambio_logo" method="POST">
+            {% csrf_token %}
+            <table width="94%" border="0" cellpadding="0" cellspacing="0" id="forms" align="center">
+                <tr>
+                    <td><input class="boton-verde" id="imagen" name="imagen" type="file"></td>
+                </tr>
+
+            </table>
+            <input class="boton-verde" id="enviar" type="submit" value="Enviar"/>
+            <br><br><br>
+        </form>
+{% endblock %}

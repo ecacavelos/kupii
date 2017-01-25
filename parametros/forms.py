@@ -1,7 +1,8 @@
 from django import forms
 from django.forms import Form, ModelForm
 from django.forms.models import modelformset_factory
-from principal.models import PlanDePago, PlanDePagoVendedor, Timbrado, RangoFactura, ConceptoFactura, CoordenadasFactura
+from principal.models import PlanDePago, PlanDePagoVendedor, Timbrado, RangoFactura, ConceptoFactura, \
+    CoordenadasFactura, LogDeLogos
 from django.forms.widgets import TextInput, Textarea, CheckboxInput
 from django.contrib.auth.models import User
 
@@ -88,6 +89,7 @@ class CoordenadasFacturaForm(ModelForm):
 
         }
 
+
 ConceptoFacturaFormSet = modelformset_factory(ConceptoFactura, extra=0, can_order=True)
 
 
@@ -116,6 +118,7 @@ class RangoFacturaForm(ModelForm):
                 attrs={'style': 'width: auto; margin-left:3%;margin: 1.5% 1.5%'}
             )
         )
+
 
 RangoFacturaFormSet = modelformset_factory(RangoFactura, extra=0, can_order=True)
 
@@ -151,3 +154,28 @@ def opciones_usuarios(first_option=None):
         lista_usuarios_tupla.append(tupla)
     usuarios = tuple(lista_usuarios_tupla)
     return usuarios
+
+
+class Cambio_Logo(ModelForm):
+    required_css_class = 'required'
+
+    class Meta:
+        model = PlanDePagoVendedor
+        widgets = {
+            'porcentaje_cuota_inicial': TextInput,
+            'cantidad_cuotas': TextInput,
+            'cuota_inicial': TextInput,
+            'intervalos': TextInput,
+            'porcentaje_de_cuotas': TextInput,
+            'observacion': Textarea,
+        }
+
+
+FraccionFormSet = modelformset_factory(PlanDePagoVendedor, extra=0, can_order=True)
+
+
+#class UploadImageForm(forms.ModelForm):
+ #   class Meta:
+ #       model = LogDeLogos
+ #       title = forms.CharField(max_length=80)
+ #       imagen = forms.FileField()

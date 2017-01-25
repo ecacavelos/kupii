@@ -116,4 +116,5 @@ CAMBIO_LOTE="cambio_lote"
 TRANSFERENCIA_LOTE="transferencia_lote"
 RECUPERAR_LOTE="recuperar_lote"
 VER_FICHA_LOTE="ver_ficha_lote"
-
+CAMBIO_LOGO="cambio_logo"
+ADD_LOGO="add_logo"

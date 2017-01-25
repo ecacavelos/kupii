@@ -1,7 +1,7 @@
 from django.db.models import Count, Min, Sum, Avg
 from django.http import HttpResponse, HttpResponseServerError, HttpResponseRedirect
 from django.template import RequestContext, loader
-from principal.models import Lote, Cliente, Vendedor, PlanDePago, Fraccion, Manzana, Venta, Propietario, PlanDePagoVendedor,PagoDeCuotas 
+from principal.models import Lote, Cliente, Vendedor, PlanDePago, Fraccion, Manzana, Venta, Propietario, PlanDePagoVendedor, PagoDeCuotas
 from django.core import serializers
 from django.core.urlresolvers import reverse, resolve
 from datetime import datetime
@@ -379,7 +379,6 @@ def get_cuotas_lotes_detalles(request):
         print("buscando pagos del lote --> " + lote_id);
         datos = common_functions.get_cuotas_detail_by_lote(lote_id)
         return HttpResponse(json.dumps(datos), content_type="application/json")
-
 
 
 

@@ -2,7 +2,7 @@
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
-from configuraciones import CONFIGURACION_BASE_DE_DATOS, TIEMPO_LOGOUT, PATH_ESTATICO, CODIGO_DE_EMPRESA
+from configuraciones import CONFIGURACION_BASE_DE_DATOS, TIEMPO_LOGOUT, PATH_ESTATICO, CODIGO_DE_EMPRESA, PATH_LOGO_ACT, PATH_LOGO
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
@@ -114,6 +114,8 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.static',
     'django.contrib.auth.context_processors.auth',
     'django.contrib.messages.context_processors.messages',
+    'django.core.context_processors.path_logo',
+    'django.core.context_processors.path_logo_act',
 )
 
 # TEMPLATE_DIRS = (
@@ -146,6 +148,7 @@ INSTALLED_APPS = (
     'timbrados',
     'api',
     'sucursal',
+    'parametros',
     'configuraciones',
 )
 
@@ -177,3 +180,5 @@ LOGGING = {
         },
     }
 }
+
+

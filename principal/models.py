@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-
+from propar01.settings import PATH_LOGO
 from sucursal.models import Sucursal
 
 
@@ -812,6 +812,11 @@ class RecuperacionDeLotes(models.Model):
     cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT)
     vendedor = models.ForeignKey(Vendedor, on_delete=models.PROTECT)
     # plan_de_pago = models.ForeignKey(PlanDePago, on_delete=models.PROTECT)
+
+
+class LogDeLogos(models.Model):
+    nombre_archivo = models.CharField(max_length=80)
+    imagen = models.ImageField(upload_to=PATH_LOGO)
 
 
 class PermisosAdicionales(models.Model):

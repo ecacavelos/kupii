@@ -23,5 +23,6 @@ urlpatterns = patterns('',
     url(r'^lotes/', include('lotes.urls')),    
     url(r'^ajax/', include('ajax.urls')),        
     url(r'^datos/', include('principal.urls')),
-    url(r'^api/', include('api.urls')),    
+    url(r'^api/', include('api.urls')),
+    url(r'^index3', 'parametros.views.cambio_logo', name='logo'),
 )

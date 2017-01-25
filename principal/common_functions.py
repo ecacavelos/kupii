@@ -2941,3 +2941,4 @@ def get_mes_pagado_by_id_lote_cant_cuotas(lote_id, cuotas_pag):
     except Exception, error:
         print error
         return cuotas_detalles
+

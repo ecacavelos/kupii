@@ -350,7 +350,7 @@ def get_propietario_name_by_id(request):
                 print error
                 #return HttpResponseServerError('No se pudo procesar el pedido')
         else:
-            return HttpResponseRedirect(reverse('login')) 
+            return HttpResponseRedirect(reverse('login'))
 
 
 @require_http_methods(["GET"])
@@ -996,3 +996,5 @@ def get_plan_pago_fraccion(request):
                 print error
         else:
             return HttpResponseRedirect(reverse('login'))
+
+

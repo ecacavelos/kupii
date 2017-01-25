@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block header_scripts %}
+    <script type="text/javascript" src="{{ STATIC_URL }}parametros/cambio_logo.js" xmlns="http://www.w3.org/1999/html"></script>
+{% endblock %}
+{% block content %}
+
+    <link rel="stylesheet" type="text/css" href="../../../principal/static/parametros/cambio_logo.css">
+    <link rel="shortcut icon" href="{{ STATIC_URL }}custom/img/favicon.ico" type="image/x-icon"/>
+    <link rel="icon" href="{{ STATIC_URL }}custom/img/favicon.ico" type="image/x-icon"/>
+    <link href="{{ STATIC_URL }}custom/css/grid.css" rel="stylesheet" type="text/css"/>
+    <link href="{{ STATIC_URL }}custom/css/body-index.css" rel="stylesheet" type="text/css"/>
+    <link href="{{ STATIC_URL }}lotes.css" rel="stylesheet" type="text/css"/>
+    <link href="{{ STATIC_URL }}custom/css/jquery-ui.css" rel="stylesheet" type="text/css"/>
+    <link href="{{ STATIC_URL }}custom/css/fonts.css" rel="stylesheet" type="text/css"/>
+    <link href="{{ STATIC_URL }}bootstrap.min.css" rel="stylesheet" type="text/css"/>
+    <style type="text/css">
+        .ui-autocomplete-loading {
+            background: url('{{ STATIC_URL }}custom/img/progress.gif') no-repeat right center
+        }
+    </style>
+    <div class="gri16 text-izquierda" id="breadcumb">
+        <a href="{% url 'frontend_home' %}">Inicio</a>
+        <a href="{% url 'frontend_home' %}parametros/">> Parametros</a>
+        <span class="verde-1">> Cambiar Logo</span>
+    </div>
+    <div>
+        <form enctype="multipart/form-data" name="listar_logo" id="listar_logo" method="POST">
+            {% csrf_token %}
+            <div class="clear"></div>
+            <div id="listado-cuadro-busqueda">
+                <br>
+                <br>
+            </div>
+            <div id="listado-item-logo">
+                <a href="{% url 'frontend_home' %}parametros/agregar_logo" class="boton-verde"><span class="glyphicon glyphicon-pencil"></span>Agregar Logo</a>
+                <br>
+                <br>
+                <table id="listado-logo" border="1" cellpadding="0" class="listado-logo" align="center">
+                    <tr>
+                        <th>Nombre de Archivo</th><th>Imagen</th><th>Seleccion</th>
+                    </tr>
+                    {% for path_logo in logo_list %}
+                        {% if path_logo.id < 300 %}
+                            <tr>
+                                <td>{{ path_logo.nombre_archivo }}</td>
+                                <td><img src="/static/custom/img/logos/{{ path_logo.nombre_archivo }}" width="100" height="100"></td>
+                                <td><input type="radio" name="seleccion" value="{{ path_logo.id }}" id="seleccion"></td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                </table>
+                <input class="boton-verde" id="cambiar" type="submit" value="Cambiar"/>
+                <br><br><br>
+            </div>
+            <br><br><br>
+        </form>
+    </div>
+{% endblock %}

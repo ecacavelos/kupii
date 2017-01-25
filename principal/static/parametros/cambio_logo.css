@@ -1,0 +1,53 @@
+#boton-verde {
+    background-color: #006633;
+    border: thin solid #FFFFFF;
+    color: #FFFFFF;
+    font-size: 13px;
+    /* margin-right: 5px; */
+    margin-bottom: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+#miModal {
+    display: none; /* Hidden by default */
+    position: relative; /* Stay in place */
+    z-index: 2; /* Sit on top */
+    left: 0;
+    top: 0;
+    box-sizing: border-box;
+    padding: 15px 20px;
+    width: 50%; /* Full width */
+    height: 20%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+
+}
+
+
+/* Modal Content/Box */
+#modal_content_lista {
+
+    background-color: #14B76E;
+    border: 3px solid #0f0f0f;
+    padding-top: 20px;
+    padding-right: 30px;
+    padding-left: 80px;
+
+    color: white;
+    text-align: left;
+}
+
+/* The Close Button */
+#modal_close_lista {
+    color: #000000;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+#modal_close_lista:hover,
+#modal_close_lista:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
