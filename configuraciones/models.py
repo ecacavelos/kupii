@@ -6,7 +6,7 @@ class Configuraciones(models.Model):
     copias_facturas = models.IntegerField()
     tipo_numeracion_manzana = models.CharField(max_length=6)
     codigo_empresa = models.CharField(max_length=4)
-
+    tamanho_letra = models.FloatField()
     def as_json(self):
         return dict(
             codigo_empresa=self.codigo_empresa,

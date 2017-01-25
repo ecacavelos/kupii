@@ -82,6 +82,7 @@ CREATE TABLE principal_configuraciones
   copias_facturas integer,
   tipo_numeracion_manzana character varying(6),
   codigo_empresa character varying(4),
+  tamanho_letra NUMERIC (99,2),
   CONSTRAINT pk_configuraciones PRIMARY KEY (id)
 )
 WITH (
@@ -91,11 +92,11 @@ ALTER TABLE principal_configuraciones
   OWNER TO postgres;
 
 INSERT INTO principal_configuraciones (
-  copias_facturas, tipo_numeracion_manzana, codigo_empresa
-) VALUES (2, 'NORMAL', 'PROP');
+  copias_facturas, tipo_numeracion_manzana, codigo_empresa, tamanho_letra
+) VALUES (2, 'NORMAL', 'PROP', 10.00);
 INSERT INTO principal_configuraciones (
-  copias_facturas, tipo_numeracion_manzana, codigo_empresa
-) VALUES (3, 'ROMANA', 'VIER');
+  copias_facturas, tipo_numeracion_manzana, codigo_empresa, tamanho_letra
+) VALUES (3, 'ROMANA', 'VIER', 10.00);
 
 --  23/01/2017 08:53 - Andres Romero - CBI-DEV: NO EJECUTADO - PROPAR: NO EJECUTADO  - GRUPO-MV: NO EJECUTADO
 /* Este query  crea la tabla para poder registrar el logo principal del sistema*/

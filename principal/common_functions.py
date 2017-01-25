@@ -1422,11 +1422,11 @@ def crear_json_print_object(factura, manzana, lote_id, usuario):
     # Obtener las coordenadas de impresion de la factura
     try:
         coor = CoordenadasFactura.objects.get(usuario=usuario)
-
+        conf = Configuraciones.objects.get(codigo_empresa=CODIGO_DE_EMPRESA)
     except Exception as e:
         logging.error('Failed.', exc_info=e)
         coor = CoordenadasFactura.objects.get(usuario_id=2)
-        conf = Configuraciones.objects.get(codigo_empresa=CODIGO_DE_EMPRESA)
+
     lineas = []
 
     # nros de facturas
@@ -1926,20 +1926,6 @@ def crear_json_print_object(factura, manzana, lote_id, usuario):
             # linea["coord_y"] = int(coor.iva10_2y * cm)
             lineas.append(linea)
 
-            total_venta += int(value['cantidad']) * int(value['precio_unitario'])
-            if value['exentas'] != '':
-                exentas += int(value['exentas'])
-            value['iva_5'] = int(value['iva_5'])
-            # p.drawString(coor.iva5_2x * cm, float(pos_y - 0.5) * cm, unicode(
-            # '{:,}'.format(value['iva_5']).replace(",", ".")))
-            if value['iva_5'] != '':
-                iva5 += int(value['iva_5'])
-            value['iva_10'] = int(value['iva_10'])
-            # p.drawString(coor.iva10_2x * cm, float(pos_y - 0.5) * cm, unicode(
-            # '{:,}'.format(detalle['iva_10']).replace(",", ".")))
-            if value['iva_10'] != '':
-                iva10 += int(value['iva_10'])
-
         pos_x += 0.5
         pos_y += 0.5
         pos_z += 0.5
@@ -2182,7 +2168,7 @@ def crear_json_print_object(factura, manzana, lote_id, usuario):
         lineas.append(linea)
 
 
-    response = json.dumps(({"tipoPapel": "A4",
+    response = json.dumps(({"tipoPapel": "A4", "fontSize": unicode(conf.tamanho_letra),
                             "lineas": lineas
                             }), separators=(',', ':'))
 
