@@ -24,5 +24,5 @@ urlpatterns = patterns('',
     url(r'^ajax/', include('ajax.urls')),        
     url(r'^datos/', include('principal.urls')),
     url(r'^api/', include('api.urls')),
-    url(r'^index3', 'parametros.views.cambio_logo', name='logo'),
+    url(r'^logo', 'parametros.views.cambio_logo', name='logo'),
 )
