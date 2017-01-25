@@ -43,7 +43,7 @@
                         {% if path_logo.id < 300 %}
                             <tr>
                                 <td>{{ path_logo.nombre_archivo }}</td>
-                                <td><img src="/static/custom/img/logos/{{ path_logo.nombre_archivo }}" width="100" height="100"></td>
+                                <td><img src="{{ STATIC_URL }}custom/img/logos/{{ path_logo.nombre_archivo }}" width="100" height="100"></td>
                                 <td><input type="radio" name="seleccion" value="{{ path_logo.id }}" id="seleccion"></td>
                             </tr>
                         {% endif %}
