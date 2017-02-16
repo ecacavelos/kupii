@@ -40,8 +40,8 @@
 <div class="gri16 text-izquierda" id="breadcumb">
 	<a href="{% url 'frontend_home' %}">Inicio</a> 
 	<a href="{% url 'frontend_home' %}parametros/">> Parametros</a>  
-	<a href="{% url 'frontend_home' %}parametros/timbrados/">> Timbrados</a>
-	<a href="{% url 'frontend_home' %}parametros/timbrado/rango_factura/">> Rangos de Facturas del Timbrado</a>   
+	<a href="{% url 'frontend_home' %}parametros/timbrado/">> Timbrados</a>
+	<a href="{% url 'frontend_home' %}parametros/timbrado/listado/{{id_timbrado}}/rango_factura/">> Rangos de Facturas del Timbrado</a>
 	<span class="verde-1">> Listado de Rangos de Facturas</span> 
 </div>
 <div class="clear"></div>
@@ -68,7 +68,7 @@
 </div>
 <div class="clear"></div>
 <div id="listado-cuadro-busqueda">
-	<a href="{% url 'frontend_home' %}parametros/timbrado/listado/{{id_timbrado}/rango_factura/agregar" class="boton-verde">Agregar Rango de Facturas</a>
+	<a href="{% url 'frontend_home' %}parametros/timbrado/listado/{{id_timbrado}}/rango_factura/agregar" class="boton-verde">Agregar Rango de Facturas</a>
 	<br><br>
 </div>
 <div id="listado-item-lote">

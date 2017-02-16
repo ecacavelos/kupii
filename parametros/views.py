@@ -875,9 +875,13 @@ def detalle_rango_factura(request, timbrado_id, rango_factura_id, usuario_id):
             codigo_lote = ''
             loggear_accion(request.user, "Borrar", "Rango Factura", id_objeto, codigo_lote)
 
+            trfu_list = TimbradoRangoFacturaUsuario.objects.filter(rango_factura_id=rango_factura_id)
+            for trfu in trfu_list:
+                trfu.delete()
             c.delete()
             return HttpResponseRedirect(
-                settings.URL_PREFIX + '/parametros/timbrado/' + unicode(timbrado_id) + '/rango_factura/listado')
+                #settings.URL_PREFIX + '/parametros/timbrado/' + unicode(timbrado_id) + '/rango_factura/listado')
+                '/parametros/timbrado/listado/' + unicode(timbrado_id) + '/rango_factura/listado')
     else:
         rango = TimbradoRangoFacturaUsuario.objects.get(timbrado_id=timbrado_id, rango_factura_id=rango_factura_id,
                                                         usuario_id=usuario_id)
@@ -1152,7 +1156,8 @@ def agregar_rango_factura(request, timbrado_id):
             timbradoRangoFacturaUsuario.save()
             # Redireccionamos al listado de planes de pago luego de agregar el nuevo plan.
             return HttpResponseRedirect(
-                settings.URL_PREFIX + '/parametros/timbrado/listado/' + unicode(timbrado_id) + '/rango_factura/listado')
+                #settings.URL_PREFIX + '/parametros/timbrado/listado/' + unicode(timbrado_id) + '/rango_factura/listado')
+                '/parametros/timbrado/listado/' + unicode(timbrado_id) + '/rango_factura/listado')
     else:
         form = RangoFacturaForm()
 

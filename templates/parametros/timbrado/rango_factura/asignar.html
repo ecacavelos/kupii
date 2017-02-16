@@ -102,19 +102,10 @@ function solo_numeros_monto_fijo_cuotas_gerente () {
 		return numeric + decimal;
 	}
 
-function _validar(){
-	var res = $("#id_monto_fijo_cuotas_gerente").val();
-	for ( i = 0; i < res.length; i++) {
-		res = res.replace(".", "");
-	}
-	res = res.replace(",", ".");
-	$("#id_monto_fijo_cuotas_gerente").val(res);
-}
-
 $(document).ready(function() {
 
     $("#asignar_form").submit(function( event ) {
-        if ($("#asignar_form").val() == ''){
+        if ($("#user").val() == ''){
             alert ('Debe seleccionar un usuario');
             return false;
         }
@@ -146,7 +137,7 @@ $(document).ready(function() {
 
 <div class="grid_16" align="center">
 	
-	  <form id="asignar_form" action="" method="post" onsubmit="_validar();">
+	  <form id="asignar_form" action="" method="post">
 	  	<div id="{{message_id}}">{{ message }}</div>
 	  	<table width="94%" border="0" cellpadding="0" cellspacing="0" id="forms" align="center">
 		{% csrf_token %}

@@ -25,6 +25,7 @@ var descripcion = "{{descripcion}}";
 <div class="clear" id="qz-status" onload="setear_impresora()"></div>
 
 <h1 id="title" >Facturar</h1>
+    <div id="message-error"><p style="color: red; text-align: left; margin-left: 50px;">{{ message }}</p></div>
 	<div class="cabecera_factura">
 		<form action = "" method="post" id="agregar-factura-form">
 			{% csrf_token %}

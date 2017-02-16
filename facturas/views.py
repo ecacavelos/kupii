@@ -70,12 +70,23 @@ def facturar_operacion(request, tipo_operacion, operacion_id):
                 precio_venta = venta.precio_final_de_venta
                 entrega_inicial = venta.entrega_inicial
                 descripcion = "Venta al Contado de Lote: "+venta.lote.codigo_paralot
-            
-            ultimo_timbrado = Timbrado.objects.latest('id')
-            trfu = TimbradoRangoFacturaUsuario.objects.get(usuario_id=request.user, timbrado_id = ultimo_timbrado.id)
+
+            #Se Obtiene el ultimo timbrado cargado
+            trfu = TimbradoRangoFacturaUsuario.objects.filter(usuario_id=request.user).latest('timbrado')
+            ultimo_timbrado = trfu.timbrado
+
+            #Se pregunta por la fecha de validez del
+            hoy = date.today()
+            message = ''
+            if hoy > ultimo_timbrado.hasta:
+                message += 'El último Timbrado agregado ha expirado, agregue un nuevo timbrado.'
+
+
             try: 
                 ultimaFactura = Factura.objects.filter(rango_factura_id= trfu.rango_factura.id).latest('id')
                 ultimo_numero = ultimaFactura.numero.split("-")
+                if  unicode(int(ultimo_numero[2])+1) > trfu.rango_factura.nro_hasta:
+                    message += ' El numero de factura ha sobrepasado al nro máximo del timbrado, agregue un nuevo timbrado o suba el nro maximo.'
                 ultima_factura = unicode(trfu.rango_factura.nro_sucursal)+'-'+unicode(trfu.rango_factura.nro_boca)+'-'+unicode(int(ultimo_numero[2])+1).zfill(7)
             except:
                 ultima_factura = unicode(trfu.rango_factura.nro_sucursal)+'-'+unicode(trfu.rango_factura.nro_boca)+'-0000001'
@@ -95,7 +106,7 @@ def facturar_operacion(request, tipo_operacion, operacion_id):
                     'precio_venta': precio_venta,
                     'grupo': grupo,
                     'users': users,
-
+                    'message': message,
                 })
             if tipo_operacion == '2': # VENTA
                 c = RequestContext(request, {
@@ -110,6 +121,7 @@ def facturar_operacion(request, tipo_operacion, operacion_id):
                     'tipo_venta': tipo_venta,
                     'precio_venta': precio_venta,
                     'descripcion': descripcion,
+                    'message': message,
     })
             return HttpResponse(t.render(c))
             
