@@ -404,6 +404,7 @@ def obtener_dias_atraso(fecha_pago_parsed, fecha_vencimiento_parsed):
 
 def obtener_detalle_interes_lote(lote_id, fecha_pago_parsed, proximo_vencimiento_parsed, nro_cuotas_a_pagar):
     # Si se tienen cuotas en MORA.
+    dias_habiles = 0
     if nro_cuotas_a_pagar > 0:
 
         resumen_lote = get_cuotas_detail_by_lote(unicode(lote_id))

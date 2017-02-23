@@ -150,6 +150,7 @@ INSTALLED_APPS = (
     'sucursal',
     'parametros',
     'configuraciones',
+    'logos',
 )
 
 # A sample logging configuration. The only tangible logging

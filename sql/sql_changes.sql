@@ -12,7 +12,7 @@
 -- query en cuestion --
 -- agregar siempre despues de este ejemplo el siguiente cambio --
 
--- 23/01/2017 18:08 - Franco Albertini - CBI-DEV: NO EJECUTADO - PROPAR: NO EJECUTADO  - GRUPO-MV: NO EJECUTADO
+-- 23/01/2017 18:08 - Franco Albertini - CBI-DEV: NO EJECUTADO - PROPAR: EJECUTADO  - GRUPO-MV: EJECUTADO
 /* Este query añade los campos de las coordenadas para la copia nro 3 de la factura */
 ALTER TABLE principal_coordenadasfactura ADD COLUMN fecha_3x double precision ;
 ALTER TABLE principal_coordenadasfactura ADD COLUMN fecha_3y double precision ;
@@ -134,7 +134,7 @@ SET fecha_1x = 3.3, fecha_1y = 3.3, contado_1x = 9, contado_1y = 2.9, credito_1x
   liq_total_iva_3y = 28.8, timbrado_3x = null, timbrado_3y = null, numero_3x = 16, numero_3y = 21.8,
   total_a_pagar_exentas_iva5_3x = 1, total_a_pagar_exentas_iva5_3y = 1 WHERE id = 20;
 
---  23/01/2017 08:53 - Andres Romero - CBI-DEV: NO EJECUTADO - PROPAR: NO EJECUTADO  - GRUPO-MV: NO EJECUTADO
+--  23/01/2017 08:53 - Andres Romero - CBI-DEV: NO EJECUTADO - PROPAR: EJECUTADO  - GRUPO-MV: NO EJECUTADO
 /* Este query  crea la tabla para poder registrar el logo principal del sistema*/
 CREATE TABLE public.principal_logdelogos
 (
