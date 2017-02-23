@@ -1546,7 +1546,7 @@ def cambio_logo(request):
                 nombre = img_selecionada.nombre_archivo
                 #SE LEE LA IMAGEN
                 #image_file = open(os.path.join(PATH_LOGO, nombre))
-                image_file = open('principal/static/custom/img/logos/'+nombre, 'rb')
+                image_file = open(PATH_LOGO+nombre, 'rb')
                 fecha = datetime.datetime.now()
                 # SE CAMBIA EL NOMBRE
                 nombre2 = fecha.strftime('propar_logo.jpg')
