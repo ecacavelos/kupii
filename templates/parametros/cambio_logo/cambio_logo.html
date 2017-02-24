@@ -39,12 +39,16 @@
                     <tr>
                         <th>Nombre de Archivo</th><th>Imagen</th><th>Seleccion</th>
                     </tr>
-                    {% for path_logo in logo_list %}
-                        {% if path_logo.id < 300 %}
+                    {% for logo in logo_list %}
+                        {% if logo.id < 300 %}
                             <tr>
-                                <td>{{ path_logo.nombre_archivo }}</td>
-                                <td><img src="{{ STATIC_URL }}custom/img/logos/{{ path_logo.nombre_archivo }}" width="100" height="100"></td>
-                                <td><input type="radio" name="seleccion" value="{{ path_logo.id }}" id="seleccion"></td>
+                                <td>{{ logo.nombre_archivo }}</td>
+                                <td><img src="{{ MEDIA_URL }}{{ logo.nombre_archivo }}" width="100" height="100"></td>
+                                {% if logo.seleccionado %}
+                                    <td><input type="radio" name="seleccion" value="{{ logo.id }}" id="seleccion" checked="checked"></td>
+                                {% else %}
+                                    <td><input type="radio" name="seleccion" value="{{ logo.id }}" id="seleccion"></td>
+                                {% endif %}
                             </tr>
                         {% endif %}
                     {% endfor %}

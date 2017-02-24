@@ -12,6 +12,13 @@
 -- query en cuestion --
 -- agregar siempre despues de este ejemplo el siguiente cambio --
 
+
+-- 24/02/2017 16:50 - Franco Albertini - CBI-DEV: NO EJECUTADO - PROPAR: EJECUTADO  - GRUPO-MV: EJECUTADO
+/* Este query añade la columna seleccioanado a la tabla de logos */
+ALTER TABLE principal_logdelogos ADD COLUMN seleccionado boolean;
+UPDATE principal_logdelogos SET seleccionado = false;
+
+
 -- 23/01/2017 18:08 - Franco Albertini - CBI-DEV: NO EJECUTADO - PROPAR: EJECUTADO  - GRUPO-MV: EJECUTADO
 /* Este query añade los campos de las coordenadas para la copia nro 3 de la factura */
 ALTER TABLE principal_coordenadasfactura ADD COLUMN fecha_3x double precision ;

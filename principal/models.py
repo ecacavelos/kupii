@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from propar01.settings import PATH_LOGO
+from propar01.settings import LOGO_FILE_PATH
 from sucursal.models import Sucursal
 
 
@@ -816,7 +816,8 @@ class RecuperacionDeLotes(models.Model):
 
 class LogDeLogos(models.Model):
     nombre_archivo = models.CharField(max_length=80)
-    imagen = models.ImageField(upload_to=PATH_LOGO)
+    imagen = models.ImageField(upload_to=LOGO_FILE_PATH)
+    seleccionado = models.BooleanField()
 
 
 class PermisosAdicionales(models.Model):

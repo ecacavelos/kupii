@@ -16,8 +16,9 @@ import datetime
 from propar01 import settings
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
+
+from propar01.configuraciones import LOGO_FILE_PATH
 from propar01.settings import PATH_LOGO
-from propar01.settings import PATH_LOGO_ACT
 
 
 # Funcion principal del modulo de lotes.
@@ -1535,6 +1536,7 @@ def cambio_logo(request):
                     lista = lista_ordenada
                     c = RequestContext(request, {
                         'logo_list': lista,
+                        'path_logos': PATH_LOGO,
                     })
                     return HttpResponse(t.render(c))
                 except Exception, error:
@@ -1543,19 +1545,9 @@ def cambio_logo(request):
             if request.method == 'POST':
                 id_imagen = request.POST['seleccion']
                 img_selecionada = LogDeLogos.objects.get(id=id_imagen)
-                nombre = img_selecionada.nombre_archivo
-                #SE LEE LA IMAGEN
-                #image_file = open(os.path.join(PATH_LOGO, nombre))
-                image_file = open(PATH_LOGO+nombre, 'rb')
-                fecha = datetime.datetime.now()
-                # SE CAMBIA EL NOMBRE
-                nombre2 = fecha.strftime('propar_logo.jpg')
-                current_path2 = PATH_LOGO_ACT + nombre2
-                # SE ELIMINA EL LOGO ACTUAL
-                default_storage.delete(current_path2)
-                current_path3 = PATH_LOGO_ACT + nombre2
-
-                default_storage.save(current_path3, image_file)
+                todas_los_logos = LogDeLogos.objects.all().update(seleccionado=False)
+                img_selecionada.seleccionado = True
+                img_selecionada.save()
                 return HttpResponseRedirect(reverse('logo'))
         else:
             t = loader.get_template('index2.html')
@@ -1574,27 +1566,22 @@ def agregar_logo(request):
                 c = RequestContext(request, {})
                 return HttpResponse(t.render(c))
             if request.method == 'POST':
-                file_handle = request.FILES['imagen']
-                content_type = file_handle.content_type
-                image_file = ContentFile(file_handle.read())
-                # datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
+                archivo = request.FILES['imagen']
+                extension = archivo.content_type
+                archivo_imagen = ContentFile(archivo.read())
                 fecha = datetime.datetime.now()
-                imagen = fecha.strftime('%Y_%m_%d_%H_%M_%S_propar_logo.jpg')  # image_id + '.' + file_extension
-                imagen2 = fecha.strftime('propar_logo.jpg')
-                # imagen = 'propar_logo.jpg'  # image_id + '.' + file_extension
-                # cambiar el path donde guardar la imagen
-                current_path = PATH_LOGO + imagen
-                current_path2 = PATH_LOGO_ACT + imagen2
-                default_storage.delete(current_path2)
-                current_path3 = PATH_LOGO_ACT + imagen2
-                default_storage.save(current_path, image_file)
-                default_storage.save(current_path3, image_file)
+                nuevo_nombre_logo = fecha.strftime('%Y_%m_%d_%H_%M_%S_logo.jpg')  # fecha + logo + extension
+                nuevo_logo = LOGO_FILE_PATH + nuevo_nombre_logo
+                try:
+                    default_storage.save(nuevo_logo, archivo_imagen)
+                    p = LogDeLogos(
+                        nombre_archivo=nuevo_nombre_logo,
+                        imagen=archivo_imagen
+                    )
+                    p.save()
+                except Exception, error:
+                    print error
 
-                p = LogDeLogos(
-                    nombre_archivo=imagen,
-                    imagen=image_file
-                )
-                p.save()
             return HttpResponseRedirect(reverse('logo'))
         else:
             t = loader.get_template('index2.html')
