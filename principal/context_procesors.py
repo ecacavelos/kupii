@@ -1,5 +1,5 @@
 from principal.models import LogDeLogos
-from propar01.configuraciones import PATH_LOGO
+from propar01.configuraciones import PATH_LOGO, NOMBRE_EMPRESA
 
 
 def objeto_logo(request):
@@ -10,6 +10,7 @@ def objeto_logo(request):
         print 'todavia no hay un logo seleccionado'
     return {'objeto_logo': objeto_logo_seleccionado,
             'path_logo': PATH_LOGO,
+            'nombre_empresa': NOMBRE_EMPRESA
             }
 
 
