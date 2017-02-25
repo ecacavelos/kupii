@@ -1548,7 +1548,7 @@ def cambio_logo(request):
                 todas_los_logos = LogDeLogos.objects.all().update(seleccionado=False)
                 img_selecionada.seleccionado = True
                 img_selecionada.save()
-                return HttpResponseRedirect(reverse('logo'))
+                return HttpResponseRedirect(reverse('cambio_logo'))
         else:
             t = loader.get_template('index2.html')
             grupo = request.user.groups.get().id
@@ -1582,7 +1582,7 @@ def agregar_logo(request):
                 except Exception, error:
                     print error
 
-            return HttpResponseRedirect(reverse('logo'))
+            return HttpResponseRedirect(reverse('cambio_logo'))
         else:
             t = loader.get_template('index2.html')
             grupo = request.user.groups.get().id

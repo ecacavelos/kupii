@@ -465,7 +465,7 @@
 								}
 							});
 					request_print.success(function(data2) {
-						window.location.href = BASE_URL + redirect;
+						window.location.href = base_url + redirect;
 						console.log(data2);
 					});
 				});
