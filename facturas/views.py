@@ -39,6 +39,7 @@ def facturacion(request):
     else:
         return HttpResponseRedirect(reverse('login')) 
 
+
 def facturar_operacion(request, tipo_operacion, operacion_id):
     if request.user.is_authenticated():
         if request.method == 'GET':
@@ -56,44 +57,41 @@ def facturar_operacion(request, tipo_operacion, operacion_id):
             tipo_venta = ''
             precio_venta = ''
             
-            if tipo_operacion == '1': # PAGO DE CUOTA
+            if tipo_operacion == '1':  # PAGO DE CUOTA
                 pago = PagoDeCuotas.objects.get(pk=operacion_id)
                 cantidad_pagos_anteriores = obtener_cantidad_cuotas_pagadas(pago)
                 cuota_desde_num = cantidad_pagos_anteriores - pago.nro_cuotas_a_pagar+1
-                #cuota_desde_num = pago.venta.pagos_realizados - pago.nro_cuotas_a_pagar+1
+                # cuota_desde_num = pago.venta.pagos_realizados - pago.nro_cuotas_a_pagar+1
                 cuota_desde = unicode(cuota_desde_num)+"/"+unicode( pago.plan_de_pago.cantidad_de_cuotas)
                 cuota_hasta = unicode(cuota_desde_num  + pago.nro_cuotas_a_pagar-1)+"/"+unicode( pago.plan_de_pago.cantidad_de_cuotas)
                 
-            if tipo_operacion == '2': # VENTA
+            if tipo_operacion == '2':  # VENTA
                 venta = Venta.objects.get(pk=operacion_id)
                 tipo_venta = "Contado"
                 precio_venta = venta.precio_final_de_venta
                 entrega_inicial = venta.entrega_inicial
                 descripcion = "Venta al Contado de Lote: "+venta.lote.codigo_paralot
 
-            #Se Obtiene el ultimo timbrado cargado
+            # Se Obtiene el ultimo timbrado cargado
             trfu = TimbradoRangoFacturaUsuario.objects.filter(usuario_id=request.user).latest('timbrado')
             ultimo_timbrado = trfu.timbrado
 
-            #Se pregunta por la fecha de validez del
+            # Se pregunta por la fecha de validez del
             hoy = date.today()
             message = ''
             if hoy > ultimo_timbrado.hasta:
                 message += 'El último Timbrado agregado ha expirado, agregue un nuevo timbrado.'
 
-
             try: 
-                ultimaFactura = Factura.objects.filter(rango_factura_id= trfu.rango_factura.id).latest('id')
+                ultimaFactura = Factura.objects.filter(rango_factura_id=trfu.rango_factura.id).latest('id')
                 ultimo_numero = ultimaFactura.numero.split("-")
-                if  unicode(int(ultimo_numero[2])+1) > trfu.rango_factura.nro_hasta:
+                if int(ultimo_numero[2])+1 > int(trfu.rango_factura.nro_hasta):
                     message += ' El numero de factura ha sobrepasado al nro máximo del timbrado, agregue un nuevo timbrado o suba el nro maximo.'
                 ultima_factura = unicode(trfu.rango_factura.nro_sucursal)+'-'+unicode(trfu.rango_factura.nro_boca)+'-'+unicode(int(ultimo_numero[2])+1).zfill(7)
             except:
                 ultima_factura = unicode(trfu.rango_factura.nro_sucursal)+'-'+unicode(trfu.rango_factura.nro_boca)+'-0000001'
             
-            
-            
-            if tipo_operacion == '1': # PAGO DE CUOTA
+            if tipo_operacion == '1':  # PAGO DE CUOTA
                 c = RequestContext(request, {
                     'cliente': pago.cliente,
                     'lote': pago.lote.codigo_paralot,
@@ -108,7 +106,7 @@ def facturar_operacion(request, tipo_operacion, operacion_id):
                     'users': users,
                     'message': message,
                 })
-            if tipo_operacion == '2': # VENTA
+            if tipo_operacion == '2':  # VENTA
                 c = RequestContext(request, {
                     'cliente': venta.cliente,
                     'lote': venta.lote.codigo_paralot,
@@ -122,7 +120,7 @@ def facturar_operacion(request, tipo_operacion, operacion_id):
                     'precio_venta': precio_venta,
                     'descripcion': descripcion,
                     'message': message,
-    })
+                })
             return HttpResponse(t.render(c))
             
         else: #POST se envia el formulario.  

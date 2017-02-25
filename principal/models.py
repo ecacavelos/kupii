@@ -817,7 +817,7 @@ class RecuperacionDeLotes(models.Model):
 class LogDeLogos(models.Model):
     nombre_archivo = models.CharField(max_length=80)
     imagen = models.ImageField(upload_to=LOGO_FILE_PATH)
-    seleccionado = models.BooleanField()
+    seleccionado = models.BooleanField(default=False)
 
 
 class PermisosAdicionales(models.Model):
