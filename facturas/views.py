@@ -213,21 +213,34 @@ def facturar(request):
             # retornamos todos los users para que pueda seleccionar
             users = User.objects.all()
 
-            ultimo_timbrado = Timbrado.objects.latest('id')
-            trfu = TimbradoRangoFacturaUsuario.objects.get(usuario_id=request.user, timbrado_id = ultimo_timbrado.id)
-            try: 
-                ultimaFactura = Factura.objects.filter(rango_factura_id= trfu.rango_factura.id).latest('id')
+            # Se Obtiene el ultimo timbrado cargado
+            trfu = TimbradoRangoFacturaUsuario.objects.filter(usuario_id=request.user).latest('timbrado')
+            ultimo_timbrado = trfu.timbrado
+
+            # Se pregunta por la fecha de validez del
+            hoy = date.today()
+            message = ''
+            if hoy > ultimo_timbrado.hasta:
+                message += 'El último Timbrado agregado ha expirado, agregue un nuevo timbrado.'
+
+            try:
+                ultimaFactura = Factura.objects.filter(rango_factura_id=trfu.rango_factura.id).latest('id')
                 ultimo_numero = ultimaFactura.numero.split("-")
-                ultima_factura = unicode(trfu.rango_factura.nro_sucursal)+'-'+unicode(trfu.rango_factura.nro_boca)+'-'+unicode(int(ultimo_numero[2])+1).zfill(7)
+                if int(ultimo_numero[2]) + 1 > int(trfu.rango_factura.nro_hasta):
+                    message += ' El numero de factura ha sobrepasado al nro máximo del timbrado, agregue un nuevo timbrado o suba el nro maximo.'
+                ultima_factura = unicode(trfu.rango_factura.nro_sucursal) + '-' + unicode(
+                    trfu.rango_factura.nro_boca) + '-' + unicode(int(ultimo_numero[2]) + 1).zfill(7)
             except:
-                ultima_factura = unicode(trfu.rango_factura.nro_sucursal)+'-'+unicode(trfu.rango_factura.nro_boca)+'-0000001'
+                ultima_factura = unicode(trfu.rango_factura.nro_sucursal) + '-' + unicode(
+                    trfu.rango_factura.nro_boca) + '-0000001'
             
             c = RequestContext(request, {
                 'ultima_factura': ultima_factura,
                 'ultimo_timbrado_numero': trfu.timbrado.numero,
                 'ultimo_timbrado_id': ultimo_timbrado.id,
                 'grupo': grupo,
-                'users': users
+                'users': users,
+                'message': message,
             })
             return HttpResponse(t.render(c))
         else: #POST se envia el formulario.  
@@ -301,6 +314,7 @@ def facturar(request):
                         pago.factura = nueva_factura
                         pago.save() 
             return crear_pdf_factura(nueva_factura, request, manzana, lote_id, request.user)
+
     else:
         return HttpResponseRedirect(reverse('login')) 
     
