@@ -405,6 +405,7 @@ def obtener_dias_atraso(fecha_pago_parsed, fecha_vencimiento_parsed):
 def obtener_detalle_interes_lote(lote_id, fecha_pago_parsed, proximo_vencimiento_parsed, nro_cuotas_a_pagar):
     # Si se tienen cuotas en MORA.
     dias_habiles = 0
+    dias_atraso_1ra_cuota = 0
     if nro_cuotas_a_pagar > 0:
 
         resumen_lote = get_cuotas_detail_by_lote(unicode(lote_id))
@@ -475,6 +476,8 @@ def obtener_detalle_interes_lote(lote_id, fecha_pago_parsed, proximo_vencimiento
                 detalle = {}
                 fecha_vencimiento = proximo_vencimiento_parsed + MonthDelta(cuota)
                 dias_atraso = (fecha_pago_parsed - fecha_vencimiento).days
+                if dias_atraso_1ra_cuota == 0:
+                    dias_atraso_1ra_cuota = dias_atraso
                 nro_cuota = cuotas_pagadas + (cuota + 1)
                 if es_ref:
                     resto_division = nro_cuota % venta.plan_de_pago.intervalo_cuota_refuerzo
@@ -529,7 +532,7 @@ def obtener_detalle_interes_lote(lote_id, fecha_pago_parsed, proximo_vencimiento
             # cantidad_ideal_cuotas=monthdelta(fecha_primer_vencimiento, fecha_vencimiento_mes_pago)
             # cuotas_atrasadas=cantidad_ideal_cuotas-cuotas_pagadas
 
-            if cuotas_atrasadas >= 6:
+            if dias_atraso_1ra_cuota >= 180:
                 # gestion_cobranza = int(0.1*(math.ceil(float(cuotas_atrasadas*monto_cuota))+sumatoria_intereses))
                 if config_intereses.gestion_cobranza:
                     gestion_cobranza = roundup(0.05*(
