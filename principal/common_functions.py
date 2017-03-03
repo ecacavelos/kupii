@@ -532,7 +532,7 @@ def obtener_detalle_interes_lote(lote_id, fecha_pago_parsed, proximo_vencimiento
             # cantidad_ideal_cuotas=monthdelta(fecha_primer_vencimiento, fecha_vencimiento_mes_pago)
             # cuotas_atrasadas=cantidad_ideal_cuotas-cuotas_pagadas
 
-            if dias_atraso_1ra_cuota >= 180:
+            if dias_atraso_1ra_cuota > 180:
                 # gestion_cobranza = int(0.1*(math.ceil(float(cuotas_atrasadas*monto_cuota))+sumatoria_intereses))
                 if config_intereses.gestion_cobranza:
                     gestion_cobranza = roundup(0.05*(
