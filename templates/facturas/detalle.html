@@ -114,12 +114,12 @@
 						{% endif %}
 					{% endif %}
 					{% if field.html_name == 'cliente'  or field.html_name == 'rango_factura' or field.html_name == 'detalle' or field.html_name == 'anulado' %}
-					{%if field.html_name == 'cliente' %}
-					<td colspan="5" class="noimage">{{ factura.cliente }}{{ field.errors }}</td>
-					{% endif %}
-					{%if field.html_name == 'lote' %}
-					<td colspan="5" class="noimage">{{ factura.lote }}{{ field.errors }}</td>
-					{% endif %}
+					    {%if field.html_name == 'cliente' %}
+					        <td colspan="5" class="noimage">{{ factura.cliente }}{{ field.errors }}</td>
+					    {% endif %}
+					    {%if field.html_name == 'lote' %}
+                            <td colspan="5" class="noimage">{{ factura.lote }}{{ field.errors }}</td>
+					    {% endif %}
 					{%if field.html_name == 'rango_factura' %}
 						<td colspan="5" class="noimage">{{ numero_timbrado }}{{ field.errors }}</td>
 					{% endif %}

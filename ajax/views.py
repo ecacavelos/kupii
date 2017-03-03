@@ -813,16 +813,22 @@ def facturar(request):
             print 'POST'          
             #Obtener el cliente
             cliente_id = request.POST.get('cliente','')
-            
-            #Obtener el Lote
-            lote_id = request.POST.get('lote','')
-            
-            x = unicode(lote_id)
-            fraccion_int = int(x[0:3])
-            manzana_int = int(x[4:7])
-            lote_int = int(x[8:])
-            manzana = Manzana.objects.get(fraccion_id=fraccion_int, nro_manzana=manzana_int)
-            lote_id = Lote.objects.get(manzana=manzana.id, nro_lote=lote_int)
+
+            # Obtener el Lote
+            lote = request.POST.get('lote', '')
+
+            # si lote está o no está vacio
+            if lote != '':
+                x = unicode(lote)
+                fraccion_int = int(x[0:3])
+                manzana_int = int(x[4:7])
+                lote_int = int(x[8:])
+
+                manzana = Manzana.objects.get(fraccion_id=fraccion_int, nro_manzana=manzana_int)
+                lote_id = Lote.objects.get(manzana=manzana.id, nro_lote=lote_int)
+            else:
+                manzana = None
+                lote_id = None
             
             #Obtener el TIMBRADO
             timbrado_id = request.POST.get('id_timbrado','')
@@ -939,14 +945,19 @@ def imprimir_factura(request):
             factura = Factura.objects.get(pk=id_factura)
             #Obtener el Lote
             lote = request.POST.get('lote','')
-            
-            x = unicode(lote)
-            fraccion_int = int(x[0:3])
-            manzana_int = int(x[4:7])
-            lote_int = int(x[8:])
-            
-            manzana = Manzana.objects.get(fraccion_id=fraccion_int, nro_manzana=manzana_int)
-            lote_id = Lote.objects.get(manzana=manzana.id, nro_lote=lote_int)
+
+            #si lote está o no está vacio
+            if lote != '' and lote != '---------':
+                x = unicode(lote)
+                fraccion_int = int(x[0:3])
+                manzana_int = int(x[4:7])
+                lote_int = int(x[8:])
+
+                manzana = Manzana.objects.get(fraccion_id=fraccion_int, nro_manzana=manzana_int)
+                lote_id = Lote.objects.get(manzana=manzana.id, nro_lote=lote_int)
+            else:
+                manzana = 0
+                lote_id = 0
             
             # response = crear_pdf_factura(factura, request, manzana, lote_id, request.user)
             # response = base64.b64encode(response.content)

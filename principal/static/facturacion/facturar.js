@@ -568,7 +568,7 @@
 			indicador_validez = '#840A0A'; // Por defecto invalido (Rojo)
 			
 			// Requerimieno minimo para un detalle valido
-			if (cantidad != 0  && precio_unitario != 0 && $("#lote").val() != '' && $("#id_name_cliente").val() != '' && (exentas !=0 || iva_10 != 0 || iva_5 !=0)){
+			if (cantidad != 0  && precio_unitario != 0 && /*$("#lote").val() != '' && */ $("#id_name_cliente").val() != '' && (exentas !=0 || iva_10 != 0 || iva_5 !=0)){
 				if (cantidad*precio_unitario == (exentas+iva_10+iva_5)){
 					// VALIDO
 					console.log('Detalle VALIDO');

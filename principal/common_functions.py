@@ -1481,79 +1481,81 @@ def crear_json_print_object(factura, manzana, lote_id, usuario):
     lineas.append(linea)
 
     # fraccion
-    linea = {
-        "valor": manzana.fraccion.nombre,
-        "coord_x": int(coor.fraccion_1x * cm),
-        "coord_y": int(coor.fraccion_1y * cm)
-    }
-    lineas.append(linea)
+    if manzana != 0:
+        linea = {
+            "valor": manzana.fraccion.nombre,
+            "coord_x": int(coor.fraccion_1x * cm),
+            "coord_y": int(coor.fraccion_1y * cm)
+        }
+        lineas.append(linea)
 
-    linea = {
-        "valor": manzana.fraccion.nombre,
-        "coord_x": int(coor.fraccion_2x * cm),
-        "coord_y": int(coor.fraccion_2y * cm)
-    }
-    lineas.append(linea)
+        linea = {
+            "valor": manzana.fraccion.nombre,
+            "coord_x": int(coor.fraccion_2x * cm),
+            "coord_y": int(coor.fraccion_2y * cm)
+        }
+        lineas.append(linea)
 
-    # manzana
-    linea = {
-        "valor": manzana.nro_manzana,
-        "coord_x": int(coor.manzana_1x * cm),
-        "coord_y": int(coor.manzana_1y * cm)
-    }
-    lineas.append(linea)
+        # manzana
+        linea = {
+            "valor": manzana.nro_manzana,
+            "coord_x": int(coor.manzana_1x * cm),
+            "coord_y": int(coor.manzana_1y * cm)
+        }
+        lineas.append(linea)
 
-    linea = {
-        "valor": manzana.nro_manzana,
-        "coord_x": int(coor.manzana_2x * cm),
-        "coord_y": int(coor.manzana_2y * cm)
-    }
-    lineas.append(linea)
+        linea = {
+            "valor": manzana.nro_manzana,
+            "coord_x": int(coor.manzana_2x * cm),
+            "coord_y": int(coor.manzana_2y * cm)
+        }
+        lineas.append(linea)
 
     # lote
-    linea = {
-        "valor": lote_id.nro_lote,
-        "coord_x": int(coor.lote_1x * cm),
-        "coord_y": int(coor.lote_1y * cm)
-    }
-    lineas.append(linea)
+    if lote_id != 0:
+        linea = {
+            "valor": lote_id.nro_lote,
+            "coord_x": int(coor.lote_1x * cm),
+            "coord_y": int(coor.lote_1y * cm)
+        }
+        lineas.append(linea)
 
-    linea = {
-        "valor": lote_id.nro_lote,
-        "coord_x": int(coor.lote_2x * cm),
-        "coord_y": int(coor.lote_2y * cm)
-    }
-    lineas.append(linea)
+        linea = {
+            "valor": lote_id.nro_lote,
+            "coord_x": int(coor.lote_2x * cm),
+            "coord_y": int(coor.lote_2y * cm)
+        }
+        lineas.append(linea)
 
-    # superficie
-    linea = {
-        "valor": unicode(lote_id.superficie) + "  mts2",
-        "coord_x": int(coor.superficie_1x * cm),
-        "coord_y": int(coor.superficie_1y * cm)
-    }
-    lineas.append(linea)
+        # superficie
+        linea = {
+            "valor": unicode(lote_id.superficie) + "  mts2",
+            "coord_x": int(coor.superficie_1x * cm),
+            "coord_y": int(coor.superficie_1y * cm)
+        }
+        lineas.append(linea)
 
-    linea = {
-        "valor": unicode(lote_id.superficie) + "  mts2",
-        "coord_x": int(coor.superficie_2x * cm),
-        "coord_y": int(coor.superficie_2y * cm)
-    }
-    lineas.append(linea)
+        linea = {
+            "valor": unicode(lote_id.superficie) + "  mts2",
+            "coord_x": int(coor.superficie_2x * cm),
+            "coord_y": int(coor.superficie_2y * cm)
+        }
+        lineas.append(linea)
 
-    # Cta Cte catastral
-    linea = {
-        "valor": lote_id.cuenta_corriente_catastral,
-        "coord_x": int(coor.cta_cte_ctral_1x * cm),
-        "coord_y": int(coor.cta_cte_ctral_1y * cm)
-    }
-    lineas.append(linea)
+        # Cta Cte catastral
+        linea = {
+            "valor": lote_id.cuenta_corriente_catastral,
+            "coord_x": int(coor.cta_cte_ctral_1x * cm),
+            "coord_y": int(coor.cta_cte_ctral_1y * cm)
+        }
+        lineas.append(linea)
 
-    linea = {
-        "valor": lote_id.cuenta_corriente_catastral,
-        "coord_x": int(coor.cta_cte_ctral_2x * cm),
-        "coord_y": int(coor.cta_cte_ctral_2y * cm)
-    }
-    lineas.append(linea)
+        linea = {
+            "valor": lote_id.cuenta_corriente_catastral,
+            "coord_x": int(coor.cta_cte_ctral_2x * cm),
+            "coord_y": int(coor.cta_cte_ctral_2y * cm)
+        }
+        lineas.append(linea)
 
     # if nueva_factura.cliente.ruc == None:
     #     nueva_factura.cliente.ruc = ""
@@ -1661,44 +1663,46 @@ def crear_json_print_object(factura, manzana, lote_id, usuario):
         lineas.append(linea)
 
         # fraccion
-        linea = {
-            "valor": manzana.fraccion.nombre,
-            "coord_x": int(coor.fraccion_3x * cm),
-            "coord_y": int(coor.fraccion_3y * cm)
-        }
-        lineas.append(linea)
+        if manzana != 0:
+            linea = {
+                "valor": manzana.fraccion.nombre,
+                "coord_x": int(coor.fraccion_3x * cm),
+                "coord_y": int(coor.fraccion_3y * cm)
+            }
+            lineas.append(linea)
 
-        # manzana
-        linea = {
-            "valor": manzana.nro_manzana,
-            "coord_x": int(coor.manzana_3x * cm),
-            "coord_y": int(coor.manzana_3y * cm)
-        }
-        lineas.append(linea)
+            # manzana
+            linea = {
+                "valor": manzana.nro_manzana,
+                "coord_x": int(coor.manzana_3x * cm),
+                "coord_y": int(coor.manzana_3y * cm)
+            }
+            lineas.append(linea)
 
         # lote
-        linea = {
-            "valor": lote_id.nro_lote,
-            "coord_x": int(coor.lote_3x * cm),
-            "coord_y": int(coor.lote_3y * cm)
-        }
-        lineas.append(linea)
+        if lote_id != 0:
+            linea = {
+                "valor": lote_id.nro_lote,
+                "coord_x": int(coor.lote_3x * cm),
+                "coord_y": int(coor.lote_3y * cm)
+            }
+            lineas.append(linea)
 
-        # superficie
-        linea = {
-            "valor": unicode(lote_id.superficie) + "  mts2",
-            "coord_x": int(coor.superficie_3x * cm),
-            "coord_y": int(coor.superficie_3y * cm)
-        }
-        lineas.append(linea)
+            # superficie
+            linea = {
+                "valor": unicode(lote_id.superficie) + "  mts2",
+                "coord_x": int(coor.superficie_3x * cm),
+                "coord_y": int(coor.superficie_3y * cm)
+            }
+            lineas.append(linea)
 
-        # Cta Cte catastral
-        linea = {
-            "valor": lote_id.cuenta_corriente_catastral,
-            "coord_x": int(coor.cta_cte_ctral_3x * cm),
-            "coord_y": int(coor.cta_cte_ctral_3y * cm)
-        }
-        lineas.append(linea)
+            # Cta Cte catastral
+            linea = {
+                "valor": lote_id.cuenta_corriente_catastral,
+                "coord_x": int(coor.cta_cte_ctral_3x * cm),
+                "coord_y": int(coor.cta_cte_ctral_3y * cm)
+            }
+            lineas.append(linea)
 
         # if nueva_factura.cliente.ruc == None:
         #     nueva_factura.cliente.ruc = ""
