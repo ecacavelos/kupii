@@ -2190,7 +2190,7 @@ def obtener_cantidad_cuotas_pagadas(pago):
     id_venta = pago.venta.id
     fecha_venta = pago.venta.fecha_de_venta
 
-    pagos = PagoDeCuotas.objects.filter(venta=id_venta, fecha_de_pago__range=(fecha_venta, fecha_pago)).order_by(
+    pagos = PagoDeCuotas.objects.filter(venta=id_venta, id__lte=pago.id, fecha_de_pago__range=(fecha_venta, fecha_pago)).order_by(
         'fecha_de_pago', 'id').aggregate(Sum('nro_cuotas_a_pagar'))
     print PagoDeCuotas.objects.filter(venta=id_venta, fecha_de_pago__range=(fecha_venta, fecha_pago)).order_by(
         'fecha_de_pago', 'id').query
