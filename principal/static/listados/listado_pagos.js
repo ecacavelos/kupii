@@ -22,11 +22,6 @@ function buscar() {
 	
 	function desplegar_campos() {
 		$("#busqueda_label").autocomplete();
-		$("#fecha_desde").hide();
-		$("#fecha_hasta").hide();
-		$("#busqueda_label").show();
-		$("#fecha_desde").val("");
-		$("#fecha_hasta").val("");	
 		if ($("#tipo_busqueda").val() == 'fecha') {
 			$('#busqueda_label').val("");
 			$('#busqueda_label').unmask('');

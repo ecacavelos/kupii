@@ -1752,6 +1752,7 @@ def listar_busqueda_pagos(request):
                     'ultima_busqueda': ultima_busqueda,
                     'tipo_busqueda' : tipo_busqueda,
                     'busqueda_label' : busqueda_label,
+                    'fecha_desde' : fecha_desde,
                     'fecha_hasta' : fecha_hasta,
                     'busqueda' : busqueda                    
                 })                    

@@ -268,12 +268,20 @@
 			    <!-- <td width="25px" title="Agregar Cliente"><a class="add" href="{% url 'frontend_home' %}clientes/agregar/">&nbsp;</a></td>-->
 			    <!--<td width="25px" title="Ver Facturas"><a class="edit" href="{% url 'frontend_home' %}facturacion/listado/">&nbsp;</a></td>--> 
 			  </tr>
-			  
+
+                <tr>
+				<td class="last" title="Listado de Pagos">
+					<a href="{% url 'frontend_home' %}movimientos/listado_pagos/">Listado de Pagos</a>
+				</td>
+			  </tr>
+
 			  <tr>
 				<td class="last" title="Informe Facturacion">
 					<a href="{% url 'frontend_home' %}informes/informe_facturacion/">Informe de Facturacion</a>
 				</td>
 			  </tr>
+
+
 			</table>
 		</div>
 	{%endif%}
