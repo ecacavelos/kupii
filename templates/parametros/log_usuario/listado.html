@@ -1,53 +1,28 @@
 {% extends "lotes/base_lotes.html" %}
 {% block header_scripts %}
-<script type="text/javascript">
-	function buscar() {
-		if ($("#fecha_ini").val() == "" || $("#fecha_ini").val() == "") {
-			alert("Debe ingresar un rango de fecha.");
-		} else {
-			$("#frm_busqueda").submit();
-		}
-	}
-	$(document).ready(function() {
-		$("#fecha_ini").focus(); 
-		
-//Cambiar calendario a español
-		$.datepicker.regional['es'] = {
-			closeText : 'Cerrar',
-			prevText : '<Ant',
-			nextText : 'Sig>',
-			currentText : 'Hoy',
-			monthNames : ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
-			monthNamesShort : ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
-			dayNames : ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
-			dayNamesShort : ['Dom', 'Lun', 'Mar', 'Mié', 'Juv', 'Vie', 'Sáb'],
-			dayNamesMin : ['Do', 'Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sá'],
-			weekHeader : 'Sm',
-			dateFormat : 'dd/mm/yy',
-			firstDay : 1,
-			isRTL : false,
-			showMonthAfterYear : false,
-			yearSuffix : ''
-		};
-		// Setear idioma al calendario
-		$.datepicker.setDefaults($.datepicker.regional['es']);
-		
-		var fecha_ini = "{{fecha_ini}}";
-		var fecha_fin = "{{fecha_fin}}";
-		
-		$('#fecha_ini').val(fecha_ini);
-		$('#fecha_fin').val(fecha_fin);
-		
-		$('#fecha_ini').mask('##/##/####');
-		$("#fecha_ini").datepicker({
-			dateFormat : 'dd/mm/yy'
-		});
-		$('#fecha_fin').mask('##/##/####');
-		$("#fecha_fin").datepicker({
-			dateFormat : 'dd/mm/yy'
-		});
-	});
-</script>
+    <script type="text/javascript">
+        /* Variables que vienenn del controlador */
+        var fecha_ini = "{{fecha_ini}}";
+        var fecha_fin = "{{fecha_fin}}";
+        $('#fecha_ini').val(fecha_ini);
+        $('#fecha_fin').val(fecha_fin);
+
+        var usuario_id = "{{ usuario_id }}";
+        var usuario_name = "{{ usuario_name }}";
+        $('#usuario_id').val(usuario_id);
+        $('#usuario_name').val(usuario_name);
+
+        var lote_id = "{{ lote_id }}";
+        var lote_cod = "{{ codigo_lote }}";
+        $('#lote_id').val(lote_id);
+        $('#lote_cod').val(lote_cod);
+
+        var nro_factura = "{{ nro_factura }}";
+        var factura_id = "{{ factura_id }}";
+        $('#nro_factura').val(nro_factura);
+        $('#factura_id').val(factura_id);
+    </script>
+    <script type="text/javascript" src="{{ STATIC_URL }}parametros/log_usuarios/listado_log_usuarios.js"></script>
 {%endblock%}
 {% block content %}
 <div class="gri16 text-izquierda" id="breadcumb">
@@ -59,25 +34,57 @@
 <div class="clear"></div>
 <h1>Listado de Logs de Usuarios</h1>
 <div class="grid_6">
-	<form name="frm_busqueda" id="frm_busqueda" method="get" action="/parametros/log_usuario/listado_busqueda_log_usuario/">
-		{% csrf_token %}
+	<form name="frm_busqueda" id="frm_busqueda" method="get" action="{% url 'frontend_home' %}parametros/log_usuario/listado_busqueda_log_usuarios/">
 		<table id="lista-categoria" frame="box">
 			<tr>
 				<th class="acciones" colspan="3"><strong><a href="#" style="color: white;">Filtrar</a></strong></th>
 			</tr>
-			<th></th><th id="label_desde">Desde:</th><th id="label_hasta">Hasta:</th>
+			<th></th><th>Desde:</th><th>Hasta:</th>
 			<tr>
-				<td id="label_busqueda"> Rango de Fecha: </td>
+				<td> Rango de Fecha: </td>
 				<td>
-				<input name="fecha_ini" id="fecha_ini" type="text" value="" />
+				    <input name="fecha_ini" id="fecha_ini" type="text" value="" />
 				</td>
 				<td>
-				<input name="fecha_fin" id="fecha_fin" type="text" value="" />
+				    <input name="fecha_fin" id="fecha_fin" type="text" value="" />
 				</td>
 			</tr>
+			</tr>
 			<tr>
-				<td></td>
-				<td><input type="button" value="Buscar" onclick="buscar();" class="historico" style="cursor: pointer"/></td>
+                <td>
+                    Usuario:
+                </td>
+                <td>
+                    <input type="text" id="usuario_name" name="usuario_name" placeholder="Todos los Usuarios" />
+                    <input type="hidden" id="usuario_id" name="usuario_id"/>
+                </td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>
+                    Lote:
+                </td>
+                <td>
+                    <input type="text" id="lote_cod" name="lote_cod" placeholder="Todos los Lotes" />
+                    <input type="hidden" id="lote_id" name="lote_id"/>
+                </td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>
+                    Factura:
+                </td>
+                <td>
+                    <input type="text" id="nro_factura" name="nro_factura" placeholder="Todas las Facturas" />
+                    <input type="hidden" id="factura_id" name="factura_id"/>
+                </td>
+                <td></td>
+            </tr>
+			<tr>
+				<td>
+				<input id="boton_buscar" type="button" value="Buscar" onclick="validar();" class="historico" style="cursor: pointer"/>
+				</td>
+				<!-- <td colspan="2"><a class="boton-verde" id="id_boton" onclick="excel_log_usuarios();">Descargar como Excel</a></td> -->
 			</tr>
 		</table>
 	</form>

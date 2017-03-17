@@ -1467,12 +1467,41 @@ def listar_busqueda_log_usuario(request):
     data = request.GET
     fecha_ini = data.get('fecha_ini', '')
     fecha_fin = data.get('fecha_fin', '')
-    fecha_ini_parsed = unicode(datetime.datetime.combine(datetime.datetime.strptime(fecha_ini, "%d/%m/%Y").date(),
-                                                         datetime.datetime.min.time()))
-    fecha_fin_parsed = unicode(datetime.datetime.combine(datetime.datetime.strptime(fecha_fin, "%d/%m/%Y").date(),
-                                                         datetime.datetime.max.time()))
-    object_list = LogUsuario.objects.filter(fecha_hora__range=(fecha_ini_parsed, fecha_fin_parsed)).order_by(
-        'fecha_hora')
+    fecha_ini_parsed = unicode(datetime.datetime.combine(
+        datetime.datetime.strptime(fecha_ini, "%d/%m/%Y").date(), datetime.datetime.min.time()))
+    fecha_fin_parsed = unicode(datetime.datetime.combine(
+        datetime.datetime.strptime(fecha_fin, "%d/%m/%Y").date(), datetime.datetime.max.time()))
+
+    usuario_id = data.get('usuario_id', '')
+
+    lote_id = data.get('lote_id', '')
+    lote_cod = data.get('lote_cod', '')
+
+    factura_id = data.get('factura_id', '')
+
+    if usuario_id == '':
+        if lote_id == '':
+            if factura_id == '':
+                object_list = LogUsuario.objects.filter(
+                    fecha_hora__range=(fecha_ini_parsed, fecha_fin_parsed)
+                ).order_by('fecha_hora')
+            else:
+                object_list = LogUsuario.objects.filter(
+                    fecha_hora__range=(fecha_ini_parsed, fecha_fin_parsed),
+                    factura_id = factura_id
+                ).order_by('fecha_hora')
+        else:
+            object_list = LogUsuario.objects.filter(
+                fecha_hora__range=(fecha_ini_parsed, fecha_fin_parsed),
+                factura_id=factura_id,
+                codigo_lote=lote_cod
+            ).order_by('fecha_hora')
+    else:
+        object_list = LogUsuario.objects.filter(
+            fecha_hora__range=(fecha_ini_parsed, fecha_fin_parsed),
+            factura_id=factura_id,
+            codigo_lote=lote_cod
+        ).order_by('fecha_hora')
 
     ultimo = "&fecha_ini=" + fecha_ini + "&fecha_fin=" + fecha_fin
     paginator = Paginator(object_list, 15)
