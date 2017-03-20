@@ -29,6 +29,22 @@ function validar() {
         $("#usuario_name").val("");
     }
 
+    if( $("#lote_cod").val() == "" ){
+        $("#lote_id").val("");
+    }
+
+    if( $("#lote_id").val() == "" ){
+        $("#lote_cod").val("");
+    }
+
+    if( $("#nro_factura").val() == "" ){
+        $("#factura_id").val("");
+    }
+
+    if( $("#factura_id").val() == "" ){
+        $("#nro_factura").val("");
+    }
+
     enviar_busqueda();
 }
 
@@ -61,13 +77,25 @@ $(document).ready(function () {
     $("#fecha_ini").datepicker({
         dateFormat: 'dd/mm/yy'
     });
+    $('#fecha_ini').val(fecha_ini);
+
+
     $('#fecha_fin').mask('##/##/####');
     $("#fecha_fin").datepicker({
         dateFormat: 'dd/mm/yy'
     });
+    $('#fecha_fin').val(fecha_fin);
+
+    $('#usuario_id').val(usuario_id);
+    $('#usuario_name').val(usuario_name);
 
     $('#lote_cod').mask('###/###/####');
+    $('#lote_id').val(lote_id);
+    $('#lote_cod').val(lote_cod);
+
     $('#nro_factura').mask('###-###-#######');
+    $('#nro_factura').val(nro_factura);
+    $('#factura_id').val(factura_id);
 
     base_url = base_context + "/ajax/get_usuario_by_username/";
     params = "value";

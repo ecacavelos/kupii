@@ -4,23 +4,17 @@
         /* Variables que vienenn del controlador */
         var fecha_ini = "{{fecha_ini}}";
         var fecha_fin = "{{fecha_fin}}";
-        $('#fecha_ini').val(fecha_ini);
-        $('#fecha_fin').val(fecha_fin);
 
         var usuario_id = "{{ usuario_id }}";
         var usuario_name = "{{ usuario_name }}";
-        $('#usuario_id').val(usuario_id);
-        $('#usuario_name').val(usuario_name);
 
         var lote_id = "{{ lote_id }}";
         var lote_cod = "{{ codigo_lote }}";
-        $('#lote_id').val(lote_id);
-        $('#lote_cod').val(lote_cod);
+
 
         var nro_factura = "{{ nro_factura }}";
         var factura_id = "{{ factura_id }}";
-        $('#nro_factura').val(nro_factura);
-        $('#factura_id').val(factura_id);
+
     </script>
     <script type="text/javascript" src="{{ STATIC_URL }}parametros/log_usuarios/listado_log_usuarios.js"></script>
 {%endblock%}
@@ -34,7 +28,7 @@
 <div class="clear"></div>
 <h1>Listado de Logs de Usuarios</h1>
 <div class="grid_6">
-	<form name="frm_busqueda" id="frm_busqueda" method="get" action="{% url 'frontend_home' %}parametros/log_usuario/listado_busqueda_log_usuarios/">
+	<form name="frm_busqueda" id="frm_busqueda" method="get" action="{% url 'frontend_home' %}parametros/log_usuario/listado_busqueda_log_usuario/">
 		<table id="lista-categoria" frame="box">
 			<tr>
 				<th class="acciones" colspan="3"><strong><a href="#" style="color: white;">Filtrar</a></strong></th>

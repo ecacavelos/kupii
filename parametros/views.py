@@ -3,7 +3,7 @@ import os
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext, loader
 from principal.models import PlanDePago, PlanDePagoVendedor, Timbrado, RangoFactura, TimbradoRangoFacturaUsuario, \
-    ConceptoFactura, LogUsuario, CoordenadasFactura, LogDeLogos
+    ConceptoFactura, LogUsuario, CoordenadasFactura, LogDeLogos, Lote, Factura
 from parametros.forms import PlanDePagoForm, SearchForm, PlanDePagoVendedorForm, TimbradoForm, RangoFacturaForm, \
     ConceptoFacturaForm, CoordenadasFacturaForm  # UploadImageForm
 from django.core.urlresolvers import reverse, resolve
@@ -1473,37 +1473,54 @@ def listar_busqueda_log_usuario(request):
         datetime.datetime.strptime(fecha_fin, "%d/%m/%Y").date(), datetime.datetime.max.time()))
 
     usuario_id = data.get('usuario_id', '')
+    usuario_name = data.get('usuario_name','')
 
     lote_id = data.get('lote_id', '')
     lote_cod = data.get('lote_cod', '')
 
     factura_id = data.get('factura_id', '')
+    nro_factura = data.get('nro_factura', '')
 
-    if usuario_id == '':
-        if lote_id == '':
-            if factura_id == '':
-                object_list = LogUsuario.objects.filter(
-                    fecha_hora__range=(fecha_ini_parsed, fecha_fin_parsed)
-                ).order_by('fecha_hora')
-            else:
-                object_list = LogUsuario.objects.filter(
-                    fecha_hora__range=(fecha_ini_parsed, fecha_fin_parsed),
-                    factura_id = factura_id
-                ).order_by('fecha_hora')
-        else:
-            object_list = LogUsuario.objects.filter(
-                fecha_hora__range=(fecha_ini_parsed, fecha_fin_parsed),
-                factura_id=factura_id,
-                codigo_lote=lote_cod
-            ).order_by('fecha_hora')
-    else:
-        object_list = LogUsuario.objects.filter(
-            fecha_hora__range=(fecha_ini_parsed, fecha_fin_parsed),
-            factura_id=factura_id,
-            codigo_lote=lote_cod
-        ).order_by('fecha_hora')
+    #where_str = ' WHERE "principal_logusuario"."fecha_hora" >= %s AND "principal_logusuario"."fecha_hora" <= %s ', [fecha_ini_parsed, fecha_fin_parsed]
+    kwargs = {'fecha_hora__range': (fecha_ini_parsed, fecha_fin_parsed)}
 
-    ultimo = "&fecha_ini=" + fecha_ini + "&fecha_fin=" + fecha_fin
+    #order_str = ' ORDER BY "principal_lousuario"."fecha_hora" DESC '
+
+
+    if usuario_id != '':
+        usuario = User.objects.get(pk=usuario_id)
+        #where_str =+ ' AND "principal_logusuario"."usuario_id" = %s ', [usuario_id]
+        kwargs['usuario_id'] = usuario_id
+        usuario_name = usuario.username
+
+    if lote_id != '':
+        lote = Lote.objects.get(pk=lote_id)
+        #where_str = + ' AND "principal_logusuario"."lote_id" = %s ', [lote_id]
+        kwargs['codigo_lote'] = lote.codigo_paralot
+        lote_cod = lote.codigo_paralot
+
+    if factura_id != '':
+        factura = Factura.objects.get(pk=factura_id)
+        #where_str = + ' AND "principal_logusuario"."factura_id" = %s ', [factura_id]
+        kwargs['id_objeto'] = factura_id
+        kwargs['tipo_objeto'] = "Factura"
+        nro_factura = factura.numero
+
+    object_list = LogUsuario.objects.filter(**kwargs)
+
+    #object_list = LogUsuario.objects.raw(
+    #    '''SELECT "principal_logusuario"."id",
+    #              "principal_logusuario"."fecha_hora",
+    #              "principal_logusuario"."usuario_id",
+    #              "principal_logusuario"."accion",
+    #              "principal_logusuario"."tipo_objeto",
+    #              "principal_logusuario"."id_objeto",
+    #              "principal_logusuario"."codigo_lote"
+    #       FROM "principal_logusuario" ''' + where_str + order_str
+    #)
+
+
+    ultimo = "&fecha_ini=" + fecha_ini + "&fecha_fin=" + fecha_fin + "&usuario_id=" + usuario_id + "&lote_id=" + lote_id + "&factura_id=" + factura_id
     paginator = Paginator(object_list, 15)
     page = request.GET.get('page')
     try:
@@ -1515,6 +1532,14 @@ def listar_busqueda_log_usuario(request):
 
     c = RequestContext(request, {
         'object_list': lista,
+        'fecha_ini': fecha_ini,
+        'fecha_fin': fecha_fin,
+        'usuario_id': usuario_id,
+        'usuario_name': usuario_name,
+        'lote_id': lote_id,
+        'codigo_lote': lote_cod,
+        'factura_id': factura_id,
+        'nro_factura': nro_factura,
         'ultimo': ultimo
     })
     return HttpResponse(t.render(c))
