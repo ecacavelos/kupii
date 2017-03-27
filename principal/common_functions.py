@@ -2190,8 +2190,13 @@ def obtener_cantidad_cuotas_pagadas(pago):
     id_venta = pago.venta.id
     fecha_venta = pago.venta.fecha_de_venta
 
-    pagos = PagoDeCuotas.objects.filter(venta=id_venta, id__lte=pago.id, fecha_de_pago__range=(fecha_venta, fecha_pago)).order_by(
+    #pagos = PagoDeCuotas.objects.filter(venta=id_venta, id__lte=pago.id, fecha_de_pago__range=(fecha_venta, fecha_pago)).order_by(
+    #    'fecha_de_pago', 'id').aggregate(Sum('nro_cuotas_a_pagar'))
+
+    pagos = PagoDeCuotas.objects.filter(venta=id_venta,
+                                        fecha_de_pago__range=(fecha_venta, fecha_pago)).order_by(
         'fecha_de_pago', 'id').aggregate(Sum('nro_cuotas_a_pagar'))
+
     print PagoDeCuotas.objects.filter(venta=id_venta, fecha_de_pago__range=(fecha_venta, fecha_pago)).order_by(
         'fecha_de_pago', 'id').query
     cantidad_pagos = pagos['nro_cuotas_a_pagar__sum']
@@ -2202,6 +2207,9 @@ def lote_libre(lote_id):
     # esta_libre = True
     # TODO: Hacer el analisis exaustivo para ver si un lote esta libre o no
     # Contemplar transferencias, reservas, transferencias y cambios.
+
+    if lote_id == 8608:
+        print 'hola'
 
     venta = get_ultima_venta_no_recuperada(lote_id)
 
@@ -2214,6 +2222,8 @@ def lote_libre(lote_id):
         if object_list:
             esta_libre = False
         elif lote_reservado_segun_estado(lote_id):
+            esta_libre = False
+        elif Lote.objects.get(pk=lote_id).estado == '3':
             esta_libre = False
         else:
             esta_libre = True

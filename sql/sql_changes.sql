@@ -12,6 +12,18 @@
 -- query en cuestion --
 -- agregar siempre despues de este ejemplo el siguiente cambio --
 
+/*Se agraga pk a tabla de movimientos*/
+ALTER TABLE principal_pagodecuotas
+  ADD CONSTRAINT pk_pagodecuotas PRIMARY KEY(id);
+
+
+/* Para borrar movimientos con id duplicados */
+delete from principal_pagodecuotas
+    where exists (select 1
+                  from principal_pagodecuotas t2
+                  where t2.id = principal_pagodecuotas.id and
+                  t2.ctid > principal_pagodecuotas.ctid
+                 );
 
 -- 24/02/2017 16:50 - Franco Albertini - CBI-DEV: NO EJECUTADO - PROPAR: EJECUTADO  - GRUPO-MV: EJECUTADO
 /* Este query añade la columna seleccioanado a la tabla de logos */
