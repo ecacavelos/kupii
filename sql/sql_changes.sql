@@ -25,6 +25,12 @@ delete from principal_pagodecuotas
                   t2.ctid > principal_pagodecuotas.ctid
                  );
 
+/* Para encontrar los movimientos con id duplicados */
+SELECT id, count(*)
+from principal_pagodecuotas
+group by id
+HAVING count(*) > 1;
+
 -- 24/02/2017 16:50 - Franco Albertini - CBI-DEV: NO EJECUTADO - PROPAR: EJECUTADO  - GRUPO-MV: EJECUTADO
 /* Este query añade la columna seleccioanado a la tabla de logos */
 ALTER TABLE principal_logdelogos ADD COLUMN seleccionado boolean;
