@@ -104,12 +104,12 @@
 			+ '<input type="text" id="id_detalle_exentas_'+cantidad_detalles+'" class= "exentas-item item" placeholder="Exentas">'
 			+ '<input type="text" id="id_detalle_iva5_'+cantidad_detalles+'" class= "iva_5-item item" placeholder="IVA 5%">'
 			+ '<input type="text" id="id_detalle_iva10_'+cantidad_detalles+'" class= "iva_10-item item" placeholder="IVA 10%">'
-			+ '<a href="#" class="add-btn">+</a>'
+			+ '<a href="#" class="rm-btn">-</a>'
 		    + '</div>';
         	         
         	$('.detalle_factura').append(item_detalle_factura); 
-        	$(this).attr('class', 'rm-btn');
-        	$(this).html('-');
+        	//$(this).attr('class', 'rm-btn');
+        	//$(this).html('-');
         	aplicarFuncionesDetalles();
     	});
 		
@@ -469,38 +469,6 @@
 						console.log(data2);
 					});
 				});
-				// useDefaultPrinter();
-				// pdf = request.responseText;
-				// qz.setPaperSize("210mm", "297mm");
-				// qz.appendPDF("data:application/pdf;base64,"+pdf);
-				// qz.printPS();
-				// timeoutID = window.setTimeout(pregunta, 5000);
-				// function pregunta(){
-				// 	if (confirm("¿Volver a Imprimir?")) {
-	        		// 	//alert("Apretó aceptar");
-	        		// 	//volver a hacer click en este boton
-	        		// 	$("#imprimir_factura").trigger("click");
-	    			// } else {
-	    			// 	//ajax de marcar como impreso
-	    			// 	var request = $.ajax({
-	    			// 		type : "POST",
-				// 			url : base_context+"/ajax/marcar_impresa/",
-				// 			async: false,
-				// 			data : {
-				// 				csrfmiddlewaretoken : $('input[name=csrfmiddlewaretoken]').val(),
-				// 				id_factura: $("#id_factura").val(),
-				// 				},
-				// 				dataType : "json"
-				// 		});
-				// 		request.done(function(msg) {
-				// 			hola = msg;
-				// 			console.log(msg);
-				// 		});
-	    			//
-	    			// }
-				// }
-				
-    			
     	});
     	
     	detalles();
@@ -635,16 +603,6 @@
 	function utf8_encode(argString) {
   //  discuss at: http://phpjs.org/functions/utf8_encode/
   // original by: Webtoolkit.info (http://www.webtoolkit.info/)
-  // improved by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
-  // improved by: sowberry
-  // improved by: Jack
-  // improved by: Yves Sucaet
-  // improved by: kirilloid
-  // bugfixed by: Onno Marsman
-  // bugfixed by: Onno Marsman
-  // bugfixed by: Ulrich
-  // bugfixed by: Rafal Kukawski
-  // bugfixed by: kirilloid
   //   example 1: utf8_encode('Kevin van Zonneveld');
   //   returns 1: 'Kevin van Zonneveld'
 
@@ -704,14 +662,6 @@
 function utf8_decode(str_data) {
   //  discuss at: http://phpjs.org/functions/utf8_decode/
   // original by: Webtoolkit.info (http://www.webtoolkit.info/)
-  //    input by: Aman Gupta
-  //    input by: Brett Zamir (http://brett-zamir.me)
-  // improved by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
-  // improved by: Norman "zEh" Fuchs
-  // bugfixed by: hitwork
-  // bugfixed by: Onno Marsman
-  // bugfixed by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
-  // bugfixed by: kirilloid
   //   example 1: utf8_decode('Kevin van Zonneveld');
   //   returns 1: 'Kevin van Zonneveld'
 
