@@ -393,20 +393,6 @@
         {% endif %}
         {% if grupo == 5 %}
             <div class="grid_10" align="center">
-                <!--<p>{{nombre}}</p>-->
-                <table width="90%" border="0" cellpadding="0" cellspacing="0" id="lista-categoria" align="center">
-                    <tr>
-                        <th colspan="3" class="categorias"><strong>Personas</strong></th>
-                    </tr>
-                    <tr>
-                        <td><strong><a href="{% url 'frontend_home' %}clientes/listado/">Clientes</a></strong></td>
-                        <td width="25px" title="Agregar Cliente"><a
-                                href="{% url 'frontend_home' %}clientes/agregar/"><span
-                                class="glyphicon glyphicon-pencil"></span></a></td>
-                        <td width="25px" title="Ver Clientes"><a href="{% url 'frontend_home' %}clientes/listado/"><span
-                                class="glyphicon glyphicon-list-alt"></span></a></td>
-                    </tr>
-                </table>
                 <table width="90%" border="0" cellpadding="0" cellspacing="0" id="lista-categoria" align="center">
                     <tr>
                         <th colspan="3" class="categorias"><strong>Facturación</strong></th>
@@ -419,6 +405,11 @@
                         <td width="25px" title="Ver Facturas"><a
                                 href="{% url 'frontend_home' %}facturacion/listado/"><span
                                 class="glyphicon glyphicon-list-alt"></span></a></td>
+                    </tr>
+                    <tr>
+                        <td colspan="3" title="Lotes Libres">
+                            <a href="{% url 'frontend_home' %}informes/lotes_libres/">Lotes Libres</a>
+                        </td>
                     </tr>
                 </table>
             </div>
@@ -449,53 +440,6 @@
                         <td width="25px" title="Ver Pagos"><a
                                 href="{% url 'frontend_home' %}movimientos/listado_pagos/"><span
                                 class="glyphicon glyphicon-list-alt"></span></a></td>
-                    </tr>
-                    <!--
-                    <tr>
-                        <td title="Reservar Lote"><a href="{% url 'frontend_home' %}movimientos/reservas_lotes/">Reservar
-                            Lote</a></td>
-                        <td width="25px" title="Agregar Reserva"><a
-                                href="{% url 'frontend_home' %}movimientos/reservas_lotes/"><span
-                                class="glyphicon glyphicon-pencil"></span></a></td>
-                        <td width="25px" title="Ver Reservas"><a
-                                href="{% url 'frontend_home' %}movimientos/listado_reservas/"><span
-                                class="glyphicon glyphicon-list-alt"></span></a></td>
-                    </tr>
-
-                    <tr>
-                        <td title="Transferencia de Lote"><a
-                                href="{% url 'frontend_home' %}movimientos/transferencias_lotes/">Transferencia de
-                            Lote</a></td>
-                        <td width="25px" title="Agregar Transferencia"><a
-                                href="{% url 'frontend_home' %}movimientos/transferencias_lotes/"><span
-                                class="glyphicon glyphicon-pencil"></span></a></td>
-                        <td width="25px" title="Ver Transferencias"><a
-                                href="{% url 'frontend_home' %}movimientos/listado_transferencias/"><span
-                                class="glyphicon glyphicon-list-alt"></span></a></td>
-                    </tr>
-                    <tr>
-                        <td title="Cambio de Lote"><a href="{% url 'frontend_home' %}movimientos/cambio_lotes/">Cambio
-                            de Lote</a></td>
-                        <td width="25px" title="Agregar Cambio"><a
-                                href="{% url 'frontend_home' %}movimientos/cambio_lotes/"><span
-                                class="glyphicon glyphicon-pencil"></span></a></td>
-                        <td width="25px" title="Ver Cambios"><a
-                                href="{% url 'frontend_home' %}movimientos/listado_cambios/"><span
-                                class="glyphicon glyphicon-list-alt"></span></a></td>
-                    </tr>
-                    -->
-                </table>
-            </div>
-            <div class="grid_6">
-                <table width="90%" border="0" cellpadding="0" cellspacing="0" id="lista-categoria" align="center">
-                    <tr>
-                        <th class="acciones"><strong><a href="{% url 'frontend_home' %}informes/" style="color: white;">Informes</a></strong>
-                        </th>
-                    </tr>
-                    <tr>
-                        <td class="last" title="Lotes Libres">
-                            <a href="{% url 'frontend_home' %}informes/lotes_libres/">Lotes Libres</a>
-                        </td>
                     </tr>
                 </table>
             </div>
