@@ -256,7 +256,7 @@
 					ponerPuntos();
 					validarDetalle();
 					if (msg.length > 1){
-						$('.item-detalle')[index -1].children[7].click();
+						$('.item-detalle')[0].children[7].click();
 			        	index = $('.item-detalle').length;
 			        	var inputs= $('.item-detalle')[index -1].children;
 						inputs[0].value=msg[1].cantidad;
@@ -270,7 +270,7 @@
 						aplicarFuncionesDetalles();
 						validarDetalle();
 						if (msg.length == 3){
-							$('.item-detalle')[index -1].children[7].click();
+							$('.item-detalle')[0].children[7].click();
 				        	index = $('.item-detalle').length;
 				        	var inputs= $('.item-detalle')[index -1].children;
 							inputs[0].value=msg[2].cantidad;
