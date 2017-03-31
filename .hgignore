@@ -11,3 +11,5 @@ principal\static\facturacion\qz-print\assets\signing\sign-message.asp
 .idea\workspace.xml
 .idea/
 propar01\configuraciones.py
+principal/static/custom/img/logos/
+principal\static\custom\img\propar_logo.jpg
