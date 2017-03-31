@@ -760,7 +760,7 @@ class PagoDeCuotas(models.Model):
     venta = models.ForeignKey(Venta, on_delete=models.PROTECT)
     transaccion = models.ForeignKey(Transaccion, on_delete=models.PROTECT)
     lote = models.ForeignKey(Lote, on_delete=models.PROTECT)
-    fecha_de_pago = models.DateField()
+    fecha_de_pago = models.DateTimeField()
     nro_cuotas_a_pagar = models.IntegerField()
     cliente = models.ForeignKey(Cliente, on_delete=models.PROTECT)
     plan_de_pago = models.ForeignKey(PlanDePago, on_delete=models.PROTECT)

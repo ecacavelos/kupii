@@ -276,8 +276,10 @@ def pago_de_cuotas(request):
                 cuota_obsequio = data.get('cuota_obsequio')
                 resumen_cuotas = int (resumen_cuotas) + 1
                 date_parse_error = False
-                fecha_pago=data.get('pago_fecha_de_pago', '')
-                fecha_pago_parsed = datetime.datetime.strptime(fecha_pago, "%d/%m/%Y").date()
+                fecha_pago = data.get('pago_fecha_de_pago', '')
+                hora_pago = unicode(datetime.datetime.now().time())[:8]
+                fecha_pago = fecha_pago + ' ' + hora_pago
+                fecha_pago_parsed = datetime.datetime.strptime(fecha_pago, "%d/%m/%Y %H:%M:%S")
                 detalle = data.get('detalle', '')
                 if detalle == '':
                     detalle =None
@@ -599,7 +601,10 @@ def pago_de_cuotas_cliente(request):
                             mes = unicode('0') + unicode(mes)
                         fecha_actual = unicode(dia) + '/' + unicode(mes) + '/' + unicode(anho)
                     fecha_pago = fecha_actual
-                    fecha_pago_parsed = datetime.datetime.strptime(fecha_pago, "%d/%m/%Y").date()
+                    hora_pago = unicode(datetime.datetime.now().time())[:8]
+                    fecha_pago = fecha_pago + ' ' + hora_pago
+                    fecha_pago_parsed = datetime.datetime.strptime(fecha_pago, "%d/%m/%Y %H:%M:%S")
+                    #fecha_pago_parsed = datetime.datetime.strptime(fecha_pago, "%d/%m/%Y").date()
 
                     detalle = json.dumps(venta_json['detalle'])
                     if detalle == '':
@@ -1187,7 +1192,7 @@ def listar_pagos(request):
             if object_list:
                 for i in object_list:
                     try:
-                        i.fecha_de_pago=i.fecha_de_pago.strftime("%d/%m/%Y")
+                        i.fecha_de_pago=i.fecha_de_pago.strftime("%d/%m/%Y %H:%M:%S")
                         i.total_de_cuotas=unicode('{:,}'.format(i.total_de_cuotas)).replace(",", ".")
                         i.total_de_mora=unicode('{:,}'.format(i.total_de_mora)).replace(",", ".")
                         i.total_de_pago=unicode('{:,}'.format(i.total_de_pago)).replace(",", ".")
@@ -1716,7 +1721,8 @@ def listar_busqueda_pagos(request):
                             for i in object_list:
                                 i.total_de_cuotas=unicode('{:,}'.format(i.total_de_cuotas)).replace(",", ".")
                                 i.total_de_mora=unicode('{:,}'.format(i.total_de_mora)).replace(",", ".")
-                                i.total_de_pago=unicode('{:,}'.format(i.total_de_pago)).replace(",", ".")             
+                                i.total_de_pago=unicode('{:,}'.format(i.total_de_pago)).replace(",", ".")
+                        busqueda_label = Cliente.objects.get(pk=cliente_id)
                     except Exception, error:
                         print error
                         print i.id
@@ -2404,7 +2410,7 @@ def modificar_pago_de_cuotas(request, id):
                 pago = PagoDeCuotas.objects.get(pk=id)
                 fecha= pago.fecha_de_pago
                 if fecha != "" and fecha != None:
-                    fecha = pago.fecha_de_pago.strftime('%d/%m/%Y')
+                    fecha = pago.fecha_de_pago.strftime('%d/%m/%Y %H:%M:%S')
                 t = loader.get_template('movimientos/modificar_pagocuota.html')
                 c = RequestContext(request, {
                     'pagocuota': pago,
@@ -2424,7 +2430,7 @@ def modificar_pago_de_cuotas(request, id):
                 total_de_pago = data.get('monto_total')
                 date_parse_error = False
                 fecha_pago = data.get('fecha', '')
-                fecha_pago_parsed = datetime.datetime.strptime(fecha_pago, "%d/%m/%Y").date()
+                fecha_pago_parsed = datetime.datetime.strptime(fecha_pago, "%d/%m/%Y %H:%M:%S")
                 cuota_obsequio = data.get('cuota_obsequio','off')
                 if cuota_obsequio == 'on':
                     cuota_obsequio = True
@@ -2456,7 +2462,7 @@ def modificar_pago_de_cuotas(request, id):
                 message = "Pago Modificado Exitosamente"
                 
                 t = loader.get_template('movimientos/modificar_pagocuota.html')
-                fecha = pago.fecha_de_pago.strftime('%d/%m/%Y')
+                fecha = pago.fecha_de_pago.strftime('%d/%m/%Y %H:%M:%S')
                 c = RequestContext(request, {
                     'pagocuota': pago,
                     'fecha_pago': fecha,
@@ -2513,7 +2519,9 @@ def agregar_pago(request, id):
                 total_de_pago = data.get('monto_total')
                 date_parse_error = False
                 fecha_pago=data.get('fecha', '')
-                fecha_pago_parsed = datetime.datetime.strptime(fecha_pago, "%d/%m/%Y").date()
+                hora_pago = datetime.now().time()
+                fecha_pago = fecha_pago +' '+hora_pago
+                fecha_pago_parsed = datetime.datetime.strptime(fecha_pago, "%d/%m/%Y %H:%M:%S")
     
                 try:
                     pago.total_de_cuotas = total_de_cuotas

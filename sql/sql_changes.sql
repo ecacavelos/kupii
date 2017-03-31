@@ -12,6 +12,10 @@
 -- query en cuestion --
 -- agregar siempre despues de este ejemplo el siguiente cambio --
 
+/* Se convierte el date de fecha de pago a timestamp */
+ALTER TABLE principal_pagodecuotas
+   ALTER COLUMN fecha_de_pago TYPE timestamp without time zone;
+
 /*Se agraga pk a tabla de movimientos*/
 ALTER TABLE principal_pagodecuotas
   ADD CONSTRAINT pk_pagodecuotas PRIMARY KEY(id);

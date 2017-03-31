@@ -5,7 +5,7 @@ $(document).ready(function() {
 	$("#id_fecha").datepicker({
 		dateFormat : 'dd/mm/yy'
 	});
-	$('#id_fecha').mask('##/##/####');
+	$('#id_fecha').mask('##/##/#### ##:##:##');
 	$('.grid_6').hide();
 	//Cambiar calendario a español
 	$.datepicker.regional['es'] = {
@@ -72,7 +72,7 @@ function validatePago(event) {
 function isValidDate(dateString)
 {
     // First check for the pattern
-    if(!/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(dateString))
+    if(!/^\d{1,2}\/\d{1,2}\/\d{4} (\d{2}):(\d{2}):(\d{2})$/.test(dateString))
     {
         alert("Formato de fecha incorrecto");
         $('#enviar_pago').attr("disabled",true);

@@ -1512,8 +1512,8 @@ def obtener_pagos_liquidacion(entidad_id, tipo_busqueda, fecha_ini, fecha_fin, o
                     monto_propietario = montos['monto_propietario']
                     total_de_cuotas = int(pago['monto'])
                     fecha_pago_str = unicode(pago['fecha_de_pago'])
-                    fecha_pago = unicode(datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
-                    fecha_pago_order = datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d").strftime("%d/%m/%Y")
+                    fecha_pago = unicode(datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d %H:%M:%S").strftime("%d/%m/%Y %H:%M:%S"))
+                    fecha_pago_order = datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d %H:%M:%S").strftime("%d/%m/%Y %H:%M:%S")
                     # Se setean los datos de cada fila
                     fila = {}
                     fila['pago_id'] = pago['id']
@@ -1911,7 +1911,7 @@ def obtener_pagos_liquidacion(entidad_id, tipo_busqueda, fecha_ini, fecha_fin, o
                                 fecha_pago_str = unicode(pago['fecha_de_pago'])
                                 try:
                                     fecha_pago = unicode(
-                                        datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
+                                        datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d %H:%M:%S").strftime("%d/%m/%Y %H:%M:%S"))
                                 except Exception, error:
                                     print error + ": " + fecha_pago_str
 
@@ -2035,9 +2035,14 @@ def liquidacion_propietarios(request):
 
                         # PARAMETROS RECIBIDOS
                         fecha_ini = request.GET['fecha_ini']
+                        #fecha_ini_con_hora = fecha_ini + ' ' +'00:00:00'
                         fecha_fin = request.GET['fecha_fin']
+                        #fecha_fin_con_hora  = fecha_fin + ' ' +'00:00:00'
+
                         fecha_ini_parsed = datetime.datetime.strptime(fecha_ini, "%d/%m/%Y").date()
+                        #fecha_ini_parsed = datetime.datetime.strptime(fecha_ini, "%d/%m/%Y %H:%M:%S")
                         fecha_fin_parsed = datetime.datetime.strptime(fecha_fin, "%d/%m/%Y").date()
+                        #fecha_fin_parsed = datetime.datetime.strptime(fecha_fin, "%d/%m/%Y %H:%M:%S")
                         tipo_busqueda = request.GET['tipo_busqueda']
                         order_by = request.GET['order_by']
                         busqueda_id = request.GET['busqueda']
@@ -2385,7 +2390,7 @@ def liquidacion_vendedores(request):
                                     fecha_pago_str = unicode(pago['fecha_de_pago'])
                                     try:
                                         fecha_pago = unicode(
-                                            datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
+                                            datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d %H:%M:%S").strftime("%d/%m/%Y %H:%M:%S"))
                                     except Exception, error:
                                         print unicode(error) + ": " + fecha_pago_str
 
@@ -2435,7 +2440,7 @@ def liquidacion_vendedores(request):
                                     fecha_pago_str = unicode(pago['fecha_de_pago'])
                                     try:
                                         fecha_pago = unicode(
-                                            datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
+                                            datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d %H:%M:%S").strftime("%d/%m/%Y %H:%M:%S"))
                                     except Exception, error:
                                         print error + ": " + fecha_pago_str
 
@@ -2574,7 +2579,7 @@ def liquidacion_general_vendedores(request):
                                                                                                         'venta__plan_de_pago_vendedor',
                                                                                                         'venta__lote__manzana__fraccion')
                     cant_cuotas_pagadas_ventas = PagoDeCuotas.objects.filter(venta__in=ventas_id,
-                                                                             fecha_de_pago__lt=fecha_ini_parsed).values(
+                                                                             fecha_de_pago__lt=fecha_ini_parsed).order_by('fecha_de_pago').values(
                         'venta_id').annotate(Sum('nro_cuotas_a_pagar')).prefetch_related('venta_id')
 
                     filas_vendedor = []
@@ -2799,7 +2804,7 @@ def liquidacion_general_vendedores(request):
                                     fecha_pago_str = unicode(pago['fecha_de_pago'])
                                     try:
                                         fecha_pago = unicode(
-                                            datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
+                                            datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d %H:%M:%S").strftime("%d/%m/%Y %H:%M:%S"))
                                     except Exception, error:
                                         print unicode(error) + ": " + fecha_pago_str
 
@@ -2848,7 +2853,7 @@ def liquidacion_general_vendedores(request):
                                     fecha_pago_str = unicode(pago['fecha_de_pago'])
                                     try:
                                         fecha_pago = unicode(
-                                            datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
+                                            datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d %H:%M:%S").strftime("%d/%m/%Y %H:%M:%S"))
                                     except Exception, error:
                                         print error + ": " + fecha_pago_str
 
@@ -3255,7 +3260,7 @@ def informe_movimientos(request):
                                     cuota['tipo_de_venta'] = tipo_de_venta
                                     fecha_pago_str = unicode(pago['fecha_de_pago'])
                                     cuota['fecha_de_pago'] = unicode(
-                                        datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
+                                        datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d %H:%M:%S").strftime("%d/%m/%Y %H:%M:%S"))
                                     cuota['id'] = pago['id']
                                     cuota['nro_cuota'] = pago['nro_cuota_y_total']
 
@@ -6414,7 +6419,7 @@ def informe_ventas(request):
                             for pago in venta_pagos_query_set:
                                 cuota = {}
                                 cuota['fecha_de_pago'] = datetime.datetime.strptime(unicode(pago.fecha_de_pago),
-                                                                                    "%Y-%m-%d").strftime("%d/%m/%Y")
+                                                                                    "%Y-%m-%d %H:%M:%S").strftime("%d/%m/%Y %H:%M:%S")
                                 cuota['id'] = pago.id
                                 detalle_str = ""
                                 cuota['detalle'] = ""
@@ -6448,7 +6453,7 @@ def informe_ventas(request):
                                             cuotas_detalles[0]['fecha']) + ' '
 
                                         fecha_pago_parsed = datetime.datetime.strptime(cuota['fecha_de_pago'],
-                                                                                       "%d/%m/%Y").date()
+                                                                                       "%d/%m/%Y %H:%M:%S").date()
                                         proximo_vencimiento_parsed = datetime.datetime.strptime(
                                             unicode(cuotas_detalles[0]['fecha']), "%d/%m/%Y").date()
                                         dias_atraso = obtener_dias_atraso(fecha_pago_parsed, proximo_vencimiento_parsed)
@@ -6492,7 +6497,7 @@ def informe_ventas(request):
                                         print "pago cancelado"
 
                                     fecha_pago_parsed = datetime.datetime.strptime(cuota['fecha_de_pago'],
-                                                                                   "%d/%m/%Y").date()
+                                                                                   "%d/%m/%Y %H:%M:%S").date()
                                     proximo_vencimiento_parsed = datetime.datetime.strptime(cuota['vencimiento'],
                                                                                             "%d/%m/%Y").date()
                                     dias_atraso = obtener_dias_atraso(fecha_pago_parsed, proximo_vencimiento_parsed)
