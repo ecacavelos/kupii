@@ -3972,7 +3972,7 @@ def clientes_atrasados_reporte_excel(request):
                     # formateamos la fecha
                     fecha_str = unicode(clientes_atrasados[i]['fecha_ultimo_pago'])
                     if clientes_atrasados[i]['fecha_ultimo_pago'] != 'Dato no disponible':
-                        fecha = unicode(datetime.datetime.strptime(fecha_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
+                        fecha = unicode(datetime.datetime.strptime(fecha_str, "%Y-%m-%d %H:%M:%S").strftime("%d/%m/%Y %H:%M:%S"))
                         sheet.write(c, 11, unicode(fecha), style4)
                     else:
                         sheet.write(c, 11, unicode('Dato no disponible'), style4)
