@@ -476,8 +476,11 @@ def obtener_clientes_atrasados(filtros, fraccion, meses_peticion):
         if ultima_venta != None:
             detalle_cuotas = get_cuotas_detail_by_lote(unicode(str(r[0])))
             hoy = date.today()
-            cuotas_a_pagar = obtener_cuotas_a_pagar_full(ultima_venta, hoy, detalle_cuotas,
+            try:
+                cuotas_a_pagar = obtener_cuotas_a_pagar_full(ultima_venta, hoy, detalle_cuotas,
                                                          500)  # Maximo atraso = 500 para tener un parametro maximo de atraso en las cuotas.
+            except Exception, e:
+                print e
         else:
             cuotas_a_pagar = []
 
@@ -5043,7 +5046,7 @@ def liquidacion_vendedores_reporte_excel(request):
                     fecha_pago_str = unicode(pago['fecha_de_pago'])
                     try:
                         fecha_pago = unicode(
-                            datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
+                            datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d %H:%M:%S").strftime("%d/%m/%Y %H:%M:%S"))
                     except Exception, error:
                         print error + ": " + fecha_pago_str
 
@@ -5090,7 +5093,7 @@ def liquidacion_vendedores_reporte_excel(request):
                     fecha_pago_str = unicode(pago['fecha_de_pago'])
                     try:
                         fecha_pago = unicode(
-                            datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
+                            datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d %H:%M:%S").strftime("%d/%m/%Y %H:%M:%S"))
                     except Exception, error:
                         print error + ": " + fecha_pago_str
 
@@ -5320,6 +5323,7 @@ def liquidacion_vendedores_reporte_excel(request):
 def liquidacion_general_vendedores_reporte_excel(request):
     fecha_ini = request.GET['fecha_ini']
     fecha_fin = request.GET['fecha_fin']
+
     fecha_ini_parsed = datetime.datetime.strptime(fecha_ini, "%d/%m/%Y").date()
     fecha_fin_parsed = datetime.datetime.strptime(fecha_fin, "%d/%m/%Y").date()
 
@@ -5329,6 +5333,12 @@ def liquidacion_general_vendedores_reporte_excel(request):
 
     for venta in ventas:
         ventas_id.append(venta.id)
+
+    #fecha_ini_str_with_time = fecha_ini + " 00:00:00"
+    #fecha_fin_str_with_time = fecha_ini + " 00:00:00"
+
+    #fecha_ini_parsed_with_time = datetime.datetime.strptime(fecha_ini_str_with_time, "%d/%m/%Y %H:%M:%S").strftime("%Y-%m-%d %H:%M:%S")
+    #fecha_fin_parsed_with_time = datetime.datetime.strptime(fecha_fin_str_with_time, "%d/%m/%Y %H:%M:%S").strftime("%Y-%m-%d %H:%M:%S")
 
     pagos_de_cuotas_ventas = PagoDeCuotas.objects.filter(venta__in=ventas_id, fecha_de_pago__range=(
         fecha_ini_parsed, fecha_fin_parsed)).order_by('fecha_de_pago').prefetch_related('venta',
@@ -5390,8 +5400,8 @@ def liquidacion_general_vendedores_reporte_excel(request):
                     montos = calculo_montos_liquidacion_vendedores_contado(venta)
                     monto_vendedor = montos['monto_vendedor']
                     fecha_pago_str = unicode(venta.fecha_de_venta)
-                    fecha_pago = unicode(datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
-                    fecha_pago_order = venta.fecha_de_venta
+                    fecha_pago = unicode(datetime.datetime.strptime(fecha_pago_str + " 00:00:00", "%Y-%m-%d  %H:%M:%S").strftime("%d/%m/%Y  %H:%M:%S"))
+                    fecha_pago_order =  datetime.datetime.strptime(unicode(venta.fecha_de_venta) + " 00:00:00", "%Y-%m-%d  %H:%M:%S")
 
                     # Fraccion    Lote    Fecha de Pago    Cliente    Cuota Nº    Mes    Monto Pag Monto Prop.
                     fila = {}
@@ -5433,7 +5443,7 @@ def liquidacion_general_vendedores_reporte_excel(request):
                     try:
                         filas_vendedor = sorted(filas_vendedor, key=lambda f: (f['fecha_de_pago_order']))
                     except Exception, error:
-                        print error + ": " + fecha_pago_str
+                        print unicode(error) + ": " + fecha_pago_str
                     if filas_vendedor:
                         filas_vendedor[0]['mismo_vendedor'] = False
                         filas.extend(filas_vendedor)
@@ -5512,9 +5522,9 @@ def liquidacion_general_vendedores_reporte_excel(request):
                 if venta.vendedor != g_vendedor:
                     # Totales por VENDEDOR
                     try:
-                        filas_vendedor = sorted(filas_vendedor, key=lambda f: (f['fecha_de_pago_order']))
+                        filas_vendedor = sorted(filas_vendedor, key=lambda f: ( f['fecha_de_pago_order'] ))
                     except Exception, error:
-                        print error + ": " + fecha_pago_str
+                        print unicode(error) + ": " + fecha_pago_str
 
                     if filas_vendedor:
                         filas_vendedor[0]['mismo_vendedor'] = False
@@ -5539,7 +5549,7 @@ def liquidacion_general_vendedores_reporte_excel(request):
                     fecha_pago_str = unicode(pago['fecha_de_pago'])
                     try:
                         fecha_pago = unicode(
-                            datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
+                            datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d %H:%M:%S").strftime("%d/%m/%Y %H:%M:%S"))
                     except Exception, error:
                         print error + ": " + fecha_pago_str
 
@@ -5586,7 +5596,7 @@ def liquidacion_general_vendedores_reporte_excel(request):
                     fecha_pago_str = unicode(pago['fecha_de_pago'])
                     try:
                         fecha_pago = unicode(
-                            datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
+                            datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d %H:%M:%S").strftime("%d/%m/%Y %H:%M:%S"))
                     except Exception, error:
                         print error + ": " + fecha_pago_str
 
