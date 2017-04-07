@@ -20,7 +20,7 @@ def logout(request):
 def index(request):
     if request.user.is_authenticated():
         t = loader.get_template('index2.html')
-        grupo= request.user.groups.get().id
+        grupo= request.user.groups.get().name
         c = RequestContext(request, {
             'grupo': grupo
                                      })
