@@ -646,6 +646,9 @@ def obtener_cuotas_a_pagar_full(venta, fecha_pago, resumen_cuotas_a_pagar, maxim
                 resumen_cuotas_a_pagar['proximo_vencimiento'], "%d/%m/%Y").date(), cuotas_atrasadas)
             interes_total = 0
 
+            if intereses == None:
+                print 'intereses es none'
+
             if len(intereses) <= maximo_atraso:  # Hasta 300 cuotas (infinito)
 
                 for interes_item in intereses:

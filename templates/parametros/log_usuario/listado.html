@@ -137,6 +137,6 @@
 				P&aacute;gina |{{object_list.number}}|
 				{%if object_list.has_next%} <a href="?page={{ object_list.next_page_number }}{{ultimo}}"> Siguiente </a> <a href="?page={{ object_list.end_index}}{{ultimo}}"> Ultima </a> {%endif%} </span>
 		</div></br>
-	<a href="{% url 'frontend_home' %}parametros/log_usuario/" class="boton-verde">Volver al módulo de Logs de Usuarios</a>
+	<a href="{% url 'frontend_home' %}" class="boton-verde">Volver al Menú Principal</a>
 	</div>
 {% endblock %}

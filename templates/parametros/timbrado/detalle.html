@@ -110,8 +110,10 @@ $(document).ready(function() {
 </div>
 <br>
 <div id="footer">
-	<a href="{% url 'frontend_home' %}parametros/timbrado/listado/{{timbrado.id}}/rango_factura/" class="boton-verde">Rangos de Facturas del timbrado</a><br>
+	<a href="{% url 'frontend_home' %}parametros/timbrado/listado/{{timbrado.id}}/rango_factura/listado" class="boton-verde">Rangos de Facturas del timbrado</a><br>
 	<br>
 	<a href="{% url 'frontend_home' %}parametros/timbrado/listado" class="boton-verde">Volver al Listado de Timbrados</a>
+    <br>
+    <a href="{% url 'frontend_home' %}" class="boton-verde">Volver al Menú Principal</a>
 </div>
 {% endblock %}
