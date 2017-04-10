@@ -6983,7 +6983,8 @@ def informe_pagos_practipago(request):
 
                                 pago_item = {
                                     'id': pago.id,
-                                    'fecha_de_pago': pago.fecha_de_pago,
+                                    'fecha_de_pago': datetime.datetime.strptime(
+                                        unicode(pago.fecha_de_pago),"%Y-%m-%d %H:%M:%S").strftime("%d/%m/%Y %H:%M:%S"),
                                     'cantidad_cuotas': pago.nro_cuotas_a_pagar,
                                     'vencimiento': vencimiento,
                                     'dias_atraso': dias_de_atraso,
@@ -7087,7 +7088,8 @@ def informe_pagos_practipago(request):
 
                                     pago_item = {
                                         'id': pago.id,
-                                        'fecha_de_pago': pago.fecha_de_pago,
+                                        'fecha_de_pago': datetime.datetime.strptime(
+                                        unicode(pago.fecha_de_pago),"%Y-%m-%d %H:%M:%S").strftime("%d/%m/%Y %H:%M:%S"),
                                         'cantidad_cuotas': pago.nro_cuotas_a_pagar,
                                         'vencimiento': vencimiento,
                                         'dias_atraso': dias_de_atraso,
