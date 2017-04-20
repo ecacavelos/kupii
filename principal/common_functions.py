@@ -403,6 +403,8 @@ def obtener_dias_atraso(fecha_pago_parsed, fecha_vencimiento_parsed):
 
 
 def obtener_detalle_interes_lote(lote_id, fecha_pago_parsed, proximo_vencimiento_parsed, nro_cuotas_a_pagar):
+    if lote_id == 519:
+        print "este es el lote"
     # Si se tienen cuotas en MORA.
     dias_habiles = 0
     dias_atraso_1ra_cuota = 0
@@ -1425,7 +1427,7 @@ def crear_pdf_factura(nueva_factura, manzana, lote_id, usuario):
     return response
 
 
-def crear_json_print_object(factura, manzana, lote_id, usuario):
+def crear_json_print_object(factura, manzana, lote_id, usuario, fraccion=None):
     # Obtener las coordenadas de impresion de la factura
     try:
         coor = CoordenadasFactura.objects.get(usuario=usuario)
@@ -1513,6 +1515,20 @@ def crear_json_print_object(factura, manzana, lote_id, usuario):
             "coord_y": int(coor.manzana_2y * cm)
         }
         lineas.append(linea)
+    else:
+        linea = {
+            "valor": fraccion.nombre,
+            "coord_x": int(coor.fraccion_1x * cm),
+            "coord_y": int(coor.fraccion_1y * cm)
+        }
+        lineas.append(linea)
+
+        linea = {
+            "valor": fraccion.nombre,
+            "coord_x": int(coor.fraccion_2x * cm),
+            "coord_y": int(coor.fraccion_2y * cm)
+        }
+        lineas.append(linea)
 
     # lote
     if lote_id != 0:
@@ -1557,6 +1573,36 @@ def crear_json_print_object(factura, manzana, lote_id, usuario):
             "valor": lote_id.cuenta_corriente_catastral,
             "coord_x": int(coor.cta_cte_ctral_2x * cm),
             "coord_y": int(coor.cta_cte_ctral_2y * cm)
+        }
+        lineas.append(linea)
+
+        #Sucursal
+        linea = {
+            "valor": factura.lote.manzana.fraccion.sucursal.nombre,
+            "coord_x": int(coor.sucursal_1x * cm),
+            "coord_y": int(coor.sucursal_1y * cm)
+        }
+        lineas.append(linea)
+
+        linea = {
+            "valor": factura.lote.manzana.fraccion.sucursal.nombre,
+            "coord_x": int(coor.sucursal_2x * cm),
+            "coord_y": int(coor.sucursal_2y * cm)
+        }
+        lineas.append(linea)
+    else:
+        # Sucursal
+        linea = {
+            "valor": fraccion.sucursal.nombre,
+            "coord_x": int(coor.sucursal_1x * cm),
+            "coord_y": int(coor.sucursal_1y * cm)
+        }
+        lineas.append(linea)
+
+        linea = {
+            "valor": fraccion.sucursal.nombre,
+            "coord_x": int(coor.sucursal_2x * cm),
+            "coord_y": int(coor.sucursal_2y * cm)
         }
         lineas.append(linea)
 

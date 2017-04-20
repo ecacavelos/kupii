@@ -476,6 +476,7 @@ class Factura(models.Model):
     impresa = models.BooleanField(default=False)
 
 
+
 class CoordenadasFactura(models.Model):
     # FACTURA 1
     # Timbrado
@@ -570,6 +571,9 @@ class CoordenadasFactura(models.Model):
     # Liquidacion total iva
     liq_total_iva_1x = models.FloatField()
     liq_total_iva_1y = models.FloatField()
+    #Sucursal
+    sucursal_1x = models.FloatField()
+    sucursal_1y = models.FloatField()
 
     # FACTURA 2
     # Timbrado
@@ -662,6 +666,9 @@ class CoordenadasFactura(models.Model):
     # Liquidacion total iva
     liq_total_iva_2x = models.FloatField()
     liq_total_iva_2y = models.FloatField()
+    # Sucursal
+    sucursal_2x = models.FloatField()
+    sucursal_2y = models.FloatField()
 
     # FACTURA 3
     # Timbrado

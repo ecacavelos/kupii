@@ -12,6 +12,12 @@
 -- query en cuestion --
 -- agregar siempre despues de este ejemplo el siguiente cambio --
 
+/* Se agrega campos de coordenadas para sucursal */
+ALTER TABLE principal_coordenadasfactura ADD COLUMN sucursal_1x double precision;
+ALTER TABLE principal_coordenadasfactura ADD COLUMN sucursal_1y double precision;
+ALTER TABLE principal_coordenadasfactura ADD COLUMN sucursal_2x double precision;
+ALTER TABLE principal_coordenadasfactura ADD COLUMN sucursal_2y double precision;
+
 /* Se convierte el date de fecha de pago a timestamp */
 ALTER TABLE principal_pagodecuotas
    ALTER COLUMN fecha_de_pago TYPE timestamp without time zone;
