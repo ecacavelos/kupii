@@ -487,7 +487,11 @@ def obtener_clientes_atrasados(filtros, fraccion, meses_peticion):
         if (len(cuotas_a_pagar) >= meses_peticion + 1):
 
             # cuotas_atrasadas = detalle_cuotas['cantidad_total_cuotas'] - detalle_cuotas['cant_cuotas_pagadas'];  # CUOTAS ATRASADAS
-            cuotas_atrasadas = len(cuotas_a_pagar);
+            if cuotas_atrasadas > 1:
+                cuotas_atrasadas = len(cuotas_a_pagar) - 1
+            else:
+                cuotas_atrasadas = len(cuotas_a_pagar)
+                
             cantidad_cuotas_pagadas = detalle_cuotas['cant_cuotas_pagadas'];  # CUOTAS PAGADAS
 
             # DATOS DEL CLIENTE
@@ -801,6 +805,8 @@ def clientes_atrasados(request):
                 # PARAMETROS
                 meses_peticion = 1
                 fraccion = ''
+                fraccion_nombre = ''
+                tipo_busqueda = ''
 
                 try:
                     if request.GET['tipo_busqueda'] == 'fecha':
@@ -832,11 +838,13 @@ def clientes_atrasados(request):
                     return HttpResponse(t.render(c))
                 elif filtros == 1:
                     fraccion = request.GET['fraccion']
+                    fraccion_nombre = request.GET['fraccion_nombre']
                 elif filtros == 2:
                     meses_peticion = int(request.GET['meses_atraso'])
                 else:
                     if filtros != 5:
                         fraccion = request.GET['fraccion']
+                        fraccion_nombre = request.GET['fraccion_nombre']
                         meses_peticion = int(request.GET['meses_atraso'])
 
                 if filtros != 5:
@@ -849,10 +857,11 @@ def clientes_atrasados(request):
 
                 a = len(clientes_atrasados)
                 if a > 0:
-                    ultimo = "&fraccion=" + unicode(fraccion) + "&meses_atraso=" + unicode(meses_peticion)
+                    ultimo = "&fraccion=" + unicode(fraccion) +"&fraccion_nombre=" + unicode(fraccion_nombre) + "&meses_atraso=" + unicode(meses_peticion)
                     lista = clientes_atrasados
                     c = RequestContext(request, {
                         'fraccion': fraccion,
+                        'fraccion_nombre': fraccion_nombre,
                         'meses_atraso': meses_peticion,
                         'ultimo': ultimo,
                         'object_list': lista,
@@ -861,9 +870,10 @@ def clientes_atrasados(request):
                     })
                     return HttpResponse(t.render(c))
                 else:
-                    ultimo = "&fraccion=" + unicode(fraccion) + "&meses_atraso=" + unicode(meses_peticion)
+                    ultimo = "&fraccion=" + unicode(fraccion) +"&fraccion_nombre=" + unicode(fraccion_nombre) + "&meses_atraso=" + unicode(meses_peticion)
                     c = RequestContext(request, {
                         'fraccion': fraccion,
+                        'fraccion_nombre': fraccion_nombre,
                         'meses_atraso': meses_peticion,
                         'ultimo': ultimo,
                         'object_list': clientes_atrasados

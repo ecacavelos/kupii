@@ -17,6 +17,8 @@ ALTER TABLE principal_coordenadasfactura ADD COLUMN sucursal_1x double precision
 ALTER TABLE principal_coordenadasfactura ADD COLUMN sucursal_1y double precision;
 ALTER TABLE principal_coordenadasfactura ADD COLUMN sucursal_2x double precision;
 ALTER TABLE principal_coordenadasfactura ADD COLUMN sucursal_2y double precision;
+/* Se agregan valores a los campos agregados */
+UPDATE principal_coordenadasfactura SET sucursal_1x = 14, sucursal_1y = 1.3, sucursal_2x = 14, sucursal_2y = 15.2 ;
 
 /* Se convierte el date de fecha de pago a timestamp */
 ALTER TABLE principal_pagodecuotas
