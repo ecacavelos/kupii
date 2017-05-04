@@ -469,6 +469,7 @@ def obtener_clientes_atrasados(filtros, fraccion, meses_peticion):
 
         cliente_atrasado = {}
 
+        cuotas_a_pagar = []
         # OBTENER LA ULTIMA VENTA Y SU DETALLE
         ultima_venta = get_ultima_venta_no_recuperada(r[0])
 
@@ -481,13 +482,12 @@ def obtener_clientes_atrasados(filtros, fraccion, meses_peticion):
                                                          500)  # Maximo atraso = 500 para tener un parametro maximo de atraso en las cuotas.
             except Exception, e:
                 print e
-        else:
-            cuotas_a_pagar = []
+
 
         if (len(cuotas_a_pagar) >= meses_peticion + 1):
 
             # cuotas_atrasadas = detalle_cuotas['cantidad_total_cuotas'] - detalle_cuotas['cant_cuotas_pagadas'];  # CUOTAS ATRASADAS
-            if cuotas_atrasadas > 1:
+            if len(cuotas_a_pagar) > 1:
                 cuotas_atrasadas = len(cuotas_a_pagar) - 1
             else:
                 cuotas_atrasadas = len(cuotas_a_pagar)
@@ -2777,11 +2777,11 @@ def liquidacion_general_vendedores(request):
                             # preguntar por el plan de pago de la venta con el vendedor, si el vendedor lleva un % del pago de acuerdo al nro de cuota que se está pagando
                             try:
 
-                                # if pago['id']== 1840987:
-                                #    print "este es"
-
-                                if venta.lote.manzana.fraccion.nombre == 'VISTA AL PARANA':
+                                if pago['id']== 1858020:
                                     print "este es"
+
+                                #if venta.lote.manzana.fraccion.nombre == 'VISTA AL PARANA':
+                                #    print "este es"
 
                                 if g_vendedor == "":
                                     g_vendedor = venta.vendedor
