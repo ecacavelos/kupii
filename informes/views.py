@@ -2584,6 +2584,7 @@ def liquidacion_general_vendedores(request):
                     # ventas.group_by = ['vendedor_id']
                     ventas_id = []
 
+
                     for venta in ventas:
                         ventas_id.append(venta.id)
 
@@ -2591,8 +2592,9 @@ def liquidacion_general_vendedores(request):
                         fecha_ini_parsed, fecha_fin_parsed)).order_by('fecha_de_pago').prefetch_related('venta',
                                                                                                         'venta__plan_de_pago_vendedor',
                                                                                                         'venta__lote__manzana__fraccion')
+
                     cant_cuotas_pagadas_ventas = PagoDeCuotas.objects.filter(venta__in=ventas_id,
-                                                                             fecha_de_pago__lt=fecha_ini_parsed).order_by('fecha_de_pago').values(
+                                                                             fecha_de_pago__lt=fecha_ini_parsed).values(
                         'venta_id').annotate(Sum('nro_cuotas_a_pagar')).prefetch_related('venta_id')
 
                     filas_vendedor = []
@@ -2764,6 +2766,8 @@ def liquidacion_general_vendedores(request):
                                     filas_vendedor.append(fila)
 
                         pagos = []
+                        if venta.id == 2652:
+                            print "este es"
                         pagos = get_pago_cuotas(venta, fecha_ini_parsed, fecha_fin_parsed, pagos_de_cuotas_ventas,
                                                 cant_cuotas_pagadas_ventas)
                         lista_cuotas_ven = []

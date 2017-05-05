@@ -752,6 +752,8 @@ def get_pago_cuotas(venta, fecha_ini, fecha_fin, pagos=None, pagos_anteriores=No
                     Sum('nro_cuotas_a_pagar')).values()[0]
         else:
             for pago in pagos_anteriores:
+                if venta.id == 2652:
+                    print "esta es la venta"
                 if pago['venta_id'] == venta.id:
                     cantidad_pagos_anteriores = pago['nro_cuotas_a_pagar__sum']
                     break
