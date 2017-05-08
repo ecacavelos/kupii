@@ -7605,7 +7605,9 @@ def informe_facturacion(request):
                         try:
                             fila = {}
                             grupo = request.user.groups.get().id
-                            if grupo == 1:
+                            tipo_usuario = request.user.groups.get().name
+                            #if grupo == 1 or grupo == 5:
+                            if tipo_usuario == 'Administradores' or tipo_usuario == 'operador_contable':
                                 if busqueda == '':
                                     if sucursal_label == '':
                                         if fraccion_label == '':
@@ -7830,7 +7832,9 @@ def informe_facturacion_reporte_excel(request):
                         try:
                             fila = {}
                             grupo = request.user.groups.get().id
-                            if grupo == 1:
+                            tipo_usuario = request.user.groups.get().name
+                            # if grupo == 1 or grupo == 5:
+                            if tipo_usuario == 'Administradores' or tipo_usuario == 'operador_contable':
                                 if busqueda == '':
                                     if sucursal_label == '':
                                         if fraccion_label == '':
