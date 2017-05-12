@@ -443,16 +443,17 @@ def detalle_factura(request, factura_id):
                 #form.save(commit=False)
                 #factura.save()
                 
-                #fecha = form.data['fecha']
+                fecha = form.data['fecha']
                 numero = form.data['numero']
                 observacion = form.data['observacion']
                 
                 fac = Factura.objects.get(pk=factura_id)
                 user = User.objects.get(pk=data.get('usuario'))
-                #fac.fecha = fecha
+                fac.fecha = datetime.datetime.strptime(fecha, "%d/%m/%Y").date()
                 fac.numero = numero
                 fac.observacion = observacion
                 fac.usuario = user
+
                 if data.get('anulado') == None:
                     fac.anulado = False
                 fac.save()    

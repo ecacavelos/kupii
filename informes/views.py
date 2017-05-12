@@ -6144,7 +6144,7 @@ def informe_movimientos_reporte_excel(request):
                     cuota['tipo_de_venta'] = tipo_de_venta
                     fecha_pago_str = unicode(pago['fecha_de_pago'])
                     cuota['fecha_de_pago'] = unicode(
-                        datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
+                        datetime.datetime.strptime(fecha_pago_str, "%Y-%m-%d %H:%M:%S").strftime("%d/%m/%Y %H:%M:%S"))
                     cuota['id'] = pago['id']
                     cuota['nro_cuota'] = pago['nro_cuota_y_total']
 
