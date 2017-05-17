@@ -4596,7 +4596,7 @@ def liquidacion_propietarios_reporte_excel(request):
                     c += 2
 
                 sheet.write(c, 0, pago['lote'], style_datos_texto_lote)
-                sheet.write(c, 1, pago['fecha_de_pago'], style_datos_texto)
+                sheet.write(c, 1, pago['fecha_de_pago'][:10], style_datos_texto)
                 sheet.write(c, 2, pago['cliente'], style_normal)
                 sheet.write(c, 3, pago['nro_cuota'], style_datos_texto)
                 sheet.write(c, 4, pago['mes'], style_datos_texto)
