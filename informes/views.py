@@ -7742,7 +7742,7 @@ def informe_facturacion(request):
                         except Exception, error:
                             print error
 
-                        ultimo = "&fecha_ini=" + fecha_ini + "&fecha_fin=" + fecha_fin + "&busqueda=" + busqueda + "&busqueda_label"
+                        ultimo = "&fecha_ini=" + fecha_ini + "&fecha_fin=" + fecha_fin + "&busqueda=" + busqueda + "&busqueda_label=" + busqueda_label
                         lista = filas
 
                         #                         paginator = Paginator(filas, 25)

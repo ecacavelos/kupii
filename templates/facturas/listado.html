@@ -2,31 +2,54 @@
 {% block header_scripts %}
 <script type="text/javascript">
 	$(document).ready(function() {
-		$("#busqueda_label").mask("###-###-#######");
-		if ($("#tipo_busqueda").val()=="rango_fecha"){
-			$("#busqueda_label").hide();
-			$("#label_busqueda").html("Rango de Fecha");
-			$("#label_desde").show();
-			$("#label_hasta").show();
-			$("#label_relleno").hide();
-			$("#label_relleno2").hide();
-			$("#fecha_ini").focus();
-		} else {
-			$("#busqueda_label").show();
-			$("#busqueda_label").focus();
-			$("#fecha_ini").hide();
-			$("#fecha_fin").hide();
-			$("#label_desde").hide();
-			$("#label_hasta").hide();
-			$("#label_relleno").show();
-			$("#label_relleno2").show();
-			$("#label_busqueda").html("Numero de Factura");
-			$("#busqueda_label").attr("placeholder","001-001-0000001");
-			tipo_busqueda=$("#tipo_busqueda").val();
-			busqueda_label=$("#busqueda_label").val();			
-			busqueda=$("#busqueda").val();	
-			autocompleteFacturaPorNumero(tipo_busqueda, busqueda_label, busqueda);	
-		}
+
+	    var fecha_ini = "{{fecha_ini}}";
+		var fecha_fin = "{{fecha_fin}}";
+		var tipo_busqueda = "{{ tipo_busqueda }}";
+		var busqueda = "{{ busqueda }}";
+		var busqueda_label = "{{ busqueda_label }}";
+
+		if (tipo_busqueda == "rango_fecha"){
+				$("#busqueda_label").hide();
+				$("#label_busqueda").html("Rango de Fecha");
+				$("#label_desde").show();
+				$("#label_hasta").show();
+				$("#label_relleno").hide();
+				$("#label_relleno2").hide();
+				$("#fecha_ini").show();
+				$("#fecha_fin").show();
+				$("#fecha_ini").focus();
+
+				$("#tipo_busqueda").val(tipo_busqueda);
+				$("#fecha_ini").val(fecha_ini);
+				$("#fecha_fin").val(fecha_fin);
+                $("#busqueda_label").val("");
+				$("#busqueda").val("");
+			} else {
+				$("#busqueda_label").show();
+				$("#busqueda_label").focus();
+				$("#fecha_ini").hide();
+				$("#fecha_fin").hide();
+				$("#label_desde").hide();
+				$("#label_hasta").hide();
+				$("#label_relleno").show();
+				$("#label_relleno2").show();
+				$("#label_busqueda").html("Numero de Factura");
+				$("#busqueda_label").attr("placeholder","001-001-0000001");
+				$("#tipo_busqueda").val("nro_factura");
+				tipo_busqueda_input =$("#tipo_busqueda").val();
+				busqueda_label_input =$("#busqueda_label").val();
+				busqueda_input=$("#busqueda").val();
+				autocompleteFacturaPorNumero(tipo_busqueda_input, busqueda_label_input, busqueda_input);
+                if (tipo_busqueda != ""){
+                    $("#tipo_busqueda").val(tipo_busqueda);
+                }
+
+				$("#fecha_ini").val("");
+				$("#fecha_fin").val("");
+				$("#busqueda_label").val(busqueda_label);
+				$("#busqueda").val(busqueda);
+			}
 		
 		$("#tipo_busqueda").change(function(){
 			if ($("#tipo_busqueda").val()=="rango_fecha"){
@@ -39,6 +62,9 @@
 				$("#fecha_ini").show();
 				$("#fecha_fin").show();
 				$("#fecha_ini").focus();
+				$("#busqueda_label").val("");
+				$("#busqueda").val("");
+
 			} else {
 				$("#busqueda_label").show();
 				$("#busqueda_label").focus();
@@ -53,7 +79,9 @@
 				tipo_busqueda=$("#tipo_busqueda").val();
 				busqueda_label=$("#busqueda_label").val();			
 				busqueda=$("#busqueda").val();	
-				autocompleteFacturaPorNumero(tipo_busqueda, busqueda_label, busqueda);	
+				autocompleteFacturaPorNumero(tipo_busqueda, busqueda_label, busqueda);
+				$("#fecha_ini").val("");
+				$("#fecha_fin").val("");
 			}
 		});
 		
@@ -121,8 +149,8 @@ function validar(){
 <div class="clear"></div>
 <h1>Listado de Facturas</h1>
 <div class="grid_6">
-	<form name="frm_busqueda" id="frm_busqueda" method="post" action="{% url 'frontend_home' %}facturacion/listado/">
-		{% csrf_token %}
+	<form name="frm_busqueda" id="frm_busqueda" method="get" action="{% url 'frontend_home' %}facturacion/listado/">
+		<!--{% csrf_token %}-->
 		<table id="lista-categoria" frame="box">
 			<tr>
 				<th class="acciones" colspan="3"><strong><a href="#" style="color: white;">Filtrar</a></strong></th>

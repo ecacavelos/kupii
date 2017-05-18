@@ -323,26 +323,14 @@ def facturar(request):
 def consultar_facturas(request):
     if request.user.is_authenticated():
         if request.method == 'GET':
-            #Mostrar la lista de todas las facturas.  
-            object_list = Factura.objects.all().order_by('-id','-fecha')
-            for factura in object_list:
-                monto=0
-                lista_detalles=json.loads(factura.detalle)
-                for key, value in lista_detalles.iteritems():
-                    if value['cantidad'] == "" or value['precio_unitario'] == "":
-                        print ('Encontramos detalle invalido')
-                        monto+=0
-                    else:
-                        monto+=int(int(value['cantidad'])*int(value['precio_unitario']))
-                factura.monto=unicode('{:,}'.format(monto)).replace(",", ".") 
-        else: #POST se envia el formulario con los parametros de busqueda.  
-            data = request.POST     
+            data = request.GET
             # En caso de que se haya solicitado una busqueda, filtramos de acuerdo al parametro correspondiente.
-            tipo_busqueda = data.get('tipo_busqueda')
-            busqueda = data.get('busqueda')
+            tipo_busqueda = data.get('tipo_busqueda','')
+            busqueda = data.get('busqueda','')
+            busqueda_label = data.get('busqueda_label','')
+            fecha_ini = data.get('fecha_ini', '')
+            fecha_fin = data.get('fecha_fin', '')
             if tipo_busqueda == 'rango_fecha':
-                fecha_ini = data.get('fecha_ini', '')
-                fecha_fin = data.get('fecha_fin', '')
                 fecha_ini_parsed = unicode(datetime.datetime.strptime(fecha_ini, "%d/%m/%Y").date())
                 fecha_fin_parsed = unicode(datetime.datetime.strptime(fecha_fin, "%d/%m/%Y").date())
                 object_list = Factura.objects.filter(fecha__range=(fecha_ini_parsed,fecha_fin_parsed)).order_by('id','fecha')                    
@@ -364,9 +352,25 @@ def consultar_facturas(request):
                     for key, value in lista_detalles.iteritems():
                         monto+=int(int(value['cantidad'])*int(value['precio_unitario']))
                     factura.monto=unicode('{:,}'.format(monto)).replace(",", ".")
-        
+
+            if tipo_busqueda == '':
+                object_list = Factura.objects.all().order_by('-id', '-fecha')
+                for factura in object_list:
+                    monto = 0
+                    lista_detalles = json.loads(factura.detalle)
+                    for key, value in lista_detalles.iteritems():
+                        if value['cantidad'] == "" or value['precio_unitario'] == "":
+                            print ('Encontramos detalle invalido')
+                            monto += 0
+                        else:
+                            monto += int(int(value['cantidad']) * int(value['precio_unitario']))
+                    factura.monto = unicode('{:,}'.format(monto)).replace(",", ".")
+
+
+
         paginator=Paginator(object_list,15)
-        page=request.GET.get('page')
+        page=request.GET.get('page','')
+        ultima_busqueda = "&fecha_ini=" + fecha_ini + "&fecha_fin=" + fecha_fin + "&busqueda=" + busqueda + "&busqueda_label=" + busqueda_label + "&tipo_busqueda=" + tipo_busqueda
         try:
             lista=paginator.page(page)
         except PageNotAnInteger:
@@ -377,6 +381,12 @@ def consultar_facturas(request):
         t = loader.get_template('facturas/listado.html')
         c = RequestContext(request, {
             'object_list': lista,
+            'ultima_busqueda': ultima_busqueda,
+            'fecha_ini': fecha_ini,
+            'fecha_fin': fecha_fin,
+            'busqueda': busqueda,
+            'busqueda_label': busqueda_label,
+            'tipo_busqueda': tipo_busqueda,
             #'message': message,
         })
         return HttpResponse(t.render(c))
