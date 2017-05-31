@@ -202,6 +202,12 @@
                     <td colspan="2"><span class="label_nombre_fraccion"> todos excepto pagos de cuotas </span></td>
                     <input type="hidden" id="todos_excepto_pago_cuota" name="todos_excepto_pago_cuota" value="0">
                 </tr>
+                <!--
+                <tr>
+                    <td><input type="checkbox" id="anulados" name="anulados" class="checkbox_todos_excepto_pago_cuotas"></td>
+                    <td colspan="2"><span class="label_nombre_fraccion"> Anulados </span></td>
+                </tr>
+                -->
 			{%else%}
 				<tr style="display: none">
 					<td>
@@ -232,7 +238,7 @@
 </div>
 <div id="listado-item-lote">
 	<table border="1" cellpadding="0" cellspacing="0" class="listado-pagos" align="center">
-		<th>Fecha</th><th>Numero</th><th>Lote</th><th>Cliente</th><th>Ruc</th><th>Tipo</th><th>Usuario</th><th>Total Exentas</th><th>Total IVA 5%</th><th>Total IVA 10%</th><th>Total Facturado</th>
+		<th>Fecha</th><th>Numero</th><th>Lote</th><th>Cliente - RUC</th><th>Tipo</th><th>Usuario</th><th>Total Exentas</th><th>Total IVA 5%</th><th>Total IVA 10%</th><th>Total Facturado</th><th>Anulado</th>
 		{% for hw in object_list %}
 			
 		{% if forloop.counter|divisibleby:2 %}
@@ -240,8 +246,7 @@
 			<td>{{hw.fecha}}</td>
 			<td><a href="{% url 'frontend_home' %}facturacion/listado/{{hw.id}}" target="_blank"><strong>{{hw.numero}}</strong></a></td>
 			<td>{{hw.lote}}</td>
-			<td>{{hw.cliente}}</td>
-			<td>{{hw.ruc}}</td>
+			<td>{{hw.cliente}} - {{hw.ruc}}</td>
 			{% if hw.tipo == 'co' %}
 				<td>Contado</td>
 			{% else %}
@@ -252,6 +257,8 @@
 			<td>{{hw.total_iva5}}</td>
 			<td>{{hw.total_iva10}}</td>
 			<td>{{hw.total_facturado}}</td>
+            <td>{{hw.anulado}}</td>
+
 			
 		</tr>
 		{% else %}
@@ -259,8 +266,7 @@
 			<td>{{hw.fecha}}</td>
 			<td><a href="{% url 'frontend_home' %}facturacion/listado/{{hw.id}}" target="_blank"><strong>{{hw.numero}}</strong></a></td>
 			<td>{{hw.lote}}</td>
-			<td>{{hw.cliente}}</td>
-			<td>{{hw.ruc}}</td>
+			<td>{{hw.cliente}} - {{hw.ruc}}</td>
 			{% if hw.tipo == 'co' %}
 				<td>Contado</td>
 			{% else %}
@@ -271,6 +277,7 @@
 			<td>{{hw.total_iva5}}</td>
 			<td>{{hw.total_iva10}}</td>
 			<td>{{hw.total_facturado}}</td>
+            <td>{{hw.anulado}}</td>
 			
 		</tr>
 		{% endif %}

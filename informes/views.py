@@ -7586,6 +7586,14 @@ def informe_facturacion(request):
                         concepto = request.GET.get('concepto', '')
                         concepto_label = request.GET.get('concepto_label', '')
 
+                        filtro_anulado = request.GET.get('anulados', None)
+
+                        if filtro_anulado == 'on':
+                            filtro_anulado = True
+                        else:
+                            filtro_anulado = None
+
+
                         todos_excepto_pago_cuota = False
                         if request.GET.get('todos_excepto_pago_cuota', '') == '1':
                             todos_excepto_pago_cuota = True
@@ -7613,16 +7621,35 @@ def informe_facturacion(request):
                                         if fraccion_label == '':
                                             if concepto_label == '':
                                                 if (todos_excepto_pago_cuota):
-                                                    facturas = Factura.objects.filter(anulado=False, fecha__range=(
-                                                        fecha_ini_parsed, fecha_fin_parsed)).exclude(
-                                                        detalle__icontains='Pago de Cuota').order_by('numero')
+                                                    if filtro_anulado != None:
+                                                        facturas = Factura.objects.filter(anulado=filtro_anulado, fecha__range=(
+                                                            fecha_ini_parsed, fecha_fin_parsed)).exclude(
+                                                            detalle__icontains='Pago de Cuota').order_by('numero')
+                                                    else:
+                                                        facturas = Factura.objects.filter(fecha__range=(
+                                                                                              fecha_ini_parsed,
+                                                                                              fecha_fin_parsed)).exclude(
+                                                            detalle__icontains='Pago de Cuota').order_by('numero')
                                                 else:
-                                                    facturas = Factura.objects.filter(anulado=False, fecha__range=(
-                                                        fecha_ini_parsed, fecha_fin_parsed)).order_by('numero')
+                                                    if filtro_anulado != None:
+                                                        facturas = Factura.objects.filter(anulado=filtro_anulado, fecha__range=(
+                                                            fecha_ini_parsed, fecha_fin_parsed)).order_by('numero')
+                                                    else:
+                                                        facturas = Factura.objects.filter(fecha__range=(
+                                                                                              fecha_ini_parsed,
+                                                                                              fecha_fin_parsed)).order_by(
+                                                            'numero')
                                             else:
-                                                facturas = Factura.objects.filter(anulado=False, fecha__range=(
-                                                    fecha_ini_parsed, fecha_fin_parsed),
-                                                                                  detalle__icontains=concepto_label).order_by('numero')
+                                                if filtro_anulado != None:
+                                                    facturas = Factura.objects.filter(anulado=filtro_anulado, fecha__range=(
+                                                        fecha_ini_parsed, fecha_fin_parsed),
+                                                                                      detalle__icontains=concepto_label).order_by('numero')
+                                                else:
+                                                    facturas = Factura.objects.filter(fecha__range=(
+                                                                                          fecha_ini_parsed,
+                                                                                          fecha_fin_parsed),
+                                                                                      detalle__icontains=concepto_label).order_by(
+                                                        'numero')
                                         else:
                                             facturas = Factura.objects.raw(
                                                 '''SELECT "principal_factura"."id", "principal_factura"."fecha",
@@ -7635,7 +7662,8 @@ def informe_facturacion(request):
                                                           "principal_factura"."anulado",
                                                           "principal_factura"."observacion",
                                                           "principal_factura"."usuario_id",
-                                                          "principal_factura"."impresa"
+                                                          "principal_factura"."impresa",
+                                                          "principal_factura"."anulado"
                                                           FROM "principal_factura"
                                                 WHERE "principal_factura"."lote_id" IN (
                                                 SELECT id FROM "principal_lote" WHERE manzana_id IN (
@@ -7651,15 +7679,21 @@ def informe_facturacion(request):
                                                         "principal_factura"."tipo", "principal_factura"."detalle",
                                                         "principal_factura"."anulado",
                                                         "principal_factura"."observacion",
-                                                        "principal_factura"."usuario_id", "principal_factura"."impresa"
+                                                        "principal_factura"."usuario_id", "principal_factura"."impresa",
+                                                        "principal_factura"."anulado"
                                                         FROM "principal_factura"
                                             WHERE (SUBSTR("principal_factura"."numero", 1, 3) LIKE %s) AND fecha >= %s
                                             AND fecha <= %s ORDER BY numero''',
                                             [sucursal_label, fecha_ini_parsed, fecha_fin_parsed])
                                 else:
                                     if sucursal_label == '':
-                                        facturas = Factura.objects.filter(anulado=False, fecha__range=(
-                                            fecha_ini_parsed, fecha_fin_parsed), usuario=busqueda).order_by('numero')
+                                        if filtro_anulado != None:
+                                            facturas = Factura.objects.filter(anulado=filtro_anulado, fecha__range=(
+                                                fecha_ini_parsed, fecha_fin_parsed), usuario=busqueda).order_by('numero')
+                                        else:
+                                            facturas = Factura.objects.filter(fecha__range=(
+                                                fecha_ini_parsed, fecha_fin_parsed), usuario=busqueda).order_by(
+                                                'numero')
                                     else:
                                         # Esta manera es haciendo el query estatico, en duro, luego por cada rox ir creando un objeto Factura y luego ir agregando
                                         # a una lista Facturas, pero no es lo mismo el QuerySet que la List, asi que explota el codigo mas abajo
@@ -7680,13 +7714,30 @@ def informe_facturacion(request):
 
                                         # y esta forma es obtener RawWuerySet, es decir, los modelos del Django a partir de un query estático y que me sirve para no modificar codigo
                                         facturas = Factura.objects.raw(
-                                            '''SELECT "principal_factura"."id", "principal_factura"."fecha", "principal_factura"."numero", "principal_factura"."cliente_id", "principal_factura"."lote_id", "principal_factura"."rango_factura_id", "principal_factura"."tipo", "principal_factura"."detalle", "principal_factura"."anulado", "principal_factura"."observacion", "principal_factura"."usuario_id", "principal_factura"."impresa" FROM "principal_factura" WHERE (SUBSTR("principal_factura"."numero", 1, 3) LIKE %s) AND fecha >= %s AND fecha <= %s AND usuario_id = %s ORDER BY numero''',
+                                            '''SELECT "principal_factura"."id", 
+                                                      "principal_factura"."fecha", 
+                                                      "principal_factura"."numero", 
+                                                      "principal_factura"."cliente_id", 
+                                                      "principal_factura"."lote_id", 
+                                                      "principal_factura"."rango_factura_id", 
+                                                      "principal_factura"."tipo", 
+                                                      "principal_factura"."detalle", 
+                                                      "principal_factura"."anulado", 
+                                                      "principal_factura"."observacion", 
+                                                      "principal_factura"."usuario_id", 
+                                                      "principal_factura"."impresa",
+                                                      "principal_factura"."anulado"
+                                                      FROM "principal_factura" WHERE (SUBSTR("principal_factura"."numero", 1, 3) LIKE %s) AND fecha >= %s AND fecha <= %s AND usuario_id = %s ORDER BY numero''',
                                             [sucursal_label, fecha_ini_parsed, fecha_fin_parsed, busqueda])
 
                             else:
-                                facturas = Factura.objects.filter(anulado=False,
-                                                                  fecha__range=(fecha_ini_parsed, fecha_fin_parsed),
-                                                                  usuario=request.user).order_by('numero')
+                                if filtro_anulado != None:
+                                    facturas = Factura.objects.filter(anulado=False,
+                                                                      fecha__range=(fecha_ini_parsed, fecha_fin_parsed),
+                                                                      usuario=request.user).order_by('numero')
+                                else:
+                                    facturas = Factura.objects.filter(fecha__range=(fecha_ini_parsed, fecha_fin_parsed),
+                                                                      usuario=request.user).order_by('numero')
 
                             for factura in facturas:
 
@@ -7708,6 +7759,11 @@ def informe_facturacion(request):
                                 fila['ruc'] = unicode(factura.cliente.ruc)
                                 fila['lote'] = unicode(factura.lote.codigo_paralot)
                                 fila['tipo'] = unicode(factura.tipo)
+                                if factura.anulado == None or factura.anulado == False:
+                                    fila['anulado'] = 'No'
+                                else:
+                                    fila['anulado'] = 'SI'
+
                                 if factura.usuario_id != None:
                                     fila['usuario'] = unicode(factura.usuario)
 
