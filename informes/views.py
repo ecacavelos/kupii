@@ -7643,6 +7643,23 @@ def informe_facturacion(request):
 
 def proceso_informe_facturacion(fecha_ini, fecha_fin, busqueda, busqueda_label, sucursal, sucursal_label, fraccion, fraccion_label, concepto, concepto_label, anulados, todos_excepto_pago_cuota, usuario):
     try:
+
+        if fraccion == 'undefined' or fraccion_label == 'undefined':
+            fraccion = ''
+            fraccion_label = ''
+
+        if sucursal == 'undefinded' or sucursal_label == 'undefined':
+            sucursal = ''
+            sucursal_label = ''
+
+        if concepto == '' or concepto_label == 'undefined':
+            concepto = ''
+            concepto_label = ''
+
+        if busqueda == '' or busqueda_label == 'undefined':
+            busqueda = ''
+            busqueda_label = ''
+
         fila = {}
         kwargs = {}
         filas = []
@@ -7679,11 +7696,11 @@ def proceso_informe_facturacion(fecha_ini, fecha_fin, busqueda, busqueda_label, 
             if busqueda_label != '':
                 kwargs['usuario'] = busqueda
 
-        # Filtro Sucursal
+        # Filtro Fraccion
         if fraccion != '':
             kwargs['lote__manzana__fraccion'] = fraccion
 
-        # Filtro Fraccion
+        # Filtro Sucursal
         if sucursal != '':
             kwargs['lote__manzana__fraccion_sucursal'] = sucursal
 
@@ -7829,16 +7846,20 @@ def informe_facturacion_reporte_excel(request):
                                                            'font: name Calibri, bold True, height 200; align: horiz right')
 
                         usuario = unicode(request.user)
+                        if busqueda_label == 'undefined':
+                            nombre_usuario = usuario
+                        else:
+                            nombre_usuario = busqueda_label
 
                         if busqueda != '':
                             sheet.header_str = (
-                                u"&LFecha: &D Hora: &T \nUsuario: " + usuario + " "
+                                u"&LFecha: &D Hora: &T \nUsuario: " + nombre_usuario + " "
                                                                                 u"&CPROPAR S.R.L.\n INFORME DE FACTURACION "
                                                                                 u"&RPeriodo del : " + fecha_ini + " al " + fecha_fin + " \nPage &P of &N"
                             )
 
                             c = 0
-                            sheet.write_merge(c, c, 0, 8, "Facturacion del Usuario: " + busqueda_label, style_titulo)
+                            sheet.write_merge(c, c, 0, 8, "Facturacion del Usuario: " + nombre_usuario, style_titulo)
                             c = c + 1
                             sheet.write(c, 0, 'Fecha', style_titulo)
                             sheet.write(c, 1, 'Numero', style_titulo)
@@ -7854,7 +7875,7 @@ def informe_facturacion_reporte_excel(request):
 
                         else:
                             sheet.header_str = (
-                                u"&LFecha: &D Hora: &T \nUsuario: " + usuario + " "
+                                u"&LFecha: &D Hora: &T \nUsuario: " + nombre_usuario + " "
                                                                                 u"&CPROPAR S.R.L.\n INFORME DE FACTURACION "
                                                                                 u"&RPeriodo del : " + fecha_ini + " al " + fecha_fin + " \nPage &P of &N"
                             )
