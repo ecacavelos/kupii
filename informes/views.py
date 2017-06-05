@@ -7683,7 +7683,7 @@ def proceso_informe_facturacion(fecha_ini, fecha_fin, busqueda, busqueda_label, 
         else:
             filtro_anulado = None
 
-        if todos_excepto_pago_cuota == '1' or todos_excepto_pago_cuota == 'on':
+        if todos_excepto_pago_cuota == '1':
             todos_excepto_pago_cuota = True
 
         # Filtro Fecha
@@ -7901,29 +7901,30 @@ def informe_facturacion_reporte_excel(request):
                         cant_filas = len(filas)
                         cont_filas = 0
                         for fila in filas:
+                            #TODO: Ver que mierda es este tema de sucursales
                             # esta parte usamos para dividir las sucursales de acuerdo a los primeros 3 nros de factura
                             # y separar en el excel
-                            sucursal_aux = fila['numero'][:3]
-                            if sucursal_aux != sucursal:
-                                sucursal = sucursal_aux
-                                c += 1
-                                # le agregamos el formato decimal a nuestra sumatoria por sucursal
-                                totales_sucursales[fil][0] = unicode('{:,}'.format(totales_sucursales[fil][0])).replace(
-                                    ",", ".")
-                                totales_sucursales[fil][1] = unicode('{:,}'.format(totales_sucursales[fil][1])).replace(
-                                    ",", ".")
-                                totales_sucursales[fil][2] = unicode('{:,}'.format(totales_sucursales[fil][2])).replace(
-                                    ",", ".")
-                                totales_sucursales[fil][3] = unicode('{:,}'.format(totales_sucursales[fil][3])).replace(
-                                    ",", ".")
-                                totales_sucursales[fil][4] = unicode('{:,}'.format(totales_sucursales[fil][4])).replace(
-                                    ",", ".")
-                                sheet.write(c, 6, totales_sucursales[fil][0], style_titulo)
-                                sheet.write(c, 7, totales_sucursales[fil][1], style_titulo)
-                                sheet.write(c, 8, totales_sucursales[fil][2], style_titulo)
-                                sheet.write(c, 9, totales_sucursales[fil][3], style_titulo)
-                                sheet.write(c, 10, totales_sucursales[fil][4], style_titulo)
-                                fil += 1
+                            # sucursal_aux = fila['numero'][:3]
+                            # if sucursal_aux != sucursal:
+                            #     sucursal = sucursal_aux
+                            #     c += 1
+                            #     # le agregamos el formato decimal a nuestra sumatoria por sucursal
+                            #     totales_sucursales[fil][0] = unicode('{:,}'.format(totales_sucursales[fil][0])).replace(
+                            #         ",", ".")
+                            #     totales_sucursales[fil][1] = unicode('{:,}'.format(totales_sucursales[fil][1])).replace(
+                            #         ",", ".")
+                            #     totales_sucursales[fil][2] = unicode('{:,}'.format(totales_sucursales[fil][2])).replace(
+                            #         ",", ".")
+                            #     totales_sucursales[fil][3] = unicode('{:,}'.format(totales_sucursales[fil][3])).replace(
+                            #         ",", ".")
+                            #     totales_sucursales[fil][4] = unicode('{:,}'.format(totales_sucursales[fil][4])).replace(
+                            #         ",", ".")
+                            #     sheet.write(c, 6, totales_sucursales[fil][0], style_titulo)
+                            #     sheet.write(c, 7, totales_sucursales[fil][1], style_titulo)
+                            #     sheet.write(c, 8, totales_sucursales[fil][2], style_titulo)
+                            #     sheet.write(c, 9, totales_sucursales[fil][3], style_titulo)
+                            #     sheet.write(c, 10, totales_sucursales[fil][4], style_titulo)
+                            #     fil += 1
 
                             c += 1
                             sheet.write(c, 0, fila['fecha'], style_centrado)

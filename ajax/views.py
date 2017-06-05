@@ -851,6 +851,14 @@ def facturar(request):
             #Obtener observacion
             observacion = request.POST.get('observacion','')
 
+            # Obtener si se carga como anulado
+            anulado = False
+            anulado = request.POST.get('anulado', '')
+            if anulado == '1':
+                anulado = True
+            else:
+                anulado = False
+
             # si es que un administrador selecciona el user
             user = ''
             if (request.POST.get('user', '') != ''):
@@ -866,7 +874,7 @@ def facturar(request):
             nueva_factura.tipo = tipo
             nueva_factura.detalle = detalle
             nueva_factura.lote = lote_id
-            nueva_factura.anulado = False
+            nueva_factura.anulado = anulado
             nueva_factura.observacion = observacion
             if user == '':
                 nueva_factura.usuario = request.user

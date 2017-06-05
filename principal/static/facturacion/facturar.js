@@ -81,7 +81,13 @@
 			}
 		});
 		
-		
+		$("#anulado").change(function () {
+            if ($("#anulado").prop('checked') == true){
+                $("#anulado").val(1);
+            }else{
+                $("#anulado").val(0);
+            }
+        });
 		
 		// 2. Se agrega el primer item (al menos debe existir 1).
 		$('.detalle_factura').append(item_inicial_detalle_factura);
@@ -367,6 +373,7 @@
 						nro_cuota_desde : $("#id_nro_cuota").val(),
 						nro_cuota_hasta : $("#id_nro_cuota_hasta").val(),
 						observacion: $("#observacion").val(),
+						anulado: $("#anulado").val(),
 						
 					},
 					dataType : "json"
@@ -413,6 +420,7 @@
 						nro_cuota_hasta : $("#id_nro_cuota_hasta").val(),
 						observacion: $("#observacion").val(),
 						user: $("#user").val(),
+						anulado: $("#anulado").val(),
 					},
 					dataType : "json"
 				});
