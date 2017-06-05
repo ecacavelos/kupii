@@ -7570,7 +7570,9 @@ def informe_facturacion(request):
                     return HttpResponse(t.render(c))
                 else:  # Parametros SETEADOS
                     t = loader.get_template('informes/informe_facturacion.html')
+
                     try:
+
                         fecha_ini = request.GET['fecha_ini']
                         fecha_fin = request.GET['fecha_fin']
 
@@ -7586,220 +7588,18 @@ def informe_facturacion(request):
                         concepto = request.GET.get('concepto', '')
                         concepto_label = request.GET.get('concepto_label', '')
 
-                        filtro_anulado = request.GET.get('anulados', None)
+                        anulados = request.GET.get('anulados', '')
 
-                        if filtro_anulado == 'on':
-                            filtro_anulado = True
-                        else:
-                            filtro_anulado = None
+                        todos_excepto_pago_cuota = request.GET.get('todos_excepto_pago_cuota', '')
 
+                        usuario = request.user
+                        grupo = usuario.groups.get().id
 
-                        todos_excepto_pago_cuota = False
-                        if request.GET.get('todos_excepto_pago_cuota', '') == '1':
-                            todos_excepto_pago_cuota = True
-
-                        fecha_ini_parsed = datetime.datetime.strptime(fecha_ini, "%d/%m/%Y").strftime("%Y-%m-%d")
-                        fecha_fin_parsed = datetime.datetime.strptime(fecha_fin, "%d/%m/%Y").strftime("%Y-%m-%d")
-
-                        filas = []
                         lista_totales = []
 
-                        # Totales GENERALES
-                        total_general_facturado = 0
-                        total_general_exentas = 0
-                        total_general_iva5 = 0
-                        total_general_iva10 = 0
+                        lista = proceso_informe_facturacion(fecha_ini, fecha_fin, busqueda, busqueda_label, sucursal, sucursal_label, fraccion, fraccion_label, concepto, concepto_label, anulados, todos_excepto_pago_cuota, usuario)
 
-                        try:
-                            fila = {}
-                            grupo = request.user.groups.get().id
-                            tipo_usuario = request.user.groups.get().name
-                            #if grupo == 1 or grupo == 5:
-                            if tipo_usuario == 'Administradores' or tipo_usuario == 'operador_contable':
-                                if busqueda == '':
-                                    if sucursal_label == '':
-                                        if fraccion_label == '':
-                                            if concepto_label == '':
-                                                if (todos_excepto_pago_cuota):
-                                                    if filtro_anulado != None:
-                                                        facturas = Factura.objects.filter(anulado=filtro_anulado, fecha__range=(
-                                                            fecha_ini_parsed, fecha_fin_parsed)).exclude(
-                                                            detalle__icontains='Pago de Cuota').order_by('numero')
-                                                    else:
-                                                        facturas = Factura.objects.filter(fecha__range=(
-                                                                                              fecha_ini_parsed,
-                                                                                              fecha_fin_parsed)).exclude(
-                                                            detalle__icontains='Pago de Cuota').order_by('numero')
-                                                else:
-                                                    if filtro_anulado != None:
-                                                        facturas = Factura.objects.filter(anulado=filtro_anulado, fecha__range=(
-                                                            fecha_ini_parsed, fecha_fin_parsed)).order_by('numero')
-                                                    else:
-                                                        facturas = Factura.objects.filter(fecha__range=(
-                                                                                              fecha_ini_parsed,
-                                                                                              fecha_fin_parsed)).order_by(
-                                                            'numero')
-                                            else:
-                                                if filtro_anulado != None:
-                                                    facturas = Factura.objects.filter(anulado=filtro_anulado, fecha__range=(
-                                                        fecha_ini_parsed, fecha_fin_parsed),
-                                                                                      detalle__icontains=concepto_label).order_by('numero')
-                                                else:
-                                                    facturas = Factura.objects.filter(fecha__range=(
-                                                                                          fecha_ini_parsed,
-                                                                                          fecha_fin_parsed),
-                                                                                      detalle__icontains=concepto_label).order_by(
-                                                        'numero')
-                                        else:
-                                            facturas = Factura.objects.raw(
-                                                '''SELECT "principal_factura"."id", "principal_factura"."fecha",
-                                                          "principal_factura"."numero",
-                                                          "principal_factura"."cliente_id",
-                                                          "principal_factura"."lote_id",
-                                                          "principal_factura"."rango_factura_id",
-                                                          "principal_factura"."tipo",
-                                                          "principal_factura"."detalle",
-                                                          "principal_factura"."anulado",
-                                                          "principal_factura"."observacion",
-                                                          "principal_factura"."usuario_id",
-                                                          "principal_factura"."impresa",
-                                                          "principal_factura"."anulado"
-                                                          FROM "principal_factura"
-                                                WHERE "principal_factura"."lote_id" IN (
-                                                SELECT id FROM "principal_lote" WHERE manzana_id IN (
-                                                SELECT id FROM "principal_manzana" WHERE fraccion_id = %s))
-                                                AND fecha >= %s AND fecha <= %s ORDER BY numero''',
-                                                [fraccion, fecha_ini_parsed, fecha_fin_parsed])
-                                    else:
-                                        facturas = Factura.objects.raw(
-                                            '''SELECT "principal_factura"."id", "principal_factura"."fecha",
-                                                        "principal_factura"."numero", "principal_factura"."cliente_id",
-                                                        "principal_factura"."lote_id",
-                                                        "principal_factura"."rango_factura_id",
-                                                        "principal_factura"."tipo", "principal_factura"."detalle",
-                                                        "principal_factura"."anulado",
-                                                        "principal_factura"."observacion",
-                                                        "principal_factura"."usuario_id", "principal_factura"."impresa",
-                                                        "principal_factura"."anulado"
-                                                        FROM "principal_factura"
-                                            WHERE (SUBSTR("principal_factura"."numero", 1, 3) LIKE %s) AND fecha >= %s
-                                            AND fecha <= %s ORDER BY numero''',
-                                            [sucursal_label, fecha_ini_parsed, fecha_fin_parsed])
-                                else:
-                                    if sucursal_label == '':
-                                        if filtro_anulado != None:
-                                            facturas = Factura.objects.filter(anulado=filtro_anulado, fecha__range=(
-                                                fecha_ini_parsed, fecha_fin_parsed), usuario=busqueda).order_by('numero')
-                                        else:
-                                            facturas = Factura.objects.filter(fecha__range=(
-                                                fecha_ini_parsed, fecha_fin_parsed), usuario=busqueda).order_by(
-                                                'numero')
-                                    else:
-                                        # Esta manera es haciendo el query estatico, en duro, luego por cada rox ir creando un objeto Factura y luego ir agregando
-                                        # a una lista Facturas, pero no es lo mismo el QuerySet que la List, asi que explota el codigo mas abajo
-                                        # facturas = []
-                                        # # QUERY para traer las Facturas con los filtros seleccionados
-                                        # query = ('''SELECT "principal_factura"."id", "principal_factura"."fecha", "principal_factura"."numero", "principal_factura"."cliente_id", "principal_factura"."lote_id", "principal_factura"."rango_factura_id", "principal_factura"."tipo", "principal_factura"."detalle", "principal_factura"."anulado", "principal_factura"."observacion", "principal_factura"."usuario_id", "principal_factura"."impresa" FROM "principal_factura" WHERE (SUBSTR("principal_factura"."numero", 1, 3) like %s) AND fecha >= %s AND fecha <= %s AND usuario_id = %s ''')
-                                        # cursor = connection.cursor()
-                                        # cursor.execute(query, [sucursal_label, fecha_ini_parsed, fecha_fin_parsed, busqueda])
-                                        # results = cursor.fetchall()
-                                        # if (len(results) > 0):
-                                        #     #Obtenemos las factuas con ese id a partir del result
-                                        #     for row in results:
-                                        #         factura = Factura.objects.filter(id=row[0])
-                                        #         facturas.append(factura)
-
-                                        # esta forma seria tratando de utilizar el filter para que retorne un QuerySet pero aca se indica la columna y no se como obtener los 3 primeros caracteres
-                                        # facturas = Factura.objects.filter(anulado=False, fecha__range=(fecha_ini_parsed, fecha_fin_parsed), usuario=busqueda, numero_subtr(1:3)__iexact=sucursal_label)
-
-                                        # y esta forma es obtener RawWuerySet, es decir, los modelos del Django a partir de un query estático y que me sirve para no modificar codigo
-                                        facturas = Factura.objects.raw(
-                                            '''SELECT "principal_factura"."id", 
-                                                      "principal_factura"."fecha", 
-                                                      "principal_factura"."numero", 
-                                                      "principal_factura"."cliente_id", 
-                                                      "principal_factura"."lote_id", 
-                                                      "principal_factura"."rango_factura_id", 
-                                                      "principal_factura"."tipo", 
-                                                      "principal_factura"."detalle", 
-                                                      "principal_factura"."anulado", 
-                                                      "principal_factura"."observacion", 
-                                                      "principal_factura"."usuario_id", 
-                                                      "principal_factura"."impresa",
-                                                      "principal_factura"."anulado"
-                                                      FROM "principal_factura" WHERE (SUBSTR("principal_factura"."numero", 1, 3) LIKE %s) AND fecha >= %s AND fecha <= %s AND usuario_id = %s ORDER BY numero''',
-                                            [sucursal_label, fecha_ini_parsed, fecha_fin_parsed, busqueda])
-
-                            else:
-                                if filtro_anulado != None:
-                                    facturas = Factura.objects.filter(anulado=False,
-                                                                      fecha__range=(fecha_ini_parsed, fecha_fin_parsed),
-                                                                      usuario=request.user).order_by('numero')
-                                else:
-                                    facturas = Factura.objects.filter(fecha__range=(fecha_ini_parsed, fecha_fin_parsed),
-                                                                      usuario=request.user).order_by('numero')
-
-                            for factura in facturas:
-
-                                # Totales Factura
-                                total_facturado = 0
-                                total_exentas = 0
-                                total_iva5 = 0
-                                total_iva10 = 0
-
-                                fecha_str = unicode(factura.fecha)
-                                fecha = unicode(datetime.datetime.strptime(fecha_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
-
-                                # Se setean los datos de cada fila
-                                fila = {}
-                                fila['id'] = factura.id
-                                fila['fecha'] = fecha
-                                fila['numero'] = factura.numero
-                                fila['cliente'] = unicode(factura.cliente)
-                                fila['ruc'] = unicode(factura.cliente.ruc)
-                                fila['lote'] = unicode(factura.lote.codigo_paralot)
-                                fila['tipo'] = unicode(factura.tipo)
-                                if factura.anulado == None or factura.anulado == False:
-                                    fila['anulado'] = 'No'
-                                else:
-                                    fila['anulado'] = 'SI'
-
-                                if factura.usuario_id != None:
-                                    fila['usuario'] = unicode(factura.usuario)
-
-                                lista_detalles = json.loads(factura.detalle)
-                                for key, value in lista_detalles.iteritems():
-                                    total_exentas += int(value['exentas'])
-                                    total_iva5 += int(value['iva_5'])
-                                    total_iva10 += int(value['iva_10'])
-                                    total_facturado += int(int(value['cantidad']) * int(value['precio_unitario']))
-
-                                fila['total_exentas'] = unicode('{:,}'.format(total_exentas)).replace(",", ".")
-                                fila['total_iva5'] = unicode('{:,}'.format(total_iva5)).replace(",", ".")
-                                fila['total_iva10'] = unicode('{:,}'.format(total_iva10)).replace(",", ".")
-                                fila['total_facturado'] = unicode('{:,}'.format(total_facturado)).replace(",", ".")
-
-                                filas.append(fila)
-
-                                # Acumulamos para los TOTALES GENERALES
-                                total_general_exentas += int(total_exentas)
-                                total_general_iva5 += int(total_iva5)
-                                total_general_iva10 += int(total_iva10)
-                                total_general_facturado += int(total_facturado)
-
-                            # Totales GENERALES
-                            fila['total_general_facturado'] = unicode('{:,}'.format(total_general_facturado)).replace(
-                                ",", ".")
-                            fila['total_general_exentas'] = unicode('{:,}'.format(total_general_exentas)).replace(",",
-                                                                                                                  ".")
-                            fila['total_general_iva5'] = unicode('{:,}'.format(total_general_iva5)).replace(",", ".")
-                            fila['total_general_iva10'] = unicode('{:,}'.format(total_general_iva10)).replace(",", ".")
-
-                        except Exception, error:
-                            print error
-
-                        ultimo = "&fecha_ini=" + fecha_ini + "&fecha_fin=" + fecha_fin + "&busqueda=" + busqueda + "&busqueda_label=" + busqueda_label
-                        lista = filas
+                        ultimo = "&fecha_ini=" + fecha_ini + "&fecha_fin=" + fecha_fin + "&busqueda=" + busqueda + "&busqueda_label=" + busqueda_label + "&anulados=" + anulados + "&todos_excepto_pago_cuota=" + todos_excepto_pago_cuota
 
                         #                         paginator = Paginator(filas, 25)
                         #                         page = request.GET.get('page')
@@ -7825,6 +7625,8 @@ def informe_facturacion(request):
                             'fraccion': fraccion,
                             'concepto_label': concepto_label,
                             'concepto': concepto,
+                            'anulados': anulados,
+                            'todos_excepto_pago_cuota': todos_excepto_pago_cuota,
                         })
                         return HttpResponse(t.render(c))
                     except Exception, error:
@@ -7838,6 +7640,138 @@ def informe_facturacion(request):
                 return HttpResponse(t.render(c))
         else:
             return HttpResponseRedirect(reverse('login'))
+
+def proceso_informe_facturacion(fecha_ini, fecha_fin, busqueda, busqueda_label, sucursal, sucursal_label, fraccion, fraccion_label, concepto, concepto_label, anulados, todos_excepto_pago_cuota, usuario):
+    try:
+        fila = {}
+        kwargs = {}
+        filas = []
+        # Totales GENERALES
+
+        total_general_facturado = 0
+        total_general_exentas = 0
+        total_general_iva5 = 0
+        total_general_iva10 = 0
+        total_general_cuota_total = 0
+
+        tipo_usuario = usuario.groups.get().name
+
+        fecha_ini_parsed = datetime.datetime.strptime(fecha_ini, "%d/%m/%Y").strftime("%Y-%m-%d")
+        fecha_fin_parsed = datetime.datetime.strptime(fecha_fin, "%d/%m/%Y").strftime("%Y-%m-%d")
+
+        if anulados == 'solo_anulados':
+            filtro_anulado = True
+        elif anulados == 'no_anulados':
+            filtro_anulado = False
+        else:
+            filtro_anulado = None
+
+        if todos_excepto_pago_cuota == '1' or todos_excepto_pago_cuota == 'on':
+            todos_excepto_pago_cuota = True
+
+        # Filtro Fecha
+        kwargs['fecha__range'] = (fecha_ini_parsed, fecha_fin_parsed)
+
+        # Filtro Usuario
+        if tipo_usuario != 'Administradores' and tipo_usuario != 'operador_contable':
+            kwargs['usuario'] = usuario
+        else:
+            if busqueda_label != '':
+                kwargs['usuario'] = busqueda
+
+        # Filtro Sucursal
+        if fraccion != '':
+            kwargs['lote__manzana__fraccion'] = fraccion
+
+        # Filtro Fraccion
+        if sucursal != '':
+            kwargs['lote__manzana__fraccion_sucursal'] = sucursal
+
+        # Filtro Anulado
+        if filtro_anulado != None:
+            kwargs['anulado'] = filtro_anulado
+
+        # Filtro Concepto
+        if concepto_label != '':
+            kwargs['detalle__icontains'] = concepto_label
+
+        # Filtro Todos excepto pago de cuotas
+        if todos_excepto_pago_cuota == True:
+            facturas = Factura.objects.filter(**kwargs).exclude(detalle__icontains='Pago de Cuota').order_by('numero')
+            todos_excepto_pago_cuota = '1'
+        else:
+            facturas = Factura.objects.filter(**kwargs).order_by('numero')
+            todos_excepto_pago_cuota = '0'
+
+        for factura in facturas:
+
+            # Totales Factura
+            total_facturado = 0
+            total_exentas = 0
+            total_iva5 = 0
+            total_cuota_total = 0
+            total_iva10 = 0
+
+
+
+            fecha_str = unicode(factura.fecha)
+            fecha = unicode(datetime.datetime.strptime(fecha_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
+
+            # Se setean los datos de cada fila
+            fila = {}
+            fila['id'] = factura.id
+            fila['fecha'] = fecha
+            fila['numero'] = factura.numero
+            fila['cliente'] = unicode(factura.cliente)
+            fila['ruc'] = unicode(factura.cliente.ruc)
+            fila['lote'] = unicode(factura.lote.codigo_paralot)
+            fila['tipo'] = unicode(factura.tipo)
+            if factura.anulado == None or factura.anulado == False:
+                fila['anulado'] = 'No'
+            else:
+                fila['anulado'] = 'SI'
+
+            if factura.usuario_id != None:
+                fila['usuario'] = unicode(factura.usuario)
+
+            lista_detalles = json.loads(factura.detalle)
+            for key, value in lista_detalles.iteritems():
+                total_exentas += int(value['exentas'])
+                total_iva5 += int(value['iva_5'])
+                total_cuota_total += int(int(value['exentas']) + int(value['iva_5']))
+                total_iva10 += int(value['iva_10'])
+                total_facturado += int(int(value['cantidad']) * int(value['precio_unitario']))
+
+            fila['total_exentas'] = unicode('{:,}'.format(total_exentas)).replace(",", ".")
+            fila['total_iva5'] = unicode('{:,}'.format(total_iva5)).replace(",", ".")
+            fila['total_cuota_total'] = unicode('{:,}'.format(total_cuota_total)).replace(",", ".")
+            fila['total_iva10'] = unicode('{:,}'.format(total_iva10)).replace(",", ".")
+            fila['total_facturado'] = unicode('{:,}'.format(total_facturado)).replace(",", ".")
+
+            filas.append(fila)
+
+            # Acumulamos para los TOTALES GENERALES
+            total_general_exentas += int(total_exentas)
+            total_general_iva5 += int(total_iva5)
+            total_general_iva10 += int(total_iva10)
+            total_general_facturado += int(total_facturado)
+            total_general_cuota_total += int(total_cuota_total)
+
+        # Totales GENERALES
+        fila['total_general_facturado'] = unicode('{:,}'.format(total_general_facturado)).replace(
+            ",", ".")
+        fila['total_general_exentas'] = unicode('{:,}'.format(total_general_exentas)).replace(",",
+                                                                                              ".")
+        fila['total_general_iva5'] = unicode('{:,}'.format(total_general_iva5)).replace(",", ".")
+        fila['total_general_iva10'] = unicode('{:,}'.format(total_general_iva10)).replace(",", ".")
+        fila['total_general_cuota_total'] = unicode(
+            '{:,}'.format(total_general_cuota_total)).replace(",", ".")
+
+    except Exception, error:
+        print error
+
+    lista = filas
+    return lista
 
 
 def informe_facturacion_reporte_excel(request):
@@ -7868,200 +7802,17 @@ def informe_facturacion_reporte_excel(request):
                         concepto = request.GET.get('concepto', '')
                         concepto_label = request.GET.get('concepto_label', '')
 
-                        todos_excepto_pago_cuota = False
-                        if request.GET.get('todos_excepto_pago_cuota', '') == '1':
-                            todos_excepto_pago_cuota = True
+                        anulados = request.GET.get('anulados', '')
 
-                        fecha_ini_parsed = datetime.datetime.strptime(fecha_ini, "%d/%m/%Y").strftime("%Y-%m-%d")
-                        fecha_fin_parsed = datetime.datetime.strptime(fecha_fin, "%d/%m/%Y").strftime("%Y-%m-%d")
+                        todos_excepto_pago_cuota = request.GET.get('todos_excepto_pago_cuota', '')
 
-                        filas = []
-                        lista_totales = []
+                        usuario = request.user
 
-                        # Totales GENERALES
-                        total_general_exentas = 0
-                        total_general_iva5 = 0
-                        total_general_cuota_total = 0
-                        total_general_iva10 = 0
-                        total_general_facturado = 0
+                        filas = proceso_informe_facturacion(fecha_ini, fecha_fin, busqueda, busqueda_label, sucursal,
+                                                            sucursal_label, fraccion, fraccion_label, concepto,
+                                                            concepto_label, anulados, todos_excepto_pago_cuota, usuario)
 
-                        try:
-                            fila = {}
-                            grupo = request.user.groups.get().id
-                            tipo_usuario = request.user.groups.get().name
-                            # if grupo == 1 or grupo == 5:
-                            if tipo_usuario == 'Administradores' or tipo_usuario == 'operador_contable':
-                                if busqueda == '':
-                                    if sucursal_label == '':
-                                        if fraccion_label == '':
-                                            if concepto_label == '':
-                                                if (todos_excepto_pago_cuota):
-                                                    facturas = Factura.objects.filter(anulado=False, fecha__range=(
-                                                        fecha_ini_parsed, fecha_fin_parsed)).exclude(
-                                                        detalle__icontains='Pago de Cuota').order_by('numero')
-                                                else:
-                                                    facturas = Factura.objects.filter(anulado=False, fecha__range=(
-                                                        fecha_ini_parsed, fecha_fin_parsed)).order_by('numero')
-                                            else:
-                                                facturas = Factura.objects.filter(anulado=False, fecha__range=(
-                                                    fecha_ini_parsed, fecha_fin_parsed),
-                                                        detalle__icontains=concepto_label).order_by('numero')
-                                        else:
-                                            facturas = Factura.objects.raw(
-                                                '''SELECT "principal_factura"."id", "principal_factura"."fecha",
-                                                          "principal_factura"."numero",
-                                                          "principal_factura"."cliente_id",
-                                                          "principal_factura"."lote_id",
-                                                          "principal_factura"."rango_factura_id",
-                                                          "principal_factura"."tipo", "principal_factura"."detalle",
-                                                          "principal_factura"."anulado",
-                                                          "principal_factura"."observacion",
-                                                          "principal_factura"."usuario_id",
-                                                          "principal_factura"."impresa"
-                                                          FROM "principal_factura"
-                                                WHERE "principal_factura"."lote_id" IN (
-                                                SELECT id FROM "principal_lote" WHERE manzana_id IN (
-                                                SELECT id FROM "principal_manzana" WHERE fraccion_id = %s))
-                                                AND fecha >= %s AND fecha <= %s ORDER BY numero''',
-                                                [fraccion, fecha_ini_parsed, fecha_fin_parsed])
-                                    else:
-                                        facturas = Factura.objects.raw(
-                                            '''SELECT "principal_factura"."id", "principal_factura"."fecha",
-                                                      "principal_factura"."numero",
-                                                      "principal_factura"."cliente_id", "principal_factura"."lote_id",
-                                                      "principal_factura"."rango_factura_id",
-                                                      "principal_factura"."tipo", "principal_factura"."detalle",
-                                                      "principal_factura"."anulado", "principal_factura"."observacion",
-                                                      "principal_factura"."usuario_id", "principal_factura"."impresa"
-                                                      FROM "principal_factura"
-                                            WHERE (SUBSTR("principal_factura"."numero", 1, 3) LIKE %s)
-                                            AND fecha >= %s AND fecha <= %s ORDER BY numero''',
-                                            [sucursal_label, fecha_ini_parsed, fecha_fin_parsed])
-                                else:
-                                    if sucursal_label == '':
-                                        facturas = Factura.objects.filter(anulado=False, fecha__range=(
-                                            fecha_ini_parsed, fecha_fin_parsed), usuario=busqueda).order_by('numero')
-                                    else:
-                                        # esta forma es obtener RawWuerySet, es decir, los modelos del Django a partir
-                                        # de un query estático y que me sirve para no modificar codigo
-                                        facturas = Factura.objects.raw(
-                                            '''SELECT "principal_factura"."id", "principal_factura"."fecha",
-                                                      "principal_factura"."numero", "principal_factura"."cliente_id",
-                                                      "principal_factura"."lote_id",
-                                                      "principal_factura"."rango_factura_id",
-                                                      "principal_factura"."tipo", "principal_factura"."detalle",
-                                                      "principal_factura"."anulado", "principal_factura"."observacion",
-                                                      "principal_factura"."usuario_id", "principal_factura"."impresa"
-                                                      FROM "principal_factura"
-                                            WHERE (SUBSTR("principal_factura"."numero", 1, 3) LIKE %s)
-                                            AND fecha >= %s AND fecha <= %s AND usuario_id = %s ORDER BY numero''',
-
-                                            [sucursal_label, fecha_ini_parsed, fecha_fin_parsed, busqueda])
-
-                            else:
-                                facturas = Factura.objects.filter(anulado=False,
-                                                fecha__range=(fecha_ini_parsed, fecha_fin_parsed),
-                                                usuario=request.user).order_by('numero')
-
-                            sucursal = facturas[0].numero[:3]
-                            total_facturado_sucursal = 0
-                            total_exentas_sucursal = 0
-                            total_iva5_sucursal = 0
-                            total_cuota_total_sucursal = 0
-                            total_iva10_sucursal = 0
-                            totales_sucursales = []
-                            cant_facturas = len(list(facturas))
-                            cont = 0
-                            for factura in facturas:
-                                cont += 1
-                                # esta parte es donde tengo que ir sumando los totales por sucursales e ir guardando
-                                # para luego ubicar en el excel
-                                # haremos una lista donde iremos agregando los totales porque no sabemos cuantas
-                                # sucursales puede haber en cuestion segun los filtros
-                                sucursal_aux = factura.numero[:3]
-                                if sucursal_aux != sucursal:
-                                    totales_sucursales.append(total_sucursal)
-                                    total_exentas_sucursal = 0
-                                    total_iva5_sucursal = 0
-                                    total_cuota_total_sucursal = 0
-                                    total_iva10_sucursal = 0
-                                    total_facturado_sucursal = 0
-                                    sucursal = sucursal_aux
-
-                                # Totales Factura
-                                total_exentas = 0
-                                total_iva5 = 0
-                                total_cuota_total = 0
-                                total_iva10 = 0
-                                total_facturado = 0
-
-                                fecha_str = unicode(factura.fecha)
-                                fecha = unicode(datetime.datetime.strptime(fecha_str, "%Y-%m-%d").strftime("%d/%m/%Y"))
-
-                                # Se setean los datos de cada fila
-                                fila = {}
-                                fila['id'] = factura.id
-                                fila['fecha'] = fecha
-                                fila['numero'] = factura.numero
-                                fila['cliente'] = unicode(factura.cliente)
-                                fila['ruc'] = unicode(factura.cliente.ruc)
-                                fila['lote'] = unicode(factura.lote.codigo_paralot)
-                                fila['tipo'] = unicode(factura.tipo)
-                                if factura.usuario_id != None:
-                                    fila['usuario'] = unicode(factura.usuario)
-
-                                lista_detalles = json.loads(factura.detalle)
-                                for key, value in lista_detalles.iteritems():
-                                    total_exentas += int(value['exentas'])
-                                    total_iva5 += int(value['iva_5'])
-                                    total_cuota_total += int(int(value['exentas']) + int(value['iva_5']))
-                                    total_iva10 += int(value['iva_10'])
-                                    total_facturado += int(int(value['cantidad']) * int(value['precio_unitario']))
-
-                                fila['total_exentas'] = unicode('{:,}'.format(total_exentas)).replace(",", ".")
-                                fila['total_iva5'] = unicode('{:,}'.format(total_iva5)).replace(",", ".")
-                                fila['total_cuota_total'] = unicode('{:,}'.format(total_cuota_total)).replace(",", ".")
-                                fila['total_iva10'] = unicode('{:,}'.format(total_iva10)).replace(",", ".")
-                                fila['total_facturado'] = unicode('{:,}'.format(total_facturado)).replace(",", ".")
-
-                                filas.append(fila)
-
-                                # Acumulamos para los TOTALES GENERALES
-                                total_general_exentas += int(total_exentas)
-                                total_general_iva5 += int(total_iva5)
-                                total_general_cuota_total += int(total_cuota_total)
-                                total_general_iva10 += int(total_iva10)
-                                total_general_facturado += int(total_facturado)
-
-                                # Acumulamos para los TOTALES POR SUCURSALES
-                                total_exentas_sucursal += int(total_exentas)
-                                total_iva5_sucursal += int(total_iva5)
-                                total_cuota_total_sucursal += int(total_cuota_total)
-                                total_iva10_sucursal += int(total_iva10)
-                                total_facturado_sucursal += int(total_facturado)
-                                total_sucursal = [total_exentas_sucursal, total_iva5_sucursal,
-                                                  total_cuota_total_sucursal, total_iva10_sucursal,
-                                                  total_facturado_sucursal]
-
-                                if cont == cant_facturas:
-                                    totales_sucursales.append(total_sucursal)
-
-                            # Totales GENERALES
-                            fila['total_general_exentas'] = unicode('{:,}'.format(total_general_exentas)).replace(",",
-                                                                                                                  ".")
-                            fila['total_general_iva5'] = unicode('{:,}'.format(total_general_iva5)).replace(",", ".")
-                            fila['total_general_cuota_total'] = unicode(
-                                '{:,}'.format(total_general_cuota_total)).replace(",", ".")
-                            fila['total_general_iva10'] = unicode('{:,}'.format(total_general_iva10)).replace(",", ".")
-                            fila['total_general_facturado'] = unicode('{:,}'.format(total_general_facturado)).replace(
-                                ",",
-                                ".")
-
-                        except Exception, error:
-                            print error
-
-                        ultimo = "&fecha_ini=" + fecha_ini + "&fecha_fin=" + fecha_fin + "&busqueda=" + busqueda + "&busqueda_label"
-                        lista = filas
+                        totales_sucursales =0
 
                         wb = xlwt.Workbook(encoding='utf-8')
                         sheet = wb.add_sheet('test', cell_overwrite_ok=True)
@@ -8171,28 +7922,30 @@ def informe_facturacion_reporte_excel(request):
                             try:
                                 # si se trata de la ultima fila, para el ultimo total de la sucursal debemos de colocar tambien
                                 if (fila['total_general_facturado']):
-                                    sheet.write(c, 6, fila['total_exentas'], style_derecha)
-                                    sheet.write(c, 7, fila['total_iva5'], style_derecha)
-                                    sheet.write(c, 8, fila['total_cuota_total'], style_derecha)
-                                    sheet.write(c, 9, fila['total_iva10'], style_derecha)
-                                    sheet.write(c, 10, fila['total_facturado'], style_derecha)
-                                    c += 1
 
-                                    totales_sucursales[fil][0] = unicode(
-                                        '{:,}'.format(totales_sucursales[fil][0])).replace(",", ".")
-                                    totales_sucursales[fil][1] = unicode(
-                                        '{:,}'.format(totales_sucursales[fil][1])).replace(",", ".")
-                                    totales_sucursales[fil][2] = unicode(
-                                        '{:,}'.format(totales_sucursales[fil][2])).replace(",", ".")
-                                    totales_sucursales[fil][3] = unicode(
-                                        '{:,}'.format(totales_sucursales[fil][3])).replace(",", ".")
-                                    totales_sucursales[fil][4] = unicode(
-                                        '{:,}'.format(totales_sucursales[fil][4])).replace(",", ".")
-                                    sheet.write(c, 6, totales_sucursales[fil][0], style_titulo)
-                                    sheet.write(c, 7, totales_sucursales[fil][1], style_titulo)
-                                    sheet.write(c, 8, totales_sucursales[fil][2], style_titulo)
-                                    sheet.write(c, 9, totales_sucursales[fil][3], style_titulo)
-                                    sheet.write(c, 10, totales_sucursales[fil][4], style_titulo)
+                                    #TODO: Ver que mierda trató de hacer aquí con la sucursal
+                                    # sheet.write(c, 6, fila['total_exentas'], style_derecha)
+                                    # sheet.write(c, 7, fila['total_iva5'], style_derecha)
+                                    # sheet.write(c, 8, fila['total_cuota_total'], style_derecha)
+                                    # sheet.write(c, 9, fila['total_iva10'], style_derecha)
+                                    # sheet.write(c, 10, fila['total_facturado'], style_derecha)
+                                    # c += 1
+                                    #
+                                    # totales_sucursales[fil][0] = unicode(
+                                    #     '{:,}'.format(totales_sucursales[fil][0])).replace(",", ".")
+                                    # totales_sucursales[fil][1] = unicode(
+                                    #     '{:,}'.format(totales_sucursales[fil][1])).replace(",", ".")
+                                    # totales_sucursales[fil][2] = unicode(
+                                    #     '{:,}'.format(totales_sucursales[fil][2])).replace(",", ".")
+                                    # totales_sucursales[fil][3] = unicode(
+                                    #     '{:,}'.format(totales_sucursales[fil][3])).replace(",", ".")
+                                    # totales_sucursales[fil][4] = unicode(
+                                    #     '{:,}'.format(totales_sucursales[fil][4])).replace(",", ".")
+                                    # sheet.write(c, 6, totales_sucursales[fil][0], style_titulo)
+                                    # sheet.write(c, 7, totales_sucursales[fil][1], style_titulo)
+                                    # sheet.write(c, 8, totales_sucursales[fil][2], style_titulo)
+                                    # sheet.write(c, 9, totales_sucursales[fil][3], style_titulo)
+                                    # sheet.write(c, 10, totales_sucursales[fil][4], style_titulo)
 
                                     c += 1
                                     sheet.write_merge(c, c, 0, 5, "Totales Facturados", style_titulo)

@@ -33,6 +33,8 @@
 		var fraccion_label = '{{fraccion_label}}';
 		var concepto = '{{concepto}}';
 		var concepto_label = '{{concepto_label}}';
+		var anulados = '{{ anulados }}';
+		var todos_excepto_pago_cuota = '{{ todos_excepto_pago_cuota }}';
 
 
 		$('#fecha_ini').val(fecha_ini);
@@ -45,6 +47,14 @@
 		$('#fraccion').val(fraccion);
 		$('#concepto_label').val(concepto_label);
 		$('#concepto').val(concepto);
+
+		if (todos_excepto_pago_cuota == '1'){
+		    $('#checkbox_todos_excepto_pago_cuotas').prop('checked', true);
+        } else{
+            $('#checkbox_todos_excepto_pago_cuotas').prop('checked', false);
+        }
+
+        $("#anulados").val(anulados);
 
 		$('#fecha_ini').mask('##/##/####');
 		$("#fecha_ini").datepicker({
@@ -200,14 +210,18 @@
                 <tr>
                     <td><input type="checkbox" id="checkbox_todos_excepto_pago_cuotas" class="checkbox_todos_excepto_pago_cuotas"></td>
                     <td colspan="2"><span class="label_nombre_fraccion"> todos excepto pagos de cuotas </span></td>
-                    <input type="hidden" id="todos_excepto_pago_cuota" name="todos_excepto_pago_cuota" value="0">
+                    <input type="hidden" id="todos_excepto_pago_cuota" name="todos_excepto_pago_cuota">
                 </tr>
-                <!--
                 <tr>
-                    <td><input type="checkbox" id="anulados" name="anulados" class="checkbox_todos_excepto_pago_cuotas"></td>
-                    <td colspan="2"><span class="label_nombre_fraccion"> Anulados </span></td>
+                    <td colspan="1"><span class="label_nombre_fraccion"> Anulados </span></td>
+                    <td colspan="2">
+                        <select id="anulados" name="anulados">
+                            <option value="">Anuladas y no Anuladas</option>
+                            <option value="solo_anulados">Solo Anuladas</option>
+                            <option value="no_anulados">No Anuladas</option>
+                        </select>
+                    </td>
                 </tr>
-                -->
 			{%else%}
 				<tr style="display: none">
 					<td>
@@ -238,7 +252,7 @@
 </div>
 <div id="listado-item-lote">
 	<table border="1" cellpadding="0" cellspacing="0" class="listado-pagos" align="center">
-		<th>Fecha</th><th>Numero</th><th>Lote</th><th>Cliente - RUC</th><th>Tipo</th><th>Usuario</th><th>Total Exentas</th><th>Total IVA 5%</th><th>Total IVA 10%</th><th>Total Facturado</th><th>Anulado</th>
+		<th>Fecha</th><th>Numero</th><th>Lote</th><th>Cliente - RUC</th><th>Tipo</th><th>Usuario</th><th>Anulado</th><th>Total Exentas</th><th>Total IVA 5%</th><th>Total IVA 10%</th><th>Total Facturado</th>
 		{% for hw in object_list %}
 			
 		{% if forloop.counter|divisibleby:2 %}
@@ -253,11 +267,12 @@
 				<td>Credito</td>
 			{% endif %}
 			<td>{{hw.usuario}}</td>
+            <td>{{hw.anulado}}</td>
 			<td>{{hw.total_exentas}}</td>
 			<td>{{hw.total_iva5}}</td>
 			<td>{{hw.total_iva10}}</td>
 			<td>{{hw.total_facturado}}</td>
-            <td>{{hw.anulado}}</td>
+
 
 			
 		</tr>
@@ -273,11 +288,12 @@
 				<td>Credito</td>
 			{% endif %}
 			<td>{{hw.usuario}}</td>
+            <td>{{hw.anulado}}</td>
 			<td>{{hw.total_exentas}}</td>
 			<td>{{hw.total_iva5}}</td>
 			<td>{{hw.total_iva10}}</td>
 			<td>{{hw.total_facturado}}</td>
-            <td>{{hw.anulado}}</td>
+
 			
 		</tr>
 		{% endif %}

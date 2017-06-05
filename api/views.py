@@ -478,7 +478,7 @@ def pago(request):
                                             else:  # Parametros totalmente correctos, emitir el pago
 
                                                 detalle_cuotas = get_cuotas_detail_by_lote(unicode(lote.id))
-                                                # cuota_detalle = get_cuota_information_by_lote(unicode(lote.id), 1)
+                                                # cuota_detalle = get_cuota_information_by_lote(unicodeinf(lote.id), 1)
 
                                                 vencimiento = detalle_cuotas['proximo_vencimiento']
 
