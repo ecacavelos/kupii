@@ -2,8 +2,8 @@
 {% block title %} Login {% endblock %}
 {% block content %}
     <script type="text/javascript">
-        $(document).ready(function() {
-           $("#username").focus();
+        $(document).ready(function () {
+            $("#username").focus();
         });
     </script>
     <div id="text" style="alignment-adjust: center;">
@@ -11,25 +11,43 @@
             <form action="{% url 'login' %}" method="post">
                 {% csrf_token %}
                 <tr>
-                    <td><label for="username">Usuario:</label></td>
-                    <td><input type="text" name="username" value="" id="username"
-                               style="font-size: 13px; padding: 4px;"></td>
+                    <td>
+                        <label for="username">Usuario:</label>
+                    </td>
+                    <td>
+                        <input type="text" name="username" value="" id="username"
+                               style="font-size: 13px; padding: 4px;">
+                    </td>
                 </tr>
                 <tr>
-                    <td><label for="password">Contrase&ntilde;a:</label></td>
-                    <td><input type="password" name="password" value="" id="password"></td>
+                    <td>
+                        <label for="password">Contrase&ntilde;a:</label>
+                    </td>
+                    <td>
+                        <input type="password" name="password" value="" id="password">
+                    </td>
                 </tr>
+                <tr>
+                    <td colspan="2">
+                        <input type="submit" style="cursor: pointer;" value="Login"/>
+
+                    {% if next %}
+
+                            <input type="hidden" name="next" value="{{ next }}"/>
+
+                    {% else %}
+
+                            <input type="hidden" name="next" value="{% url 'frontend_home' %}"/>
+
+
+                    {% endif %}
+                    </td>
+                </tr>
+
             </form>
+            {% if form.errors %}
+                <p class="error">Usuario o contrase&ntilde;a incorrectos</p>
+            {% endif %}
         </table>
-        <input type="submit" style="cursor: pointer;" value="Login"/>
-        {% if next %}
-            <input type="hidden" name="next" value="{{ next }}"/>
-        {% else %}
-            <input type="hidden" name="next" value="{% url 'frontend_home' %}"/>
-        {% endif %}
-        </form>
-        {% if form.errors %}
-            <p class="error">Usuario o contrase&ntilde;a incorrectos</p>
-        {% endif %}
     </div>
 {% endblock %}
