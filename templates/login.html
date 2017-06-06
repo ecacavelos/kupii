@@ -1,9 +1,14 @@
 {% extends "lotes/base_lotes.html" %}
 {% block title %} Login {% endblock %}
 {% block content %}
+    <script type="text/javascript">
+        $(document).ready(function() {
+           $("#username").focus();
+        });
+    </script>
     <div id="text" style="alignment-adjust: center;">
         <table class="listado-lotes2">
-            <form action="." method="post">
+            <form action="{% url 'login' %}" method="post">
                 {% csrf_token %}
                 <tr>
                     <td><label for="username">Usuario:</label></td>
