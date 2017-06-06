@@ -1515,8 +1515,8 @@ def obtener_pagos_liquidacion(entidad_id, tipo_busqueda, fecha_ini, fecha_fin, o
                     lista_cuotas_inm.append(numero_cuota)
 
                 for pago in pagos:
-                   # if pago['id'] == 1854827:
-                    #    print "Este es el pago"
+                    if pago['id'] == 1859897:
+                        print "Este es el pago"
                     #if pago['cuota_obsequio']:
                      #   print "Es una cuota obsequio"
                     # try:

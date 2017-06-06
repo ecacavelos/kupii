@@ -739,6 +739,10 @@ def verificar_permisos(user_id, permiso):
 
 def get_pago_cuotas(venta, fecha_ini, fecha_fin, pagos=None, pagos_anteriores=None):
     cantidad_pagos_anteriores = 0
+
+    if venta.id == 4125:
+        print 'esta es la venta'
+
     if fecha_ini is None and fecha_fin is None:
         # Se traen todos los pagos
         if pagos is None:
@@ -759,6 +763,8 @@ def get_pago_cuotas(venta, fecha_ini, fecha_fin, pagos=None, pagos_anteriores=No
                     break
 
         if pagos is None:
+            time = datetime.time(23,59)
+            fecha_fin = datetime.datetime.combine(fecha_fin, time)
             pagos = PagoDeCuotas.objects.filter(venta_id=venta.id,
                                                 fecha_de_pago__range=(fecha_ini, fecha_fin)).order_by('fecha_de_pago')
 
