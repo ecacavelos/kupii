@@ -19,12 +19,13 @@
                     <td><label for="password">Contrase&ntilde;a:</label></td>
                     <td><input type="password" name="password" value="" id="password"></td>
                 </tr>
+            </form>
         </table>
         <input type="submit" style="cursor: pointer;" value="Login"/>
         {% if next %}
-            <input type="hidden" name="next" value="{{ next }}"/></td>
+            <input type="hidden" name="next" value="{{ next }}"/>
         {% else %}
-            <input type="hidden" name="next" value="{% url 'frontend_home' %}"/></td>
+            <input type="hidden" name="next" value="{% url 'frontend_home' %}"/>
         {% endif %}
         </form>
         {% if form.errors %}
