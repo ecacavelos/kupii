@@ -181,7 +181,7 @@
                         $.each(data, function (index, value) {
                             //$("#id_manzana").append('<option value="'+ value.id +'">' + 'Manzana ' + value.label + '</option>') ;
                             $("#id_manzana").append('<option value="' + value.pk + '">' + 'Manzana ' + value.fields.nro_manzana + '</option>');
-                            $("#id_codigo_paralot").val(value.fields.fraccion);
+                            $("#id_codigo_paralot").val(padFraccion(value.fields.fraccion,3));
                         });
                     });
                 }
@@ -225,6 +225,12 @@
         function pad(num, size) {
             max_size = 4 ;
             var s = "000" + num;
+            return s.substr(s.length - max_size);
+        }
+
+        function padFraccion (num, size) {
+            max_size = 3 ;
+            var s = "00" + num;
             return s.substr(s.length - max_size);
         }
 
