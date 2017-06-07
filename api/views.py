@@ -309,7 +309,7 @@ def pago(request):
                                                 nuevo_pago.venta = venta
                                                 nuevo_pago.lote = lote
                                                 nuevo_pago.transaccion = transaccion
-                                                nuevo_pago.fecha_de_pago = hoy
+                                                nuevo_pago.fecha_de_pago = datetime.datetime.now().replace(microsecond=0)
                                                 nuevo_pago.nro_cuotas_a_pagar = 1
                                                 nuevo_pago.cliente = transaccion.cliente
                                                 nuevo_pago.plan_de_pago = venta.plan_de_pago
@@ -506,7 +506,7 @@ def pago(request):
                                                 nuevo_pago.venta = venta
                                                 nuevo_pago.lote = lote
                                                 nuevo_pago.transaccion = transaccion
-                                                nuevo_pago.fecha_de_pago = hoy
+                                                nuevo_pago.fecha_de_pago = datetime.datetime.now().replace(microsecond=0)
                                                 nuevo_pago.nro_cuotas_a_pagar = int(detalle_pago['cantidad_cuotas'])
                                                 nuevo_pago.cliente = transaccion.cliente
                                                 nuevo_pago.plan_de_pago = venta.plan_de_pago
