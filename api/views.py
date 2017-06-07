@@ -276,7 +276,7 @@ def pago(request):
                                         venta = Venta.objects.get(Q(lote=lote), Q(cliente=transaccion.cliente))
                                         detalle_cuotas = get_cuotas_detail_by_lote(unicode(lote.id))
                                         hoy = date.today()
-                                        cuotas_a_pagar_detalle = obtener_cuotas_a_pagar(venta, hoy, detalle_cuotas)
+                                        cuotas_a_pagar_detalle = obtener_cuotas_a_pagar_full(venta, hoy, detalle_cuotas, 500)
                                         if not cuotas_a_pagar_detalle:
                                             error_msg = 'Cuota a pagar no encontrada'
                                             print error_msg
@@ -445,7 +445,7 @@ def pago(request):
                                         detalle_cuotas = get_cuotas_detail_by_lote(unicode(lote.id))
                                         hoy = date.today()
                                         # ahora = datetime.datetime.now()
-                                        cuotas_a_pagar_detalle = obtener_cuotas_a_pagar(venta, hoy, detalle_cuotas)
+                                        cuotas_a_pagar_detalle = obtener_cuotas_a_pagar_full(venta, hoy, detalle_cuotas, 500)
                                         if not cuotas_a_pagar_detalle:
                                             error_msg = 'Cuota a pagar no encontrada'
                                             print error_msg
