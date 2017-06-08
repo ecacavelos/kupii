@@ -8,12 +8,20 @@
             <th colspan="2">
                 <b>Fraccion - Lote: </b> {{ venta.fraccion }} - {{ venta.lote }}
             </th>
-            <th colspan="2">
-                <b>Cuotas pagadas: </b> {{ venta.fraccion }}
+            <th colspan="1">
+                <b>Cuotas pagadas: </b> {{ venta.cuotas_pagadas }}<br>
+                <b>Cuotas atrasadas: </b> {{ venta.cuotas_atrasadas }}
+            </th>
+            <th colspan="1">
+                <b>Total pagado: </b><br> {{ venta.total_pagado }} Gs. / {{ venta.precio_final_venta }} Gs.
+            </th>
+            <th colspan="1">
+                <b>Restante: </b><br> {{ venta.cuotas_restantes }} Cuotas. {{ venta.monto_restante }} Gs.
             </th>
             <th colspan="2">
                 <b>Cantidad de Cuotas a pagar: </b> <input style="color: black; text-align: center" type="number"
                                                id="cantidad_cuotas_{{ venta.id }}" class="cantidad_cuotas" value="{{ nro_cuotas }}">
+            </th>">
             </th>
         </tr>
         <tr>
@@ -55,12 +63,12 @@
         </tbody>
         <tfoot>
             <tr>
-                <td colspan="4" style="text-align: right"><b>Totales</b></td>
+                <td colspan="4" style="text-align: right"><b>Totales:</b></td>
                 <td style="text-align: right" class="total_monto_cuota_lote" id="total_monto_cuota_lote_{{ venta.id }}">{{ venta.totalMontoCuotas }}</td>
                 <td style="text-align: right" class="total_monto_intereses_lote" id="total_monto_intereses_lote_{{ venta.id }}">{{ venta.totalIntereses }}</td>
             </tr>
             <tr>
-                <td colspan="4" style="text-align: right"><b>Total a Pagar Lote</b></td>
+                <td colspan="4" style="text-align: right"><b>Total a Pagar Lote:</b></td>
                 <td colspan="2" style="text-align: right"><b class="total_monto_lote" id="total_monto_lote_{{ venta.id }}">{{ venta.totalPagoLote }}</b></td>
             </tr>
         </tfoot>

@@ -22,7 +22,7 @@ from django.utils import timezone
 
 
 def get_cuotas_detail_by_lote(lote_id):
-    print("buscando pagos del lote --> " + lote_id)
+    print("buscando pagos del lote --> " + unicode(lote_id))
     # El query es: select sum(nro_cuotas_a_pagar) from principal_pagodecuotas where lote_id = 16108
     venta = get_ultima_venta_no_recuperada(lote_id)
 
@@ -35,6 +35,11 @@ def get_cuotas_detail_by_lote(lote_id):
 
         cant_cuotas_pagadas = PagoDeCuotas.objects.filter(venta=venta).aggregate(Sum('nro_cuotas_a_pagar'))
         plan_de_pago = PlanDePago.objects.get(id=venta.plan_de_pago.id)
+
+        # Se trae el monto total pagado de todas las cuotas pagadas sin intereses
+        total_pagado_cuotas = PagoDeCuotas.objects.filter(venta=venta).aggregate(Sum('total_de_cuotas'))
+        precio_final_venta = venta.precio_final_de_venta
+
         # calcular la fecha de vencimiento.
         if cant_cuotas_pagadas['nro_cuotas_a_pagar__sum']:
             proximo_vencimiento = (
@@ -51,13 +56,19 @@ def get_cuotas_detail_by_lote(lote_id):
         datos = dict([('cant_cuotas_pagadas', cant_cuotas_pagadas['nro_cuotas_a_pagar__sum']),
                       ('cantidad_total_cuotas', plan_de_pago.cantidad_de_cuotas),
                       ('contado', contado),
-                      ('proximo_vencimiento', proximo_vencimiento)])
+                      ('proximo_vencimiento', proximo_vencimiento),
+                      ('total_pagado_cuotas', total_pagado_cuotas['total_de_cuotas__sum']),
+                      ('precio_final_venta', precio_final_venta),
+                      ])
 
     else:
         datos = dict([('cant_cuotas_pagadas', 0),
                       ('cantidad_total_cuotas', 0),
                       ('contado', None),
-                      ('proximo_vencimiento', None)])
+                      ('proximo_vencimiento', None),
+                      ('total_pagado_cuotas', 0),
+                      ('precio_final_venta', 0),
+                      ])
     return datos
 
 

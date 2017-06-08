@@ -411,37 +411,90 @@ def get_cuotas_a_pagar_by_cliente_id(request):
                     venta['id'] = venta_cliente.id
                     venta['fraccion'] = venta_cliente.lote.manzana.fraccion
                     venta['lote'] = venta_cliente.lote
-                    venta['cuotas'] = get_mes_pagado_by_id_lote_cant_cuotas(venta_cliente.lote_id, 1)
 
-                    monto_cuota = venta['cuotas'][0]['monto_cuota']
-                    monto_intereses = 0
-                    monto_total = 0
-                    gestion_cobranza = 0
-                    detalles = calculo_interes(venta_cliente.lote_id, '', venta['cuotas'][0]['fecha'], 1)
+                    detalle_cuotas_pagadas = get_cuotas_detail_by_lote(venta_cliente.lote_id)
+                    cuotas_pagadas = detalle_cuotas_pagadas['cant_cuotas_pagadas']
+                    venta['cuotas_pagadas'] = unicode(cuotas_pagadas) + "/" + unicode(detalle_cuotas_pagadas['cantidad_total_cuotas'])
+                    venta['total_pagado'] = unicode('{:,}'.format(detalle_cuotas_pagadas['total_pagado_cuotas'])).replace(",", ".")
+                    venta['precio_final_venta'] = unicode('{:,}'.format(detalle_cuotas_pagadas['precio_final_venta'])).replace(",", ".")
+                    cuotas_restantes = detalle_cuotas_pagadas['cantidad_total_cuotas'] - detalle_cuotas_pagadas['cant_cuotas_pagadas']
+                    monto_restante = detalle_cuotas_pagadas['precio_final_venta'] - detalle_cuotas_pagadas['total_pagado_cuotas']
+                    venta['cuotas_restantes'] = unicode('{:,}'.format(cuotas_restantes).replace(",", "."))
+                    venta['monto_restante'] = unicode('{:,}'.format(monto_restante).replace(",", "."))
 
-                    if detalles != []:
-                        venta['cuotas'][0]['dias_atraso'] =  detalles[0]['dias_atraso']
-                        monto_intereses = detalles[0]['intereses']
-                        venta['cuotas'][0]['intereses'] =  unicode('{:,}'.format(monto_intereses)).replace(",", ".")
-                        venta['cuotas'][0]['vencimiento_gracia'] = detalles[0]['vencimiento_gracia']
-                        try:
-                            gestion_cobranza = detalles[1]['gestion_cobranza']
-                            venta['gestion_cobranza'] = unicode('{:,}'.format(gestion_cobranza)).replace(",", ".")
-                        except:
-                            gestion_cobranza = 0
+                    # obtenemos la cantidad de cuotas atrasadas para pre cargar el lote con esa cantidad a pagar
+                    # Calculamos en base al primer vencimiento, cuantas cuotas debieron haberse pagado hasta la fecha
+                    fecha_primer_vencimiento = venta_cliente.fecha_primer_vencimiento
+                    cantidad_ideal_cuotas = monthdelta(fecha_primer_vencimiento, date.today()) + 1
+                    # Y obtenemos las cuotas atrasadas
+                    cuotas_atrasadas = cantidad_ideal_cuotas - cuotas_pagadas
+
+                    if cuotas_atrasadas == 0:
+                        fecha_proximo_vencimiento_dias = detalle_cuotas_pagadas['proximo_vencimiento']
+                        fecha_pago_dias = date.today()
+                        dias_atraso = fecha_pago_dias - fecha_proximo_vencimiento_dias
+                        if dias_atraso.days > 5:
+                            cuotas_atrasadas = 1
+
+                    cantidad_cuotas = cuotas_atrasadas
+
+                    if cantidad_cuotas < 1:
+                        cantidad_cuotas = 1
+
+                    if cuotas_atrasadas < 0 or cuotas_atrasadas == 0:
+                        cuotas_atrasadas = 0
+                    venta['cuotas_atrasadas'] = cuotas_atrasadas
+                    venta['cantidad_cuotas'] = cantidad_cuotas
+                    venta['cuotas'] = get_mes_pagado_by_id_lote_cant_cuotas(venta_cliente.lote_id, cantidad_cuotas)
+
+                    if len(venta['cuotas']) > 0:
+                        detalles = calculo_interes(venta_cliente.lote_id, '', venta['cuotas'][0]['fecha'],
+                                                   cantidad_cuotas)
                     else:
-                        venta['cuotas'][0]['vencimiento_gracia'] = "-"
-                    monto_total = monto_cuota + monto_intereses + gestion_cobranza
+                        detalles = []
+                    i = 0
+                    for cuota in venta['cuotas']:
+                        i = i + 1
+                        monto_cuota = cuota['monto_cuota']
+                        monto_intereses = 0
+                        monto_total = 0
+                        gestion_cobranza = 0
 
-                    total_pago_cuotas = total_pago_cuotas + monto_cuota
-                    total_pago_intereses = total_pago_intereses + (monto_intereses + gestion_cobranza)
-                    total_pago = total_pago + (monto_cuota + (monto_intereses + gestion_cobranza) )
+                        if detalles != []:
+                            try:
+                                dias_atraso = detalles[i - 1]['dias_atraso']
+                                if dias_atraso < 0:
+                                    dias_atraso = 0
+                                cuota['dias_atraso'] = dias_atraso
+                                monto_intereses = detalles[i - 1]['intereses']
+                                cuota['intereses'] = unicode('{:,}'.format(monto_intereses)).replace(",", ".")
+                                cuota['vencimiento_gracia'] = detalles[i - 1]['vencimiento_gracia']
+                                try:
+                                    gestion_cobranza = detalles[(i - 1) + 1]['gestion_cobranza']
+                                    venta['gestion_cobranza'] = unicode('{:,}'.format(gestion_cobranza)).replace(",",
+                                                                                                                 ".")
+                                except:
+                                    gestion_cobranza = 0
+                            except:
+                                cuota['dias_atraso'] = 0
+                                cuota['intereses'] = 0
+                                cuota['vencimiento_gracia'] = "-"
 
-                    venta['totalMontoCuotas'] = unicode('{:,}'.format(monto_cuota)).replace(",", ".")
-                    venta['totalIntereses'] = unicode('{:,}'.format(monto_intereses + gestion_cobranza)).replace(",", ".")
-                    venta['totalPagoLote'] = unicode('{:,}'.format(monto_total)).replace(",", ".")
-                    venta['cuotas'][0]['monto_cuota'] = unicode('{:,}'.format(monto_cuota)).replace(",", ".")
-                    cant_cuotas = cant_cuotas + 1
+
+                        else:
+                            cuota['vencimiento_gracia'] = "-"
+                        monto_total = monto_cuota + monto_intereses + gestion_cobranza
+
+                        total_pago_cuotas = total_pago_cuotas + monto_cuota
+                        total_pago_intereses = total_pago_intereses + (monto_intereses + gestion_cobranza)
+                        total_pago = total_pago + (monto_total)
+
+                        cuota['monto_cuota'] = unicode('{:,}'.format(monto_cuota)).replace(",", ".")
+
+                    venta['totalMontoCuotas'] = unicode('{:,}'.format(total_pago_cuotas)).replace(",", ".")
+                    venta['totalIntereses'] = unicode('{:,}'.format(total_pago_intereses)).replace(",", ".")
+                    venta['totalPagoLote'] = unicode('{:,}'.format(total_pago)).replace(",", ".")
+
                     ventas.append(venta)
 
 
@@ -457,7 +510,7 @@ def get_cuotas_a_pagar_by_cliente_id(request):
                     'total_pago_cuotas': total_pago_cuotas,
                     'total_pago_intereses': total_pago_intereses,
                     'total_pago': total_pago,
-                    'cant_cuotas': cant_cuotas,
+                    'cant_cuotas': cantidad_cuotas,
                 })
                 return HttpResponse(t.render(c))
             except Exception, error:
@@ -487,6 +540,45 @@ def get_cuotas_a_pagar_by_venta_id_nro_cuotas(request):
                 venta['lote'] = venta_del_cliente.lote
                 venta['cuotas'] = get_mes_pagado_by_id_lote_cant_cuotas(venta_del_cliente.lote_id, nro_cuotas_a_pagar)
 
+                detalle_cuotas_pagadas = get_cuotas_detail_by_lote(venta_del_cliente.lote_id)
+                cuotas_pagadas = detalle_cuotas_pagadas['cant_cuotas_pagadas']
+                venta['cuotas_pagadas'] = unicode(cuotas_pagadas) + "/" + unicode(
+                    detalle_cuotas_pagadas['cantidad_total_cuotas'])
+                venta['total_pagado'] = unicode('{:,}'.format(detalle_cuotas_pagadas['total_pagado_cuotas'])).replace(
+                    ",", ".")
+                venta['precio_final_venta'] = unicode(
+                    '{:,}'.format(detalle_cuotas_pagadas['precio_final_venta'])).replace(",", ".")
+                cuotas_restantes = detalle_cuotas_pagadas['cantidad_total_cuotas'] - detalle_cuotas_pagadas[
+                    'cant_cuotas_pagadas']
+                monto_restante = detalle_cuotas_pagadas['precio_final_venta'] - detalle_cuotas_pagadas[
+                    'total_pagado_cuotas']
+                venta['cuotas_restantes'] = unicode('{:,}'.format(cuotas_restantes).replace(",", "."))
+                venta['monto_restante'] = unicode('{:,}'.format(monto_restante).replace(",", "."))
+
+                # obtenemos la cantidad de cuotas atrasadas para pre cargar el lote con esa cantidad a pagar
+                # Calculamos en base al primer vencimiento, cuantas cuotas debieron haberse pagado hasta la fecha
+                fecha_primer_vencimiento = venta_del_cliente.fecha_primer_vencimiento
+                cantidad_ideal_cuotas = monthdelta(fecha_primer_vencimiento, date.today()) + 1
+                # Y obtenemos las cuotas atrasadas
+                cuotas_atrasadas = cantidad_ideal_cuotas - cuotas_pagadas
+
+                if cuotas_atrasadas == 0:
+                    fecha_proximo_vencimiento_dias = detalle_cuotas_pagadas['proximo_vencimiento']
+                    fecha_pago_dias = date.today()
+                    dias_atraso = fecha_pago_dias - fecha_proximo_vencimiento_dias
+                    if dias_atraso.days > 5:
+                        cuotas_atrasadas = 1
+
+                cantidad_cuotas = cuotas_atrasadas
+
+                if cantidad_cuotas < 1:
+                    cantidad_cuotas = 1
+
+                if cuotas_atrasadas < 0 or cuotas_atrasadas == 0:
+                    cuotas_atrasadas = 0
+                venta['cuotas_atrasadas'] = cuotas_atrasadas
+                venta['cantidad_cuotas'] = cantidad_cuotas
+
                 if len(venta['cuotas']) > 0:
                     detalles = calculo_interes(venta_del_cliente.lote_id, '', venta['cuotas'][0]['fecha'], nro_cuotas_a_pagar)
                 else:
@@ -503,9 +595,9 @@ def get_cuotas_a_pagar_by_venta_id_nro_cuotas(request):
                             dias_atraso = detalles[i-1]['dias_atraso']
                             if dias_atraso < 0:
                                 dias_atraso = 0
-                            cuota['dias_atraso'] =  dias_atraso
+                            cuota['dias_atraso'] = dias_atraso
                             monto_intereses = detalles[i-1]['intereses']
-                            cuota['intereses'] =  unicode('{:,}'.format(monto_intereses)).replace(",", ".")
+                            cuota['intereses'] = unicode('{:,}'.format(monto_intereses)).replace(",", ".")
                             cuota['vencimiento_gracia'] = detalles[i-1]['vencimiento_gracia']
                             try:
                                 gestion_cobranza = detalles[(i-1)+1]['gestion_cobranza']
