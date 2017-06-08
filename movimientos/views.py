@@ -407,6 +407,11 @@ def get_cuotas_a_pagar_by_cliente_id(request):
                 total_pago = 0
                 cant_cuotas = 0
                 for venta_cliente in ventas_del_cliente:
+
+                    total_pago_cuotas_venta = 0
+                    total_pago_intereses_venta = 0
+                    total_pago_venta = 0
+
                     venta = {}
                     venta['id'] = venta_cliente.id
                     venta['fraccion'] = venta_cliente.lote.manzana.fraccion
@@ -485,15 +490,19 @@ def get_cuotas_a_pagar_by_cliente_id(request):
                             cuota['vencimiento_gracia'] = "-"
                         monto_total = monto_cuota + monto_intereses + gestion_cobranza
 
+                        total_pago_cuotas_venta = total_pago_cuotas_venta + monto_cuota
+                        total_pago_intereses_venta = total_pago_intereses_venta + (monto_intereses + gestion_cobranza)
+                        total_pago_venta = total_pago_venta + (monto_total)
+
                         total_pago_cuotas = total_pago_cuotas + monto_cuota
                         total_pago_intereses = total_pago_intereses + (monto_intereses + gestion_cobranza)
                         total_pago = total_pago + (monto_total)
 
                         cuota['monto_cuota'] = unicode('{:,}'.format(monto_cuota)).replace(",", ".")
 
-                    venta['totalMontoCuotas'] = unicode('{:,}'.format(total_pago_cuotas)).replace(",", ".")
-                    venta['totalIntereses'] = unicode('{:,}'.format(total_pago_intereses)).replace(",", ".")
-                    venta['totalPagoLote'] = unicode('{:,}'.format(total_pago)).replace(",", ".")
+                    venta['totalMontoCuotas'] = unicode('{:,}'.format(total_pago_cuotas_venta)).replace(",", ".")
+                    venta['totalIntereses'] = unicode('{:,}'.format(total_pago_intereses_venta)).replace(",", ".")
+                    venta['totalPagoLote'] = unicode('{:,}'.format(total_pago_venta)).replace(",", ".")
 
                     ventas.append(venta)
 
@@ -526,6 +535,10 @@ def get_cuotas_a_pagar_by_venta_id_nro_cuotas(request):
                 total_pago_cuotas = 0
                 total_pago_intereses = 0
                 total_pago = 0
+
+                total_pago_cuotas_venta = 0
+                total_pago_intereses_venta = 0
+                total_pago_venta = 0
 
                 venta_id = request.GET['venta_id']
                 nro_cuotas_a_pagar = request.GET['nro_cuotas']
@@ -614,15 +627,19 @@ def get_cuotas_a_pagar_by_venta_id_nro_cuotas(request):
                         cuota['vencimiento_gracia'] = "-"
                     monto_total = monto_cuota + monto_intereses + gestion_cobranza
 
+                    total_pago_cuotas_venta = total_pago_cuotas_venta + monto_cuota
+                    total_pago_intereses_venta = total_pago_intereses_venta + (monto_intereses + gestion_cobranza)
+                    total_pago_venta = total_pago_venta + (monto_total)
+
                     total_pago_cuotas = total_pago_cuotas + monto_cuota
                     total_pago_intereses = total_pago_intereses + (monto_intereses + gestion_cobranza)
                     total_pago = total_pago + (monto_total)
 
                     cuota['monto_cuota'] = unicode('{:,}'.format(monto_cuota)).replace(",", ".")
 
-                venta['totalMontoCuotas'] = unicode('{:,}'.format(total_pago_cuotas)).replace(",", ".")
-                venta['totalIntereses'] = unicode('{:,}'.format(total_pago_intereses)).replace(",", ".")
-                venta['totalPagoLote'] = unicode('{:,}'.format(total_pago)).replace(",", ".")
+                venta['totalMontoCuotas'] = unicode('{:,}'.format(total_pago_cuotas_venta)).replace(",", ".")
+                venta['totalIntereses'] = unicode('{:,}'.format(total_pago_intereses_venta)).replace(",", ".")
+                venta['totalPagoLote'] = unicode('{:,}'.format(total_pago_venta)).replace(",", ".")
 
                 ventas.append(venta)
 
