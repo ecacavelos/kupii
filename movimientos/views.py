@@ -432,7 +432,7 @@ def get_cuotas_a_pagar_by_cliente_id(request):
                     if cuotas_atrasadas == 0:
                         fecha_proximo_vencimiento_dias = detalle_cuotas_pagadas['proximo_vencimiento']
                         fecha_pago_dias = date.today()
-                        dias_atraso = fecha_pago_dias - fecha_proximo_vencimiento_dias
+                        dias_atraso = fecha_pago_dias - datetime.datetime.strptime(fecha_proximo_vencimiento_dias, "%d/%m/%Y").date()
                         if dias_atraso.days > 5:
                             cuotas_atrasadas = 1
 
