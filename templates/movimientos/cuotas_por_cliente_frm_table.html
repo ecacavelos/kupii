@@ -8,7 +8,12 @@
         </tr>
         <tr>
             <th colspan="2">
-                <b>Fraccion - Lote: </b> <br>{{ venta.fraccion }} - {{ venta.lote }}
+                <b>Fraccion - Lote: </b> <br>{{ venta.fraccion }} -
+                <a target="_blank" href="/informes/informe_movimientos/?lote_ini={{ venta.lote }}&lote_fin={{ venta.lote }}&fecha_ini=&fecha_fin=">
+                    {{ venta.lote }}
+                    <br>
+                    (Ver Pagos)
+                </a>
             </th>
             <th colspan="1">
                 <b>Cuotas pagadas: </b> {{ venta.cuotas_pagadas }}<br>
@@ -18,7 +23,7 @@
                 <b>Total pagado: </b><br> {{ venta.total_pagado }} Gs. / {{ venta.precio_final_venta }} Gs.
             </th>
             <th colspan="1">
-                <b>Restante: </b><br> {{ venta.cuotas_restantes }} Cuotas. {{ venta.monto_restante }} Gs.
+                <b>Saldo: </b><br> {{ venta.cuotas_restantes }} Cuotas. {{ venta.monto_restante }} Gs.
             </th>
             <th colspan="2">
                 <b>Cantidad de Cuotas a pagar: </b> <input style="color: black; text-align: center" type="number"
@@ -104,9 +109,14 @@
         </tr>
     </tfoot>
 </table>
-<div>
-    <input type="button" class="button_verde" id="procesar_pagos" value="Procesar Pagos">
-</div>
+{% if vision_general_cliente %}
+{% else %}
+    <div>
+        <input type="button" class="button_verde" id="procesar_pagos" value="Procesar Pagos">
+    </div>
+{% endif %}
+
+
 {% else %}
     <table cellpadding="0" cellspacing="0" border="1" class="listado-lotes"  align="center">
         <tr>

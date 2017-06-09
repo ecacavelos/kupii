@@ -1,0 +1,634 @@
+{% extends "lotes/base_lotes.html" %}
+{% block header_scripts %}
+
+<script type="text/javascript">
+var total_pago_cuotas_cliente = 0;
+var total_pago_intereses_cliente = 0;
+var total_pago_cliente = 0;
+	$(document).ready(function() {
+		$("#busqueda_label").focus();
+		var tipo_busqueda=$("#tipo_busqueda").val();
+		var busqueda_label=$("#busqueda_label").val();			
+		var busqueda=$("#busqueda").val();			
+		
+		$("#busqueda_label").focus(); 
+		autocompleteClientePorNombreOCedula(tipo_busqueda, busqueda_label, busqueda);
+		
+		$("#tipo_busqueda").change(function(){
+			//alert("cambió");
+			tipo_busqueda=$("#tipo_busqueda").val();
+			busqueda_label=$("#busqueda_label").val();			
+			busqueda=$("#busqueda").val();	
+			autocompleteClientePorNombreOCedula(tipo_busqueda, busqueda_label, busqueda);
+		});
+
+	});
+	function buscar() {
+		if ($("#tipo_busqueda").val() == 0) {
+			alert("Debe elegir un tipo de busqueda.");
+		} else {
+			if ($("#busqueda_label").val() == "") {
+				alert("Debe ingresar un nombre para buscar.");
+			} else {
+				$("#frm_busqueda").submit();
+			}
+		}
+	}
+
+	function autocompleteClientePorNombreOCedula(tipo_busqueda, busqueda_label, busqueda){
+        if (tipo_busqueda == 'nombre') {
+            console.log("por nombre");
+            $("#busqueda_label").val("");
+            var id_cliente;
+            $("#busqueda").empty();
+            base_url = base_context + "/ajax/get_cliente_id_by_name/";
+            params = "value";
+            $("#busqueda_label").autocomplete({
+                source : base_url,
+                minLength : 1,
+                dataType: "json",
+                create : function(){
+                    $(this).data('ui-autocomplete')._renderItem = function(ul,item){
+                        return $('<li>').append('<a>'+item.cedula +" - "+item.nombres + " "+ item.apellidos+'</a>').appendTo(ul);
+                        console.log(item);
+                        };
+                },
+                select : function(event, ui) {
+                    event.preventDefault();
+                    id_cliente = ui.item.id;
+                    $("#busqueda").val(id_cliente);
+                    $("#busqueda_label").val(ui.item.nombres+" "+ui.item.apellidos);
+                    getCuotasApagarByClienteId(id_cliente);
+                }
+            });
+        }
+        if (tipo_busqueda == 'cedula') {
+            console.log("por cedula");
+            $("#busqueda_label").val("");
+            var id_cliente;
+            $("#busqueda").empty();
+            base_url = base_context + "/ajax/get_cliente_name_id_by_cedula/";
+            params = "value";
+            $("#busqueda_label").autocomplete({
+                source : base_url,
+                minLength : 1,
+                create : function(){
+                    $(this).data('ui-autocomplete')._renderItem = function(ul,item){
+                        return $('<li>').append('<a>'+item.cedula +" - "+item.nombres + " "+ item.apellidos+'</a>').appendTo(ul);
+                        console.log(item);
+                        };
+                },
+                select : function(event, ui) {
+                    id_cliente = ui.item.id;
+                    event.preventDefault();
+                    $("#busqueda").val(id_cliente);
+                    //alert(id_cliente);
+                    $("#busqueda_label").val(ui.item.cedula);
+                    getCuotasApagarByClienteId(id_cliente);
+                }
+            });
+        }
+    }
+
+    function getCuotasApagarByClienteId(clienteId) {
+        $.ajax({
+            url: base_context + "/movimientos/get_cuotas_a_pagar_by_cliente_id/",
+            type: 'GET',
+            dataType: "html",
+            data: {
+                cliente_id: clienteId
+            },
+            success: function (response) {
+                //borra y arma la tabla
+                $("#lista_lotes_cliente").empty();
+                $("#lista_lotes_cliente").append(response);
+                $(".gestion_cobranza").mask('###.###.###.###',{reverse: true});
+                $(".cuota_intereses").mask('###.###.###.###',{reverse: true});
+
+                total_pago_cuotas_cliente = parseInt( sacarPuntos( $("#total_pago_cuotas_cliente").html() ) );
+                total_pago_intereses_cliente = parseInt( sacarPuntos( $("#total_pago_intereses_cliente").html() ) );
+                total_pago_cliente = parseInt( sacarPuntos( $("#total_pago_cliente").html() ) );
+
+                $(".cantidad_cuotas").change(function () {
+                    if (this.value == "" || this.value == "0"){
+                        var ventaId = this.id;
+                        ventaId = ventaId.split("_");
+                        ventaId = ventaId[2];
+
+                        total_pago_cuotas_cliente = total_pago_cuotas_cliente - parseInt( sacarPuntos( $("#total_monto_cuota_lote_"+ventaId).html() ) );
+                        total_pago_intereses_cliente = total_pago_intereses_cliente - parseInt( sacarPuntos( $("#total_monto_intereses_lote_"+ventaId).html() ) );
+                        total_pago_cliente = total_pago_cliente - parseInt( sacarPuntos( $("#total_monto_lote_"+ventaId).html() ) );
+
+                        $("#lista_cuotas_"+ventaId).empty();
+                        $("#total_monto_cuota_lote_"+ventaId).html("0");
+                        $("#total_monto_intereses_lote_"+ventaId).html("0");
+                        $("#total_monto_lote_"+ventaId).html("0");
+
+                        $("#total_pago_cuotas_cliente").html(ponerPuntos(total_pago_cuotas_cliente));
+                        $("#total_pago_intereses_cliente").html(ponerPuntos(total_pago_intereses_cliente));
+                        $("#total_pago_cliente").html(ponerPuntos(total_pago_cliente));
+                    }else{
+                        var ventaId = this.id;
+                        ventaId = ventaId.split("_");
+                        ventaId = ventaId[2];
+                        var nroCuotas = this.value;
+                        getCuotasByVentaIdNroCuotas(ventaId,nroCuotas);
+                    }
+                });
+                /*
+                $(".cantidad_cuotas").blur(function () {
+                    if (this.value == "" || this.value == "0"){
+                        var ventaId = this.id;
+                        ventaId = ventaId.split("_");
+                        ventaId = ventaId[2];
+
+                        total_pago_cuotas_cliente = total_pago_cuotas_cliente - parseInt( sacarPuntos( $("#total_monto_cuota_lote_"+ventaId).html() ) );
+                        total_pago_intereses_cliente = total_pago_intereses_cliente - parseInt( sacarPuntos( $("#total_monto_intereses_lote_"+ventaId).html() ) );
+                        total_pago_cliente = total_pago_cliente - parseInt( sacarPuntos( $("#total_monto_lote_"+ventaId).html() ) );
+
+                        $("#lista_cuotas_"+ventaId).empty();
+                        $("#total_monto_cuota_lote_"+ventaId).html("0");
+                        $("#total_monto_intereses_lote_"+ventaId).html("0");
+                        $("#total_monto_lote_"+ventaId).html("0");
+
+                        $("#total_pago_cuotas_cliente").html(ponerPuntos(total_pago_cuotas_cliente));
+                        $("#total_pago_intereses_cliente").html(ponerPuntos(total_pago_intereses_cliente));
+                        $("#total_pago_cliente").html(ponerPuntos(total_pago_cliente));
+
+                    }else{
+                        var ventaId = this.id;
+                        ventaId = ventaId.split("_");
+                        ventaId = ventaId[2];
+                        var nroCuotas = this.value;
+                        getCuotasByVentaIdNroCuotas(ventaId,nroCuotas);
+                    }
+                });
+                */
+                $(".cantidad_cuotas").keyup(function () {
+                    if (this.value == "" || this.value == "0"){
+                        var ventaId = this.id;
+                        ventaId = ventaId.split("_");
+                        ventaId = ventaId[2];
+
+                        total_pago_cuotas_cliente = total_pago_cuotas_cliente - parseInt( sacarPuntos( $("#total_monto_cuota_lote_"+ventaId).html() ) );
+                        total_pago_intereses_cliente = total_pago_intereses_cliente - parseInt( sacarPuntos( $("#total_monto_intereses_lote_"+ventaId).html() ) );
+                        total_pago_cliente = total_pago_cliente - parseInt( sacarPuntos( $("#total_monto_lote_"+ventaId).html() ) );
+
+                        $("#lista_cuotas_"+ventaId).empty();
+                        $("#total_monto_cuota_lote_"+ventaId).html("0");
+                        $("#total_monto_intereses_lote_"+ventaId).html("0");
+                        $("#total_monto_lote_"+ventaId).html("0");
+
+                        $("#total_pago_cuotas_cliente").html(ponerPuntos(total_pago_cuotas_cliente));
+                        $("#total_pago_intereses_cliente").html(ponerPuntos(total_pago_intereses_cliente));
+                        $("#total_pago_cliente").html(ponerPuntos(total_pago_cliente));
+
+                    }else{
+                        var ventaId = this.id;
+                        ventaId = ventaId.split("_");
+                        ventaId = ventaId[2];
+                        var nroCuotas = this.value;
+                        getCuotasByVentaIdNroCuotas(ventaId,nroCuotas);
+                    }
+                });
+                /*
+                $(".gestion_cobranza").change(function () {
+                    var ventaId = this.id;
+                    ventaId = ventaId.split("_");
+                    ventaId = ventaId[2];
+                    if (this.value == ""){
+                        this.value = 0;
+                    }
+                    recalcularTotales(ventaId);
+                });
+                */
+                $(".gestion_cobranza").keyup(function () {
+                    var ventaId = this.id;
+                    ventaId = ventaId.split("_");
+                    ventaId = ventaId[2];
+                    if (this.value == ""){
+                        this.value = 0;
+                    }
+                    recalcularTotales(ventaId);
+                });
+                /*
+                $(".cuota_intereses").change(function () {
+                    var ventaId = this.id;
+                    ventaId = ventaId.split("_");
+                    ventaId = ventaId[2];
+                    if (this.value == ""){
+                        this.value = 0;
+                    }
+                    recalcularTotales(ventaId);
+                });
+                */
+                $(".cuota_intereses").keyup(function () {
+                    var ventaId = this.id;
+                    ventaId = ventaId.split("_");
+                    ventaId = ventaId[2];
+                    if (this.value == ""){
+                        this.value = 0;
+                    }
+                    recalcularTotales(ventaId);
+                });
+
+                $(".cuota_intereses").keypress(function () {
+                    if (this.value == "0"){
+                        this.value = "";
+                    }
+                });
+                $(".gestion_cobranza").keypress(function () {
+                    if (this.value == "0"){
+                        this.value = "";
+                    }
+                });
+
+                $("#procesar_pagos").click(function () {
+                    $("#procesar_pagos").attr("disabled", true);
+                    enviarPagos();
+                });
+
+                $("#procesar_pagos").hide();
+                //console.log(response);
+            },
+            error: function (xhr, errmsg, err) {
+                console.log(err);
+                //mensaje de error ?
+            }
+        });
+    }
+
+    function getCuotasByVentaIdNroCuotas(ventaId,nroCuotas){
+        $.ajax({
+            url: base_context + "/movimientos/get_cuotas_a_pagar_by_venta_id_nro_cuotas/",
+            type: 'GET',
+            dataType: "html",
+            data: {
+                venta_id: ventaId,
+                nro_cuotas: nroCuotas,
+            },
+            success: function (response) {
+                //borra y arma la tabla
+                total_pago_cuotas_cliente = total_pago_cuotas_cliente - parseInt( sacarPuntos( $("#total_monto_cuota_lote_"+ventaId).html() ) );
+                total_pago_intereses = total_pago_intereses_cliente - parseInt( sacarPuntos( $("#total_monto_intereses_lote_"+ventaId).html() ) );
+                total_pago_cliente = total_pago_cliente - parseInt( sacarPuntos( $("#total_monto_lote_"+ventaId).html() ) );
+
+                $("#listado_cuotas_"+ventaId).empty();
+                $("#listado_cuotas_"+ventaId).append(response);
+                $(".gestion_cobranza").mask('###.###.###.###',{reverse: true});
+                $(".cuota_intereses").mask('###.###.###.###',{reverse: true});
+
+                total_pago_cuotas_cliente = total_pago_cuotas_cliente + parseInt( sacarPuntos( $("#total_monto_cuota_lote_"+ventaId).html() ) );
+                total_pago_intereses_cliente = total_pago_intereses + parseInt( sacarPuntos( $("#total_monto_intereses_lote_"+ventaId).html() ) );
+                total_pago_cliente = total_pago_cliente + parseInt( sacarPuntos( $("#total_monto_lote_"+ventaId).html() ) );
+
+                $("#total_pago_cuotas_cliente").html(ponerPuntos(total_pago_cuotas_cliente));
+                $("#total_pago_intereses_cliente").html(ponerPuntos(total_pago_intereses_cliente));
+                $("#total_pago_cliente").html(ponerPuntos(total_pago_cliente));
+
+                $(".cantidad_cuotas").change(function () {
+                    if (this.value == "" || this.value == "0"){
+                        var ventaId = this.id;
+                        ventaId = ventaId.split("_");
+                        ventaId = ventaId[2];
+
+                        total_pago_cuotas_cliente = total_pago_cuotas_cliente - parseInt( sacarPuntos( $("#total_monto_cuota_lote_"+ventaId).html() ) );
+                        total_pago_intereses_cliente = total_pago_intereses_cliente - parseInt( sacarPuntos( $("#total_monto_intereses_lote_"+ventaId).html() ) );
+                        total_pago_cliente = total_pago_cliente - parseInt( sacarPuntos( $("#total_monto_lote_"+ventaId).html() ) );
+
+                        $("#lista_cuotas_"+ventaId).empty();
+                        $("#total_monto_cuota_lote_"+ventaId).html("0");
+                        $("#total_monto_intereses_lote_"+ventaId).html("0");
+                        $("#total_monto_lote_"+ventaId).html("0");
+
+                        $("#total_pago_cuotas_cliente").html(ponerPuntos(total_pago_cuotas_cliente));
+                        $("#total_pago_intereses_cliente").html(ponerPuntos(total_pago_intereses_cliente));
+                        $("#total_pago_cliente").html(ponerPuntos(total_pago_cliente));
+                    }else{
+                        var ventaId = this.id;
+                        ventaId = ventaId.split("_");
+                        ventaId = ventaId[2];
+                        var nroCuotas = this.value;
+                        getCuotasByVentaIdNroCuotas(ventaId,nroCuotas);
+                    }
+                });
+                /*
+                $(".cantidad_cuotas").blur(function () {
+                    if (this.value == "" || this.value == "0"){
+                        var ventaId = this.id;
+                        ventaId = ventaId.split("_");
+                        ventaId = ventaId[2];
+
+                        total_pago_cuotas_cliente = total_pago_cuotas_cliente - parseInt( sacarPuntos( $("#total_monto_cuota_lote_"+ventaId).html() ) );
+                        total_pago_intereses_cliente = total_pago_intereses_cliente - parseInt( sacarPuntos( $("#total_monto_intereses_lote_"+ventaId).html() ) );
+                        total_pago_cliente = total_pago_cliente - parseInt( sacarPuntos( $("#total_monto_lote_"+ventaId).html() ) );
+
+                        $("#lista_cuotas_"+ventaId).empty();
+                        $("#total_monto_cuota_lote_"+ventaId).html("0");
+                        $("#total_monto_intereses_lote_"+ventaId).html("0");
+                        $("#total_monto_lote_"+ventaId).html("0");
+
+                        $("#total_pago_cuotas_cliente").html(ponerPuntos(total_pago_cuotas_cliente));
+                        $("#total_pago_intereses_cliente").html(ponerPuntos(total_pago_intereses_cliente));
+                        $("#total_pago_cliente").html(ponerPuntos(total_pago_cliente));
+
+                    }else{
+                        var ventaId = this.id;
+                        ventaId = ventaId.split("_");
+                        ventaId = ventaId[2];
+                        var nroCuotas = this.value;
+                        getCuotasByVentaIdNroCuotas(ventaId,nroCuotas);
+                    }
+                });
+                */
+                $(".cantidad_cuotas").keyup(function () {
+                    if (this.value == "" || this.value == "0"){
+                        var ventaId = this.id;
+                        ventaId = ventaId.split("_");
+                        ventaId = ventaId[2];
+
+                        total_pago_cuotas_cliente = total_pago_cuotas_cliente - parseInt( sacarPuntos( $("#total_monto_cuota_lote_"+ventaId).html() ) );
+                        total_pago_intereses_cliente = total_pago_intereses_cliente - parseInt( sacarPuntos( $("#total_monto_intereses_lote_"+ventaId).html() ) );
+                        total_pago_cliente = total_pago_cliente - parseInt( sacarPuntos( $("#total_monto_lote_"+ventaId).html() ) );
+
+                        $("#lista_cuotas_"+ventaId).empty();
+                        $("#total_monto_cuota_lote_"+ventaId).html("0");
+                        $("#total_monto_intereses_lote_"+ventaId).html("0");
+                        $("#total_monto_lote_"+ventaId).html("0");
+
+                        $("#total_pago_cuotas_cliente").html(ponerPuntos(total_pago_cuotas_cliente));
+                        $("#total_pago_intereses_cliente").html(ponerPuntos(total_pago_intereses_cliente));
+                        $("#total_pago_cliente").html(ponerPuntos(total_pago_cliente));
+
+                    }else{
+                        var ventaId = this.id;
+                        ventaId = ventaId.split("_");
+                        ventaId = ventaId[2];
+                        var nroCuotas = this.value;
+                        getCuotasByVentaIdNroCuotas(ventaId,nroCuotas);
+                    }
+                });
+                /*
+                $(".gestion_cobranza").change(function () {
+                    var ventaId = this.id;
+                    ventaId = ventaId.split("_");
+                    ventaId = ventaId[2];
+                    if (this.value == ""){
+                        this.value = 0;
+                    }
+                    recalcularTotales(ventaId);
+                });
+                */
+                $(".gestion_cobranza").keyup(function () {
+                    var ventaId = this.id;
+                    ventaId = ventaId.split("_");
+                    ventaId = ventaId[2];
+                    if (this.value == ""){
+                        this.value = 0;
+                    }
+                    recalcularTotales(ventaId);
+                });
+                /*
+                $(".cuota_intereses").change(function () {
+                    var ventaId = this.id;
+                    ventaId = ventaId.split("_");
+                    ventaId = ventaId[2];
+                    if (this.value == ""){
+                        this.value = 0;
+                    }
+                    recalcularTotales(ventaId);
+                });
+                */
+                $(".cuota_intereses").keyup(function () {
+                    var ventaId = this.id;
+                    ventaId = ventaId.split("_");
+                    ventaId = ventaId[2];
+                    if (this.value == ""){
+                        this.value = 0;
+                    }
+                    recalcularTotales(ventaId);
+                });
+
+                $(".cuota_intereses").keypress(function () {
+                    if (this.value == "0"){
+                        this.value = "";
+                    }
+                });
+                $(".gestion_cobranza").keypress(function () {
+                    if (this.value == "0"){
+                        this.value = "";
+                    }
+                });
+
+
+                //console.log(response);
+            },
+            error: function (xhr, errmsg, err) {
+                console.log(err);
+                //mensaje de error ?
+            }
+        });
+    }
+    
+    function recalcularTotales(ventaId) {
+
+        var total_intereses_venta = 0;
+        var total_monto_venta = 0;
+
+        var total_intereses_lotes = 0;
+        var total_cuotas_lotes = 0;
+
+        //Se obtienen y se suman los intereses de la venta o lote
+        var inputs_intereses_de_venta = $("#lista_cuotas_"+ventaId).find(".cuota_intereses");
+        inputs_intereses_de_venta.each(function( index ) {
+           total_intereses_venta = total_intereses_venta + parseInt( sacarPuntos( $( this ).val() ) );
+        });
+
+        //Se obtienen y se suma la gestione de cobranza de la venta o lote, a total intereses del mismo, y se asigna a su input
+        var input_gestion_cobranza_venta = $("#gestion_cobranza_"+ventaId);
+        if (input_gestion_cobranza_venta.length == 0){
+            total_intereses_venta = total_intereses_venta;
+        } else {
+           total_intereses_venta = total_intereses_venta +  parseInt( sacarPuntos( input_gestion_cobranza_venta.val() ) );
+        }
+
+        $("#total_monto_intereses_lote_"+ventaId).html( ponerPuntos(total_intereses_venta) );
+
+        //Se obtiene el total del pago de cuotas, se suma al total del lote, y se asigna a su debido input
+        var input_total_monto_cuota_lote = $("#total_monto_cuota_lote_"+ventaId);
+        total_monto_venta = total_intereses_venta + parseInt( sacarPuntos( input_total_monto_cuota_lote.html() ) );
+        $("#total_monto_lote_"+ventaId).html( ponerPuntos(total_monto_venta) );
+
+        //Se obtienen y se suman todos los totales de cuotas
+        var inputs_totales_cuotas = $(".total_monto_cuota_lote");
+        inputs_totales_cuotas.each(function( index ) {
+           total_cuotas_lotes = total_cuotas_lotes + parseInt( sacarPuntos( $( this ).html() ) );
+        });
+
+        //Se obtienen y se suman todos los totales de intereses
+        var inputs_totales_intereses = $(".total_monto_intereses_lote");
+        inputs_totales_intereses.each(function( index ) {
+           total_intereses_lotes = total_intereses_lotes + parseInt( sacarPuntos( $( this ).html() ) );
+        });
+
+        total_pago_cuotas_cliente = total_cuotas_lotes;
+        total_pago_intereses_cliente = total_intereses_lotes;
+        total_pago_cliente = total_pago_cuotas_cliente + total_pago_intereses_cliente;
+
+        $("#total_pago_cuotas_cliente").html(ponerPuntos(total_pago_cuotas_cliente));
+        $("#total_pago_intereses_cliente").html(ponerPuntos(total_pago_intereses_cliente));
+        $("#total_pago_cliente").html(ponerPuntos(total_pago_cliente));
+
+        console.log("Totales recalculados");
+    }
+
+    function ponerPuntos(numero){
+        $("#poner_puntos").val(numero);
+        $("#poner_puntos").mask('###.###.###.###.###',{reverse: true});
+        numero = $("#poner_puntos").val();
+        return numero;
+    }
+
+    function sacarPuntos(numero){
+        numero = numero.replace(".", "");
+        numero = numero.replace(".", "");
+        numero = numero.replace(".", "");
+        numero = numero.replace(".", "");
+        numero = numero.replace(".", "");
+
+        return (numero);
+    }
+
+    function enviarPagos(){
+        var clienteId = $("#busqueda").val();
+        var ventasJson = "";
+        ventasJson = armarJsonDePagos(clienteId);
+        console.log(ventasJson);
+        $.ajax({
+            url: base_context + "/movimientos/pago_cuotas_cliente/",
+            type: 'POST',
+            dataType: "json",
+            data: {
+                cliente_id: clienteId,
+                ventas_json: ventasJson,
+            },
+            success: function (response) {
+                window.location = base_context + "/movimientos/listado_busqueda_pagos/?tipo_busqueda=cliente&busqueda_label=&busqueda="+clienteId+"&fecha_desde=&fecha_hasta=&tabla=venta";
+            },
+            error: function (xhr, errmsg, err) {
+                console.log(err);
+                alert("Ocurrio un error al enviar los pagos.")
+                $("#procesar_pagos").removeAttr("disabled");
+                //mensaje de error ?
+            }
+        });
+    }
+
+    function armarJsonDePagos(clienteId) {
+        var ventasJson = [];
+        $(".listado-lotes").each(function( index ) {
+            var venta = {};
+            var detalle = {};
+            var i = 0;
+            var paso = 0;
+
+            var ventaId = this.id;
+            ventaId = ventaId.split("_");
+            ventaId = ventaId[2];
+            var nro_cuotas = 0;
+
+            venta['pago_total_de_pago'] = parseInt( sacarPuntos($("#total_monto_lote_"+ventaId).html()) );
+
+            if (venta['pago_total_de_pago'] != 0){
+                venta['id'] = ventaId;
+                venta['interes_original'] = parseInt( sacarPuntos($("#interes_original_"+ventaId).val() ) );
+                var inputs_cuota_nro = $(".cuota_nro_"+ventaId);
+                venta['resumen_cuotas'] = parseInt( $(inputs_cuota_nro[0]).html().split("/")[0] ) - 1;
+                if (venta['resumen_cuotas'] == 0){
+                    venta['resumen_cuotas'] = 1;
+                }
+
+                $("#lista_cuotas_"+ventaId).find("input[type=text]").each(function( index ) {
+                    detalle['item'+i] = {};
+                    var item = {};
+                    if (this.className == "cuota_intereses"){
+                        item['nro_cuota'] = parseInt($(this).closest('tr').find('.cuota_nro_'+ventaId).html().split("/")[0]);
+                        item['intereses'] = parseInt( sacarPuntos(this.value) );
+                    } else {
+                        item['gestion_cobranza'] = parseInt( sacarPuntos(this.value) );
+                    }
+                    detalle["item"+i] = item;
+                    i++;
+                    paso = i;
+                });
+
+                $("#lista_cuotas_"+ventaId).find('.cuota_nro_'+ventaId).each(function( index ) {
+                    nro_cuotas ++;
+                });
+
+                if (paso > 0){
+                    venta['detalle'] = detalle;
+                } else {
+                    venta['detalle'] = "";
+                }
+                venta['nro_cuotas'] = nro_cuotas
+                venta['pago_total_de_cuotas'] = parseInt( sacarPuntos($("#total_monto_cuota_lote_"+ventaId).html()) );
+                venta['pago_total_de_mora'] = parseInt( sacarPuntos($("#total_monto_intereses_lote_"+ventaId).html()) );
+
+                ventasJson.push(venta);
+            }
+
+        });
+        return JSON.stringify(ventasJson);
+    }
+
+</script>
+{% endblock %}
+{% block content %}
+<div class="gri16 text-izquierda" id="breadcumb">
+	<a href="{% url 'frontend_home' %}">Inicio</a><span class="verde-1">></span>
+	<a href="{% url 'frontend_home' %}movimientos/">Movimientos</a>
+	<span class="verde-1">> Vision General Cliente</span>
+</div>
+<div class="clear"></div>
+<h1>Vision General Cliente</h1>
+<div class="grid_6">
+	<form name="frm_busqueda" id="frm_busqueda" method="get" action="{% url 'frontend_home' %}movimientos/get_cuotas_a_pagar_by_cliente/">
+		{% csrf_token %}
+		<table id="lista-categoria" frame="box">
+			<tr>
+				<th class="acciones"  colspan="3"><strong><a href="#" style="color: white;">Filtrar</a></strong></th>
+			</tr>
+			<tr>
+				<td>
+				<select id="tipo_busqueda" name="tipo_busqueda">
+					<!-- <option value="0">Elija una opcion</option> -->
+					<option value="nombre">Nombre</option>
+					<option value="cedula">Cedula</option>
+				</select></td>
+				<td>
+				<input name="busqueda_label" id="busqueda_label" type="text" value=""/>
+				<input id="busqueda" type="hidden" name="busqueda" />
+				<input name="tabla" type="hidden" value="cliente"/>
+				</td>
+				<td>
+				<!--<input type="button" value="Buscar" onclick="buscar();" class="historico" style="cursor: pointer"/>-->
+				</td>
+			</tr>
+		</table>
+	</form>
+</div>
+
+<div class="clear"></div>
+    <div id="listado-item-lote">
+        <input type="hidden" id="poner_puntos">
+        <div id="lista_lotes_cliente">
+            {% csrf_token %}
+            <!-- se rellena dinamicamente con getCuotasApagarByClienteId -->
+        </div>
+    </div>
+<br>
+<div id="footer">
+	<a href="{% url 'frontend_home' %}" class="boton-verde">Volver al Menú Principal</a>
+</div>
+{% endblock %}

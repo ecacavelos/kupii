@@ -827,6 +827,46 @@ def pago_de_cuotas_cliente(request):
             return HttpResponse(t.render(c))
     else:
         return HttpResponseRedirect("/login")
+
+#TODO: por ahora usamos como vision general del cliente
+def vision_general_cliente(request):
+    if request.user.is_authenticated():
+        if verificar_permisos(request.user.id, permisos.ADD_PAGODECUOTAS):
+            t = loader.get_template('movimientos/vision_general_cliente.html')
+            grupo = request.user.groups.get().id
+            if request.method == 'POST':
+                print "es post"
+
+            elif request.method == 'GET':
+                query = ('''SELECT NOW()''')
+                cursor = connection.cursor()
+                cursor.execute(query)
+                results = cursor.fetchall()
+                if (len(results) > 0):
+                    fecha_actual = results
+                    dia = fecha_actual[0][0].day
+                    mes = fecha_actual[0][0].month
+                    anho = fecha_actual[0][0].year
+                    if dia >= 1 and dia <= 9:
+                        dia = unicode('0') + unicode(dia)
+                    if mes >= 1 and mes <= 9:
+                        mes = unicode('0') + unicode(mes)
+                    fecha_actual = unicode(dia) + '/' + unicode(mes) + '/' + unicode(anho)
+                c = RequestContext(request, {
+                    'grupo': grupo,
+                    'fecha_actual': fecha_actual,
+                    'vision_general_cliente': True,
+                })
+                return HttpResponse(t.render(c))
+        else:
+            t = loader.get_template('index2.html')
+            grupo = request.user.groups.get().id
+            c = RequestContext(request, {
+                'grupo': grupo
+            })
+            return HttpResponse(t.render(c))
+    else:
+        return HttpResponseRedirect("/login")
     
 
 def pago_de_cuotas_venta(request, id_venta):        
