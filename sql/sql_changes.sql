@@ -15,11 +15,15 @@
 
 --################################### Hasta acá proximo tag ##########################################################--
 
+
+
+--################################### Hasta Acá TAG v_0.1.454 ########################################################--
+
 -- 09/06/2017 15:00 - Franco Albertini
 -- BASE DE DATOS:        ESTADO:
 -- CBI-DEV:           NO EJECUTADO
 -- GRUPO-MV:          NO EJECUTADO
--- Propar:            NO EJECUTADO
+-- Propar:               EJECUTADO
 
 /* Se crea la tabla motivos contactos y se carga la tabla */
 CREATE TABLE public.motivos_contacto
@@ -82,7 +86,7 @@ CREATE TABLE public.contactos
     mensaje_respuesta text COLLATE pg_catalog."default",
     proximo_contacto timestamp without time zone,
     comentarios_gerencia text COLLATE pg_catalog."default",
-  ﻿ recipiente character varying(100) COLLATE pg_catalog."default",
+    recipiente character varying(100) COLLATE pg_catalog."default",
     CONSTRAINT contactos_pkey PRIMARY KEY (id),
     CONSTRAINT contactos_clientes_fk FOREIGN KEY (cliente_id)
         REFERENCES public.principal_cliente (id) MATCH SIMPLE
