@@ -216,7 +216,22 @@ def get_cliente_id_by_name(request):
                 print error
                 #return HttpResponseServerError('No se pudo procesar el pedido')
         else:
-            return HttpResponseRedirect(reverse('login')) 
+            return HttpResponseRedirect(reverse('login'))
+
+
+def get_usuario_by_name(request):
+    if request.method == 'GET':
+        if request.user.is_authenticated():
+            try:
+                nombre_usuario = request.GET['term']
+                print("term ->" + nombre_usuario)
+                lista_usuarios = User.objects.filter(username__icontains=nombre_usuario)
+                lista = list(lista_usuarios.values('id', 'username'))
+                return HttpResponse(json.dumps(lista))
+            except Exception, error:
+                print error
+        else:
+            return HttpResponseRedirect(reverse('login'))
 
 def get_vendedor_id_by_name(request):
     if request.method == 'GET':

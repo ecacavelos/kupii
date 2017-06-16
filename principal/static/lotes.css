@@ -264,6 +264,16 @@ table.listado-totales tr td.last {
     cursor: pointer;
 	}
 
+	a.boton-verde:hover{
+		background-color: lightgreen;
+    	border: thin solid #000000;
+    	color: #006633;
+	}
+
+	a.boton-verde:visited{
+		color: #FFFFFF;
+	}
+
 	#listado-item-lote{
 		alignment-adjust: center;
 	

@@ -465,6 +465,12 @@ input[type=button] {
 		border:thin #FFF solid;
 		background-color:#006633;
 	}
+input[type=button]:hover {
+		background-color: lightgreen;
+    	border: thin solid #000000;
+    	color: #006633;
+	}
+
 input[type=submit] {
 		padding:5px 10px;
 		margin-right:5px;
@@ -473,7 +479,11 @@ input[type=submit] {
 		border:thin #FFF solid;
 		background-color:#006633;
 	}
-
+input[type=submit]:hover {
+		background-color: lightgreen;
+    	border: thin solid #000000;
+    	color: #006633;
+	}
 
 input.verdecito[type=button] {
 	background-color:#02B06B;

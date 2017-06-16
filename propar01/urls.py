@@ -29,6 +29,7 @@ urlpatterns = patterns('',
                        url(r'^datos/', include('principal.urls')),
                        url(r'^api/', include('api.urls')),
                        url(r'^logo/', 'parametros.views.cambio_logo', name='cambio_logo'),
+                       url(r'^contactos/', include('contactos.contactos_urls')),
                        )
 urlpatterns += patterns('',
                         (r'^media/(?P<path>.*)$', 'django.views.static.serve', {

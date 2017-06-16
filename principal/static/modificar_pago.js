@@ -69,8 +69,7 @@ function validatePago(event) {
 	return false;
 }
 
-function isValidDate(dateString)
-{
+function isValidDate(dateString) {
     // First check for the pattern
     if(!/^\d{1,2}\/\d{1,2}\/\d{4} (\d{2}):(\d{2}):(\d{2})$/.test(dateString))
     {
@@ -111,4 +110,4 @@ function isValidDate(dateString)
     {
     	return day > 0 && day <= monthLength[month - 1];
     }
-};
+}

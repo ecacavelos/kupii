@@ -1,0 +1,68 @@
+{% extends "lotes/base_lotes.html" %}
+
+{% block header_resources %}
+    <!--<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />-->
+    <!--<link rel="stylesheet" href="{{ STATIC_URL }}custom/css/jquery.datetimepicker.css"> -->
+    <link rel="stylesheet" href="{{ STATIC_URL }}custom/css/bootstrap-datetimepicker.min.css">
+{% endblock %}
+
+{% block header_scripts %}
+    <!-- Scripts externos -->
+    <!--<script type="text/javascript" src="{{ STATIC_URL }}jquery.datetimepicker.full.min.js"></script>-->
+    <script type="text/javascript" src="{{ STATIC_URL }}bootstrap-datetimepicker.min.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}contactos/agregar_contactos.js"></script>
+
+    <!-- Script local -->
+    <script type="text/javascript">
+        /* Variables del controlador: */
+        var id_usuario = "{{ id_usuario }}";
+        var tipo_usuario = "{{ tipo_usuario }}";
+
+        $(document).ready(function () {
+            /* Se inicializa los el formulario*/
+            inicializarFormulario();
+        });
+
+    </script>
+{% endblock %}
+
+{% block content %}
+    <div class="gri16 text-izquierda" id="breadcumb">
+        <a href="{% url 'frontend_home' %}">Inicio</a> <span class="verde-1">></span>
+        <a href="{% url 'frontend_home' %}contactos/">Contactos</a>
+        <span class="verde-1">> Agregar Contacto</span>
+    </div>
+
+    <div class="clear"></div>
+
+    <div class="grid_10">
+        <h1 style="text-align: center">Contacto a Cliente</h1>
+    </div>
+
+    <div class="clear"></div>
+
+    <div class="grid_16" align="center">
+
+        <form action="" method="post" id="form_add_contacto" name="form_add_contacto">
+            <div id="{{ message_id }}">{{ message }}</div>
+            <table width="94%" border="0" cellpadding="0" cellspacing="0" id="forms" align="center">
+                {% csrf_token %}
+                {% for field in form %}
+                    <tr>
+                        <td><strong>{{ field.label_tag }}</strong></td>
+                        <td class="noimage">{{ field }}{{ field.errors }}</td>
+                    </tr>
+                {% endfor %}
+
+
+            </table>
+            <input id="agregar_contacto" name="" type="button" value="Agregar" onclick="validarContacto();"
+                   style="margin-bottom: 10px; cursor: pointer;"/>
+        </form>
+        <a href="{% url 'frontend_home' %}" class="boton-verde">Volver al Menú Principal</a>
+        <br><br><br>
+
+
+        <div class="clear"></div>
+    </div>
+{% endblock %}

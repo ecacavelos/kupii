@@ -1,0 +1,251 @@
+{% extends "lotes/base_lotes.html" %}
+{% block header_resources %}
+    <link rel="stylesheet" href="{{ STATIC_URL }}custom/css/bootstrap-datetimepicker.min.css">
+{% endblock %}
+{% block header_scripts %}
+    <script type="text/javascript" src="{{ STATIC_URL }}bootstrap-datetimepicker.min.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}contactos/listado_contactos.js"></script>
+    <script type="text/javascript">
+        /* Variables del servidor que pasamos al Javascript */
+
+        /* Variables de rango de fecha para ultima busqueda */
+        var fecha_ini = "{{ fecha_ini }}";
+        var fecha_fin = "{{ fecha_fin }}";
+
+        /* Variables de nombre y id del cliente para ultima busqueda */
+        var nombre_cliente = "{{ nombre_cliente }}";
+        var cliente_id = "{{ cliente_id }}";
+
+        /* Variables de codigo y id del lote para ultima busqueda */
+        var codigo_lote = "{{ codigo_lote }}";
+        var lote_id = "{{ lote_id }}";
+
+        /* Variables de nombre y id del usuario para ultima busqueda */
+        var nombre_usuario = "{{ nombre_usuario}}";
+        var usuario_id = "{{ usuario_id }}";
+
+        /* Variables de respondido para ultima busqueda */
+        var respondido = "{{ respondido }}";
+
+        /* Variable de ultima busqueda enviar al usar los links de paginacion */
+        var ultima_busqueda = "{{ ultima_busqueda }}";
+
+        /* Variable de formato de reporte para enviar si es descargar excel o mostrar en pantalla */
+        var formato_reporte = "{{ formato_reporte }}";
+
+        $(document).ready(function () {
+            /* Se inicializa el formulario */
+            inicializarFormularioBusqueda();
+
+            /* Se ponen los valores de la ultima busqueda en los inputs */
+            /* Rango de Fechas */
+            $("#fecha_ini").val(fecha_ini);
+            $("#fecha_fin").val(fecha_fin);
+
+            /* Cliente */
+            $("#nombre_cliente").val(nombre_cliente);
+            $("#cliente_id").val(cliente_id);
+
+            /* Lote */
+            $("#codigo_lote").val(codigo_lote);
+            $("#lote_id").val(lote_id);
+
+            /* Usuario */
+            $("#nombre_usuario").val(nombre_usuario);
+            $("#usuario_id").val(usuario_id);
+
+            /* Respondido */
+            $("#respondido").val(respondido);
+
+            /* Se deshabilita el boton de descargar excel hasta que funcione */
+            $("#id_boton_excel").prop("disabled", true);
+
+
+        });
+
+    </script>
+
+{% endblock %}
+{% block content %}
+    <div class="gri16 text-izquierda" id="breadcumb">
+        <a href="{% url 'frontend_home' %}">Inicio</a><span class="verde-1">></span>
+        <a href="{% url 'frontend_home' %}contactos/">Contactos</a>
+        <span class="verde-1">> Listado de Contactos con Clientes</span>
+    </div>
+
+    <div class="clear"></div>
+    <h1>Listado de Contactos con Clientes</h1>
+
+    <div class="grid_6">
+        <form name="frm_busqueda" id="frm_busqueda" method="get" action="">
+            <!--{% csrf_token %}-->
+            <table id="lista-categoria" frame="box">
+                <tr>
+                    <th class="acciones" colspan="3"><strong>Filtrar</strong></th>
+                </tr>
+                <tr>
+                    <td>Rango Fecha:</td>
+                    <td colspan="1">
+                        <input id="fecha_ini" type="text" name="fecha_ini" placeholder="Ej: dd/mm/aaaa hh:mm:ss"/>
+                    </td>
+                    <td colspan="1">
+                        <input id="fecha_fin" type="text" name="fecha_fin" placeholder="Ej: dd/mm/aaaa hh:mm:ss"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Lote:</td>
+                    <td colspan="2">
+                        <input id="codigo_lote" type="text" name="codigo_lote" placeholder="Todos los lotes"/>
+                        <input type="hidden" id="lote_id" name="lote_id"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Cliente:</td>
+                    <td colspan="2">
+                        <input id="nombre_cliente" type="text" name="nombre_cliente" placeholder="Todos los Clientes"
+                               style="width: 100%"/>
+                        <input type="hidden" id="cliente_id" name="cliente_id"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Usuario:</td>
+                    <td colspan="2">
+                        {% if tipo_usuario  == "Administradores" %}
+                            <input id="nombre_usuario" type="text" name="nombre_usuario" placeholder="Todos los Usuarios" style="width: 100%"/>
+                            <input type="hidden" id="usuario_id" name="usuario_id"/>
+                        {% else %}
+                            <input id="nombre_usuario" type="text" name="nombre_usuario" readonly="readonly" placeholder="Todos los Usuarios" style="width: 100%" value="{{ usuario.username }}"/>
+                            <input type="hidden" id="usuario_id" name="usuario_id" value="{{ usuario.id }}"/>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Respondido:</td>
+                    <td colspan="2">
+                        <select name="respondido" id="respondido">
+                            <option value="">Todos</option>
+                            <option value="True">Respondidos</option>
+                            <option value="False">No Respondidos </option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <input type="button" value="Buscar" onclick="validar();" class="historico" style="cursor: pointer"/>
+                    </td>
+                    <td colspan="2">
+                        <input type="button" onclick="descargar_excel();" value="Descargar como Excel" id="id_boton_excel"/>
+                    </td>
+                </tr>
+
+            </table>
+            <input type="hidden" id="formato_reporte" name="formato_reporte" value="pantalla"/>
+        </form>
+    </div>
+
+    <div class="clear"></div>
+    <div id="listado-cuadro-busqueda">
+        <a href="{% url 'frontend_home' %}contactos/agregar" class="boton-verde">Agregar Contacto con Cliente</a>
+        <br>
+        <br>
+    </div>
+    <div id="listado-item-lote">
+        <table border="1" cellpadding="0" cellspacing="0" class="listado-lotes" align="center">
+            <!-- <th>ID Contacto</th> -->
+            <th>Fecha de contacto</th>
+            <th>Usuario</th>
+            <th>Cliente</th>
+            <th>Tipo contacto</th>
+            <th>Motivo Contacto</th>
+            <th>Lote</th>
+            <th>Nro. o Dir. contactada</th>
+            <th>Próximo Contacto</th>
+            <th>Respondido</th>
+            <th>Recipiente</th>
+            <th>Tipo Respuesta</th>
+
+            {% for contacto in lista_paginada %}
+                {% if forloop.counter|divisibleby:2 %}
+                    <tr>
+                        <!-- <td> {{contacto.id}} </td> -->
+                        <td> {{ contacto.fecha_contacto|date:"d/m/Y h:i:s" }} </td>
+                        <td> {{ contacto.remitente_usuario }} </td>
+                        <td> {{ contacto.cliente }} </td>
+                        <td><a href="{% url 'frontend_detalle_contacto' contacto.id %}"> {{ contacto.tipo_contacto }}
+                            (Ver Detalles) </a></td>
+                        <td> {{ contacto.motivo_contacto }} </td>
+                        <td> {{ contacto.lote }} </td>
+                        <td> {{ contacto.numero_direccion_contactado }} </td>
+                        <td> {{ contacto.proximo_contacto|date:"d/m/Y h:i:s" }} </td>
+                        {% if contacto.respondido %}
+                            <td> Si, {{ contacto.fecha_respuesta|date:"d/m/Y h:i:s" }} </td>
+                        {% else %}
+                            <td> NO</td>
+                        {% endif %}
+                        <td> {{ contacto.recipiente }} </td>
+                        {% if contacto.tipo_respuesta == None %}
+                            <td></td>
+                        {% else %}
+                            <td> {{ contacto.tipo_respuesta }} </td>
+                        {% endif %}
+
+                    </tr>
+                {% else %}
+                    <tr class="bkg_gris">
+                        <!-- <td> {{contacto.id}} </td> -->
+                        <td> {{ contacto.fecha_contacto|date:"d/m/Y h:i:s" }} </td>
+                        <td> {{ contacto.remitente_usuario }} </td>
+                        <td> {{ contacto.cliente }}  </td>
+                        <td><a href="{% url 'frontend_detalle_contacto' contacto.id %}"> {{ contacto.tipo_contacto }}
+                            (Ver Detalles) </a></td>
+                        <td> {{ contacto.motivo_contacto }} </td>
+                        <td> {{ contacto.lote }} </td>
+                        <td> {{ contacto.numero_direccion_contactado }} </td>
+                        <td> {{ contacto.proximo_contacto|date:"d/m/Y h:i:s" }} </td>
+                        {% if contacto.respondido %}
+                            <td> Si, {{ contacto.fecha_respuesta|date:"d/m/Y h:i:s" }} </td>
+                        {% else %}
+                            <td> NO</td>
+                        {% endif %}
+                        <td> {{ contacto.recipiente }} </td>
+                        {% if contacto.tipo_respuesta == None %}
+                            <td></td>
+                        {% else %}
+                            <td> {{ contacto.tipo_respuesta }} </td>
+                        {% endif %}
+
+                    </tr>
+                {% endif %}
+            {% endfor %}
+            <div class="pagination">
+			<span class="step-links">
+				Mostrando {{ lista_paginada.start_index }}-{{ lista_paginada.end_index }} de {{ lista_paginada.paginator.count }} Resultados
+                {% if lista_paginada.has_previous %}
+                    <a href="?page={{ lista_paginada.first_index }}{{ ultima_busqueda }}"> Primera </a>
+                    <a href="?page={{ lista_paginada.previous_page_number }}{{ ultima_busqueda }}"> Anterior</a>
+                {% endif %}
+                P&aacute;gina |{{ lista_paginada.number }}|
+                {% if lista_paginada.has_next %}
+                    <a href="?page={{ lista_paginada.next_page_number }}{{ ultima_busqueda }}"> Siguiente </a>
+                    <a href="?page={{ lista_paginada.end_index }}{{ ultima_busqueda }}"> Ultima </a>
+                {% endif %}
+			</span>
+            </div>
+        </table>
+    </div>
+
+    <div id="footer">
+        <div class="pagination">
+			<span class="step-links"> Mostrando {{ lista_paginada.start_index }}-{{ lista_paginada.end_index }} de {{ lista_paginada.paginator.count }} Resultados
+                {% if lista_paginada.has_previous %}
+                    <a href="?page={{ lista_paginada.first_index }}{{ ultima_busqueda }}"> Primera </a><a href="?page=
+                        {{ lista_paginada.previous_page_number }}{{ ultima_busqueda }}"> Anterior</a> {% endif %}
+                P&aacute;gina |{{ lista_paginada.number }}|
+                {% if lista_paginada.has_next %}
+                    <a href="?page={{ lista_paginada.next_page_number }}{{ ultima_busqueda }}"> Siguiente </a>
+                    <a href="?page={{ lista_paginada.end_index }}{{ ultima_busqueda }}"> Ultima </a> {% endif %} </span>
+        </div>
+        </br>
+        <a href="{% url 'frontend_home' %}" class="boton-verde">Volver al Menú Principal</a>
+    </div>
+{% endblock %}

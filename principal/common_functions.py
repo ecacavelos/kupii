@@ -726,7 +726,7 @@ def obtener_cuotas_a_pagar_full(venta, fecha_pago, resumen_cuotas_a_pagar, maxim
     return lista_cuotas
 
 
-def verificar_permisos(user_id, permiso):
+def verificar_permisos(user_id, permiso_buscado):
     """
     Metodo que comprueba que un usuario determinado tenga permisos sobre esa vista
     @return: True, False
@@ -734,12 +734,21 @@ def verificar_permisos(user_id, permiso):
     """
 
     print("Id_user->" + unicode(user_id))
-    print("Permiso->" + unicode(permiso))
-
-    permi = 'principal.' + permiso
+    print("Permiso->" + unicode(permiso_buscado))
     user = User.objects.get(id=user_id)
-    perm = user.has_perm(permi)
-    if perm:
+    lista_permisos = user.get_all_permissions()
+    tiene_permiso = False
+
+    for permiso in lista_permisos:
+        if user.groups.get().name == "Administradores":
+            tiene_permiso = True
+            break
+        permiso_sin_punto = permiso.split(".")[1]
+        if permiso_sin_punto == permiso_buscado:
+            tiene_permiso = True
+            break
+
+    if tiene_permiso:
         print("El usuario si posee ese permiso")
         ok = True
     else:

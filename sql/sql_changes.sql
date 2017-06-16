@@ -7,10 +7,113 @@
  IMPORTANTE: El que hace el deploy, debe acualizar los estados, de las cabeceras de los querys a EJECUTADO, de las respectivas instacias de BD
  */
 
+
 -- EJEMPLO: ##/##/#### ##:## - Desarrollador - BD: EJECUTADO O NO - BD: EJECUTADO O NO  - BD: EJECUTADO O NO
 /* Breve descripcion de lo que hace el query */
 -- query en cuestion --
 -- agregar siempre despues de este ejemplo el siguiente cambio --
+
+--################################### Hasta acá proximo tag ##########################################################--
+
+-- 09/06/2017 15:00 - Franco Albertini
+-- BASE DE DATOS:        ESTADO:
+-- CBI-DEV:           NO EJECUTADO
+-- GRUPO-MV:          NO EJECUTADO
+-- Propar:            NO EJECUTADO
+
+/* Se crea la tabla motivos contactos y se carga la tabla */
+CREATE TABLE public.motivos_contacto
+(
+    id SERIAL NOT NULL,
+    descripcion character varying(100) COLLATE pg_catalog."default" NOT NULL,
+    CONSTRAINT motivos_contacto_pkey PRIMARY KEY (id)
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE public.motivos_contacto
+    OWNER to propar_db_user;
+
+INSERT INTO public.motivos_contacto (descripcion) VALUES ('Morosidad');
+INSERT INTO public.motivos_contacto (descripcion) VALUES ('Demanda');
+INSERT INTO public.motivos_contacto (descripcion) VALUES ('Oferta de Promocion');
+
+
+/* Se crea la tabla tipo de contacto y se carga la table */
+CREATE TABLE public.tipo_contacto
+(
+    id SERIAL NOT NULL,
+    descripcion character varying(100) COLLATE pg_catalog."default" NOT NULL,
+    CONSTRAINT tipo_contacto_pkey PRIMARY KEY (id)
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE public.tipo_contacto
+    OWNER to propar_db_user;
+
+INSERT INTO public.tipo_contacto (descripcion) VALUES ('Llamada');
+INSERT INTO public.tipo_contacto (descripcion) VALUES ('Mail');
+INSERT INTO public.tipo_contacto (descripcion) VALUES ('Mensaje WhatsApp');
+INSERT INTO public.tipo_contacto (descripcion) VALUES ('Mensaje Texto (SMS)');
+INSERT INTO public.tipo_contacto (descripcion) VALUES ('Reunion Oficina Cliente');
+INSERT INTO public.tipo_contacto (descripcion) VALUES ('Reunion Oficina Propar');
+INSERT INTO public.tipo_contacto (descripcion) VALUES ('Reunion Residencia Cliente');
+
+/* Se crea la tabla contactos */
+CREATE TABLE public.contactos
+(
+    id SERIAL NOT NULL,
+    lote_id integer NOT NULL,
+    cliente_id integer NOT NULL,
+    tipo_contacto_id integer NOT NULL,
+    motivo_contacto_id integer NOT NULL,
+    remitente_usuario_id integer NOT NULL,
+    fecha_contacto timestamp without time zone NOT NULL,
+    numero_direccion_contactado text COLLATE pg_catalog."default" NOT NULL,
+    mensaje_enviado text COLLATE pg_catalog."default" NOT NULL,
+    respondido boolean NOT NULL,
+    fecha_respuesta timestamp without time zone,
+    tipo_respuesta_id integer,
+    mensaje_respuesta text COLLATE pg_catalog."default",
+    proximo_contacto timestamp without time zone,
+    comentarios_gerencia text COLLATE pg_catalog."default",
+  ﻿ recipiente character varying(100) COLLATE pg_catalog."default",
+    CONSTRAINT contactos_pkey PRIMARY KEY (id),
+    CONSTRAINT contactos_clientes_fk FOREIGN KEY (cliente_id)
+        REFERENCES public.principal_cliente (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT contactos_lotes_fk FOREIGN KEY (lote_id)
+        REFERENCES public.principal_lote (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT contactos_motivos_contacto_fk FOREIGN KEY (motivo_contacto_id)
+        REFERENCES public.motivos_contacto (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT contactos_tipos_contacto_fk FOREIGN KEY (tipo_contacto_id)
+        REFERENCES public.tipo_contacto (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT contactos_usuarios_fk FOREIGN KEY (remitente_usuario_id)
+        REFERENCES public.auth_user (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE public.contactos
+    OWNER to propar_db_user;
+
+--################################### Hasta Acá TAG v_0.1.453 ########################################################--
 
 /* Se agrega campos de coordenadas para sucursal */
 ALTER TABLE principal_coordenadasfactura ADD COLUMN sucursal_1x double precision;

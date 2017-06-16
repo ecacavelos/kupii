@@ -82,7 +82,7 @@
 				tipo_busqueda=$("#tipo_busqueda").val();
 				busqueda_label=$("#busqueda_label").val();			
 				busqueda=$("#busqueda").val();
-			$("#busqueda_label").autocomplete("destroy");
+				$("#busqueda_label").autocomplete("destroy");
 				autocompleteLotePorCodigoParalot(tipo_busqueda, busqueda_label, busqueda);
 			}
 			if($("#tipo_busqueda").val() == "nombre"){
@@ -99,7 +99,7 @@
 				tipo_busqueda=$("#tipo_busqueda").val();
 				busqueda_label=$("#busqueda_label").val();			
 				busqueda=$("#busqueda").val();
-			$("#busqueda_label").autocomplete("destroy");
+			    $("#busqueda_label").autocomplete("destroy");
 				autocompleteClientePorNombreOCedula(tipo_busqueda, busqueda_label, busqueda);
 			}
 			if($("#tipo_busqueda").val() == "cedula"){
@@ -116,7 +116,7 @@
 				tipo_busqueda=$("#tipo_busqueda").val();
 				busqueda_label=$("#busqueda_label").val();			
 				busqueda=$("#busqueda").val();
-			$("#busqueda_label").autocomplete("destroy");
+				$("#busqueda_label").autocomplete("destroy");
 				autocompleteClientePorNombreOCedula(tipo_busqueda, busqueda_label, busqueda);
 			}
 			if($("#tipo_busqueda").val() == "nombre_fraccion"){
@@ -133,7 +133,7 @@
 				tipo_busqueda=$("#tipo_busqueda").val();
 				busqueda_label=$("#busqueda_label").val();
 				busqueda=$("#busqueda").val();
-			$("#busqueda_label").autocomplete("destroy");
+				$("#busqueda_label").autocomplete("destroy");
 				autocompleteFraccionPorNombreOId(tipo_busqueda, busqueda_label, busqueda);
 			}
 			if($("#tipo_busqueda").val() == "estado"){
@@ -152,7 +152,7 @@
 				tipo_busqueda=$("#tipo_busqueda").val();
 				busqueda_label=$("#busqueda_label").val();
 				busqueda=$("#busqueda").val();
-			$("#busqueda_label").autocomplete("destroy");
+				$("#busqueda_label").autocomplete("destroy");
 				autocompleteFraccionPorNombre(tipo_busqueda, busqueda_label, busqueda);
 			}
 

@@ -151,6 +151,9 @@ INSTALLED_APPS = (
     'parametros',
     'configuraciones',
     'logos',
+    'tipo_contacto',
+    'motivo_contacto',
+    'contactos',
 )
 
 # A sample logging configuration. The only tangible logging
