@@ -726,14 +726,15 @@ def get_detalles_factura(request):
                 nro_cuota_hasta = request.GET.get('nro_cuota_hasta').split("/")
                 num_desde = int(nro_cuota_desde[0])
                 num_hasta = int(nro_cuota_hasta[0])
-                lote =  Lote.objects.get(codigo_paralot= codigo)
+                lote =  Lote.objects.get(codigo_paralot=codigo)
                 
                 cuotas_pag = ((num_hasta - num_desde) + 1) 
                 cuotas_detalles = get_cuota_information_by_lote(lote.id,cuotas_pag, True)
                 
                 cliente = Cliente.objects.get(pk=cliente_id)
-                venta = Venta.objects.get(lote_id=lote.id, cliente_id=cliente.id, recuperado=False)
-                object_list=get_pago_cuotas(venta, None, None)
+                #venta = Venta.objects.get(lote_id=lote.id, cliente_id=cliente.id, recuperado=False)
+                venta = get_ultima_venta(lote.id)
+                object_list = get_pago_cuotas(venta, None, None)
                 #object_list = sorted(object_list, key=lambda k: k['id']) 
                 gestion_cobranza = []
                 interes_moratorio = 0   
@@ -805,7 +806,7 @@ def get_detalles_factura(request):
             except Exception, error:
                 print error
         else:
-            return HttpResponse(json.dumps(object_list, cls=DjangoJSONEncoder), content_type="application/json")
+            return HttpResponseRedirect(reverse('login'))
 
 def get_pagos_by_ventas(request):
     if request.method == 'GET':
