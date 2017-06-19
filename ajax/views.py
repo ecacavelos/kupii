@@ -732,7 +732,7 @@ def get_detalles_factura(request):
                 cuotas_detalles = get_cuota_information_by_lote(lote.id,cuotas_pag, True)
                 
                 cliente = Cliente.objects.get(pk=cliente_id)
-                venta = Venta.objects.get(lote_id= lote.id, cliente_id=cliente.id)
+                venta = Venta.objects.get(lote_id=lote.id, cliente_id=cliente.id, recuperado=False)
                 object_list=get_pago_cuotas(venta, None, None)
                 #object_list = sorted(object_list, key=lambda k: k['id']) 
                 gestion_cobranza = []
