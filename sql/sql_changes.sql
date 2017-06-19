@@ -117,6 +117,11 @@ TABLESPACE pg_default;
 ALTER TABLE public.contactos
     OWNER to propar_db_user;
 
+/* Se añade el content type para los permisos */
+INSERT INTO public.django_content_type (name, app_label, model) VALUES ('tipo contacto', 'tipo_contacto', 'tipocontacto');
+INSERT INTO public.django_content_type (name, app_label, model) VALUES ('contacto', 'contactos', 'contacto');
+INSERT INTO public.django_content_type (name, app_label, model) VALUES ('motivo contacto', 'motivo_contacto', 'motivocontacto');
+
 --################################### Hasta Acá TAG v_0.1.453 ########################################################--
 
 /* Se agrega campos de coordenadas para sucursal */
