@@ -912,7 +912,7 @@ def facturar(request):
                 num_desde = int(numero_cuota_desde[0])
                 num_hasta = int(numero_cuota_hasta[0])
                 
-                venta = Venta.objects.get(cliente_id= nueva_factura.cliente.id, lote_id= lote_id.id)
+                venta = get_ultima_venta(lote_id)
                 object_list= get_pago_cuotas(venta, None, None)
                 for x in xrange(0,len(object_list)):
                     if num_desde <= int(object_list[x]['nro_cuota']) <= num_hasta:
