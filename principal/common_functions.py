@@ -38,6 +38,8 @@ def get_cuotas_detail_by_lote(lote_id):
 
         # Se trae el monto total pagado de todas las cuotas pagadas sin intereses
         total_pagado_cuotas = PagoDeCuotas.objects.filter(venta=venta).aggregate(Sum('total_de_cuotas'))
+        if total_pagado_cuotas['total_de_cuotas__sum'] is None:
+            total_pagado_cuotas['total_de_cuotas__sum'] = 0
         precio_final_venta = venta.precio_final_de_venta
 
         # calcular la fecha de vencimiento.
