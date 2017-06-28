@@ -2861,6 +2861,7 @@ def eliminar_venta(request):
     else:
         return HttpResponseRedirect("/login")
 
+
 def eliminar_pagodecuotas(request):        
     if request.user.is_authenticated():
         if verificar_permisos(request.user.id, permisos.DELETE_PAGODECUOTAS):           
@@ -2883,4 +2884,22 @@ def eliminar_pagodecuotas(request):
                 return HttpResponse(data,content_type="application/json")
     else:
         return HttpResponseRedirect("/login")
-        
+
+
+def eliminar_recuperacion(request):
+    if request.user.is_authenticated():
+        if verificar_permisos(request.user.id, permisos.DELETE_RECUPERACIONDELOTES):
+            if request.method == 'POST':
+                data = request.POST
+                recuperacion = RecuperacionDeLotes.objects.get(id=int(data.get('id_recuperacion')))
+                try:
+                    recuperacion.delete()
+                    ok = True
+                except Exception, error:
+                    print error
+                    ok = False
+                data = json.dumps({
+                    'ok': ok})
+                return HttpResponse(data,content_type="application/json")
+    else:
+        return HttpResponseRedirect("/login")

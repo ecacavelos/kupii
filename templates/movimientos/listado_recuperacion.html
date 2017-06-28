@@ -129,6 +129,17 @@
 				autocompleteClientePorNombreOCedula(tipo_busqueda, busqueda_label, busqueda);		
 		}
         }
+        function eliminar_recuperacion(recuperacion_id) {
+            $.ajax({
+                url: "{% url 'eliminar_recuperacion' %}",
+                method: "POST",
+                data: { id_recuperacion : recuperacion_id },
+                success: function(result){
+                    alert("La recuperacion fue borrada");
+                    location.reload();
+                }
+            });
+        }
     </script>
 {% endblock %}
 {% block content %}
@@ -185,6 +196,7 @@
             <th>Cliente</th>
             <th>Vendedor</th>
             <th>Venta</th>
+            <th>Acciones</th>
 
             {% for hw in object_list %}
                     <tr>
@@ -208,6 +220,9 @@
                         </td>
                         <td>
                             {{ hw.venta }}
+                        </td>
+                        <td>
+                            <input type="button" value="Eliminar" class="button_verde" onclick="eliminar_recuperacion({{ hw.id }});"/>
                         </td>
 
 
