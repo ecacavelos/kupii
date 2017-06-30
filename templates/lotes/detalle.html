@@ -126,6 +126,16 @@
             //$('#id_precio_costo').prop('disabled', true);
             $('#id_codigo_paralot').prop('disabled', true);
             $("#id_cuota").mask("###.###.###", {reverse: true});
+            if (grupo == 1){
+                $("#id_cuota").on('blur', function () {
+                var precio_credito = $("#id_cuota").cleanVal() * 130
+                $('#id_precio_credito').val(precio_credito);
+                $('#id_precio_credito').mask("###.###.###.###.###", {reverse: true});
+                var precio_contado = precio_credito / 2
+                $('#id_precio_contado').val(precio_contado);
+                $('#id_precio_contado').mask("###.###.###.###.###", {reverse: true});
+            });
+            }
 
 
             $('#id_superficie').val($('#id_superficie').val().replace(".", ","));
@@ -180,16 +190,8 @@
                 $('#id_cuota').prop('readonly', true);
                 $('#id_estado').prop('disabled', true);
 
-                $("#id_cuota").on('blur', function () {
-                    var precio_credito = $("#id_cuota").cleanVal() * 130
-                    $('#id_precio_credito').val(precio_credito);
-                    $('#id_precio_credito').mask("###.###.###.###.###", {reverse: true});
-                    var precio_contado = precio_credito / 2
-                    $('#id_precio_contado').val(precio_contado);
-                    $('#id_precio_contado').mask("###.###.###.###.###", {reverse: true});
-                });
-
             }
+
         });
     </script>
 {% endblock %}
