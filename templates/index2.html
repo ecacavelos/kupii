@@ -350,13 +350,22 @@
                         </td>
                     </tr>
                     <tr>
+                        <td colspan="3"  title="Cliente">
+                            <!--<a href="{% url 'frontend_home' %}lotes/consultar/">Próx Pago de Cuotas</a></td>-->
+                            <a href="{% url 'frontend_home' %}clientes/listado">Clientes</a>
+                        </td>
+                    </tr>
+                    <tr>
                         <td colspan="3"  class="last" title="Pago de Cuotas por Cliente"><a
                                 href="{% url 'frontend_home' %}movimientos/pago_cuotas_cliente/">Pago de Cuotas por
                             Cliente</a></td>
                     </tr>
-                    <td colspan="3"  title="Vision General del Cliente">
-                        <!--<a href="{% url 'frontend_home' %}lotes/consultar/">Próx Pago de Cuotas</a></td>-->
-                        <a href="{% url 'frontend_home' %}movimientos/vision_general_cliente/">Vision General del cliente</a>
+                    <tr>
+                        <td colspan="3"  title="Vision General del Cliente">
+                            <!--<a href="{% url 'frontend_home' %}lotes/consultar/">Próx Pago de Cuotas</a></td>-->
+                            <a href="{% url 'frontend_home' %}movimientos/vision_general_cliente/">Vision General del cliente</a>
+                        </td>
+                    </tr>
                     <tr>
                         <td colspan="3"  class="last" title="Clientes Atrasados">
                             <a href="{% url 'frontend_home' %}informes/clientes_atrasados/">Clientes Atrasados</a>

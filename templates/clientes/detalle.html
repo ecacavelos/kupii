@@ -71,8 +71,8 @@ $(document).ready(function() {
 				<a href="{% url 'frontend_home' %}clientes/listado/ventas/{{ venta.id }}" target="_blank">{{ venta }}</a>
 			{% endfor %}
 		</div>
+        <input class="lote-form-button" type="submit" name="boton_guardar" value="Guardar Cambios" />
 		{%if grupo == 1%}
-			<input class="lote-form-button" type="submit" name="boton_guardar" value="Guardar Cambios" />
 			<input class="lote-form-button" type="submit" name="boton_borrar" value="Borrar este Registro" />
 		{%endif%}
 	</form>
