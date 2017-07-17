@@ -19,6 +19,14 @@
 
 --################################### Hasta Acá TAG v_0.1.454 ########################################################--
 
+-- 17/07/2017 17:00 - Jose Duarte
+-- BASE DE DATOS:        ESTADO:
+-- CBI-DEV:           NO EJECUTADO
+-- GRUPO-MV:          NO EJECUTADO
+-- Propar:            NO  EJECUTADO
+ alter table principal_cliente add column
+email character varying(100);
+
 -- 09/06/2017 15:00 - Franco Albertini
 -- BASE DE DATOS:        ESTADO:
 -- CBI-DEV:           NO EJECUTADO

@@ -30,6 +30,7 @@ class Cliente(models.Model):
     celular_2 = models.CharField(max_length=255, blank=True)
     nombre_conyuge = models.CharField('nombre del conyuge', max_length=255, blank=True)
     deuda_contraida = models.BigIntegerField(blank=True, null=True)
+    email = models.CharField(max_length=60, blank=True, null=True)
 
     def __unicode__(self):
         return unicode(u'%s %s' % (self.nombres, self.apellidos))
