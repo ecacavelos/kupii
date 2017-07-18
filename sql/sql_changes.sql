@@ -19,6 +19,41 @@
 
 --################################### Hasta Acá TAG v_0.1.454 ########################################################--
 
+-- 18/07/2017 14:00 - Jose Duarte
+-- BASE DE DATOS:        ESTADO:
+-- CBI-DEV:           NO EJECUTADO
+-- GRUPO-MV:          NO EJECUTADO
+-- Propar:            NO  EJECUTADO
+
+ --creamos una tabla tipo de mejora
+CREATE TABLE principal_tipomejora
+(
+  id serial NOT NULL,
+  descripcion character varying(60) NOT NULL
+);
+
+ --agregamos una clave primaria
+ALTER TABLE principal_tipomejora ADD PRIMARY KEY(id);
+
+--agregamos el id de mejora dentro de la tabla lote
+ALTER TABLE principal_lote ADD COLUMN mejora_id integer;
+ALTER TABLE principal_lote ALTER COLUMN mejora_id SET NOT NULL;
+--agregamos el constraint dentro de lote para la mejora
+ALTER TABLE principal_lote ADD
+CONSTRAINT principal_lote_mejoras_id_fkey FOREIGN KEY (mejora_id)
+      REFERENCES principal_tipomejora (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE INITIALLY DEFERRED;
+
+--realizamos el insert de los tipos de mejora para los lotes
+insert into principal_tipomejora values (1,'ALAMBRADO');
+insert into principal_tipomejora values (2,'CASA');
+insert into principal_tipomejora values (3,'VALDIO');
+insert into principal_tipomejora values (4,'TINGLADO');
+insert into principal_tipomejora values (5,'EDIFICIO');
+insert into principal_tipomejora values (6,'MOTEL');
+
+
+
 -- 17/07/2017 17:00 - Jose Duarte
 -- BASE DE DATOS:        ESTADO:
 -- CBI-DEV:           NO EJECUTADO

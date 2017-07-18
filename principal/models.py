@@ -300,6 +300,15 @@ class Cobrador(models.Model):
             ('ver_opciones_cobrador', 'Ver opciones de cobradores'),
         )
 
+class TipoMejora(models.Model):
+    '''clase tipo mejora para los lotes'''
+    id = models.IntegerField(primary_key=True)
+    descripcion = models.CharField(max_length=60)
+
+
+    def __unicode__(self):
+        return self.descripcion
+
 
 class Lote(models.Model):
     codigo_paralot = models.CharField(max_length=20, blank=True, null=True)
@@ -313,7 +322,9 @@ class Lote(models.Model):
     cuenta_corriente_catastral = models.CharField(max_length=255, blank=True)
     boleto_nro = models.CharField(max_length=255, blank=True, null=True)
     comentarios = models.CharField(max_length=255, blank=True, null=True)
-    casa_edificada = models.CharField(max_length=255, blank=True, null=True)
+    #casa_edificada = models.CharField(max_length=255, blank=True, null=True)
+
+    mejora = models.ForeignKey(TipoMejora, on_delete=models.PROTECT)
     ESTADO_CHOICES = (
         ("1", "Libre"),
         ("2", "Reservado"),
