@@ -672,14 +672,14 @@ def obtener_cuotas_a_pagar_full(venta, fecha_pago, resumen_cuotas_a_pagar, maxim
 
                         cantidad_cuotas += 1
                         interes_total += interes_item['intereses']
-                        sumatoria_cuotas = sumatoria_cuotas + venta.precio_de_cuota + interes_total
+                        sumatoria_cuotas = sumatoria_cuotas + venta.precio_de_cuota + interes_item['intereses']
                         cuota = {
                             'cantidad_sumatoria_cuotas': cantidad_cuotas,
                             'numero_cuota': interes_item['nro_cuota'],
                             'monto_cuota': venta.precio_de_cuota,
                             'interes': interes_item['intereses'],
                             'interes_total': interes_total,
-                            'monto_total_a_pagar': venta.precio_de_cuota + interes_total,
+                            'monto_total_a_pagar': venta.precio_de_cuota + interes_item['intereses'],
                             'vencimiento': interes_item['vencimiento'],
                             'fecha_pago': fecha_pago.strftime("%d/%m/%Y"),
                             'monto_sumatoria_cuotas': sumatoria_cuotas

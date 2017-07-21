@@ -411,6 +411,7 @@ class Transaccion(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     id_transaccion_externa = models.IntegerField()
     updated = models.DateTimeField()
+    lote = models.ForeignKey(Lote, on_delete=models.PROTECT, null=True)
 
 
 class Timbrado(models.Model):

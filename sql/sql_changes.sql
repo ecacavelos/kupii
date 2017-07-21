@@ -15,7 +15,7 @@
 
 --################################### Hasta acá proximo tag ##########################################################--
 
-
+ALTER TABLE principal_transaccion ADD COLUMN lote_id integer;
 
 --################################### Hasta Acá TAG v_0.1.454 ########################################################--
 
@@ -59,7 +59,7 @@ insert into principal_tipomejora values (6,'MOTEL');
 -- CBI-DEV:           NO EJECUTADO
 -- GRUPO-MV:          NO EJECUTADO
 -- Propar:            NO  EJECUTADO
- alter table principal_cliente add column
+ALTER TABLE principal_cliente ADD COLUMN
 email character varying(100);
 
 -- 09/06/2017 15:00 - Franco Albertini
