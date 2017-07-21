@@ -14,7 +14,11 @@
 -- agregar siempre despues de este ejemplo el siguiente cambio --
 
 --################################### Hasta acá proximo tag ##########################################################--
-
+-- 21/07/2017 15:00 - Franco Albertini
+-- BASE DE DATOS:        ESTADO:
+-- CBI-DEV:           NO EJECUTADO
+-- GRUPO-MV:          NO EJECUTADO
+-- Propar:            EJECUTADO
 ALTER TABLE principal_transaccion ADD COLUMN lote_id integer;
 
 --################################### Hasta Acá TAG v_0.1.454 ########################################################--
@@ -23,7 +27,7 @@ ALTER TABLE principal_transaccion ADD COLUMN lote_id integer;
 -- BASE DE DATOS:        ESTADO:
 -- CBI-DEV:           NO EJECUTADO
 -- GRUPO-MV:          NO EJECUTADO
--- Propar:            NO  EJECUTADO
+-- Propar:            EJECUTADO
 
  --creamos una tabla tipo de mejora
 CREATE TABLE principal_tipomejora
@@ -37,7 +41,6 @@ ALTER TABLE principal_tipomejora ADD PRIMARY KEY(id);
 
 --agregamos el id de mejora dentro de la tabla lote
 ALTER TABLE principal_lote ADD COLUMN mejora_id integer;
-ALTER TABLE principal_lote ALTER COLUMN mejora_id SET NOT NULL;
 --agregamos el constraint dentro de lote para la mejora
 ALTER TABLE principal_lote ADD
 CONSTRAINT principal_lote_mejoras_id_fkey FOREIGN KEY (mejora_id)
@@ -58,7 +61,7 @@ insert into principal_tipomejora values (6,'MOTEL');
 -- BASE DE DATOS:        ESTADO:
 -- CBI-DEV:           NO EJECUTADO
 -- GRUPO-MV:          NO EJECUTADO
--- Propar:            NO  EJECUTADO
+-- Propar:            EJECUTADO
 ALTER TABLE principal_cliente ADD COLUMN
 email character varying(100);
 

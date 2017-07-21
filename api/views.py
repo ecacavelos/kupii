@@ -809,6 +809,7 @@ def aqui_pagos_consulta(request):
                         respuesta['codRetorno'] = '000'
                         respuesta['desRetorno'] = 'Aprobado'
                         respuesta['razonSocial'] = unicode(cliente)
+                        respuesta['idOperacion'] = transaccion.id
 
                         # mas abajo se loggea
                         for venta in ventas_list:
@@ -992,9 +993,10 @@ def aqui_pagos_pago(request):
                                     nuevo_pago.plan_de_pago = venta.plan_de_pago
                                     nuevo_pago.plan_de_pago_vendedores = venta.plan_de_pago_vendedor
                                     nuevo_pago.vendedor = venta.vendedor
-                                    nuevo_pago.total_de_cuotas = venta.precio_de_cuota
-                                    nuevo_pago.total_de_pago = int(importe)
-                                    nuevo_pago.total_de_mora = int(importe) - venta.precio_de_cuota
+                                    nuevo_pago.total_de_cuotas = venta.precio_de_cuota * int(cant_cuotas)
+                                    # por los 2 ultimos ceros que representan decimales en su manera de mandar los importes se divide entre 100 para sacarlos
+                                    nuevo_pago.total_de_pago = int(importe)/100
+                                    nuevo_pago.total_de_mora = int(importe)/100 - (venta.precio_de_cuota * int(cant_cuotas))
                                     nuevo_pago.detalle = lista_detalles_json
                                     nuevo_pago.save()
 
