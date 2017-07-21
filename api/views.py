@@ -754,6 +754,7 @@ def aqui_pagos_consulta(request):
     cod_servicio = ''
     try:
         data = json.loads(request.body)
+
         cod_servicio = data.get('codServicio')
         tipo_trx = data.get('tipoTrx')
         username = data.get('usuario')
@@ -809,7 +810,6 @@ def aqui_pagos_consulta(request):
                         respuesta['codRetorno'] = '000'
                         respuesta['desRetorno'] = 'Aprobado'
                         respuesta['razonSocial'] = unicode(cliente)
-                        respuesta['idOperacion'] = transaccion.id
 
                         # mas abajo se loggea
                         for venta in ventas_list:
