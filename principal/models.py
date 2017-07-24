@@ -324,7 +324,7 @@ class Lote(models.Model):
     comentarios = models.CharField(max_length=255, blank=True, null=True)
     #casa_edificada = models.CharField(max_length=255, blank=True, null=True)
 
-    mejora = models.ForeignKey(TipoMejora, on_delete=models.PROTECT)
+    mejora = models.ForeignKey(TipoMejora, on_delete=models.PROTECT, blank=True, null= True)
     ESTADO_CHOICES = (
         ("1", "Libre"),
         ("2", "Reservado"),
