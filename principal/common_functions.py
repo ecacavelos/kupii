@@ -279,6 +279,20 @@ def filtros_establecidos(request, tipo_informe):
             logging.error('Failed.', exc_info=e)
             print('Parametros no seteados')
             return 0
+    elif tipo_informe == 'proximos_vencimientos':
+        try:
+            if request['fraccion'] == '':
+                return 0
+            else:
+                fecha_ini = request['fecha_ini']
+                fecha_fin = request['fecha_fin']
+                tipo_b = request['tipo_busqueda']
+                print("Filtros: " + "fecha_ini = " + fecha_ini + " fecha_fin = " + fecha_fin + " tipo_busqueda = " + tipo_b)
+                return 1
+        except Exception as e:
+            logging.error('Failed.', exc_info=e)
+            print('Parametros no seteados')
+            return 2
     elif tipo_informe == 'lotes_libres':
         try:
             sucursal = request['sucursal']

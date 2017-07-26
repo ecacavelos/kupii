@@ -176,6 +176,29 @@ table.listado-clientes-atrasados tr th {
 	color:#FFF
 }
 
+table.listado-proximos-vencimientos{
+	border: 5px solid #CCC;
+	margin-bottom:15px;
+	margin-left:auto;
+    margin-right:auto;
+}
+table.listado-proximos-vencimientos tr td {
+	padding:2.9px;
+	font-size:14px;
+	text-align:center;
+	border-bottom:thin solid #CCC
+}
+
+table.listado-proximos-vencimientos tr th {
+	padding: 7px 7px 7px 7px;
+	font-size:14px;
+	font-weight:400;
+	text-align:center;
+	background-color:#02B06B;
+	color:#FFF
+}
+
+
 table.listado-pagos {
 	border: 5px solid #CCC;
 	margin-bottom:15px;
