@@ -656,6 +656,8 @@ def obtener_clientes_atrasados(filtros, fraccion, meses_peticion):
 
             cliente_atrasado['lote'] = ultima_venta.lote.codigo_paralot
 
+            cliente_atrasado['codigo_lote'] = ultima_venta.lote.id
+
             # IMPORTE CUOTA
             cliente_atrasado['importe_cuota'] = unicode('{:,}'.format(ultima_venta.precio_de_cuota)).replace(",", ".")
 
@@ -8471,6 +8473,7 @@ def informe_facturacion_reporte_excel(request):
                         return response
                     except Exception, error:
                         print error
+
 
 
 def get_ultima_venta_no_recuperada_by_lote(lote_id):

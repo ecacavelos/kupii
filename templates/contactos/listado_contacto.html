@@ -163,7 +163,7 @@
             <th>Respondido</th>
             <th>Recipiente</th>
             <th>Tipo Respuesta</th>
-
+            {% if lista_paginada %}
             {% for contacto in lista_paginada %}
                 {% if forloop.counter|divisibleby:2 %}
                     <tr>
@@ -217,6 +217,9 @@
                     </tr>
                 {% endif %}
             {% endfor %}
+            {% else %}
+            <h2 align="center">No hay registros de la búsqueda</h2>
+            {% endif %}
             <div class="pagination">
 			<span class="step-links">
 				Mostrando {{ lista_paginada.start_index }}-{{ lista_paginada.end_index }} de {{ lista_paginada.paginator.count }} Resultados

@@ -8,6 +8,54 @@ from django.core.urlresolvers import reverse
 from principal.common_functions import *
 from principal import permisos
 
+#metodo para consultar el listado pero como filtro el codigo de lote
+#utilizado en clientes atrasados.
+def detalle_lote(request, codigo_lote):
+    if request.user.is_authenticated():
+        if verificar_permisos(request.user.id, permisos.VER_LISTADO_CONTACTOS):
+            # Si el usuario tiene permiso
+            t = loader.get_template('contactos/listado_contacto.html')
+
+            ultima_busqueda = "&lote_id=" + codigo_lote
+
+            if codigo_lote == '':
+                # obtenemos todos los contactos en ordenados por fecha descendente
+                contactos = Contacto.objects.all().order_by('-fecha_contacto')
+            else:
+                # obtenemos los contactos por filtros ordenados por fecha descendente
+                filtros = {}
+
+                if codigo_lote != '':
+                    filtros['lote_id'] = codigo_lote
+
+                #obtenemos los contactos segun los filtros ordenados por fecha de contacto de forma descendente
+                contactos = Contacto.objects.filter(**filtros).order_by('-fecha_contacto')
+
+            paginator = Paginator(contactos, 15)
+            page = request.GET.get('page')
+            try:
+                lista_paginada = paginator.page(page)
+            except PageNotAnInteger:
+                lista_paginada = paginator.page(1)
+            except EmptyPage:
+                lista_paginada = paginator.page(paginator.num_pages)
+
+            c = RequestContext(request, {
+                'lista_paginada': lista_paginada,
+                'lote_id': codigo_lote,
+                'ultima_busqueda': ultima_busqueda,
+                'usuario': request.user,
+                'tipo_usuario': request.user.groups.get().name,
+            })
+            return HttpResponse(t.render(c))
+
+        else:
+            # si no tiene permisos se le redirige al home
+            return HttpResponseRedirect(reverse('frontend_home'))
+    else:
+        # si no está logueado se le redirige al login
+        return HttpResponseRedirect(reverse('login'))
+
 
 # Método para consultar el listado de Contactos.
 def listado_contactos(request):

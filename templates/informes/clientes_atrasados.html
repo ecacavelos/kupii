@@ -176,7 +176,9 @@
 			{% endif %}
 			
 			</td>
-			<td>{{hw.lote}}</td>
+
+            <td><a href="{% url 'frontend_cliente_atrasado_lote' hw.codigo_lote %}"> {{ hw.lote }}
+                            (Ver Detalles) </a></td>
 			<td>{{hw.cuotas_atrasadas}}</td>
 			<td>{{hw.cuotas_pagadas}}</td>
 			<td>{{hw.importe_cuota}}</td>
@@ -232,7 +234,8 @@
 			
 			</td>
 
-			<td>{{hw.lote}}</td>
+			<td><a href="{% url 'frontend_cliente_atrasado_lote' hw.codigo_lote %}"> {{ hw.lote }}
+                            (Ver Detalles) </a></td>
 			<td>{{hw.cuotas_atrasadas}}</td>
 			<td>{{hw.cuotas_pagadas}}</td>
 			<td>{{hw.importe_cuota}}</td>

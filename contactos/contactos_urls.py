@@ -5,4 +5,5 @@ urlpatterns = patterns('contactos.contactos_views',
                        url(r'^listado/$', 'listado_contactos', name='frontend_listado_contactos'),
                        url(r'^listado/(?P<contacto_id>\d+)/$', 'detalle_contacto', name='frontend_detalle_contacto'),
                        url(r'^agregar/$', 'agregar_contacto'),
+                       url(r'^listado_lote/(?P<codigo_lote>\d+)/$', 'detalle_lote', name='frontend_cliente_atrasado_lote'),
                        )
