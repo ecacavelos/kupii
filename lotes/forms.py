@@ -13,6 +13,7 @@ class LoteForm(ModelForm):
         labels = {
             'precio_costo': ('Costo'),
             'codigo_paralot': ('Codigo'),
+            'demanda': ('Demanda'),
         }
         widgets = {
                  'nro_lote': TextInput,

@@ -56,7 +56,14 @@
                         <td class="noimage">{{ field }}{{ field.errors }}</td>
                     </tr>
                 {% endfor %}
-
+                <tr>
+                    <td><strong>Demanda:</strong></td>
+                    <td class="noimage"><b>{{ lote_demanda }}</b></td>
+                </tr>
+                <tr>
+                    <td><strong>Mejora:</strong></td>
+                    <td class="noimage"><b>{{ lote_mejora }}</b></td>
+                </tr>
 
             </table>
             <input id="agregar_contacto" name="boton_guardar" type="submit" value="Guardar Cambios"

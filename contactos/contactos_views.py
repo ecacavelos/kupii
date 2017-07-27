@@ -252,6 +252,16 @@ def detalle_contacto(request, contacto_id):
             message = ''
             message_id = "message"
 
+            if contacto.lote.demanda != None:
+                lote_demanda = contacto.lote.demanda
+            else:
+                lote_demanda = "NO"
+
+            if contacto.lote.mejora != None:
+                lote_mejora = contacto.lote.mejora.descripcion
+            else:
+                lote_mejora = " "
+
             if request.method == 'POST':
                 # Se envía una peticion por post
                 data = request.POST
@@ -294,6 +304,8 @@ def detalle_contacto(request, contacto_id):
             tipo_usuario = request.user.groups.get().name
             c = RequestContext(request, {
                 'form': form,
+                'lote_demanda': lote_demanda,
+                'lote_mejora': lote_mejora,
                 'message_id': message_id,
                 'message': message,
                 'id_usuario': request.user.id,

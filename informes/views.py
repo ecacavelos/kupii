@@ -658,6 +658,16 @@ def obtener_clientes_atrasados(filtros, fraccion, meses_peticion):
 
             cliente_atrasado['codigo_lote'] = ultima_venta.lote.id
 
+            if ultima_venta.lote.mejora != None:
+                cliente_atrasado['lote_mejora'] = ultima_venta.lote.mejora.descripcion
+            else:
+               cliente_atrasado['lote_mejora'] = "NO"
+
+            if ultima_venta.lote.demanda != None:
+                cliente_atrasado['lote_demanda'] = ultima_venta.lote.demanda
+            else:
+                cliente_atrasado['lote_demanda'] = "NO"
+
             # IMPORTE CUOTA
             cliente_atrasado['importe_cuota'] = unicode('{:,}'.format(ultima_venta.precio_de_cuota)).replace(",", ".")
 

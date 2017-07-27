@@ -132,6 +132,7 @@
 		<th>Cliente</th><th>Telefono</th><th>Celular</th><th>Direccion</th><th>Cod. Lote</th><th>Cuotas Atras.</th>
 		<th>Cuotas Pag.</th><th>Importe Cuota</th><th>Total Atras.</th><th>Total Pag.</th>
 		<th>%Pag</th><th>Fec. Ultimo. Pago</th><th>Interes</th><th>Gestion Cobr</th>
+        <th>Mejora</th><th>Demanda</th>
 		{% for hw in object_list %}
 			{% if forloop.counter|divisibleby:2 %}
 		<tr>
@@ -188,6 +189,8 @@
 			<td>{{hw.fecha_ultimo_pago}}</td>
 			<td>{{hw.intereses}}</td>
 			<td>{{hw.gestion_cobranza}}</td>
+            <td>{{ hw.lote_mejora }}</td>
+            <td>{{ hw.lote_demanda }}</td>
 		</tr>
 			{% else %}
 		<tr class="bkg_gris">
@@ -245,6 +248,8 @@
 			<td>{{hw.fecha_ultimo_pago}}</td>
 			<td>{{hw.intereses}}</td>
 			<td>{{hw.gestion_cobranza}}</td>
+            <td>{{ hw.lote_mejora }}</td>
+            <td>{{ hw.lote_demanda }}</td>
 		</tr>
 		{% endif %}
 		{% endfor %}

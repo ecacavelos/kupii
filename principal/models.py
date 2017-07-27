@@ -325,12 +325,17 @@ class Lote(models.Model):
     #casa_edificada = models.CharField(max_length=255, blank=True, null=True)
 
     mejora = models.ForeignKey(TipoMejora, on_delete=models.PROTECT, blank=True, null= True)
+    DEMANDA_CHOICES = (
+        ("NO", "NO"),
+        ("SI", "SI"),
+    )
     ESTADO_CHOICES = (
         ("1", "Libre"),
         ("2", "Reservado"),
         ("3", "Vendido"),
         ("4", "Recuperado"),
     )
+    demanda = models.CharField(max_length=2, choices=DEMANDA_CHOICES, default='NO')
     estado = models.CharField(max_length=1, choices=ESTADO_CHOICES)
 
     def __unicode__(self):
