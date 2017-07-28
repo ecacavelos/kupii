@@ -442,15 +442,15 @@ def get_cuotas_a_pagar_by_cliente_id(request):
                             cuotas_atrasadas = 1
 
                     cantidad_cuotas = cuotas_atrasadas
-
-                    if cantidad_cuotas < 1:
-                        cantidad_cuotas = 1
+                    cant_cuotas = cuotas_atrasadas
+                    if cant_cuotas < 1:
+                        cant_cuotas = 1
 
                     if cuotas_atrasadas < 0 or cuotas_atrasadas == 0:
                         cuotas_atrasadas = 0
                     venta['cuotas_atrasadas'] = cuotas_atrasadas
-                    venta['cantidad_cuotas'] = cantidad_cuotas
-                    venta['cuotas'] = get_mes_pagado_by_id_lote_cant_cuotas(venta_cliente.lote_id, cantidad_cuotas)
+                    venta['cantidad_cuotas'] = cant_cuotas
+                    venta['cuotas'] = get_mes_pagado_by_id_lote_cant_cuotas(venta_cliente.lote_id, cant_cuotas)
 
                     if len(venta['cuotas']) > 0:
                         detalles = calculo_interes(venta_cliente.lote_id, '', venta['cuotas'][0]['fecha'],
@@ -519,7 +519,7 @@ def get_cuotas_a_pagar_by_cliente_id(request):
                     'total_pago_cuotas': total_pago_cuotas,
                     'total_pago_intereses': total_pago_intereses,
                     'total_pago': total_pago,
-                    'cant_cuotas': cantidad_cuotas,
+                    'cant_cuotas': cant_cuotas,
                 })
                 return HttpResponse(t.render(c))
             except Exception, error:

@@ -13,6 +13,8 @@
 -- query en cuestion --
 -- agregar siempre despues de este ejemplo el siguiente cambio --
 
+ALTER TABLE principal_lote ADD COLUMN demanda character varying(2);
+
 --################################### Hasta acá proximo tag ##########################################################--
 -- 21/07/2017 15:00 - Franco Albertini
 -- BASE DE DATOS:        ESTADO:
