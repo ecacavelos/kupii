@@ -482,81 +482,85 @@ def obtener_clientes_con_lotes_por_vencer(fraccion, fecha_inicio, fecha_fin):
             except Exception, e:
                 print e
 
-        #obtenemos del proximo vencimiento
-        venc = datetime.datetime.strptime(detalle_cuotas['proximo_vencimiento'], formato_fecha)
+            #obtenemos del proximo vencimiento
+            venc = datetime.datetime.strptime(detalle_cuotas['proximo_vencimiento'], formato_fecha)
 
-        #hacemos la comparacion para saber si la proxima fecha de vencimiento
-        #se encuentra en el rango
-        if ( (fecha_inicial)<=(venc)):
-            if( (venc) <= (fecha_final)):
+            #hacemos la comparacion para saber si la proxima fecha de vencimiento
+            #se encuentra en el rango
+            if ( (fecha_inicial)<=(venc)):
+                if( (venc) <= (fecha_final)):
 
-                # cuotas_atrasadas = detalle_cuotas['cantidad_total_cuotas'] - detalle_cuotas['cant_cuotas_pagadas'];  # CUOTAS ATRASADAS
-                if len(cuotas_a_pagar) > 1:
-                    cuotas_atrasadas = len(cuotas_a_pagar) - 1
-                else:
-                    cuotas_atrasadas = len(cuotas_a_pagar)
+                    # cuotas_atrasadas = detalle_cuotas['cantidad_total_cuotas'] - detalle_cuotas['cant_cuotas_pagadas'];  # CUOTAS ATRASADAS
+                    if len(cuotas_a_pagar) > 1:
+                        cuotas_atrasadas = len(cuotas_a_pagar) - 1
+                    else:
+                        cuotas_atrasadas = len(cuotas_a_pagar)
 
-                cantidad_cuotas_pagadas = detalle_cuotas['cant_cuotas_pagadas'];  # CUOTAS PAGADAS
+                    cantidad_cuotas_pagadas = detalle_cuotas['cant_cuotas_pagadas'];  # CUOTAS PAGADAS
 
-                # DATOS DEL CLIENTE
-                cliente_atrasado['cliente'] = ultima_venta.cliente.nombres + ' ' + ultima_venta.cliente.apellidos
-                cliente_atrasado['direccion_particular'] = ultima_venta.cliente.direccion_particular
-                cliente_atrasado['direccion_cobro'] = ultima_venta.cliente.direccion_cobro
-                cliente_atrasado['telefono_particular'] = ultima_venta.cliente.telefono_particular
-                cliente_atrasado['telefono_laboral'] = ultima_venta.cliente.telefono_laboral
-                cliente_atrasado['celular_1'] = ultima_venta.cliente.celular_1
-                cliente_atrasado['celular_2'] = ultima_venta.cliente.celular_2
+                    # DATOS DEL CLIENTE
+                    cliente_atrasado['cliente'] = ultima_venta.cliente.nombres + ' ' + ultima_venta.cliente.apellidos
+                    cliente_atrasado['direccion_particular'] = ultima_venta.cliente.direccion_particular
+                    cliente_atrasado['direccion_cobro'] = ultima_venta.cliente.direccion_cobro
+                    cliente_atrasado['telefono_particular'] = ultima_venta.cliente.telefono_particular
+                    cliente_atrasado['telefono_laboral'] = ultima_venta.cliente.telefono_laboral
+                    cliente_atrasado['celular_1'] = ultima_venta.cliente.celular_1
+                    cliente_atrasado['celular_2'] = ultima_venta.cliente.celular_2
 
-                # FECHA ULTIMO PAGO
-                if (len(PagoDeCuotas.objects.filter(venta_id=ultima_venta.id).order_by('-fecha_de_pago')) > 0):
-                        fecha_ultimo_pago = \
-                        PagoDeCuotas.objects.filter(venta_id=ultima_venta.id).order_by('-fecha_de_pago')[0].fecha_de_pago
+                    # FECHA ULTIMO PAGO
+                    if (len(PagoDeCuotas.objects.filter(venta_id=ultima_venta.id).order_by('-fecha_de_pago')) > 0):
+                            fecha_ultimo_pago = \
+                            PagoDeCuotas.objects.filter(venta_id=ultima_venta.id).order_by('-fecha_de_pago')[0].fecha_de_pago
 
-                        cliente_atrasado['fecha_ultimo_pago'] = fecha_ultimo_pago.strftime(formato_fecha)
-                else:
-                    cliente_atrasado['fecha_ultimo_pago'] = 'Dato no disponible'
+                            cliente_atrasado['fecha_ultimo_pago'] = fecha_ultimo_pago.strftime(formato_fecha)
+                    else:
+                        cliente_atrasado['fecha_ultimo_pago'] = 'Dato no disponible'
 
-                cliente_atrasado['proximo_vencimiento'] = detalle_cuotas['proximo_vencimiento']
+                    cliente_atrasado['proximo_vencimiento'] = detalle_cuotas['proximo_vencimiento']
 
-                cliente_atrasado['lote'] = ultima_venta.lote.codigo_paralot
+                    cliente_atrasado['lote'] = ultima_venta.lote.codigo_paralot
 
-                # IMPORTE CUOTA
-                cliente_atrasado['importe_cuota'] = unicode('{:,}'.format(ultima_venta.precio_de_cuota)).replace(",", ".")
+                    # IMPORTE CUOTA
+                    cliente_atrasado['importe_cuota'] = unicode('{:,}'.format(ultima_venta.precio_de_cuota)).replace(",", ".")
 
-                # CUOTAS ATRASADAS
-                cliente_atrasado['cuotas_atrasadas'] = unicode('{:,}'.format(cuotas_atrasadas)).replace(",", ".")
+                    # CUOTAS ATRASADAS
+                    cliente_atrasado['cuotas_atrasadas'] = unicode('{:,}'.format(cuotas_atrasadas)).replace(",", ".")
 
-                # TOTAL ATRASO
-                total_atrasado = cuotas_atrasadas * ultima_venta.precio_de_cuota;
-                cliente_atrasado['total_atrasado'] = unicode('{:,}'.format(total_atrasado)).replace(",", ".")
+                    # TOTAL ATRASO
+                    total_atrasado = cuotas_atrasadas * ultima_venta.precio_de_cuota;
+                    cliente_atrasado['total_atrasado'] = unicode('{:,}'.format(total_atrasado)).replace(",", ".")
 
-                # CUOTAS PAGADAS
-                cuotas_pagadas = unicode('{:,}'.format(cantidad_cuotas_pagadas)).replace(",", ".") + '/' + unicode(
-                    '{:,}'.format(detalle_cuotas['cantidad_total_cuotas'])).replace(",", ".")
-                cliente_atrasado['cuotas_pagadas'] = cuotas_pagadas
+                    # CUOTAS PAGADAS
+                    cuotas_pagadas = unicode('{:,}'.format(cantidad_cuotas_pagadas)).replace(",", ".") + '/' + unicode(
+                        '{:,}'.format(detalle_cuotas['cantidad_total_cuotas'])).replace(",", ".")
+                    cliente_atrasado['cuotas_pagadas'] = cuotas_pagadas
 
-                # TOTAL PAGADO
-                total_pagado = cantidad_cuotas_pagadas * ultima_venta.precio_de_cuota;
-                cliente_atrasado['total_pagado'] = unicode('{:,}'.format(total_pagado)).replace(",", ".")
+                    # TOTAL PAGADO
+                    total_pagado = cantidad_cuotas_pagadas * ultima_venta.precio_de_cuota;
+                    cliente_atrasado['total_pagado'] = unicode('{:,}'.format(total_pagado)).replace(",", ".")
 
-                porcentaje_pagado = round(
-                    (float(cantidad_cuotas_pagadas) / float(detalle_cuotas['cantidad_total_cuotas'])) * 100);
-                cliente_atrasado['porc_pagado'] = unicode('{:,}'.format(int(porcentaje_pagado))).replace(",", ".") + '%'
+                    if(detalle_cuotas['cantidad_total_cuotas'] == 0):
+                        porcentaje_pagado = 0
+                    else:
+                        porcentaje_pagado = round(
+                            (float(cantidad_cuotas_pagadas) / float(detalle_cuotas['cantidad_total_cuotas'])) * 100);
 
-                proximo_vencimiento_parsed = datetime.datetime.strptime(detalle_cuotas['proximo_vencimiento'],
-                                                                        "%d/%m/%Y").date()
-                detalles = obtener_detalle_interes_lote(unicode(ultima_venta.lote_id), hoy, proximo_vencimiento_parsed,
-                                                        cuotas_atrasadas)
-                total_interes = 0
-                total_cobranza = 0
-                for detalle in detalles:
-                    if 'intereses' in detalle:
-                        total_interes += detalle['intereses']
-                    if 'gestion_cobranza' in detalle:
-                        total_cobranza = detalle['gestion_cobranza']
-                cliente_atrasado['intereses'] = unicode('{:,}'.format(total_interes)).replace(",", ".")
-                cliente_atrasado['gestion_cobranza'] = unicode('{:,}'.format(total_cobranza)).replace(",", ".")
-                listado_clientes.append(cliente_atrasado)
+                    cliente_atrasado['porc_pagado'] = unicode('{:,}'.format(int(porcentaje_pagado))).replace(",", ".") + '%'
+
+                    proximo_vencimiento_parsed = datetime.datetime.strptime(detalle_cuotas['proximo_vencimiento'],
+                                                                            "%d/%m/%Y").date()
+                    detalles = obtener_detalle_interes_lote(unicode(ultima_venta.lote_id), hoy, proximo_vencimiento_parsed,
+                                                            cuotas_atrasadas)
+                    total_interes = 0
+                    total_cobranza = 0
+                    for detalle in detalles:
+                        if 'intereses' in detalle:
+                            total_interes += detalle['intereses']
+                        if 'gestion_cobranza' in detalle:
+                            total_cobranza = detalle['gestion_cobranza']
+                    cliente_atrasado['intereses'] = unicode('{:,}'.format(total_interes)).replace(",", ".")
+                    cliente_atrasado['gestion_cobranza'] = unicode('{:,}'.format(total_cobranza)).replace(",", ".")
+                    listado_clientes.append(cliente_atrasado)
 
     return listado_clientes
 
@@ -4333,6 +4337,8 @@ def clientes_atrasados_reporte_excel(request):
                 sheet.write(1, 9, "Total Pag.", style)
                 sheet.write(1, 10, "% Pag.", style)
                 sheet.write(1, 11, "Fec Ult.Pago.", style)
+                sheet.write(1,12,"Mejora", style)
+                sheet.write(1,13,"Demanda",style)
 
                 # Ancho de la columna Nombre
                 col_nombre = sheet.col(0)
@@ -4381,6 +4387,14 @@ def clientes_atrasados_reporte_excel(request):
                 # Ancho de la columna Fecha
                 col_fecha = sheet.col(11)
                 col_fecha.width = 256 * 20  # 12 characters wide
+
+                # Ancho de la columna  Mejora
+                col_mejora = sheet.col(12)
+                col_mejora.width = 256 * 14  # 5 characters wide
+
+                # Ancho de la columna Demanda
+                col_demanda = sheet.col(13)
+                col_demanda.width = 256 * 10  # 5 characters wide
 
                 i = 0
                 c = 2
@@ -4432,6 +4446,8 @@ def clientes_atrasados_reporte_excel(request):
                         sheet.write(c, 11, unicode(fecha_str), style4)
                     else:
                         sheet.write(c, 11, unicode('Dato no disponible'), style4)
+                    sheet.write(c, 12, unicode(clientes_atrasados[i]['lote_mejora']), style4)
+                    sheet.write(c, 13, unicode(clientes_atrasados[i]['lote_demanda']), style4)
                     c += 1
 
             response = HttpResponse(content_type='application/vnd.ms-excel')

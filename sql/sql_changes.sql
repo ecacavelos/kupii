@@ -13,6 +13,16 @@
 -- query en cuestion --
 -- agregar siempre despues de este ejemplo el siguiente cambio --
 
+--################################### Hasta acá proximo tag ##########################################################--
+-- 31/07/2017 15:00 - Jose Duarte
+-- BASE DE DATOS:        ESTADO:
+-- CBI-DEV:           NO EJECUTADO
+-- GRUPO-MV:          NO EJECUTADO
+-- Propar:            EJECUTADO
+
+--actualizacion de la descripcion de tipo de mejora
+update table principal_tipomejora set descripcion = 'BALDIO' WHERE id = 3;
+--agreggamos demanda a los lotes
 ALTER TABLE principal_lote ADD COLUMN demanda character varying(2);
 
 --################################### Hasta acá proximo tag ##########################################################--
