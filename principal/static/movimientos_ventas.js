@@ -504,7 +504,14 @@ function calculateMontoCuotas() {
 	entrega_inicial = parseInt(entrega_inicial);
 	precio_venta = parseInt(precio_venta);
 	var monto_ref = parseInt(res_refuerzo) * parseInt(cantidad_cuotas_ref);
+
 	var cuotas_restantes = cantidad_cuotas - cantidad_cuotas_ref
+
+	if (cuotas_restantes == 0) {
+		//para el caso de los planes de pago con una sola cuotas
+		cuotas_restantes = 1
+	}
+
 	console.log("precio_credito: " + precio_credito);
 	console.log("entrega_inicial: " + entrega_inicial);
 	console.log("cantidad_credito: " + cantidad_cuotas);
