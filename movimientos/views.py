@@ -103,6 +103,10 @@ def ventas_de_lotes(request):
                         sumatoria_cuotas = nueva_venta.entrega_inicial + (cant_cuotas * nueva_venta.precio_de_cuota)
                     else:
                         cant_cuotas = nueva_venta.plan_de_pago.cantidad_de_cuotas - nueva_venta.plan_de_pago.cuotas_de_refuerzo
+
+                        #para el caso de planes de pagos con una sola cuota
+                        if cant_cuotas == 0:
+                            cant_cuotas = 1
                         sumatoria_cuotas = nueva_venta.entrega_inicial + (cant_cuotas * nueva_venta.precio_de_cuota) + (nueva_venta.plan_de_pago.cuotas_de_refuerzo * nueva_venta.monto_cuota_refuerzo)
                 else:
                     sumatoria_cuotas = nueva_venta.precio_final_de_venta
@@ -177,6 +181,11 @@ def ventas_de_lotes_calcular_cuotas(request):
                     response_data['monto_total'] = int(entrega_inicial) + (datos_plan.cantidad_de_cuotas * int(monto_cuota))
                 else:
                     cantidad_cuotas_sin_ref = datos_plan.cantidad_de_cuotas - datos_plan.cuotas_de_refuerzo
+
+                    #este caso especial es cuando el plan de pago tiene una sola cuota
+                    #por lo tanto se setea a uno
+                    if cantidad_cuotas_sin_ref == 0 :
+                        cantidad_cuotas_sin_ref = 1
                     response_data['monto_total'] = int(entrega_inicial) + (cantidad_cuotas_sin_ref * int(monto_cuota)) + (datos_plan.cuotas_de_refuerzo * int(monto_refuerzo))
             else:
                 response_data['monto_total'] = int(precio_venta_actual)
