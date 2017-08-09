@@ -7,6 +7,7 @@ from operator import itemgetter
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
 from datetime import datetime, timedelta, date
+from datetime import datetime, timedelta, date
 from django.core.urlresolvers import reverse, resolve
 from calendar import monthrange
 from principal.common_functions import get_nro_cuota
@@ -2368,6 +2369,9 @@ def liquidacion_vendedores(request):
                     fecha_fin = request.GET['fecha_fin']
                     fecha_ini_parsed = datetime.datetime.strptime(fecha_ini, "%d/%m/%Y").date()
                     fecha_fin_parsed = datetime.datetime.strptime(fecha_fin, "%d/%m/%Y").date()
+
+                    fecha_final = fecha_fin_parsed+timedelta(days=1)
+                    #fecha_finalizacion = datetime.datetime.strptime(un_dia_mas, "%d/%m/%Y").date()
                     busqueda_label = request.GET['busqueda_label']
                     vendedor_id = request.GET['busqueda']
                     print("vendedor_id ->" + vendedor_id)
@@ -2381,7 +2385,7 @@ def liquidacion_vendedores(request):
                         ventas_id.append(venta.id)
 
                     pagos_de_cuotas_ventas = PagoDeCuotas.objects.filter(venta__in=ventas_id, fecha_de_pago__range=(
-                        fecha_ini_parsed, fecha_fin_parsed)).order_by('fecha_de_pago').prefetch_related('venta',
+                        fecha_ini_parsed, fecha_final)).order_by('fecha_de_pago').prefetch_related('venta',
                                                                                                         'venta__plan_de_pago_vendedor',
                                                                                                         'venta__lote__manzana__fraccion')
                     cant_cuotas_pagadas_ventas = PagoDeCuotas.objects.filter(venta__in=ventas_id,
@@ -2834,9 +2838,11 @@ def liquidacion_general_vendedores(request):
 
                     for venta in ventas:
                         ventas_id.append(venta.id)
+                    #aumentamos en uno la fecha de final para consultar con el rango de fecha seleccionado incluido
+                    fecha_final = fecha_fin_parsed + timedelta(days=1)
 
                     pagos_de_cuotas_ventas = PagoDeCuotas.objects.filter(venta__in=ventas_id, fecha_de_pago__range=(
-                        fecha_ini_parsed, fecha_fin_parsed)).order_by('fecha_de_pago').prefetch_related('venta',
+                        fecha_ini_parsed, fecha_final)).order_by('fecha_de_pago').prefetch_related('venta',
                                                                                                         'venta__plan_de_pago_vendedor',
                                                                                                         'venta__lote__manzana__fraccion')
 
@@ -5256,8 +5262,11 @@ def liquidacion_vendedores_reporte_excel(request):
     for venta in ventas:
         ventas_id.append(venta.id)
 
+    #actualizamos a un dia mas para que busque tambien las que se encuentran en esa fecha de fin seleccionada
+    fecha_final = fecha_fin_parsed + timedelta(days=1)
+
     pagos_de_cuotas_ventas = PagoDeCuotas.objects.filter(venta__in=ventas_id, fecha_de_pago__range=(
-        fecha_ini_parsed, fecha_fin_parsed)).order_by('fecha_de_pago').prefetch_related('venta',
+        fecha_ini_parsed, fecha_final)).order_by('fecha_de_pago').prefetch_related('venta',
                                                                                         'venta__plan_de_pago_vendedor',
                                                                                         'venta__lote__manzana__fraccion')
     cant_cuotas_pagadas_ventas = PagoDeCuotas.objects.filter(venta__in=ventas_id,
@@ -5809,8 +5818,10 @@ def liquidacion_general_vendedores_reporte_excel(request):
     #fecha_ini_parsed_with_time = datetime.datetime.strptime(fecha_ini_str_with_time, "%d/%m/%Y %H:%M:%S").strftime("%Y-%m-%d %H:%M:%S")
     #fecha_fin_parsed_with_time = datetime.datetime.strptime(fecha_fin_str_with_time, "%d/%m/%Y %H:%M:%S").strftime("%Y-%m-%d %H:%M:%S")
 
+    fecha_final = fecha_fin_parsed + timedelta(days=1)
+
     pagos_de_cuotas_ventas = PagoDeCuotas.objects.filter(venta__in=ventas_id, fecha_de_pago__range=(
-        fecha_ini_parsed, fecha_fin_parsed)).order_by('fecha_de_pago').prefetch_related('venta',
+        fecha_ini_parsed, fecha_final)).order_by('fecha_de_pago').prefetch_related('venta',
                                                                                         'venta__plan_de_pago_vendedor',
                                                                                         'venta__lote__manzana__fraccion')
     cant_cuotas_pagadas_ventas = PagoDeCuotas.objects.filter(venta__in=ventas_id,
