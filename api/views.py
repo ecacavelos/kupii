@@ -837,11 +837,11 @@ def aqui_pagos_consulta(request):
                                     'idOperacion': transaccion.id,
                                     'concepto': 'Pago de Cuota Nro. ' + unicode(cuota['numero_cuota']) + '/' + cuota_detalle[0]['nro_cuota'].split('/')[1] + ' del lote ' + venta.lote.codigo_paralot,
                                     'fechaVencimiento': cuota['vencimiento'],
-                                    'interes': cuota['interes'],
-                                    'montoCuota': cuota['monto_cuota'],
+                                    'interes': (unicode(cuota['interes']) + '00').zfill(15),
+                                    'montoCuota': (unicode(cuota['monto_cuota']) + '00').zfill(15),
                                     'sumatoriaCantidadCuotas': cuota['cantidad_sumatoria_cuotas'],
-                                    'sumatoriaTotalAPagar': cuota['monto_sumatoria_cuotas'],
-                                    'importe': (unicode(cuota['monto_sumatoria_cuotas']) + '00').zfill(17)
+                                    'sumatoriaTotalAPagar': (unicode(cuota['monto_sumatoria_cuotas']) + '00').zfill(15),
+                                    'importe': (unicode(cuota['monto_sumatoria_cuotas']) + '00').zfill(15)
                                 }
 
                                 detalles.append(detalle)
